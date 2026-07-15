@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Bisa Media</title>
+  <style>
+    :root {
+      --bm-primary: #696cff;
+      --bm-primary-dark: #575be8;
+      --bm-bg: #f5f5f9;
+      --bm-card: #ffffff;
+      --bm-text: #566a7f;
+      --bm-heading: #384551;
+      --bm-muted: #a1acb8;
+      --bm-border: #d9dee3;
+      --bm-danger: #ff3e1d;
+      --bm-success: #71dd37;
+      --bm-shadow: 0 0.125rem 0.375rem rgba(67, 89, 113, 0.12);
+      --bm-radius: 0.75rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(105, 108, 255, 0.16), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(3, 195, 236, 0.13), transparent 30%),
+        var(--bm-bg);
+      color: var(--bm-text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-page {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      color: var(--bm-heading);
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: var(--bm-shadow);
+    }
+
+    .brand-fallback {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--bm-primary), #03c3ec);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: var(--bm-shadow);
+    }
+
+    .login-card {
+      background: var(--bm-card);
+      border-radius: var(--bm-radius);
+      box-shadow: var(--bm-shadow);
+      padding: 28px;
+      border: 1px solid rgba(67, 89, 113, 0.08);
+    }
+
+    .login-card h1 {
+      margin: 0 0 8px;
+      color: var(--bm-heading);
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .login-card p {
+      margin: 0 0 24px;
+      color: var(--bm-text);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--bm-heading);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .form-control-wrap {
+      position: relative;
+    }
+
+    .form-control {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--bm-border);
+      border-radius: 0.5rem;
+      color: var(--bm-heading);
+      background: #fff;
+      font-size: 15px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--bm-primary);
+      box-shadow: 0 0 0 0.2rem rgba(105, 108, 255, 0.15);
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--bm-danger);
+    }
+
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: var(--bm-muted);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 6px;
+    }
+
+    .password-toggle:hover {
+      color: var(--bm-primary);
+    }
+
+    .helper-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 2px 0 22px;
+      font-size: 14px;
+    }
+
+    .check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      color: var(--bm-text);
+    }
+
+    .check-label input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--bm-primary);
+    }
+
+    .forgot-link {
+      color: var(--bm-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-login {
+      width: 100%;
+      border: 0;
+      border-radius: 0.5rem;
+      background: var(--bm-primary);
+      color: #fff;
+      min-height: 42px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 0.125rem 0.25rem rgba(105, 108, 255, 0.36);
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn-login:hover {
+      background: var(--bm-primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 0.25rem 0.5rem rgba(105, 108, 255, 0.32);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .alert {
+      display: none;
+      padding: 10px 12px;
+      border-radius: 0.5rem;
+      margin-bottom: 18px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .alert.is-show {
+      display: block;
+    }
+
+    .alert-danger {
+      color: #b42318;
+      background: rgba(255, 62, 29, 0.1);
+      border: 1px solid rgba(255, 62, 29, 0.18);
+    }
+
+    .alert-success {
+      color: #2b7a0b;
+      background: rgba(113, 221, 55, 0.12);
+      border: 1px solid rgba(113, 221, 55, 0.24);
+    }
+
+    .demo-info {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 0.5rem;
+      background: rgba(105, 108, 255, 0.08);
+      color: var(--bm-text);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .demo-info strong {
+      color: var(--bm-heading);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--bm-muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+        align-items: flex-start;
+      }
+
+      .login-page {
+        margin-top: 26px;
+      }
+
+      .login-card {
+        padding: 22px;
+      }
+
+      .helper-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="login-page">
+    <div class="brand" aria-label="Bisa Media">
+      <img src="media/logo.png" alt="Logo Bisa Media" onerror="this.style.display='none';document.querySelector('.brand-fallback').style.display='flex';" />
+      <span class="brand-fallback">BM</span>
+      <span>Bisa Media</span>
+    </div>
+
+    <section class="login-card">
+      <h1>Selamat Datang</h1>
+      <p>Silakan masuk untuk membuka dashboard siBisaHadir.</p>
+
+      <div id="loginAlert" class="alert" role="alert"></div>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="username">Email / Username</label>
+          <input class="form-control" id="username" name="username" type="text" autocomplete="username" placeholder="Masukkan email atau username" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <div class="form-control-wrap">
+            <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" placeholder="Masukkan password" />
+            <button class="password-toggle" id="togglePassword" type="button">Lihat</button>
+          </div>
+        </div>
+
+        <div class="helper-row">
+          <label class="check-label">
+            <input id="rememberMe" type="checkbox" />
+            <span>Ingat saya</span>
+          </label>
+          <a class="forgot-link" href="javascript:void(0);" id="forgotPassword">Lupa password?</a>
+        </div>
+
+        <button class="btn-login" id="loginButton" type="submit">Masuk</button>
+      </form>
+
+      <div class="demo-info">
+        <strong>Akun demo:</strong><br />
+        Username: <strong>admin</strong> / <strong>admin@bisamedia.id</strong><br />
+        Password: <strong>123456</strong>
+      </div>
+    </section>
+
+    <div class="footer-note">© <span id="yearNow"></span> Bisa Media</div>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var form = document.getElementById('loginForm');
+      var username = document.getElementById('username');
+      var password = document.getElementById('password');
+      var rememberMe = document.getElementById('rememberMe');
+      var loginButton = document.getElementById('loginButton');
+      var alertBox = document.getElementById('loginAlert');
+      var togglePassword = document.getElementById('togglePassword');
+      var forgotPassword = document.getElementById('forgotPassword');
+      var yearNow = document.getElementById('yearNow');
+      var AUTH_KEY = 'bmLoginDemoAuth';
+      var USER_KEY = 'bmLoginDemoUser';
+      var REDIRECT_PAGE = 'BM_dashboard.html';
+
+      if (yearNow) yearNow.textContent = String(new Date().getFullYear());
+
+      var savedUser = localStorage.getItem(USER_KEY) || '';
+      if (savedUser) {
+        username.value = savedUser;
+        rememberMe.checked = true;
+      }
+
+      function showAlert(message, type) {
+        alertBox.textContent = message;
+        alertBox.className = 'alert is-show ' + (type === 'success' ? 'alert-success' : 'alert-danger');
+      }
+
+      function clearAlert() {
+        alertBox.textContent = '';
+        alertBox.className = 'alert';
+      }
+
+      function setInvalid(input, invalid) {
+        if (!input) return;
+        input.classList.toggle('is-invalid', !!invalid);
+      }
+
+      function isValidDemoAccount(user, pass) {
+        var normalizedUser = String(user || '').trim().toLowerCase();
+        var normalizedPass = String(pass || '').trim();
+
+        var allowedUsers = ['admin', 'owner', 'bm', 'admin@bisamedia.id'];
+        return allowedUsers.indexOf(normalizedUser) !== -1 && normalizedPass === '123456';
+      }
+
+      username.addEventListener('input', function () {
+        setInvalid(username, false);
+        clearAlert();
+      });
+
+      password.addEventListener('input', function () {
+        setInvalid(password, false);
+        clearAlert();
+      });
+
+      togglePassword.addEventListener('click', function () {
+        var show = password.type === 'password';
+        password.type = show ? 'text' : 'password';
+        togglePassword.textContent = show ? 'Sembunyi' : 'Lihat';
+      });
+
+      forgotPassword.addEventListener('click', function () {
+        showAlert('Untuk demo statis, gunakan akun demo yang tersedia di bawah form.', 'danger');
+      });
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        clearAlert();
+
+        var userValue = username.value.trim();
+        var passValue = password.value.trim();
+        var hasError = false;
+
+        if (!userValue) {
+          setInvalid(username, true);
+          hasError = true;
+        }
+
+        if (!passValue) {
+          setInvalid(password, true);
+          hasError = true;
+        }
+
+        if (hasError) {
+          showAlert('Email/username dan password wajib diisi.', 'danger');
+          return;
+        }
+
+        if (!isValidDemoAccount(userValue, passValue)) {
+          setInvalid(username, true);
+          setInvalid(password, true);
+          showAlert('Login gagal. Gunakan akun demo yang tersedia.', 'danger');
+          return;
+        }
+
+        if (rememberMe.checked) {
+          localStorage.setItem(USER_KEY, userValue);
+        } else {
+          localStorage.removeItem(USER_KEY);
+        }
+
+        localStorage.setItem(AUTH_KEY, '1');
+        loginButton.disabled = true;
+        loginButton.textContent = 'Memproses...';
+        showAlert('Login berhasil. Mengalihkan ke dashboard...', 'success');
+
+        window.setTimeout(function () {
+          window.location.href = REDIRECT_PAGE;
+        }, 650);
+      });
+    })();
+  </script>
+</body>
+</html>

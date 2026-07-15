@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Date Range Picker Popup</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --hover:#f3f4f6;
+      --primary:#14b8a6;
+      --shadow: 0 10px 30px rgba(0,0,0,.18);
+      --radius: 12px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    body{
+      margin:0;
+      font-family: var(--font);
+      color:var(--text);
+      background:#f7f7f8;
+      padding:24px;
+    }
+
+    /* DEMO INPUT */
+    .demo-row{
+      max-width: 820px;
+      margin: 0 auto;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .demo-row input{
+      flex:1;
+      height:42px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:0 12px;
+      background:#fff;
+      outline:none;
+    }
+    .demo-row button{
+      height:42px;
+      padding:0 14px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+    }
+    .demo-row button:hover{ background: var(--hover); }
+
+    /* ===== POPUP OVERLAY ===== */
+    .drp-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(17,24,39,.40);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      z-index:9999;
+    }
+    .drp-overlay[data-open="1"]{ display:flex; }
+
+    /* ===== PANEL PICKER (MODAL) ===== */
+    .drp{
+      width: min(860px, 96vw);           /* perkecil: 860px */
+      max-height: min(560px, 86vh);      /* popup tidak kebesaran */
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .drp__header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      flex: 0 0 auto;
+    }
+    .drp__title{
+      font-weight:700;
+      font-size:13px;
+    }
+
+    .drp__right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .drp__compare{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+      user-select:none;
+    }
+
+    /* Close (X) */
+    .close-btn{
+      width:34px;height:34px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      font-size:16px;
+      line-height:1;
+    }
+    .close-btn:hover{ background: var(--hover); }
+
+    /* Toggle switch */
+    .switch{
+      position:relative;
+      width:42px;
+      height:22px;
+      background:#e5e7eb;
+      border-radius:999px;
+      cursor:pointer;
+      transition:.2s;
+    }
+    .switch::after{
+      content:"";
+      position:absolute;
+      top:3px; left:3px;
+      width:16px; height:16px;
+      background:#fff;
+      border-radius:999px;
+      box-shadow:0 2px 8px rgba(0,0,0,.15);
+      transition:.2s;
+    }
+    .switch[data-on="1"]{ background: rgba(20,184,166,.35); }
+    .switch[data-on="1"]::after{ left:23px; background: var(--primary); }
+
+    .drp__body{
+      display:flex;
+      min-height: 0; /* penting biar scroll modal jalan */
+      flex: 1 1 auto;
+    }
+
+    /* Sidebar preset */
+    .presets{
+      width: 190px;                 /* lebih kecil */
+      border-right:1px solid var(--line);
+      padding:10px 8px;
+      background:#fafafa;
+      overflow:auto;
+    }
+    .preset{
+      display:flex;
+      align-items:center;
+      height:36px;
+      padding:0 10px;
+      border-radius:10px;
+      cursor:pointer;
+      font-size:12px;
+      color:#111827;
+      user-select:none;
+    }
+    .preset:hover{ background: var(--hover); }
+    .preset[data-active="1"]{
+      background: rgba(20,184,166,.12);
+      color:#0f766e;
+      font-weight:700;
+    }
+
+    /* Calendar area */
+    .cal-area{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      padding:10px 12px 0 12px;
+      gap:10px;
+      overflow:auto; /* konten kanan bisa scroll jika layar kecil */
+      min-width: 0;
+    }
+
+    .range-info{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding:2px 2px 0 2px;
+      font-size:12px;
+      color:var(--muted);
+    }
+    .range-info strong{ color:var(--text); font-weight:700; }
+
+    .compare-info{
+      display:none;
+      margin-top:2px;
+      font-size:11px;
+      color:var(--muted);
+    }
+    .compare-info[data-show="1"]{ display:block; }
+
+    .cal-wrap{
+      display:flex;
+      gap:12px;
+      padding:0 2px 10px 2px;
+      min-width: 0;
+    }
+
+    .cal{
+      flex:1;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      padding:10px;
+      background:#fff;
+      min-width: 0;
+    }
+
+    .cal__top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 2px 8px 2px;
+      font-size:12px;
+      font-weight:800;
+      color:#111827;
+    }
+    .nav{ display:flex; gap:8px; align-items:center; }
+    .icon-btn{
+      width:28px; height:28px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      color:#111827;
+      user-select:none;
+    }
+    .icon-btn:hover{ background:var(--hover); }
+
+    .dow, .grid{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:6px;
+    }
+    .dow{
+      padding:6px 0 8px 0;
+      font-size:10.5px;
+      color:var(--muted);
+      text-transform:capitalize;
+    }
+    .dow div{ text-align:center; }
+
+    .day{
+      height:32px;                 /* sedikit lebih kecil */
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      color:#111827;
+    }
+    .day:hover{ background: var(--hover); }
+
+    .day[data-muted="1"]{
+      color:#9ca3af;
+      cursor:default;
+    }
+    .day[data-muted="1"]:hover{ background: transparent; }
+
+    .day[data-in-range="1"]{ background: rgba(20,184,166,.18); }
+    .day[data-start="1"], .day[data-end="1"]{
+      background: var(--primary);
+      color:#fff;
+      font-weight:800;
+    }
+
+    .day[data-compare="1"]{
+      outline: 2px dashed rgba(59,130,246,.55);
+      outline-offset: -2px;
+    }
+
+    .drp__footer{
+      border-top:1px solid var(--line);
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:#fff;
+      flex: 0 0 auto;
+    }
+    .tz{
+      font-size:11px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 55%;
+    }
+
+    .actions{ display:flex; gap:10px; align-items:center; }
+    .btn{
+      height:36px;
+      padding:0 14px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      cursor:pointer;
+      background:#fff;
+      font-weight:700;
+      font-size:12px;
+    }
+    .btn:hover{ background: var(--hover); }
+
+    .btn-primary{
+      background: var(--primary);
+      border-color: var(--primary);
+      color:#fff;
+    }
+    .btn-primary:hover{ filter:brightness(.98); background: var(--primary); }
+
+    .btn-danger{
+      border-color: rgba(239,68,68,.35);
+      color: #ef4444;
+    }
+
+    @media (max-width: 860px){
+      .cal-wrap{ flex-direction:column; }
+      .tz{ max-width: 45%; }
+    }
+    @media (max-width: 640px){
+      .drp{ max-height: 90vh; }
+      .drp__body{ flex-direction:column; }
+      .presets{ width:auto; border-right:none; border-bottom:1px solid var(--line); }
+      .tz{ max-width: 42%; }
+    }
+
+
+    /* ===== EMBED MODE untuk halaman BM_* ===== */
+    body[data-embed="1"]{
+      background: transparent;
+      padding:0;
+      overflow:hidden;
+    }
+    body[data-embed="1"] .demo-row{ display:none; }
+    body[data-embed="1"] .drp-overlay{
+      position:static;
+      inset:auto;
+      display:flex;
+      min-height:100vh;
+      background: transparent;
+      padding:0;
+    }
+    body[data-embed="1"] .drp-overlay[data-open="0"]{ display:flex; }
+    body[data-embed="1"] .drp{
+      width:100%;
+      height:100vh;
+      max-height:100vh;
+      border-radius:0;
+      border:0;
+      box-shadow:none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-row">
+    <input id="rangeInput" placeholder="Klik untuk pilih tanggal…" readonly />
+    <button id="openBtn" type="button">Pilih Tanggal</button>
+  </div>
+
+  <!-- OVERLAY POPUP -->
+  <div class="drp-overlay" id="drpOverlay" data-open="0" aria-hidden="true">
+    <div class="drp" role="dialog" aria-modal="true" aria-label="Date range picker">
+      <div class="drp__header">
+        <div class="drp__title">Tentukan rentang waktu data</div>
+
+        <div class="drp__right">
+          <div class="drp__compare">
+            <span>Bandingkan tanggal</span>
+            <div class="switch" id="compareSwitch" data-on="0" role="switch" aria-checked="false" tabindex="0"></div>
+          </div>
+          <button class="close-btn" id="closeBtn" type="button" aria-label="Tutup">×</button>
+        </div>
+      </div>
+
+      <div class="drp__body">
+        <div class="presets" id="presets"></div>
+
+        <div class="cal-area">
+          <div class="range-info">
+            <div>
+              <span>Rentang:</span>
+              <strong id="rangeLabel">—</strong>
+              <div class="compare-info" id="compareLabel" data-show="0">Pembanding: —</div>
+            </div>
+            <div style="font-size:11px;color:var(--muted);">
+              Klik 1x = mulai, klik 2x = akhir
+            </div>
+          </div>
+
+          <div class="cal-wrap">
+            <div class="cal">
+              <div class="cal__top">
+                <div class="nav">
+                  <button class="icon-btn" id="prevBtn" type="button" aria-label="Bulan sebelumnya">&#x2039;</button>
+                </div>
+                <div id="monthLabelA">—</div>
+                <div style="width:28px;"></div>
+              </div>
+              <div class="dow" id="dowA"></div>
+              <div class="grid" id="gridA"></div>
+            </div>
+
+            <div class="cal">
+              <div class="cal__top">
+                <div style="width:28px;"></div>
+                <div id="monthLabelB">—</div>
+                <div class="nav">
+                  <button class="icon-btn" id="nextBtn" type="button" aria-label="Bulan berikutnya">&#x203A;</button>
+                </div>
+              </div>
+              <div class="dow" id="dowB"></div>
+              <div class="grid" id="gridB"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="drp__footer">
+        <div class="tz">UTC+07:00 (Waktu Indonesia Barat)</div>
+        <div class="actions">
+          <button class="btn btn-danger" id="cancelBtn" type="button">Batalkan</button>
+          <button class="btn btn-primary" id="applyBtn" type="button">Terapkan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const __params = new URLSearchParams(window.location.search || '');
+  const __embedMode = __params.get('embed') === '1' || __params.get('host') === '1';
+  if (__embedMode) document.body.setAttribute('data-embed', '1');
+
+  // ====== Util tanggal ======
+  const MONTHS_ID = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  const DOW_ID = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"]; // start Monday
+
+  function pad2(n){ return String(n).padStart(2,"0"); }
+  function startOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function addDays(d, days){ const x=new Date(d); x.setDate(x.getDate()+days); return x; }
+  function addMonths(d, months){ return new Date(d.getFullYear(), d.getMonth()+months, 1); }
+  function sameDay(a,b){ return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function isBetween(d, start, end){
+    if(!start || !end) return false;
+    const t = startOfDay(d).getTime();
+    return t > startOfDay(start).getTime() && t < startOfDay(end).getTime();
+  }
+  function fmtHuman(d){
+    if(!d) return "—";
+    return `${pad2(d.getDate())} ${MONTHS_ID[d.getMonth()]} ${d.getFullYear()}`;
+  }
+  function fmtISO(d){
+    if(!d) return "";
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  }
+  function parseISO(s){
+    const m = String(s || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!m) return null;
+    return new Date(Number(m[1]), Number(m[2])-1, Number(m[3]));
+  }
+  function monIndex(jsDay){ return (jsDay + 6) % 7; } // Monday=0
+
+  function getMonthMatrix(year, month){
+    const first = new Date(year, month, 1);
+    const firstIdx = monIndex(first.getDay());
+    const daysInMonth = new Date(year, month+1, 0).getDate();
+
+    const cells = [];
+    for(let i=0;i<firstIdx;i++) cells.push({ date:null, muted:true });
+    for(let d=1; d<=daysInMonth; d++) cells.push({ date:new Date(year, month, d), muted:false });
+    while(cells.length < 42) cells.push({ date:null, muted:true });
+    return cells;
+  }
+
+  // ====== State ======
+  const today = startOfDay(new Date());
+  let baseMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  let startDate = null;
+  let endDate = null;
+  let compareOn = false;
+
+  let applied = { start:null, end:null, compare:false };
+
+  // ====== Preset ======
+  const presetItems = [
+    { key:"all", label:"Sepanjang masa", getRange:()=>({start:null,end:null}) },
+    { key:"today", label:"Hari ini", getRange:()=>({start:today,end:today}) },
+    { key:"yesterday", label:"Kemarin", getRange:()=>({start:addDays(today,-1), end:addDays(today,-1)}) },
+    { key:"last7", label:"7 hari terakhir", getRange:()=>({start:addDays(today,-6), end:today}) },
+    { key:"last14", label:"14 hari terakhir", getRange:()=>({start:addDays(today,-13), end:today}) },
+    { key:"last30", label:"30 hari terakhir", getRange:()=>({start:addDays(today,-29), end:today}) },
+    { key:"thisWeek", label:"Minggu ini", getRange:()=>{
+      const idx = monIndex(today.getDay());
+      const s = addDays(today, -idx);
+      const e = addDays(s, 6);
+      return {start:s, end:e};
+    }},
+    { key:"lastWeek", label:"Minggu lalu", getRange:()=>{
+      const idx = monIndex(today.getDay());
+      const thisWeekStart = addDays(today, -idx);
+      const s = addDays(thisWeekStart, -7);
+      const e = addDays(s, 6);
+      return {start:s, end:e};
+    }},
+    { key:"thisMonth", label:"Bulan ini", getRange:()=>{
+      const s = new Date(today.getFullYear(), today.getMonth(), 1);
+      const e = new Date(today.getFullYear(), today.getMonth()+1, 0);
+      return {start:s, end:e};
+    }},
+    { key:"lastMonth", label:"Bulan lalu", getRange:()=>{
+      const s = new Date(today.getFullYear(), today.getMonth()-1, 1);
+      const e = new Date(today.getFullYear(), today.getMonth(), 0);
+      return {start:s, end:e};
+    }},
+  ];
+
+  // ====== DOM ======
+  const overlay = document.getElementById("drpOverlay");
+  const presetsEl = document.getElementById("presets");
+  const rangeLabel = document.getElementById("rangeLabel");
+  const compareLabel = document.getElementById("compareLabel");
+
+  const monthLabelA = document.getElementById("monthLabelA");
+  const monthLabelB = document.getElementById("monthLabelB");
+  const gridA = document.getElementById("gridA");
+  const gridB = document.getElementById("gridB");
+  const dowA = document.getElementById("dowA");
+  const dowB = document.getElementById("dowB");
+
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const applyBtn = document.getElementById("applyBtn");
+
+  const compareSwitch = document.getElementById("compareSwitch");
+  const closeBtn = document.getElementById("closeBtn");
+
+  const openBtn = document.getElementById("openBtn");
+  const rangeInput = document.getElementById("rangeInput");
+
+  // ====== Popup open/close ======
+  function openPopup(){
+    overlay.dataset.open = "1";
+    overlay.setAttribute("aria-hidden","false");
+  }
+  function closePopup(){
+    if(__embedMode){
+      window.parent?.postMessage({ type:'ceo:popup-close' }, '*');
+      return;
+    }
+    overlay.dataset.open = "0";
+    overlay.setAttribute("aria-hidden","true");
+  }
+
+  // klik di luar (overlay) untuk close
+  overlay.addEventListener("click", (e)=>{
+    if(e.target === overlay) closePopup();
+  });
+
+  // ESC untuk close
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape" && overlay.dataset.open === "1") closePopup();
+  });
+
+  openBtn?.addEventListener("click", openPopup);
+  closeBtn?.addEventListener("click", closePopup);
+  rangeInput?.addEventListener("click", openPopup);
+
+  // ====== Render helpers ======
+  function renderDow(el){
+    el.innerHTML = "";
+    DOW_ID.forEach(d=>{
+      const x = document.createElement("div");
+      x.textContent = d;
+      el.appendChild(x);
+    });
+  }
+
+  function monthTitle(d){ return `${MONTHS_ID[d.getMonth()]} ${d.getFullYear()}`; }
+
+  function ensureBaseMonthFromSelection(){
+    if(startDate) baseMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  }
+
+  function getCompareRange(){
+    if(!compareOn || !startDate || !endDate) return null;
+    const s = startOfDay(startDate);
+    const e = startOfDay(endDate);
+    const lenDays = Math.round((e - s) / (1000*60*60*24)) + 1; // inclusive
+    const compareEnd = addDays(s, -1);
+    const compareStart = addDays(compareEnd, -(lenDays-1));
+    return { start: compareStart, end: compareEnd };
+  }
+
+  function updateLabels(){
+    if(!startDate && !endDate){
+      rangeLabel.textContent = "—";
+    }else if(startDate && !endDate){
+      rangeLabel.textContent = `${fmtHuman(startDate)} —`;
+    }else{
+      rangeLabel.textContent = `${fmtHuman(startDate)} - ${fmtHuman(endDate)}`;
+    }
+
+    const cr = getCompareRange();
+    if(cr){
+      compareLabel.dataset.show = "1";
+      compareLabel.textContent = `Pembanding: ${fmtHuman(cr.start)} - ${fmtHuman(cr.end)}`;
+    }else{
+      compareLabel.dataset.show = "0";
+      compareLabel.textContent = "Pembanding: —";
+    }
+  }
+
+  function renderMonth(gridEl, monthDate){
+    const y = monthDate.getFullYear();
+    const m = monthDate.getMonth();
+    const cells = getMonthMatrix(y,m);
+    gridEl.innerHTML = "";
+
+    const cr = getCompareRange();
+
+    cells.forEach((c)=>{
+      const btn = document.createElement("div");
+      btn.className = "day";
+
+      if(c.muted){
+        btn.dataset.muted = "1";
+        btn.textContent = "";
+        gridEl.appendChild(btn);
+        return;
+      }
+
+      const d = c.date;
+      btn.textContent = d.getDate();
+
+      if(startDate && sameDay(d, startDate)) btn.dataset.start = "1";
+      if(endDate && sameDay(d, endDate)) btn.dataset.end = "1";
+      if(isBetween(d, startDate, endDate)) btn.dataset.inRange = "1";
+
+      if(cr && (sameDay(d, cr.start) || sameDay(d, cr.end) || isBetween(d, cr.start, cr.end))){
+        btn.dataset.compare = "1";
+      }
+
+      btn.addEventListener("click", ()=> onPickDate(d));
+      gridEl.appendChild(btn);
+    });
+  }
+
+  function render(){
+    renderDow(dowA); renderDow(dowB);
+
+    const leftMonth = new Date(baseMonth.getFullYear(), baseMonth.getMonth(), 1);
+    const rightMonth = addMonths(leftMonth, 1);
+
+    monthLabelA.textContent = monthTitle(leftMonth);
+    monthLabelB.textContent = monthTitle(rightMonth);
+
+    renderMonth(gridA, leftMonth);
+    renderMonth(gridB, rightMonth);
+
+    updateLabels();
+  }
+
+  // ====== Interactions ======
+  function clearActivePresets(){
+    [...presetsEl.querySelectorAll(".preset")].forEach(p=>p.dataset.active="0");
+  }
+
+  function setRange(s,e){
+    startDate = s ? startOfDay(s) : null;
+    endDate = e ? startOfDay(e) : null;
+    if(startDate && endDate && endDate < startDate){
+      const tmp = startDate; startDate = endDate; endDate = tmp;
+    }
+    ensureBaseMonthFromSelection();
+    render();
+  }
+
+  function onPickDate(d){
+    clearActivePresets();
+    if(!startDate || (startDate && endDate)){
+      startDate = startOfDay(d);
+      endDate = null;
+      render();
+      return;
+    }
+    endDate = startOfDay(d);
+    if(endDate < startDate){
+      const tmp = startDate; startDate = endDate; endDate = tmp;
+    }
+    render();
+  }
+
+  function buildPresets(){
+    presetsEl.innerHTML = "";
+    presetItems.forEach(item=>{
+      const row = document.createElement("div");
+      row.className = "preset";
+      row.textContent = item.label;
+      row.dataset.active = "0";
+      row.addEventListener("click", ()=>{
+        clearActivePresets();
+        row.dataset.active = "1";
+        const r = item.getRange();
+        setRange(r.start, r.end);
+      });
+      presetsEl.appendChild(row);
+    });
+  }
+
+  prevBtn.addEventListener("click", ()=>{ baseMonth = addMonths(baseMonth, -1); render(); });
+  nextBtn.addEventListener("click", ()=>{ baseMonth = addMonths(baseMonth, 1); render(); });
+
+  function toggleCompare(next){
+    compareOn = next;
+    compareSwitch.dataset.on = compareOn ? "1" : "0";
+    compareSwitch.setAttribute("aria-checked", compareOn ? "true" : "false");
+    render();
+  }
+  compareSwitch.addEventListener("click", ()=> toggleCompare(!compareOn));
+  compareSwitch.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter" || e.key === " "){
+      e.preventDefault();
+      toggleCompare(!compareOn);
+    }
+  });
+
+  cancelBtn.addEventListener("click", ()=>{
+    compareOn = applied.compare;
+    compareSwitch.dataset.on = compareOn ? "1":"0";
+    compareSwitch.setAttribute("aria-checked", compareOn ? "true":"false");
+    setRange(applied.start, applied.end);
+    closePopup();
+  });
+
+  applyBtn.addEventListener("click", ()=>{
+    applied = { start: startDate, end: endDate, compare: compareOn };
+
+    if(__embedMode){
+      window.parent?.postMessage({
+        type:'ceo:rekap-range-apply',
+        start: fmtISO(startDate),
+        end: fmtISO(endDate),
+        compare: !!compareOn,
+      }, '*');
+      return;
+    }
+
+    if(!startDate && !endDate){
+      if(rangeInput) rangeInput.value = "";
+    }else if(startDate && !endDate){
+      if(rangeInput) rangeInput.value = `${fmtISO(startDate)} —`;
+    }else{
+      if(rangeInput) rangeInput.value = `${fmtISO(startDate)} to ${fmtISO(endDate)}${compareOn ? " (compare on)" : ""}`;
+    }
+    closePopup();
+  });
+
+  // init
+  buildPresets();
+  const initialStart = parseISO(__params.get('start'));
+  const initialEnd = parseISO(__params.get('end'));
+  if(initialStart || initialEnd){
+    setRange(initialStart || initialEnd, initialEnd || initialStart);
+  }else{
+    setRange(addDays(today,-6), today);
+    const presetEls = presetsEl.querySelectorAll(".preset");
+    const last7Idx = presetItems.findIndex(x=>x.key==="last7");
+    if(presetEls[last7Idx]) presetEls[last7Idx].dataset.active = "1";
+  }
+  applied = { start:startDate, end:endDate, compare:compareOn };
+  if(__embedMode) openPopup();
+})();
+</script>
+</body>
+</html>
