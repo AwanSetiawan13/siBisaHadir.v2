@@ -97,7 +97,7 @@
     window.bootstrap.Modal = class {
       constructor(el) { this.el = el; }
       static getOrCreateInstance(el) {
-        if (!el) return { show() {}, hide() {} };
+        if (!el) return { show() { }, hide() { } };
         if (!modalStore.has(el)) modalStore.set(el, new window.bootstrap.Modal(el));
         return modalStore.get(el);
       }
@@ -172,10 +172,10 @@
     return raw
       .replace(/^(lihat|view|edit|ubah|tambah|add|hapus|delete|delate)\s*/i, '')
       .replace(/^data\s+dari\s+/i, '')
-      .replace(/^\((.*)\)$/,'$1')
+      .replace(/^\((.*)\)$/, '$1')
       .replace(/^data\s+/i, '')
-      .replace(/^"(.*)"$/,'$1')
-      .replace(/^'(.*)'$/,'$1')
+      .replace(/^"(.*)"$/, '$1')
+      .replace(/^'(.*)'$/, '$1')
       .replace(/\s*ini\??$/i, '')
       .replace(/\s*\([^)]*\)\s*$/g, '')
       .trim();
@@ -358,7 +358,7 @@
     })();
 
     const saveState = () => {
-      try { localStorage.setItem(MENU_HDR_KEY, JSON.stringify(state)); } catch {}
+      try { localStorage.setItem(MENU_HDR_KEY, JSON.stringify(state)); } catch { }
     };
 
     headers.forEach((hdr) => {
@@ -411,11 +411,11 @@
   }
 
 
-function ensureSidebarFeatureExtensions() {
-  return;
-}
+  function ensureSidebarFeatureExtensions() {
+    return;
+  }
 
-// Run before building MENU_INDEX
+  // Run before building MENU_INDEX
   pruneRemovedMenuItems();
   applySidebarTextOverrides();
   ensureSidebarFeatureExtensions();
@@ -1514,7 +1514,7 @@ function ensureSidebarFeatureExtensions() {
             mode: 'view',
             title: label.includes('persetujuan') ? `Persetujuan (${normalizeFeatureTitle(title)})` : getModalActionTitle('view', title),
             fields,
-            onSave: () => {},
+            onSave: () => { },
             viewActions: {
               left: [
                 {
@@ -1550,7 +1550,7 @@ function ensureSidebarFeatureExtensions() {
           return;
         }
 
-        openModal({ mode: 'view', title: getModalActionTitle('view', title), fields, onSave: () => {} });
+        openModal({ mode: 'view', title: getModalActionTitle('view', title), fields, onSave: () => { } });
         return;
       }
 
@@ -1840,7 +1840,7 @@ function ensureSidebarFeatureExtensions() {
     const dateStart = state.dateStart || '';
     const dateEnd = state.dateEnd || '';
 
-    const rows = $$('tbody tr', table); 
+    const rows = $$('tbody tr', table);
 
     for (const tr of rows) {
       const rowText = norm(tr.textContent);
@@ -1892,7 +1892,8 @@ function ensureSidebarFeatureExtensions() {
       }
 
       const ok = okQuery && okMonth && okDate;
-      tr.style.display = ok ? '' : 'none';    }
+      tr.style.display = ok ? '' : 'none';
+    }
 
     renumberVisibleRows(table);
   }
@@ -2012,7 +2013,7 @@ function ensureSidebarFeatureExtensions() {
         table._bmFilterState.dateEnd = '';
         input.value = iso ? formatDMYFromISO(iso) : '';
         applyFilters(table, table._bmFilterState);
-        try { localStorage.setItem(`bmDateRangeFilter:${table.id || 'tbl'}`, JSON.stringify({ date: iso || '' })); } catch {}
+        try { localStorage.setItem(`bmDateRangeFilter:${table.id || 'tbl'}`, JSON.stringify({ date: iso || '' })); } catch { }
       }
 
       closePopupHost();
@@ -2032,7 +2033,7 @@ function ensureSidebarFeatureExtensions() {
         table._bmFilterState.dateEnd = endIso || '';
         input.value = formatDMYRangeFromISO(startIso || '', endIso || '');
         applyFilters(table, table._bmFilterState);
-        try { localStorage.setItem(`bmDateRangeFilter:${table.id || 'tbl'}`, JSON.stringify({ start: startIso || '', end: endIso || '' })); } catch {}
+        try { localStorage.setItem(`bmDateRangeFilter:${table.id || 'tbl'}`, JSON.stringify({ start: startIso || '', end: endIso || '' })); } catch { }
       }
 
       closePopupHost();
@@ -2109,7 +2110,7 @@ function ensureSidebarFeatureExtensions() {
             applyFilters(table, table._bmFilterState);
           }
         }
-      } catch {}
+      } catch { }
 
       inp.addEventListener('click', () => {
         const url = inp.getAttribute('data-popup-url') || 'popup.html';
@@ -2133,7 +2134,7 @@ function ensureSidebarFeatureExtensions() {
         try {
           localStorage.removeItem(`bmDateFilter:${table.id || 'tbl'}`);
           localStorage.removeItem(`bmDateRangeFilter:${table.id || 'tbl'}`);
-        } catch {}
+        } catch { }
       });
     });
     // Month filters
@@ -2180,7 +2181,7 @@ function ensureSidebarFeatureExtensions() {
   window.ceo$ = $;
   window.ceo$$ = $$;
 
-  const showCeoToast = window.ceoToast || (() => {});
+  const showCeoToast = window.ceoToast || (() => { });
   const setModalActionTitle = window.ceoSetModalActionTitle || ((el, mode, featureTitle = '') => {
     if (!el) return;
     const baseTitle = String(featureTitle || el.dataset.ceoFeatureTitle || el.textContent || '').replace(/\s+/g, ' ').trim();
@@ -2254,7 +2255,7 @@ function ensureSidebarFeatureExtensions() {
     try {
       if (localStorage.getItem(BM_NO_DEMO_PURGE_KEY) === '1') return;
       Object.values(LS).forEach((key) => {
-        try { localStorage.removeItem(key); } catch (e) {}
+        try { localStorage.removeItem(key); } catch (e) { }
       });
       [
         'ceoEmployeesV1',
@@ -2281,10 +2282,10 @@ function ensureSidebarFeatureExtensions() {
         'bmNoDemoPurgeV2',
         'bmNoDemoPurgeV3'
       ].forEach((key) => {
-        try { localStorage.removeItem(key); } catch (e) {}
+        try { localStorage.removeItem(key); } catch (e) { }
       });
       localStorage.setItem(BM_NO_DEMO_PURGE_KEY, '1');
-    } catch (e) {}
+    } catch (e) { }
   }
 
   purgeOldDemoStorageOnce();
@@ -2317,16 +2318,16 @@ function ensureSidebarFeatureExtensions() {
   // Sumber referensi: halaman "Modul Role" & "User Role".
   // ================================
   const Owner_PERM_MODULES = [
-    { key: 'dashboard',   label: 'Dashboard',            feature: 'Dashboard' },
-    { key: 'payroll',     label: 'Payroll',              feature: 'Payroll' },
-    { key: 'kpi',         label: 'Penilaian Kinerja',    feature: 'Penilaian Kinerja' },
-    { key: 'discipline',  label: 'Disiplin & Peringatan',feature: 'Disiplin & Peringatan' },
-    { key: 'karyawan',    label: 'Data Karyawan',        feature: 'Data Karyawan' },
-    { key: 'inventaris',  label: 'Inventaris',           feature: 'Inventaris' },
-    { key: 'dokumen',     label: 'Dokumen Digital',      feature: 'Dokumen Digital' },
-    { key: 'notif',       label: 'Notifikasi',           feature: 'Notifikasi' },
-    { key: 'diskusi',     label: 'Diskusi',              feature: 'Diskusi' },
-    { key: 'roles',       label: 'Pengaturan Role',      feature: 'Pengaturan Role' },
+    { key: 'dashboard', label: 'Dashboard', feature: 'Dashboard' },
+    { key: 'payroll', label: 'Payroll', feature: 'Payroll' },
+    { key: 'kpi', label: 'Penilaian Kinerja', feature: 'Penilaian Kinerja' },
+    { key: 'discipline', label: 'Disiplin & Peringatan', feature: 'Disiplin & Peringatan' },
+    { key: 'karyawan', label: 'Data Karyawan', feature: 'Data Karyawan' },
+    { key: 'inventaris', label: 'Inventaris', feature: 'Inventaris' },
+    { key: 'dokumen', label: 'Dokumen Digital', feature: 'Dokumen Digital' },
+    { key: 'notif', label: 'Notifikasi', feature: 'Notifikasi' },
+    { key: 'diskusi', label: 'Diskusi', feature: 'Diskusi' },
+    { key: 'roles', label: 'Pengaturan Role', feature: 'Pengaturan Role' },
   ];
 
   const Owner_ROLE_LIST = [
@@ -2467,66 +2468,66 @@ function ensureSidebarFeatureExtensions() {
   // Seed data
   // --------------------------------------------------------------
   function ensureSeeds() {
-  const emptyListKeys = [
-    LS.SUB,
-    LS.DIV_LEGACY,
-    LS.DIVISI,
-    LS.JABATAN,
-    LS.STAFF,
-    LS.CAL,
-    LS.KAR,
-    LS.KONTRAK,
-    LS.ABSEN,
-    LS.ABSEN_DEMO,
+    const emptyListKeys = [
+      LS.SUB,
+      LS.DIV_LEGACY,
+      LS.DIVISI,
+      LS.JABATAN,
+      LS.STAFF,
+      LS.CAL,
+      LS.KAR,
+      LS.KONTRAK,
+      LS.ABSEN,
+      LS.ABSEN_DEMO,
+      LS.KARYAWAN_DIVISI,
+      LS.KEGIATAN_KARYAWAN,
+      LS.KUNJUNGAN_KARYAWAN,
+      LS.AKUN_KARYAWAN,
+      LS.AKUN_USER,
+      LS.SKENARIO_JAM_KERJA,
+      LS.WAKTU_LIBUR,
+    ];
+
+    emptyListKeys.forEach((key) => {
+      const current = readList(key, null);
+      if (!Array.isArray(current)) writeList(key, []);
+    });
+
+    const prof = readList(LS.PROFIL, null);
+    if (!prof || typeof prof !== 'object' || Array.isArray(prof)) {
+      writeList(LS.PROFIL, {
+        name: '',
+        tagline: '',
+        email: '',
+        phone: '',
+        website: '',
+        address: '',
+        about: '',
+        logo_data_url: '',
+        avatar_data_url: '',
+      });
+    } else {
+      if (!('logo_data_url' in prof)) prof.logo_data_url = '';
+      if (!('avatar_data_url' in prof)) prof.avatar_data_url = '';
+      writeList(LS.PROFIL, prof);
+    }
+  }
+
+
+
+  // ===== Data awal dikosongkan =====
+  [
     LS.KARYAWAN_DIVISI,
     LS.KEGIATAN_KARYAWAN,
     LS.KUNJUNGAN_KARYAWAN,
-    LS.AKUN_KARYAWAN,
-    LS.AKUN_USER,
     LS.SKENARIO_JAM_KERJA,
     LS.WAKTU_LIBUR,
-  ];
-
-  emptyListKeys.forEach((key) => {
-    const current = readList(key, null);
-    if (!Array.isArray(current)) writeList(key, []);
+  ].forEach((key) => {
+    const rows = readList(key, null);
+    if (!Array.isArray(rows)) writeList(key, []);
   });
 
-  const prof = readList(LS.PROFIL, null);
-  if (!prof || typeof prof !== 'object' || Array.isArray(prof)) {
-    writeList(LS.PROFIL, {
-      name: '',
-      tagline: '',
-      email: '',
-      phone: '',
-      website: '',
-      address: '',
-      about: '',
-      logo_data_url: '',
-      avatar_data_url: '',
-    });
-  } else {
-    if (!('logo_data_url' in prof)) prof.logo_data_url = '';
-    if (!('avatar_data_url' in prof)) prof.avatar_data_url = '';
-    writeList(LS.PROFIL, prof);
-  }
-}
-
-
-
-// ===== Data awal dikosongkan =====
-[
-  LS.KARYAWAN_DIVISI,
-  LS.KEGIATAN_KARYAWAN,
-  LS.KUNJUNGAN_KARYAWAN,
-  LS.SKENARIO_JAM_KERJA,
-  LS.WAKTU_LIBUR,
-].forEach((key) => {
-  const rows = readList(key, null);
-  if (!Array.isArray(rows)) writeList(key, []);
-});
-
-syncEmployeeAccounts();
+  syncEmployeeAccounts();
 
   // --------------------------------------------------------------
   // Bootstrap modal helper
@@ -3671,7 +3672,7 @@ syncEmployeeAccounts();
     });
   }
 
-  
+
   // --------------------------------------------------------------
   // Struktur Organisasi (V3)
   // - Divisi:   { sub_perusahaan, kode_divisi, induk, divisi }
@@ -3870,7 +3871,7 @@ syncEmployeeAccounts();
     subSel.innerHTML =
       '<option value="">Pilih Sub Perusahaan</option>' +
       (subs.map((sp) => `<option value="${escapeHtml(sp.id)}">${escapeHtml(sp.name)}</option>`).join('') ||
-      '<option value="" disabled>(Belum ada sub perusahaan)</option>');
+        '<option value="" disabled>(Belum ada sub perusahaan)</option>');
 
     subSel.addEventListener('change', refreshParentOptions);
 
@@ -4175,13 +4176,13 @@ syncEmployeeAccounts();
       divSel.innerHTML =
         '<option value="">Pilih Divisi</option>' +
         (divs.map((d) => `<option value="${escapeHtml(d.id)}">${escapeHtml(d.code || '-')} - ${escapeHtml(d.name)}</option>`).join('') ||
-        '<option value="" disabled>(Belum ada divisi)</option>');
+          '<option value="" disabled>(Belum ada divisi)</option>');
     };
 
     subSel.innerHTML =
       '<option value="">Pilih Sub Perusahaan</option>' +
       (subs.map((sp) => `<option value="${escapeHtml(sp.id)}">${escapeHtml(sp.name)}</option>`).join('') ||
-      '<option value="" disabled>(Belum ada sub perusahaan)</option>');
+        '<option value="" disabled>(Belum ada sub perusahaan)</option>');
     presenceEl.innerHTML = JABATAN_PRESENCE_OPTS.map((x) => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join('');
     fineEarlyEl.innerHTML = YES_NO_STATUS_OPTS.map((x) => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join('');
     fineGradeEl.innerHTML = YES_NO_STATUS_OPTS.map((x) => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join('');
@@ -4479,7 +4480,7 @@ syncEmployeeAccounts();
 
       // Preview langsung tampil setelah user memilih file. Ini tetap aman walaupun file terlalu besar untuk localStorage.
       if (runtimeImageSrc && runtimeImageSrc.startsWith('blob:')) {
-        try { URL.revokeObjectURL(runtimeImageSrc); } catch (e) {}
+        try { URL.revokeObjectURL(runtimeImageSrc); } catch (e) { }
       }
       runtimeImageSrc = URL.createObjectURL(file);
       if (fileName) fileName.textContent = file.name || 'Gambar struktur perusahaan tersimpan.';
@@ -4524,7 +4525,7 @@ syncEmployeeAccounts();
     resetBtn?.addEventListener('click', () => {
       confirmDelete('Hapus gambar Struktur Perusahaan?', () => {
         if (runtimeImageSrc && runtimeImageSrc.startsWith('blob:')) {
-          try { URL.revokeObjectURL(runtimeImageSrc); } catch (e) {}
+          try { URL.revokeObjectURL(runtimeImageSrc); } catch (e) { }
         }
         runtimeImageSrc = '';
         localStorage.removeItem(BM_STRUCTURE_IMAGE_KEY);
@@ -4806,7 +4807,7 @@ syncEmployeeAccounts();
     const activeStatusEl = $('#ceoKrActiveStatus', modalEl);
     const placementListEl = $('#ceoKrPlacementList', modalEl);
     const addPlacementEl = $('#ceoKrAddPlacement', modalEl);
-        const fatherEl = $('#ceoKrFather', modalEl);
+    const fatherEl = $('#ceoKrFather', modalEl);
     const childNoEl = $('#ceoKrChildNo', modalEl);
     const childFromEl = $('#ceoKrChildFrom', modalEl);
     const joinEl = $('#ceoKrJoin', modalEl);
@@ -4955,7 +4956,7 @@ syncEmployeeAccounts();
     fillSelectOptions(genderEl, makeSimpleOpts(GENDER_OPTS), 'Pilih jenis kelamin');
     fillSelectOptions(eduEl, makeSimpleOpts(EDUCATION_OPTS), 'Pilih pendidikan');
     fillSelectOptions(activeStatusEl, makeSimpleOpts(ACTIVE_STATUS_OPTS), 'Pilih status keaktifan');
-        fillSelectOptions(workHourTypeEl, makeSimpleOpts(getShiftScenarioOptions()), 'Pilih tipe jam kerja');
+    fillSelectOptions(workHourTypeEl, makeSimpleOpts(getShiftScenarioOptions()), 'Pilih tipe jam kerja');
     fillSelectOptions(payrollPeriodEl, makeSimpleOpts(PAYROLL_PERIOD_OPTS), 'Pilih periode payroll');
     fillSelectOptions(payrollTypeEl, makeSimpleOpts(PAYROLL_TYPE_OPTS), 'Pilih tipe payroll');
     fillSelectOptions(presenceAreaActiveEl, makeSimpleOpts(YES_NO_STATUS_OPTS), 'Pilih status area presensi');
@@ -5794,7 +5795,7 @@ syncEmployeeAccounts();
     }
 
     function toContractDataUrl(templateHtml) {
-      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Kontrak Karyawan</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#222}.doc{max-width:760px;margin:auto;border:1px solid #ddd;padding:36px}.head{text-align:center;border-bottom:3px solid #2563eb;margin-bottom:24px}.head h1{margin:0 0 8px}.table{width:100%;border-collapse:collapse;margin:20px 0}.table td{border:1px solid #ddd;padding:10px}.table td:first-child{width:220px;font-weight:bold;background:#f8fafc}.sign{display:flex;justify-content:space-between;margin-top:80px;text-align:center}.sign div{width:40%;border-top:1px solid #333;padding-top:10px}</style></head><body><div class="doc">${templateHtml.replaceAll('bm-contract-paper__head','head').replaceAll('bm-contract-paper__table','table').replaceAll('bm-contract-paper__sign','sign').replaceAll('bm-contract-paper__section','section')}</div></body></html>`;
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Kontrak Karyawan</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#222}.doc{max-width:760px;margin:auto;border:1px solid #ddd;padding:36px}.head{text-align:center;border-bottom:3px solid #2563eb;margin-bottom:24px}.head h1{margin:0 0 8px}.table{width:100%;border-collapse:collapse;margin:20px 0}.table td{border:1px solid #ddd;padding:10px}.table td:first-child{width:220px;font-weight:bold;background:#f8fafc}.sign{display:flex;justify-content:space-between;margin-top:80px;text-align:center}.sign div{width:40%;border-top:1px solid #333;padding-top:10px}</style></head><body><div class="doc">${templateHtml.replaceAll('bm-contract-paper__head', 'head').replaceAll('bm-contract-paper__table', 'table').replaceAll('bm-contract-paper__sign', 'sign').replaceAll('bm-contract-paper__section', 'section')}</div></body></html>`;
       return `data:text/html;charset=UTF-8,${encodeURIComponent(html)}`;
     }
 
@@ -6196,7 +6197,7 @@ syncEmployeeAccounts();
   }
 
 
-// --------------------------------------------------------------
+  // --------------------------------------------------------------
   // Init calendar for pages
   // --------------------------------------------------------------
   function initCalendarPages() {
@@ -6235,7 +6236,7 @@ syncEmployeeAccounts();
     }
   }
 
-  
+
   // --------------------------------------------------------------
   // Dashboard dynamic numbers (biar lebih hidup)
   // --------------------------------------------------------------
@@ -6316,7 +6317,7 @@ syncEmployeeAccounts();
 
 
 
-// --------------------------------------------------------------
+  // --------------------------------------------------------------
   // Sinkron data demo Kehadiran ke Dashboard
   // --------------------------------------------------------------
   function normalizeNameKey(value) {
@@ -6402,12 +6403,12 @@ syncEmployeeAccounts();
     const displayEmployees = employees.length
       ? employees
       : demoAttendanceRows.map((row, index) => ({
-          id: `demo-attendance-${index + 1}`,
-          name: row.name,
-          sub_demo: row.sub || '-',
-          divisi_demo: row.divisi || '-',
-          __attendanceDemoOnly: true,
-        }));
+        id: `demo-attendance-${index + 1}`,
+        name: row.name,
+        sub_demo: row.sub || '-',
+        divisi_demo: row.divisi || '-',
+        __attendanceDemoOnly: true,
+      }));
     const total = displayEmployees.length;
 
     let attendance = readList(LS.ABSEN, null);
@@ -6491,74 +6492,74 @@ syncEmployeeAccounts();
   }
 
 
-function syncEmployeeAccounts() {
-  const employees = Array.isArray(readList(LS.KAR, [])) ? readList(LS.KAR, []) : [];
+  function syncEmployeeAccounts() {
+    const employees = Array.isArray(readList(LS.KAR, [])) ? readList(LS.KAR, []) : [];
 
-  if (!employees.length) {
-    writeList(LS.AKUN_KARYAWAN, []);
-    return [];
-  }
-
-  const metaRows = Array.isArray(readList(LS.AKUN_KARYAWAN, [])) ? readList(LS.AKUN_KARYAWAN, []) : [];
-  const map = new Map(metaRows.map((row) => [String(row?.employee_id || ''), row]));
-  const mergedMeta = employees.map((emp, idx) => {
-    const key = String(emp?.id || '');
-    const prev = map.get(key) || {};
-    return {
-      employee_id: key,
-      password: String(prev.password || emp?.password || ''),
-      created_at: String(prev.created_at || emp?.join_date || todayISO()),
-      status_akun: String(prev.status_akun || emp?.active_status || 'Aktif'),
-    };
-  });
-  writeList(LS.AKUN_KARYAWAN, mergedMeta);
-  return employees.map((emp) => {
-    const meta = mergedMeta.find((row) => String(row.employee_id) === String(emp.id)) || {};
-    return {
-      employee_id: String(emp.id || ''),
-      employee_no: String(emp.employee_no || '-'),
-      nama_karyawan: String(emp.name || '-'),
-      email: String(emp.email || '-'),
-      password: String(meta.password || ''),
-      dibuat_pada: String(meta.created_at || todayISO()),
-      status_akun: String(meta.status_akun || 'Aktif'),
-    };
-  });
-}
-
-function ceoSetReadonlyFields(root, readonly) {
-  Array.from(root.querySelectorAll('input, select, textarea, button[data-role="picker"]')).forEach((el) => {
-    if (el.id && /Save$/i.test(el.id)) return;
-    if (el.type === 'file') {
-      el.disabled = !!readonly;
-      return;
+    if (!employees.length) {
+      writeList(LS.AKUN_KARYAWAN, []);
+      return [];
     }
-    if (el.tagName === 'SELECT' || el.tagName === 'BUTTON') el.disabled = !!readonly;
-    else el.readOnly = !!readonly;
-  });
-}
 
-function initEmployeeActivitiesPage() {
-  const table = $('#tblKegiatanKaryawan');
-  if (!table) return;
-  const addBtn = $('#btnAddKegiatanKaryawan');
-  const tbody = table.querySelector('tbody');
-
-  function getEmployeePicOptions(extraValues = []) {
-    const employeeRows = Array.isArray(readList(LS.KAR, [])) ? readList(LS.KAR, []) : [];
-    const names = employeeRows.map((row) => String(row?.name || '').trim()).filter(Boolean);
-    const extra = Array.isArray(extraValues) ? extraValues.map((value) => String(value || '').trim()).filter(Boolean) : [];
-    const merged = Array.from(new Set([...names, ...extra]));
-    return merged.map((name) => ({ value: name, label: name }));
+    const metaRows = Array.isArray(readList(LS.AKUN_KARYAWAN, [])) ? readList(LS.AKUN_KARYAWAN, []) : [];
+    const map = new Map(metaRows.map((row) => [String(row?.employee_id || ''), row]));
+    const mergedMeta = employees.map((emp, idx) => {
+      const key = String(emp?.id || '');
+      const prev = map.get(key) || {};
+      return {
+        employee_id: key,
+        password: String(prev.password || emp?.password || ''),
+        created_at: String(prev.created_at || emp?.join_date || todayISO()),
+        status_akun: String(prev.status_akun || emp?.active_status || 'Aktif'),
+      };
+    });
+    writeList(LS.AKUN_KARYAWAN, mergedMeta);
+    return employees.map((emp) => {
+      const meta = mergedMeta.find((row) => String(row.employee_id) === String(emp.id)) || {};
+      return {
+        employee_id: String(emp.id || ''),
+        employee_no: String(emp.employee_no || '-'),
+        nama_karyawan: String(emp.name || '-'),
+        email: String(emp.email || '-'),
+        password: String(meta.password || ''),
+        dibuat_pada: String(meta.created_at || todayISO()),
+        status_akun: String(meta.status_akun || 'Aktif'),
+      };
+    });
   }
 
+  function ceoSetReadonlyFields(root, readonly) {
+    Array.from(root.querySelectorAll('input, select, textarea, button[data-role="picker"]')).forEach((el) => {
+      if (el.id && /Save$/i.test(el.id)) return;
+      if (el.type === 'file') {
+        el.disabled = !!readonly;
+        return;
+      }
+      if (el.tagName === 'SELECT' || el.tagName === 'BUTTON') el.disabled = !!readonly;
+      else el.readOnly = !!readonly;
+    });
+  }
 
-  function render() {
-    const rows = readList(LS.KEGIATAN_KARYAWAN, []);
-    tbody.innerHTML = '';
-    rows.forEach((item, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
+  function initEmployeeActivitiesPage() {
+    const table = $('#tblKegiatanKaryawan');
+    if (!table) return;
+    const addBtn = $('#btnAddKegiatanKaryawan');
+    const tbody = table.querySelector('tbody');
+
+    function getEmployeePicOptions(extraValues = []) {
+      const employeeRows = Array.isArray(readList(LS.KAR, [])) ? readList(LS.KAR, []) : [];
+      const names = employeeRows.map((row) => String(row?.name || '').trim()).filter(Boolean);
+      const extra = Array.isArray(extraValues) ? extraValues.map((value) => String(value || '').trim()).filter(Boolean) : [];
+      const merged = Array.from(new Set([...names, ...extra]));
+      return merged.map((name) => ({ value: name, label: name }));
+    }
+
+
+    function render() {
+      const rows = readList(LS.KEGIATAN_KARYAWAN, []);
+      tbody.innerHTML = '';
+      rows.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
         <td>${idx + 1}</td>
         <td>${escapeHtml(item.nama_kegiatan || '-')}</td>
         <td>${escapeHtml(item.tanggal_kegiatan || '-')}</td>
@@ -6572,13 +6573,13 @@ function initEmployeeActivitiesPage() {
           </div>
         </td>
       `.trim();
-      tbody.appendChild(tr);
-    });
-  }
+        tbody.appendChild(tr);
+      });
+    }
 
-  function openModal(mode, data) {
-    const id = 'ceoKegiatanKaryawanModal';
-    const modalEl = ensureModal(id, `
+    function openModal(mode, data) {
+      const id = 'ceoKegiatanKaryawanModal';
+      const modalEl = ensureModal(id, `
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -6607,150 +6608,150 @@ function initEmployeeActivitiesPage() {
         </div>
       </div>
     `);
-    let currentCover = String(data?.gambar_sampul || '');
-    const namaEl = $('#ceoKgtNama', modalEl);
-    const penyelenggaraEl = $('#ceoKgtPenyelenggara', modalEl);
-    const pesertaEl = $('#ceoKgtPeserta', modalEl);
-    const kategoriEl = $('#ceoKgtKategori', modalEl);
-    const tanggalEl = $('#ceoKgtTanggal', modalEl);
-    const waktuEl = $('#ceoKgtWaktu', modalEl);
-    const zonaEl = $('#ceoKgtZona', modalEl);
-    const deskripsiEl = $('#ceoKgtDeskripsi', modalEl);
-    const coverEl = $('#ceoKgtCover', modalEl);
-    const previewEl = $('#ceoKgtPreview', modalEl);
-    const previewEmptyEl = $('#ceoKgtPreviewEmpty', modalEl);
-    const saveBtn = $('#ceoKgtSave', modalEl);
-    setModalActionTitle($('#ceoKgtTitle', modalEl), mode);
+      let currentCover = String(data?.gambar_sampul || '');
+      const namaEl = $('#ceoKgtNama', modalEl);
+      const penyelenggaraEl = $('#ceoKgtPenyelenggara', modalEl);
+      const pesertaEl = $('#ceoKgtPeserta', modalEl);
+      const kategoriEl = $('#ceoKgtKategori', modalEl);
+      const tanggalEl = $('#ceoKgtTanggal', modalEl);
+      const waktuEl = $('#ceoKgtWaktu', modalEl);
+      const zonaEl = $('#ceoKgtZona', modalEl);
+      const deskripsiEl = $('#ceoKgtDeskripsi', modalEl);
+      const coverEl = $('#ceoKgtCover', modalEl);
+      const previewEl = $('#ceoKgtPreview', modalEl);
+      const previewEmptyEl = $('#ceoKgtPreviewEmpty', modalEl);
+      const saveBtn = $('#ceoKgtSave', modalEl);
+      setModalActionTitle($('#ceoKgtTitle', modalEl), mode);
 
-    fillSelectOptions(
-      penyelenggaraEl,
-      getEmployeePicOptions([data?.penyelenggara]),
-      'Pilih penyelenggara / PIC'
-    );
+      fillSelectOptions(
+        penyelenggaraEl,
+        getEmployeePicOptions([data?.penyelenggara]),
+        'Pilih penyelenggara / PIC'
+      );
 
-    namaEl.value = String(data?.nama_kegiatan || '');
-    penyelenggaraEl.value = String(data?.penyelenggara || '');
-    pesertaEl.value = String(data?.peserta || '');
-    kategoriEl.value = String(data?.kategori || '');
-    tanggalEl.value = String(data?.tanggal_kegiatan || '');
-    waktuEl.value = String(data?.waktu_kegiatan || '');
-    zonaEl.value = String(data?.zona_waktu || 'WIB');
-    deskripsiEl.value = String(data?.deskripsi || '');
+      namaEl.value = String(data?.nama_kegiatan || '');
+      penyelenggaraEl.value = String(data?.penyelenggara || '');
+      pesertaEl.value = String(data?.peserta || '');
+      kategoriEl.value = String(data?.kategori || '');
+      tanggalEl.value = String(data?.tanggal_kegiatan || '');
+      waktuEl.value = String(data?.waktu_kegiatan || '');
+      zonaEl.value = String(data?.zona_waktu || 'WIB');
+      deskripsiEl.value = String(data?.deskripsi || '');
 
-    function updatePreview() {
-      if (currentCover) {
-        previewEl.src = currentCover;
-        previewEl.style.display = '';
-        previewEmptyEl.classList.add('d-none');
-      } else {
-        previewEl.removeAttribute('src');
-        previewEl.style.display = 'none';
-        previewEmptyEl.classList.remove('d-none');
-      }
-    }
-    updatePreview();
-    coverEl.onchange = () => {
-      const file = coverEl.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        currentCover = String(reader.result || '');
-        updatePreview();
-      };
-      reader.readAsDataURL(file);
-    };
-
-    if (mode === 'view') {
-      ceoSetReadonlyFields(modalEl, true);
-      saveBtn.classList.add('d-none');
-    } else {
-      ceoSetReadonlyFields(modalEl, false);
-      saveBtn.classList.remove('d-none');
-    }
-
-    saveBtn.onclick = (event) => {
-      event?.preventDefault?.();
-      try {
-        const payload = {
-          id: data?.id || uid('kgt'),
-          nama_kegiatan: String(namaEl.value || '').trim(),
-          penyelenggara: String(penyelenggaraEl.value || '').trim(),
-          peserta: String(pesertaEl.value || '').trim(),
-          gambar_sampul: currentCover,
-          kategori: String(kategoriEl.value || '').trim(),
-          tanggal_kegiatan: String(tanggalEl.value || '').trim(),
-          waktu_kegiatan: String(waktuEl.value || '').trim(),
-          zona_waktu: String(zonaEl.value || 'WIB').trim(),
-          deskripsi: String(deskripsiEl.value || '').trim(),
-        };
-        if (!payload.nama_kegiatan) {
-          namaEl?.focus?.();
-          return window.alert('Nama kegiatan wajib diisi.');
+      function updatePreview() {
+        if (currentCover) {
+          previewEl.src = currentCover;
+          previewEl.style.display = '';
+          previewEmptyEl.classList.add('d-none');
+        } else {
+          previewEl.removeAttribute('src');
+          previewEl.style.display = 'none';
+          previewEmptyEl.classList.remove('d-none');
         }
-        // Penyelenggara/PIC, tanggal, kategori, gambar, dan deskripsi dibuat opsional
-        // agar Tambah Kegiatan tetap bisa disimpan walaupun master karyawan masih kosong.
-        const rows = readList(LS.KEGIATAN_KARYAWAN, []);
-        const safeRows = Array.isArray(rows) ? rows : [];
-        const idx = safeRows.findIndex((x) => String(x.id) === String(payload.id));
-        if (idx >= 0) safeRows[idx] = { ...safeRows[idx], ...payload };
-        else safeRows.unshift(payload);
-        writeList(LS.KEGIATAN_KARYAWAN, safeRows);
-        syncKegiatanKaryawanCalendarEvent(payload);
-        render();
-        try { bootstrap.Modal.getOrCreateInstance(modalEl).hide(); } catch (err) { modalEl.classList.remove('show'); modalEl.style.display = 'none'; }
-        if (typeof window.ceoToast === 'function') window.ceoToast(mode === 'edit' ? 'Kegiatan karyawan berhasil diperbarui.' : 'Kegiatan karyawan berhasil disimpan.');
-      } catch (error) {
-        console.error('Gagal menyimpan kegiatan karyawan:', error);
-        window.alert('Gagal menyimpan kegiatan karyawan. Cek Console browser untuk detail error.');
       }
-    };
-    showModal(id);
-    const titleInput = modalEl.querySelector('.modal-body input, .modal-body select, .modal-body textarea');
-    window.setTimeout(() => titleInput?.focus?.(), 120);
+      updatePreview();
+      coverEl.onchange = () => {
+        const file = coverEl.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          currentCover = String(reader.result || '');
+          updatePreview();
+        };
+        reader.readAsDataURL(file);
+      };
+
+      if (mode === 'view') {
+        ceoSetReadonlyFields(modalEl, true);
+        saveBtn.classList.add('d-none');
+      } else {
+        ceoSetReadonlyFields(modalEl, false);
+        saveBtn.classList.remove('d-none');
+      }
+
+      saveBtn.onclick = (event) => {
+        event?.preventDefault?.();
+        try {
+          const payload = {
+            id: data?.id || uid('kgt'),
+            nama_kegiatan: String(namaEl.value || '').trim(),
+            penyelenggara: String(penyelenggaraEl.value || '').trim(),
+            peserta: String(pesertaEl.value || '').trim(),
+            gambar_sampul: currentCover,
+            kategori: String(kategoriEl.value || '').trim(),
+            tanggal_kegiatan: String(tanggalEl.value || '').trim(),
+            waktu_kegiatan: String(waktuEl.value || '').trim(),
+            zona_waktu: String(zonaEl.value || 'WIB').trim(),
+            deskripsi: String(deskripsiEl.value || '').trim(),
+          };
+          if (!payload.nama_kegiatan) {
+            namaEl?.focus?.();
+            return window.alert('Nama kegiatan wajib diisi.');
+          }
+          // Penyelenggara/PIC, tanggal, kategori, gambar, dan deskripsi dibuat opsional
+          // agar Tambah Kegiatan tetap bisa disimpan walaupun master karyawan masih kosong.
+          const rows = readList(LS.KEGIATAN_KARYAWAN, []);
+          const safeRows = Array.isArray(rows) ? rows : [];
+          const idx = safeRows.findIndex((x) => String(x.id) === String(payload.id));
+          if (idx >= 0) safeRows[idx] = { ...safeRows[idx], ...payload };
+          else safeRows.unshift(payload);
+          writeList(LS.KEGIATAN_KARYAWAN, safeRows);
+          syncKegiatanKaryawanCalendarEvent(payload);
+          render();
+          try { bootstrap.Modal.getOrCreateInstance(modalEl).hide(); } catch (err) { modalEl.classList.remove('show'); modalEl.style.display = 'none'; }
+          if (typeof window.ceoToast === 'function') window.ceoToast(mode === 'edit' ? 'Kegiatan karyawan berhasil diperbarui.' : 'Kegiatan karyawan berhasil disimpan.');
+        } catch (error) {
+          console.error('Gagal menyimpan kegiatan karyawan:', error);
+          window.alert('Gagal menyimpan kegiatan karyawan. Cek Console browser untuk detail error.');
+        }
+      };
+      showModal(id);
+      const titleInput = modalEl.querySelector('.modal-body input, .modal-body select, .modal-body textarea');
+      window.setTimeout(() => titleInput?.focus?.(), 120);
+    }
+
+    addBtn?.addEventListener('click', () => openModal('add', null));
+    table.addEventListener('click', (e) => {
+      const rows = readList(LS.KEGIATAN_KARYAWAN, []);
+      const viewBtn = e.target?.closest?.('button[data-kgt-view]');
+      const editBtn = e.target?.closest?.('button[data-kgt-edit]');
+      const delBtn = e.target?.closest?.('button[data-kgt-del]');
+      if (viewBtn) {
+        const cur = rows.find((x) => String(x.id) === String(viewBtn.getAttribute('data-kgt-view') || ''));
+        if (cur) openModal('view', cur);
+        return;
+      }
+      if (editBtn) {
+        const cur = rows.find((x) => String(x.id) === String(editBtn.getAttribute('data-kgt-edit') || ''));
+        if (cur) openModal('edit', cur);
+        return;
+      }
+      if (delBtn) {
+        const id = String(delBtn.getAttribute('data-kgt-del') || '');
+        confirmDelete('Delete Kegiatan Karyawan ini?', () => {
+          writeList(LS.KEGIATAN_KARYAWAN, rows.filter((x) => String(x.id) !== id));
+          removeKegiatanKaryawanCalendarEvent(id);
+          render();
+        });
+      }
+    });
+    render();
   }
 
-  addBtn?.addEventListener('click', () => openModal('add', null));
-  table.addEventListener('click', (e) => {
-    const rows = readList(LS.KEGIATAN_KARYAWAN, []);
-    const viewBtn = e.target?.closest?.('button[data-kgt-view]');
-    const editBtn = e.target?.closest?.('button[data-kgt-edit]');
-    const delBtn = e.target?.closest?.('button[data-kgt-del]');
-    if (viewBtn) {
-      const cur = rows.find((x) => String(x.id) === String(viewBtn.getAttribute('data-kgt-view') || ''));
-      if (cur) openModal('view', cur);
-      return;
-    }
-    if (editBtn) {
-      const cur = rows.find((x) => String(x.id) === String(editBtn.getAttribute('data-kgt-edit') || ''));
-      if (cur) openModal('edit', cur);
-      return;
-    }
-    if (delBtn) {
-      const id = String(delBtn.getAttribute('data-kgt-del') || '');
-      confirmDelete('Delete Kegiatan Karyawan ini?', () => {
-        writeList(LS.KEGIATAN_KARYAWAN, rows.filter((x) => String(x.id) !== id));
-        removeKegiatanKaryawanCalendarEvent(id);
-        render();
-      });
-    }
-  });
-  render();
-}
+  function initWorkShiftScenarioPage() {
+    const table = $('#tblSkenarioJamKerja');
+    if (!table) return;
+    const addBtn = $('#btnAddSkenarioJamKerja');
+    const tbody = table.querySelector('tbody');
+    const DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
-function initWorkShiftScenarioPage() {
-  const table = $('#tblSkenarioJamKerja');
-  if (!table) return;
-  const addBtn = $('#btnAddSkenarioJamKerja');
-  const tbody = table.querySelector('tbody');
-  const DAY_NAMES = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-
-  function render() {
-    const rows = readList(LS.SKENARIO_JAM_KERJA, []);
-    tbody.innerHTML = '';
-    rows.forEach((item, idx) => {
-      const status = String(item.aktif || '').toLowerCase() === 'aktif' ? 'success' : 'secondary';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
+    function render() {
+      const rows = readList(LS.SKENARIO_JAM_KERJA, []);
+      tbody.innerHTML = '';
+      rows.forEach((item, idx) => {
+        const status = String(item.aktif || '').toLowerCase() === 'aktif' ? 'success' : 'secondary';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
         <td>${idx + 1}</td>
         <td>${escapeHtml(item.nama_shift || '-')}</td>
         <td><span class="badge bg-label-${status}">${escapeHtml(item.aktif || '-')}</span></td>
@@ -6762,171 +6763,171 @@ function initWorkShiftScenarioPage() {
           </div>
         </td>
       `.trim();
-      tbody.appendChild(tr);
-    });
-  }
+        tbody.appendChild(tr);
+      });
+    }
 
-  function normalizeSchedules(data) {
-    const legacyDays = new Set(ensureArr(data?.hari));
-    const rawSchedules = ensureArr(data?.jadwal_hari);
-    return DAY_NAMES.map((day) => {
-      const existing = rawSchedules.find((item) => String(item?.hari || '') === day) || {};
-      const aktif = typeof existing.aktif === 'boolean'
-        ? existing.aktif
-        : legacyDays.has(day);
-      return {
-        hari: day,
-        aktif,
-        jam_check_in: String(existing.jam_check_in || (aktif ? data?.jam_check_in || '' : '')).trim(),
-        jam_check_out: String(existing.jam_check_out || (aktif ? data?.jam_check_out || '' : '')).trim(),
-        jam_istirahat: String(existing.jam_istirahat || (aktif ? data?.jam_istirahat || '' : '')).trim(),
-        selesai_istirahat: String(existing.selesai_istirahat || (aktif ? data?.selesai_istirahat || '' : '')).trim(),
-        toleransi_keterlambatan: String(existing.toleransi_keterlambatan || (aktif ? data?.toleransi_keterlambatan || '' : '')).trim(),
-        denda_keterlambatan: String(existing.denda_keterlambatan || (aktif ? data?.denda_keterlambatan || '' : '')).trim(),
-      };
-    });
-  }
-
-  function rowFieldValue(tr, selector) {
-    return String($(selector, tr)?.value || '').trim();
-  }
-
-  function readFileAsDataUrl(file) {
-    return new Promise((resolve) => {
-      if (!file) return resolve('');
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ''));
-      reader.onerror = () => resolve('');
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function compressImageFileToDataUrl(file, options = {}) {
-    const maxSide = Number(options.maxSide || 900);
-    const quality = Number(options.quality || 0.72);
-
-    return new Promise((resolve) => {
-      if (!file || !String(file.type || '').startsWith('image/')) return resolve('');
-
-      const reader = new FileReader();
-      reader.onerror = () => resolve('');
-      reader.onload = () => {
-        const img = new Image();
-        img.onerror = () => resolve('');
-        img.onload = () => {
-          try {
-            const ratio = Math.min(1, maxSide / Math.max(img.width || 1, img.height || 1));
-            const width = Math.max(1, Math.round((img.width || 1) * ratio));
-            const height = Math.max(1, Math.round((img.height || 1) * ratio));
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return resolve('');
-
-            ctx.drawImage(img, 0, 0, width, height);
-            let dataUrl = canvas.toDataURL('image/jpeg', quality);
-
-            // Batas aman localStorage. Kalau masih terlalu besar, turunkan ukuran lagi.
-            if (dataUrl.length > 450000) {
-              const smallerRatio = Math.min(1, 650 / Math.max(img.width || 1, img.height || 1));
-              canvas.width = Math.max(1, Math.round((img.width || 1) * smallerRatio));
-              canvas.height = Math.max(1, Math.round((img.height || 1) * smallerRatio));
-              const ctx2 = canvas.getContext('2d');
-              if (!ctx2) return resolve('');
-              ctx2.drawImage(img, 0, 0, canvas.width, canvas.height);
-              dataUrl = canvas.toDataURL('image/jpeg', 0.62);
-            }
-
-            resolve(dataUrl.length <= 450000 ? dataUrl : '');
-          } catch (err) {
-            console.warn('Gagal kompres gambar, file dilewati agar data karyawan tetap tersimpan.', err);
-            resolve('');
-          }
+    function normalizeSchedules(data) {
+      const legacyDays = new Set(ensureArr(data?.hari));
+      const rawSchedules = ensureArr(data?.jadwal_hari);
+      return DAY_NAMES.map((day) => {
+        const existing = rawSchedules.find((item) => String(item?.hari || '') === day) || {};
+        const aktif = typeof existing.aktif === 'boolean'
+          ? existing.aktif
+          : legacyDays.has(day);
+        return {
+          hari: day,
+          aktif,
+          jam_check_in: String(existing.jam_check_in || (aktif ? data?.jam_check_in || '' : '')).trim(),
+          jam_check_out: String(existing.jam_check_out || (aktif ? data?.jam_check_out || '' : '')).trim(),
+          jam_istirahat: String(existing.jam_istirahat || (aktif ? data?.jam_istirahat || '' : '')).trim(),
+          selesai_istirahat: String(existing.selesai_istirahat || (aktif ? data?.selesai_istirahat || '' : '')).trim(),
+          toleransi_keterlambatan: String(existing.toleransi_keterlambatan || (aktif ? data?.toleransi_keterlambatan || '' : '')).trim(),
+          denda_keterlambatan: String(existing.denda_keterlambatan || (aktif ? data?.denda_keterlambatan || '' : '')).trim(),
         };
-        img.src = String(reader.result || '');
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function createStoredFilePayload(file, fallbackName = '') {
-    if (!file) return Promise.resolve({ name: String(fallbackName || '').trim(), data_url: '' });
-
-    const fileName = String(file.name || fallbackName || '').trim();
-
-    // PDF/file besar tidak disimpan sebagai base64 ke localStorage supaya Simpan Karyawan tidak gagal.
-    if (!String(file.type || '').startsWith('image/')) {
-      return Promise.resolve({ name: fileName, data_url: '' });
+      });
     }
 
-    return compressImageFileToDataUrl(file).then((dataUrl) => ({
-      name: fileName,
-      data_url: dataUrl,
-    }));
-  }
-
-  function stripEmployeeFileData(row) {
-    const next = { ...(row || {}) };
-    [
-      'photo_data_url',
-      'foto_karyawan_data_url',
-      'foto_data_url',
-      'file_kk_data_url',
-      'kartu_keluarga_data_url',
-      'kk_data_url',
-      'file_identity_data_url',
-      'ktp_data_url',
-      'file_ktp_data_url'
-    ].forEach((key) => {
-      if (key in next) next[key] = '';
-    });
-    return next;
-  }
-
-  function safeWriteEmployees(rows) {
-    try {
-      writeList(LS.KAR, rows);
-      return { rows, stripped: false };
-    } catch (err) {
-      console.warn('localStorage penuh / gagal menyimpan file karyawan. Data teks tetap disimpan tanpa preview file.', err);
-      const slimRows = (Array.isArray(rows) ? rows : []).map(stripEmployeeFileData);
-      writeList(LS.KAR, slimRows);
-      return { rows: slimRows, stripped: true };
+    function rowFieldValue(tr, selector) {
+      return String($(selector, tr)?.value || '').trim();
     }
-  }
 
-  function maskPassword(value) {
-    return String(value || '').trim() ? '••••••••' : '-';
-  }
-
-  function ensureFilePreviewControl(inputId, linkId) {
-    const input = document.getElementById(inputId);
-    const link = document.getElementById(linkId);
-    if (!input || !link) return;
-    const dataUrl = String(input.dataset.fileUrl || '').trim();
-    if (!dataUrl) {
-      link.classList.add('d-none');
-      return;
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve) => {
+        if (!file) return resolve('');
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+      });
     }
-    link.classList.remove('d-none');
-    link.href = dataUrl;
-    link.target = '_blank';
-    link.rel = 'noopener';
-  }
 
-  function setScheduleRowState(tr, readOnly) {
-    const isActive = !!$('.ceo-shift-day-active', tr)?.checked;
-    Array.from(tr.querySelectorAll('.ceo-shift-row-input')).forEach((input) => {
-      input.disabled = readOnly || !isActive;
-    });
-    tr.classList.toggle('opacity-75', !isActive);
-  }
+    function compressImageFileToDataUrl(file, options = {}) {
+      const maxSide = Number(options.maxSide || 900);
+      const quality = Number(options.quality || 0.72);
 
-  function renderScheduleRows(tbodyEl, schedules, readOnly) {
-    tbodyEl.innerHTML = schedules.map((item, idx) => `
+      return new Promise((resolve) => {
+        if (!file || !String(file.type || '').startsWith('image/')) return resolve('');
+
+        const reader = new FileReader();
+        reader.onerror = () => resolve('');
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => resolve('');
+          img.onload = () => {
+            try {
+              const ratio = Math.min(1, maxSide / Math.max(img.width || 1, img.height || 1));
+              const width = Math.max(1, Math.round((img.width || 1) * ratio));
+              const height = Math.max(1, Math.round((img.height || 1) * ratio));
+
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return resolve('');
+
+              ctx.drawImage(img, 0, 0, width, height);
+              let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+              // Batas aman localStorage. Kalau masih terlalu besar, turunkan ukuran lagi.
+              if (dataUrl.length > 450000) {
+                const smallerRatio = Math.min(1, 650 / Math.max(img.width || 1, img.height || 1));
+                canvas.width = Math.max(1, Math.round((img.width || 1) * smallerRatio));
+                canvas.height = Math.max(1, Math.round((img.height || 1) * smallerRatio));
+                const ctx2 = canvas.getContext('2d');
+                if (!ctx2) return resolve('');
+                ctx2.drawImage(img, 0, 0, canvas.width, canvas.height);
+                dataUrl = canvas.toDataURL('image/jpeg', 0.62);
+              }
+
+              resolve(dataUrl.length <= 450000 ? dataUrl : '');
+            } catch (err) {
+              console.warn('Gagal kompres gambar, file dilewati agar data karyawan tetap tersimpan.', err);
+              resolve('');
+            }
+          };
+          img.src = String(reader.result || '');
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function createStoredFilePayload(file, fallbackName = '') {
+      if (!file) return Promise.resolve({ name: String(fallbackName || '').trim(), data_url: '' });
+
+      const fileName = String(file.name || fallbackName || '').trim();
+
+      // PDF/file besar tidak disimpan sebagai base64 ke localStorage supaya Simpan Karyawan tidak gagal.
+      if (!String(file.type || '').startsWith('image/')) {
+        return Promise.resolve({ name: fileName, data_url: '' });
+      }
+
+      return compressImageFileToDataUrl(file).then((dataUrl) => ({
+        name: fileName,
+        data_url: dataUrl,
+      }));
+    }
+
+    function stripEmployeeFileData(row) {
+      const next = { ...(row || {}) };
+      [
+        'photo_data_url',
+        'foto_karyawan_data_url',
+        'foto_data_url',
+        'file_kk_data_url',
+        'kartu_keluarga_data_url',
+        'kk_data_url',
+        'file_identity_data_url',
+        'ktp_data_url',
+        'file_ktp_data_url'
+      ].forEach((key) => {
+        if (key in next) next[key] = '';
+      });
+      return next;
+    }
+
+    function safeWriteEmployees(rows) {
+      try {
+        writeList(LS.KAR, rows);
+        return { rows, stripped: false };
+      } catch (err) {
+        console.warn('localStorage penuh / gagal menyimpan file karyawan. Data teks tetap disimpan tanpa preview file.', err);
+        const slimRows = (Array.isArray(rows) ? rows : []).map(stripEmployeeFileData);
+        writeList(LS.KAR, slimRows);
+        return { rows: slimRows, stripped: true };
+      }
+    }
+
+    function maskPassword(value) {
+      return String(value || '').trim() ? '••••••••' : '-';
+    }
+
+    function ensureFilePreviewControl(inputId, linkId) {
+      const input = document.getElementById(inputId);
+      const link = document.getElementById(linkId);
+      if (!input || !link) return;
+      const dataUrl = String(input.dataset.fileUrl || '').trim();
+      if (!dataUrl) {
+        link.classList.add('d-none');
+        return;
+      }
+      link.classList.remove('d-none');
+      link.href = dataUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+    }
+
+    function setScheduleRowState(tr, readOnly) {
+      const isActive = !!$('.ceo-shift-day-active', tr)?.checked;
+      Array.from(tr.querySelectorAll('.ceo-shift-row-input')).forEach((input) => {
+        input.disabled = readOnly || !isActive;
+      });
+      tr.classList.toggle('opacity-75', !isActive);
+    }
+
+    function renderScheduleRows(tbodyEl, schedules, readOnly) {
+      tbodyEl.innerHTML = schedules.map((item, idx) => `
       <tr data-day="${escapeHtml(item.hari)}">
         <td class="text-center align-middle">
           <div class="form-check d-inline-flex justify-content-center m-0">
@@ -6943,29 +6944,29 @@ function initWorkShiftScenarioPage() {
       </tr>
     `).join('');
 
-    Array.from(tbodyEl.querySelectorAll('tr')).forEach((tr) => {
-      const checkbox = $('.ceo-shift-day-active', tr);
-      setScheduleRowState(tr, readOnly);
-      checkbox?.addEventListener('change', () => setScheduleRowState(tr, readOnly));
-    });
-  }
+      Array.from(tbodyEl.querySelectorAll('tr')).forEach((tr) => {
+        const checkbox = $('.ceo-shift-day-active', tr);
+        setScheduleRowState(tr, readOnly);
+        checkbox?.addEventListener('change', () => setScheduleRowState(tr, readOnly));
+      });
+    }
 
-  function collectSchedules(tbodyEl) {
-    return Array.from(tbodyEl.querySelectorAll('tr')).map((tr) => ({
-      hari: String(tr.getAttribute('data-day') || '').trim(),
-      aktif: !!$('.ceo-shift-day-active', tr)?.checked,
-      jam_check_in: rowFieldValue(tr, 'td:nth-child(3) input'),
-      jam_check_out: rowFieldValue(tr, 'td:nth-child(4) input'),
-      jam_istirahat: rowFieldValue(tr, 'td:nth-child(5) input'),
-      selesai_istirahat: rowFieldValue(tr, 'td:nth-child(6) input'),
-      toleransi_keterlambatan: rowFieldValue(tr, 'td:nth-child(7) input'),
-      denda_keterlambatan: rowFieldValue(tr, 'td:nth-child(8) input'),
-    }));
-  }
+    function collectSchedules(tbodyEl) {
+      return Array.from(tbodyEl.querySelectorAll('tr')).map((tr) => ({
+        hari: String(tr.getAttribute('data-day') || '').trim(),
+        aktif: !!$('.ceo-shift-day-active', tr)?.checked,
+        jam_check_in: rowFieldValue(tr, 'td:nth-child(3) input'),
+        jam_check_out: rowFieldValue(tr, 'td:nth-child(4) input'),
+        jam_istirahat: rowFieldValue(tr, 'td:nth-child(5) input'),
+        selesai_istirahat: rowFieldValue(tr, 'td:nth-child(6) input'),
+        toleransi_keterlambatan: rowFieldValue(tr, 'td:nth-child(7) input'),
+        denda_keterlambatan: rowFieldValue(tr, 'td:nth-child(8) input'),
+      }));
+    }
 
-  function openModal(mode, data) {
-    const id = 'ceoShiftScenarioModal';
-    const modalEl = ensureModal(id, `
+    function openModal(mode, data) {
+      const id = 'ceoShiftScenarioModal';
+      const modalEl = ensureModal(id, `
       <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
@@ -7006,80 +7007,80 @@ function initWorkShiftScenarioPage() {
         </div>
       </div>
     `);
-    const nameEl = $('#ceoShiftName', modalEl);
-    const activeEl = $('#ceoShiftActive', modalEl);
-    const scheduleBody = $('#ceoShiftScheduleRows', modalEl);
-    const saveBtn = $('#ceoShiftSave', modalEl);
-    setModalActionTitle($('#ceoShiftTitle', modalEl), mode);
-    nameEl.value = String(data?.nama_shift || '');
-    activeEl.value = String(data?.aktif || 'Aktif');
-    renderScheduleRows(scheduleBody, normalizeSchedules(data), mode === 'view');
-    if (mode === 'view') {
-      ceoSetReadonlyFields(modalEl, true);
-      saveBtn.classList.add('d-none');
-    } else {
-      ceoSetReadonlyFields(modalEl, false);
-      saveBtn.classList.remove('d-none');
-    }
-    saveBtn.onclick = () => {
-      const jadwalHari = collectSchedules(scheduleBody);
-      const hariAktif = jadwalHari.filter((item) => item.aktif);
-      if (!String(nameEl.value || '').trim()) return window.alert('Nama shift wajib diisi.');
-      if (!hariAktif.length) return window.alert('Pilih minimal satu hari aktif.');
+      const nameEl = $('#ceoShiftName', modalEl);
+      const activeEl = $('#ceoShiftActive', modalEl);
+      const scheduleBody = $('#ceoShiftScheduleRows', modalEl);
+      const saveBtn = $('#ceoShiftSave', modalEl);
+      setModalActionTitle($('#ceoShiftTitle', modalEl), mode);
+      nameEl.value = String(data?.nama_shift || '');
+      activeEl.value = String(data?.aktif || 'Aktif');
+      renderScheduleRows(scheduleBody, normalizeSchedules(data), mode === 'view');
+      if (mode === 'view') {
+        ceoSetReadonlyFields(modalEl, true);
+        saveBtn.classList.add('d-none');
+      } else {
+        ceoSetReadonlyFields(modalEl, false);
+        saveBtn.classList.remove('d-none');
+      }
+      saveBtn.onclick = () => {
+        const jadwalHari = collectSchedules(scheduleBody);
+        const hariAktif = jadwalHari.filter((item) => item.aktif);
+        if (!String(nameEl.value || '').trim()) return window.alert('Nama shift wajib diisi.');
+        if (!hariAktif.length) return window.alert('Pilih minimal satu hari aktif.');
 
-      const firstActive = hariAktif[0] || {};
-      const payload = {
-        id: data?.id || uid('shift'),
-        nama_shift: String(nameEl.value || '').trim(),
-        aktif: String(activeEl.value || 'Aktif').trim(),
-        hari: hariAktif.map((item) => item.hari),
-        jadwal_hari: jadwalHari,
-        jam_check_in: String(firstActive.jam_check_in || '').trim(),
-        jam_check_out: String(firstActive.jam_check_out || '').trim(),
-        jam_istirahat: String(firstActive.jam_istirahat || '').trim(),
-        selesai_istirahat: String(firstActive.selesai_istirahat || '').trim(),
-        toleransi_keterlambatan: String(firstActive.toleransi_keterlambatan || '').trim(),
-        denda_keterlambatan: String(firstActive.denda_keterlambatan || '').trim(),
-      };
-      const rows = readList(LS.SKENARIO_JAM_KERJA, []);
-      const idx = rows.findIndex((x) => String(x.id) === String(payload.id));
-      if (idx >= 0) rows[idx] = { ...rows[idx], ...payload };
-      else rows.unshift(payload);
-      writeList(LS.SKENARIO_JAM_KERJA, rows);
-      bootstrap.Modal.getOrCreateInstance(modalEl).hide();
-      render();
-    };
-    showModal(id);
-    const titleInput = modalEl.querySelector('.modal-body input, .modal-body select, .modal-body textarea');
-    window.setTimeout(() => titleInput?.focus?.(), 120);
-  }
-
-  addBtn?.addEventListener('click', () => openModal('add', null));
-  table.addEventListener('click', (e) => {
-    const rows = readList(LS.SKENARIO_JAM_KERJA, []);
-    const viewBtn = e.target?.closest?.('button[data-shift-view]');
-    const editBtn = e.target?.closest?.('button[data-shift-edit]');
-    const delBtn = e.target?.closest?.('button[data-shift-del]');
-    if (viewBtn) {
-      const cur = rows.find((x) => String(x.id) === String(viewBtn.getAttribute('data-shift-view') || ''));
-      if (cur) openModal('view', cur);
-      return;
-    }
-    if (editBtn) {
-      const cur = rows.find((x) => String(x.id) === String(editBtn.getAttribute('data-shift-edit') || ''));
-      if (cur) openModal('edit', cur);
-      return;
-    }
-    if (delBtn) {
-      const id = String(delBtn.getAttribute('data-shift-del') || '');
-      confirmDelete('Delete Skenario Jam Kerja ini?', () => {
-        writeList(LS.SKENARIO_JAM_KERJA, rows.filter((x) => String(x.id) !== id));
+        const firstActive = hariAktif[0] || {};
+        const payload = {
+          id: data?.id || uid('shift'),
+          nama_shift: String(nameEl.value || '').trim(),
+          aktif: String(activeEl.value || 'Aktif').trim(),
+          hari: hariAktif.map((item) => item.hari),
+          jadwal_hari: jadwalHari,
+          jam_check_in: String(firstActive.jam_check_in || '').trim(),
+          jam_check_out: String(firstActive.jam_check_out || '').trim(),
+          jam_istirahat: String(firstActive.jam_istirahat || '').trim(),
+          selesai_istirahat: String(firstActive.selesai_istirahat || '').trim(),
+          toleransi_keterlambatan: String(firstActive.toleransi_keterlambatan || '').trim(),
+          denda_keterlambatan: String(firstActive.denda_keterlambatan || '').trim(),
+        };
+        const rows = readList(LS.SKENARIO_JAM_KERJA, []);
+        const idx = rows.findIndex((x) => String(x.id) === String(payload.id));
+        if (idx >= 0) rows[idx] = { ...rows[idx], ...payload };
+        else rows.unshift(payload);
+        writeList(LS.SKENARIO_JAM_KERJA, rows);
+        bootstrap.Modal.getOrCreateInstance(modalEl).hide();
         render();
-      });
+      };
+      showModal(id);
+      const titleInput = modalEl.querySelector('.modal-body input, .modal-body select, .modal-body textarea');
+      window.setTimeout(() => titleInput?.focus?.(), 120);
     }
-  });
-  render();
-}
+
+    addBtn?.addEventListener('click', () => openModal('add', null));
+    table.addEventListener('click', (e) => {
+      const rows = readList(LS.SKENARIO_JAM_KERJA, []);
+      const viewBtn = e.target?.closest?.('button[data-shift-view]');
+      const editBtn = e.target?.closest?.('button[data-shift-edit]');
+      const delBtn = e.target?.closest?.('button[data-shift-del]');
+      if (viewBtn) {
+        const cur = rows.find((x) => String(x.id) === String(viewBtn.getAttribute('data-shift-view') || ''));
+        if (cur) openModal('view', cur);
+        return;
+      }
+      if (editBtn) {
+        const cur = rows.find((x) => String(x.id) === String(editBtn.getAttribute('data-shift-edit') || ''));
+        if (cur) openModal('edit', cur);
+        return;
+      }
+      if (delBtn) {
+        const id = String(delBtn.getAttribute('data-shift-del') || '');
+        confirmDelete('Delete Skenario Jam Kerja ini?', () => {
+          writeList(LS.SKENARIO_JAM_KERJA, rows.filter((x) => String(x.id) !== id));
+          render();
+        });
+      }
+    });
+    render();
+  }
 
 
 
@@ -7171,130 +7172,130 @@ function initWorkShiftScenarioPage() {
   }
 
   function bmEnsureRrkRows() {
-  const stored = readList(BM_RRK_KEY, null);
-  if (Array.isArray(stored)) return stored;
-  const org = bmFirstOrgPath();
-  const demoRows = [
-    {
-      id: 'rrk_demo_1',
-      ...org,
-      rancangan_rencana: 'Menyusun rencana kerja mingguan untuk monitoring progres tim.',
-      tingkat_urgensi: 'Tinggi',
-    },
-    {
-      id: 'rrk_demo_2',
-      ...org,
-      rancangan_rencana: 'Melakukan evaluasi hasil pekerjaan dan menyiapkan laporan follow up.',
-      tingkat_urgensi: 'Sedang',
-    },
-  ];
-  writeList(BM_RRK_KEY, demoRows);
-  return demoRows;
-}
+    const stored = readList(BM_RRK_KEY, null);
+    if (Array.isArray(stored)) return stored;
+    const org = bmFirstOrgPath();
+    const demoRows = [
+      {
+        id: 'rrk_demo_1',
+        ...org,
+        rancangan_rencana: 'Menyusun rencana kerja mingguan untuk monitoring progres tim.',
+        tingkat_urgensi: 'Tinggi',
+      },
+      {
+        id: 'rrk_demo_2',
+        ...org,
+        rancangan_rencana: 'Melakukan evaluasi hasil pekerjaan dan menyiapkan laporan follow up.',
+        tingkat_urgensi: 'Sedang',
+      },
+    ];
+    writeList(BM_RRK_KEY, demoRows);
+    return demoRows;
+  }
 
   function bmEnsureReportRows() {
-  const stored = readList(BM_REPORT_KEY, null);
-  if (Array.isArray(stored)) return stored;
-  const org = bmFirstOrgPath();
-  const rrkRows = bmEnsureRrkRows();
-  const demoRows = [
-    {
-      id: 'report_demo_1',
-      ...org,
-      tanggal: todayISO(),
-      rrk_id: rrkRows[0]?.id || '',
-      pekerjaan: 'Mengecek progres pekerjaan harian dan memastikan tugas prioritas berjalan.',
-      kendala: 'Tidak ada kendala besar.',
-      keterangan: 'Progress berjalan sesuai rencana.',
-      link: '',
-      status: 'Proses',
-    },
-    {
-      id: 'report_demo_2',
-      ...org,
-      tanggal: addDaysISO(todayISO(), -1),
-      rrk_id: rrkRows[1]?.id || rrkRows[0]?.id || '',
-      pekerjaan: 'Merapihkan hasil pengerjaan dan menyiapkan bahan evaluasi.',
-      kendala: 'Butuh konfirmasi minor dari PIC.',
-      keterangan: 'Menunggu feedback lanjutan.',
-      link: '',
-      status: 'Pending',
-    },
-  ];
-  writeList(BM_REPORT_KEY, demoRows);
-  return demoRows;
-}
+    const stored = readList(BM_REPORT_KEY, null);
+    if (Array.isArray(stored)) return stored;
+    const org = bmFirstOrgPath();
+    const rrkRows = bmEnsureRrkRows();
+    const demoRows = [
+      {
+        id: 'report_demo_1',
+        ...org,
+        tanggal: todayISO(),
+        rrk_id: rrkRows[0]?.id || '',
+        pekerjaan: 'Mengecek progres pekerjaan harian dan memastikan tugas prioritas berjalan.',
+        kendala: 'Tidak ada kendala besar.',
+        keterangan: 'Progress berjalan sesuai rencana.',
+        link: '',
+        status: 'Proses',
+      },
+      {
+        id: 'report_demo_2',
+        ...org,
+        tanggal: addDaysISO(todayISO(), -1),
+        rrk_id: rrkRows[1]?.id || rrkRows[0]?.id || '',
+        pekerjaan: 'Merapihkan hasil pengerjaan dan menyiapkan bahan evaluasi.',
+        kendala: 'Butuh konfirmasi minor dari PIC.',
+        keterangan: 'Menunggu feedback lanjutan.',
+        link: '',
+        status: 'Pending',
+      },
+    ];
+    writeList(BM_REPORT_KEY, demoRows);
+    return demoRows;
+  }
 
   function bmEnsureRrkRowsForPath(path) {
-  const rows = bmEnsureRrkRows();
-  const jabatanId = String(path?.jabatan_id || '').trim();
-  if (!jabatanId) return rows;
-  const hasRowsForPath = rows.some((row) => String(row?.jabatan_id || '') === jabatanId);
-  if (hasRowsForPath) return rows;
+    const rows = bmEnsureRrkRows();
+    const jabatanId = String(path?.jabatan_id || '').trim();
+    if (!jabatanId) return rows;
+    const hasRowsForPath = rows.some((row) => String(row?.jabatan_id || '') === jabatanId);
+    if (hasRowsForPath) return rows;
 
-  const demoRows = [
-    {
-      id: `rrk_demo_${jabatanId}_1`,
-      sub_id: String(path?.sub_id || '').trim(),
-      divisi_id: String(path?.divisi_id || '').trim(),
-      jabatan_id: jabatanId,
-      rancangan_rencana: 'Menyusun rencana kerja mingguan untuk monitoring progres tim.',
-      tingkat_urgensi: 'Tinggi',
-    },
-    {
-      id: `rrk_demo_${jabatanId}_2`,
-      sub_id: String(path?.sub_id || '').trim(),
-      divisi_id: String(path?.divisi_id || '').trim(),
-      jabatan_id: jabatanId,
-      rancangan_rencana: 'Melakukan evaluasi hasil pekerjaan dan menyiapkan laporan follow up.',
-      tingkat_urgensi: 'Sedang',
-    },
-  ];
-  const nextRows = [...demoRows, ...rows];
-  writeList(BM_RRK_KEY, nextRows);
-  return nextRows;
-}
+    const demoRows = [
+      {
+        id: `rrk_demo_${jabatanId}_1`,
+        sub_id: String(path?.sub_id || '').trim(),
+        divisi_id: String(path?.divisi_id || '').trim(),
+        jabatan_id: jabatanId,
+        rancangan_rencana: 'Menyusun rencana kerja mingguan untuk monitoring progres tim.',
+        tingkat_urgensi: 'Tinggi',
+      },
+      {
+        id: `rrk_demo_${jabatanId}_2`,
+        sub_id: String(path?.sub_id || '').trim(),
+        divisi_id: String(path?.divisi_id || '').trim(),
+        jabatan_id: jabatanId,
+        rancangan_rencana: 'Melakukan evaluasi hasil pekerjaan dan menyiapkan laporan follow up.',
+        tingkat_urgensi: 'Sedang',
+      },
+    ];
+    const nextRows = [...demoRows, ...rows];
+    writeList(BM_RRK_KEY, nextRows);
+    return nextRows;
+  }
 
   function bmEnsureReportRowsForPath(path) {
-  const rows = bmEnsureReportRows();
-  const jabatanId = String(path?.jabatan_id || '').trim();
-  if (!jabatanId) return rows;
-  const hasRowsForPath = rows.some((row) => String(row?.jabatan_id || '') === jabatanId);
-  if (hasRowsForPath) return rows;
+    const rows = bmEnsureReportRows();
+    const jabatanId = String(path?.jabatan_id || '').trim();
+    if (!jabatanId) return rows;
+    const hasRowsForPath = rows.some((row) => String(row?.jabatan_id || '') === jabatanId);
+    if (hasRowsForPath) return rows;
 
-  const rrkRows = bmEnsureRrkRowsForPath(path).filter((rrk) => String(rrk?.jabatan_id || '') === jabatanId);
-  const demoRows = [
-    {
-      id: `report_demo_${jabatanId}_1`,
-      sub_id: String(path?.sub_id || '').trim(),
-      divisi_id: String(path?.divisi_id || '').trim(),
-      jabatan_id: jabatanId,
-      tanggal: todayISO(),
-      rrk_id: rrkRows[0]?.id || '',
-      pekerjaan: 'Mengecek progres pekerjaan harian dan memastikan tugas prioritas berjalan.',
-      kendala: 'Tidak ada kendala besar.',
-      keterangan: 'Progress berjalan sesuai rencana.',
-      link: '',
-      status: 'Proses',
-    },
-    {
-      id: `report_demo_${jabatanId}_2`,
-      sub_id: String(path?.sub_id || '').trim(),
-      divisi_id: String(path?.divisi_id || '').trim(),
-      jabatan_id: jabatanId,
-      tanggal: addDaysISO(todayISO(), -1),
-      rrk_id: rrkRows[1]?.id || rrkRows[0]?.id || '',
-      pekerjaan: 'Merapihkan hasil pengerjaan dan menyiapkan bahan evaluasi.',
-      kendala: 'Butuh konfirmasi minor dari PIC.',
-      keterangan: 'Menunggu feedback lanjutan.',
-      link: '',
-      status: 'Pending',
-    },
-  ];
-  const nextRows = [...demoRows, ...rows];
-  writeList(BM_REPORT_KEY, nextRows);
-  return nextRows;
-}
+    const rrkRows = bmEnsureRrkRowsForPath(path).filter((rrk) => String(rrk?.jabatan_id || '') === jabatanId);
+    const demoRows = [
+      {
+        id: `report_demo_${jabatanId}_1`,
+        sub_id: String(path?.sub_id || '').trim(),
+        divisi_id: String(path?.divisi_id || '').trim(),
+        jabatan_id: jabatanId,
+        tanggal: todayISO(),
+        rrk_id: rrkRows[0]?.id || '',
+        pekerjaan: 'Mengecek progres pekerjaan harian dan memastikan tugas prioritas berjalan.',
+        kendala: 'Tidak ada kendala besar.',
+        keterangan: 'Progress berjalan sesuai rencana.',
+        link: '',
+        status: 'Proses',
+      },
+      {
+        id: `report_demo_${jabatanId}_2`,
+        sub_id: String(path?.sub_id || '').trim(),
+        divisi_id: String(path?.divisi_id || '').trim(),
+        jabatan_id: jabatanId,
+        tanggal: addDaysISO(todayISO(), -1),
+        rrk_id: rrkRows[1]?.id || rrkRows[0]?.id || '',
+        pekerjaan: 'Merapihkan hasil pengerjaan dan menyiapkan bahan evaluasi.',
+        kendala: 'Butuh konfirmasi minor dari PIC.',
+        keterangan: 'Menunggu feedback lanjutan.',
+        link: '',
+        status: 'Pending',
+      },
+    ];
+    const nextRows = [...demoRows, ...rows];
+    writeList(BM_REPORT_KEY, nextRows);
+    return nextRows;
+  }
 
 
   function bmOptionLabel(row, fallback = '-') {
@@ -7636,7 +7637,7 @@ function initWorkShiftScenarioPage() {
           </td>
         </tr>
       `.trim()).join('');
-      (window.ceoRefreshCrudActions || function () {})(table);
+      (window.ceoRefreshCrudActions || function () { })(table);
     }
 
     function openRrkModal(mode, data = {}) {
@@ -7790,7 +7791,7 @@ function initWorkShiftScenarioPage() {
           </tr>
         `.trim();
       }).join('');
-      (window.ceoRefreshCrudActions || function () {})(table);
+      (window.ceoRefreshCrudActions || function () { })(table);
     }
 
     function openReportModal(mode, data = {}) {
@@ -7930,7 +7931,7 @@ function initWorkShiftScenarioPage() {
     render();
   }
 
-// --------------------------------------------------------------
+  // --------------------------------------------------------------
   // Run
   // --------------------------------------------------------------
   function boot() {
@@ -7940,12 +7941,12 @@ function initWorkShiftScenarioPage() {
     try {
       const u = new URL(window.location.href);
       if (u.searchParams.get('reset_data') === '1') {
-        Object.values(LS).forEach((k) => { try { localStorage.removeItem(k); } catch (e) {} });
+        Object.values(LS).forEach((k) => { try { localStorage.removeItem(k); } catch (e) { } });
         // legacy keys
-        try { localStorage.removeItem('ceoEmployeesV1'); } catch (e) {}
-        try { localStorage.removeItem('ceoDivisionsV1'); } catch (e) {}
+        try { localStorage.removeItem('ceoEmployeesV1'); } catch (e) { }
+        try { localStorage.removeItem('ceoDivisionsV1'); } catch (e) { }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     ensureSeeds();
     applyCompanyBranding();
@@ -9301,7 +9302,7 @@ function initWorkShiftScenarioPage() {
       try {
         const parsed = JSON.parse(storedRaw);
         if (parsed && typeof parsed === 'object') return parsed;
-      } catch (error) {}
+      } catch (error) { }
     }
 
     const cells = row ? $$('td', row) : [];
@@ -10424,6 +10425,7 @@ function initWorkShiftScenarioPage() {
         '  <div class="card-body d-flex flex-column gap-2">',
         '    <span class="bm-folder-icon bm-folder-icon-lg"><iconify-icon icon="' + meta.icon + '"></iconify-icon></span>',
         '    <div class="fw-semibold bm-folder-title"><span class="bm-folder-title-text">' + safeName + '</span></div>',
+        '    <div class="text-muted bm-folder-date">' + date + '</div>',
         link ? '    <small class="text-muted text-truncate" title="' + safeLink + '">Link: tersedia</small>' : '    <small class="text-muted">' + meta.gridLabel + '</small>',
         '  </div>',
         '</div>'
@@ -11062,25 +11064,25 @@ function initWorkShiftScenarioPage() {
     modalEl.setAttribute('aria-hidden', 'true');
     modalEl.innerHTML = [
       '<div class="modal-dialog modal-dialog-centered">',
-        '<div class="modal-content">',
-          '<div class="bm-rename-shell bm-upload-folder-shell">',
-            '<h4 class="bm-rename-title">Upload Folder</h4>',
-            '<div class="bm-rename-field bm-upload-folder-info">',
-              '<label>Pilih Folder</label>',
-              '<div class="bm-upload-folder-box">',
-                '<span class="bm-upload-folder-icon"><iconify-icon icon="material-symbols:drive-folder-upload-rounded"></iconify-icon></span>',
-                '<div>',
-                  '<strong>Upload seluruh isi folder</strong>',
-                  '<small>Folder, subfolder, PDF, Word, gambar, dan file lain akan ikut masuk.</small>',
-                '</div>',
-              '</div>',
-            '</div>',
-            '<div class="bm-rename-actions">',
-              '<button class="btn bm-rename-btn bm-rename-btn-cancel" type="button" data-bs-dismiss="modal">Batal</button>',
-              '<button class="btn bm-rename-btn bm-rename-btn-ok" type="button" id="dkUploadFolderChooseBtn">Pilih Folder</button>',
-            '</div>',
-          '</div>',
-        '</div>',
+      '<div class="modal-content">',
+      '<div class="bm-rename-shell bm-upload-folder-shell">',
+      '<h4 class="bm-rename-title">Upload Folder</h4>',
+      '<div class="bm-rename-field bm-upload-folder-info">',
+      '<label>Pilih Folder</label>',
+      '<div class="bm-upload-folder-box">',
+      '<span class="bm-upload-folder-icon"><iconify-icon icon="material-symbols:drive-folder-upload-rounded"></iconify-icon></span>',
+      '<div>',
+      '<strong>Upload seluruh isi folder</strong>',
+      '<small>Folder, subfolder, PDF, Word, gambar, dan file lain akan ikut masuk.</small>',
+      '</div>',
+      '</div>',
+      '</div>',
+      '<div class="bm-rename-actions">',
+      '<button class="btn bm-rename-btn bm-rename-btn-cancel" type="button" data-bs-dismiss="modal">Batal</button>',
+      '<button class="btn bm-rename-btn bm-rename-btn-ok" type="button" id="dkUploadFolderChooseBtn">Pilih Folder</button>',
+      '</div>',
+      '</div>',
+      '</div>',
       '</div>'
     ].join('');
 
@@ -11434,34 +11436,34 @@ function initWorkShiftScenarioPage() {
     const recipientRows = [
       '<div class="bm-template-preview-section-title">' + recipientTitle + '</div>',
       '<div class="bm-template-preview-box">',
-        '<div class="bm-template-preview-row"><span>Nama</span><span>:</span><strong>' + escapeTemplateValue(recipient.name) + '</strong></div>',
-        recipient.isCustom ? '' : '<div class="bm-template-preview-row"><span>NIK/ID</span><span>:</span><span>' + escapeTemplateValue(recipient.employeeNo) + '</span></div>',
-        recipient.isCustom ? '' : '<div class="bm-template-preview-row"><span>Jabatan</span><span>:</span><span>' + escapeTemplateValue(recipient.position) + '</span></div>',
-        recipient.isCustom ? '' : '<div class="bm-template-preview-row"><span>Divisi</span><span>:</span><span>' + escapeTemplateValue(recipient.division) + '</span></div>',
-        '<div class="bm-template-preview-row"><span>Perusahaan</span><span>:</span><span>' + escapeTemplateValue(recipient.company) + '</span></div>',
+      '<div class="bm-template-preview-row"><span>Nama</span><span>:</span><strong>' + escapeTemplateValue(recipient.name) + '</strong></div>',
+      recipient.isCustom ? '' : '<div class="bm-template-preview-row"><span>NIK/ID</span><span>:</span><span>' + escapeTemplateValue(recipient.employeeNo) + '</span></div>',
+      recipient.isCustom ? '' : '<div class="bm-template-preview-row"><span>Jabatan</span><span>:</span><span>' + escapeTemplateValue(recipient.position) + '</span></div>',
+      recipient.isCustom ? '' : '<div class="bm-template-preview-row"><span>Divisi</span><span>:</span><span>' + escapeTemplateValue(recipient.division) + '</span></div>',
+      '<div class="bm-template-preview-row"><span>Perusahaan</span><span>:</span><span>' + escapeTemplateValue(recipient.company) + '</span></div>',
       '</div>'
     ].join('');
 
     if (template.kind === 'letter') {
       return [
         '<div class="bm-template-preview-a4-stack">',
-          '<section class="bm-template-preview-document bm-template-preview-a4-page">',
-            '<div class="bm-template-preview-doc-head">',
-              '<h5>SURAT RESMI</h5>',
-              '<div class="bm-template-preview-doc-number">No: ' + escapeTemplateValue(docNumber) + '</div>',
-            '</div>',
-            '<p class="mb-1">Tasikmalaya, ' + escapeTemplateValue(todayText) + '</p>',
-            '<p>Kepada Yth.<br><strong>' + escapeTemplateValue(recipient.name || 'Nama Tujuan') + '</strong><br>di Tempat</p>',
-            '<p>Dengan hormat,</p>',
-            '<p>Melalui surat ini, PT Bisa Media Grup menyampaikan pemberitahuan atau informasi resmi yang berkaitan dengan kebutuhan administrasi, pekerjaan, atau koordinasi perusahaan.</p>',
-            '<p>Adapun isi surat dapat disesuaikan kembali berdasarkan kebutuhan, nama penerima, jabatan, dan konteks dokumen yang akan digunakan.</p>',
-            '<p>Demikian surat ini dibuat untuk digunakan sebagaimana mestinya. Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>',
-            '<div class="bm-template-preview-sign">',
-              '<div><div>Hormat kami,</div><div class="bm-template-preview-line">PT Bisa Media Grup</div></div>',
-              '<div><div>Penerima</div><div class="bm-template-preview-line">' + escapeTemplateValue(recipient.name) + '</div></div>',
-            '</div>',
-            '<div class="bm-template-preview-page-number">Hal. 1</div>',
-          '</section>',
+        '<section class="bm-template-preview-document bm-template-preview-a4-page">',
+        '<div class="bm-template-preview-doc-head">',
+        '<h5>SURAT RESMI</h5>',
+        '<div class="bm-template-preview-doc-number">No: ' + escapeTemplateValue(docNumber) + '</div>',
+        '</div>',
+        '<p class="mb-1">Tasikmalaya, ' + escapeTemplateValue(todayText) + '</p>',
+        '<p>Kepada Yth.<br><strong>' + escapeTemplateValue(recipient.name || 'Nama Tujuan') + '</strong><br>di Tempat</p>',
+        '<p>Dengan hormat,</p>',
+        '<p>Melalui surat ini, PT Bisa Media Grup menyampaikan pemberitahuan atau informasi resmi yang berkaitan dengan kebutuhan administrasi, pekerjaan, atau koordinasi perusahaan.</p>',
+        '<p>Adapun isi surat dapat disesuaikan kembali berdasarkan kebutuhan, nama penerima, jabatan, dan konteks dokumen yang akan digunakan.</p>',
+        '<p>Demikian surat ini dibuat untuk digunakan sebagaimana mestinya. Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>',
+        '<div class="bm-template-preview-sign">',
+        '<div><div>Hormat kami,</div><div class="bm-template-preview-line">PT Bisa Media Grup</div></div>',
+        '<div><div>Penerima</div><div class="bm-template-preview-line">' + escapeTemplateValue(recipient.name) + '</div></div>',
+        '</div>',
+        '<div class="bm-template-preview-page-number">Hal. 1</div>',
+        '</section>',
         '</div>'
       ].join('');
     }
@@ -11469,73 +11471,73 @@ function initWorkShiftScenarioPage() {
     if (template.kind === 'free') {
       return [
         '<div class="bm-template-preview-a4-stack">',
-          '<section class="bm-template-preview-document bm-template-preview-a4-page">',
-            '<div class="bm-template-preview-doc-head">',
-              '<h5>DOKUMEN BEBAS</h5>',
-              '<div class="bm-template-preview-doc-number">No: ' + escapeTemplateValue(docNumber) + '</div>',
-            '</div>',
-            recipientRows,
-            '<div class="bm-template-preview-section-title">Isi Dokumen</div>',
-            '<p>Template ini disediakan untuk kebutuhan dokumen umum yang formatnya dapat disesuaikan sendiri, seperti berita acara, memo internal, catatan kerja, pengajuan, atau dokumen administratif lainnya.</p>',
-            '<p>Bagian isi dapat diedit sesuai kebutuhan perusahaan, unit kerja, maupun pihak penerima dokumen.</p>',
-            '<div class="bm-template-preview-sign">',
-              '<div><div>Tasikmalaya, ' + escapeTemplateValue(todayText) + '</div><div class="bm-template-preview-line">Pembuat Dokumen</div></div>',
-              '<div><div>Penerima</div><div class="bm-template-preview-line">' + escapeTemplateValue(recipient.name) + '</div></div>',
-            '</div>',
-            '<div class="bm-template-preview-page-number">Hal. 1</div>',
-          '</section>',
+        '<section class="bm-template-preview-document bm-template-preview-a4-page">',
+        '<div class="bm-template-preview-doc-head">',
+        '<h5>DOKUMEN BEBAS</h5>',
+        '<div class="bm-template-preview-doc-number">No: ' + escapeTemplateValue(docNumber) + '</div>',
+        '</div>',
+        recipientRows,
+        '<div class="bm-template-preview-section-title">Isi Dokumen</div>',
+        '<p>Template ini disediakan untuk kebutuhan dokumen umum yang formatnya dapat disesuaikan sendiri, seperti berita acara, memo internal, catatan kerja, pengajuan, atau dokumen administratif lainnya.</p>',
+        '<p>Bagian isi dapat diedit sesuai kebutuhan perusahaan, unit kerja, maupun pihak penerima dokumen.</p>',
+        '<div class="bm-template-preview-sign">',
+        '<div><div>Tasikmalaya, ' + escapeTemplateValue(todayText) + '</div><div class="bm-template-preview-line">Pembuat Dokumen</div></div>',
+        '<div><div>Penerima</div><div class="bm-template-preview-line">' + escapeTemplateValue(recipient.name) + '</div></div>',
+        '</div>',
+        '<div class="bm-template-preview-page-number">Hal. 1</div>',
+        '</section>',
         '</div>'
       ].join('');
     }
 
     return [
       '<div class="bm-template-preview-a4-stack bm-template-preview-contract-stack">',
-        '<section class="bm-template-preview-document bm-template-preview-a4-page">',
-          '<div class="bm-template-preview-doc-head">',
-            '<h5>PERJANJIAN KERJA WAKTU TERTENTU</h5>',
-            '<div class="bm-template-preview-doc-number">No: ' + escapeTemplateValue(docNumber) + '</div>',
-          '</div>',
-          '<p>Pada hari ini, ' + escapeTemplateValue(todayText) + ', bertempat di Tasikmalaya, yang bertanda tangan di bawah ini:</p>',
-          '<ol class="bm-template-preview-ordered">',
-            '<li><strong>PT Bisa Media Grup</strong>, selanjutnya disebut sebagai <strong>PIHAK PERTAMA</strong>.</li>',
-            '<li><strong>' + escapeTemplateValue(recipient.name) + '</strong>, selanjutnya disebut sebagai <strong>PIHAK KEDUA</strong>.</li>',
-          '</ol>',
-          recipientRows,
-          '<div class="bm-template-preview-section-title">Pasal 1 - Ruang Lingkup Pekerjaan</div>',
-          '<p>PIHAK KEDUA bersedia melaksanakan pekerjaan sesuai jabatan, penempatan, arahan kerja, target, dan standar operasional yang ditetapkan oleh PIHAK PERTAMA.</p>',
-          '<div class="bm-template-preview-section-title">Pasal 2 - Masa Perjanjian</div>',
-          '<p>Perjanjian kerja ini berlaku untuk jangka waktu tertentu sesuai kesepakatan para pihak dan dapat diperpanjang berdasarkan kebutuhan perusahaan serta hasil evaluasi kinerja.</p>',
-          '<div class="bm-template-preview-section-title">Pasal 3 - Waktu Kerja</div>',
-          '<p>Waktu kerja mengikuti ketentuan perusahaan. Penyesuaian jadwal dapat dilakukan sesuai kebutuhan operasional, sistem kerja, dan arahan atasan langsung.</p>',
-          '<div class="bm-template-preview-page-number">Hal. 1</div>',
-        '</section>',
+      '<section class="bm-template-preview-document bm-template-preview-a4-page">',
+      '<div class="bm-template-preview-doc-head">',
+      '<h5>PERJANJIAN KERJA WAKTU TERTENTU</h5>',
+      '<div class="bm-template-preview-doc-number">No: ' + escapeTemplateValue(docNumber) + '</div>',
+      '</div>',
+      '<p>Pada hari ini, ' + escapeTemplateValue(todayText) + ', bertempat di Tasikmalaya, yang bertanda tangan di bawah ini:</p>',
+      '<ol class="bm-template-preview-ordered">',
+      '<li><strong>PT Bisa Media Grup</strong>, selanjutnya disebut sebagai <strong>PIHAK PERTAMA</strong>.</li>',
+      '<li><strong>' + escapeTemplateValue(recipient.name) + '</strong>, selanjutnya disebut sebagai <strong>PIHAK KEDUA</strong>.</li>',
+      '</ol>',
+      recipientRows,
+      '<div class="bm-template-preview-section-title">Pasal 1 - Ruang Lingkup Pekerjaan</div>',
+      '<p>PIHAK KEDUA bersedia melaksanakan pekerjaan sesuai jabatan, penempatan, arahan kerja, target, dan standar operasional yang ditetapkan oleh PIHAK PERTAMA.</p>',
+      '<div class="bm-template-preview-section-title">Pasal 2 - Masa Perjanjian</div>',
+      '<p>Perjanjian kerja ini berlaku untuk jangka waktu tertentu sesuai kesepakatan para pihak dan dapat diperpanjang berdasarkan kebutuhan perusahaan serta hasil evaluasi kinerja.</p>',
+      '<div class="bm-template-preview-section-title">Pasal 3 - Waktu Kerja</div>',
+      '<p>Waktu kerja mengikuti ketentuan perusahaan. Penyesuaian jadwal dapat dilakukan sesuai kebutuhan operasional, sistem kerja, dan arahan atasan langsung.</p>',
+      '<div class="bm-template-preview-page-number">Hal. 1</div>',
+      '</section>',
 
-        '<section class="bm-template-preview-document bm-template-preview-a4-page">',
-          '<div class="bm-template-preview-section-title">Pasal 4 - Hak dan Kewajiban</div>',
-          '<p>PIHAK KEDUA wajib menjaga kedisiplinan, menjalankan pekerjaan dengan penuh tanggung jawab, menjaga etika kerja, serta mematuhi seluruh kebijakan dan peraturan perusahaan.</p>',
-          '<p>PIHAK PERTAMA wajib memberikan arahan kerja, fasilitas kerja yang diperlukan, serta hak-hak PIHAK KEDUA sesuai ketentuan perusahaan dan kesepakatan yang berlaku.</p>',
-          '<div class="bm-template-preview-section-title">Pasal 5 - Kompensasi</div>',
-          '<p>Ketentuan mengenai gaji, tunjangan, insentif, benefit, dan pembayaran lainnya ditetapkan berdasarkan kebijakan perusahaan serta dapat disesuaikan dengan hasil evaluasi dan kebutuhan operasional.</p>',
-          '<div class="bm-template-preview-section-title">Pasal 6 - Kerahasiaan</div>',
-          '<p>PIHAK KEDUA wajib menjaga seluruh informasi perusahaan, data klien, data kreator, strategi bisnis, dokumen internal, sistem kerja, serta informasi lain yang bersifat rahasia.</p>',
-          '<div class="bm-template-preview-section-title">Pasal 7 - Larangan</div>',
-          '<p>PIHAK KEDUA dilarang menggunakan aset, data, dokumen, maupun akses perusahaan untuk kepentingan pribadi atau pihak lain tanpa persetujuan tertulis dari PIHAK PERTAMA.</p>',
-          '<div class="bm-template-preview-page-number">Hal. 2</div>',
-        '</section>',
+      '<section class="bm-template-preview-document bm-template-preview-a4-page">',
+      '<div class="bm-template-preview-section-title">Pasal 4 - Hak dan Kewajiban</div>',
+      '<p>PIHAK KEDUA wajib menjaga kedisiplinan, menjalankan pekerjaan dengan penuh tanggung jawab, menjaga etika kerja, serta mematuhi seluruh kebijakan dan peraturan perusahaan.</p>',
+      '<p>PIHAK PERTAMA wajib memberikan arahan kerja, fasilitas kerja yang diperlukan, serta hak-hak PIHAK KEDUA sesuai ketentuan perusahaan dan kesepakatan yang berlaku.</p>',
+      '<div class="bm-template-preview-section-title">Pasal 5 - Kompensasi</div>',
+      '<p>Ketentuan mengenai gaji, tunjangan, insentif, benefit, dan pembayaran lainnya ditetapkan berdasarkan kebijakan perusahaan serta dapat disesuaikan dengan hasil evaluasi dan kebutuhan operasional.</p>',
+      '<div class="bm-template-preview-section-title">Pasal 6 - Kerahasiaan</div>',
+      '<p>PIHAK KEDUA wajib menjaga seluruh informasi perusahaan, data klien, data kreator, strategi bisnis, dokumen internal, sistem kerja, serta informasi lain yang bersifat rahasia.</p>',
+      '<div class="bm-template-preview-section-title">Pasal 7 - Larangan</div>',
+      '<p>PIHAK KEDUA dilarang menggunakan aset, data, dokumen, maupun akses perusahaan untuk kepentingan pribadi atau pihak lain tanpa persetujuan tertulis dari PIHAK PERTAMA.</p>',
+      '<div class="bm-template-preview-page-number">Hal. 2</div>',
+      '</section>',
 
-        '<section class="bm-template-preview-document bm-template-preview-a4-page">',
-          '<div class="bm-template-preview-section-title">Pasal 8 - Evaluasi dan Pemutusan Perjanjian</div>',
-          '<p>PIHAK PERTAMA berhak melakukan evaluasi terhadap kinerja PIHAK KEDUA. Apabila ditemukan pelanggaran, ketidaksesuaian kinerja, atau kebutuhan organisasi berubah, maka perjanjian dapat ditinjau kembali sesuai ketentuan yang berlaku.</p>',
-          '<div class="bm-template-preview-section-title">Pasal 9 - Penyelesaian Perselisihan</div>',
-          '<p>Apabila terjadi perselisihan, para pihak sepakat untuk menyelesaikan terlebih dahulu melalui musyawarah secara baik-baik. Apabila tidak tercapai kesepakatan, penyelesaian dilakukan sesuai ketentuan hukum yang berlaku.</p>',
-          '<div class="bm-template-preview-section-title">Pasal 10 - Penutup</div>',
-          '<p>Perjanjian ini dibuat dengan itikad baik dan dipahami oleh para pihak. Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian berdasarkan kesepakatan tertulis.</p>',
-          '<div class="bm-template-preview-sign">',
-            '<div><div>PIHAK PERTAMA</div><div class="bm-template-preview-line">PT Bisa Media Grup</div></div>',
-            '<div><div>PIHAK KEDUA</div><div class="bm-template-preview-line">' + escapeTemplateValue(recipient.name) + '</div></div>',
-          '</div>',
-          '<div class="bm-template-preview-page-number">Hal. 3</div>',
-        '</section>',
+      '<section class="bm-template-preview-document bm-template-preview-a4-page">',
+      '<div class="bm-template-preview-section-title">Pasal 8 - Evaluasi dan Pemutusan Perjanjian</div>',
+      '<p>PIHAK PERTAMA berhak melakukan evaluasi terhadap kinerja PIHAK KEDUA. Apabila ditemukan pelanggaran, ketidaksesuaian kinerja, atau kebutuhan organisasi berubah, maka perjanjian dapat ditinjau kembali sesuai ketentuan yang berlaku.</p>',
+      '<div class="bm-template-preview-section-title">Pasal 9 - Penyelesaian Perselisihan</div>',
+      '<p>Apabila terjadi perselisihan, para pihak sepakat untuk menyelesaikan terlebih dahulu melalui musyawarah secara baik-baik. Apabila tidak tercapai kesepakatan, penyelesaian dilakukan sesuai ketentuan hukum yang berlaku.</p>',
+      '<div class="bm-template-preview-section-title">Pasal 10 - Penutup</div>',
+      '<p>Perjanjian ini dibuat dengan itikad baik dan dipahami oleh para pihak. Hal-hal yang belum diatur dalam perjanjian ini akan diatur kemudian berdasarkan kesepakatan tertulis.</p>',
+      '<div class="bm-template-preview-sign">',
+      '<div><div>PIHAK PERTAMA</div><div class="bm-template-preview-line">PT Bisa Media Grup</div></div>',
+      '<div><div>PIHAK KEDUA</div><div class="bm-template-preview-line">' + escapeTemplateValue(recipient.name) + '</div></div>',
+      '</div>',
+      '<div class="bm-template-preview-page-number">Hal. 3</div>',
+      '</section>',
       '</div>'
     ].join('');
   }
@@ -11682,8 +11684,8 @@ function initWorkShiftScenarioPage() {
     card.setAttribute('data-template-name', safeName);
     card.innerHTML = [
       '<div class="bm-template-card-head">',
-        '<h5 class="bm-template-card-title">' + escapeTemplateValue(safeName) + '</h5>',
-        '<button class="bm-template-card-dots" type="button" data-template-dots aria-label="Aksi template"><iconify-icon icon="mdi:dots-vertical"></iconify-icon></button>',
+      '<h5 class="bm-template-card-title">' + escapeTemplateValue(safeName) + '</h5>',
+      '<button class="bm-template-card-dots" type="button" data-template-dots aria-label="Aksi template"><iconify-icon icon="mdi:dots-vertical"></iconify-icon></button>',
       '</div>',
       '<div class="bm-template-card-body"><iconify-icon class="bm-template-doc-icon" icon="solar:folder-open-bold"></iconify-icon></div>'
     ].join('');
@@ -11924,17 +11926,17 @@ function initWorkShiftScenarioPage() {
     if (String(renderedHtml).indexOf('bm-template-inline-saved-page') >= 0) {
       return [
         '<div class="bm-template-preview-a4-stack bm-template-preview-a4-stack--inline">',
-          renderedHtml,
+        renderedHtml,
         '</div>'
       ].join('');
     }
 
     return [
       '<div class="bm-template-preview-document">',
-        '<h4>' + escapeHtml(cleanTitle.toUpperCase()) + '</h4>',
-        '<div class="bm-template-preview-section">',
-          renderedHtml,
-        '</div>',
+      '<h4>' + escapeHtml(cleanTitle.toUpperCase()) + '</h4>',
+      '<div class="bm-template-preview-section">',
+      renderedHtml,
+      '</div>',
       '</div>'
     ].join('');
   }
@@ -11947,7 +11949,7 @@ function initWorkShiftScenarioPage() {
       '<div class="bm-template-inline-page-label">Halaman ' + String(pageNumber || 1) + '</div>',
       '<div class="bm-template-inline-doc-header">Header</div>',
       '<div class="bm-template-inline-body" contenteditable="true" spellcheck="false" data-placeholder="Tulis template dokumen di sini...">',
-        bodyHtml || '<p><br></p>',
+      bodyHtml || '<p><br></p>',
       '</div>',
       '<div class="bm-template-inline-doc-footer">Footer</div>'
     ].join('');
@@ -12073,7 +12075,7 @@ function initWorkShiftScenarioPage() {
     body.addEventListener('keydown', function (event) {
       if (event.key === 'Tab') {
         event.preventDefault();
-        try { document.execCommand('insertText', false, '    '); } catch (error) {}
+        try { document.execCommand('insertText', false, '    '); } catch (error) { }
       }
 
       if (event.key === 'Enter' && body.scrollHeight >= body.clientHeight - 24) {
@@ -12090,10 +12092,10 @@ function initWorkShiftScenarioPage() {
       const content = String(body.innerHTML || '').trim() || '<p><br></p>';
       return [
         '<section class="bm-template-preview-document bm-template-preview-a4-page bm-template-inline-saved-page">',
-          '<div class="bm-template-preview-page-number">Halaman ' + String(index + 1) + '</div>',
-          '<div class="bm-template-preview-section">',
-            content,
-          '</div>',
+        '<div class="bm-template-preview-page-number">Halaman ' + String(index + 1) + '</div>',
+        '<div class="bm-template-preview-section">',
+        content,
+        '</div>',
         '</section>'
       ].join('');
     }).join('');
@@ -12161,57 +12163,57 @@ function initWorkShiftScenarioPage() {
     editor.className = 'bm-template-inline-docs';
     editor.innerHTML = [
       '<div class="bm-template-inline-topbar">',
-        '<button class="btn btn-sm btn-outline-secondary bm-template-inline-back" type="button" id="bmTemplateInlineBack">',
-          '<i class="bx bx-arrow-back me-1"></i>Kembali',
-        '</button>',
-        '<div class="bm-template-inline-file">',
-          '<span class="bm-template-inline-file-icon"><iconify-icon icon="mdi:file-document-edit-outline"></iconify-icon></span>',
-          '<div class="bm-template-inline-file-main">',
-            '<input class="bm-template-inline-title" id="bmTemplateInlineTitle" value="Untitled document" aria-label="Judul template" />',
-            '<div class="bm-template-inline-url">docs.google.com/document/d/template-baru/edit</div>',
-          '</div>',
-        '</div>',
-        '<button class="btn btn-primary btn-sm bm-template-inline-save" type="button" id="bmTemplateInlineSave">Simpan Template</button>',
+      '<button class="btn btn-sm btn-outline-secondary bm-template-inline-back" type="button" id="bmTemplateInlineBack">',
+      '<i class="bx bx-arrow-back me-1"></i>Kembali',
+      '</button>',
+      '<div class="bm-template-inline-file">',
+      '<span class="bm-template-inline-file-icon"><iconify-icon icon="mdi:file-document-edit-outline"></iconify-icon></span>',
+      '<div class="bm-template-inline-file-main">',
+      '<input class="bm-template-inline-title" id="bmTemplateInlineTitle" value="Untitled document" aria-label="Judul template" />',
+      '<div class="bm-template-inline-url">docs.google.com/document/d/template-baru/edit</div>',
+      '</div>',
+      '</div>',
+      '<button class="btn btn-primary btn-sm bm-template-inline-save" type="button" id="bmTemplateInlineSave">Simpan Template</button>',
       '</div>',
       '<div class="bm-template-inline-toolbar" aria-label="Toolbar dokumen">',
-        '<button type="button" data-inline-command="bold"><strong>B</strong></button>',
-        '<button type="button" data-inline-command="italic"><em>I</em></button>',
-        '<button type="button" data-inline-command="underline"><u>U</u></button>',
-        '<span class="bm-template-inline-separator"></span>',
-        '<button type="button" data-inline-command="insertUnorderedList"><i class="bx bx-list-ul"></i></button>',
-        '<button type="button" data-inline-command="insertOrderedList"><i class="bx bx-list-ol"></i></button>',
-        '<span class="bm-template-inline-separator"></span>',
-        '<button type="button" data-inline-command="justifyLeft"><i class="bx bx-align-left"></i></button>',
-        '<button type="button" data-inline-command="justifyCenter"><i class="bx bx-align-middle"></i></button>',
-        '<button type="button" data-inline-command="justifyRight"><i class="bx bx-align-right"></i></button>',
-        '<span class="bm-template-inline-separator"></span>',
-        '<div class="bm-template-inline-variable-wrap">',
-          '<select class="bm-template-inline-variable-select" id="bmTemplateInlineVariableSelect" aria-label="Pilih variable karyawan">',
-            '<option value="">Variable Karyawan</option>',
-            '<option value="{{nama_karyawan}}">Nama Karyawan</option>',
-            '<option value="{{nik}}">NIK / ID Karyawan</option>',
-            '<option value="{{jabatan}}">Jabatan</option>',
-            '<option value="{{divisi}}">Divisi</option>',
-            '<option value="{{sub_perusahaan}}">Sub Perusahaan</option>',
-            '<option value="{{email_karyawan}}">Email</option>',
-            '<option value="{{nomor_dokumen}}">Nomor Dokumen</option>',
-            '<option value="{{tanggal_dokumen}}">Tanggal Dokumen</option>',
-          '</select>',
-          '<button class="bm-template-inline-variable-btn" type="button" id="bmTemplateInlineInsertVariable">Masukkan</button>',
-        '</div>',
+      '<button type="button" data-inline-command="bold"><strong>B</strong></button>',
+      '<button type="button" data-inline-command="italic"><em>I</em></button>',
+      '<button type="button" data-inline-command="underline"><u>U</u></button>',
+      '<span class="bm-template-inline-separator"></span>',
+      '<button type="button" data-inline-command="insertUnorderedList"><i class="bx bx-list-ul"></i></button>',
+      '<button type="button" data-inline-command="insertOrderedList"><i class="bx bx-list-ol"></i></button>',
+      '<span class="bm-template-inline-separator"></span>',
+      '<button type="button" data-inline-command="justifyLeft"><i class="bx bx-align-left"></i></button>',
+      '<button type="button" data-inline-command="justifyCenter"><i class="bx bx-align-middle"></i></button>',
+      '<button type="button" data-inline-command="justifyRight"><i class="bx bx-align-right"></i></button>',
+      '<span class="bm-template-inline-separator"></span>',
+      '<div class="bm-template-inline-variable-wrap">',
+      '<select class="bm-template-inline-variable-select" id="bmTemplateInlineVariableSelect" aria-label="Pilih variable karyawan">',
+      '<option value="">Variable Karyawan</option>',
+      '<option value="{{nama_karyawan}}">Nama Karyawan</option>',
+      '<option value="{{nik}}">NIK / ID Karyawan</option>',
+      '<option value="{{jabatan}}">Jabatan</option>',
+      '<option value="{{divisi}}">Divisi</option>',
+      '<option value="{{sub_perusahaan}}">Sub Perusahaan</option>',
+      '<option value="{{email_karyawan}}">Email</option>',
+      '<option value="{{nomor_dokumen}}">Nomor Dokumen</option>',
+      '<option value="{{tanggal_dokumen}}">Tanggal Dokumen</option>',
+      '</select>',
+      '<button class="bm-template-inline-variable-btn" type="button" id="bmTemplateInlineInsertVariable">Masukkan</button>',
+      '</div>',
       '</div>',
       '<div class="bm-template-inline-workspace">',
-        '<div class="bm-template-inline-pages" id="bmTemplateInlinePages">',
-          '<article class="bm-template-inline-paper" data-inline-page="1">',
-            '<div class="bm-template-inline-page-label">Halaman 1</div>',
-            '<div class="bm-template-inline-doc-header">Header</div>',
-            '<div class="bm-template-inline-body" id="bmTemplateInlineBody" contenteditable="true" spellcheck="false" data-placeholder="Tulis template dokumen di sini...">',
-              '<h1>Untitled document</h1>',
-              '<p>Mulai tulis isi template seperti di Google Docs.</p>',
-            '</div>',
-            '<div class="bm-template-inline-doc-footer">Footer</div>',
-          '</article>',
-        '</div>',
+      '<div class="bm-template-inline-pages" id="bmTemplateInlinePages">',
+      '<article class="bm-template-inline-paper" data-inline-page="1">',
+      '<div class="bm-template-inline-page-label">Halaman 1</div>',
+      '<div class="bm-template-inline-doc-header">Header</div>',
+      '<div class="bm-template-inline-body" id="bmTemplateInlineBody" contenteditable="true" spellcheck="false" data-placeholder="Tulis template dokumen di sini...">',
+      '<h1>Untitled document</h1>',
+      '<p>Mulai tulis isi template seperti di Google Docs.</p>',
+      '</div>',
+      '<div class="bm-template-inline-doc-footer">Footer</div>',
+      '</article>',
+      '</div>',
       '</div>'
     ].join('');
 
@@ -12244,7 +12246,7 @@ function initWorkShiftScenarioPage() {
           : null;
         const targetBody = activeEditable || body;
         if (targetBody) targetBody.focus();
-        try { document.execCommand(command, false, null); } catch (error) {}
+        try { document.execCommand(command, false, null); } catch (error) { }
         window.setTimeout(function () { paginateInlineTemplatePages(targetBody); }, 0);
       });
     });
@@ -13429,6 +13431,7 @@ function initWorkShiftScenarioPage() {
         '  <div class="card-body d-flex flex-column gap-2">',
         '    <span class="bm-folder-icon bm-folder-icon-lg"><iconify-icon icon="' + meta.icon + '"></iconify-icon></span>',
         '    <div class="fw-semibold bm-folder-title"><span class="bm-folder-title-text">' + safeName + '</span></div>',
+        '    <div class="text-muted bm-folder-date">' + date + '</div>',
         link || objectUrl ? '    <small class="text-muted text-truncate" title="' + safeLink + '">Link: tersedia</small>' : '    <small class="text-muted">' + meta.grid + '</small>',
         '  </div>',
         '</div>'
@@ -13704,13 +13707,13 @@ function initWorkShiftScenarioPage() {
     if (type === 'pdf') {
       return [
         '<div class="bm-upload-file-popup bm-upload-file-popup--pdf">',
-          '<div class="bm-upload-file-popup-head">',
-            '<div>',
-              '<h5>' + name + '</h5>',
-              '<small>PDF Preview • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
-            '</div>',
-          '</div>',
-          '<iframe class="bm-upload-file-frame" src="' + src + '" title="' + name + '"></iframe>',
+        '<div class="bm-upload-file-popup-head">',
+        '<div>',
+        '<h5>' + name + '</h5>',
+        '<small>PDF Preview • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
+        '</div>',
+        '</div>',
+        '<iframe class="bm-upload-file-frame" src="' + src + '" title="' + name + '"></iframe>',
         '</div>'
       ].join('');
     }
@@ -13718,13 +13721,13 @@ function initWorkShiftScenarioPage() {
     if (type === 'image') {
       return [
         '<div class="bm-upload-file-popup bm-upload-file-popup--image">',
-          '<div class="bm-upload-file-popup-head">',
-            '<div>',
-              '<h5>' + name + '</h5>',
-              '<small>Image Preview • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
-            '</div>',
-          '</div>',
-          '<div class="bm-upload-file-image-wrap"><img src="' + src + '" alt="' + name + '" /></div>',
+        '<div class="bm-upload-file-popup-head">',
+        '<div>',
+        '<h5>' + name + '</h5>',
+        '<small>Image Preview • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
+        '</div>',
+        '</div>',
+        '<div class="bm-upload-file-image-wrap"><img src="' + src + '" alt="' + name + '" /></div>',
         '</div>'
       ].join('');
     }
@@ -13734,17 +13737,17 @@ function initWorkShiftScenarioPage() {
 
     return [
       '<div class="bm-upload-file-popup bm-upload-file-popup--document">',
-        '<div class="bm-upload-file-popup-head">',
-          '<div>',
-            '<h5>' + name + '</h5>',
-            '<small>' + escapeHtml(label) + ' • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
-          '</div>',
-        '</div>',
-        '<div class="bm-upload-file-placeholder">',
-          '<iconify-icon icon="' + icon + '"></iconify-icon>',
-          '<h6>' + name + '</h6>',
-          '<p>File ini dibuka tetap di popup ini. Untuk format DOC/DOCX atau file Office, browser belum selalu bisa menampilkan isi asli secara langsung dari file lokal.</p>',
-        '</div>',
+      '<div class="bm-upload-file-popup-head">',
+      '<div>',
+      '<h5>' + name + '</h5>',
+      '<small>' + escapeHtml(label) + ' • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
+      '</div>',
+      '</div>',
+      '<div class="bm-upload-file-placeholder">',
+      '<iconify-icon icon="' + icon + '"></iconify-icon>',
+      '<h6>' + name + '</h6>',
+      '<p>File ini dibuka tetap di popup ini. Untuk format DOC/DOCX atau file Office, browser belum selalu bisa menampilkan isi asli secara langsung dari file lokal.</p>',
+      '</div>',
       '</div>'
     ].join('');
   }
@@ -14044,7 +14047,7 @@ function initWorkShiftScenarioPage() {
         if (Array.isArray(parsed)) {
           return parsed.filter(function (entry) { return entry && entry.name; });
         }
-      } catch (err) {}
+      } catch (err) { }
     }
 
     var employee = text(row.getAttribute('data-share-name'), '');
@@ -14185,7 +14188,7 @@ function initWorkShiftScenarioPage() {
           var instance = window.bootstrap.Dropdown.getInstance(button);
           if (instance) instance.hide();
         }
-      } catch (error) {}
+      } catch (error) { }
       button.classList.remove('show');
       button.setAttribute('aria-expanded', 'false');
     });
@@ -14357,9 +14360,14 @@ function initWorkShiftScenarioPage() {
     var title = oldBody.querySelector('.bm-folder-title');
     var icon = oldBody.querySelector('.bm-folder-icon, .bm-folder-icon-lg');
     var small = oldBody.querySelector('small');
+    var dateEl = oldBody.querySelector('.bm-folder-date');
 
     var header = document.createElement('div');
     header.className = 'bm-folder-document-card-head';
+
+    var titleSection = document.createElement('div');
+    titleSection.style.minWidth = '0';
+    titleSection.style.flex = '1';
 
     var titleWrap = document.createElement('div');
     titleWrap.className = 'fw-semibold bm-folder-title bm-folder-document-card-title';
@@ -14374,6 +14382,28 @@ function initWorkShiftScenarioPage() {
       if (titleText) titleText.textContent = name;
     }
 
+    titleSection.appendChild(titleWrap);
+
+    if (!dateEl) {
+      var row = card.closest('[data-folder-row]');
+      var rowDate = '';
+      if (row) {
+        rowDate = row.getAttribute('data-created');
+        if (!rowDate && row.tagName && row.tagName.toLowerCase() === 'tr') {
+          var cells = row.querySelectorAll('td');
+          if (cells[2]) rowDate = cells[2].textContent.trim();
+        }
+      }
+      if (!rowDate) {
+        var now = new Date();
+        rowDate = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+      }
+      dateEl = document.createElement('div');
+      dateEl.className = 'text-muted bm-folder-date';
+      dateEl.textContent = rowDate;
+    }
+    titleSection.appendChild(dateEl);
+
     var dotsWrap = document.createElement('div');
     dotsWrap.className = 'bm-folder-document-card-dots';
 
@@ -14382,7 +14412,7 @@ function initWorkShiftScenarioPage() {
       oldMenuWrap.remove();
     }
 
-    header.appendChild(titleWrap);
+    header.appendChild(titleSection);
     header.appendChild(dotsWrap);
 
     var body = document.createElement('div');
@@ -14796,16 +14826,16 @@ function initWorkShiftScenarioPage() {
     modalEl.setAttribute('aria-hidden', 'true');
     modalEl.innerHTML = [
       '<div class="modal-dialog modal-dialog-centered modal-xl">',
-        '<div class="modal-content position-relative">',
-          '<button type="button" class="bm-document-view-close" data-bs-dismiss="modal" aria-label="Tutup">x</button>',
-          '<div class="bm-document-view-shell">',
-            '<div class="bm-document-view-head">',
-              '<h4 class="bm-document-view-title" id="dkDocumentViewTitle">Dokumen</h4>',
-              '<span class="bm-document-view-badge">Document Preview</span>',
-            '</div>',
-            '<div class="bm-document-view-paper-wrap" id="dkDocumentViewPaper"></div>',
-          '</div>',
-        '</div>',
+      '<div class="modal-content position-relative">',
+      '<button type="button" class="bm-document-view-close" data-bs-dismiss="modal" aria-label="Tutup">x</button>',
+      '<div class="bm-document-view-shell">',
+      '<div class="bm-document-view-head">',
+      '<h4 class="bm-document-view-title" id="dkDocumentViewTitle">Dokumen</h4>',
+      '<span class="bm-document-view-badge">Document Preview</span>',
+      '</div>',
+      '<div class="bm-document-view-paper-wrap" id="dkDocumentViewPaper"></div>',
+      '</div>',
+      '</div>',
       '</div>'
     ].join('');
     document.body.appendChild(modalEl);
@@ -14815,15 +14845,15 @@ function initWorkShiftScenarioPage() {
   function fallbackHtml(title) {
     return [
       '<div class="bm-template-preview-a4-stack">',
-        '<section class="bm-template-preview-document bm-template-preview-a4-page">',
-          '<div class="bm-template-preview-doc-head">',
-            '<h5>' + String(title || 'DOKUMEN').replace(/[&<>"']/g, function (char) {
-              return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[char];
-            }) + '</h5>',
-          '</div>',
-          '<p>Dokumen ini dibuat dari Template dan siap untuk dibuka kembali melalui popup.</p>',
-          '<div class="bm-template-preview-page-number">Hal. 1</div>',
-        '</section>',
+      '<section class="bm-template-preview-document bm-template-preview-a4-page">',
+      '<div class="bm-template-preview-doc-head">',
+      '<h5>' + String(title || 'DOKUMEN').replace(/[&<>"']/g, function (char) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[char];
+      }) + '</h5>',
+      '</div>',
+      '<p>Dokumen ini dibuat dari Template dan siap untuk dibuka kembali melalui popup.</p>',
+      '<div class="bm-template-preview-page-number">Hal. 1</div>',
+      '</section>',
       '</div>'
     ].join('');
   }
@@ -14869,7 +14899,7 @@ function initWorkShiftScenarioPage() {
       if (window.Iconify && typeof window.Iconify.scan === 'function') {
         window.Iconify.scan(document.body);
       }
-    } catch (error) {}
+    } catch (error) { }
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -14890,7 +14920,7 @@ function initWorkShiftScenarioPage() {
 
   try {
     observer.observe(document.body, { childList: true, subtree: true });
-  } catch (error) {}
+  } catch (error) { }
 })();
 
 
@@ -14956,7 +14986,7 @@ function initWorkShiftScenarioPage() {
       var rendered = false;
       try {
         rendered = !!(icon.shadowRoot && icon.shadowRoot.querySelector('svg'));
-      } catch (error) {}
+      } catch (error) { }
 
       icon.classList.toggle('bm-icon-fallback-visible', !rendered);
     });
@@ -14969,7 +14999,7 @@ function initWorkShiftScenarioPage() {
       if (window.Iconify && typeof window.Iconify.scan === 'function') {
         window.Iconify.scan(root === document ? document.body : root);
       }
-    } catch (error) {}
+    } catch (error) { }
   }
 
   function scheduleIconFallbacks(scope) {
@@ -15124,7 +15154,7 @@ function initWorkShiftScenarioPage() {
         if (Array.isArray(parsed) && parsed.length) {
           return parsed.map(function (entry) { return cleanText(entry && entry.name, ''); }).filter(Boolean).join(', ');
         }
-      } catch (error) {}
+      } catch (error) { }
     }
     return cleanText(row.getAttribute('data-share-name') || '', '-');
   }
@@ -15181,7 +15211,7 @@ function initWorkShiftScenarioPage() {
         if (Array.isArray(parsed)) {
           return parsed.filter(function (entry) { return entry && entry.name; });
         }
-      } catch (error) {}
+      } catch (error) { }
     }
 
     var names = cleanText(row.getAttribute('data-share-name') || '', '');
@@ -15280,7 +15310,7 @@ function initWorkShiftScenarioPage() {
 
     try {
       observer.observe(document.body, { childList: true, subtree: true });
-    } catch (error) {}
+    } catch (error) { }
 
     window.setInterval(function () {
       applyIconFallbacks(document);
@@ -15309,6 +15339,12 @@ function initWorkShiftScenarioPage() {
     var itemType = String(row.getAttribute('data-item-type') || '').toLowerCase();
     var fileKind = String(row.getAttribute('data-file-kind') || '').toLowerCase();
     var link = String(row.getAttribute('data-link') || '').toLowerCase();
+
+    // Treat static rows with data-folder-row and no link as folder
+    if (!itemType && row.hasAttribute('data-folder-row') && !link) {
+      itemType = 'folder';
+    }
+
     var name = String(row.getAttribute('data-name') || row.textContent || '').toLowerCase();
     var source = [itemType, fileKind, link, name].join(' ');
 
@@ -15324,14 +15360,14 @@ function initWorkShiftScenarioPage() {
 
   function iconForKind(kind) {
     var map = {
-      folder: 'solar:folder-open-bold',
-      spreadsheet: 'mdi:file-table-outline',
-      doc: 'solar:document-bold',
-      word: 'mdi:microsoft-word',
-      pdf: 'mdi:file-pdf-box',
-      image: 'solar:gallery-bold',
-      'google-link': 'fa6-brands:google-drive',
-      file: 'solar:upload-square-bold'
+      folder: 'bx bxs-folder-open',
+      spreadsheet: 'bx bxs-spreadsheet',
+      doc: 'bx bxs-file',
+      word: 'bx bxs-file-doc',
+      pdf: 'bx bxs-file-pdf',
+      image: 'bx bxs-image',
+      'google-link': 'bx bxl-google',
+      file: 'bx bxs-file'
     };
     return map[kind] || map.file;
   }
@@ -15341,11 +15377,25 @@ function initWorkShiftScenarioPage() {
 
     var kind = detectKind(row);
     var iconName = iconForKind(kind);
+
+    var currentKind = row.getAttribute('data-icon-kind');
+    var needsUpdate = (currentKind !== kind);
+
+    row.querySelectorAll('.bm-folder-icon, .bm-folder-icon-lg').forEach(function (holder) {
+      var currentHolderKind = holder.getAttribute('data-icon-kind');
+      var iconEl = holder.querySelector('i');
+      if (currentHolderKind !== kind || !iconEl || !iconEl.className.includes(iconName)) {
+        needsUpdate = true;
+      }
+    });
+
+    if (!needsUpdate) return;
+
     row.setAttribute('data-icon-kind', kind);
 
     row.querySelectorAll('.bm-folder-icon, .bm-folder-icon-lg').forEach(function (holder) {
       holder.setAttribute('data-icon-kind', kind);
-      holder.innerHTML = '<iconify-icon icon="' + iconName + '"></iconify-icon>';
+      holder.innerHTML = '<i class="' + iconName + '"></i>';
     });
   }
 
@@ -15357,7 +15407,7 @@ function initWorkShiftScenarioPage() {
       if (window.Iconify && typeof window.Iconify.scan === 'function') {
         window.Iconify.scan(root === document ? document.body : root);
       }
-    } catch (error) {}
+    } catch (error) { }
   }
 
   ready(function () {
@@ -15382,6 +15432,6 @@ function initWorkShiftScenarioPage() {
 
     try {
       observer.observe(document.body, { childList: true, subtree: true });
-    } catch (error) {}
+    } catch (error) { }
   });
 })();
