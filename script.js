@@ -10306,6 +10306,10 @@
       return { icon: 'solar:folder-open-bold', subLabel: 'Folder pribadi', gridLabel: 'Tipe: Folder' };
     }
 
+    if (type === 'google-forms' || type === 'google-form' || /\/forms\//i.test(link || '') || kind === 'google-form' || kind === 'google-forms' || kind === 'form') {
+      return { icon: 'mdi:form-select', subLabel: 'Google Forms', gridLabel: 'Tipe: Google Form' };
+    }
+
     if (kind === 'sheet' || kind === 'spreadsheet' || type === 'google-sheet' || /\/spreadsheets\//i.test(link || '') || /\.(xls|xlsx|csv)$/i.test(source)) {
       return { icon: 'mdi:file-table-outline', subLabel: 'Spreadsheet', gridLabel: 'Tipe: Spreadsheet' };
     }
@@ -10340,6 +10344,7 @@
   function inferGoogleType(link) {
     if (/\/spreadsheets\//i.test(link)) return 'google-sheet';
     if (/\/document\//i.test(link)) return 'google-doc';
+    if (/\/forms\//i.test(link)) return 'google-forms';
     return 'google-link';
   }
 
@@ -10348,6 +10353,7 @@
     if (value) return value;
     if (/\/spreadsheets\//i.test(link)) return 'Google Sheet';
     if (/\/document\//i.test(link)) return 'Google Docs';
+    if (/\/forms\//i.test(link)) return 'Google Form';
     return 'Google Docs / Sheet';
   }
 
@@ -10473,6 +10479,43 @@
     showFolderFeedback('Folder berhasil ditambahkan.', 'success');
   }
 
+  function openFormPopup() {
+    const modal = getModal('dkFormModal');
+    const input = document.getElementById('dkFormNameInput');
+    if (!modal || !input) {
+      const name = window.prompt('Masukkan nama form baru:');
+      if (name && name.trim()) {
+        addGoogleFormItem(name.trim());
+        window.open('https://docs.google.com/forms/create', '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
+    input.value = '';
+    modal.show();
+    window.setTimeout(function () { input.focus(); }, 150);
+  }
+
+  function saveFormPopup() {
+    const input = document.getElementById('dkFormNameInput');
+    const name = input ? input.value.trim() : '';
+    if (!name) {
+      if (input) input.focus();
+      return;
+    }
+    addGoogleFormItem(name);
+    const modal = getModal('dkFormModal');
+    if (modal) modal.hide();
+    showFolderFeedback('Google Form berhasil dibuat.', 'success');
+    window.open('https://docs.google.com/forms/create', '_blank', 'noopener,noreferrer');
+  }
+
+  function addGoogleFormItem(name) {
+    addDriveItemRow(name, {
+      itemType: 'google-forms',
+      link: 'https://docs.google.com/forms'
+    });
+  }
+
   const docsSheetTitleState = {
     link: '',
     title: '',
@@ -10503,6 +10546,7 @@
     const type = inferGoogleType(link || '');
     if (type === 'google-sheet') return 'Google Sheet';
     if (type === 'google-doc') return 'Google Docs';
+    if (type === 'google-forms' || type === 'google-form') return 'Google Form';
     return 'Google Docs / Sheet';
   }
 
@@ -11129,7 +11173,7 @@
     }
 
     if (action === 'google-forms') {
-      window.open('https://docs.google.com/forms/create', '_blank', 'noopener,noreferrer');
+      openFormPopup();
       return;
     }
 
@@ -11915,6 +11959,8 @@
       el.removeAttribute('data-bm-template-hidden');
     });
 
+    bmEditingTemplateName = null;
+
     if (returnToDocumentModal) reopenTemplateDocumentModal();
   }
 
@@ -12117,6 +12163,14 @@
     const bodyHtml = getInlineTemplateSavedPagesHtml();
     const bodyText = getInlineTemplatePlainText();
 
+    if (bmEditingTemplateName && bmEditingTemplateName !== title) {
+      if (bmDemoTemplates[bmEditingTemplateName]) {
+        delete bmDemoTemplates[bmEditingTemplateName];
+      }
+      const oldCard = document.getElementById('dkTemplateGrid')?.querySelector('[data-template-card][data-template-name="' + bmEditingTemplateName.replace(/"/g, '\\"') + '"]');
+      if (oldCard) oldCard.remove();
+    }
+
     bmDemoTemplates[title] = {
       label: title,
       title: title.toUpperCase(),
@@ -12132,7 +12186,208 @@
     filterTemplateCards(document.getElementById('dkTemplateSearchInput')?.value || '');
 
     restoreFolderMainViewFromTemplateEditor(true);
-    showFolderFeedback('Template baru berhasil disimpan dan kembali ke Document.', 'success');
+    showFolderFeedback('Template berhasil disimpan.', 'success');
+  }
+
+  let bmEditingTemplateName = null;
+
+  function openTemplateEditModal(templateName) {
+    bmEditingTemplateName = templateName;
+    const listModal = getModal('dkTemplateModal');
+    const listModalEl = document.getElementById('dkTemplateModal');
+
+    if (listModal) listModal.hide();
+    if (listModalEl) listModalEl.classList.remove('show');
+    clearModalStateAfterInlineTemplate();
+
+    restoreFolderMainViewFromTemplateEditor();
+
+    const card = document.querySelector('.bm-folder-card-page');
+    if (!card) return;
+
+    const hideTargets = [
+      document.getElementById('bmDrivePathbar'),
+      card
+    ].filter(Boolean);
+
+    hideTargets.forEach(function (el) {
+      el.hidden = true;
+      el.setAttribute('data-bm-template-hidden', 'true');
+    });
+
+    const template = bmDemoTemplates[templateName] || bmDemoTemplates['Kontrak Kerja'];
+    let bodyHtml = '';
+    if (template && template.html) {
+      const temp = document.createElement('div');
+      temp.innerHTML = template.html;
+      const sections = temp.querySelectorAll('.bm-template-preview-section');
+      if (sections.length > 0) {
+        bodyHtml = Array.prototype.map.call(sections, function (sec) {
+          return sec.innerHTML;
+        }).join('<p><br></p>');
+      } else {
+        bodyHtml = template.html;
+      }
+    } else {
+      if (templateName === 'Surat') {
+        bodyHtml = [
+          '<h1>SURAT RESMI</h1>',
+          '<p>Tasikmalaya, {{tanggal_dokumen}}</p>',
+          '<p>Kepada Yth.<br><strong>{{nama_karyawan}}</strong><br>di Tempat</p>',
+          '<p>Dengan hormat,</p>',
+          '<p>Melalui surat ini, PT Bisa Media Grup menyampaikan pemberitahuan atau informasi resmi yang berkaitan dengan kebutuhan administrasi, pekerjaan, atau koordinasi perusahaan.</p>',
+          '<p>Adapun isi surat dapat disesuaikan kembali berdasarkan kebutuhan, nama penerima, jabatan, dan konteks dokumen yang akan digunakan.</p>',
+          '<p>Demikian surat ini dibuat untuk digunakan sebagaimana mestinya. Atas perhatian dan kerja samanya, kami ucapkan terima kasih.</p>'
+        ].join('');
+      } else if (templateName === 'Dokumen Bebas') {
+        bodyHtml = [
+          '<h1>DOKUMEN BEBAS</h1>',
+          '<p>Tulis isi dokumen bebas di sini. Anda dapat menggunakan format teks tebal, miring, garis bawah, serta memasukkan variabel karyawan.</p>'
+        ].join('');
+      } else {
+        bodyHtml = [
+          '<h1>PERJANJIAN KERJA WAKTU TERTENTU</h1>',
+          '<p>Bahwa Perjanjian Kerja Waktu Tertentu ini dibuat oleh dan antara pihak perusahaan dengan karyawan:</p>',
+          '<p>Nama: {{nama_karyawan}}<br>Jabatan: {{jabatan}}<br>Divisi: {{divisi}}</p>',
+          '<p>Kedua belah pihak telah sepakat untuk mengikatkan diri dalam hubungan kerja dengan ketentuan-ketentuan perjanjian kerja yang telah ditentukan.</p>'
+        ].join('');
+      }
+    }
+
+    const editor = document.createElement('div');
+    editor.id = 'bmTemplateInlineEditor';
+    editor.className = 'bm-template-inline-docs';
+    editor.innerHTML = [
+      '<div class="bm-template-inline-topbar">',
+      '<button class="btn btn-sm btn-outline-secondary bm-template-inline-back" type="button" id="bmTemplateInlineBack">',
+      '<i class="bx bx-arrow-back me-1"></i>Kembali',
+      '</button>',
+      '<div class="bm-template-inline-file">',
+      '<span class="bm-template-inline-file-icon"><iconify-icon icon="mdi:file-document-edit-outline"></iconify-icon></span>',
+      '<div class="bm-template-inline-file-main">',
+      '<input class="bm-template-inline-title" id="bmTemplateInlineTitle" value="' + escapeTemplateValue(templateName) + '" aria-label="Judul template" />',
+      '<div class="bm-template-inline-url">docs.google.com/document/d/template-edit/edit</div>',
+      '</div>',
+      '</div>',
+      '<button class="btn btn-primary btn-sm bm-template-inline-save" type="button" id="bmTemplateInlineSave">Simpan Template</button>',
+      '</div>',
+      '<div class="bm-template-inline-toolbar" aria-label="Toolbar dokumen">',
+      '<button type="button" data-inline-command="bold"><strong>B</strong></button>',
+      '<button type="button" data-inline-command="italic"><em>I</em></button>',
+      '<button type="button" data-inline-command="underline"><u>U</u></button>',
+      '<span class="bm-template-inline-separator"></span>',
+      '<button type="button" data-inline-command="insertUnorderedList"><i class="bx bx-list-ul"></i></button>',
+      '<button type="button" data-inline-command="insertOrderedList"><i class="bx bx-list-ol"></i></button>',
+      '<span class="bm-template-inline-separator"></span>',
+      '<button type="button" data-inline-command="justifyLeft"><i class="bx bx-align-left"></i></button>',
+      '<button type="button" data-inline-command="justifyCenter"><i class="bx bx-align-middle"></i></button>',
+      '<button type="button" data-inline-command="justifyRight"><i class="bx bx-align-right"></i></button>',
+      '<span class="bm-template-inline-separator"></span>',
+      '<div class="bm-template-inline-variable-wrap">',
+      '<select class="bm-template-inline-variable-select" id="bmTemplateInlineVariableSelect" aria-label="Pilih variable karyawan">',
+      '<option value="">Variable Karyawan</option>',
+      '<option value="{{nama_karyawan}}">Nama Karyawan</option>',
+      '<option value="{{nik}}">NIK / ID Karyawan</option>',
+      '<option value="{{jabatan}}">Jabatan</option>',
+      '<option value="{{divisi}}">Divisi</option>',
+      '<option value="{{sub_perusahaan}}">Sub Perusahaan</option>',
+      '<option value="{{email_karyawan}}">Email</option>',
+      '<option value="{{nomor_dokumen}}">Nomor Dokumen</option>',
+      '<option value="{{tanggal_dokumen}}">Tanggal Dokumen</option>',
+      '</select>',
+      '<button class="bm-template-inline-variable-btn" type="button" id="bmTemplateInlineInsertVariable">Masukkan</button>',
+      '</div>',
+      '</div>',
+      '<div class="bm-template-inline-workspace">',
+      '<div class="bm-template-inline-pages" id="bmTemplateInlinePages">',
+      '<article class="bm-template-inline-paper" data-inline-page="1">',
+      '<div class="bm-template-inline-page-label">Halaman 1</div>',
+      '<div class="bm-template-inline-doc-header">Header</div>',
+      '<div class="bm-template-inline-body" id="bmTemplateInlineBody" contenteditable="true" spellcheck="false" data-placeholder="Tulis template dokumen di sini...">',
+      bodyHtml,
+      '</div>',
+      '<div class="bm-template-inline-doc-footer">Footer</div>',
+      '</article>',
+      '</div>',
+      '</div>'
+    ].join('');
+
+    card.insertAdjacentElement('afterend', editor);
+
+    const titleInput = document.getElementById('bmTemplateInlineTitle');
+    const body = document.querySelector('#bmTemplateInlinePages .bm-template-inline-body');
+    const firstPage = document.querySelector('#bmTemplateInlinePages [data-inline-page]');
+    if (firstPage) bindInlineTemplatePage(firstPage);
+    const backBtn = document.getElementById('bmTemplateInlineBack');
+    const saveBtn = document.getElementById('bmTemplateInlineSave');
+
+    if (titleInput && body) {
+      window.setTimeout(function () {
+        titleInput.focus();
+      }, 120);
+    }
+
+    editor.querySelectorAll('[data-inline-command]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        const command = button.getAttribute('data-inline-command');
+        if (!command) return;
+        const activeEditable = document.activeElement && document.activeElement.closest
+          ? document.activeElement.closest('#bmTemplateInlinePages .bm-template-inline-body')
+          : null;
+        const targetBody = activeEditable || body;
+        if (targetBody) targetBody.focus();
+        try { document.execCommand(command, false, null); } catch (error) { }
+        window.setTimeout(function () { paginateInlineTemplatePages(targetBody); }, 0);
+      });
+    });
+
+    const variableSelect = document.getElementById('bmTemplateInlineVariableSelect');
+    const insertVariableBtn = document.getElementById('bmTemplateInlineInsertVariable');
+
+    function insertInlineTemplateVariable() {
+      const value = variableSelect ? String(variableSelect.value || '') : '';
+      if (!value) {
+        showFolderFeedback('Pilih variable karyawan terlebih dahulu.', 'warning');
+        return;
+      }
+
+      const activeEditable = document.activeElement && document.activeElement.closest
+        ? document.activeElement.closest('#bmTemplateInlinePages .bm-template-inline-body')
+        : null;
+      const targetBody = activeEditable || body;
+      if (targetBody) targetBody.focus();
+
+      try {
+        document.execCommand('insertText', false, value);
+      } catch (error) {
+        const selection = window.getSelection ? window.getSelection() : null;
+        if (selection && selection.rangeCount) {
+          selection.getRangeAt(0).insertNode(document.createTextNode(value));
+        } else if (targetBody) {
+          targetBody.appendChild(document.createTextNode(value));
+        }
+      }
+
+      if (variableSelect) variableSelect.value = '';
+      window.setTimeout(function () { paginateInlineTemplatePages(targetBody); }, 0);
+    }
+
+    if (insertVariableBtn) {
+      insertVariableBtn.addEventListener('click', insertInlineTemplateVariable);
+    }
+
+    if (variableSelect) {
+      variableSelect.addEventListener('change', function () {
+        if (variableSelect.value) insertInlineTemplateVariable();
+      });
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener('click', function () {
+        restoreFolderMainViewFromTemplateEditor(true);
+      });
+    }
+    if (saveBtn) saveBtn.addEventListener('click', saveInlineTemplateEditor);
   }
 
   function openTemplateCreateModal() {
@@ -12383,7 +12638,8 @@
       menu.id = 'bmTemplateDeleteMenu';
       menu.className = 'bm-template-delete-menu';
       menu.innerHTML = [
-        '<button type="button" data-template-rename-confirm><span class="bm-menu-iconify"><iconify-icon icon="material-symbols:edit-square-outline-rounded"></iconify-icon></span>Rename</button>',
+        '<button type="button" data-template-rename-confirm><span class="bm-menu-iconify"><iconify-icon icon="material-symbols:drive-file-rename-outline-rounded"></iconify-icon></span>Rename</button>',
+        '<button type="button" data-template-edit-confirm><span class="bm-menu-iconify"><iconify-icon icon="material-symbols:edit-note-rounded"></iconify-icon></span>Edit</button>',
         '<button type="button" data-template-delete-confirm><span class="bm-menu-iconify"><iconify-icon icon="material-symbols:delete-rounded"></iconify-icon></span>Hapus</button>'
       ].join('');
       document.body.appendChild(menu);
@@ -12407,7 +12663,8 @@
     let left = rect.right - width;
     let top = rect.bottom + 6;
     if (left < 12) left = 12;
-    if (top + 48 > window.innerHeight - 12) top = rect.top - 48 - 6;
+    const menuHeight = menu.offsetHeight || 115;
+    if (top + menuHeight > window.innerHeight - 12) top = rect.top - menuHeight - 6;
     menu.style.left = left + 'px';
     menu.style.top = top + 'px';
     menu.classList.add('show');
@@ -12723,6 +12980,17 @@
         return;
       }
 
+      const editConfirm = event.target.closest('[data-template-edit-confirm]');
+      if (editConfirm) {
+        event.preventDefault();
+        event.stopPropagation();
+        const target = bmTemplateDeleteTarget;
+        const templateName = target ? (target.getAttribute('data-template-name') || 'Template') : 'Template';
+        closeTemplateDeleteMenu();
+        openTemplateEditModal(templateName);
+        return;
+      }
+
       const deleteConfirm = event.target.closest('[data-template-delete-confirm]');
       if (deleteConfirm) {
         event.preventDefault();
@@ -12817,7 +13085,12 @@
 
       if (left < 12) left = 12;
       if (left + menuWidth > viewportWidth - 12) left = Math.max(12, viewportWidth - menuWidth - 12);
-      if (top + menuHeight > viewportHeight - 12) top = Math.max(12, rect.top - menuHeight - 6);
+
+      if (top + menuHeight > viewportHeight - 12) {
+        const topAbove = rect.top - menuHeight - 6;
+        top = (topAbove >= 12) ? topAbove : (rect.top + (rect.height / 2) - (menuHeight / 2));
+      }
+      top = Math.max(12, Math.min(top, viewportHeight - menuHeight - 12));
 
       menu.style.left = left + 'px';
       menu.style.top = top + 'px';
@@ -12953,6 +13226,16 @@
     if (folderNameInput) {
       folderNameInput.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') saveCreateFolderPopup();
+      });
+    }
+
+    const saveFormButton = document.getElementById('dkSaveFormBtn');
+    if (saveFormButton) saveFormButton.addEventListener('click', saveFormPopup);
+
+    const formNameInput = document.getElementById('dkFormNameInput');
+    if (formNameInput) {
+      formNameInput.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') saveFormPopup();
       });
     }
 
@@ -13111,18 +13394,25 @@
     menu.style.inset = 'auto';
     menu.style.minWidth = '13.75rem';
 
+    // Force layout reflow to ensure offsetHeight is calculated
+    void menu.offsetHeight;
+
     var rect = button.getBoundingClientRect();
     var vw = window.innerWidth || document.documentElement.clientWidth;
     var vh = window.innerHeight || document.documentElement.clientHeight;
     var width = menu.offsetWidth || 224;
-    var height = menu.offsetHeight || 292;
+    var height = menu.offsetHeight || 380;
 
     var left = rect.right - width;
     var top = rect.bottom + 8;
 
+    if (top + height > vh - 12) {
+      top = rect.top - height - 8;
+    }
+
     if (left < 12) left = 12;
     if (left + width > vw - 12) left = Math.max(12, vw - width - 12);
-    if (top + height > vh - 12) top = Math.max(12, rect.top - height - 8);
+    if (top < 12) top = 12;
 
     menu.style.left = left + 'px';
     menu.style.top = top + 'px';
@@ -13320,6 +13610,10 @@
 
     if (type === 'folder' || source === 'folder') {
       return { icon: 'solar:folder-open-bold', sub: 'Folder pribadi', grid: 'Tipe: Folder' };
+    }
+
+    if (type === 'google-forms' || type === 'google-form' || /\/forms\//i.test(link || '') || source === 'form' || source === 'forms') {
+      return { icon: 'mdi:form-select', sub: 'Google Forms', grid: 'Tipe: Google Form' };
     }
 
     if (type === 'google-sheet' || source === 'sheet' || source === 'spreadsheet' || /\/spreadsheets\//i.test(link || '') || /\.(xls|xlsx|csv)(?:$|[\s?#])/.test(source)) {
@@ -14086,6 +14380,51 @@
     }).join('');
   }
 
+  function repositionDrawer() {
+    var drawer = document.getElementById('bmItemDetailDrawer');
+    if (!drawer) return;
+
+    if (!drawer.classList.contains('is-open')) {
+      drawer.style.top = '';
+      drawer.style.height = '';
+      drawer.style.bottom = '';
+      drawer.style.left = '';
+      drawer.style.right = '';
+      return;
+    }
+
+    var vw = window.innerWidth || document.documentElement.clientWidth;
+    if (vw < 992) {
+      drawer.style.top = '';
+      drawer.style.height = '';
+      drawer.style.bottom = '';
+      drawer.style.left = '';
+      drawer.style.right = '';
+      return;
+    }
+
+    var card = document.querySelector('.bm-folder-card-page');
+    if (!card) return;
+
+    var cardRect = card.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+
+    // Start aligned with card (a bit lower), but clamp to 22px (1.35rem) at the top when scrolling
+    var top = Math.max(22, cardRect.top);
+    var bottom = Math.min(vh - 22, cardRect.bottom);
+    var height = bottom - top;
+
+    if (height < 100) {
+      height = 100;
+    }
+
+    drawer.style.top = top + 'px';
+    drawer.style.height = height + 'px';
+    drawer.style.bottom = 'auto';
+    drawer.style.left = (cardRect.right + 16) + 'px';
+    drawer.style.right = 'auto';
+  }
+
   function openDrawer(itemId) {
     var row = firstItemRow(itemId);
     if (!row) return false;
@@ -14113,6 +14452,7 @@
     drawer.classList.add('is-open');
     drawer.setAttribute('aria-hidden', 'false');
     document.body.classList.add('bm-item-detail-open');
+    repositionDrawer();
     return true;
   }
 
@@ -14122,6 +14462,11 @@
     if (drawer) {
       drawer.classList.remove('is-open');
       drawer.setAttribute('aria-hidden', 'true');
+      drawer.style.top = '';
+      drawer.style.height = '';
+      drawer.style.bottom = '';
+      drawer.style.left = '';
+      drawer.style.right = '';
     }
     if (backdrop) backdrop.hidden = true;
     document.body.classList.remove('bm-item-detail-open');
@@ -14138,6 +14483,9 @@
 
     if (close) close.addEventListener('click', closeDrawer);
     if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+    window.addEventListener('scroll', repositionDrawer, true);
+    window.addEventListener('resize', repositionDrawer);
 
     if (history) {
       history.addEventListener('click', function (event) {
@@ -14199,7 +14547,7 @@
   }
 
   function bringFolderModalToFront(modal) {
-    if (!modal || !/^(dkLinkModal|dkFolderModal)$/.test(modal.id || '')) return;
+    if (!modal || !/^(dkLinkModal|dkFolderModal|dkFormModal)$/.test(modal.id || '')) return;
     closeFolderActionDropdowns();
     modal.style.zIndex = '2147483600';
     var dialog = modal.querySelector('.modal-dialog');
@@ -14212,10 +14560,10 @@
   }
 
   document.addEventListener('click', function (event) {
-    var trigger = event.target && event.target.closest ? event.target.closest('[data-doc-action="google-docs-sheet"], [data-doc-action="create-folder"]') : null;
+    var trigger = event.target && event.target.closest ? event.target.closest('[data-doc-action="google-docs-sheet"], [data-doc-action="create-folder"], [data-doc-action="google-forms"]') : null;
     if (!trigger) return;
     window.setTimeout(function () {
-      var modal = document.querySelector('#dkLinkModal.show, #dkFolderModal.show');
+      var modal = document.querySelector('#dkLinkModal.show, #dkFolderModal.show, #dkFormModal.show');
       bringFolderModalToFront(modal);
     }, 0);
   }, true);
