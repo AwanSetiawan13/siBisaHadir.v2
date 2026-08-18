@@ -15783,3 +15783,492 @@
     } catch (error) { }
   });
 })();
+
+
+/* ===== APPENDED FROM siKOL ===== */
+(() => {
+  "use strict";
+
+  const toast = document.getElementById("toast");
+
+  function showToast(message) {
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.classList.add("show");
+
+    window.clearTimeout(showToast.timer);
+    showToast.timer = window.setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2000);
+  }
+
+  /* ------------------------- Login ------------------------- */
+
+  const loginForm = document.getElementById("loginForm");
+
+  if (loginForm) {
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const rememberMe = document.getElementById("rememberMe");
+    const loginMessage = document.getElementById("loginMessage");
+    const togglePassword = document.getElementById("togglePassword");
+    const forgotPassword = document.getElementById("forgotPassword");
+
+    const rememberedUser = localStorage.getItem("bisaMediaRememberedUser");
+
+    if (rememberedUser) {
+      username.value = rememberedUser;
+      rememberMe.checked = true;
+    }
+
+    togglePassword.addEventListener("click", () => {
+      const isVisible = password.type === "text";
+
+      password.type = isVisible ? "password" : "text";
+      togglePassword.setAttribute(
+        "aria-label",
+        isVisible ? "Tampilkan password" : "Sembunyikan password"
+      );
+    });
+
+    forgotPassword.addEventListener("click", () => {
+      showToast("Fitur lupa password siap dihubungkan ke backend.");
+    });
+
+    loginForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      if (!username.value.trim()) {
+        loginMessage.textContent = "Email / username wajib diisi.";
+        username.focus();
+        return;
+      }
+
+      if (!password.value) {
+        loginMessage.textContent = "Password wajib diisi.";
+        password.focus();
+        return;
+      }
+
+      loginMessage.textContent = "";
+
+      if (rememberMe.checked) {
+        localStorage.setItem("bisaMediaRememberedUser", username.value.trim());
+      } else {
+        localStorage.removeItem("bisaMediaRememberedUser");
+      }
+
+      window.location.href = "dashboard.html";
+    });
+  }
+
+  /* ----------------------- Dashboard ----------------------- */
+
+  const sidebarToggle = document.getElementById("sidebarToggle");
+  const logoutButton = document.getElementById("logoutButton");
+  const monthSelect = document.getElementById("monthSelect");
+  const menuSearch = document.getElementById("menuSearch");
+
+  sidebarToggle?.addEventListener("click", () => {
+    document.body.classList.toggle("sidebar-collapsed");
+  });
+
+  logoutButton?.addEventListener("click", () => {
+    window.location.href = "index.html";
+  });
+
+  monthSelect?.addEventListener("change", () => {
+    showToast(`Dashboard bulan ${monthSelect.value}`);
+  });
+
+  // Load sidebar toggle state from localStorage
+  document.querySelectorAll(".nav-group").forEach((group, index) => {
+    const isCollapsed = localStorage.getItem(`nav-group-collapsed-${index}`);
+    if (isCollapsed !== null) {
+      if (isCollapsed === "true") {
+        group.classList.add("is-collapsed");
+      } else {
+        group.classList.remove("is-collapsed");
+      }
+    }
+  });
+
+  document.querySelectorAll(".nav-group__toggle").forEach((button, index) => {
+    button.addEventListener("click", () => {
+      const group = button.closest(".nav-group");
+      if (group) {
+        group.classList.toggle("is-collapsed");
+        const collapsed = group.classList.contains("is-collapsed");
+        localStorage.setItem(`nav-group-collapsed-${index}`, collapsed);
+      }
+    });
+  });
+
+  // Load subgroup toggle state from localStorage
+  document.querySelectorAll(".nav-subgroup").forEach((subgroup, index) => {
+    const isCollapsed = localStorage.getItem(`nav-subgroup-collapsed-${index}`);
+    if (isCollapsed !== null) {
+      if (isCollapsed === "true") {
+        subgroup.classList.add("is-collapsed");
+      } else {
+        subgroup.classList.remove("is-collapsed");
+      }
+    }
+  });
+
+  document.querySelectorAll(".nav-subgroup__toggle").forEach((button, index) => {
+    button.addEventListener("click", () => {
+      const subgroup = button.closest(".nav-subgroup");
+      if (subgroup) {
+        subgroup.classList.toggle("is-collapsed");
+        const collapsed = subgroup.classList.contains("is-collapsed");
+        localStorage.setItem(`nav-subgroup-collapsed-${index}`, collapsed);
+      }
+    });
+  });
+
+  // Reveal sidebar once state is fully restored on page load to prevent flicker
+  document.getElementById("sidebar")?.classList.add("is-ready");
+
+  document.querySelectorAll(".nav-group__items .nav-item").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const href = link.getAttribute("href");
+      if (!href || href === "#" || href.startsWith("#")) {
+        event.preventDefault();
+        showToast(`${link.textContent.trim()} dipilih`);
+      }
+    });
+  });
+
+
+  menuSearch?.addEventListener("input", () => {
+    const keyword = menuSearch.value.trim().toLowerCase();
+
+    document.querySelectorAll(".nav-group__items .nav-item").forEach((item) => {
+      const matches = item.textContent.toLowerCase().includes(keyword);
+      item.style.display = keyword === "" || matches ? "" : "none";
+    });
+  });
+
+  /* ----------------------- Campaign Modal ----------------------- */
+  const campaignModal = document.getElementById("campaignModal");
+  const openModalBtn = document.querySelector(".btn-tambah");
+  const closeModalBtn = document.getElementById("closeModal");
+  const campaignForm = document.getElementById("campaignForm");
+
+  if (campaignModal) {
+    // Open modal
+    openModalBtn?.addEventListener("click", () => {
+      campaignModal.classList.add("is-active");
+    });
+
+    // Close modal
+    closeModalBtn?.addEventListener("click", () => {
+      campaignModal.classList.remove("is-active");
+    });
+
+    // Close modal when clicking on overlay background
+    campaignModal.addEventListener("click", (e) => {
+      if (e.target === campaignModal) {
+        campaignModal.classList.remove("is-active");
+      }
+    });
+
+    // Form submit
+    campaignForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Campaign berhasil ditambahkan");
+      campaignModal.classList.remove("is-active");
+      campaignForm.reset();
+    });
+  }
+
+  /* ----------------------- Kreator Modal ----------------------- */
+  const kreatorModal = document.getElementById("kreatorModal");
+  const openKreatorModalBtn = document.querySelector(".btn-tambah");
+  const closeKreatorModalBtn = document.getElementById("closeKreatorModal");
+  const kreatorForm = document.getElementById("kreatorForm");
+  const toggleKreatorPassword = document.getElementById("toggleKreatorPassword");
+  const kreatorPassword = document.getElementById("kreatorPassword");
+
+  if (kreatorModal) {
+    // Open modal
+    openKreatorModalBtn?.addEventListener("click", () => {
+      kreatorModal.classList.add("is-active");
+    });
+
+    // Close modal
+    closeKreatorModalBtn?.addEventListener("click", () => {
+      kreatorModal.classList.remove("is-active");
+    });
+
+    // Close modal when clicking on overlay background
+    kreatorModal.addEventListener("click", (e) => {
+      if (e.target === kreatorModal) {
+        kreatorModal.classList.remove("is-active");
+      }
+    });
+
+    // Toggle password visibility
+    toggleKreatorPassword?.addEventListener("click", () => {
+      const isPassword = kreatorPassword.type === "password";
+      kreatorPassword.type = isPassword ? "text" : "password";
+    });
+
+    // Form submit
+    kreatorForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Kreator berhasil ditambahkan");
+      kreatorModal.classList.remove("is-active");
+      kreatorForm.reset();
+    });
+  }
+
+  /* ------------------- Performa Kreator Toggle View & Upload ------------------- */
+  const btnTambahPerforma = document.getElementById("btnTambahPerforma");
+  const tablePanel = document.getElementById("tablePanel");
+  const formPanel = document.getElementById("formPanel");
+  const pageHeading = document.getElementById("pageHeading");
+  const performaForm = document.getElementById("performaForm");
+  const fileUploadContainer = document.getElementById("fileUploadContainer");
+  const performaFileInput = document.getElementById("performaFileInput");
+  const previewBox = document.getElementById("previewBox");
+
+  if (btnTambahPerforma && tablePanel && formPanel && performaForm) {
+    // Toggle to Add Form view
+    btnTambahPerforma.addEventListener("click", () => {
+      tablePanel.style.display = "none";
+      formPanel.style.display = "block";
+      btnTambahPerforma.style.display = "none";
+      if (pageHeading) {
+        pageHeading.innerHTML = '<span style="font-weight: 700; font-style: normal; color: #17171a;">TAMBAH</span> Performa Kreator';
+      }
+    });
+
+    // Handle Choose File click behavior
+    fileUploadContainer?.addEventListener("click", () => {
+      performaFileInput.click();
+    });
+
+    // Handle File input changes & Preview updates
+    performaFileInput?.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        previewBox.innerHTML = `
+          <div class="preview-file-info">
+            <svg class="preview-file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <strong style="font-size: 15px; margin-top: 8px;">${file.name}</strong>
+            <span style="font-size: 12px; color: var(--muted);">${(file.size / 1024).toFixed(1)} KB</span>
+          </div>
+        `;
+      } else {
+        previewBox.innerHTML = "";
+      }
+    });
+
+    // Handle form submit
+    performaForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      // Submit logic/feedback
+      showToast("Performa Kreator berhasil ditambahkan");
+
+      // Revert view to main dashboard table
+      performaForm.reset();
+      previewBox.innerHTML = "";
+      formPanel.style.display = "none";
+      tablePanel.style.display = "block";
+      btnTambahPerforma.style.display = "";
+      if (pageHeading) {
+        pageHeading.innerHTML = "Performa Kreator";
+      }
+    });
+  }
+
+  /* ----------------------- Leads Kreator Modal ----------------------- */
+  const leadsKreatorModal = document.getElementById("leadsKreatorModal");
+  const btnTambahLeads = document.getElementById("btnTambahLeads");
+  const closeLeadsKreatorModal = document.getElementById("closeLeadsKreatorModal");
+  const leadsKreatorForm = document.getElementById("leadsKreatorForm");
+
+  if (leadsKreatorModal) {
+    // Open modal
+    btnTambahLeads?.addEventListener("click", () => {
+      leadsKreatorModal.classList.add("is-active");
+    });
+
+    // Close modal
+    closeLeadsKreatorModal?.addEventListener("click", () => {
+      leadsKreatorModal.classList.remove("is-active");
+    });
+
+    // Close modal when clicking on overlay background
+    leadsKreatorModal.addEventListener("click", (e) => {
+      if (e.target === leadsKreatorModal) {
+        leadsKreatorModal.classList.remove("is-active");
+      }
+    });
+
+    // Form submit
+    leadsKreatorForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Leads Kreator berhasil ditambahkan");
+      leadsKreatorModal.classList.remove("is-active");
+      leadsKreatorForm.reset();
+    });
+  }
+
+  /* ---------------------- Leveling Kreator Modal ---------------------- */
+  const levelingKreatorModal = document.getElementById("levelingKreatorModal");
+  const btnTambahLeveling = document.getElementById("btnTambahLeveling");
+  const closeLevelingKreatorModal = document.getElementById("closeLevelingKreatorModal");
+  const levelingKreatorForm = document.getElementById("levelingKreatorForm");
+
+  if (levelingKreatorModal) {
+    // Open modal
+    btnTambahLeveling?.addEventListener("click", () => {
+      levelingKreatorModal.classList.add("is-active");
+    });
+
+    // Close modal
+    closeLevelingKreatorModal?.addEventListener("click", () => {
+      levelingKreatorModal.classList.remove("is-active");
+    });
+
+    // Close modal when clicking on overlay background
+    levelingKreatorModal.addEventListener("click", (e) => {
+      if (e.target === levelingKreatorModal) {
+        levelingKreatorModal.classList.remove("is-active");
+      }
+    });
+
+    // Form submit
+    levelingKreatorForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Leveling Kreator berhasil ditambahkan");
+      levelingKreatorModal.classList.remove("is-active");
+      levelingKreatorForm.reset();
+    });
+  }
+
+  /* ------------------- Dashboard Filter Dropdown & Calendar Modal ------------------- */
+  const filterCampaignDropdown = document.getElementById("filterCampaignDropdown");
+  const btnFilterCampaign = document.getElementById("btnFilterCampaign");
+  const filterCampaignForm = document.getElementById("filterCampaignForm");
+
+  if (filterCampaignDropdown && btnFilterCampaign) {
+    // Toggle popover on click
+    btnFilterCampaign.addEventListener("click", (e) => {
+      e.stopPropagation();
+      filterCampaignDropdown.classList.toggle("is-active");
+    });
+
+    // Close popover when clicking elsewhere on the page
+    document.addEventListener("click", (e) => {
+      if (!filterCampaignDropdown.contains(e.target) && e.target !== btnFilterCampaign) {
+        filterCampaignDropdown.classList.remove("is-active");
+      }
+    });
+
+    // Submit Filter Form
+    filterCampaignForm?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Filter berhasil diterapkan");
+      filterCampaignDropdown.classList.remove("is-active");
+    });
+  }
+
+  const calendarCampaignModal = document.getElementById("calendarCampaignModal");
+  const btnCalendarCampaign = document.getElementById("btnCalendarCampaign");
+  const closeCalendarModal = document.getElementById("closeCalendarModal");
+  const btnCancelCalendar = document.getElementById("btnCancelCalendar");
+  const btnApplyCalendar = document.getElementById("btnApplyCalendar");
+
+  if (calendarCampaignModal) {
+    // Open Calendar Modal
+    btnCalendarCampaign?.addEventListener("click", () => {
+      calendarCampaignModal.classList.add("is-active");
+    });
+
+    // Close Calendar Modal
+    closeCalendarModal?.addEventListener("click", () => {
+      calendarCampaignModal.classList.remove("is-active");
+    });
+
+    btnCancelCalendar?.addEventListener("click", () => {
+      calendarCampaignModal.classList.remove("is-active");
+    });
+
+    // Close when clicking overlay background
+    calendarCampaignModal.addEventListener("click", (e) => {
+      if (e.target === calendarCampaignModal) {
+        calendarCampaignModal.classList.remove("is-active");
+      }
+    });
+
+    // Apply Calendar Selection
+    btnApplyCalendar?.addEventListener("click", () => {
+      showToast("Periode tanggal berhasil diterapkan");
+      calendarCampaignModal.classList.remove("is-active");
+    });
+  }
+
+  /* ------------------- Export Excel Performa & Campaign ------------------- */
+  const btnExportExcel = document.getElementById("btnExportExcel");
+  if (btnExportExcel) {
+    btnExportExcel.addEventListener("click", () => {
+      const pageHeading = document.getElementById("pageHeading")?.innerText || "";
+
+      let csvData = [];
+      let filename = "export.csv";
+
+      if (pageHeading.includes("Performa")) {
+        filename = "performa_kreator.csv";
+        csvData = [
+          ["Tanggal", "Username", "GMV Afiliasi", "Pesanan Afiliasi", "Est Komisi"],
+          ["11/08/2026", "kreator.kece", "Rp 50.000.000", "120", "Rp 5.000.000"],
+          ["10/08/2026", "kreator.super", "Rp 75.000.000", "180", "Rp 7.500.000"],
+          ["09/08/2026", "kreator.top", "Rp 120.000.000", "300", "Rp 12.000.000"]
+        ];
+      } else {
+        filename = "campaign_data.csv";
+        csvData = [
+          ["Brand/Seller", "Kategori", "Kreator", "Jenis Campaign", "Tanggal"],
+          ["Brand A", "Fashion", "Kreator A", "Live", "11/08/2026"],
+          ["Brand B", "Beauty", "Kreator B", "Video", "10/08/2026"],
+          ["Brand C", "Food", "Kreator C", "Live + Video", "09/08/2026"]
+        ];
+      }
+
+      const csvContent = "data:text/csv;charset=utf-8,"
+        + csvData.map(row => row.join(",")).join("\n");
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+
+      link.click();
+      document.body.removeChild(link);
+
+      showToast("File Excel berhasil diunduh");
+    });
+  }
+
+  /* ------------------- Milestone Actions ------------------- */
+  const btnTambahMilestone = document.getElementById("btnTambahMilestone");
+  btnTambahMilestone?.addEventListener("click", () => {
+    showToast("Fitur Tambah Milestone siap dihubungkan ke backend.");
+  });
+})();
+
+// Custom script notes for SpV KOL dropdown toggle verification (Added safely at the bottom)
+
