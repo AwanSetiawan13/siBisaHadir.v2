@@ -15859,7 +15859,7 @@
         localStorage.removeItem("bisaMediaRememberedUser");
       }
 
-      window.location.href = "dashboard.html";
+      window.location.href = "kol_dashboard.html";
     });
   }
 
@@ -16268,7 +16268,23 @@
   btnTambahMilestone?.addEventListener("click", () => {
     showToast("Fitur Tambah Milestone siap dihubungkan ke backend.");
   });
+
+  // Persist sidebar scroll position across navigation
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) {
+    const restoreScroll = () => {
+      const savedScroll = localStorage.getItem("sidebarScrollPosition");
+      if (savedScroll !== null) {
+        sidebar.scrollTop = parseInt(savedScroll, 10);
+      }
+    };
+    restoreScroll();
+    // Fallback for slower rendering/layouts
+    setTimeout(restoreScroll, 50);
+    setTimeout(restoreScroll, 150);
+
+    sidebar.addEventListener("scroll", () => {
+      localStorage.setItem("sidebarScrollPosition", sidebar.scrollTop);
+    });
+  }
 })();
-
-// Custom script notes for SpV KOL dropdown toggle verification (Added safely at the bottom)
-
