@@ -1239,25 +1239,49 @@
     });
   }
 
-  function buildActionsCell(viewHref) {
-    const td = document.createElement('td');
-    td.className = 'tdActions';
-    td.innerHTML = `
-      <div class="d-flex justify-content-center gap-2">
-        <a aria-label="Lihat" class="btn btn-sm btn-icon btn-primary" href="${viewHref || '#'}" title="Lihat">
-          <i class="bx bx-show"></i>
-        </a>
-        <button aria-label="Edit" class="btn btn-sm btn-icon btn-outline-primary" title="Edit" type="button">
-          <i class="bx bx-edit-alt"></i>
-        </button>
-        <button aria-label="Hapus" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus" type="button">
-          <i class="bx bx-trash"></i>
-        </button>
-      </div>
-    `.trim();
-    return td;
-  }
+  function buildActionsCell(row, config) {
+    const cell = document.createElement('td');
+    cell.className = 'tdActions';
+    const table = row.closest('table');
+    const tableId = table ? String(table.id).trim() : '';
 
+    if (tableId === 'tblKehadiranV2' || tableId === 'tblIstirahatV2' || tableId === 'tblLemburV2') {
+      let html = '<div class="d-flex justify-content-center gap-1">';
+      if (config.view) {
+        html += '<button class="btn-view" title="Lihat" type="button" style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.15s ease; color: #29A3D8;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>';
+      }
+      if (config.edit) {
+        html += '<button class="btn-edit" title="Edit" type="button" style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.15s ease; color: #2264c6;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path></svg></button>';
+      }
+      if (config.delete) {
+        html += '<button class="btn-delete" title="Hapus" type="button" style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.15s ease; color: #ff5252;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>';
+      }
+      html += '</div>';
+      cell.innerHTML = html;
+      
+      cell.querySelectorAll('.btn-view').forEach(btn => {
+        btn.addEventListener('mouseenter', () => btn.style.backgroundColor = 'rgba(41, 163, 216, 0.08)');
+        btn.addEventListener('mouseleave', () => btn.style.backgroundColor = 'transparent');
+      });
+      cell.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('mouseenter', () => btn.style.backgroundColor = 'rgba(34, 100, 198, 0.08)');
+        btn.addEventListener('mouseleave', () => btn.style.backgroundColor = 'transparent');
+      });
+      cell.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('mouseenter', () => btn.style.backgroundColor = 'rgba(255, 82, 82, 0.08)');
+        btn.addEventListener('mouseleave', () => btn.style.backgroundColor = 'transparent');
+      });
+    } else {
+      cell.innerHTML = `
+        <div class="d-flex justify-content-center gap-2">
+          ${config.view ? '<button aria-label="Lihat" class="btn btn-sm btn-icon btn-primary" title="Lihat" type="button"><i class="bx bx-show"></i></button>' : ''}
+          ${config.edit ? '<button aria-label="Edit" class="btn btn-sm btn-icon btn-outline-primary" title="Edit" type="button"><i class="bx bx-edit-alt"></i></button>' : ''}
+          ${config.delete ? '<button aria-label="Hapus" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus" type="button"><i class="bx bx-trash"></i></button>' : ''}
+        </div>
+      `.trim();
+    }
+    return cell;
+  }
 
   function isPhotoPreviewLabel(label) {
     const t = String(label || '').trim().toLowerCase();
@@ -16033,6 +16057,9 @@
   const performaForm = document.getElementById("performaForm");
   const fileUploadContainer = document.getElementById("fileUploadContainer");
   const performaFileInput = document.getElementById("performaFileInput");
+  const performaFormatSelect = document.getElementById("performaFormatSelect");
+  const performaPasteInput = document.getElementById("performaPasteInput");
+  const btnCancelTambahPerforma = document.getElementById("btnCancelTambahPerforma");
   const previewBox = document.getElementById("previewBox");
 
   if (btnTambahPerforma && tablePanel && formPanel && performaForm) {
@@ -16045,6 +16072,39 @@
         pageHeading.innerHTML = '<span style="font-weight: 700; font-style: normal; color: #17171a;">TAMBAH</span> Performa Kreator';
       }
     });
+
+    // Cancel and go back to table view
+    btnCancelTambahPerforma?.addEventListener("click", () => {
+      performaForm.reset();
+      performaFormatSelect?.dispatchEvent(new Event("change"));
+      previewBox.innerHTML = "";
+      formPanel.style.display = "none";
+      tablePanel.style.display = "block";
+      btnTambahPerforma.style.display = "";
+      if (pageHeading) {
+        pageHeading.innerHTML = "Performa Kreator";
+      }
+    });
+
+    // Toggle input field type based on Format select
+    if (performaFormatSelect && fileUploadContainer && performaPasteInput) {
+      performaFormatSelect.addEventListener("change", () => {
+        if (performaFormatSelect.value === "Excel") {
+          fileUploadContainer.style.display = "flex";
+          performaPasteInput.style.display = "none";
+          performaFileInput.required = true;
+          performaPasteInput.required = false;
+          performaPasteInput.value = "";
+        } else {
+          fileUploadContainer.style.display = "none";
+          performaPasteInput.style.display = "block";
+          performaFileInput.required = false;
+          performaPasteInput.required = true;
+          performaFileInput.value = "";
+        }
+        previewBox.innerHTML = "";
+      });
+    }
 
     // Handle Choose File click behavior
     fileUploadContainer?.addEventListener("click", () => {
@@ -16073,6 +16133,29 @@
       }
     });
 
+    // Handle Paste Input changes & Preview updates
+    performaPasteInput?.addEventListener("input", (e) => {
+      const text = e.target.value.trim();
+      if (text) {
+        const lineCount = text.split("\n").filter((l) => l.trim()).length;
+        previewBox.innerHTML = `
+          <div class="preview-file-info">
+            <svg class="preview-file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <strong style="font-size: 15px; margin-top: 8px;">Pasted Data</strong>
+            <span style="font-size: 12px; color: var(--muted);">${lineCount} baris data terdeteksi</span>
+          </div>
+        `;
+      } else {
+        previewBox.innerHTML = "";
+      }
+    });
+
     // Handle form submit
     performaForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -16082,6 +16165,7 @@
 
       // Revert view to main dashboard table
       performaForm.reset();
+      performaFormatSelect?.dispatchEvent(new Event("change"));
       previewBox.innerHTML = "";
       formPanel.style.display = "none";
       tablePanel.style.display = "block";
@@ -16288,3 +16372,45 @@
     });
   }
 })();
+
+// Global Custom Dropdown Checklist Select Logic
+window.toggleDropdownChecklist = function(trigger) {
+  const container = trigger.closest(".dropdown-select-checkbox");
+  
+  // Close all other active dropdowns first
+  document.querySelectorAll(".dropdown-select-checkbox").forEach(d => {
+    if (d !== container) d.classList.remove("is-active");
+  });
+  
+  container.classList.toggle("is-active");
+};
+
+// Close dropdowns when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".dropdown-select-checkbox")) {
+    document.querySelectorAll(".dropdown-select-checkbox").forEach(d => {
+      d.classList.remove("is-active");
+    });
+  }
+});
+
+// Global Custom Dropdown Tree Logic
+window.toggleDropdownTree = function(trigger) {
+  const container = trigger.closest(".dropdown-select-tree");
+  
+  // Close all other active dropdown trees first
+  document.querySelectorAll(".dropdown-select-tree").forEach(d => {
+    if (d !== container) d.classList.remove("is-active");
+  });
+  
+  container.classList.toggle("is-active");
+};
+
+// Close dropdown trees when clicking outside
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".dropdown-select-tree")) {
+    document.querySelectorAll(".dropdown-select-tree").forEach(d => {
+      d.classList.remove("is-active");
+    });
+  }
+});
