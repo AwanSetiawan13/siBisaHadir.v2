@@ -395,16 +395,9 @@
 
           <!-- Kegiatan Hari Ini -->
           <div class="db-activity-section">
-            <h2 class="db-activity-title">Kegiatan Hari ini</h2>
+            <h2 class="db-activity-title">Kegiatan bulan ini</h2>
             <div class="db-activity-list" id="activityList">
-              <div class="db-activity-item">
-                <div class="db-activity-info">
-                  <strong>Meeting Bersama A</strong>
-                  <span class="db-activity-time">00:00 - 11:11</span>
-                </div>
-                <span class="db-activity-badge"
-                  style="background: #ffcc00; color: #111; box-shadow: none;">Meeting</span>
-              </div>
+              <!-- Filled dynamically by JS -->
             </div>
           </div>
         </div>
@@ -636,6 +629,74 @@
         });
       }
 
+      function updateMonthActivities() {
+        const listContainer = document.getElementById("activityList");
+        if (!listContainer) return;
+        listContainer.innerHTML = "";
+
+        // Gather all activities in scheduleDb
+        let allActivities = [];
+        for (const [day, items] of Object.entries(scheduleDb)) {
+          items.forEach(item => {
+            allActivities.push({
+              day: parseInt(day),
+              ...item
+            });
+          });
+        }
+
+        // Sort by day
+        allActivities.sort((a, b) => a.day - b.day);
+
+        if (allActivities.length === 0) {
+          listContainer.innerHTML = `<div class="db-empty-row" style="padding: 20px 0; color: var(--muted); text-align: center; width: 100%;">Tidak ada kegiatan bulan ini.</div>`;
+          return;
+        }
+
+        allActivities.forEach(item => {
+          const mm = String(calMonth + 1).padStart(2, '0');
+          const dd = String(item.day).padStart(2, '0');
+          const dateStr = `${dd}/${mm}/${calYear}`;
+          
+          let badgeBg = "#ffcc00";
+          let badgeColor = "#111";
+          if (item.title.includes("Meeting")) {
+            badgeBg = "#ffcc00";
+            badgeColor = "#111";
+          } else if (item.title.includes("Visit")) {
+            badgeBg = "#2196f3";
+            badgeColor = "#fff";
+          } else if (item.title.includes("HR")) {
+            badgeBg = "#9c27b0";
+            badgeColor = "#fff";
+          } else if (item.title.includes("Deadline")) {
+            badgeBg = "#f44336";
+            badgeColor = "#fff";
+          } else if (item.title.includes("Tanggal Merah")) {
+            badgeBg = "#ff5252";
+            badgeColor = "#fff";
+          } else {
+            badgeBg = "#29A3D8";
+            badgeColor = "#fff";
+          }
+
+          // Strip type prefix if present
+          const displayTitle = item.title.replace(/^\[.*?\]\s*/, "");
+          const typeLabel = item.title.match(/^\[(.*?)\]/) ? item.title.match(/^\[(.*?)\]/)[1] : "Kegiatan";
+
+          const div = document.createElement("div");
+          div.className = "db-activity-item";
+          div.innerHTML = `
+            <div class="db-activity-info">
+              <strong>${displayTitle}</strong>
+              <span class="db-activity-time">${dateStr} | ${item.time}</span>
+            </div>
+            <span class="db-activity-badge" style="background: ${badgeBg}; color: ${badgeColor}; box-shadow: none;">${typeLabel}</span>
+          `;
+          listContainer.appendChild(div);
+        });
+      }
+
       function renderCalendar() {
         if (!monthLabel || !calBody) return;
         monthLabel.textContent = monthNames[calMonth];
@@ -668,6 +729,7 @@
         calBody.innerHTML = html;
         selectedDateLabel.textContent = formatDateLabel(calYear, calMonth, activeDay);
         updateScheduleList(activeDay);
+        updateMonthActivities();
       }
 
       window.selectCalendarDay = function (day) {

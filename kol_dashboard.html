@@ -7,6 +7,44 @@
   <title>Dashboard | Bisa Media</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="media/logo.png" />
+  <style>
+    /* Styling for Kehadiran Hari Ini Widget (Bigger font sizes) */
+    .db-attendance-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 40px;
+    }
+    .db-att-stat {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+    .db-att-stat-label-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    .db-att-label {
+      font-size: 15px; /* enlarged from 13px */
+      font-weight: 600;
+      color: #333;
+    }
+    .db-att-count {
+      color: #8c8c8c;
+      font-weight: 600;
+      font-size: 13.5px; /* enlarged from 11px */
+    }
+    .db-att-bar {
+      height: 5px;
+      background: #1c88e3;
+      border-radius: 3px;
+      width: 100%;
+      box-shadow: 0 2px 4px rgba(28, 136, 227, 0.2);
+      margin-top: 4px;
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -446,25 +484,25 @@
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
                   <span class="db-att-label">Terlambat</span>
-                  <span class="db-att-count" id="attTerlambat">0</span>
+                  <span class="db-att-count" id="attTerlambat">10</span>
                 </div>
               </div>
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
                   <span class="db-att-label">Izin / Cuti</span>
-                  <span class="db-att-count" id="attIzin">0</span>
+                  <span class="db-att-count" id="attIzin">10</span>
                 </div>
               </div>
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
                   <span class="db-att-label">Tidak Hadir</span>
-                  <span class="db-att-count" id="attTidak">0</span>
+                  <span class="db-att-count" id="attTidak">10</span>
                 </div>
               </div>
-              <div class="db-att-stat db-att-stat--full">
+              <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
                   <span class="db-att-label">Lembur</span>
-                  <span class="db-att-count" id="attLembur">0</span>
+                  <span class="db-att-count" id="attLembur">10</span>
                 </div>
               </div>
             </div>
@@ -542,19 +580,21 @@
         <div class="db-topk-header">
           <h2>TOP Kreator</h2>
           <div class="db-topk-controls">
-            <span class="db-topk-count">
+            <span class="db-topk-count" style="display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid var(--blue-200); border-radius: 6px; padding: 2px 6px; background: rgba(57,173,217,.05);">
               <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
                 style="display:inline-block;vertical-align:middle;stroke:var(--blue-500);fill:none;stroke-width:2;">
                 <circle cx="12" cy="12" r="8.5"></circle>
                 <circle cx="12" cy="9" r="2.3"></circle>
                 <path d="M7.8 17c.8-2.2 2.2-3.3 4.2-3.3s3.4 1.1 4.2 3.3"></path>
               </svg>
-              <strong>5</strong>
+              <select id="topKreatorLimitSelect" style="border: none; background: transparent; font-weight: 700; color: var(--blue-700); cursor: pointer; outline: none; font-size: 13px; font-family: 'Outfit'; padding: 0;">
+                <option value="5">5</option>
+                <option value="10">10</option>
+              </select>
             </span>
-            <select class="db-topk-period" aria-label="Pilih periode">
-              <option>Bulan</option>
-              <option>Minggu</option>
-              <option>Tahun</option>
+            <select class="db-topk-period" id="topKreatorPeriodSelect" aria-label="Pilih periode">
+              <option value="Bulan">Bulan</option>
+              <option value="Minggu">Minggu</option>
             </select>
           </div>
         </div>
@@ -571,38 +611,7 @@
                   <th>GMV</th>
                 </tr>
               </thead>
-              <tbody id="topKreatorBody">
-                <tr>
-                  <td>1.</td>
-                  <td><span class="db-topk-avatar"></span></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>2.</td>
-                  <td><span class="db-topk-avatar"></span></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>3.</td>
-                  <td><span class="db-topk-avatar"></span></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>4.</td>
-                  <td><span class="db-topk-avatar"></span></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td>5.</td>
-                  <td><span class="db-topk-avatar"></span></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </tbody>
+              <tbody id="topKreatorBody"></tbody>
             </table>
           </div>
 
@@ -682,7 +691,7 @@
       renderCalendar();
     })();
 
-    /* ===== TOP Kreator Chart (Canvas) ===== */
+    /* ===== TOP Kreator Chart (Canvas) & Table Dynamic Rendering ===== */
     (function () {
       const canvas = document.getElementById("topKreatorChart");
       if (!canvas) return;
@@ -690,64 +699,138 @@
       const W = canvas.width;
       const H = canvas.height;
 
-      const data = [3, 5, 4, 7, 6, 8, 10, 12, 9, 15, 11, 14];
-      const maxVal = Math.max(...data);
-      const padL = 40, padR = 20, padT = 20, padB = 30;
-      const chartW = W - padL - padR;
-      const chartH = H - padT - padB;
+      const datasets = {
+        "Bulan": [
+          { name: "kreator.top", gmv: 120, gmvLabel: "Rp 120.000.000" },
+          { name: "kreator.super", gmv: 75, gmvLabel: "Rp 75.000.000" },
+          { name: "kreator.kece", gmv: 50, gmvLabel: "Rp 50.000.000" },
+          { name: "kreator.hits", gmv: 45, gmvLabel: "Rp 45.000.000" },
+          { name: "kreator.cantik", gmv: 40, gmvLabel: "Rp 40.000.000" },
+          { name: "kreator.ganteng", gmv: 35, gmvLabel: "Rp 35.000.000" },
+          { name: "kreator.style", gmv: 30, gmvLabel: "Rp 30.000.000" },
+          { name: "kreator.vlog", gmv: 25, gmvLabel: "Rp 25.000.000" },
+          { name: "kreator.game", gmv: 20, gmvLabel: "Rp 20.000.000" },
+          { name: "kreator.baru", gmv: 15, gmvLabel: "Rp 15.000.000" }
+        ],
+        "Minggu": [
+          { name: "kreator.super", gmv: 25, gmvLabel: "Rp 25.000.000" },
+          { name: "kreator.top", gmv: 22, gmvLabel: "Rp 22.000.000" },
+          { name: "kreator.hits", gmv: 18, gmvLabel: "Rp 18.000.000" },
+          { name: "kreator.kece", gmv: 15, gmvLabel: "Rp 15.000.000" },
+          { name: "kreator.style", gmv: 12, gmvLabel: "Rp 12.000.000" },
+          { name: "kreator.cantik", gmv: 10, gmvLabel: "Rp 10.000.000" },
+          { name: "kreator.vlog", gmv: 9, gmvLabel: "Rp 9.000.000" },
+          { name: "kreator.ganteng", gmv: 8, gmvLabel: "Rp 8.000.000" },
+          { name: "kreator.baru", gmv: 6, gmvLabel: "Rp 6.000.000" },
+          { name: "kreator.game", gmv: 5, gmvLabel: "Rp 5.000.000" }
+        ]
+      };
 
-      ctx.clearRect(0, 0, W, H);
+      const tableBody = document.getElementById("topKreatorBody");
+      const periodSelect = document.getElementById("topKreatorPeriodSelect");
+      const limitSelect = document.getElementById("topKreatorLimitSelect");
 
-      /* Grid lines */
-      ctx.strokeStyle = "#e0e0e0";
-      ctx.lineWidth = 0.5;
-      for (let i = 0; i <= 5; i++) {
-        const y = padT + (chartH / 5) * i;
+      function renderTopKreator() {
+        const period = periodSelect ? periodSelect.value : "Bulan";
+        const limit = limitSelect ? parseInt(limitSelect.value) : 5;
+        
+        // Slice the dataset
+        const list = (datasets[period] || datasets["Bulan"]).slice(0, limit);
+
+        // 1. Render Table
+        if (tableBody) {
+          tableBody.innerHTML = "";
+          list.forEach((item, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${index + 1}.</td>
+              <td><span class="db-topk-avatar"></span></td>
+              <td style="text-align: left; font-weight: 600;">${item.name}</td>
+              <td style="color: #2e7d32; font-weight: 600;">${item.gmvLabel}</td>
+            `;
+            tableBody.appendChild(row);
+          });
+        }
+
+        const trendData = {
+          "Bulan": {
+            labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"],
+            values: [45, 50, 58, 62, 55, 68, 75, 80, 78, 85, 90, 95]
+          },
+          "Minggu": {
+            labels: ["M1", "M2", "M3", "M4"],
+            values: [15, 22, 18, 25]
+          }
+        };
+
+        // 2. Render Chart (Canvas)
+        ctx.clearRect(0, 0, W, H);
+        const trend = trendData[period] || trendData["Bulan"];
+        const values = trend.values;
+        const labels = trend.labels;
+        const maxVal = Math.max(...values, 10);
+        const padL = 40, padR = 20, padT = 20, padB = 30;
+        const chartW = W - padL - padR;
+        const chartH = H - padT - padB;
+        const N = values.length;
+
+        /* Grid lines */
+        ctx.strokeStyle = "#e0e0e0";
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i <= 5; i++) {
+          const y = padT + (chartH / 5) * i;
+          ctx.beginPath();
+          ctx.moveTo(padL, y);
+          ctx.lineTo(W - padR, y);
+          ctx.stroke();
+        }
+
+        /* Y-axis labels */
+        ctx.fillStyle = "#999";
+        ctx.font = "10px sans-serif";
+        ctx.textAlign = "right";
+        for (let i = 0; i <= 5; i++) {
+          const y = padT + (chartH / 5) * i;
+          const val = (maxVal * (5 - i) / 5).toFixed(0) + "M";
+          ctx.fillText(val, padL - 6, y + 3);
+        }
+
+        /* X-axis labels */
+        ctx.textAlign = "center";
+        for (let i = 0; i < N; i++) {
+          const x = padL + (chartW / (N - 1 || 1)) * i;
+          ctx.fillText(labels[i], x, H - 8);
+        }
+
+        /* Line */
+        ctx.strokeStyle = "#3166b3";
+        ctx.lineWidth = 2;
+        ctx.lineJoin = "round";
         ctx.beginPath();
-        ctx.moveTo(padL, y);
-        ctx.lineTo(W - padR, y);
+        for (let i = 0; i < N; i++) {
+          const x = padL + (chartW / (N - 1 || 1)) * i;
+          const y = padT + chartH - (values[i] / maxVal) * chartH;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
         ctx.stroke();
+
+        /* Dots */
+        ctx.fillStyle = "#3166b3";
+        for (let i = 0; i < N; i++) {
+          const x = padL + (chartW / (N - 1 || 1)) * i;
+          const y = padT + chartH - (values[i] / maxVal) * chartH;
+          ctx.beginPath();
+          ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
-      /* Y-axis labels */
-      ctx.fillStyle = "#999";
-      ctx.font = "10px sans-serif";
-      ctx.textAlign = "right";
-      for (let i = 0; i <= 5; i++) {
-        const y = padT + (chartH / 5) * i;
-        const val = (maxVal * (5 - i) / 5).toFixed(1);
-        ctx.fillText(val, padL - 6, y + 3);
-      }
+      if (periodSelect) periodSelect.addEventListener("change", renderTopKreator);
+      if (limitSelect) limitSelect.addEventListener("change", renderTopKreator);
 
-      /* X-axis labels */
-      ctx.textAlign = "center";
-      for (let i = 0; i < 12; i++) {
-        const x = padL + (chartW / 11) * i;
-        ctx.fillText(i + 1, x, H - 8);
-      }
-
-      /* Line */
-      ctx.strokeStyle = "#3166b3";
-      ctx.lineWidth = 2;
-      ctx.lineJoin = "round";
-      ctx.beginPath();
-      for (let i = 0; i < data.length; i++) {
-        const x = padL + (chartW / 11) * i;
-        const y = padT + chartH - (data[i] / maxVal) * chartH;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      /* Dots */
-      ctx.fillStyle = "#3166b3";
-      for (let i = 0; i < data.length; i++) {
-        const x = padL + (chartW / 11) * i;
-        const y = padT + chartH - (data[i] / maxVal) * chartH;
-        ctx.beginPath();
-        ctx.arc(x, y, 3, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      // Initial render
+      renderTopKreator();
     })();
   </script>
 </body>

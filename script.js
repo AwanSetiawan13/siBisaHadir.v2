@@ -16267,6 +16267,14 @@
       showToast("Filter berhasil diterapkan");
       filterCampaignDropdown.classList.remove("is-active");
     });
+
+    // Reset Filter Form
+    filterCampaignForm?.addEventListener("reset", () => {
+      setTimeout(() => {
+        showToast("Filter berhasil di-reset");
+        filterCampaignDropdown.classList.remove("is-active");
+      }, 50);
+    });
   }
 
   const calendarCampaignModal = document.getElementById("calendarCampaignModal");

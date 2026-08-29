@@ -611,12 +611,16 @@
       <div class="dashboard-heading" style="display: flex; justify-content: space-between; align-items: center;">
         <h1 style="padding-left: 0;">Laporan</h1>
         
-        <div style="display: flex; gap: 10px;">
-          <select class="dropdown-select-blue">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <select class="dropdown-select-blue" id="picFilterSelect">
             <option>Tim Saya</option>
+            <option>Saya</option>
           </select>
-          <select class="dropdown-select-blue">
-            <option>Agustus</option>
+          <select id="monthSelect" class="month-select" aria-label="Pilih bulan">
+            <option>September</option>
+            <option>Oktober</option>
+            <option>November</option>
+            <option>Desember</option>
           </select>
         </div>
       </div>
@@ -730,16 +734,16 @@
         </section>
 
         <!-- Pencapaian per Program -->
-        <section class="analytics-card">
-          <h2 class="analytics-card__title">Pencapaian per Program</h2>
+        <section class="analytics-card" style="padding: 18px 0;">
+          <h2 class="analytics-card__title" style="padding: 0 18px; margin-bottom: 15px;">Pencapaian per Program</h2>
           <div style="flex-grow: 1; overflow-y: auto;">
             <table class="mini-table">
               <thead>
                 <tr>
-                  <th>Program</th>
+                  <th style="padding-left: 18px;">Program</th>
                   <th>Total RRK</th>
                   <th>Progres Rata-rata</th>
-                  <th>Tugas Tercapai</th>
+                  <th style="padding-right: 18px; text-align: right;">Tugas Tercapai</th>
                 </tr>
               </thead>
               <tbody>
@@ -905,10 +909,47 @@
       });
     }
 
-    // Search bar functionality
+    // Search bar functionality and PIC toggle
     document.addEventListener("DOMContentLoaded", () => {
       const searchInput = document.getElementById("laporanSearchInput");
       const rows = document.querySelectorAll("#laporanTableBody tr");
+      const picFilterSelect = document.getElementById("picFilterSelect");
+
+      function updatePicVisibility() {
+        if (!picFilterSelect) return;
+        const isSaya = picFilterSelect.value === "Saya";
+        const table = document.querySelector(".campaign-table table");
+        if (!table) return;
+
+        // Get the PIC header (3rd th)
+        const picHeader = table.querySelector("thead th:nth-child(3)");
+        if (picHeader) {
+          picHeader.style.display = isSaya ? "none" : "";
+        }
+
+        // Get the PIC cell in each row (3rd td)
+        const tableRows = table.querySelectorAll("tbody tr");
+        tableRows.forEach(row => {
+          const picCell = row.querySelector("td:nth-child(3)");
+          if (picCell) {
+            picCell.style.display = isSaya ? "none" : "";
+          }
+        });
+
+        // Update the date of Row 4 (tg-2)
+        const tg2Row = document.getElementById("tg-2");
+        if (tg2Row) {
+          const dateCell = tg2Row.querySelector("td:nth-child(4)");
+          if (dateCell) {
+            dateCell.textContent = isSaya ? "2 Ags 2026" : "8 Ags 2026";
+          }
+        }
+      }
+
+      if (picFilterSelect) {
+        picFilterSelect.addEventListener("change", updatePicVisibility);
+        updatePicVisibility();
+      }
 
       searchInput.addEventListener("input", () => {
         const query = searchInput.value.trim().toLowerCase();
