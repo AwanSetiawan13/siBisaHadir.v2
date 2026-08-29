@@ -730,6 +730,52 @@
       const periodSelect = document.getElementById("topKreatorPeriodSelect");
       const limitSelect = document.getElementById("topKreatorLimitSelect");
 
+      // Specific trend data for each creator
+      const creatorTrends = {
+        "kreator.top": {
+          "Bulan": [45, 50, 58, 62, 55, 68, 75, 80, 78, 85, 90, 95],
+          "Minggu": [15, 22, 18, 25]
+        },
+        "kreator.super": {
+          "Bulan": [30, 35, 40, 48, 52, 45, 60, 65, 70, 72, 75, 80],
+          "Minggu": [12, 15, 14, 20]
+        },
+        "kreator.kece": {
+          "Bulan": [20, 25, 22, 30, 35, 38, 42, 40, 45, 50, 48, 55],
+          "Minggu": [8, 12, 10, 15]
+        },
+        "kreator.hits": {
+          "Bulan": [15, 18, 22, 20, 25, 28, 30, 35, 32, 40, 42, 45],
+          "Minggu": [6, 8, 10, 12]
+        },
+        "kreator.cantik": {
+          "Bulan": [10, 12, 15, 18, 16, 20, 25, 22, 30, 35, 38, 40],
+          "Minggu": [5, 7, 6, 10]
+        },
+        "kreator.ganteng": {
+          "Bulan": [8, 10, 12, 15, 14, 18, 20, 25, 22, 28, 30, 35],
+          "Minggu": [4, 5, 7, 8]
+        },
+        "kreator.style": {
+          "Bulan": [6, 8, 10, 12, 15, 14, 18, 20, 22, 25, 28, 30],
+          "Minggu": [3, 4, 5, 7]
+        },
+        "kreator.vlog": {
+          "Bulan": [5, 6, 8, 10, 12, 15, 14, 18, 20, 22, 24, 25],
+          "Minggu": [2, 3, 4, 6]
+        },
+        "kreator.game": {
+          "Bulan": [4, 5, 6, 8, 10, 12, 15, 14, 16, 18, 20, 22],
+          "Minggu": [1, 2, 3, 5]
+        },
+        "kreator.baru": {
+          "Bulan": [2, 3, 4, 5, 6, 8, 10, 12, 14, 15, 16, 18],
+          "Minggu": [1, 1, 2, 3]
+        }
+      };
+
+      let selectedCreator = null;
+
       function renderTopKreator() {
         const period = periodSelect ? periodSelect.value : "Bulan";
         const limit = limitSelect ? parseInt(limitSelect.value) : 5;
@@ -737,22 +783,56 @@
         // Slice the dataset
         const list = (datasets[period] || datasets["Bulan"]).slice(0, limit);
 
+        // Ensure selectedCreator is valid and belongs to current period list
+        if (list.length > 0) {
+          const names = list.map(item => item.name);
+          if (!selectedCreator || !names.includes(selectedCreator)) {
+            selectedCreator = list[0].name;
+          }
+        }
+
         // 1. Render Table
         if (tableBody) {
           tableBody.innerHTML = "";
           list.forEach((item, index) => {
             const row = document.createElement("tr");
+            row.style.cursor = "pointer";
+            row.style.transition = "background-color 0.15s";
+            
+            const isSelected = item.name === selectedCreator;
+            if (isSelected) {
+              row.style.backgroundColor = "rgba(41, 163, 217, 0.08)";
+            }
+
             row.innerHTML = `
               <td>${index + 1}.</td>
               <td><span class="db-topk-avatar"></span></td>
-              <td style="text-align: left; font-weight: 600;">${item.name}</td>
+              <td style="text-align: left; font-weight: 600; color: ${isSelected ? 'var(--blue-700)' : '#4c4c4c'}">${item.name}</td>
               <td style="color: #2e7d32; font-weight: 600;">${item.gmvLabel}</td>
             `;
+
+            row.addEventListener("mouseenter", () => {
+              if (item.name !== selectedCreator) {
+                row.style.backgroundColor = "#f8fafc";
+              }
+            });
+            row.addEventListener("mouseleave", () => {
+              if (item.name !== selectedCreator) {
+                row.style.backgroundColor = "";
+              }
+            });
+
+            row.addEventListener("click", () => {
+              selectedCreator = item.name;
+              renderTopKreator();
+            });
+
             tableBody.appendChild(row);
           });
         }
 
-        const trendData = {
+        // Default fallback trend values
+        const defaultTrendData = {
           "Bulan": {
             labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"],
             values: [45, 50, 58, 62, 55, 68, 75, 80, 78, 85, 90, 95]
@@ -763,16 +843,32 @@
           }
         };
 
-        // 2. Render Chart (Canvas)
-        ctx.clearRect(0, 0, W, H);
-        const trend = trendData[period] || trendData["Bulan"];
+        // 2. Fetch Trend Data for selected creator
+        const trend = (creatorTrends[selectedCreator] && creatorTrends[selectedCreator][period])
+          ? {
+              labels: period === "Bulan" 
+                ? ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"]
+                : ["M1", "M2", "M3", "M4"],
+              values: creatorTrends[selectedCreator][period]
+            }
+          : (defaultTrendData[period] || defaultTrendData["Bulan"]);
+
         const values = trend.values;
         const labels = trend.labels;
+
+        // 3. Render Chart (Canvas)
+        ctx.clearRect(0, 0, W, H);
         const maxVal = Math.max(...values, 10);
-        const padL = 40, padR = 20, padT = 20, padB = 30;
+        const padL = 40, padR = 20, padT = 35, padB = 30; // padT is 35 to make room for Title
         const chartW = W - padL - padR;
         const chartH = H - padT - padB;
         const N = values.length;
+
+        /* Title text indicating which creator is selected */
+        ctx.fillStyle = "#29A3D8";
+        ctx.font = "bold 12px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("Trend GMV - " + selectedCreator, padL, padT - 12);
 
         /* Grid lines */
         ctx.strokeStyle = "#e0e0e0";
@@ -826,8 +922,12 @@
         }
       }
 
-      if (periodSelect) periodSelect.addEventListener("change", renderTopKreator);
-      if (limitSelect) limitSelect.addEventListener("change", renderTopKreator);
+      if (periodSelect) periodSelect.addEventListener("change", () => {
+        renderTopKreator();
+      });
+      if (limitSelect) limitSelect.addEventListener("change", () => {
+        renderTopKreator();
+      });
 
       // Initial render
       renderTopKreator();
