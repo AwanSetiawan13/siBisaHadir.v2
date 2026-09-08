@@ -16757,7 +16757,7 @@
               if (fBox) {
                 fBox.innerHTML = `
                   <img src="${selectedFotoDataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" alt="Foto Kreator"/>
-                  <span class="btn-choose-file" style="position: absolute; bottom: 6px; background: rgba(0,0,0,0.65); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px;">Ganti Foto</span>
+                  <span class="btn-choose-file" style="position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.65); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; white-space: nowrap;">Ganti Foto</span>
                   <input type="file" id="fotoInput" style="display: none;" accept="image/*" />
                 `;
                 bindFotoUploadListener();
@@ -16850,9 +16850,9 @@
           window.addKreatorItem(kreatorData);
         } else {
           try {
-            const list = JSON.parse(localStorage.getItem("bisa_kreator_list_v4") || "[]");
+            const list = JSON.parse(localStorage.getItem("bisa_kreator_list_v5") || "[]");
             list.unshift(kreatorData);
-            localStorage.setItem("bisa_kreator_list_v4", JSON.stringify(list));
+            localStorage.setItem("bisa_kreator_list_v5", JSON.stringify(list));
           } catch (err) {}
         }
         showToast("Kreator berhasil ditambahkan");
@@ -16864,7 +16864,7 @@
       const kTitle = document.getElementById("kreatorModalTitle");
       if (kTitle) kTitle.innerHTML = 'Tambah <span style="font-weight: 700;">Kreator</span>';
       const kSubBtn = document.getElementById("btnKreatorSubmit") || kreatorForm.querySelector("button[type='submit']");
-      if (kSubBtn) kSubBtn.textContent = "Submit";
+      if (kSubBtn) kSubBtn.textContent = "Simpan";
 
       kreatorModal.classList.remove("is-active");
       kreatorForm.reset();
