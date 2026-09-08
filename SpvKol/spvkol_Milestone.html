@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milestone - Bisa Media</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" type="image/png" href="../media/logo.png" />
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* New Milestone page custom styling */
+    .milestone-metric-grid-new {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 29px;
+      margin-bottom: 26px;
+    }
+
+    @media (max-width: 992px) {
+      .milestone-metric-grid-new {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 576px) {
+      .milestone-metric-grid-new {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card list/grid matching brand-grid exactly */
+    .milestone-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      padding: 16px 20px 24px;
+    }
+
+    @media (max-width: 1200px) {
+      .milestone-card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .milestone-card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .milestone-card {
+      background: #fff;
+      border: 1px solid #c9c9cc;
+      border-radius: 6px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .milestone-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .milestone-card__title {
+      font-size: 15px;
+      font-weight: 700;
+      font-style: italic;
+      color: #4c4c4c;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .milestone-card__week {
+      background: #35a9d2;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .milestone-card__progress-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .milestone-card__progress-bar {
+      flex: 1;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .milestone-card__progress-fill {
+      height: 100%;
+      background: #2b5cbb;
+      border-radius: 3px;
+    }
+
+    .milestone-card__progress-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8c8c8c;
+      white-space: nowrap;
+    }
+
+    .milestone-card__avatars {
+      display: flex;
+      align-items: center;
+    }
+
+    .milestone-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+      margin-left: -6px;
+      object-fit: cover;
+      display: inline-block;
+    }
+
+    .milestone-avatar:first-child {
+      margin-left: 0;
+    }
+
+    .milestone-avatar--red {
+      background: #ff5252;
+    }
+
+    .milestone-avatar--green {
+      background: #00e676;
+    }
+
+    .milestone-card__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .milestone-card__status {
+      background: #00e676;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+    }
+
+    /* Toolbar overrides */
+    .custom-filter-btn {
+      border: 1.5px solid #35a9d2 !important;
+      color: #35a9d2 !important;
+      background: #fff !important;
+      border-radius: 6px !important;
+      width: 38px !important;
+      height: 38px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    /* Detail View Tabs */
+    .detail-tab {
+      position: relative;
+      outline: none;
+      transition: color 0.15s ease;
+    }
+
+    .detail-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--blue-800);
+      border-top-left-radius: 2px;
+      border-top-right-radius: 2px;
+    }
+
+    /* Floating Chat Widget */
+    .chat-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .chat-trigger-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50% 50% 0 50%; /* Speech bubble look */
+      background-color: #39add9;
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 16px rgba(57, 173, 217, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .chat-trigger-btn:hover {
+      transform: scale(1.05);
+      background-color: #2ea7d2;
+    }
+
+    .chat-trigger-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .chat-popup {
+      position: absolute;
+      bottom: 72px;
+      right: 0;
+      width: 300px;
+      height: 380px;
+      background-color: #fff;
+      border: 1.5px solid #39add9;
+      border-radius: 20px 20px 0 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideUp 0.25s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-header {
+      background-color: #e9ecef;
+      padding: 12px 16px;
+      border-bottom: 1.5px solid #39add9;
+    }
+
+    .chat-header h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      font-style: italic;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: #fff;
+    }
+
+    .chat-msg {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 85%;
+    }
+
+    .chat-msg.left {
+      align-self: flex-start;
+      flex-direction: row;
+    }
+
+    .chat-msg.right {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #0076c6; /* Solid blue circle from screenshot */
+      flex-shrink: 0;
+    }
+
+    .chat-bubble {
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      background-color: #fff;
+      border: 1px solid #cdd0d5;
+      color: #333;
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+
+    .chat-msg.left .chat-bubble {
+      border-bottom-left-radius: 2px;
+    }
+
+    .chat-msg.right .chat-bubble {
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-footer {
+      padding: 12px;
+      background-color: #fff;
+      border-top: 1px solid #f1f3f5;
+    }
+
+    .chat-input-wrap {
+      display: flex;
+      align-items: center;
+      border: 1px solid #a0a5b0;
+      border-radius: 20px;
+      padding: 4px 6px 4px 12px;
+      background-color: #fff;
+    }
+
+    .chat-input-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      background: transparent;
+      padding: 4px 0;
+    }
+
+    .chat-send-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #0076c6; /* Blue circle send button */
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s;
+    }
+
+    .chat-send-btn:hover {
+      background-color: #0064a7;
+    }
+
+    .chat-send-btn svg {
+      transform: rotate(-30deg); /* Slanted airplane icon */
+      margin-left: 2px;
+      margin-top: -1px;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+            <aside id="sidebar" class="sidebar kol-sidebar">
+    <div class="sidebar-brand">
+      <img class="brand-logo brand-logo--sidebar" src="../media/logo.png" alt="Logo Bisa Media" />
+      <span class="brand-name brand-name--dark">Bisa Media</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Menu utama">
+      <a class="nav-item " href="spvkol_dashboard.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3.5 10.5L12 3l8.5 7.5"></path>
+          <path d="M5.5 9.5V21h13V9.5"></path>
+          <path d="M9.5 21v-6h5v6"></path>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <a class="nav-item " href="spvkol_kalender.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>Kalender</span>
+      </a>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Absensi</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_kehadiran.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Kehadiran</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_presensi_istirahat.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+            <span>Presensi Istirahat</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_presensi_lembur.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Presensi Lembur</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Oprasional</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_dashboard_campaign.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3.5 10.5L12 3l8.5 7.5"></path>
+              <path d="M5.5 9.5V21h13V9.5"></path>
+              <path d="M9.5 21v-6h5v6"></path>
+            </svg>
+            <span>Dashboard Campaign</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_campaign.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 13h3l9 4V7l-9 4H4z"></path>
+              <path d="M7 13l1.5 5"></path>
+              <path d="M18 9.5c1 .6 1.5 1.4 1.5 2.5S19 13.9 18 14.5"></path>
+            </svg>
+            <span>Campaign</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_kreator.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="9" cy="8" r="3"></circle>
+              <path d="M3.5 19c.6-3.4 2.4-5.2 5.5-5.2s4.9 1.8 5.5 5.2"></path>
+              <circle cx="17" cy="9" r="2"></circle>
+              <path d="M15.5 14.5c2.7-.3 4.4 1.2 5 4"></path>
+            </svg>
+            <span>Kreator</span>
+          </a>
+
+          <a class="nav-item" href="spvkol_tracking_sampel.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10" cy="10" r="5"></circle>
+              <path d="M14 14l6 6"></path>
+              <path d="M8 10h4M10 8v4"></path>
+            </svg>
+            <span>Tracking Sampel</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_Performa_Kreator.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19V5"></path>
+              <path d="M4 19h16"></path>
+              <path d="M7 15l4-4 3 2 5-6"></path>
+            </svg>
+            <span>Performa Kreator</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Dokumen & Kolaborasi</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_folder.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>My Folders</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group ">
+        <button class="nav-group__toggle" type="button">
+          <span>Perancangan Kerja</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_rrk.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 21V4"></path>
+              <path d="M5 5h11l-2 4 2 4H5"></path>
+            </svg>
+            <span>RRK</span>
+          </a>
+
+          <a class="nav-item nav-item--active" href="spvkol_Milestone.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 21V4"></path>
+              <path d="M5 5h11l-2 4 2 4H5"></path>
+              <circle cx="18.5" cy="17.5" r="2.5"></circle>
+            </svg>
+            <span>Milestone</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_tugas.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+              <path d="M8 12l2.5 2.5L16 9"></path>
+            </svg>
+            <span>Tugas</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_project.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>Project</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_laporan.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Laporan</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_pengaduan.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Pengaduan</span>
+          </a>
+        </div>
+      </section>
+
+            <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Kinerja</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_evaluasi_kinerja.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Evaluasi Kinerja</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_target_capaian.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+            <span>Target & Capaian Kerja</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_rencana_karier.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="18" y1="8" x2="23" y2="8"></line>
+              <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
+            </svg>
+            <span>Rencana Karier</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Data Master</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_Brand.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3l8 8-8 8-8-8z"></path>
+              <path d="M8.5 11.5l3 3 4.5-5"></path>
+            </svg>
+            <span>Brand</span>
+          </a>
+
+          <div class="nav-subgroup is-collapsed">
+            <button class="nav-subgroup__toggle" type="button">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+              <span>Master Pendukung</span>
+              <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 9l5 5 5-5"></path>
+              </svg>
+            </button>
+            <div class="nav-subgroup__items">
+              <a class="nav-item " href="spvkol_Kategori_Produk.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 6h12M8 12h12M8 18h12"></path>
+                  <circle cx="4" cy="6" r="1"></circle>
+                  <circle cx="4" cy="12" r="1"></circle>
+                  <circle cx="4" cy="18" r="1"></circle>
+                </svg>
+                <span>Kategori Produk</span>
+              </a>
+              <a class="nav-item " href="spvkol_Leads_Kreator.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="9" cy="8" r="3"></circle>
+                  <path d="M3.5 19c.6-3.4 2.4-5.2 5.5-5.2s4.9 1.8 5.5 5.2"></path>
+                  <path d="M17 6v6M14 9h6"></path>
+                </svg>
+                <span>Leads Kreator</span>
+              </a>
+
+              <a class="nav-item " href="spvkol_Leveling_Kreator.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8z"></path>
+                </svg>
+                <span>Leveling Kreator</span>
+              </a>
+
+              <a class="nav-item " href="spvkol_Ads_Account.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="8" cy="9" r="3"></circle>
+                  <circle cx="16" cy="9" r="3"></circle>
+                  <path d="M2.5 20c.6-3.2 2.4-5 5.5-5 1.5 0 2.7.4 3.6 1.1"></path>
+                  <path d="M12.4 16.1c.9-.7 2.1-1.1 3.6-1.1 3.1 0 4.9 1.8 5.5 5"></path>
+                </svg>
+                <span>Ads Account</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </nav>
+  </aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+            <img src="../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Supervisi KOL</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../index.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Milestone</h1>
+      </div>
+
+      <!-- Milestone Summary Layout -->
+      <div class="milestone-metric-grid-new">
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Total Milestone</span>
+            <strong class="metric-value">100</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(34, 100, 198, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #2264c6;">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+              <line x1="4" y1="22" x2="4" y2="15"></line>
+            </svg>
+          </div>
+        </article>
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Minggu Ini</span>
+            <strong class="metric-value">100</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(156, 39, 176, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #9c27b0;">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+        </article>
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Selesai</span>
+            <strong class="metric-value">100</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(76, 175, 80, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #4caf50;">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </article>
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Terlambat</span>
+            <strong class="metric-value">100</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(244, 67, 54, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #f44336;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+        </article>
+      </div>
+
+      <!-- Main Milestone Panel -->
+      <section id="mainMilestonePanel" class="panel campaign-panel" style="padding-bottom: 24px;">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <div class="filter-dropdown-wrapper" style="margin-right: 6px;">
+              <button id="btnFilterCampaign" class="small-action-button" type="button" aria-label="Filter">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </button>
+
+              <!-- Dropdown Content -->
+              <div id="filterCampaignDropdown" class="filter-popover" style="top: 100%; left: 0;">
+                <form id="filterCampaignForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">PIC</label>
+                    <div class="select-wrapper">
+                      <select class="form-select">
+                        <option value="" disabled selected hidden>Pilih PIC</option>
+                        <option value="Riva">Riva</option>
+                        <option value="Sri">Sri</option>
+                        <option value="Ahmad">Ahmad</option>
+                        <option value="Fauzi">Fauzi</option>
+                        <option value="Budi">Budi</option>
+                        <option value="Siti">Siti</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Tim</label>
+                    <div class="select-wrapper">
+                      <select class="form-select">
+                        <option value="" disabled selected hidden>Pilih Tim</option>
+                        <option value="Riva">Riva</option>
+                        <option value="Sri">Sri</option>
+                        <option value="Ahmad">Ahmad</option>
+                        <option value="Fauzi">Fauzi</option>
+                        <option value="Budi">Budi</option>
+                        <option value="Siti">Siti</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+                    <button type="reset" class="btn-reset" style="background-color: #f44336; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px;">Reset</button>
+                    <button type="submit" class="btn-simpan" style="background-color: #2264c6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px; margin: 0;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Search Bar -->
+            <label class="campaign-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="search" placeholder="Cari...." />
+            </label>
+          </div>
+
+          <div class="campaign-toolbar__right">
+            <button id="btnTambahMilestone" class="btn-tambah" style="margin-right: 6px;" type="button">
+              + Tambah
+            </button>
+          </div>
+        </div>
+
+        <div class="milestone-card-grid" id="milestoneCardGrid"></div>
+      </section>
+
+      <!-- Milestone Detail Panel (initially hidden) -->
+      <section id="milestoneDetailPanel" class="panel campaign-panel" style="display: none; padding-bottom: 30px;">
+        <div class="campaign-panel__line"></div>
+
+        <div style="padding: 24px 30px; position: relative;">
+          <!-- Close/Back Button -->
+          <button id="btnBackToMilestones" class="modal-close" style="top: 24px; right: 30px; position: absolute;"
+            type="button" aria-label="Kembali">&times;</button>
+
+          <h2 id="detailTitle"
+            style="font-size: 24px; font-weight: 700; font-style: italic; color: #4c4c4c; margin: 0 0 20px;">Kerja Sama
+            dengan Influencer</h2>
+
+          <div
+            style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 24px; font-size: 13px; color: #333;">
+            <!-- Column 1 -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center;">
+                <span style="width: 120px; color: #555; font-weight: 500;">RRK Terkait</span>
+                <span style="margin-right: 8px;">:</span>
+                <span id="detailRrk">-</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="width: 120px; color: #555; font-weight: 500;">Target Output</span>
+                <span style="margin-right: 8px;">:</span>
+                <span id="detailTarget" style="white-space: pre-line;">-</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="width: 120px; color: #555; font-weight: 500;">Progress</span>
+                <span style="margin-right: 8px;">:</span>
+                <div style="display: flex; align-items: center; gap: 10px; flex: 1; max-width: 250px;">
+                  <div style="flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                    <div id="detailProgressFill"
+                      style="height: 100%; width: 100%; background: #2b5cbb; border-radius: 3px;"></div>
+                  </div>
+                  <span id="detailProgressText" style="font-weight: 600; color: #555;">100%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center;">
+                <span style="width: 100px; color: #555; font-weight: 500;">PIC</span>
+                <span style="margin-right: 8px;">:</span>
+                <span id="detailPic">-</span>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <span style="width: 100px; color: #555; font-weight: 500;">Minggu ke</span>
+                <span style="margin-right: 8px;">:</span>
+                <span id="detailWeek">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div
+          style="background: #efefef; border-top: 1px solid #dcdcdc; border-bottom: 1px solid #dcdcdc; padding: 0 30px; display: flex; gap: 24px; height: 42px; align-items: center;">
+          <button class="detail-tab active" data-tab="output"
+            style="background: none; border: none; font-size: 13px; font-weight: 700; color: #333; cursor: pointer; padding: 0 4px; height: 100%;">Output</button>
+          <button class="detail-tab" data-tab="tugas"
+            style="background: none; border: none; font-size: 13px; font-weight: 500; color: #666; cursor: pointer; padding: 0 4px; height: 100%;">Tugas</button>
+          <button class="detail-tab" data-tab="dokument"
+            style="background: none; border: none; font-size: 13px; font-weight: 500; color: #666; cursor: pointer; padding: 0 4px; height: 100%;">Dokument</button>
+          <button class="detail-tab" data-tab="catatan"
+            style="background: none; border: none; font-size: 13px; font-weight: 500; color: #666; cursor: pointer; padding: 0 4px; height: 100%;">Catatan</button>
+        </div>
+
+        <!-- Tab Content Area -->
+        <div id="detailTabContent"
+          style="padding: 30px; min-height: 200px; background: #fff; font-size: 13px; color: #555;">
+          <!-- Output Content -->
+          <div id="tab-output" class="tab-pane">
+            <p style="margin: 0; color: #444;" id="detailOutputText">Belum ada output.</p>
+          </div>
+          <!-- Tugas Content -->
+          <div id="tab-tugas" class="tab-pane" style="display: none;">
+            <ul style="margin: 0; padding-left: 20px; color: #444; line-height: 1.6;" id="detailTugasList">
+              <!-- Rendered via JS -->
+            </ul>
+          </div>
+          <!-- Dokument Content -->
+          <div id="tab-dokument" class="tab-pane" style="display: none;">
+            <p style="margin: 0; color: #444;" id="detailDokumenText">Belum ada dokumen yang diunggah.</p>
+          </div>
+          <!-- Catatan Content -->
+          <div id="tab-catatan" class="tab-pane" style="display: none;">
+            <p style="margin: 0; color: #444;" id="detailCatatanText">Belum ada catatan.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+  </div>
+
+  <!-- Modal PopUp Tambah Milestone -->
+  <div id="milestoneModal" class="modal-overlay">
+    <div class="modal-box modal-box--medium">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Tambah <strong style="font-weight: 700;">Milestone</strong></h2>
+        <button id="closeMilestoneModal" class="modal-close" type="button" aria-label="Tutup popup" style="border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; background: #fff; font-weight: bold; cursor: pointer;">X</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <form id="milestoneForm" class="modal-form-grid" style="grid-template-columns: repeat(12, 1fr); gap: 20px;">
+        <input type="hidden" id="editIndex" value="" />
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">RRK</label>
+          <select id="inputRrk" class="form-select" required>
+            <option value="" disabled selected hidden>Pilih RRK Terkait</option>
+            <option value="Program A">Program A</option>
+            <option value="Program B">Program B</option>
+            <option value="Program C">Program C</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Judul Milestone</label>
+          <input type="text" id="inputTitle" class="form-input" placeholder="Masukkan Judul Milestone" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Output Penyelesaian</label>
+          <textarea id="inputOutput" class="form-input" placeholder="Masukkan output penyelesaian (tekan Enter untuk membuat baris baru)" style="width: 100%; min-height: 80px; padding: 8px; resize: vertical;" required></textarea>
+        </div>
+
+        <div class="form-group" style="grid-column: span 4;">
+          <label class="form-label" style="font-weight: bold;">Periode</label>
+          <select id="inputPeriode" class="form-select" required>
+            <option value="" disabled selected hidden>Pilih Periode</option>
+            <option value="Minggu 1">Minggu 1</option>
+            <option value="Minggu 2">Minggu 2</option>
+            <option value="Minggu 3">Minggu 3</option>
+            <option value="Minggu 4">Minggu 4</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: span 4;">
+          <label class="form-label" style="font-weight: bold;">Tanggal Mulai</label>
+          <input type="date" id="inputTimelineMulai" class="form-input" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 4;">
+          <label class="form-label" style="font-weight: bold;">Tanggal Selesai</label>
+          <input type="date" id="inputTimelineSelesai" class="form-input" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">PIC</label>
+          <select id="inputPIC" class="form-select" required>
+            <option value="" disabled selected hidden>Pilih PIC</option>
+            <option value="Riva">Riva</option>
+            <option value="Sri">Sri</option>
+            <option value="Ahmad">Ahmad</option>
+            <option value="Fauzi">Fauzi</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Untuk TIM</label>
+          <div class="dropdown-select-checkbox">
+            <div class="dropdown-select-trigger" onclick="toggleDropdownChecklist(this)">
+              <span class="dropdown-select-label">Pilih Tim</span>
+              <span class="dropdown-select-arrow">▼</span>
+            </div>
+            <div class="dropdown-select-options">
+              <label class="dropdown-option-item">
+                <input type="checkbox" class="tim-checkbox" value="Supervisi KOL" />
+                <span>Supervisi KOL</span>
+              </label>
+              <label class="dropdown-option-item">
+                <input type="checkbox" class="tim-checkbox" value="Riva" />
+                <span>Riva</span>
+              </label>
+              <label class="dropdown-option-item">
+                <input type="checkbox" class="tim-checkbox" value="Sri" />
+                <span>Sri</span>
+              </label>
+              <label class="dropdown-option-item">
+                <input type="checkbox" class="tim-checkbox" value="Ahmad" />
+                <span>Ahmad</span>
+              </label>
+              <label class="dropdown-option-item">
+                <input type="checkbox" class="tim-checkbox" value="Fauzi" />
+                <span>Fauzi</span>
+              </label>
+            </div>
+            <input type="hidden" id="inputTim" required />
+          </div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Dokumen (Opsional)</label>
+          <input type="file" id="inputDokumen" class="form-input" style="padding: 4px;" />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Catatan (Opsional)</label>
+          <input type="text" id="inputCatatan" class="form-input" placeholder="Tambahkan Catatan" />
+        </div>
+
+        <div style="grid-column: span 12; margin-top: 15px; display: flex; justify-content: flex-end;">
+          <button class="btn-submit-blue-outline" type="submit" style="background-color: #fff; color: #29A3D8; border: 1.5px solid #29A3D8; padding: 10px 42px; border-radius: 6px; font-weight: 700; font-size: 15px; cursor: pointer; transition: background-color 0.15s ease;">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="../script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Dropdown checklist logic for Tim
+      const timCheckboxes = document.querySelectorAll(".tim-checkbox");
+      const hiddenTim = document.getElementById("inputTim");
+      const timLabel = document.querySelector(".dropdown-select-label");
+      
+      function updateTimDropdownLabel() {
+        const selected = Array.from(timCheckboxes)
+          .filter(cb => cb.checked)
+          .map(cb => cb.value);
+        if (selected.length > 0) {
+          timLabel.textContent = selected.join(", ");
+          hiddenTim.value = selected.join(", ");
+        } else {
+          timLabel.textContent = "Pilih Tim";
+          hiddenTim.value = "";
+        }
+      }
+
+      timCheckboxes.forEach(cb => {
+        cb.addEventListener("change", updateTimDropdownLabel);
+      });
+
+      window.resetTimDropdown = function() {
+        timCheckboxes.forEach(cb => cb.checked = false);
+        updateTimDropdownLabel();
+      };
+      let milestoneData = [
+        {
+          id: 1,
+          title: "Kerja Sama dengan Influencer",
+          week: "Minggu ke 1",
+          progress: 100,
+          status: "Selesai",
+          rrk: "Program A",
+          output: "10 Influencer sepakat bekerja sama",
+          pic: "Riva",
+          tim: "Tim Kreatif"
+        },
+        {
+          id: 2,
+          title: "Produksi Konten Sosial Media",
+          week: "Minggu ke 1",
+          progress: 100,
+          status: "Selesai",
+          rrk: "Program B",
+          output: "5 video Reels & TikTok diproduksi",
+          pic: "Sri",
+          tim: "Tim Kreatif"
+        },
+        {
+          id: 3,
+          title: "Evaluasi Performa",
+          week: "Minggu ke 1",
+          progress: 100,
+          status: "Selesai",
+          rrk: "Program C",
+          output: "Laporan performa mingguan",
+          pic: "Riva",
+          tim: "Tim Marketing"
+        }
+      ];
+
+      const cardGrid = document.getElementById("milestoneCardGrid");
+      const mainPanel = document.getElementById("mainMilestonePanel");
+      const metricRow = document.querySelector(".milestone-metric-grid-new");
+      const detailPanel = document.getElementById("milestoneDetailPanel");
+      const btnBack = document.getElementById("btnBackToMilestones");
+
+      const detailTitle = document.getElementById("detailTitle");
+      const detailWeek = document.getElementById("detailWeek");
+      const detailRrk = document.getElementById("detailRrk");
+      const detailTarget = document.getElementById("detailTarget");
+      const detailPic = document.getElementById("detailPic");
+      const detailProgressFill = document.getElementById("detailProgressFill");
+      const detailProgressText = document.getElementById("detailProgressText");
+
+      const milestoneModal = document.getElementById("milestoneModal");
+      const milestoneForm = document.getElementById("milestoneForm");
+      const btnTambah = document.getElementById("btnTambahMilestone");
+      const btnClose = document.getElementById("closeMilestoneModal");
+
+      function renderCards() {
+        if (!cardGrid) return;
+        cardGrid.innerHTML = "";
+        milestoneData.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "milestone-card";
+          card.style.cursor = "pointer";
+
+          card.innerHTML = `
+            <div class="milestone-card__header">
+              <h3 class="milestone-card__title">${item.title}</h3>
+              <span class="milestone-card__week">${item.week}</span>
+            </div>
+
+            <div class="milestone-card__progress-container">
+              <div class="milestone-card__progress-bar">
+                <div class="milestone-card__progress-fill" style="width: ${item.progress}%;"></div>
+              </div>
+              <span class="milestone-card__progress-text">${item.progress}%</span>
+              <div class="milestone-card__avatars">
+                ${(() => {
+                  if (item.pic === "Riva") {
+                    return `
+                      <img class="milestone-avatar" src="../media/creator-alya.svg" title="Riva (PIC)" alt="Riva" />
+                      <img class="milestone-avatar" src="../media/creator-bima.svg" title="Ahmad" alt="Ahmad" />
+                      <img class="milestone-avatar" src="../media/creator-caca.svg" title="Siti" alt="Siti" />
+                    `;
+                  } else if (item.pic === "Sri") {
+                    return `
+                      <img class="milestone-avatar" src="../media/avatar.png" title="Sri (PIC)" alt="Sri" />
+                      <img class="milestone-avatar" src="../media/creator-bima.svg" title="Fauzi" alt="Fauzi" />
+                      <img class="milestone-avatar" src="../media/creator-alya.svg" title="Alya" alt="Alya" />
+                    `;
+                  } else {
+                    return `
+                      <img class="milestone-avatar" src="../media/creator-caca.svg" title="${item.pic}" alt="${item.pic}" />
+                      <img class="milestone-avatar" src="../media/avatar.png" title="Budi" alt="Budi" />
+                    `;
+                  }
+                })()}
+              </div>
+            </div>
+
+            <div class="milestone-card__footer">
+              <span class="milestone-card__status">${item.status}</span>
+            </div>
+          `;
+
+          card.addEventListener("click", () => {
+            // Set details
+            if (detailTitle) detailTitle.textContent = item.title;
+            if (detailWeek) detailWeek.textContent = item.week.replace("Minggu ke", "").trim() || "-";
+            if (detailRrk) detailRrk.textContent = item.rrk || "-";
+            if (detailTarget) detailTarget.textContent = item.output || "-";
+            if (detailPic) detailPic.textContent = item.pic || "-";
+            if (detailProgressFill) detailProgressFill.style.width = `${item.progress}%`;
+            if (detailProgressText) detailProgressText.textContent = `${item.progress}%`;
+
+            // Tabs dynamic loading
+            const tabOutput = document.getElementById("detailOutputText");
+            const tabTugasList = document.getElementById("detailTugasList");
+            const tabDoc = document.getElementById("tab-dokument");
+            const tabCat = document.getElementById("tab-catatan");
+            
+            if (tabOutput) {
+              tabOutput.innerHTML = item.output ? `<p style="margin: 0; color: #444; white-space: pre-line;">${item.output}</p>` : `<p style="margin: 0; color: #888;">Belum ada output.</p>`;
+            }
+            if (tabTugasList) {
+              tabTugasList.innerHTML = `
+                <li>Menyusun rancangan milestone ${item.title}</li>
+                <li>Koordinasi PIC ${item.pic || "terkait"} dengan penanggung jawab program ${item.rrk || "terkait"}</li>
+                <li>Penyelesaian output target: ${item.output || "-"}</li>
+              `;
+            }
+            if (tabDoc) {
+              tabDoc.innerHTML = item.dokumen ? `<p style="margin: 0; color: #444;">${item.dokumen}</p>` : `<p style="margin: 0; color: #888;">Belum ada dokumen yang diunggah.</p>`;
+            }
+            if (tabCat) {
+              tabCat.innerHTML = item.catatan ? `<p style="margin: 0; color: #444;">${item.catatan}</p>` : `<p style="margin: 0; color: #888;">Belum ada catatan.</p>`;
+            }
+
+            // Reset active tabs to Output tab
+            const tabs = document.querySelectorAll(".detail-tab");
+            tabs.forEach(t => {
+              t.classList.remove("active");
+              t.style.fontWeight = "500";
+              t.style.color = "#666";
+            });
+            const outputTab = Array.from(tabs).find(t => t.getAttribute("data-tab") === "output");
+            if (outputTab) {
+              outputTab.classList.add("active");
+              outputTab.style.fontWeight = "700";
+              outputTab.style.color = "#333";
+            }
+            document.querySelectorAll(".tab-pane").forEach(pane => {
+              pane.style.display = "none";
+            });
+            const defaultPane = document.getElementById("tab-output");
+            if (defaultPane) defaultPane.style.display = "block";
+
+            // Hide main views
+            mainPanel.style.display = "none";
+            if (metricRow) metricRow.style.display = "none";
+
+            // Show detail panel
+            detailPanel.style.display = "block";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            // Update chat history for clicked milestone
+            activeChatId = item.id;
+            if (typeof renderChatHistory === "function") {
+              renderChatHistory();
+            }
+          });
+
+          cardGrid.appendChild(card);
+        });
+      }
+
+      if (btnBack) {
+        btnBack.addEventListener("click", (e) => {
+          e.stopPropagation();
+          // Hide detail view
+          detailPanel.style.display = "none";
+          // Show main views
+          mainPanel.style.display = "block";
+          if (metricRow) metricRow.style.display = "grid";
+
+          // Reset chat history to general
+          activeChatId = "general";
+          if (typeof renderChatHistory === "function") {
+            renderChatHistory();
+          }
+        });
+      }
+
+      // Modal Toggles
+      if (btnTambah && milestoneModal) {
+        btnTambah.addEventListener("click", () => {
+          milestoneModal.classList.add("is-active");
+        });
+      }
+
+      function hideModal() {
+        if (milestoneModal) {
+          milestoneModal.classList.remove("is-active");
+          milestoneForm.reset();
+          if (window.resetTimDropdown) window.resetTimDropdown();
+        }
+      }
+
+      if (btnClose) {
+        btnClose.addEventListener("click", hideModal);
+      }
+
+      if (milestoneModal) {
+        milestoneModal.addEventListener("click", (e) => {
+          if (e.target === milestoneModal) hideModal();
+        });
+      }
+
+      if (milestoneForm) {
+        milestoneForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          const rrk = document.getElementById("inputRrk").value;
+          const title = document.getElementById("inputTitle").value;
+          const output = document.getElementById("inputOutput").value;
+          const periode = document.getElementById("inputPeriode").value;
+          const pic = document.getElementById("inputPIC").value;
+          const tim = document.getElementById("inputTim").value;
+          const catatan = document.getElementById("inputCatatan").value;
+          
+          let fileVal = "";
+          const fileEl = document.getElementById("inputDokumen");
+          if (fileEl && fileEl.files && fileEl.files.length > 0) {
+            fileVal = fileEl.files[0].name;
+          }
+
+          // Create new milestone item
+          const newId = milestoneData.length > 0 ? Math.max(...milestoneData.map(d => d.id)) + 1 : 1;
+          milestoneData.push({
+            id: newId,
+            title: title,
+            week: "Minggu ke " + (periode.replace("Minggu", "").trim() || "1"),
+            progress: 0,
+            status: "Belum Mulai",
+            rrk: rrk,
+            output: output,
+            pic: pic,
+            tim: tim,
+            dokumen: fileVal,
+            catatan: catatan
+          });
+
+          // Show Toast
+          const toast = document.getElementById("toast");
+          if (toast) {
+            toast.textContent = "Milestone berhasil ditambahkan";
+            toast.classList.add("toast--show");
+            setTimeout(() => toast.classList.remove("toast--show"), 3000);
+          }
+
+          hideModal();
+          renderCards();
+        });
+      }
+
+      // Tab logic
+      const tabs = document.querySelectorAll(".detail-tab");
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          // Remove active classes
+          tabs.forEach(t => {
+            t.classList.remove("active");
+            t.style.fontWeight = "500";
+            t.style.color = "#666";
+          });
+
+          // Add active
+          tab.classList.add("active");
+          tab.style.fontWeight = "700";
+          tab.style.color = "#333";
+
+          // Hide all panes
+          document.querySelectorAll(".tab-pane").forEach(pane => {
+            pane.style.display = "none";
+          });
+
+          // Show active pane
+          const tabId = tab.getAttribute("data-tab");
+          const targetPane = document.getElementById("tab-" + tabId);
+          if (targetPane) {
+            targetPane.style.display = "block";
+          }
+        });
+      });
+
+      renderCards();
+
+      // Floating Chat Trigger and Logic
+      let activeChatId = "general";
+      const chatHistories = {
+        general: [
+          { type: "left", text: "Halo! Ada yang bisa dibantu terkait milestone ini?" },
+          { type: "right", text: "Saya ingin menanyakan detail target output." }
+        ],
+        1: [
+          { type: "left", text: "Bagaimana perkembangan kerja sama dengan 10 influencer?" },
+          { type: "right", text: "Sudah 8 yang tanda tangan kontrak, tinggal 2 lagi." }
+        ],
+        2: [
+          { type: "left", text: "Apakah produksi video Reels & TikTok minggu ini berjalan lancar?" },
+          { type: "right", text: "Lancar, saat ini sedang tahap editing akhir." }
+        ],
+        3: [
+          { type: "left", text: "Kapan laporan performa mingguan siap direview?" },
+          { type: "right", text: "Laporan sedang disusun dan akan dikirim sore ini." }
+        ]
+      };
+
+      const chatTriggerBtn = document.getElementById("chatTriggerBtn");
+      const chatPopup = document.getElementById("chatPopup");
+      const chatForm = document.getElementById("chatForm");
+      const chatInput = document.getElementById("chatInput");
+      const chatBody = document.getElementById("chatBody");
+
+      function renderChatHistory() {
+        if (!chatBody) return;
+        chatBody.innerHTML = "";
+
+        const headerTitle = document.getElementById("chatHeaderTitle");
+        if (headerTitle) {
+          if (activeChatId === "general") {
+            headerTitle.innerHTML = "<em>Diskusi</em>";
+          } else {
+            const milestone = milestoneData.find(m => m.id === activeChatId);
+            const title = milestone ? milestone.title : "Milestone Detail";
+            headerTitle.innerHTML = `<em>Diskusi - ${title}</em>`;
+          }
+        }
+
+        const history = chatHistories[activeChatId] || [];
+        history.forEach(msg => {
+          const msgDiv = document.createElement("div");
+          msgDiv.className = `chat-msg ${msg.type}`;
+          if (msg.type === "left") {
+            msgDiv.innerHTML = `
+              <div class="chat-avatar"></div>
+              <div class="chat-bubble">${msg.text}</div>
+            `;
+          } else {
+            msgDiv.innerHTML = `
+              <div class="chat-bubble">${msg.text}</div>
+              <div class="chat-avatar"></div>
+            `;
+          }
+          chatBody.appendChild(msgDiv);
+        });
+
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      if (chatTriggerBtn && chatPopup) {
+        chatTriggerBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isHidden = chatPopup.style.display === "none";
+          chatPopup.style.display = isHidden ? "flex" : "none";
+          if (isHidden) {
+            renderChatHistory();
+          }
+        });
+
+        // Close on clicking outside the widget
+        document.addEventListener("click", (e) => {
+          if (chatPopup.style.display === "flex") {
+            const chatWidget = document.getElementById("chatWidget");
+            if (chatWidget && !chatWidget.contains(e.target)) {
+              chatPopup.style.display = "none";
+            }
+          }
+        });
+
+        // Submit chat form
+        chatForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const text = chatInput.value.trim();
+          if (!text) return;
+
+          // Save to active history
+          if (!chatHistories[activeChatId]) {
+            chatHistories[activeChatId] = [];
+          }
+          chatHistories[activeChatId].push({ type: "right", text: text });
+          renderChatHistory();
+
+          chatInput.value = "";
+
+          // Simulate automatic reply after 1 second
+          setTimeout(() => {
+            const replyText = activeChatId === "general"
+              ? "Pesan Anda diterima. PIC Milestone akan segera merespon diskusi ini."
+              : `Pertanyaan Anda mengenai detail milestone "${milestoneData.find(m => m.id === activeChatId)?.title || 'ini'}" telah diteruskan ke PIC.`;
+
+            chatHistories[activeChatId].push({ type: "left", text: replyText });
+            renderChatHistory();
+          }, 1000);
+        });
+      }
+
+      // Initial render of chat history
+      renderChatHistory();
+    });
+  </script>
+  <!-- Floating Chat Widget -->
+  <div id="chatWidget" class="chat-widget">
+    <!-- Chat Popup -->
+    <div id="chatPopup" class="chat-popup" style="display: none;">
+      <div class="chat-header">
+        <h3 id="chatHeaderTitle"><em>Diskusi</em></h3>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="chat-footer">
+        <form id="chatForm" class="chat-input-wrap">
+          <input type="text" id="chatInput" placeholder="Teks..." required />
+          <button type="submit" class="chat-send-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Trigger Button -->
+    <button id="chatTriggerBtn" class="chat-trigger-btn" type="button" aria-label="Buka Diskusi">
+      <!-- Chat icon (speech bubble with text lines) -->
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+      </svg>
+    </button>
+  </div>
+</body>
+
+</html>

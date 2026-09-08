@@ -2005,7 +2005,8 @@
     const host = ensurePopupHost();
     const frame = host.querySelector('#ceoPopupHostFrame');
 
-    const baseUrl = url || 'popup.html';
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const baseUrl = url || (isSub ? '../popup.html' : 'popup.html');
     const sep = baseUrl.includes('?') ? '&' : '?';
     // host=1 => popup.html tidak bikin backdrop gelap sendiri (biar gak dobel)
     const finalUrl = `${baseUrl}${sep}embed=1&host=1&scale=0.90`;
@@ -2137,7 +2138,8 @@
       } catch { }
 
       inp.addEventListener('click', () => {
-        const url = inp.getAttribute('data-popup-url') || 'popup.html';
+        const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+        const url = inp.getAttribute('data-popup-url') || (isSub ? '../popup.html' : 'popup.html');
         const curStart = table._bmFilterState.dateStart || table._bmFilterState.date || '';
         const curEnd = table._bmFilterState.dateEnd || table._bmFilterState.date || '';
         openPopupFrame({
@@ -2236,7 +2238,8 @@
 
       // prevent '#' / javascript:void(0)
       e.preventDefault();
-      window.location.href = 'index.html';
+      const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+      window.location.href = isSub ? '../index.html' : 'index.html';
     });
   }
 
@@ -2453,8 +2456,9 @@
     const logo = String(prof?.logo_data_url || '').trim();
     const avatar = String(prof?.avatar_data_url || '').trim();
 
-    const logoSrc = logo || './media/logo.png';
-    const avatarSrc = avatar || './media/avatar.png';
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const logoSrc = logo || ((isSub ? '../' : './') + 'media/logo.png');
+    const avatarSrc = avatar || ((isSub ? '../' : './') + 'media/avatar.png');
 
     document.querySelectorAll('img[data-ceo-brand-logo]').forEach((img) => {
       if (img && img.getAttribute('src') !== logoSrc) img.setAttribute('src', logoSrc);
@@ -6159,8 +6163,9 @@
     const logoFile = $('#cpLogoFile');
     const signatureFile = $('#cpSignatureFile');
 
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
     const setPrev = () => {
-      if (logoPrev) logoPrev.src = logoDataUrl || './media/logo.png';
+      if (logoPrev) logoPrev.src = logoDataUrl || ((isSub ? '../' : './') + 'media/logo.png');
     };
 
     const fileToDataUrl = (file) => new Promise((resolve, reject) => {
@@ -8073,7 +8078,7 @@
       rows.forEach((tr) => {
         const text = tr.textContent.toLowerCase();
         if (text.includes('terlambat') || text.includes('visit')) attention += 1;
-        if (text.includes('lengkap')) complete += 1;
+        if (text.includes('lengkap') || text.includes('selesai')) complete += 1;
       });
       fillText('ovKehadiranTotal', total);
       fillText('ovKehadiranAttention', attention);
@@ -8272,23 +8277,25 @@
       return result;
     }
 
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const mediaPfx = isSub ? '../media/' : './media/';
     const creatorData = {
       alya: {
         name: 'Alya Ramadhani',
         category: 'Beauty & Lifestyle',
-        photo: './media/creator-alya.svg',
+        photo: mediaPfx + 'creator-alya.svg',
         values: [12, 14, 17, 19, 22, 25, 27, 29, 31, 34, 36, 39],
       },
       bima: {
         name: 'Bima Pratama',
         category: 'Tech Review & Gadget',
-        photo: './media/creator-bima.svg',
+        photo: mediaPfx + 'creator-bima.svg',
         values: [9, 11, 13, 15, 18, 21, 23, 26, 28, 30, 32, 35],
       },
       caca: {
         name: 'Caca Maharani',
         category: 'Food & Daily Vlog',
-        photo: './media/creator-caca.svg',
+        photo: mediaPfx + 'creator-caca.svg',
         values: [8, 10, 12, 14, 16, 18, 20, 22, 24, 27, 29, 33],
       },
     };
@@ -8543,21 +8550,24 @@
       add: false,
       view: true,
       edit: false,
-      delete: true,
+      delete: false,
+      dotsMenu: true,
     },
     tblIstirahatV2: {
       title: 'Presensi Istirahat',
       add: false,
       view: true,
       edit: false,
-      delete: true,
+      delete: false,
+      dotsMenu: true,
     },
     tblLemburV2: {
       title: 'Presensi Lembur',
       add: false,
       view: true,
       edit: false,
-      delete: true,
+      delete: false,
+      dotsMenu: true,
     },
   };
 
@@ -8743,16 +8753,304 @@
       #bmPenilaianModal .bm-penilaian-table tfoot [data-penilaian-bobot-total],
       #bmPenilaianModal .bm-penilaian-table tfoot [data-penilaian-total] { background:#b4c7e7; text-align:right; }
       #bmPenilaianModal .bm-penilaian-note { min-height:105px; box-shadow:none; border:1px solid #d9dee3; }
-      #bmPhotoModal { position:fixed; inset:0; z-index:3005; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(0,0,0,.45); }
+      #bmPhotoModal { position:fixed; inset:0; z-index:3005; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(15,23,42,.65); backdrop-filter:blur(4px); cursor:pointer; overflow-y:auto; }
       #bmPhotoModal.bm-show { display:flex; }
-      #bmPhotoModal .bm-photo-box { width:min(620px, 96vw); background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,.35); }
-      #bmPhotoModal .bm-photo-head { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid #e5e7eb; }
-      #bmPhotoModal .bm-photo-head h5 { margin:0; font-weight:700; }
-      #bmPhotoModal .bm-photo-body { padding:18px; text-align:center; }
-      #bmPhotoModal img { width:min(420px, 100%); max-height:430px; object-fit:cover; border-radius:10px; border:1px solid #e5e7eb; }
-      #bmPhotoModal .bm-photo-meta { margin-top:12px; color:#555; }
+      #bmPhotoModal .bm-photo-box { width:min(860px, 96vw); max-height:92vh; background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 25px 60px rgba(0,0,0,.35); cursor:default; position:relative; display:flex; flex-direction:column; }
+      #bmPhotoModal .bm-photo-head { display:flex; align-items:center; justify-content:space-between; padding:16px 22px; border-bottom:1px solid #e5e7eb; background:#fff; }
+      #bmPhotoModal .bm-photo-head h5 { margin:0; font-weight:700; font-size:1.15rem; color:#1e293b; font-family:'Outfit',sans-serif,-apple-system; }
+      #bmPhotoModal .bm-photo-close-btn { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:8px; border:none; background:transparent; color:#64748b; cursor:pointer; padding:0; transition:all .15s ease; }
+      #bmPhotoModal .bm-photo-close-btn:hover { background:#f1f5f9; color:#0f172a; }
+      #bmPhotoModal .bm-photo-close-btn:active { transform:scale(.94); }
+      #bmPhotoModal .bm-photo-close-btn svg { width:20px; height:20px; }
+      #bmPhotoModal .bm-photo-body { padding:22px; overflow-y:auto; flex:1; }
+      #bmPhotoModal .bm-photo-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+      @media (max-width: 768px) { #bmPhotoModal .bm-photo-grid { grid-template-columns:1fr; gap:16px; } }
+      #bmPhotoModal .bm-photo-col, #bmPhotoModal .bm-maps-col { display:flex; flex-direction:column; }
+      #bmPhotoModal .bm-photo-frame, #bmPhotoModal .bm-maps-frame { width:100%; height:270px; border-radius:10px; border:1px solid #e2e8f0; overflow:hidden; background:#f8fafc; display:flex; align-items:center; justify-content:center; position:relative; }
+      #bmPhotoModal .bm-photo-frame img { width:100%; height:100%; object-fit:cover; display:block; }
+      #bmPhotoModal .bm-maps-frame iframe { width:100%; height:100%; border:0; display:block; }
+      #bmPhotoModal .bm-photo-caption { margin-top:10px; font-size:13px; font-weight:600; color:#475569; display:flex; align-items:center; gap:6px; }
+      #bmPhotoModal .bm-maps-caption { margin-top:10px; font-size:13px; font-weight:500; color:#334155; line-height:1.45; display:flex; align-items:flex-start; gap:6px; }
+      #bmPhotoModal .bm-maps-caption i { font-size:16px; margin-top:2px; flex-shrink:0; }
+      #bmPhotoModal .bm-photo-note-wrapper { margin-top:20px; padding:14px 18px; background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #3b82f6; border-radius:8px; text-align:left; }
+      #bmPhotoModal .bm-photo-note-title { font-size:13px; font-weight:700; color:#1e293b; margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+      #bmPhotoModal .bm-photo-note-content { font-size:13px; color:#475569; line-height:1.5; margin:0; }
+      #bmKreatorPhotoModal { position:fixed; inset:0; z-index:3005; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(15,23,42,.65); backdrop-filter:blur(4px); cursor:pointer; overflow-y:auto; }
+      #bmKreatorPhotoModal.bm-show { display:flex; }
+      #bmKreatorPhotoModal .bm-kreator-photo-box { width:min(440px, 94vw); max-height:92vh; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,.2); cursor:default; position:relative; display:flex; flex-direction:column; }
+      #bmKreatorPhotoModal .bm-kreator-photo-head { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid #edf2f7; background:#fff; }
+      #bmKreatorPhotoModal .bm-kreator-photo-head h5 { margin:0; font-weight:600; font-size:1.05rem; color:#1e293b; font-family:'Outfit',sans-serif,-apple-system; }
+      #bmKreatorPhotoModal .bm-kreator-photo-close-btn { display:inline-flex; align-items:center; justify-content:center; padding:4px 14px; border-radius:6px; border:1px solid #cbd5e1; background:#fff; color:#64748b; font-family:'Outfit',sans-serif,-apple-system; font-size:13px; font-weight:500; cursor:pointer; line-height:1.4; transition:all .15s ease; }
+      #bmKreatorPhotoModal .bm-kreator-photo-close-btn:hover { background:#f8fafc; color:#1e293b; border-color:#94a3b8; }
+      #bmKreatorPhotoModal .bm-kreator-photo-close-btn:active { transform:scale(.96); }
+      #bmKreatorPhotoModal .bm-kreator-photo-body { padding:20px; overflow-y:auto; display:flex; flex-direction:column; align-items:center; background:#fff; }
+      #bmKreatorPhotoModal .bm-kreator-photo-frame { width:100%; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden; background:#fff; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
+      #bmKreatorPhotoModal .bm-kreator-photo-frame img { max-width:100%; max-height:270px; object-fit:contain; display:block; }
+      #bmKreatorPhotoModal .bm-kreator-photo-caption { margin-top:14px; font-size:13.5px; font-weight:400; color:#64748b; text-align:center; font-family:'Outfit',sans-serif,-apple-system; }
+      .tdActions .dropdown { position: relative; display: inline-flex; justify-content: center; align-items: center; }
+      .tdActions button[data-bm-dots="true"],
+      .tdActions .dropdown-toggle {
+        background: transparent !important; border: none !important; cursor: pointer !important;
+        width: 32px !important; height: 32px !important; border-radius: 50% !important;
+        display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        padding: 0 !important; color: #64748b !important; box-shadow: none !important;
+        transition: background-color .15s ease, color .15s ease !important;
+      }
+      .tdActions button[data-bm-dots="true"]:hover,
+      .tdActions button[data-bm-dots="true"].show,
+      .tdActions .dropdown-toggle:hover,
+      .tdActions .dropdown-toggle.show {
+        background-color: rgba(67, 89, 113, .08) !important; color: #334155 !important;
+      }
+      .tdActions button[data-bm-dots="true"] i,
+      .tdActions .dropdown-toggle i { font-size: 20px !important; line-height: 1 !important; pointer-events: none; }
+      .tdActions .dropdown-toggle::after { display: none !important; }
+      .bm-table-action-menu {
+        display: none; position: fixed; z-index: 2147483000; min-width: 145px; padding: 6px; margin: 0;
+        background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,.14); list-style: none;
+      }
+      .bm-table-action-menu.show { display: block !important; }
+      .bm-table-action-menu li { margin: 0; padding: 0; list-style: none; }
+      .bm-table-action-menu .dropdown-item {
+        display: flex !important; align-items: center !important; gap: 10px !important;
+        width: 100% !important; height: auto !important; min-height: 38px !important;
+        padding: 7px 12px !important; border-radius: 6px !important;
+        font-family: 'Outfit', sans-serif !important; font-size: 13px !important; font-weight: 500 !important;
+        color: #334155 !important; background: transparent !important; border: none !important;
+        cursor: pointer !important; text-align: left !important; white-space: nowrap !important;
+        box-shadow: none !important; transition: background-color .15s ease, color .15s ease !important;
+      }
+      .bm-table-action-menu .dropdown-item:hover { background-color: #f1f5f9 !important; color: #0f172a !important; }
+      .bm-table-action-menu .dropdown-item.text-danger { color: #334155 !important; }
+      .bm-table-action-menu .dropdown-item.text-danger:hover { background-color: #fef2f2 !important; color: #dc2626 !important; }
+      .bm-table-action-menu .bm-menu-iconify {
+        width: 28px !important; height: 28px !important; border-radius: 6px !important;
+        background: #0076C5 !important; color: #fff !important;
+        display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        flex: 0 0 28px !important; box-shadow: 0 2px 6px rgba(0,118,197,.28) !important; pointer-events: none;
+      }
+      .bm-table-action-menu .bm-menu-iconify i { color: #fff !important; font-size: 16px !important; line-height: 1 !important; }
+
+      #bmForceCrudModal.modal-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.45) !important;
+        display: none;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 2100 !important;
+        padding: 16px !important;
+        box-sizing: border-box !important;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease-in-out;
+      }
+      #bmForceCrudModal.modal-overlay.is-active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
+      #bmForceCrudModal .modal-box {
+        width: 720px !important;
+        max-width: 95% !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        background: #fff !important;
+        border-radius: 8px !important;
+        padding: 24px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 14px !important;
+        transform: scale(0.95);
+        transition: transform 0.2s ease-in-out;
+        box-sizing: border-box !important;
+      }
+      #bmForceCrudModal.modal-overlay.is-active .modal-box {
+        transform: scale(1) !important;
+      }
+      #bmForceCrudModal .modal-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+      }
+      #bmForceCrudModal .modal-title {
+        margin: 0 !important;
+        font-size: 18px !important;
+        font-weight: 500 !important;
+        color: #1a1a1a !important;
+        font-family: 'Outfit', sans-serif !important;
+      }
+      #bmForceCrudModal .modal-close {
+        width: 32px !important;
+        height: 32px !important;
+        border: 1px solid #c9c9cc !important;
+        border-radius: 6px !important;
+        background: #fff !important;
+        color: #1a1a1a !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        display: grid !important;
+        place-items: center !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+        transition: background 0.15s, border-color 0.15s !important;
+        padding: 0 !important;
+      }
+      #bmForceCrudModal .modal-close:hover {
+        background: #f5f5f9 !important;
+        border-color: #99999e !important;
+      }
+      #bmForceCrudModal .modal-divider {
+        height: 1px !important;
+        border-top: 1px dashed #ababaf !important;
+        margin: 4px 0 10px !important;
+      }
+      #bmForceCrudModal .modal-form-grid {
+        display: grid !important;
+        grid-template-columns: repeat(12, 1fr) !important;
+        gap: 16px !important;
+      }
+      #bmForceCrudModal .form-group {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+      }
+      #bmForceCrudModal .form-label {
+        font-size: 12.5px !important;
+        font-weight: 700 !important;
+        color: #1a1a1a !important;
+        font-family: 'Outfit', sans-serif !important;
+        margin-bottom: 0 !important;
+      }
+      #bmForceCrudModal .form-input {
+        height: 38px !important;
+        padding: 8px 12px !important;
+        border: 1px solid #c9c9cc !important;
+        border-radius: 6px !important;
+        font-size: 13px !important;
+        color: #45454a !important;
+        background: #f8f9fa !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        font-family: 'Outfit', sans-serif !important;
+        outline: none !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+      }
+      #bmForceCrudModal .form-input:focus {
+        border-color: #39add9 !important;
+      }
+      #bmForceCrudModal .btn-cancel-modal {
+        background: #fff !important;
+        border: 1.5px solid #29A3D8 !important;
+        color: #29A3D8 !important;
+        border-radius: 6px !important;
+        padding: 8px 30px !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        transition: all 0.15s ease-in-out !important;
+        font-family: 'Outfit', sans-serif !important;
+      }
+      #bmForceCrudModal .btn-cancel-modal:hover {
+        background: rgba(41, 163, 216, 0.08) !important;
+      }
+      #bmForceCrudModal .btn-photo-view {
+        background: rgba(41, 163, 216, 0.08) !important;
+        border: 1.5px solid #29A3D8 !important;
+        color: #29A3D8 !important;
+        border-radius: 6px !important;
+        height: 38px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        cursor: pointer !important;
+        width: 100% !important;
+        padding: 0 14px !important;
+        transition: all 0.15s ease !important;
+      }
+      #bmForceCrudModal .btn-photo-view:hover {
+        background: rgba(41, 163, 216, 0.16) !important;
+      }
+      #bmForceCrudModal .status-badge {
+        width: 100% !important;
+        height: 38px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        border-radius: 6px !important;
+        box-sizing: border-box !important;
+        text-align: center !important;
+      }
     `;
     document.head.appendChild(style);
+  }
+
+  let activeTableActionMenu = null;
+  let activeTableActionButton = null;
+
+  function closeTableActionMenu() {
+    if (activeTableActionMenu) {
+      activeTableActionMenu.classList.remove('show');
+      activeTableActionMenu.style.display = 'none';
+    }
+    if (activeTableActionButton) {
+      activeTableActionButton.classList.remove('show');
+      activeTableActionButton.setAttribute('aria-expanded', 'false');
+    }
+    activeTableActionMenu = null;
+    activeTableActionButton = null;
+  }
+
+  function positionTableActionMenu(button, menu) {
+    menu.style.display = 'block';
+    menu.classList.add('show');
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '2147483000';
+    menu.style.margin = '0';
+
+    const rect = button.getBoundingClientRect();
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const width = menu.offsetWidth || 145;
+    const height = menu.offsetHeight || 88;
+
+    let left = rect.right - width;
+    let top = rect.bottom + 4;
+
+    if (left < 10) left = 10;
+    if (left + width > vw - 10) left = Math.max(10, vw - width - 10);
+    if (top + height > vh - 10) top = Math.max(10, rect.top - height - 4);
+
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+  }
+
+  function toggleTableActionMenu(button) {
+    const dropdown = button.closest('.dropdown');
+    const menu = dropdown?.querySelector('.dropdown-menu');
+    if (!menu) return;
+
+    if (activeTableActionMenu === menu) {
+      closeTableActionMenu();
+      return;
+    }
+
+    closeTableActionMenu();
+    activeTableActionButton = button;
+    activeTableActionMenu = menu;
+    button.classList.add('show');
+    button.setAttribute('aria-expanded', 'true');
+    positionTableActionMenu(button, menu);
   }
 
   function getTableMeta(table) {
@@ -8778,6 +9076,25 @@
       cell = document.createElement('td');
       cell.className = 'tdActions';
       row.appendChild(cell);
+    }
+
+    const isDots = Boolean(config?.dotsMenu || ['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(row.closest('table')?.id));
+    if (isDots) {
+      cell.className = 'tdActions text-center';
+      cell.innerHTML = `
+        <div class="dropdown bm-action-dropdown">
+          <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+            data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi">
+            <i class="bx bx-dots-vertical-rounded"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu">
+            ${config.view ? '<li><button class="dropdown-item" type="button" data-action="view" title="Lihat"><span class="bm-menu-iconify"><i class="bx bx-show"></i></span><span>Lihat</span></button></li>' : ''}
+            ${config.edit ? '<li><button class="dropdown-item" type="button" data-action="edit" title="Edit"><span class="bm-menu-iconify"><i class="bx bx-edit-alt"></i></span><span>Edit</span></button></li>' : ''}
+            ${config.delete ? '<li><button class="dropdown-item text-danger" type="button" data-action="delete" title="Hapus"><span class="bm-menu-iconify"><i class="bx bx-trash"></i></span><span>Hapus</span></button></li>' : ''}
+          </ul>
+        </div>
+      `.trim();
+      return;
     }
 
     cell.innerHTML = `
@@ -8830,29 +9147,42 @@
 
     modal = document.createElement('div');
     modal.id = 'bmForceCrudModal';
-    modal.className = 'modal fade';
-    modal.tabIndex = -1;
+    modal.className = 'modal-overlay';
     modal.setAttribute('aria-hidden', 'true');
     modal.innerHTML = `
-      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Form</h5>
-            <button aria-label="Close" class="btn-close" data-bm-force-close="1" type="button"></button>
-          </div>
-          <div class="modal-body"></div>
-          <div class="modal-footer">
-            <button class="btn btn-outline-secondary" data-bm-force-close="1" type="button">Tutup</button>
-            <button class="btn btn-primary" data-bm-force-save="1" type="button">Simpan</button>
-          </div>
+      <div class="modal-box modal-box--medium" style="width: 720px; max-width: 95%;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="bmForceCrudModalTitle">Form</h2>
+          <button class="modal-close" data-bm-force-close="1" type="button" aria-label="Tutup popup">&times;</button>
+        </div>
+        <div class="modal-divider"></div>
+        <div class="modal-form-grid" id="bmForceCrudModalBody" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px;"></div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ababaf;">
+          <button class="btn-cancel-modal" data-bm-force-close="1" type="button" style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;">Tutup</button>
+          <button class="btn-submit-modal" data-bm-force-save="1" type="button" style="display: none; background: #29A3D8; border: 1.5px solid #29A3D8; color: #fff; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; margin-left: 10px; font-family: 'Outfit', sans-serif;">Simpan</button>
         </div>
       </div>
     `.trim();
+
+    modal.addEventListener('click', function (event) {
+      if (event.target === modal || (modal.contains(event.target) && !event.target.closest('.modal-box'))) {
+        hideModal();
+      }
+    });
+
     document.body.appendChild(modal);
     return modal;
   }
 
   function showModal(modal) {
+    if (modal.classList.contains('modal-overlay')) {
+      modal.style.display = 'flex';
+      modal.classList.add('is-active');
+      modal.removeAttribute('aria-hidden');
+      modal.setAttribute('aria-modal', 'true');
+      document.body.classList.add('modal-open');
+      return;
+    }
     const backdrop = ensureBackdrop();
     backdrop.style.display = 'block';
     modal.style.display = 'block';
@@ -8868,6 +9198,7 @@
       if (!modal) return;
       modal.style.display = 'none';
       modal.classList.remove('show');
+      modal.classList.remove('is-active');
       modal.setAttribute('aria-hidden', 'true');
       modal.removeAttribute('aria-modal');
     });
@@ -8938,11 +9269,13 @@
   }
 
   function isImagePath(src) {
-    return /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(String(src || ''));
+    const s = String(src || '').trim();
+    return s.startsWith('data:image/') || /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(s);
   }
 
   function fallbackPhotoSrc() {
-    return 'media/avatar.png';
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    return isSub ? '../media/avatar.png' : 'media/avatar.png';
   }
 
   function fieldFromCell(cell, header, index, table, row) {
@@ -8952,6 +9285,8 @@
       const employeeName = normalizeText(row?.children?.[1]?.textContent || 'Pegawai');
       const dateText = normalizeText(row?.children?.[2]?.textContent || '');
       const kind = /out/i.test(header) ? 'Check Out' : 'Check In';
+      const address = photoBtn.dataset.photoAddress || photoBtn.dataset.address || '';
+      const note = photoBtn.dataset.photoNote || photoBtn.dataset.note || '-';
       return {
         label: header,
         value: 'Lihat Foto',
@@ -8959,6 +9294,21 @@
         photoSrc: isImagePath(rawSrc) ? rawSrc : fallbackPhotoSrc(),
         photoTitle: `${header} - ${employeeName}`,
         photoMeta: `${employeeName}${dateText ? ' · ' + dateText : ''} · ${kind}`,
+        photoAddress: address,
+        photoNote: note,
+        excludeFromTable: false,
+        cellIndex: index,
+      };
+    }
+
+    const badge = cell.querySelector('.status-badge');
+    const isStatus = /status/i.test(header) || !!badge;
+    if (isStatus) {
+      const statusText = normalizeText(badge ? badge.textContent : cell.textContent);
+      return {
+        label: header || `Kolom ${index + 1}`,
+        value: statusText,
+        type: 'status',
         excludeFromTable: false,
         cellIndex: index,
       };
@@ -9016,6 +9366,21 @@
   }
 
   function fieldsFromRow(row, table) {
+    if (['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(table.id)) {
+      const { headers, actionIndex } = getTableMeta(table);
+      const cells = $$('td', row);
+      const fields = [];
+
+      cells.forEach((cell, index) => {
+        if (index === 0) return;
+        if (index === actionIndex) return;
+        fields.push(fieldFromCell(cell, headers[index], index, table, row));
+      });
+
+      if (table.id === 'tblLemburV2') return normalizeLemburFields(fields);
+      return fields;
+    }
+
     const stored = readStoredFields(row);
     if (stored.length) return table.id === 'tblInstruksiTugas' ? hydrateEmployeeDropdownFields(stored) : stored;
 
@@ -9060,21 +9425,69 @@
     return fields;
   }
 
-  function renderFieldControl(field, index, readonly) {
+  function getFieldSpan(tableId, field) {
+    const label = String(field.label || '').toLowerCase();
+    if (tableId === 'tblKehadiranV2') {
+      if (label.includes('nama') || label.includes('tanggal')) return 6;
+      if (label.includes('check in') || label.includes('check out')) return 4;
+      if (label.includes('total') || label.includes('shift')) return 6;
+      return 6;
+    }
+    if (tableId === 'tblIstirahatV2') {
+      return 6;
+    }
+    if (tableId === 'tblLemburV2') {
+      if (label.includes('total')) return 12;
+      return 6;
+    }
+    return field.fullWidth ? 12 : 6;
+  }
+
+  function renderFieldControl(field, index, readonly, tableId) {
     const label = escapeHtml(field.label || `Field ${index + 1}`);
     const value = String(field.value ?? '');
     const placeholder = escapeHtml(field.placeholder || '');
     const isReadonly = !!readonly || !!field.readonly;
     const disabled = isReadonly ? 'disabled' : '';
-    const colClass = field.colClass || (field.fullWidth ? 'col-12' : 'col-md-6');
+    const span = getFieldSpan(tableId, field);
+    const colStyle = `grid-column: span ${span};`;
 
     if (field.type === 'photo') {
       return `
-        <div class="${colClass}">
+        <div class="form-group" style="${colStyle}">
           <label class="form-label">${label}</label>
-          <button class="btn btn-outline-primary w-100" type="button" data-bm-force-photo-open="1" data-photo-src="${escapeHtml(field.photoSrc || fallbackPhotoSrc())}" data-photo-title="${escapeHtml(field.photoTitle || field.label || 'Foto')}" data-photo-meta="${escapeHtml(field.photoMeta || '')}">
-            <i class="bx bx-image-alt me-1"></i> Lihat Foto
+          <button class="btn-photo-view" type="button" data-bm-force-photo-open="1"
+            data-photo-src="${escapeHtml(field.photoSrc || fallbackPhotoSrc())}"
+            data-photo-title="${escapeHtml(field.photoTitle || field.label || 'Foto')}"
+            data-photo-meta="${escapeHtml(field.photoMeta || '')}"
+            data-photo-address="${escapeHtml(field.photoAddress || '')}"
+            data-photo-note="${escapeHtml(field.photoNote || '-')}"
+            title="Lihat Foto Absensi">
+            <i class="bx bx-image-alt" style="font-size: 18px;"></i>
+            <span>Lihat Foto</span>
           </button>
+        </div>
+      `.trim();
+    }
+
+    if (field.type === 'status') {
+      const isOntime = /tepat|selesai|hadir/i.test(value);
+      const isLate = /terlambat/i.test(value);
+      let badgeStyle = 'background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3);';
+      if (isLate) {
+        badgeStyle = 'background-color: rgba(255, 82, 82, 0.1); color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.3);';
+      } else if (!isOntime && value) {
+        badgeStyle = 'background-color: rgba(255, 179, 0, 0.1); color: #ffb300; border: 1px solid rgba(255, 179, 0, 0.3);';
+      }
+
+      return `
+        <div class="form-group" style="${colStyle}">
+          <label class="form-label">${label}</label>
+          <div style="height: 38px; width: 100%; display: flex; align-items: center;">
+            <span class="status-badge" style="${badgeStyle} width: 100%; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; border-radius: 6px; font-family: 'Outfit', sans-serif; box-sizing: border-box; text-align: center;">
+              ${escapeHtml(value || '-')}
+            </span>
+          </div>
         </div>
       `.trim();
     }
@@ -9089,27 +9502,29 @@
       }).join('');
 
       return `
-        <div class="${colClass}">
+        <div class="form-group" style="${colStyle}">
           <label class="form-label">${label}</label>
-          <select class="form-select" data-bm-force-field="${index}" ${disabled}>${options}</select>
+          <div class="select-wrapper">
+            <select class="form-select" data-bm-force-field="${index}" ${disabled}>${options}</select>
+          </div>
         </div>
       `.trim();
     }
 
     if (field.textarea) {
       return `
-        <div class="${colClass}">
+        <div class="form-group" style="${colStyle}">
           <label class="form-label">${label}</label>
-          <textarea class="form-control" data-bm-force-field="${index}" rows="3" placeholder="${placeholder}" ${isReadonly ? 'readonly' : ''}>${escapeHtml(value)}</textarea>
+          <textarea class="form-input" data-bm-force-field="${index}" rows="3" placeholder="${placeholder}" ${isReadonly ? 'readonly' : ''} style="min-height: 80px; resize: vertical;">${escapeHtml(value)}</textarea>
         </div>
       `.trim();
     }
 
     const inputType = field.inputType || 'text';
     return `
-      <div class="${colClass}">
+      <div class="form-group" style="${colStyle}">
         <label class="form-label">${label}</label>
-        <input class="form-control" data-bm-force-field="${index}" type="${escapeHtml(inputType)}" value="${escapeHtml(value)}" placeholder="${placeholder}" ${isReadonly ? 'readonly' : ''} />
+        <input class="form-input" data-bm-force-field="${index}" type="${escapeHtml(inputType)}" value="${escapeHtml(value)}" placeholder="${placeholder}" ${isReadonly ? 'readonly' : ''} />
       </div>
     `.trim();
   }
@@ -9175,19 +9590,30 @@
     const readonly = mode === 'view';
     const fields = mode === 'add' ? fieldsForAdd(table, config) : fieldsFromRow(row, table);
     const modal = ensureCrudModal();
-    const title = mode === 'add' ? `Tambah ${config.title}` : mode === 'edit' ? `Edit ${config.title}` : `Lihat ${config.title}`;
+    const titleHtml = mode === 'add'
+      ? `Tambah <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`
+      : mode === 'edit'
+      ? `Edit <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`
+      : `Lihat <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`;
 
-    $('.modal-title', modal).textContent = title;
+    const titleEl = $('.modal-title', modal);
+    if (titleEl) titleEl.innerHTML = titleHtml;
+
     const helperText = mode === 'add'
-      ? '<div class="alert alert-primary py-2 small mb-3">Isi data baru pada kolom yang tersedia.</div>'
+      ? '<div class="alert alert-primary py-2 small mb-3" style="grid-column: span 12;">Isi data baru pada kolom yang tersedia.</div>'
       : '';
-    $('.modal-body', modal).innerHTML = `${helperText}<div class="row g-3">${fields.map((field, index) => renderFieldControl(field, index, readonly)).join('')}</div>`;
+    const bodyEl = $('#bmForceCrudModalBody', modal) || $('.modal-body', modal) || $('.modal-form-grid', modal);
+    if (bodyEl) {
+      bodyEl.innerHTML = `${helperText}${fields.map((field, index) => renderFieldControl(field, index, readonly, table.id)).join('')}`;
+    }
     if (table.id === 'tblInstruksiTugas' && !readonly) syncInstruksiEmployeeFields(modal, fields);
     const saveBtn = $('[data-bm-force-save]', modal);
-    saveBtn.style.display = readonly ? 'none' : '';
-    saveBtn.onclick = null;
+    if (saveBtn) {
+      saveBtn.style.display = readonly ? 'none' : '';
+      saveBtn.onclick = null;
+    }
 
-    if (!readonly) {
+    if (!readonly && saveBtn) {
       saveBtn.onclick = function () {
         const savedFields = collectFields(modal, fields);
         if (mode === 'add') {
@@ -9262,8 +9688,22 @@
     showModal(modal);
   }
 
+  const DEFAULT_PHOTO_ADDRESS = 'Bisa Media MCN, Jl. Cisalak No. 47A, Sukamanah, Kec. Cipedes, Kab. Tasikmalaya, Jawa Barat 46131';
+
+  function buildMapsEmbedUrl(address) {
+    const addr = String(address || '').trim();
+    const query = (addr && !addr.toLowerCase().includes('bisa media') && !addr.toLowerCase().includes('cisalak') && !addr.toLowerCase().includes('sirnagalih'))
+      ? encodeURIComponent(addr)
+      : encodeURIComponent('Bisa Media MCN Tasikmalaya');
+    return `https://maps.google.com/maps?q=${query}&t=&z=17&ie=UTF8&iwloc=&output=embed`;
+  }
+
   function ensurePhotoModal() {
     let modal = document.getElementById('bmPhotoModal');
+    if (modal && !modal.querySelector('.bm-photo-grid')) {
+      modal.remove();
+      modal = null;
+    }
     if (modal) return modal;
 
     modal = document.createElement('div');
@@ -9271,30 +9711,174 @@
     modal.innerHTML = `
       <div class="bm-photo-box">
         <div class="bm-photo-head">
-          <h5>Preview Foto</h5>
-          <button class="btn btn-sm btn-outline-secondary" type="button" data-bm-photo-close="1">Tutup</button>
+          <h5>Lihat Photo Check In</h5>
+          <button class="bm-photo-close-btn" type="button" data-bm-photo-close="1" aria-label="Tutup" title="Tutup">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
         <div class="bm-photo-body">
-          <img alt="Preview Foto" src="${fallbackPhotoSrc()}" />
-          <div class="bm-photo-meta"></div>
+          <div class="bm-photo-grid">
+            <div class="bm-photo-col">
+              <div class="bm-photo-frame">
+                <img alt="Preview Foto Absensi" src="${fallbackPhotoSrc()}" />
+              </div>
+              <div class="bm-photo-caption">
+                <i class="bx bx-camera"></i>
+                <span class="bm-photo-caption-text">Preview foto absensi</span>
+              </div>
+            </div>
+            <div class="bm-maps-col">
+              <div class="bm-maps-frame">
+                <iframe class="bm-maps-iframe" src="${buildMapsEmbedUrl(DEFAULT_PHOTO_ADDRESS)}" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" title="Google Maps Lokasi Absensi"></iframe>
+              </div>
+              <div class="bm-maps-caption">
+                <i class="bx bx-map-pin text-danger"></i>
+                <span class="bm-maps-address-text">${DEFAULT_PHOTO_ADDRESS}</span>
+              </div>
+            </div>
+          </div>
+          <div class="bm-photo-note-wrapper">
+            <div class="bm-photo-note-title">
+              <i class="bx bx-notepad text-primary"></i>
+              <span>Catatan:</span>
+            </div>
+            <p class="bm-photo-note-content">-</p>
+          </div>
         </div>
       </div>
     `.trim();
+
+    modal.addEventListener('click', function (event) {
+      if (
+        event.target === modal ||
+        !event.target.closest('.bm-photo-box') ||
+        event.target.closest('.bm-photo-close-btn') ||
+        event.target.closest('[data-bm-photo-close]')
+      ) {
+        closePhotoModal();
+      }
+    });
+
     document.body.appendChild(modal);
     return modal;
   }
 
-  function openPhotoModal(src, title, meta) {
+  function ensureKreatorPhotoModal() {
+    let modal = document.getElementById('bmKreatorPhotoModal');
+    if (modal) return modal;
+
+    modal = document.createElement('div');
+    modal.id = 'bmKreatorPhotoModal';
+    modal.innerHTML = `
+      <div class="bm-kreator-photo-box">
+        <div class="bm-kreator-photo-head">
+          <h5>Lihat Foto Kreator</h5>
+          <button class="bm-kreator-photo-close-btn" type="button" data-bm-kreator-photo-close="1" aria-label="Tutup" title="Tutup">
+            Tutup
+          </button>
+        </div>
+        <div class="bm-kreator-photo-body">
+          <div class="bm-kreator-photo-frame">
+            <img alt="Foto Profil Kreator" src="${fallbackPhotoSrc()}" />
+          </div>
+          <div class="bm-kreator-photo-caption">
+            <span class="bm-kreator-photo-caption-text">Preview foto kreator</span>
+          </div>
+        </div>
+      </div>
+    `.trim();
+
+    modal.addEventListener('click', function (event) {
+      if (
+        event.target === modal ||
+        !event.target.closest('.bm-kreator-photo-box') ||
+        event.target.closest('.bm-kreator-photo-close-btn') ||
+        event.target.closest('[data-bm-kreator-photo-close]')
+      ) {
+        closeKreatorPhotoModal();
+      }
+    });
+
+    document.body.appendChild(modal);
+    return modal;
+  }
+
+  function openKehadiranPhotoModal(src, title, meta, address, note) {
     const modal = ensurePhotoModal();
     modal.style.zIndex = '3005';
-    $('h5', modal).textContent = title || 'Preview Foto';
-    $('img', modal).src = isImagePath(src) ? src : fallbackPhotoSrc();
-    $('.bm-photo-meta', modal).textContent = meta || '';
+
+    const displayTitle = title || 'Lihat Photo Check In';
+    const h5 = $('h5', modal);
+    if (h5) h5.textContent = displayTitle;
+
+    const img = $('img', modal);
+    if (img) img.src = isImagePath(src) ? src : fallbackPhotoSrc();
+
+    const finalAddress = String(address || '').trim() || DEFAULT_PHOTO_ADDRESS;
+    const addressEl = $('.bm-maps-address-text', modal);
+    if (addressEl) addressEl.textContent = finalAddress;
+
+    const iframe = $('.bm-maps-iframe', modal);
+    if (iframe) {
+      const targetUrl = buildMapsEmbedUrl(finalAddress);
+      if (iframe.getAttribute('data-loaded-src') !== targetUrl) {
+        iframe.src = targetUrl;
+        iframe.setAttribute('data-loaded-src', targetUrl);
+      }
+    }
+
+    const captionText = $('.bm-photo-caption-text', modal);
+    if (captionText) captionText.textContent = meta || 'Preview foto absensi';
+
+    const finalNote = String(note !== undefined && note !== null && String(note).trim() !== '' ? note : '-').trim() || '-';
+    const noteEl = $('.bm-photo-note-content', modal);
+    if (noteEl) noteEl.textContent = finalNote;
+
     modal.classList.add('bm-show');
   }
 
+  function openKreatorPhotoModal(src, title, meta) {
+    const modal = ensureKreatorPhotoModal();
+    modal.style.zIndex = '3005';
+
+    const displayTitle = title || 'Lihat Foto Kreator';
+    const h5 = $('h5', modal);
+    if (h5) h5.textContent = displayTitle;
+
+    const img = $('img', modal);
+    if (img) img.src = isImagePath(src) ? src : fallbackPhotoSrc();
+
+    const captionText = $('.bm-kreator-photo-caption-text', modal) || $('.bm-kreator-photo-caption', modal);
+    if (captionText) captionText.textContent = meta || 'Preview foto kreator';
+
+    modal.classList.add('bm-show');
+  }
+
+  function openPhotoModal(src, title, meta, address, note, kind) {
+    const kindStr = String(kind || '').toLowerCase();
+    const titleStr = String(title || '').toLowerCase();
+    if (kindStr.includes('kreator') || titleStr.includes('kreator')) {
+      return openKreatorPhotoModal(src, title, meta);
+    }
+    return openKehadiranPhotoModal(src, title, meta, address, note);
+  }
+
+  window.openPhotoModal = openPhotoModal;
+  window.openKehadiranPhotoModal = openKehadiranPhotoModal;
+  window.openKreatorPhotoModal = openKreatorPhotoModal;
+  window.closePhotoModal = closePhotoModal;
+  window.closeKreatorPhotoModal = closeKreatorPhotoModal;
+
   function closePhotoModal() {
     const modal = document.getElementById('bmPhotoModal');
+    if (modal) modal.classList.remove('bm-show');
+  }
+
+  function closeKreatorPhotoModal() {
+    const modal = document.getElementById('bmKreatorPhotoModal');
     if (modal) modal.classList.remove('bm-show');
   }
 
@@ -9630,14 +10214,42 @@
         return;
       }
 
+      const kreatorPhotoClose = event.target.closest('[data-bm-kreator-photo-close]');
+      if (kreatorPhotoClose) {
+        event.preventDefault();
+        closeKreatorPhotoModal();
+        return;
+      }
+
+      const photoModal = document.getElementById('bmPhotoModal');
+      if (photoModal && photoModal.classList.contains('bm-show')) {
+        if (event.target === photoModal || (photoModal.contains(event.target) && !event.target.closest('.bm-photo-box'))) {
+          event.preventDefault();
+          closePhotoModal();
+          return;
+        }
+      }
+
+      const kreatorModal = document.getElementById('bmKreatorPhotoModal');
+      if (kreatorModal && kreatorModal.classList.contains('bm-show')) {
+        if (event.target === kreatorModal || (kreatorModal.contains(event.target) && !event.target.closest('.bm-kreator-photo-box'))) {
+          event.preventDefault();
+          closeKreatorPhotoModal();
+          return;
+        }
+      }
+
       const rawPhotoPreview = event.target.closest('[data-photo-preview]');
       if (rawPhotoPreview) {
         event.preventDefault();
         event.stopImmediatePropagation();
         const kind = String(rawPhotoPreview.dataset.photoKind || '').toLowerCase();
-        const title = kind.includes('out') ? 'Lihat Photo Check Out' : 'Lihat Photo Check In';
+        const title = rawPhotoPreview.dataset.photoTitle || (kind.includes('out') ? 'Lihat Photo Check Out' : (kind.includes('kreator') ? 'Lihat Foto Kreator' : 'Lihat Photo Check In'));
         const src = rawPhotoPreview.dataset.photoSrc || rawPhotoPreview.dataset.previewSrc || fallbackPhotoSrc();
-        openPhotoModal(src, title, 'Preview foto absensi');
+        const address = rawPhotoPreview.dataset.photoAddress || rawPhotoPreview.dataset.address || '';
+        const note = rawPhotoPreview.dataset.photoNote || rawPhotoPreview.dataset.note || '';
+        const meta = rawPhotoPreview.dataset.photoMeta || (kind.includes('kreator') ? 'Preview foto kreator' : (kind.includes('out') ? 'Preview foto check-out' : 'Preview foto absensi'));
+        openPhotoModal(src, title, meta, address, note, kind);
         return;
       }
 
@@ -9645,7 +10257,13 @@
       if (photoOpen) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        openPhotoModal(photoOpen.dataset.photoSrc, photoOpen.dataset.photoTitle, photoOpen.dataset.photoMeta);
+        openPhotoModal(
+          photoOpen.dataset.photoSrc,
+          photoOpen.dataset.photoTitle,
+          photoOpen.dataset.photoMeta,
+          photoOpen.dataset.photoAddress,
+          photoOpen.dataset.photoNote
+        );
         return;
       }
 
@@ -9669,16 +10287,34 @@
         return;
       }
 
-      const action = event.target.closest('.tdActions button, .tdActions a');
-      if (!action) return;
+      const dotsButton = event.target.closest('[data-bm-dots="true"], .tdActions .dropdown-toggle');
+      if (dotsButton) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+        toggleTableActionMenu(dotsButton);
+        return;
+      }
 
-      const table = action.closest('table');
-      const row = action.closest('tr');
+      const action = event.target.closest('.tdActions button, .tdActions a, .bm-table-action-menu button');
+      if (!action) {
+        if (!event.target.closest('.bm-table-action-menu')) {
+          closeTableActionMenu();
+        }
+        return;
+      }
+
+      const table = action.closest('table') || activeTableActionButton?.closest('table');
+      const row = action.closest('tr') || activeTableActionButton?.closest('tr');
       const config = table ? TABLE_CONFIG[table.id] : null;
-      if (!table || !row || !config) return;
+      if (!table || !row || !config) {
+        closeTableActionMenu();
+        return;
+      }
 
       event.preventDefault();
       event.stopImmediatePropagation();
+      closeTableActionMenu();
 
       if (isAction(action, ['lihat', 'view', 'bx-show']) && config.view) {
         openCrud('view', table, row);
@@ -9695,9 +10331,17 @@
       }
     }, true);
 
+    window.addEventListener('scroll', closeTableActionMenu, true);
+    window.addEventListener('resize', closeTableActionMenu);
+
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
-        closePhotoModal();
+        closeTableActionMenu();
+        const photoModal = document.getElementById('bmPhotoModal');
+        if (photoModal && photoModal.classList.contains('bm-show')) {
+          closePhotoModal();
+          return;
+        }
         hideModal();
       }
     });
@@ -9780,13 +10424,20 @@
     return hay.includes('hapus') || hay.includes('delete') || hay.includes('delate') || hay.includes('bx-trash');
   }
 
+  function isSpvKolContext() {
+    const loc = (window.location.pathname || '') + ' ' + (window.location.href || '');
+    const isSpvPath = /spvkol|kol_/i.test(loc);
+    const hasCustomModal = !!document.querySelector('#brandDeleteModal, #kategoriDeleteModal, #levelingDeleteModal, #leadsDeleteModal, #campaignDeleteModal, #kreatorDeleteModal, .delete-modal-box');
+    return isSpvPath || hasCustomModal;
+  }
+
   function isInsideDeleteModal(btn) {
-    return !!btn.closest?.('#ceoDeleteModal, #bmForceDeleteModal, [data-bm-force-delete-confirm], .modal-footer');
+    return !!btn.closest?.('#ceoDeleteModal, #bmForceDeleteModal, [data-bm-force-delete-confirm], .modal-footer, .delete-modal-box, .modal-overlay, [id*="DeleteModal"], .btn-delete-cancel, .btn-delete-confirm');
   }
 
   function isAnyDeleteModalOpen() {
     return !!document.querySelector(
-      '#ceoDeleteModal.show, #bmForceDeleteModal.bm-show, #bmForceDeleteModal.show, .modal.show, .modal[style*="display: block"]'
+      '#ceoDeleteModal.show, #bmForceDeleteModal.bm-show, #bmForceDeleteModal.show, .modal.show, .modal[style*="display: block"], .modal-overlay.is-active, .modal-overlay.active, .modal-overlay.show, .modal-overlay[style*="display: block"], .modal-overlay[style*="display: flex"], [id*="DeleteModal"].is-active, [id*="DeleteModal"].show, [id*="DeleteModal"].active, .is-active, .delete-modal-box'
     );
   }
 
@@ -9855,6 +10506,7 @@
   }
 
   function fallbackDelete(btn, row, table) {
+    if (isSpvKolContext()) return;
     const meta = getDeleteMeta(btn);
     const label = getFeatureLabel(table, meta);
     const ok = window.confirm(`Hapus ${label} ini?`);
@@ -9869,6 +10521,8 @@
   }
 
   document.addEventListener('click', function (event) {
+    if (isSpvKolContext()) return;
+
     const btn = event.target?.closest?.('button, a');
     if (!btn || isInsideDeleteModal(btn) || !isDeleteButton(btn)) return;
 
@@ -15883,7 +16537,8 @@
         localStorage.removeItem("bisaMediaRememberedUser");
       }
 
-      window.location.href = "kol_dashboard.html";
+      const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+      window.location.href = isSub ? "spvkol_dashboard.html" : "SpvKol/spvkol_dashboard.html";
     });
   }
 
@@ -15899,7 +16554,50 @@
   });
 
   logoutButton?.addEventListener("click", () => {
-    window.location.href = "index.html";
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    window.location.href = isSub ? "../index.html" : "index.html";
+  });
+
+  // Topbar user avatar dropdown popup in KOL
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("#userMenuButton");
+    const wrap = e.target.closest(".topbar-user-dropdown-wrap");
+
+    if (btn) {
+      const parentWrap = btn.closest(".topbar-user-dropdown-wrap");
+      if (parentWrap) {
+        const isOpen = parentWrap.classList.contains("is-open");
+        document.querySelectorAll(".topbar-user-dropdown-wrap.is-open").forEach((w) => {
+          w.classList.remove("is-open");
+          const b = w.querySelector("#userMenuButton");
+          if (b) b.setAttribute("aria-expanded", "false");
+        });
+        if (!isOpen) {
+          parentWrap.classList.add("is-open");
+          btn.setAttribute("aria-expanded", "true");
+        }
+      }
+      return;
+    }
+
+    // Clicking outside closes dropdown
+    if (!wrap) {
+      document.querySelectorAll(".topbar-user-dropdown-wrap.is-open").forEach((w) => {
+        w.classList.remove("is-open");
+        const b = w.querySelector("#userMenuButton");
+        if (b) b.setAttribute("aria-expanded", "false");
+      });
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      document.querySelectorAll(".topbar-user-dropdown-wrap.is-open").forEach((w) => {
+        w.classList.remove("is-open");
+        const b = w.querySelector("#userMenuButton");
+        if (b) b.setAttribute("aria-expanded", "false");
+      });
+    }
   });
 
   monthSelect?.addEventListener("change", () => {
@@ -16019,6 +16717,10 @@
   if (kreatorModal) {
     // Open modal
     openKreatorModalBtn?.addEventListener("click", () => {
+      window.editingKreatorId = null;
+      if (typeof window.resetKreatorForm === "function") {
+        window.resetKreatorForm();
+      }
       kreatorModal.classList.add("is-active");
     });
 
@@ -16040,12 +16742,145 @@
       kreatorPassword.type = isPassword ? "text" : "password";
     });
 
+    // Photo upload handling for Kreator
+    let selectedFotoDataUrl = "";
+    function bindFotoUploadListener() {
+      const fInput = document.getElementById("fotoInput");
+      const fBox = kreatorForm ? kreatorForm.querySelector(".foto-upload-box") : null;
+      if (fInput) {
+        fInput.addEventListener("change", (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+              selectedFotoDataUrl = evt.target.result;
+              if (fBox) {
+                fBox.innerHTML = `
+                  <img src="${selectedFotoDataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" alt="Foto Kreator"/>
+                  <span class="btn-choose-file" style="position: absolute; bottom: 6px; background: rgba(0,0,0,0.65); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px;">Ganti Foto</span>
+                  <input type="file" id="fotoInput" style="display: none;" accept="image/*" />
+                `;
+                bindFotoUploadListener();
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    }
+    window.bindKreatorFotoUploadListener = bindFotoUploadListener;
+    window.setSelectedKreatorFoto = function(url) {
+      selectedFotoDataUrl = url || "";
+    };
+    bindFotoUploadListener();
+
     // Form submit
     kreatorForm?.addEventListener("submit", (e) => {
       e.preventDefault();
-      showToast("Kreator berhasil ditambahkan");
+
+      // Read fields
+      const uidInput = document.getElementById("kreatorUidInput") || kreatorForm.querySelector("input[placeholder='Tambah UID']");
+      const userInput = document.getElementById("kreatorUsernameInput") || kreatorForm.querySelector("input[placeholder='Tambah Username']");
+      const nameInput = document.getElementById("kreatorNamaInput") || kreatorForm.querySelector("input[placeholder='Tambah Nama Kreator']");
+      const alamatInput = document.getElementById("kreatorAlamatInput") || kreatorForm.querySelector("input[placeholder='Tambah Alamat']");
+      const waInput = document.getElementById("kreatorWaInput") || kreatorForm.querySelector("input[placeholder='Tambah Nomor WA']");
+      const katInput = document.getElementById("kategoriProdukVal");
+      const katSpesifikInput = document.getElementById("kreatorKatSpesifikInput") || kreatorForm.querySelector("input[placeholder='Tambah Kategori Spesifik']");
+      const tglAwalInput = document.getElementById("kreatorKontrakAwalInput");
+      const tglAkhirInput = document.getElementById("kreatorKontrakAkhirInput");
+      const dateInputs = kreatorForm.querySelectorAll("input[placeholder='dd/mm/yyyy']");
+
+      const uidVal = uidInput && uidInput.value.trim() ? uidInput.value.trim() : "UID-" + String(Date.now()).slice(-4);
+      let userVal = userInput && userInput.value.trim() ? userInput.value.trim() : "user_" + String(Date.now()).slice(-4);
+      if (!userVal.startsWith("@")) userVal = "@" + userVal;
+      const nameVal = nameInput && nameInput.value.trim() ? nameInput.value.trim() : "Kreator Baru";
+      const alamatVal = alamatInput && alamatInput.value.trim() ? alamatInput.value.trim() : "Jakarta";
+      const waVal = waInput && waInput.value.trim() ? waInput.value.trim() : "081234567890";
+
+      let katVal = katInput && katInput.value.trim() ? katInput.value.trim() : "";
+      if (!katVal && katSpesifikInput && katSpesifikInput.value.trim()) {
+        katVal = katSpesifikInput.value.trim();
+      }
+      if (!katVal) katVal = "Fashion";
+      const katSpesifikVal = katSpesifikInput && katSpesifikInput.value.trim() ? katSpesifikInput.value.trim() : katVal;
+
+      let kontrakAwal = (tglAwalInput && tglAwalInput.value) ? tglAwalInput.value : ((dateInputs.length > 0 && dateInputs[0].value) ? dateInputs[0].value : "01/01/2026");
+      let kontrakAkhir = (tglAkhirInput && tglAkhirInput.value) ? tglAkhirInput.value : ((dateInputs.length > 1 && dateInputs[1].value) ? dateInputs[1].value : "31/12/2026");
+      let masaKontrak = `${kontrakAwal} - ${kontrakAkhir}`;
+
+      const statusSelect = document.getElementById("kreatorStatusSelect") || kreatorForm.querySelectorAll("select")[0];
+      const leadsSelect = document.getElementById("kreatorLeadsSelect") || kreatorForm.querySelectorAll("select")[1];
+      const emailInput = document.getElementById("kreatorEmailInput") || kreatorForm.querySelector("input[type='email']");
+      const passVal = (kreatorPassword && kreatorPassword.value) ? kreatorPassword.value : "password123";
+
+      const statusVal = (statusSelect && statusSelect.value) ? (statusSelect.options[statusSelect.selectedIndex]?.text || statusSelect.value) : "Bind";
+      const leadsVal = (leadsSelect && leadsSelect.value) ? (leadsSelect.options[leadsSelect.selectedIndex]?.text || leadsSelect.value) : "Member";
+      const emailVal = emailInput && emailInput.value.trim() ? emailInput.value.trim() : (userVal.replace("@", "") + "@example.com");
+
+      const editId = (window.editingKreatorId || (document.getElementById("kreatorId") && document.getElementById("kreatorId").value) || "").trim();
+      const existingFoto = (document.getElementById("kreatorFotoData") && document.getElementById("kreatorFotoData").value) || "";
+      const fotoToSave = selectedFotoDataUrl || existingFoto || "../media/avatar.png";
+
+      const kreatorData = {
+        id: editId || ('k_' + Date.now()),
+        foto: fotoToSave,
+        uid: uidVal,
+        username: userVal,
+        nama: nameVal,
+        alamat: alamatVal,
+        nomorWa: waVal,
+        kategori: katVal,
+        kategoriSpesifik: katSpesifikVal,
+        kontrakAwal: kontrakAwal,
+        kontrakAkhir: kontrakAkhir,
+        masaKontrak: masaKontrak,
+        status: statusVal,
+        leads: leadsVal,
+        email: emailVal,
+        password: passVal
+      };
+
+      if (editId) {
+        if (typeof window.updateKreatorItem === "function") {
+          window.updateKreatorItem(editId, kreatorData);
+        }
+        showToast("Data kreator berhasil diperbarui");
+      } else {
+        if (typeof window.addKreatorItem === "function") {
+          window.addKreatorItem(kreatorData);
+        } else {
+          try {
+            const list = JSON.parse(localStorage.getItem("bisa_kreator_list_v4") || "[]");
+            list.unshift(kreatorData);
+            localStorage.setItem("bisa_kreator_list_v4", JSON.stringify(list));
+          } catch (err) {}
+        }
+        showToast("Kreator berhasil ditambahkan");
+      }
+
+      window.editingKreatorId = null;
+      if (document.getElementById("kreatorId")) document.getElementById("kreatorId").value = "";
+      if (document.getElementById("kreatorFotoData")) document.getElementById("kreatorFotoData").value = "";
+      const kTitle = document.getElementById("kreatorModalTitle");
+      if (kTitle) kTitle.innerHTML = 'Tambah <span style="font-weight: 700;">Kreator</span>';
+      const kSubBtn = document.getElementById("btnKreatorSubmit") || kreatorForm.querySelector("button[type='submit']");
+      if (kSubBtn) kSubBtn.textContent = "Submit";
+
       kreatorModal.classList.remove("is-active");
       kreatorForm.reset();
+      selectedFotoDataUrl = "";
+      window.setSelectedKreatorFoto("");
+      const fBox = kreatorForm.querySelector(".foto-upload-box");
+      if (fBox) {
+        fBox.innerHTML = `
+          <span class="btn-choose-file">Choose File</span>
+          <input type="file" id="fotoInput" style="display: none;" accept="image/*" />
+        `;
+        bindFotoUploadListener();
+      }
+      if (typeof window.resetCustomCategory === "function") {
+        window.resetCustomCategory();
+      }
     });
   }
 
@@ -16160,6 +16995,68 @@
     performaForm.addEventListener("submit", (e) => {
       e.preventDefault();
 
+      // Read form data
+      const dateInput = performaForm.querySelector("input[placeholder='dd/mm/yyyy']");
+      let dateVal = dateInput && dateInput.value ? dateInput.value : "";
+      if (!dateVal) {
+        const d = new Date();
+        dateVal = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+      }
+
+      const fileInput = document.getElementById("performaFileInput");
+      const pasteInput = document.getElementById("performaPasteInput");
+      let extractedName = "kreator_1";
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        extractedName = fileInput.files[0].name.replace(/\.[^/.]+$/, "").toLowerCase().replace(/\s+/g, "_");
+      } else if (pasteInput && pasteInput.value.trim()) {
+        const firstLine = pasteInput.value.trim().split("\n")[0];
+        if (firstLine.includes("\t") || firstLine.includes(",")) {
+          const parts = firstLine.split(/[\t,]+/);
+          if (parts[1]) extractedName = parts[1].trim();
+        }
+      }
+
+      const newPerforma = {
+        id: 'p_' + Date.now(),
+        tanggal: dateVal,
+        uid: "UID " + String(Date.now()).slice(-4),
+        username: extractedName,
+        gmv: "Rp 15.420.000",
+        pesanan: "245",
+        live_gmv: "Rp 9.200.000",
+        video_gmv: "Rp 6.220.000",
+        live_orders: "150",
+        video_orders: "95",
+        ctr_live: "4.8%",
+        ctr_video: "3.2%",
+        direct_gmv: "Rp 21.300.000",
+        direct_live: "Rp 14.100.000",
+        direct_video: "Rp 7.200.000",
+        direct_orders: "380",
+        sold: "412",
+        direct_live_sold: "250",
+        direct_live_prod: "270",
+        direct_video_sold: "130",
+        direct_video_prod: "142",
+        total_sold: "657",
+        komisi: "Rp 1.542.000",
+        dasar: "10%",
+        live_views: "12.500",
+        views: "45.200",
+        live_broadcasts: "3",
+        videos: "5"
+      };
+
+      if (typeof window.addPerformaItem === "function") {
+        window.addPerformaItem(newPerforma);
+      } else {
+        try {
+          const list = JSON.parse(localStorage.getItem("bisa_performa_kreator_list_v2") || "[]");
+          list.unshift(newPerforma);
+          localStorage.setItem("bisa_performa_kreator_list_v2", JSON.stringify(list));
+        } catch (err) {}
+      }
+
       // Submit logic/feedback
       showToast("Performa Kreator berhasil ditambahkan");
 
@@ -16182,7 +17079,8 @@
   const closeLeadsKreatorModal = document.getElementById("closeLeadsKreatorModal");
   const leadsKreatorForm = document.getElementById("leadsKreatorForm");
 
-  if (leadsKreatorModal) {
+  // Only run mockup handler if page does not have its own custom CRUD table
+  if (leadsKreatorModal && !document.getElementById("tblLeadsKreator")) {
     // Open modal
     btnTambahLeads?.addEventListener("click", () => {
       leadsKreatorModal.classList.add("is-active");
@@ -16215,7 +17113,8 @@
   const closeLevelingKreatorModal = document.getElementById("closeLevelingKreatorModal");
   const levelingKreatorForm = document.getElementById("levelingKreatorForm");
 
-  if (levelingKreatorModal) {
+  // Only run mockup handler if page does not have its own custom CRUD table
+  if (levelingKreatorModal && !document.getElementById("tblLevelingKreator")) {
     // Open modal
     btnTambahLeveling?.addEventListener("click", () => {
       levelingKreatorModal.classList.add("is-active");

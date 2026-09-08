@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presensi Lembur - Bisa Media</title>
+  <link rel="icon" type="image/png" href="../media/logo.png" />
+  <link rel="stylesheet" href="../style.css" />
+  <!-- Boxicons for action icons -->
+  <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .status-badge--success {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+    .status-badge--warning {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+    .status-badge--danger {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+
+    /* Actions style from spvkol_rrk.html btn-view */
+    .btn-view {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease;
+      color: #29A3D8;
+    }
+    .btn-view:hover {
+      background-color: rgba(41, 163, 216, 0.08);
+    }
+
+    /* Align the Aksi header text and its cell contents to center */
+    #tblLemburV2 th:last-child,
+    .campaign-table th:last-child,
+    #tblLemburV2 td.tdActions,
+    .campaign-table td.tdActions {
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 6px 12px !important;
+    }
+
+    /* 3-dots action button */
+    .tdActions .dropdown {
+      position: relative;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .tdActions button[data-bm-dots="true"],
+    .tdActions .dropdown-toggle {
+      background: transparent !important;
+      border: none !important;
+      cursor: pointer !important;
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      color: #64748b !important;
+      box-shadow: none !important;
+      transition: background-color 0.15s ease, color 0.15s ease !important;
+    }
+    .tdActions button[data-bm-dots="true"]:hover,
+    .tdActions button[data-bm-dots="true"].show,
+    .tdActions .dropdown-toggle:hover,
+    .tdActions .dropdown-toggle.show {
+      background-color: rgba(67, 89, 113, 0.08) !important;
+      color: #334155 !important;
+    }
+    .tdActions button[data-bm-dots="true"] i,
+    .tdActions .dropdown-toggle i {
+      font-size: 20px !important;
+      line-height: 1 !important;
+      pointer-events: none;
+    }
+    .tdActions .dropdown-toggle::after {
+      display: none !important;
+    }
+
+    /* Dropdown popup menu matching screenshot */
+    .bm-table-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      margin: 0;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+      list-style: none;
+    }
+    .bm-table-action-menu.show {
+      display: block !important;
+    }
+    .bm-table-action-menu li {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .bm-table-action-menu .dropdown-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 38px !important;
+      padding: 7px 12px !important;
+      border-radius: 6px !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      background: transparent !important;
+      border: none !important;
+      cursor: pointer !important;
+      text-align: left !important;
+      white-space: nowrap !important;
+      box-shadow: none !important;
+      transition: background-color 0.15s ease, color 0.15s ease !important;
+    }
+    .bm-table-action-menu .dropdown-item:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    .bm-table-action-menu .dropdown-item.text-danger {
+      color: #334155 !important;
+    }
+    .bm-table-action-menu .dropdown-item.text-danger:hover {
+      background-color: #fef2f2 !important;
+      color: #dc2626 !important;
+    }
+
+    /* Rounded blue icon box matching user screenshot */
+    .bm-table-action-menu .bm-menu-iconify {
+      width: 28px !important;
+      height: 28px !important;
+      border-radius: 6px !important;
+      background: #0076C5 !important;
+      color: #ffffff !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex: 0 0 28px !important;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.28) !important;
+      pointer-events: none;
+    }
+    .bm-table-action-menu .bm-menu-iconify i {
+      color: #ffffff !important;
+      font-size: 16px !important;
+      line-height: 1 !important;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="sidebar" class="sidebar kol-sidebar">
+    <div class="sidebar-brand">
+      <img class="brand-logo brand-logo--sidebar" src="../media/logo.png" alt="Logo Bisa Media" />
+      <span class="brand-name brand-name--dark">Bisa Media</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Menu utama">
+      <a class="nav-item " href="spvkol_dashboard.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3.5 10.5L12 3l8.5 7.5"></path>
+          <path d="M5.5 9.5V21h13V9.5"></path>
+          <path d="M9.5 21v-6h5v6"></path>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <a class="nav-item " href="spvkol_kalender.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>Kalender</span>
+      </a>
+
+      <section class="nav-group ">
+        <button class="nav-group__toggle" type="button">
+          <span>Absensi</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_kehadiran.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Kehadiran</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_presensi_istirahat.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+            <span>Presensi Istirahat</span>
+          </a>
+
+          <a class="nav-item nav-item--active" href="spvkol_presensi_lembur.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Presensi Lembur</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Oprasional</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_dashboard_campaign.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3.5 10.5L12 3l8.5 7.5"></path>
+              <path d="M5.5 9.5V21h13V9.5"></path>
+              <path d="M9.5 21v-6h5v6"></path>
+            </svg>
+            <span>Dashboard Campaign</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_campaign.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 13h3l9 4V7l-9 4H4z"></path>
+              <path d="M7 13l1.5 5"></path>
+              <path d="M18 9.5c1 .6 1.5 1.4 1.5 2.5S19 13.9 18 14.5"></path>
+            </svg>
+            <span>Campaign</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_kreator.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="9" cy="8" r="3"></circle>
+              <path d="M3.5 19c.6-3.4 2.4-5.2 5.5-5.2s4.9 1.8 5.5 5.2"></path>
+              <circle cx="17" cy="9" r="2"></circle>
+              <path d="M15.5 14.5c2.7-.3 4.4 1.2 5 4"></path>
+            </svg>
+            <span>Kreator</span>
+          </a>
+
+          <a class="nav-item" href="spvkol_tracking_sampel.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10" cy="10" r="5"></circle>
+              <path d="M14 14l6 6"></path>
+              <path d="M8 10h4M10 8v4"></path>
+            </svg>
+            <span>Tracking Sampel</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_Performa_Kreator.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19V5"></path>
+              <path d="M4 19h16"></path>
+              <path d="M7 15l4-4 3 2 5-6"></path>
+            </svg>
+            <span>Performa Kreator</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Dokumen & Kolaborasi</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_folder.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>My Folders</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Perancangan Kerja</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_rrk.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 21V4"></path>
+              <path d="M5 5h11l-2 4 2 4H5"></path>
+            </svg>
+            <span>RRK</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_Milestone.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 21V4"></path>
+              <path d="M5 5h11l-2 4 2 4H5"></path>
+              <circle cx="18.5" cy="17.5" r="2.5"></circle>
+            </svg>
+            <span>Milestone</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_tugas.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+              <path d="M8 12l2.5 2.5L16 9"></path>
+            </svg>
+            <span>Tugas</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_project.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>Project</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_laporan.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Laporan</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_pengaduan.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Pengaduan</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Kinerja</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_evaluasi_kinerja.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Evaluasi Kinerja</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_target_capaian.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+            <span>Target & Capaian Kerja</span>
+          </a>
+
+          <a class="nav-item " href="spvkol_rencana_karier.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="18" y1="8" x2="23" y2="8"></line>
+              <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
+            </svg>
+            <span>Rencana Karier</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Data Master</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="spvkol_Brand.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3l8 8-8 8-8-8z"></path>
+              <path d="M8.5 11.5l3 3 4.5-5"></path>
+            </svg>
+            <span>Brand</span>
+          </a>
+
+          <div class="nav-subgroup is-collapsed">
+            <button class="nav-subgroup__toggle" type="button">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+              <span>Master Pendukung</span>
+              <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 9l5 5 5-5"></path>
+              </svg>
+            </button>
+            <div class="nav-subgroup__items">
+              <a class="nav-item " href="spvkol_Kategori_Produk.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 6h12M8 12h12M8 18h12"></path>
+                  <circle cx="4" cy="6" r="1"></circle>
+                  <circle cx="4" cy="12" r="1"></circle>
+                  <circle cx="4" cy="18" r="1"></circle>
+                </svg>
+                <span>Kategori Produk</span>
+              </a>
+              <a class="nav-item " href="spvkol_Leads_Kreator.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="9" cy="8" r="3"></circle>
+                  <path d="M3.5 19c.6-3.4 2.4-5.2 5.5-5.2s4.9 1.8 5.5 5.2"></path>
+                  <path d="M17 6v6M14 9h6"></path>
+                </svg>
+                <span>Leads Kreator</span>
+              </a>
+
+              <a class="nav-item " href="spvkol_Leveling_Kreator.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8z"></path>
+                </svg>
+                <span>Leveling Kreator</span>
+              </a>
+
+              <a class="nav-item " href="spvkol_Ads_Account.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="8" cy="9" r="3"></circle>
+                  <circle cx="16" cy="9" r="3"></circle>
+                  <path d="M2.5 20c.6-3.2 2.4-5 5.5-5 1.5 0 2.7.4 3.6 1.1"></path>
+                  <path d="M12.4 16.1c.9-.7 2.1-1.1 3.6-1.1 3.1 0 4.9 1.8 5.5 5"></path>
+                </svg>
+                <span>Ads Account</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </nav>
+  </aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+            <img src="../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Supervisi KOL</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../index.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Absensi Lembur</h1>
+      </div>
+
+      <!-- Hidden Rata-rata Durasi to prevent JS errors -->
+      <span id="ovLemburLong" style="display: none;">0</span>
+
+      <!-- Metric Summary Cards outside Panel -->
+      <div class="milestone-metric-grid-new" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 29px; margin-bottom: 26px;">
+        
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Total Lembur</span>
+            <strong class="metric-value" id="ovLemburTotal">0</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(103, 58, 183, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #673ab7;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Total Durasi</span>
+            <strong class="metric-value" id="ovLemburHours">0</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(33, 150, 243, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #2196f3;">
+              <path d="M5 2h14M5 22h14M19 2v4a7 7 0 0 1-3 5.68V15M5 2v4a7 7 0 0 0 3 5.68V15m0 0v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-5M8 6h8M6 18h12"></path>
+            </svg>
+          </div>
+        </article>
+
+      </div>
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left" style="gap: 8px; display: flex; align-items: center;">
+            <button id="btnExportLembur" class="small-action-button" type="button" aria-label="Export Excel" title="Export Excel">
+              <!-- Excel / Spreadsheet SVG -->
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="3" width="16" height="18" rx="1.5" fill="#1f72b6" stroke="#1f72b6" />
+                <line x1="12" y1="7" x2="17" y2="7" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="11" x2="17" y2="11" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="15" x2="17" y2="15" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#fff" stroke-width="1.2" />
+                <path d="M6 9l3 6M9 9l-3 6" stroke="#fff" stroke-width="1.8" />
+              </svg>
+            </button>
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterLembur" class="small-action-button" type="button" aria-label="Filter Status" title="Filter Status">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+              
+              <!-- Popover Content -->
+              <div id="filterStatusDropdown" class="filter-popover" style="width: 250px;">
+                <div class="filter-popover-form">
+                  <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+                    <label class="form-label" style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Status Check In</label>
+                    <div class="select-wrapper">
+                      <select id="filterStatusCheckIn" class="form-select" style="font-size: 12px; padding: 6px 10px; height: auto;">
+                        <option value="Semua">Semua</option>
+                        <option value="Sudah Check In">Sudah Check In</option>
+                        <option value="Belum Check In">Belum Check In</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 16px; text-align: left;">
+                    <label class="form-label" style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Status Check Out</label>
+                    <div class="select-wrapper">
+                      <select id="filterStatusCheckOut" class="form-select" style="font-size: 12px; padding: 6px 10px; height: auto;">
+                        <option value="Semua">Semua</option>
+                        <option value="Sudah Check Out">Sudah Check Out</option>
+                        <option value="Belum Check Out">Belum Check Out</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <button id="resetFilterBtn" type="button" style="background: #f44336; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit';">Reset</button>
+                    <button id="applyStatusFilterBtn" type="button" style="background: #2264c6; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit';">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button id="btnCalendarLembur" class="small-action-button" type="button" aria-label="Pilih tanggal" title="Pilih Tanggal">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+                <path d="M8 3v4M16 3v4M4 9h16"></path>
+              </svg>
+            </button>
+            <input id="dateFilterLembur" type="text" data-date-col="2" data-filter-date="" data-filter-table="#tblLemburV2" data-popup-url="../popup.html" style="display: none;" />
+          </div>
+        </div>
+
+        <div class="table-wrap campaign-table" style="padding: 0 0 24px;">
+          <table id="tblLemburV2">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Nama Karyawan</th>
+                <th>Tanggal</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+                <th>Total Waktu</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Setiawan</td>
+                <td>2026-05-21</td>
+                <td>18:00</td>
+                <td>20:00</td>
+                <td>2 Jam</td>
+                <td class="tdActions">
+                  <div class="dropdown bm-action-dropdown">
+                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                      data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi">
+                      <i class="bx bx-dots-vertical-rounded"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu">
+                      <li>
+                        <button class="dropdown-item" type="button" data-action="view" title="Lihat">
+                          <span class="bm-menu-iconify"><i class="bx bx-show"></i></span>
+                          <span>Lihat</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+  </div>
+
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="../script.js"></script>
+  <script>
+    function exportTableToCSV(tableId, filename) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+
+      const rows = Array.from(table.querySelectorAll('tr'));
+      const csvData = [];
+
+      rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        const rowData = cells.map((cell, index) => {
+          if (index === cells.length - 1 && cell.textContent.trim().toLowerCase() === 'aksi') {
+            return null;
+          }
+          if (cell.classList.contains('tdActions')) {
+            return null;
+          }
+          let text = cell.textContent.trim();
+          text = text.replace(/"/g, '""');
+          if (text.includes(',') || text.includes('\n') || text.includes('"')) {
+            text = `"${text}"`;
+          }
+          return text;
+        }).filter(val => val !== null);
+
+        if (rowData.length > 0) {
+          csvData.push(rowData);
+        }
+      });
+
+      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvData.map(row => row.join(",")).join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      if (typeof showToast === 'function') {
+        showToast("File Excel berhasil diunduh");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnCalendar = document.getElementById('btnCalendarLembur');
+      const dateInput = document.getElementById('dateFilterLembur');
+      const btnFilter = document.getElementById('btnFilterLembur');
+      const btnExport = document.getElementById('btnExportLembur');
+
+      if (btnCalendar && dateInput) {
+        btnCalendar.addEventListener('click', (e) => {
+          e.preventDefault();
+          dateInput.click();
+        });
+      }
+
+      const filterDropdown = document.getElementById('filterStatusDropdown');
+      const selIn = document.getElementById('filterStatusCheckIn');
+      const selOut = document.getElementById('filterStatusCheckOut');
+      const btnApplyFilter = document.getElementById('applyStatusFilterBtn');
+      const btnResetFilter = document.getElementById('resetFilterBtn');
+
+      function filterLemburTable() {
+        const valIn = selIn ? selIn.value : 'Semua';
+        const valOut = selOut ? selOut.value : 'Semua';
+        const table = document.getElementById('tblLemburV2');
+        if (!table) return;
+        const rows = table.querySelectorAll('tbody tr');
+        
+        for (const tr of rows) {
+          const tds = tr.querySelectorAll('td');
+          if (tds.length < 6) continue;
+          const checkIn = tds[3].textContent.trim();
+          const checkOut = tds[4].textContent.trim();
+          
+          let matchIn = true;
+          if (valIn === 'Sudah Check In') {
+            matchIn = (checkIn !== '-' && checkIn !== '');
+          } else if (valIn === 'Belum Check In') {
+            matchIn = (checkIn === '-' || checkIn === '');
+          }
+          
+          let matchOut = true;
+          if (valOut === 'Sudah Check Out') {
+            matchOut = (checkOut !== '-' && checkOut !== '');
+          } else if (valOut === 'Belum Check Out') {
+            matchOut = (checkOut === '-' || checkOut === '');
+          }
+          
+          if (matchIn && matchOut) {
+            tr.style.display = '';
+          } else {
+            tr.style.display = 'none';
+          }
+        }
+        
+        let n = 1;
+        for (const tr of rows) {
+          if (tr.style.display === 'none') continue;
+          const tdFirst = tr.querySelector('td');
+          if (tdFirst && /^\d+$/.test(tdFirst.textContent.trim())) {
+            tdFirst.textContent = String(n++);
+          }
+        }
+      }
+
+      function resetLemburTableFilter() {
+        if (selIn) selIn.value = 'Semua';
+        if (selOut) selOut.value = 'Semua';
+        filterLemburTable();
+      }
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          filterDropdown.classList.toggle('is-active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!filterDropdown.contains(e.target) && e.target !== btnFilter) {
+            filterDropdown.classList.remove('is-active');
+          }
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', () => {
+          filterLemburTable();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', () => {
+          resetLemburTableFilter();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+        });
+      }
+
+      // Add click filter for metric cards
+      const metricCards = document.querySelectorAll('.metric-card');
+      if (metricCards.length >= 2) {
+        // Card 1: Total Lembur => Reset
+        metricCards[0].style.cursor = 'pointer';
+        metricCards[0].addEventListener('click', () => {
+          resetLemburTableFilter();
+        });
+
+        // Card 2: Total Durasi => Show only those checked out
+        metricCards[1].style.cursor = 'pointer';
+        metricCards[1].addEventListener('click', () => {
+          if (selIn) selIn.value = 'Semua';
+          if (selOut) selOut.value = 'Sudah Check Out';
+          filterLemburTable();
+        });
+      }
+
+      if (btnExport) {
+        btnExport.addEventListener('click', (e) => {
+          e.preventDefault();
+          exportTableToCSV('tblLemburV2', 'data_absensi_lembur.csv');
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
