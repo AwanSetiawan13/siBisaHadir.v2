@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -248,14 +248,14 @@
             <span>Target & Capaian Kerja</span>
           </a>
 
-          <a class="nav-item " href="spvkol_rencana_karier.html">
+          <a class="nav-item " href="spvkol_upgrade_skill.html">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="8.5" cy="7" r="4"></circle>
               <line x1="18" y1="8" x2="23" y2="8"></line>
               <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
             </svg>
-            <span>Rencana Karier</span>
+            <span>Upgrade Skill</span>
           </a>
         </div>
       </section>
@@ -648,18 +648,44 @@
       const confirmDeleteBtn = document.getElementById("confirmDeleteKategoriBtn");
       let pendingDeleteKatId = null;
 
-      /* â”€â”€ State & Storage â”€â”€ */
-      const KATEGORI_STORAGE_KEY = "bisa_kategori_produk_list_v2";
-      let kategoriDb = [];
+      /* ── State & Storage ── */
+      const KATEGORI_STORAGE_KEY = "bisa_kategori_produk_list_v5";
+      const DEFAULT_KATEGORI = [
+        {
+          id: 1,
+          namaKategori: "Fashion Muslim - Hijab",
+          sub1: "Pashmina, Segi Empat, Bergo / Khimar, Hijab Instan",
+          sub2: "Ceruty Baby Doll, Paris Premium, Diamond Crepe, Jersey",
+          pic: "Setiawan"
+        }
+      ];
+      let kategoriDb = DEFAULT_KATEGORI;
 
       try {
+        if (!localStorage.getItem("bisa_kategori_reset_v5")) {
+          try {
+            localStorage.removeItem("bisa_kategori_produk_list");
+            localStorage.removeItem("bisa_kategori_produk_list_v2");
+            localStorage.removeItem("bisa_kategori_produk_list_v3");
+            localStorage.removeItem("bisa_kategori_produk_list_v4");
+            localStorage.removeItem(KATEGORI_STORAGE_KEY);
+            localStorage.setItem("bisa_kategori_reset_v5", "true");
+          } catch(e){}
+        }
+
         const saved = localStorage.getItem(KATEGORI_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) kategoriDb = parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            kategoriDb = parsed;
+          } else if (Array.isArray(parsed) && parsed.length === 0) {
+            kategoriDb = [];
+          }
+        } else {
+          localStorage.setItem(KATEGORI_STORAGE_KEY, JSON.stringify(DEFAULT_KATEGORI));
         }
       } catch (err) {
-        kategoriDb = [];
+        kategoriDb = DEFAULT_KATEGORI;
       }
 
       function saveKategoriDb() {

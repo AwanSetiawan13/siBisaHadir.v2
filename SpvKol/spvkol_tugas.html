@@ -757,7 +757,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Hari ini</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value" id="countTugasHariIni">0</strong>
           </div>
           <div class="metric-icon-box" style="background-color: rgba(34, 100, 198, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #2264c6;">
@@ -771,7 +771,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Total Tugas</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value" id="countTotalTugas">0</strong>
           </div>
           <div class="metric-icon-box" style="background-color: rgba(255, 152, 0, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #ff9800;">
@@ -783,7 +783,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Selesai</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value" id="countTugasSelesai">0</strong>
           </div>
           <div class="metric-icon-box" style="background-color: rgba(76, 175, 80, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #4caf50;">
@@ -1008,9 +1008,6 @@
           <label class="form-label" style="font-weight: bold;">Milestone</label>
           <select id="inputMilestone" class="form-select" required>
             <option value="" disabled selected hidden>Pilih Milestone Terkait</option>
-            <option value="Kerja Sama dengan Influencer">Kerja Sama dengan Influencer</option>
-            <option value="Produksi Konten Sosial Media">Produksi Konten Sosial Media</option>
-            <option value="Evaluasi Performa">Evaluasi Performa</option>
           </select>
         </div>
 
@@ -1268,38 +1265,147 @@
         timCheckboxes.forEach(cb => cb.checked = false);
         updateTimDropdownLabel();
       };
-      let tugasData = [
+      /* ── LocalStorage Persistence & Default Tugas ── */
+      const TUGAS_STORAGE_KEY = "bisa_tugas_data_v1";
+      const TUGAS_RESET_KEY = "bisa_tugas_reset_v1";
+
+      const DEFAULT_TUGAS = [
         {
           id: 1,
-          title: "Review Konten Influencer",
-          milestone: "Kerja Sama dengan Influencer",
+          title: "Screening Database 100 KOL Hijab",
+          milestone: "Kurasi & Screening 100 Database Kreator Hijab",
           progress: 100,
-          pic: "Setiawan",
+          pic: "Riva",
+          tim: "Supervisi KOL, Riva",
           deadline: "12-12-2026",
           prioritas: "Tinggi",
-          deskripsi: "Tinjau draft konten video dari KOL sebelum dipublikasi"
+          deskripsi: "Screening metrik engagement rate > 4.5% dan relevansi audiens fashion hijab",
+          subtasks: [
+            { id: 1, name: "Export database dari TikTok & Instagram", status: "Selesai", bukti: "db_kreator_raw.xlsx", revisi: "-" },
+            { id: 2, name: "Pengecekan analitik engagement rate", status: "Selesai", bukti: "analitik_er.pdf", revisi: "-" },
+            { id: 3, name: "Finalisasi 100 list terpilih", status: "Selesai", bukti: "list_100_final.xlsx", revisi: "-" }
+          ]
         },
         {
           id: 2,
-          title: "Review Konten Influencer",
-          milestone: "Kerja Sama dengan Influencer",
+          title: "Pengiriman MoU & Brief Kerjasama",
+          milestone: "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
           progress: 100,
-          pic: "Setiawan",
-          deadline: "12-12-2026",
+          pic: "Sri",
+          tim: "Riva, Sri",
+          deadline: "19-12-2026",
           prioritas: "Tinggi",
-          deskripsi: "Tinjau draft konten video dari KOL sebelum dipublikasi"
+          deskripsi: "Kirim draft kontrak MoU dan brief komisi affiliate ke 50 kreator terpilih",
+          subtasks: [
+            { id: 1, name: "Drafting template kontrak affiliate", status: "Selesai", bukti: "kontrak_template.docx", revisi: "-" },
+            { id: 2, name: "Distribusi ke 50 kreator via WhatsApp", status: "Selesai", bukti: "wa_broadcast_log.pdf", revisi: "-" },
+            { id: 3, name: "Konfirmasi tanda tangan MoU", status: "Selesai", bukti: "signed_mou_drive.pdf", revisi: "-" }
+          ]
         },
         {
           id: 3,
-          title: "Review Konten Influencer",
-          milestone: "Kerja Sama dengan Influencer",
-          progress: 100,
-          pic: "Setiawan",
-          deadline: "12-12-2026",
-          prioritas: "Tinggi",
-          deskripsi: "Tinjau draft konten video dari KOL sebelum dipublikasi"
+          title: "Pengemasan & Pengiriman Sample Hijab",
+          milestone: "Distribusi Sample Produk & Briefing Live Streaming",
+          progress: 40,
+          pic: "Ahmad",
+          tim: "Sri, Ahmad",
+          deadline: "26-12-2026",
+          prioritas: "Sedang",
+          deskripsi: "Packing sample produk hijab premium dan briefing jadwal live streaming affiliate",
+          subtasks: [
+            { id: 1, name: "Packing 50 paket sample hijab", status: "Selesai", bukti: "resi_pengiriman.pdf", revisi: "-" },
+            { id: 2, name: "Monitoring pengiriman ekspedisi", status: "Diproses", bukti: "-", revisi: "Follow up resi yang belum bergerak" },
+            { id: 3, name: "Briefing jadwal live TikTok Shop", status: "Belum Mulai", bukti: "-", revisi: "-" }
+          ]
         }
       ];
+
+      if (!localStorage.getItem(TUGAS_RESET_KEY)) {
+        try {
+          localStorage.removeItem("bisa_tugas_data");
+          localStorage.removeItem(TUGAS_STORAGE_KEY);
+          localStorage.setItem(TUGAS_RESET_KEY, "true");
+        } catch (e) { }
+      }
+
+      function loadTugasData() {
+        try {
+          const saved = localStorage.getItem(TUGAS_STORAGE_KEY);
+          if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error("Error loading tugas data:", e);
+        }
+        try {
+          localStorage.setItem(TUGAS_STORAGE_KEY, JSON.stringify(DEFAULT_TUGAS));
+        } catch (e) { }
+        return JSON.parse(JSON.stringify(DEFAULT_TUGAS));
+      }
+
+      function saveTugasData() {
+        try {
+          localStorage.setItem(TUGAS_STORAGE_KEY, JSON.stringify(tugasData));
+        } catch (e) {
+          console.error("Error saving tugas data:", e);
+        }
+      }
+
+      let tugasData = loadTugasData();
+
+      /* ── Dynamic Milestone Dropdown Population from Milestone Feature ── */
+      function populateMilestoneOptions(selectedValue = "") {
+        const inputMilestone = document.getElementById("inputMilestone");
+        if (!inputMilestone) return;
+
+        let milestoneList = [];
+        try {
+          const savedMilestones = localStorage.getItem("bisa_milestone_data_v1");
+          if (savedMilestones) {
+            const parsed = JSON.parse(savedMilestones);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              milestoneList = parsed;
+            }
+          }
+        } catch (e) {
+          console.error("Error reading Milestone list for Tugas dropdown:", e);
+        }
+
+        if (milestoneList.length === 0) {
+          milestoneList = [
+            { id: 1, title: "Kurasi & Screening 100 Database Kreator Hijab", week: "Minggu ke 1" },
+            { id: 2, title: "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate", week: "Minggu ke 2" },
+            { id: 3, title: "Distribusi Sample Produk & Briefing Live Streaming", week: "Minggu ke 3" }
+          ];
+        }
+
+        inputMilestone.innerHTML = '<option value="" disabled selected hidden>Pilih Milestone Terkait</option>';
+        milestoneList.forEach((m) => {
+          const opt = document.createElement("option");
+          const mTitle = m.title || `Milestone #${m.id}`;
+          opt.value = mTitle;
+          opt.textContent = m.week ? `[${m.week}] ${mTitle}` : mTitle;
+          if (selectedValue && (selectedValue === opt.value || selectedValue === mTitle)) {
+            opt.selected = true;
+          }
+          inputMilestone.appendChild(opt);
+        });
+      }
+
+      function updateTugasCounts() {
+        const countHariIni = document.getElementById("countTugasHariIni");
+        const countTotal = document.getElementById("countTotalTugas");
+        const countSelesai = document.getElementById("countTugasSelesai");
+
+        const total = tugasData.length;
+        const selesai = tugasData.filter(t => (t.progress === 100 || t.status === "Selesai")).length;
+        const hariIni = total;
+
+        if (countHariIni) countHariIni.textContent = hariIni;
+        if (countTotal) countTotal.textContent = total;
+        if (countSelesai) countSelesai.textContent = selesai;
+      }
 
       const cardGrid = document.getElementById("tugasCardGrid");
       const mainPanel = document.getElementById("mainTugasPanel");
@@ -1320,10 +1426,22 @@
       const btnTambah = document.getElementById("btnTambahTugas");
       const btnClose = document.getElementById("closeTugasModal");
 
-      function renderCards() {
+      function renderCards(query = "") {
         if (!cardGrid) return;
         cardGrid.innerHTML = "";
-        tugasData.forEach(item => {
+
+        let list = tugasData;
+        if (query && query.trim()) {
+          const q = query.trim().toLowerCase();
+          list = tugasData.filter(item =>
+            (item.title && item.title.toLowerCase().includes(q)) ||
+            (item.milestone && item.milestone.toLowerCase().includes(q)) ||
+            (item.pic && item.pic.toLowerCase().includes(q)) ||
+            (item.deskripsi && item.deskripsi.toLowerCase().includes(q))
+          );
+        }
+
+        list.forEach(item => {
           const card = document.createElement("div");
           card.className = "milestone-card";
           card.style.cursor = "pointer";
@@ -1410,6 +1528,7 @@
                   const normalizedVal = newVal || "-";
                   if (oldVal !== normalizedVal) {
                     task.revisi = normalizedVal;
+                    saveTugasData();
                     if (window.ceoToast) {
                       window.ceoToast("Revisi berhasil disimpan", "success");
                     }
@@ -1445,6 +1564,8 @@
 
           cardGrid.appendChild(card);
         });
+
+        updateTugasCounts();
       }
 
       if (btnBack) {
@@ -1467,6 +1588,7 @@
       // Modal Toggles
       if (btnTambah && tugasModal) {
         btnTambah.addEventListener("click", () => {
+          populateMilestoneOptions();
           tugasModal.classList.add("is-active");
         });
       }
@@ -1512,16 +1634,25 @@
 
           // Create new tugas item
           const newId = tugasData.length > 0 ? Math.max(...tugasData.map(d => d.id)) + 1 : 1;
+          const picVal = tim ? tim.split(",")[0].trim() : "Riva";
           tugasData.push({
             id: newId,
             title: title,
             milestone: milestone,
             progress: 0,
-            pic: "Setiawan", // defaults
+            pic: picVal,
+            tim: tim || "Supervisi KOL",
             deadline: formattedDeadline,
             prioritas: prioritas,
-            deskripsi: tugas
+            deskripsi: tugas,
+            subtasks: [
+              { id: 1, name: `Perencanaan & drafting ${title}`, status: "Belum Mulai", bukti: "-", revisi: "-" },
+              { id: 2, name: `Eksekusi rincian tugas`, status: "Belum Mulai", bukti: "-", revisi: "-" },
+              { id: 3, name: `Finalisasi & pelaporan`, status: "Belum Mulai", bukti: "-", revisi: "-" }
+            ]
           });
+
+          saveTugasData();
 
           // Show Toast
           const toast = document.getElementById("toast");
@@ -1536,7 +1667,16 @@
         });
       }
 
+      populateMilestoneOptions();
       renderCards();
+
+      // Search bar event
+      const searchInput = document.querySelector(".campaign-search input");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          renderCards(e.target.value);
+        });
+      }
 
       // Floating Chat Trigger and Logic
       let activeChatId = "general";

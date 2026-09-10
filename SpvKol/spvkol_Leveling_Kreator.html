@@ -244,14 +244,14 @@
             <span>Target & Capaian Kerja</span>
           </a>
 
-          <a class="nav-item " href="spvkol_rencana_karier.html">
+          <a class="nav-item " href="spvkol_upgrade_skill.html">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="8.5" cy="7" r="4"></circle>
               <line x1="18" y1="8" x2="23" y2="8"></line>
               <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
             </svg>
-            <span>Rencana Karier</span>
+            <span>Upgrade Skill</span>
           </a>
         </div>
       </section>
@@ -454,7 +454,7 @@
 
         <div class="form-group" style="grid-column: span 6;">
           <label class="form-label" style="font-weight: 600;">Range GMV (Rp)</label>
-          <input type="text" id="levelingGmvInput" class="form-input" placeholder="Tambah Range GMV (misal: Rp 10.000.000)" required />
+          <input type="text" id="levelingGmvInput" class="form-input" placeholder="Tambah Range GMV (misal: Rp. 210.000.000)" required />
         </div>
 
         <!-- Footer with standard full-width dashed line and blue outline button -->
@@ -534,18 +534,33 @@
 
       let pendingDeleteId = null;
 
-      /* â”€â”€ Storage â”€â”€ */
-      const LEVELING_STORAGE_KEY = "bisa_leveling_kreator_list_v2";
-      let levelingDb = [];
+      /* ── Storage ── */
+      const LEVELING_STORAGE_KEY = "bisa_leveling_kreator_list_v5";
+      const DEFAULT_LEVELING = [
+        { id: 1, nama: "Top Kreator", gmv: "Rp. 210.000.000" },
+        { id: 2, nama: "Semi Top Creator", gmv: "Rp. 50.000.000" },
+        { id: 3, nama: "New Growth", gmv: "Rp. 5.000.000" },
+        { id: 4, nama: "Incubate", gmv: "Rp. 0" }
+      ];
+      let levelingDb = DEFAULT_LEVELING;
 
       try {
+        ["bisa_leveling_kreator_list", "bisa_leveling_kreator_list_v2", "bisa_leveling_kreator_list_v3", "bisa_leveling_kreator_list_v4"].forEach(k => {
+          try { localStorage.removeItem(k); } catch (err) {}
+        });
         const saved = localStorage.getItem(LEVELING_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) levelingDb = parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            levelingDb = parsed;
+          } else if (Array.isArray(parsed) && parsed.length === 0) {
+            levelingDb = [];
+          }
+        } else {
+          localStorage.setItem(LEVELING_STORAGE_KEY, JSON.stringify(DEFAULT_LEVELING));
         }
       } catch (e) {
-        levelingDb = [];
+        levelingDb = DEFAULT_LEVELING;
       }
 
       function saveLevelingDb() {

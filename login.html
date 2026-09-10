@@ -9,16 +9,12 @@
 </head>
 <body class="login-body">
   <main class="login-page">
-    <img class="login-page-watermark" src="media/logo.png" alt="" aria-hidden="true" />
-
-    <section class="login-card" aria-label="Login PT. Bisa Media Grup">
+    <section id="loginCard" class="login-card" aria-label="Login PT. Bisa Media Grup">
       <div class="login-card__brand">
         <div class="brand-header">
           <img class="brand-logo brand-logo--login" src="media/logo.png" alt="Logo PT. Bisa Media Grup" />
           <span class="brand-name brand-name--light">PT. Bisa Media Grup</span>
         </div>
-
-        <img class="brand-panel-watermark" src="media/logo.png" alt="" aria-hidden="true" />
 
         <div class="welcome">
           <h1>Selamat<br />Datang.</h1>
@@ -31,8 +27,36 @@
       </div>
 
       <div class="login-card__form">
+        <div class="demo-trigger-wrapper">
+          <button
+            type="button"
+            id="demoInfoBtn"
+            class="demo-info-trigger"
+            aria-label="Informasi Akun Demo"
+            title="Lihat Akun Demo"
+          >
+            <span class="demo-icon">!</span>
+          </button>
+
+          <!-- Popup Akun Demo -->
+          <div id="demoPopup" class="demo-popup" style="display: none;" role="dialog" aria-label="Akun Demo">
+            <div class="demo-popup-header">
+              <strong>Akun demo:</strong>
+              <button type="button" id="closeDemoPopup" class="demo-popup-close" aria-label="Tutup popup">&times;</button>
+            </div>
+            <div class="demo-popup-body">
+              Username: <strong>admin</strong> / <strong>admin@bisamedia.id</strong><br />
+              Password: <strong>123456</strong>
+            </div>
+          </div>
+        </div>
+
         <form id="loginForm" class="login-form" novalidate>
           <h2>Login</h2>
+
+          <div id="loginAlert" class="login-alert" role="alert">
+            Masukan Email Username dan Password yang Benar
+          </div>
 
           <div class="form-field">
             <label for="username">Email / Username</label>
@@ -76,8 +100,6 @@
                 </svg>
               </button>
             </div>
-
-            <small>Minimal 8 karakter, termasuk huruf, angka, dan simbol.</small>
           </div>
 
           <label class="remember-option">
@@ -85,11 +107,132 @@
             <span>Ingat Saya</span>
           </label>
 
-          <p id="loginMessage" class="form-message" aria-live="polite"></p>
-
           <button class="primary-button" type="submit">Login</button>
         </form>
       </div>
+    </section>
+
+    <!-- Card Lupa Password -->
+    <section id="forgotCard" class="forgot-card" aria-label="Lupa Password" style="display: none;">
+      <form id="forgotForm" class="forgot-form" novalidate>
+        <h2 class="forgot-title">Verifikasi Email</h2>
+
+        <div class="form-field">
+          <label for="forgotEmail">Email</label>
+          <input
+            id="forgotEmail"
+            name="email"
+            type="email"
+            placeholder="Masukan Email"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <button class="primary-button btn-kirim" type="submit">Kirim</button>
+
+        <div class="forgot-back-row">
+          <button id="backToLogin" class="link-button" type="button">
+            Kembali ke Login
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Card Verifikasi OTP -->
+    <section id="otpCard" class="forgot-card otp-card" aria-label="Verifikasi OTP" style="display: none;">
+      <form id="otpForm" class="otp-form" novalidate>
+        <h2 class="otp-title">Verifikasi OTP</h2>
+        <p class="otp-desc">
+          Masukan 6 digit kode OTP yang dikirimkan ke email<br />
+          <a href="javascript:void(0);" id="otpTargetEmail" class="otp-email"></a>
+        </p>
+
+        <div class="otp-inputs">
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit" autocomplete="off" />
+          <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit" autocomplete="off" />
+        </div>
+
+        <button class="primary-button btn-kirim" type="submit">Verifikasi</button>
+
+        <div class="forgot-back-row">
+          <button id="backToForgot" class="link-button" type="button">
+            Ubah Email
+          </button>
+          <span style="color: #cbd5e1; margin: 0 8px;">•</span>
+          <button id="backToLoginFromOtp" class="link-button" type="button">
+            Kembali ke Login
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Card Reset Password / Verifikasi Password -->
+    <section id="resetPassCard" class="forgot-card reset-pass-card" aria-label="Verifikasi Password" style="display: none;">
+      <form id="resetPassForm" class="forgot-form reset-pass-form" novalidate>
+        <h2 class="reset-pass-title">Verifikasi Password</h2>
+
+        <div class="form-field">
+          <label for="newPassword">Password</label>
+          <div class="password-input">
+            <input
+              id="newPassword"
+              name="newPassword"
+              type="password"
+              placeholder="Password"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              id="toggleNewPassword"
+              class="password-toggle"
+              type="button"
+              aria-label="Tampilkan password"
+            >
+              <svg class="icon icon--muted" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.6 10.6a2 2 0 002.8 2.8"></path>
+                <path d="M9.9 4.25A10.5 10.5 0 0112 4c5.1 0 8.7 4.8 9 5.3.3.45.3.95 0 1.4a17.7 17.7 0 01-3.15 3.55"></path>
+                <path d="M6.55 6.55C4.45 8.05 3.2 9.95 3 10.3c-.3.45-.3.95 0 1.4C3.4 12.3 7 17 12 17a9.9 9.9 0 004.25-.95"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-field form-field--reset">
+          <label for="confirmPassword">Verifikasi Password</label>
+          <div class="password-input">
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              placeholder="Verifikasi Password"
+              autocomplete="new-password"
+              required
+            />
+            <button
+              id="toggleConfirmPassword"
+              class="password-toggle"
+              type="button"
+              aria-label="Tampilkan password"
+            >
+              <svg class="icon icon--muted" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.6 10.6a2 2 0 002.8 2.8"></path>
+                <path d="M9.9 4.25A10.5 10.5 0 0112 4c5.1 0 8.7 4.8 9 5.3.3.45.3.95 0 1.4a17.7 17.7 0 01-3.15 3.55"></path>
+                <path d="M6.55 6.55C4.45 8.05 3.2 9.95 3 10.3c-.3.45-.3.95 0 1.4C3.4 12.3 7 17 12 17a9.9 9.9 0 004.25-.95"></path>
+              </svg>
+            </button>
+          </div>
+          <span class="reset-hint">Minimal 8 karakter, termasuk huruf, angka, dan simbol.</span>
+        </div>
+
+        <button class="primary-button btn-kirim" type="submit">Verifikasi Password</button>
+      </form>
     </section>
   </main>
 

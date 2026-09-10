@@ -762,7 +762,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Total Milestone</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value" id="countTotalMilestone">3</strong>
           </div>
           <div class="metric-icon-box" style="background-color: rgba(34, 100, 198, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #2264c6;">
@@ -774,7 +774,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Minggu Ini</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value" id="countMingguIniMilestone">1</strong>
           </div>
           <div class="metric-icon-box" style="background-color: rgba(156, 39, 176, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #9c27b0;">
@@ -788,7 +788,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Selesai</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value" id="countSelesaiMilestone">2</strong>
           </div>
           <div class="metric-icon-box" style="background-color: rgba(76, 175, 80, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #4caf50;">
@@ -799,7 +799,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Terlambat</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value" id="countTerlambatMilestone">0</strong>
           </div>
           <div class="metric-icon-box" style="background-color: rgba(244, 67, 54, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #f44336;">
@@ -1130,41 +1130,136 @@
         timCheckboxes.forEach(cb => cb.checked = false);
         updateTimDropdownLabel();
       };
-      let milestoneData = [
+      /* ── LocalStorage Persistence & Default Milestones ── */
+      const MILESTONE_STORAGE_KEY = "bisa_milestone_data_v1";
+      const MILESTONE_RESET_KEY = "bisa_milestone_reset_v2";
+
+      const DEFAULT_MILESTONES = [
         {
           id: 1,
-          title: "Kerja Sama dengan Influencer",
+          title: "Kurasi & Screening 100 Database Kreator Hijab",
           week: "Minggu ke 1",
           progress: 100,
           status: "Selesai",
-          rrk: "Program A",
-          output: "10 Influencer sepakat bekerja sama",
+          rrk: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+          output: "100 kreator fashion muslim terkurasi dengan engagement rate > 4.5%",
           pic: "Riva",
-          tim: "Tim Kreatif"
+          tim: "Supervisi KOL, Riva"
         },
         {
           id: 2,
-          title: "Produksi Konten Sosial Media",
-          week: "Minggu ke 1",
+          title: "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
+          week: "Minggu ke 2",
           progress: 100,
           status: "Selesai",
-          rrk: "Program B",
-          output: "5 video Reels & TikTok diproduksi",
-          pic: "Sri",
-          tim: "Tim Kreatif"
+          rrk: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+          output: "50 kreator menandatangani MoU kerjasama affiliate",
+          pic: "Riva",
+          tim: "Riva, Sri"
         },
         {
           id: 3,
-          title: "Evaluasi Performa",
-          week: "Minggu ke 1",
-          progress: 100,
-          status: "Selesai",
-          rrk: "Program C",
-          output: "Laporan performa mingguan",
-          pic: "Riva",
-          tim: "Tim Marketing"
+          title: "Distribusi Sample Produk & Briefing Live Streaming",
+          week: "Minggu ke 3",
+          progress: 40,
+          status: "Berjalan",
+          rrk: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+          output: "Sample hijab terkirim dan jadwal live TikTok Shop tersusun",
+          pic: "Sri",
+          tim: "Sri, Ahmad"
         }
       ];
+
+      if (!localStorage.getItem(MILESTONE_RESET_KEY)) {
+        try {
+          localStorage.removeItem("bisa_milestone_data");
+          localStorage.removeItem(MILESTONE_STORAGE_KEY);
+          localStorage.setItem(MILESTONE_RESET_KEY, "true");
+        } catch (e) { }
+      }
+
+      function loadMilestoneData() {
+        try {
+          const saved = localStorage.getItem(MILESTONE_STORAGE_KEY);
+          if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error("Error loading milestone data:", e);
+        }
+        try {
+          localStorage.setItem(MILESTONE_STORAGE_KEY, JSON.stringify(DEFAULT_MILESTONES));
+        } catch (e) { }
+        return JSON.parse(JSON.stringify(DEFAULT_MILESTONES));
+      }
+
+      function saveMilestoneData() {
+        try {
+          localStorage.setItem(MILESTONE_STORAGE_KEY, JSON.stringify(milestoneData));
+        } catch (e) {
+          console.error("Error saving milestone data:", e);
+        }
+      }
+
+      let milestoneData = loadMilestoneData();
+
+      /* ── Dynamic RRK Dropdown Population from RRK Feature ── */
+      function populateRrkOptions(selectedValue = "") {
+        const inputRrk = document.getElementById("inputRrk");
+        if (!inputRrk) return;
+
+        let rrkList = [];
+        try {
+          const savedRrk = localStorage.getItem("bisa_rrk_data_v2");
+          if (savedRrk) {
+            const parsed = JSON.parse(savedRrk);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              rrkList = parsed;
+            }
+          }
+        } catch (e) {
+          console.error("Error reading RRK list for Milestone dropdown:", e);
+        }
+
+        if (rrkList.length === 0) {
+          rrkList = [
+            { id: 1, rencana: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab", program: "Program KOL Affiliate" }
+          ];
+        }
+
+        inputRrk.innerHTML = '<option value="" disabled selected hidden>Pilih RRK Terkait</option>';
+        rrkList.forEach(item => {
+          const opt = document.createElement("option");
+          const val = item.rencana || item.program || `RRK #${item.id}`;
+          opt.value = val;
+          opt.textContent = item.program ? `${val} (${item.program})` : val;
+          if (selectedValue && val === selectedValue) {
+            opt.selected = true;
+          }
+          inputRrk.appendChild(opt);
+        });
+      }
+
+      // Initial populate
+      populateRrkOptions();
+
+      function updateMilestoneCounts() {
+        const total = milestoneData.length;
+        const selesai = milestoneData.filter(m => m.status === "Selesai").length;
+        const berjalan = milestoneData.filter(m => m.status === "Berjalan").length;
+        const terlambat = milestoneData.filter(m => m.status === "Terlambat").length;
+
+        const countTotal = document.getElementById("countTotalMilestone");
+        const countMingguIni = document.getElementById("countMingguIniMilestone");
+        const countSelesai = document.getElementById("countSelesaiMilestone");
+        const countTerlambat = document.getElementById("countTerlambatMilestone");
+
+        if (countTotal) countTotal.textContent = total;
+        if (countMingguIni) countMingguIni.textContent = berjalan;
+        if (countSelesai) countSelesai.textContent = selesai;
+        if (countTerlambat) countTerlambat.textContent = terlambat;
+      }
 
       const cardGrid = document.getElementById("milestoneCardGrid");
       const mainPanel = document.getElementById("mainMilestonePanel");
@@ -1252,12 +1347,135 @@
             if (tabOutput) {
               tabOutput.innerHTML = item.output ? `<p style="margin: 0; color: #444; white-space: pre-line;">${item.output}</p>` : `<p style="margin: 0; color: #888;">Belum ada output.</p>`;
             }
+            // Load tasks dynamically from Tugas module (localStorage)
+            let allTasks = [];
+            try {
+              const savedTasks = localStorage.getItem("bisa_tugas_data_v1");
+              if (savedTasks) {
+                allTasks = JSON.parse(savedTasks);
+              }
+            } catch (e) {
+              console.error("Error reading tasks for Milestone:", e);
+            }
+
+            if (!Array.isArray(allTasks) || allTasks.length === 0) {
+              allTasks = [
+                {
+                  id: 1,
+                  title: "Screening Database 100 KOL Hijab",
+                  milestone: "Kurasi & Screening 100 Database Kreator Hijab",
+                  progress: 100,
+                  pic: "Riva",
+                  tim: "Supervisi KOL, Riva",
+                  deadline: "12-12-2026",
+                  prioritas: "Tinggi",
+                  deskripsi: "Screening metrik engagement rate > 4.5% dan relevansi audiens fashion hijab"
+                },
+                {
+                  id: 2,
+                  title: "Pengiriman MoU & Brief Kerjasama",
+                  milestone: "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
+                  progress: 100,
+                  pic: "Sri",
+                  tim: "Riva, Sri",
+                  deadline: "19-12-2026",
+                  prioritas: "Tinggi",
+                  deskripsi: "Kirim draft kontrak MoU dan brief komisi affiliate ke 50 kreator terpilih"
+                },
+                {
+                  id: 3,
+                  title: "Pengemasan & Pengiriman Sample Hijab",
+                  milestone: "Distribusi Sample Produk & Briefing Live Streaming",
+                  progress: 40,
+                  pic: "Ahmad",
+                  tim: "Sri, Ahmad",
+                  deadline: "26-12-2026",
+                  prioritas: "Sedang",
+                  deskripsi: "Packing sample produk hijab premium dan briefing jadwal live streaming affiliate"
+                }
+              ];
+              try {
+                localStorage.setItem("bisa_tugas_data_v1", JSON.stringify(allTasks));
+              } catch (e) { }
+            }
+
+            const mTitleLower = (item.title || "").trim().toLowerCase();
+            const matchingTasks = allTasks.filter(t => {
+              if (!t || !t.milestone) return false;
+              const tMilestoneLower = String(t.milestone).trim().toLowerCase();
+              return (
+                tMilestoneLower === mTitleLower ||
+                (mTitleLower && (tMilestoneLower.includes(mTitleLower) || mTitleLower.includes(tMilestoneLower)))
+              );
+            });
+
+            // Update Tab Tugas Button label with task count
+            const tabTugasBtn = Array.from(document.querySelectorAll(".detail-tab")).find(t => t.getAttribute("data-tab") === "tugas");
+            if (tabTugasBtn) {
+              tabTugasBtn.textContent = matchingTasks.length > 0 ? `Tugas (${matchingTasks.length})` : "Tugas";
+            }
+
             if (tabTugasList) {
-              tabTugasList.innerHTML = `
-                <li>Menyusun rancangan milestone ${item.title}</li>
-                <li>Koordinasi PIC ${item.pic || "terkait"} dengan penanggung jawab program ${item.rrk || "terkait"}</li>
-                <li>Penyelesaian output target: ${item.output || "-"}</li>
-              `;
+              if (matchingTasks.length > 0) {
+                tabTugasList.style.listStyle = "none";
+                tabTugasList.style.padding = "0";
+                tabTugasList.innerHTML = `
+                  <div style="display: flex; flex-direction: column; gap: 12px;">
+                    ${matchingTasks.map((task, idx) => {
+                      let pColor = "#2264c6";
+                      let pBg = "rgba(34, 100, 198, 0.1)";
+                      let pBorder = "rgba(34, 100, 198, 0.3)";
+                      if (task.prioritas === "Tinggi") {
+                        pColor = "#ff5252";
+                        pBg = "rgba(255, 82, 82, 0.1)";
+                        pBorder = "rgba(255, 82, 82, 0.3)";
+                      } else if (task.prioritas === "Sedang") {
+                        pColor = "#ffb300";
+                        pBg = "rgba(255, 179, 0, 0.1)";
+                        pBorder = "rgba(255, 179, 0, 0.3)";
+                      } else if (task.prioritas === "Rendah") {
+                        pColor = "#4caf50";
+                        pBg = "rgba(76, 175, 80, 0.1)";
+                        pBorder = "rgba(76, 175, 80, 0.3)";
+                      }
+
+                      return `
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; transition: box-shadow 0.2s ease;">
+                          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                              <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: #e2e8f0; border-radius: 50%; font-size: 11px; font-weight: 700; color: #475569;">${idx + 1}</span>
+                              <h4 style="margin: 0; font-size: 14px; font-weight: 700; color: #334155;">${task.title}</h4>
+                            </div>
+                            <span style="display: inline-block; padding: 3px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; background-color: ${pBg}; color: ${pColor}; border: 1px solid ${pBorder};">${task.prioritas || "Normal"}</span>
+                          </div>
+                          <p style="margin: 0 0 10px 30px; font-size: 12.5px; color: #64748b; line-height: 1.4;">${task.deskripsi || "-"}</p>
+                          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #555; padding-left: 30px; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                              <span><strong style="color: #475569;">Penugasan:</strong> ${task.pic || "-"}</span>
+                              <span><strong style="color: #475569;">Deadline:</strong> ${task.deadline || "-"}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; min-width: 140px;">
+                              <div style="flex: 1; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                                <div style="height: 100%; width: ${task.progress || 0}%; background: #2264c6; border-radius: 3px;"></div>
+                              </div>
+                              <span style="font-weight: 700; font-size: 11.5px; color: #334155;">${task.progress || 0}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      `;
+                    }).join("")}
+                  </div>
+                `;
+              } else {
+                tabTugasList.style.listStyle = "none";
+                tabTugasList.style.padding = "0";
+                tabTugasList.innerHTML = `
+                  <div style="text-align: center; padding: 28px 16px; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; color: #64748b;">
+                    <p style="margin: 0 0 4px; font-weight: 600; font-size: 13.5px; color: #334155;">Belum ada tugas untuk milestone ini</p>
+                    <span style="font-size: 12px; color: #64748b;">Buka menu <strong>Tugas</strong> lalu klik <strong>+ Tambah</strong> dan pilih Milestone <em>"${item.title}"</em>.</span>
+                  </div>
+                `;
+              }
             }
             if (tabDoc) {
               tabDoc.innerHTML = item.dokumen ? `<p style="margin: 0; color: #444;">${item.dokumen}</p>` : `<p style="margin: 0; color: #888;">Belum ada dokumen yang diunggah.</p>`;
@@ -1302,6 +1520,8 @@
 
           cardGrid.appendChild(card);
         });
+
+        updateMilestoneCounts();
       }
 
       if (btnBack) {
@@ -1324,6 +1544,7 @@
       // Modal Toggles
       if (btnTambah && milestoneModal) {
         btnTambah.addEventListener("click", () => {
+          populateRrkOptions();
           milestoneModal.classList.add("is-active");
         });
       }
@@ -1379,6 +1600,8 @@
             dokumen: fileVal,
             catatan: catatan
           });
+
+          saveMilestoneData();
 
           // Show Toast
           const toast = document.getElementById("toast");

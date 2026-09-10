@@ -1258,7 +1258,7 @@
       }
       html += '</div>';
       cell.innerHTML = html;
-      
+
       cell.querySelectorAll('.btn-view').forEach(btn => {
         btn.addEventListener('mouseenter', () => btn.style.backgroundColor = 'rgba(41, 163, 216, 0.08)');
         btn.addEventListener('mouseleave', () => btn.style.backgroundColor = 'transparent');
@@ -9593,8 +9593,8 @@
     const titleHtml = mode === 'add'
       ? `Tambah <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`
       : mode === 'edit'
-      ? `Edit <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`
-      : `Lihat <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`;
+        ? `Edit <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`
+        : `Lihat <strong style="font-weight: 700;">${escapeHtml(config.title)}</strong>`;
 
     const titleEl = $('.modal-title', modal);
     if (titleEl) titleEl.innerHTML = titleHtml;
@@ -16480,6 +16480,7 @@
       toast.classList.remove("show");
     }, 2000);
   }
+  window.showToast = showToast;
 
   /* ------------------------- Login ------------------------- */
 
@@ -16489,7 +16490,7 @@
     const username = document.getElementById("username");
     const password = document.getElementById("password");
     const rememberMe = document.getElementById("rememberMe");
-    const loginMessage = document.getElementById("loginMessage");
+    const loginAlert = document.getElementById("loginAlert");
     const togglePassword = document.getElementById("togglePassword");
     const forgotPassword = document.getElementById("forgotPassword");
 
@@ -16500,39 +16501,434 @@
       rememberMe.checked = true;
     }
 
-    togglePassword.addEventListener("click", () => {
-      const isVisible = password.type === "text";
+    try {
+      const flashMsg = sessionStorage.getItem("loginToastMsg");
+      if (flashMsg) {
+        sessionStorage.removeItem("loginToastMsg");
+        setTimeout(() => {
+          showToast(flashMsg);
+        }, 250);
+      }
+    } catch (e) {}
 
-      password.type = isVisible ? "password" : "text";
-      togglePassword.setAttribute(
-        "aria-label",
-        isVisible ? "Tampilkan password" : "Sembunyikan password"
-      );
+    const eyeSlashSvg = `<svg class="icon icon--muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 002.8 2.8"></path><path d="M9.9 4.25A10.5 10.5 0 0112 4c5.1 0 8.7 4.8 9 5.3.3.45.3.95 0 1.4a17.7 17.7 0 01-3.15 3.55"></path><path d="M6.55 6.55C4.45 8.05 3.2 9.95 3 10.3c-.3.45-.3.95 0 1.4C3.4 12.3 7 17 12 17a9.9 9.9 0 004.25-.95"></path></svg>`;
+    const eyeOpenSvg = `<svg class="icon icon--muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+
+    function setupPasswordToggle(btn, inputField) {
+      if (!btn || !inputField) return;
+      btn.addEventListener("click", () => {
+        const isVisible = inputField.type === "text";
+        inputField.type = isVisible ? "password" : "text";
+        btn.setAttribute(
+          "aria-label",
+          isVisible ? "Tampilkan password" : "Sembunyikan password"
+        );
+        btn.innerHTML = isVisible ? eyeSlashSvg : eyeOpenSvg;
+      });
+    }
+
+    setupPasswordToggle(togglePassword, password);
+
+    const loginCard = document.getElementById("loginCard") || document.querySelector(".login-card");
+    const forgotCard = document.getElementById("forgotCard");
+    const forgotForm = document.getElementById("forgotForm");
+    const forgotEmail = document.getElementById("forgotEmail");
+    const backToLogin = document.getElementById("backToLogin");
+
+    const otpCard = document.getElementById("otpCard");
+    const otpForm = document.getElementById("otpForm");
+    const otpTargetEmail = document.getElementById("otpTargetEmail");
+    const otpDigits = Array.from(document.querySelectorAll(".otp-digit"));
+    const backToForgot = document.getElementById("backToForgot");
+    const backToLoginFromOtp = document.getElementById("backToLoginFromOtp");
+
+    const resetPassCard = document.getElementById("resetPassCard");
+    const resetPassForm = document.getElementById("resetPassForm");
+    const newPassword = document.getElementById("newPassword");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const toggleNewPassword = document.getElementById("toggleNewPassword");
+    const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+    setupPasswordToggle(toggleNewPassword, newPassword);
+    setupPasswordToggle(toggleConfirmPassword, confirmPassword);
+
+    // Demo Account Popup Logic
+    const demoInfoBtn = document.getElementById("demoInfoBtn");
+    const demoPopup = document.getElementById("demoPopup");
+    const closeDemoPopup = document.getElementById("closeDemoPopup");
+
+    if (demoInfoBtn && demoPopup) {
+      demoInfoBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isHidden = demoPopup.style.display === "none";
+        demoPopup.style.display = isHidden ? "block" : "none";
+      });
+
+      if (closeDemoPopup) {
+        closeDemoPopup.addEventListener("click", (e) => {
+          e.stopPropagation();
+          demoPopup.style.display = "none";
+        });
+      }
+
+      demoPopup.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+
+      document.addEventListener("click", () => {
+        if (demoPopup.style.display !== "none") {
+          demoPopup.style.display = "none";
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && demoPopup.style.display !== "none") {
+          demoPopup.style.display = "none";
+        }
+      });
+
+      const demoBody = demoPopup.querySelector(".demo-popup-body");
+      if (demoBody && username && password) {
+        demoBody.title = "Klik untuk mengisi otomatis";
+        demoBody.addEventListener("click", () => {
+          username.value = "admin";
+          password.value = "123456";
+          username.classList.remove("is-invalid");
+          password.classList.remove("is-invalid");
+          loginAlert?.classList.remove("is-show");
+          demoPopup.style.display = "none";
+          showToast("Akun demo terisi otomatis!");
+        });
+      }
+    }
+
+    if (forgotPassword && forgotCard && loginCard) {
+      forgotPassword.addEventListener("click", () => {
+        loginCard.style.display = "none";
+        if (otpCard) otpCard.style.display = "none";
+        if (resetPassCard) resetPassCard.style.display = "none";
+        forgotCard.style.display = "block";
+        if (forgotEmail) {
+          forgotEmail.value = "";
+          forgotEmail.classList.remove("is-invalid");
+          forgotEmail.focus();
+        }
+      });
+    }
+
+    if (backToLogin && forgotCard && loginCard) {
+      backToLogin.addEventListener("click", () => {
+        forgotCard.style.display = "none";
+        if (otpCard) otpCard.style.display = "none";
+        if (resetPassCard) resetPassCard.style.display = "none";
+        loginCard.style.display = "grid";
+      });
+    }
+
+    const forgotTitle = forgotForm?.querySelector("h2");
+    if (forgotTitle && forgotCard && loginCard) {
+      forgotTitle.style.cursor = "pointer";
+      forgotTitle.title = "Kembali ke Login";
+      forgotTitle.addEventListener("click", () => {
+        forgotCard.style.display = "none";
+        if (resetPassCard) resetPassCard.style.display = "none";
+        loginCard.style.display = "grid";
+      });
+    }
+
+    // Submit Email in Forgot Password Card
+    if (forgotForm) {
+      forgotForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const emailVal = forgotEmail ? forgotEmail.value.trim() : "";
+
+        // Validasi: harus menggunakan format @ (contoh: user@gmail.com)
+        if (!emailVal || !emailVal.includes("@") || emailVal.indexOf("@") === 0 || emailVal.indexOf("@") === emailVal.length - 1) {
+          if (forgotEmail) {
+            forgotEmail.classList.add("is-invalid");
+            forgotEmail.focus();
+          }
+          showToast("Email tidak valid! Harus menyertakan tanda '@' (contoh: user@gmail.com)");
+          return;
+        }
+
+        forgotEmail.classList.remove("is-invalid");
+
+        // Set dynamic email on OTP view
+        if (otpTargetEmail) {
+          otpTargetEmail.textContent = emailVal;
+        }
+
+        // Switch to OTP Card
+        forgotCard.style.display = "none";
+        if (resetPassCard) resetPassCard.style.display = "none";
+        if (otpCard) {
+          otpCard.style.display = "block";
+          otpDigits.forEach(d => {
+            d.value = "";
+            d.classList.remove("is-invalid");
+          });
+          if (otpDigits[0]) {
+            setTimeout(() => otpDigits[0].focus(), 50);
+          }
+        }
+      });
+
+      if (forgotEmail) {
+        forgotEmail.addEventListener("input", () => {
+          forgotEmail.classList.remove("is-invalid");
+        });
+      }
+    }
+
+    // OTP Card interactions
+    if (backToForgot && forgotCard && otpCard) {
+      backToForgot.addEventListener("click", () => {
+        otpCard.style.display = "none";
+        if (resetPassCard) resetPassCard.style.display = "none";
+        forgotCard.style.display = "block";
+        if (forgotEmail) forgotEmail.focus();
+      });
+    }
+
+    if (backToLoginFromOtp && loginCard && otpCard) {
+      backToLoginFromOtp.addEventListener("click", () => {
+        otpCard.style.display = "none";
+        if (resetPassCard) resetPassCard.style.display = "none";
+        loginCard.style.display = "grid";
+      });
+    }
+
+    const otpTitle = otpForm?.querySelector("h2");
+    if (otpTitle && loginCard && otpCard) {
+      otpTitle.style.cursor = "pointer";
+      otpTitle.title = "Kembali ke Login";
+      otpTitle.addEventListener("click", () => {
+        otpCard.style.display = "none";
+        if (resetPassCard) resetPassCard.style.display = "none";
+        loginCard.style.display = "grid";
+      });
+    }
+
+    // OTP input digits behavior
+    if (otpDigits.length > 0) {
+      otpDigits.forEach((digitInput, index) => {
+        digitInput.addEventListener("input", () => {
+          digitInput.value = digitInput.value.replace(/[^0-9]/g, "");
+          if (digitInput.value) {
+            digitInput.classList.remove("is-invalid");
+            if (index < otpDigits.length - 1) {
+              otpDigits[index + 1].focus();
+            }
+          }
+        });
+
+        digitInput.addEventListener("keydown", (e) => {
+          if (e.key === "Backspace") {
+            if (!digitInput.value && index > 0) {
+              otpDigits[index - 1].focus();
+            }
+          }
+        });
+
+        digitInput.addEventListener("paste", (e) => {
+          e.preventDefault();
+          const pasteData = (e.clipboardData || window.clipboardData).getData("text").replace(/[^0-9]/g, "").slice(0, otpDigits.length);
+          if (pasteData) {
+            pasteData.split("").forEach((char, i) => {
+              if (otpDigits[i]) {
+                otpDigits[i].value = char;
+                otpDigits[i].classList.remove("is-invalid");
+              }
+            });
+            const focusIndex = Math.min(pasteData.length, otpDigits.length - 1);
+            otpDigits[focusIndex].focus();
+          }
+        });
+      });
+    }
+
+    // Submit OTP -> Muncul Tampilan Card Reset Password / Login Baru
+    if (otpForm) {
+      otpForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const code = otpDigits.map(d => d.value).join("");
+
+        if (code.length < 6) {
+          otpDigits.forEach(d => {
+            if (!d.value) d.classList.add("is-invalid");
+          });
+          const firstEmpty = otpDigits.find(d => !d.value);
+          if (firstEmpty) firstEmpty.focus();
+
+          showToast("Silakan masukkan 6 digit kode OTP yang lengkap.");
+          return;
+        }
+
+        otpDigits.forEach(d => d.classList.remove("is-invalid"));
+
+        // Alihkan ke Card Reset Password
+        otpCard.style.display = "none";
+        if (resetPassCard) {
+          resetPassCard.style.display = "block";
+          if (newPassword) {
+            newPassword.value = "";
+            newPassword.type = "password";
+            newPassword.classList.remove("is-invalid");
+          }
+          if (toggleNewPassword) {
+            toggleNewPassword.innerHTML = eyeSlashSvg;
+          }
+          if (confirmPassword) {
+            confirmPassword.value = "";
+            confirmPassword.type = "password";
+            confirmPassword.classList.remove("is-invalid");
+          }
+          if (toggleConfirmPassword) {
+            toggleConfirmPassword.innerHTML = eyeSlashSvg;
+          }
+          setTimeout(() => {
+            if (newPassword) newPassword.focus();
+          }, 50);
+        }
+      });
+    }
+
+    // Reset Password Card interactions
+    const resetPassTitle = resetPassForm?.querySelector(".reset-pass-title");
+    if (resetPassTitle && loginCard && resetPassCard) {
+      resetPassTitle.style.cursor = "pointer";
+      resetPassTitle.title = "Kembali ke Login";
+      resetPassTitle.addEventListener("click", () => {
+        resetPassCard.style.display = "none";
+        loginCard.style.display = "grid";
+      });
+    }
+
+    if (newPassword) {
+      newPassword.addEventListener("input", () => {
+        newPassword.classList.remove("is-invalid");
+      });
+    }
+
+    if (confirmPassword) {
+      confirmPassword.addEventListener("input", () => {
+        confirmPassword.classList.remove("is-invalid");
+      });
+    }
+
+    if (resetPassForm) {
+      resetPassForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const p1 = newPassword ? newPassword.value : "";
+        const p2 = confirmPassword ? confirmPassword.value : "";
+
+        if (!p1) {
+          newPassword?.classList.add("is-invalid");
+          newPassword?.focus();
+          showToast("Silakan masukkan password baru.");
+          return;
+        }
+
+        if (p1.length < 8) {
+          newPassword?.classList.add("is-invalid");
+          newPassword?.focus();
+          showToast("Minimal 8 karakter, termasuk huruf, angka, dan simbol.");
+          return;
+        }
+
+        if (!p2) {
+          confirmPassword?.classList.add("is-invalid");
+          confirmPassword?.focus();
+          showToast("Silakan masukkan verifikasi password.");
+          return;
+        }
+
+        if (p1 !== p2) {
+          confirmPassword?.classList.add("is-invalid");
+          confirmPassword?.focus();
+          showToast("Password dan Verifikasi Password tidak sama!");
+          return;
+        }
+
+        newPassword?.classList.remove("is-invalid");
+        confirmPassword?.classList.remove("is-invalid");
+
+        // Simpan email agar langsung terisi saat kembali ke login
+        if (forgotEmail && forgotEmail.value) {
+          try {
+            localStorage.setItem("bisaMediaRememberedUser", forgotEmail.value.trim());
+          } catch (e) {}
+        }
+
+        try {
+          sessionStorage.setItem("loginToastMsg", "Password berhasil diperbarui! Silakan login dengan password baru.");
+        } catch (e) {}
+
+        showToast("Password berhasil diperbarui! Kembali ke halaman login...");
+
+        // Segera kembali ke halaman login.html (bukan ke dashboard)
+        setTimeout(() => {
+          const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+          window.location.href = isSub ? "../login.html" : "login.html";
+        }, 800);
+      });
+    }
+
+    function showLoginError() {
+      if (loginAlert) {
+        loginAlert.textContent = "Masukan Email Username dan Password yang Benar";
+        loginAlert.classList.add("is-show");
+      }
+      username.classList.add("is-invalid");
+      password.classList.add("is-invalid");
+    }
+
+    function clearLoginError() {
+      if (loginAlert) {
+        loginAlert.classList.remove("is-show");
+      }
+      username.classList.remove("is-invalid");
+      password.classList.remove("is-invalid");
+    }
+
+    username.addEventListener("input", () => {
+      username.classList.remove("is-invalid");
+      if (!username.classList.contains("is-invalid") && !password.classList.contains("is-invalid")) {
+        loginAlert?.classList.remove("is-show");
+      }
     });
 
-    forgotPassword.addEventListener("click", () => {
-      showToast("Fitur lupa password siap dihubungkan ke backend.");
+    password.addEventListener("input", () => {
+      password.classList.remove("is-invalid");
+      if (!username.classList.contains("is-invalid") && !password.classList.contains("is-invalid")) {
+        loginAlert?.classList.remove("is-show");
+      }
     });
 
     loginForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      if (!username.value.trim()) {
-        loginMessage.textContent = "Email / username wajib diisi.";
-        username.focus();
+      const userVal = username.value.trim();
+      const passVal = password.value.trim();
+
+      // Valid demo passwords
+      const validPasswords = ["123456", "admin", "password", "bisamedia", "bisa123"];
+
+      if (!userVal || !passVal || !validPasswords.includes(passVal)) {
+        showLoginError();
+        if (!userVal) {
+          username.focus();
+        } else {
+          password.focus();
+        }
         return;
       }
 
-      if (!password.value) {
-        loginMessage.textContent = "Password wajib diisi.";
-        password.focus();
-        return;
-      }
-
-      loginMessage.textContent = "";
+      clearLoginError();
 
       if (rememberMe.checked) {
-        localStorage.setItem("bisaMediaRememberedUser", username.value.trim());
+        localStorage.setItem("bisaMediaRememberedUser", userVal);
       } else {
         localStorage.removeItem("bisaMediaRememberedUser");
       }
@@ -16769,7 +17165,7 @@
       }
     }
     window.bindKreatorFotoUploadListener = bindFotoUploadListener;
-    window.setSelectedKreatorFoto = function(url) {
+    window.setSelectedKreatorFoto = function (url) {
       selectedFotoDataUrl = url || "";
     };
     bindFotoUploadListener();
@@ -16813,7 +17209,10 @@
       const emailInput = document.getElementById("kreatorEmailInput") || kreatorForm.querySelector("input[type='email']");
       const passVal = (kreatorPassword && kreatorPassword.value) ? kreatorPassword.value : "password123";
 
-      const statusVal = (statusSelect && statusSelect.value) ? (statusSelect.options[statusSelect.selectedIndex]?.text || statusSelect.value) : "Bind";
+      let statusVal = (statusSelect && statusSelect.value) ? (statusSelect.options[statusSelect.selectedIndex]?.text || statusSelect.value) : "Bind";
+      if (typeof window.calculateKreatorStatus === "function") {
+        statusVal = window.calculateKreatorStatus({ kontrakAkhir: kontrakAkhir, masaKontrak: masaKontrak }) || statusVal;
+      }
       const leadsVal = (leadsSelect && leadsSelect.value) ? (leadsSelect.options[leadsSelect.selectedIndex]?.text || leadsSelect.value) : "Member";
       const emailVal = emailInput && emailInput.value.trim() ? emailInput.value.trim() : (userVal.replace("@", "") + "@example.com");
 
@@ -16850,10 +17249,11 @@
           window.addKreatorItem(kreatorData);
         } else {
           try {
-            const list = JSON.parse(localStorage.getItem("bisa_kreator_list_v5") || "[]");
+            const storageKey = window.KREATOR_STORAGE_KEY || "bisa_kreator_list_v7";
+            const list = JSON.parse(localStorage.getItem(storageKey) || "[]");
             list.unshift(kreatorData);
-            localStorage.setItem("bisa_kreator_list_v5", JSON.stringify(list));
-          } catch (err) {}
+            localStorage.setItem(storageKey, JSON.stringify(list));
+          } catch (err) { }
         }
         showToast("Kreator berhasil ditambahkan");
       }
@@ -17054,7 +17454,7 @@
           const list = JSON.parse(localStorage.getItem("bisa_performa_kreator_list_v2") || "[]");
           list.unshift(newPerforma);
           localStorage.setItem("bisa_performa_kreator_list_v2", JSON.stringify(list));
-        } catch (err) {}
+        } catch (err) { }
       }
 
       // Submit logic/feedback
@@ -17232,7 +17632,7 @@
         filename = "campaign_data.csv";
         csvData = [
           ["Brand/Seller", "Kategori", "Kreator", "Jenis Campaign", "Tanggal"],
-          ["Brand A", "Fashion", "Kreator A", "Live", "11/08/2026"],
+          ["Bisa Hijab Official", "Fashion Muslim - Hijab", "Aura Cantika", "Live", "11/08/2026"],
           ["Brand B", "Beauty", "Kreator B", "Video", "10/08/2026"],
           ["Brand C", "Food", "Kreator C", "Live + Video", "09/08/2026"]
         ];
@@ -17281,14 +17681,14 @@
 })();
 
 // Global Custom Dropdown Checklist Select Logic
-window.toggleDropdownChecklist = function(trigger) {
+window.toggleDropdownChecklist = function (trigger) {
   const container = trigger.closest(".dropdown-select-checkbox");
-  
+
   // Close all other active dropdowns first
   document.querySelectorAll(".dropdown-select-checkbox").forEach(d => {
     if (d !== container) d.classList.remove("is-active");
   });
-  
+
   container.classList.toggle("is-active");
 };
 
@@ -17302,14 +17702,14 @@ document.addEventListener("click", (e) => {
 });
 
 // Global Custom Dropdown Tree Logic
-window.toggleDropdownTree = function(trigger) {
+window.toggleDropdownTree = function (trigger) {
   const container = trigger.closest(".dropdown-select-tree");
-  
+
   // Close all other active dropdown trees first
   document.querySelectorAll(".dropdown-select-tree").forEach(d => {
     if (d !== container) d.classList.remove("is-active");
   });
-  
+
   container.classList.toggle("is-active");
 };
 

@@ -564,14 +564,14 @@
             <span>Target & Capaian Kerja</span>
           </a>
 
-          <a class="nav-item " href="spvkol_rencana_karier.html">
+          <a class="nav-item " href="spvkol_upgrade_skill.html">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="8.5" cy="7" r="4"></circle>
               <line x1="18" y1="8" x2="23" y2="8"></line>
               <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
             </svg>
-            <span>Rencana Karier</span>
+            <span>Upgrade Skill</span>
           </a>
         </div>
       </section>
@@ -1029,7 +1029,7 @@
                 </div>
               </div>
             </div>
-            <input type="hidden" id="inputPIC" required />
+            <input type="hidden" id="inputPIC" />
           </div>
         </div>
 
@@ -1127,7 +1127,7 @@
                 </div>
               </div>
             </div>
-            <input type="hidden" id="inputTim" required />
+            <input type="hidden" id="inputTim" />
           </div>
         </div>
 
@@ -1173,16 +1173,12 @@
           <label class="form-label" style="font-weight: bold; margin-bottom: 6px; display: block;">Tim</label>
           <select id="inputTugasTim" class="form-select" style="width: 100%;" required>
             <option value="" disabled selected hidden>Pilih Tim</option>
-            <option value="Sri (PIC)">Sri (PIC)</option>
-            <option value="Riva (Tim)">Riva (Tim)</option>
-            <option value="Ahmad (Tim)">Ahmad (Tim)</option>
-            <option value="Fauzi (Tim)">Fauzi (Tim)</option>
           </select>
         </div>
 
         <div class="form-group" style="margin-bottom: 15px;">
           <label class="form-label" style="font-weight: bold; margin-bottom: 6px; display: block;">Tugas</label>
-          <input type="text" id="inputTugasName" class="form-input" style="width: 100%;" placeholder="Masukan Tugas" required />
+          <input type="text" id="inputTugasName" class="form-input" style="width: 100%;" placeholder="Masukkan Tugas" required />
         </div>
 
         <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
@@ -1431,9 +1427,6 @@
       if (labelSpan) {
         labelSpan.textContent = valuesStr || (type === 'pic' ? 'Pilih PIC' : 'Pilih Tim');
       }
-      if (hiddenTim) {
-        // Safe check for DOM ready
-      }
       if (hiddenInput) {
         hiddenInput.value = valuesStr;
       }
@@ -1484,25 +1477,107 @@
       let baseBerjalan = 100;
       let baseSelesai = 100;
 
-      let projectData = [
+      /* ── LocalStorage Persistence & Default Project Data ── */
+      const PROJECT_STORAGE_KEY = "bisa_project_data_v2";
+      const PROJECT_RESET_KEY = "bisa_project_reset_v2";
+
+      const DEFAULT_PROJECTS = [
         {
           id: 1,
-          namaProject: "Pemuatan Konten Podcast",
-          deskripsi: "-",
-          pic: "-",
-          tim: "Tim 1, Tim 2, Tim 3",
-          timelineMulai: "",
-          timelineSelesai: "",
+          namaProject: "Pemuatan Konten Podcast KOL Hijab",
+          deskripsi: "Produksi episode podcast kolaborasi bersama top kreator hijab BISA Media",
+          pic: "Sri",
+          tim: "Riva, Ahmad",
+          timelineMulai: "2026-08-01",
+          timelineSelesai: "2026-08-30",
           status: "Berjalan",
+          catatan: "Fokus pada engagement TikTok & IG Reels",
           subtasks: [
-            { id: 1, recipient: "Nama Penerima", name: "Pembuatan Aplikasi A", status: "Selesai", bukti: "view_doc.pdf", revisi: "-" },
-            { id: 2, recipient: "Nama Penerima", name: "Memastikan Keberjalannya Aplikasi", status: "Diproses", bukti: "-", revisi: "Revisi detail UI" },
-            { id: 3, recipient: "Nama Penerima", name: "Sesuaikan Kembali Aplikasi A", status: "Belum Mulai", bukti: "-", revisi: "-" },
-            { id: 4, recipient: "Nama Penerima ", name: "Pembuatan Aplikasi A", status: "Selesai", bukti: "view_front.pdf", revisi: "-" },
-            { id: 5, recipient: "Nama Penerima ", name: "Memastikan Keberjalannya Aplikasi", status: "Belum Mulai", bukti: "-", revisi: "-" }
+            { id: 1, recipient: "Sri (PIC)", name: "Penyusunan guideline konten video hijab", status: "Selesai", bukti: "view_doc.pdf", revisi: "-" },
+            { id: 2, recipient: "Sri (PIC)", name: "Kurasi draft video TikTok Shop 20 kreator", status: "Diproses", bukti: "-", revisi: "Revisi detail tone and voice" },
+            { id: 3, recipient: "Riva (Tim)", name: "Briefing & Kurasi Konten Kreator Hijab", status: "Belum Mulai", bukti: "-", revisi: "-" },
+            { id: 4, recipient: "Ahmad (Tim)", name: "Approval final video & scheduling", status: "Belum Mulai", bukti: "-", revisi: "-" }
           ]
         }
       ];
+
+      if (!localStorage.getItem(PROJECT_RESET_KEY)) {
+        try {
+          localStorage.removeItem("bisa_project_data");
+          localStorage.removeItem("bisa_project_data_v1");
+          localStorage.removeItem(PROJECT_STORAGE_KEY);
+          localStorage.setItem(PROJECT_RESET_KEY, "true");
+        } catch (e) { }
+      }
+
+      function loadProjectData() {
+        try {
+          const saved = localStorage.getItem(PROJECT_STORAGE_KEY);
+          if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error("Error loading project data:", e);
+        }
+        try {
+          localStorage.setItem(PROJECT_STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
+        } catch (e) { }
+        return JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
+      }
+
+      function saveProjectData() {
+        try {
+          localStorage.setItem(PROJECT_STORAGE_KEY, JSON.stringify(projectData));
+        } catch (e) {
+          console.error("Error saving project data:", e);
+        }
+      }
+
+      let projectData = loadProjectData();
+
+      /* ── Dynamic Dropdowns for "Tambah Tugas" Inside Project Detail ── */
+      function populateTugasTimDropdown(projectItem) {
+        const timSelect = document.getElementById("inputTugasTim");
+        if (!timSelect) return;
+        timSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Tim</option>';
+
+        const members = [];
+        if (projectItem && projectItem.pic && projectItem.pic !== "-") {
+          const pics = projectItem.pic.split(',').map(p => p.trim()).filter(Boolean);
+          pics.forEach(p => {
+            const label = p.includes("(PIC)") ? p : `${p} (PIC)`;
+            if (!members.some(m => m.value === label)) {
+              members.push({ name: label, value: label });
+            }
+          });
+        }
+
+        if (projectItem && projectItem.tim && projectItem.tim !== "-") {
+          const tims = projectItem.tim.split(',').map(t => t.trim()).filter(Boolean);
+          tims.forEach(t => {
+            const label = t.includes("(Tim)") || t.includes("(PIC)") ? t : `${t} (Tim)`;
+            if (!members.some(m => m.value === label)) {
+              members.push({ name: label, value: label });
+            }
+          });
+        }
+
+        if (members.length === 0) {
+          members.push(
+            { name: "Sri (PIC)", value: "Sri (PIC)" },
+            { name: "Riva (Tim)", value: "Riva (Tim)" },
+            { name: "Ahmad (Tim)", value: "Ahmad (Tim)" }
+          );
+        }
+
+        members.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m.value;
+          opt.textContent = m.name;
+          timSelect.appendChild(opt);
+        });
+      }
 
       const tableBody = document.getElementById("projectTableBody");
       const projectModal = document.getElementById("projectModal");
@@ -1599,6 +1674,7 @@
               const normalizedVal = newVal || "-";
               if (oldVal !== normalizedVal) {
                 task.revisi = normalizedVal;
+                saveProjectData();
                 if (window.ceoToast) {
                   window.ceoToast("Revisi berhasil disimpan", "success");
                 }
@@ -1624,30 +1700,31 @@
 
         // Set info
         document.getElementById("detailTitle").textContent = item.namaProject;
-        document.getElementById("detailDesc").textContent = item.deskripsi || "Belum ada deskripsi.";
+        document.getElementById("detailDesc").textContent = item.deskripsi || "-";
         document.getElementById("detailDeadline").textContent = formatDate(item.timelineSelesai) || "-";
         document.getElementById("detailPic").textContent = item.pic || "-";
 
         const detailTimWrapper = document.getElementById("detailTim");
         if (detailTimWrapper) {
-          const teams = item.tim ? item.tim.split(',').map(t => t.trim()) : [];
+          const teams = item.tim ? item.tim.split(',').map(t => t.trim()).filter(Boolean) : [];
           if (teams.length > 0) {
-            detailTimWrapper.innerHTML = teams.map(t => `<span>: ${t}</span>`).join('');
+            detailTimWrapper.innerHTML = teams.map(t => `<span>${t}</span>`).join('');
           } else {
-            detailTimWrapper.innerHTML = `<span>: -</span>`;
+            detailTimWrapper.innerHTML = `<span>-</span>`;
           }
         }
 
         // Initialize subtasks if not already present
         if (!item.subtasks) {
           item.subtasks = [
-            { id: 1, recipient: "Sri (PIC)", name: `Pembuatan Aplikasi A untuk ${item.namaProject}`, status: "Selesai", bukti: "view_doc.pdf", revisi: "-" },
-            { id: 2, recipient: "Sri (PIC)", name: `Memastikan Keberjalannya Aplikasi ${item.namaProject}`, status: "Diproses", bukti: "-", revisi: "Revisi detail UI" },
-            { id: 3, recipient: "Sri (PIC)", name: "Sesuaikan Kembali Aplikasi A", status: "Belum Mulai", bukti: "-", revisi: "-" },
-            { id: 4, recipient: "Riva (Tim)", name: "Pembuatan Aplikasi A bagian front-end", status: "Selesai", bukti: "view_front.pdf", revisi: "-" },
-            { id: 5, recipient: "Riva (Tim)", name: "Memastikan Keberjalannya Aplikasi di sandbox", status: "Belum Mulai", bukti: "-", revisi: "-" }
+            { id: 1, recipient: `${(item.pic || "Sri").split(',')[0].trim()} (PIC)`, name: `Perencanaan & Briefing ${item.namaProject}`, status: "Selesai", bukti: "view_doc.pdf", revisi: "-" },
+            { id: 2, recipient: `${(item.pic || "Sri").split(',')[0].trim()} (PIC)`, name: `Monitoring & Kontrol Kualitas ${item.namaProject}`, status: "Diproses", bukti: "-", revisi: "Revisi detail UI" },
+            { id: 3, recipient: `${(item.tim || "Riva").split(',')[0].trim()} (Tim)`, name: `Eksekusi Tugas Lapangan ${item.namaProject}`, status: "Belum Mulai", bukti: "-", revisi: "-" }
           ];
         }
+
+        // Populate dropdown for "Tambah Tugas" for this project
+        populateTugasTimDropdown(item);
 
         renderDetailTable(item.subtasks);
 
@@ -1680,6 +1757,11 @@
 
       if (btnTambahTugasFromDetail) {
         btnTambahTugasFromDetail.addEventListener("click", () => {
+          const currentProjectId = parseInt(document.getElementById("currentActiveProjectId").value);
+          const projectItem = projectData.find(p => p.id === currentProjectId);
+          if (projectItem) {
+            populateTugasTimDropdown(projectItem);
+          }
           if (tugasProjectModal) tugasProjectModal.classList.add("is-active");
         });
       }
@@ -1704,7 +1786,12 @@
         tugasProjectForm.addEventListener("submit", (e) => {
           e.preventDefault();
           const timVal = document.getElementById("inputTugasTim").value;
-          const taskName = document.getElementById("inputTugasName").value;
+          const taskName = (document.getElementById("inputTugasName")?.value || "").trim();
+
+          if (!taskName) {
+            alert("Silakan masukkan tugas.");
+            return;
+          }
 
           const currentProjectId = parseInt(document.getElementById("currentActiveProjectId").value);
           const projectItem = projectData.find(p => p.id === currentProjectId);
@@ -1721,6 +1808,7 @@
               bukti: "-",
               revisi: "-"
             });
+            saveProjectData();
             renderDetailTable(projectItem.subtasks);
           }
 
@@ -1753,9 +1841,11 @@
 
           row.innerHTML = `
             <td>${index + 1}</td>
-            <td style="font-weight: 600; text-align: left; padding-left: 15px;">${item.namaProject}</td>
-            <td>${item.pic}</td>
-            <td>${item.tim}</td>
+            <td style="text-align: left; padding-left: 15px; font-weight: 600; color: #333;">
+              ${item.namaProject}
+            </td>
+            <td>${item.pic || "-"}</td>
+            <td>${item.tim || "-"}</td>
             <td>${formatDate(item.timelineMulai)} s/d ${formatDate(item.timelineSelesai)}</td>
             <td>
               <button class="btn-view" data-id="${item.id}" title="Lihat">
@@ -1826,15 +1916,30 @@
         e.preventDefault();
 
         const idVal = document.getElementById("editIndex").value;
-        const namaProject = document.getElementById("inputNamaProject").value;
-        const pic = document.getElementById("inputPIC").value;
-        const tim = document.getElementById("inputTim").value;
+        const namaProject = document.getElementById("inputNamaProject").value.trim();
+        const pic = document.getElementById("inputPIC").value.trim();
+        const tim = document.getElementById("inputTim").value.trim();
         const timelineMulai = document.getElementById("inputTimelineMulai").value;
         const timelineSelesai = document.getElementById("inputTimelineSelesai").value;
         const status = document.getElementById("editStatus").value || "Belum Mulai";
 
-        const deskripsi = document.getElementById("inputDeskripsi").value;
-        const catatan = document.getElementById("inputCatatan").value;
+        const deskripsi = document.getElementById("inputDeskripsi").value.trim();
+        const catatan = document.getElementById("inputCatatan").value.trim();
+
+        if (!namaProject) {
+          alert("Silakan masukkan Nama Project.");
+          return;
+        }
+
+        if (!pic) {
+          alert("Silakan pilih PIC terlebih dahulu.");
+          return;
+        }
+
+        if (!tim) {
+          alert("Silakan pilih Tim terlebih dahulu.");
+          return;
+        }
 
         if (idVal) {
           const idNum = parseInt(idVal);
@@ -1842,7 +1947,6 @@
           if (itemIdx !== -1) {
             projectData[itemIdx] = {
               ...projectData[itemIdx],
-              id: idNum,
               namaProject,
               pic,
               tim,
@@ -1852,6 +1956,7 @@
               deskripsi,
               catatan
             };
+            saveProjectData();
             if (window.ceoToast) {
               window.ceoToast("Project berhasil diubah", "success");
             } else {
@@ -1860,6 +1965,7 @@
           }
         } else {
           const nextId = projectData.length > 0 ? Math.max(...projectData.map(d => d.id)) + 1 : 1;
+          const primaryPic = pic.split(',')[0].trim();
           projectData.push({
             id: nextId,
             namaProject,
@@ -1867,10 +1973,21 @@
             tim,
             timelineMulai,
             timelineSelesai,
-            status,
+            status: "Berjalan",
             deskripsi,
-            catatan
+            catatan,
+            subtasks: [
+              {
+                id: 1,
+                recipient: `${primaryPic} (PIC)`,
+                name: `Perencanaan ${namaProject}`,
+                status: "Belum Mulai",
+                bukti: "-",
+                revisi: "-"
+              }
+            ]
           });
+          saveProjectData();
           if (window.ceoToast) {
             window.ceoToast("Project berhasil ditambahkan", "success");
           } else {
@@ -1889,8 +2006,8 @@
         document.getElementById("inputNamaProject").value = item.namaProject || "";
         document.getElementById("inputPIC").value = item.pic || "";
         document.getElementById("inputTim").value = item.tim || "";
-        document.getElementById("inputTimelineMulai").value = item.timelineMulai;
-        document.getElementById("inputTimelineSelesai").value = item.timelineSelesai;
+        document.getElementById("inputTimelineMulai").value = item.timelineMulai || "";
+        document.getElementById("inputTimelineSelesai").value = item.timelineSelesai || "";
 
         document.getElementById("inputDeskripsi").value = item.deskripsi || "";
         document.getElementById("inputCatatan").value = item.catatan || "";
@@ -1902,6 +2019,7 @@
       function handleDelete(id) {
         if (confirm("Apakah Anda yakin ingin menghapus project ini?")) {
           projectData = projectData.filter(item => item.id !== id);
+          saveProjectData();
           if (window.ceoToast) {
             window.ceoToast("Project berhasil dihapus", "success");
           } else {
@@ -1915,10 +2033,10 @@
       searchInput.addEventListener("input", () => {
         const query = searchInput.value.trim().toLowerCase();
         const filtered = projectData.filter(item => {
-          return item.namaProject.toLowerCase().includes(query) || 
-                 item.pic.toLowerCase().includes(query) ||
-                 item.tim.toLowerCase().includes(query) ||
-                 item.status.toLowerCase().includes(query);
+          return (item.namaProject && item.namaProject.toLowerCase().includes(query)) || 
+                 (item.pic && item.pic.toLowerCase().includes(query)) ||
+                 (item.tim && item.tim.toLowerCase().includes(query)) ||
+                 (item.status && item.status.toLowerCase().includes(query));
         });
         renderTable(filtered);
       });

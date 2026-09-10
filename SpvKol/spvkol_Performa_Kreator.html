@@ -244,14 +244,14 @@
             <span>Target & Capaian Kerja</span>
           </a>
 
-          <a class="nav-item " href="spvkol_rencana_karier.html">
+          <a class="nav-item " href="spvkol_upgrade_skill.html">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="8.5" cy="7" r="4"></circle>
               <line x1="18" y1="8" x2="23" y2="8"></line>
               <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
             </svg>
-            <span>Rencana Karier</span>
+            <span>Upgrade Skill</span>
           </a>
         </div>
       </section>
@@ -498,7 +498,6 @@
                 <th>Tayangan</th>
                 <th>Siaran Live</th>
                 <th>Video</th>
-                <th style="width: 80px; text-align: center;">Aksi</th>
               </tr>
             </thead>
             <tbody id="performaTableBody"></tbody>
@@ -698,18 +697,65 @@
   <script src="../script.js"></script>
   <script>
     (function() {
-      const PERFORMA_STORAGE_KEY = "bisa_performa_kreator_list_v2";
+      const PERFORMA_STORAGE_KEY = "bisa_performa_kreator_list_v4";
       try {
         localStorage.removeItem("bisa_performa_kreator_list");
+        localStorage.removeItem("bisa_performa_kreator_list_v2");
+        localStorage.removeItem("bisa_performa_kreator_list_v3");
+        if (!localStorage.getItem("bisa_performa_reset_v4")) {
+          localStorage.removeItem(PERFORMA_STORAGE_KEY);
+          localStorage.setItem("bisa_performa_reset_v4", "true");
+        }
       } catch (e) {}
-      let performaDb = [];
+
+      const DEFAULT_PERFORMA = [
+        {
+          id: 1,
+          tanggal: "18/05/2026",
+          uid: "UID-78192039",
+          username: "@bima.fashion",
+          gmv: "Rp 45.200.000",
+          pesanan: "1.250",
+          live_gmv: "Rp 32.000.000",
+          video_gmv: "Rp 13.200.000",
+          live_orders: "890",
+          video_orders: "360",
+          ctr_live: "4.8%",
+          ctr_video: "3.2%",
+          direct_gmv: "Rp 28.500.000",
+          direct_live: "Rp 20.000.000",
+          direct_video: "Rp 8.500.000",
+          direct_orders: "780",
+          sold: "1.420",
+          direct_live_sold: "980",
+          direct_live_prod: "15",
+          direct_video_sold: "440",
+          direct_video_prod: "8",
+          total_sold: "1.420",
+          komisi: "Rp 4.520.000",
+          dasar: "10%",
+          live_views: "24.500",
+          views: "68.200",
+          live_broadcasts: "6",
+          videos: "12"
+        }
+      ];
+
+      let performaDb = DEFAULT_PERFORMA;
       try {
         const saved = localStorage.getItem(PERFORMA_STORAGE_KEY);
         if (saved) {
-          performaDb = JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            performaDb = parsed;
+          } else if (Array.isArray(parsed) && parsed.length === 0) {
+            performaDb = [];
+          }
+        } else {
+          localStorage.setItem(PERFORMA_STORAGE_KEY, JSON.stringify(DEFAULT_PERFORMA));
         }
       } catch (err) {
-        console.error("Error reading performaDb:", err);
+        performaDb = DEFAULT_PERFORMA;
       }
 
       function savePerformaDb() {
@@ -810,34 +856,6 @@
             <td>${item.views || "-"}</td>
             <td>${item.live_broadcasts || "-"}</td>
             <td>${item.videos || "-"}</td>
-            <td class="tdActions text-center">
-              <div class="dropdown bm-action-dropdown">
-                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
-                  data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi">
-                  <i class="bx bx-dots-vertical-rounded"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu">
-                  <li>
-                    <button class="dropdown-item btn-act-view" type="button" data-id="${item.id}" title="Lihat">
-                      <span class="bm-menu-iconify"><i class="bx bx-show"></i></span>
-                      <span>Lihat</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button class="dropdown-item btn-act-edit" type="button" data-id="${item.id}" title="Edit">
-                      <span class="bm-menu-iconify"><i class="bx bx-edit-alt"></i></span>
-                      <span>Edit</span>
-                    </button>
-                  </li>
-                  <li>
-                    <button class="dropdown-item text-danger btn-act-delete" type="button" data-id="${item.id}" title="Hapus">
-                      <span class="bm-menu-iconify" style="background: #e02424 !important;"><i class="bx bx-trash"></i></span>
-                      <span>Hapus</span>
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </td>
           `;
           tableBody.appendChild(row);
         });

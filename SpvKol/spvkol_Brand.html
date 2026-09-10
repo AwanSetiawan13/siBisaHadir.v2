@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -280,7 +280,7 @@
             <span>Target & Capaian Kerja</span>
           </a>
 
-          <a class="nav-item " href="spvkol_rencana_karier.html">
+          <a class="nav-item " href="spvkol_upgrade_skill.html">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -288,7 +288,7 @@
               <line x1="18" y1="8" x2="23" y2="8"></line>
               <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
             </svg>
-            <span>Rencana Karier</span>
+            <span>Upgrade Skill</span>
           </a>
         </div>
       </section>
@@ -441,7 +441,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Aktif</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value">1</strong>
           </div>
           <div class="metric-icon-box"
             style="background-color: rgba(34, 100, 198, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
@@ -456,7 +456,7 @@
         <article class="metric-card">
           <div>
             <span class="metric-label">Selesai Kerja Sama</span>
-            <strong class="metric-value">100</strong>
+            <strong class="metric-value">0</strong>
           </div>
           <div class="metric-icon-box"
             style="background-color: rgba(76, 175, 80, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
@@ -922,6 +922,7 @@
         fashion: {
           label: "Fashion",
           subs: {
+            hijab_muslim: { label: "Hijab & Fashion Muslim", subs: ["Pashmina Ceruty", "Segi Empat Paris", "Bergo Maryam", "Hijab Instan Jersey", "Pashmina Silk"] },
             aksesoris_fashion: { label: "Aksesories Fashion", subs: ["Jam Tangan", "Kacamata", "Topi & Kupluk", "Perhiasan"] },
             fashion_anak: { label: "Fashion Anak", subs: ["Kaos Anak", "Celana Anak", "Jaket Anak"] },
             fashion_dewasa: { label: "Fashion Dewasa", subs: ["Kemeja Pria", "Blouse Wanita", "Celana Jeans"] },
@@ -1157,24 +1158,81 @@
         window.resetCategoryDropdown = resetCategoryDropdown;
       }
 
-      // Brand Data & LocalStorage Persistence (v4 - Clean)
-      const BRAND_STORAGE_KEY = "bisa_brand_list_v4";
-      let brandDb = [];
+      // Brand Data & LocalStorage Persistence (v7 - Hijab Brand & 5 Hijab Products)
+      const BRAND_STORAGE_KEY = "bisa_brand_list_v7";
+      const DEFAULT_BRAND = [
+        {
+          id: 1,
+          logo: "../media/logo.png",
+          shopCode: "SC-HIJAB-001",
+          nama: "Bisa Hijab Official",
+          kategori: "Fashion Muslim - Hijab",
+          telepon: "081234567890",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          sampel: [
+            {
+              nama: "Pashmina Ceruty Baby Doll",
+              pid: "PID 001",
+              foto: "../media/hijab-pashmina.svg"
+            },
+            {
+              nama: "Segi Empat Paris Premium",
+              pid: "PID 002",
+              foto: "../media/hijab-segiempat.svg"
+            },
+            {
+              nama: "Bergo Maryam Diamond Crepe",
+              pid: "PID 003",
+              foto: "../media/hijab-bergo.svg"
+            },
+            {
+              nama: "Hijab Instan Jersey Sport",
+              pid: "PID 004",
+              foto: "../media/hijab-jersey.svg"
+            },
+            {
+              nama: "Pashmina Silk Plisket Premium",
+              pid: "PID 005",
+              foto: "../media/hijab-silk.svg"
+            }
+          ],
+          adsId: "UID-718294019284",
+          adsName: "BisaMedia_TikTok_Ads_Hijab",
+          email: "bisahijab@gmail.com",
+          password: "password123",
+          alamat: "Jl. Cisalak No. 47A, Sukamanah, Kec. Cipedes, Tasikmalaya, Jawa Barat 46131",
+          deskripsi: "Brand fashion muslimah dan produsen hijab premium berkualitas tinggi dengan berbagai varian pashmina, segi empat, bergo, dan hijab instan.",
+          pic: "Setiawan"
+        }
+      ];
+      let brandDb = DEFAULT_BRAND;
 
       try {
-        ['bisa_brand_list', 'bisa_brand_list_v2', 'bisa_brand_list_v3'].forEach(k => {
+        ['bisa_brand_list', 'bisa_brand_list_v2', 'bisa_brand_list_v3', 'bisa_brand_list_v4', 'bisa_brand_list_v5', 'bisa_brand_list_v6'].forEach(k => {
           try { localStorage.removeItem(k); } catch(e){}
         });
+
+        if (!localStorage.getItem("bisa_brand_reset_v7")) {
+          try {
+            localStorage.removeItem(BRAND_STORAGE_KEY);
+            localStorage.setItem("bisa_brand_reset_v7", "true");
+          } catch(e){}
+        }
 
         const saved = localStorage.getItem(BRAND_STORAGE_KEY);
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            brandDb = parsed.filter(b => !b.isDefault && !(b.id && String(b.id).startsWith('b_init_')));
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            brandDb = parsed;
+          } else if (Array.isArray(parsed) && parsed.length === 0) {
+            brandDb = [];
           }
+        } else {
+          localStorage.setItem(BRAND_STORAGE_KEY, JSON.stringify(DEFAULT_BRAND));
         }
       } catch (err) {
-        brandDb = [];
+        brandDb = DEFAULT_BRAND;
       }
 
       function saveBrandDb() {
