@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan - Bisa Media</title>
+  <link rel="stylesheet" href="../../style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* Custom style matching mockup exactly */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .status-badge--proses {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+
+    .status-badge--selesai {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+
+    .status-badge--aktif {
+      background-color: rgba(34, 100, 198, 0.1);
+      color: #2264c6;
+      border: 1px solid rgba(34, 100, 198, 0.3);
+    }
+
+    .status-badge--belum-mulai {
+      background-color: rgba(140, 140, 140, 0.1);
+      color: #757575;
+      border: 1px solid rgba(140, 140, 140, 0.3);
+    }
+
+    /* Hierarchical table row backgrounds and indicators */
+    .row-rrk {
+      background-color: #edf5fc !important;
+      transition: background-color 0.15s ease;
+    }
+
+    .row-rrk:hover {
+      background-color: #e0effa !important;
+    }
+
+    .row-rrk td:first-child {
+      border-left: 4px solid #2264c6;
+    }
+
+    .row-milestone {
+      background-color: #fffdf5 !important;
+      transition: background-color 0.15s ease;
+    }
+
+    .row-milestone:hover {
+      background-color: #f7f2e4 !important;
+    }
+
+    .row-milestone td:first-child {
+      border-left: 4px solid #f59e0b;
+    }
+
+    .row-tugas {
+      background-color: #ffffff !important;
+      transition: background-color 0.15s ease;
+    }
+
+    .row-tugas:hover {
+      background-color: #f8fafc !important;
+    }
+
+    .row-tugas td:first-child {
+      border-left: 4px solid #cbd5e1;
+    }
+
+    /* Hierarchical badges/tags ("tanda") */
+    .hierarki-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 7px;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-right: 6px;
+      line-height: 1.2;
+      vertical-align: middle;
+      letter-spacing: 0.3px;
+    }
+
+    .hierarki-tag--rrk {
+      background-color: #2264c6;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(34, 100, 198, 0.2);
+    }
+
+    .hierarki-tag--milestone {
+      background-color: #f59e0b;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(245, 158, 11, 0.2);
+    }
+
+    .hierarki-tag--tugas {
+      background-color: #64748b;
+      color: #ffffff;
+      box-shadow: 0 1px 2px rgba(100, 116, 139, 0.2);
+    }
+
+    /* Small metrics cards for Laporan */
+    .laporan-metric-card {
+      background: #fff;
+      border: 1px solid #c5c5c8;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .laporan-metric-icon-box {
+      background-color: #2264c6;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .laporan-metric-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .laporan-metric-value {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #333;
+    }
+
+    .laporan-metric-label {
+      font-size: 11px;
+      color: #8c8c8c;
+    }
+
+    /* Middle section cards */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .analytics-card {
+      background: #fff;
+      border: 1px solid #c5c5c8;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .analytics-card__title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 15px;
+      font-style: italic;
+    }
+
+    /* Donut chart component */
+    .donut-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      height: 100%;
+    }
+
+    .donut-chart {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: conic-gradient(#29A3D8 0% 120deg,
+          #FFB300 120deg 240deg,
+          #FF5252 240deg 360deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .donut-chart__inner {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      color: #555;
+    }
+
+    .donut-legend__item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Table styles for mini tables */
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .mini-table th {
+      color: #8c8c8c;
+      font-weight: 500;
+      border-bottom: 1px solid #e1e1e3;
+      padding: 6px 8px;
+      text-align: left;
+      background: rgba(67, 89, 113, 0.05);
+      white-space: nowrap;
+    }
+
+    .mini-table td {
+      padding: 6px 4px;
+      border-bottom: 1px solid #f1f1f3;
+      color: #444;
+    }
+
+    /* Interactive hierarchy controls */
+    .toggle-icon {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+      color: #8c8c8c;
+      font-size: 10px;
+      transition: transform 0.15s ease;
+    }
+
+    /* Topbar blue dropdown selectors */
+    .dropdown-select-blue {
+      background-color: #29A3D8;
+      color: #fff;
+      border: none;
+      padding: 6px 24px 6px 10px;
+      border-radius: 5px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-select-blue:hover {
+      background-color: #1e87b7;
+    }
+
+    /* Blue style search and buttons */
+    .small-action-button-blue {
+      border: 1px solid #29A3D8;
+      color: #29A3D8;
+      background: #fff;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .small-action-button-blue:hover {
+      background-color: rgba(41, 163, 216, 0.08);
+    }
+
+    .campaign-search-blue {
+      display: flex;
+      align-items: center;
+      border: 1px solid #c5c5c8;
+      border-radius: 6px;
+      padding: 4px 10px;
+      background: #fff;
+      gap: 8px;
+    }
+
+    .campaign-search-blue svg {
+      width: 14px;
+      height: 14px;
+      color: #a1a1a5;
+    }
+
+    .campaign-search-blue input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: #333;
+      width: 120px;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="sidebar" class="sidebar kol-sidebar">
+    <div class="sidebar-brand">
+      <img class="brand-logo brand-logo--sidebar" src="../../media/logo.png" alt="Logo Bisa Media" />
+      <span class="brand-name brand-name--dark">Bisa Media</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Menu utama">
+      <a class="nav-item " href="../spvkol_dashboard.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3.5 10.5L12 3l8.5 7.5"></path>
+          <path d="M5.5 9.5V21h13V9.5"></path>
+          <path d="M9.5 21v-6h5v6"></path>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <a class="nav-item " href="../spvkol_kalender.html">
+        <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>Kalender</span>
+      </a>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Absensi</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="../absensi/spvkol_kehadiran.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span>Kehadiran</span>
+          </a>
+
+          <a class="nav-item " href="../absensi/spvkol_presensi_istirahat.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+            <span>Presensi Istirahat</span>
+          </a>
+
+          <a class="nav-item " href="../absensi/spvkol_presensi_lembur.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Presensi Lembur</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Oprasional</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="../operasional/spvkol_dashboard_campaign.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3.5 10.5L12 3l8.5 7.5"></path>
+              <path d="M5.5 9.5V21h13V9.5"></path>
+              <path d="M9.5 21v-6h5v6"></path>
+            </svg>
+            <span>Dashboard Campaign</span>
+          </a>
+
+          <a class="nav-item " href="../operasional/spvkol_campaign.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 13h3l9 4V7l-9 4H4z"></path>
+              <path d="M7 13l1.5 5"></path>
+              <path d="M18 9.5c1 .6 1.5 1.4 1.5 2.5S19 13.9 18 14.5"></path>
+            </svg>
+            <span>Campaign</span>
+          </a>
+
+          <a class="nav-item " href="../operasional/spvkol_kreator.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="9" cy="8" r="3"></circle>
+              <path d="M3.5 19c.6-3.4 2.4-5.2 5.5-5.2s4.9 1.8 5.5 5.2"></path>
+              <circle cx="17" cy="9" r="2"></circle>
+              <path d="M15.5 14.5c2.7-.3 4.4 1.2 5 4"></path>
+            </svg>
+            <span>Kreator</span>
+          </a>
+
+          <a class="nav-item" href="../operasional/spvkol_tracking_sampel.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10" cy="10" r="5"></circle>
+              <path d="M14 14l6 6"></path>
+              <path d="M8 10h4M10 8v4"></path>
+            </svg>
+            <span>Tracking Sampel</span>
+          </a>
+
+          <a class="nav-item " href="../operasional/spvkol_Performa_Kreator.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19V5"></path>
+              <path d="M4 19h16"></path>
+              <path d="M7 15l4-4 3 2 5-6"></path>
+            </svg>
+            <span>Performa Kreator</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Dokumen & Kolaborasi</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="../dokumen_kolaborasi/spvkol_folder.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>My Folders</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group ">
+        <button class="nav-group__toggle" type="button">
+          <span>Perancangan Kerja</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="../perancangan_kerja/spvkol_rrk.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 21V4"></path>
+              <path d="M5 5h11l-2 4 2 4H5"></path>
+            </svg>
+            <span>RRK</span>
+          </a>
+
+          <a class="nav-item " href="../perancangan_kerja/spvkol_Milestone.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 21V4"></path>
+              <path d="M5 5h11l-2 4 2 4H5"></path>
+              <circle cx="18.5" cy="17.5" r="2.5"></circle>
+            </svg>
+            <span>Milestone</span>
+          </a>
+
+          <a class="nav-item " href="../perancangan_kerja/spvkol_tugas.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+              <path d="M8 12l2.5 2.5L16 9"></path>
+            </svg>
+            <span>Tugas</span>
+          </a>
+
+          <a class="nav-item " href="../perancangan_kerja/spvkol_project.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+            <span>Project</span>
+          </a>
+
+          <a class="nav-item nav-item--active" href="../perancangan_kerja/spvkol_laporan.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Laporan</span>
+          </a>
+
+          <a class="nav-item " href="../perancangan_kerja/spvkol_pengaduan.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Pengaduan</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Kinerja</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="../kinerja/spvkol_evaluasi_kinerja.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Evaluasi Kinerja</span>
+          </a>
+
+          <a class="nav-item " href="../kinerja/spvkol_target_capaian.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+            <span>Target & Capaian Kerja</span>
+          </a>
+
+          <a class="nav-item " href="../kinerja/spvkol_rencana_karier.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="8.5" cy="7" r="4"></circle>
+              <line x1="18" y1="8" x2="23" y2="8"></line>
+              <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
+            </svg>
+            <span>Rencana Karier</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="nav-group is-collapsed">
+        <button class="nav-group__toggle" type="button">
+          <span>Data Master</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item " href="../data_master/spvkol_Brand.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3l8 8-8 8-8-8z"></path>
+              <path d="M8.5 11.5l3 3 4.5-5"></path>
+            </svg>
+            <span>Brand</span>
+          </a>
+
+          <div class="nav-subgroup is-collapsed">
+            <button class="nav-subgroup__toggle" type="button">
+              <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+              <span>Master Pendukung</span>
+              <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 9l5 5 5-5"></path>
+              </svg>
+            </button>
+            <div class="nav-subgroup__items">
+              <a class="nav-item " href="../data_master/master_pendukung/spvkol_Kategori_Produk.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 6h12M8 12h12M8 18h12"></path>
+                  <circle cx="4" cy="6" r="1"></circle>
+                  <circle cx="4" cy="12" r="1"></circle>
+                  <circle cx="4" cy="18" r="1"></circle>
+                </svg>
+                <span>Kategori Produk</span>
+              </a>
+              <a class="nav-item " href="../data_master/master_pendukung/spvkol_Leads_Kreator.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="9" cy="8" r="3"></circle>
+                  <path d="M3.5 19c.6-3.4 2.4-5.2 5.5-5.2s4.9 1.8 5.5 5.2"></path>
+                  <path d="M17 6v6M14 9h6"></path>
+                </svg>
+                <span>Leads Kreator</span>
+              </a>
+
+              <a class="nav-item " href="../data_master/master_pendukung/spvkol_Leveling_Kreator.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8z"></path>
+                </svg>
+                <span>Leveling Kreator</span>
+              </a>
+
+              <a class="nav-item " href="../data_master/master_pendukung/spvkol_Ads_Account.html">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="8" cy="9" r="3"></circle>
+                  <circle cx="16" cy="9" r="3"></circle>
+                  <path d="M2.5 20c.6-3.2 2.4-5 5.5-5 1.5 0 2.7.4 3.6 1.1"></path>
+                  <path d="M12.4 16.1c.9-.7 2.1-1.1 3.6-1.1 3.1 0 4.9 1.8 5.5 5"></path>
+                </svg>
+                <span>Ads Account</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </nav>
+  </aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna"
+            aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Supervisi KOL</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../index.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="padding-left: 0;">Laporan</h1>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <select id="monthSelect" class="month-select" aria-label="Pilih bulan">
+            <option>September</option>
+            <option>Oktober</option>
+            <option>November</option>
+            <option>Desember</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Laporan Metrics Grid -->
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 15px; margin-bottom: 26px;">
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <strong class="laporan-metric-value" id="statTotalProject">100</strong>
+            <span class="laporan-metric-label">Total Project</span>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <strong class="laporan-metric-value" id="statTotalRrk">100</strong>
+            <span class="laporan-metric-label">Total RRK</span>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+              <line x1="4" y1="22" x2="4" y2="15"></line>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <strong class="laporan-metric-value" id="statTotalMilestone">100</strong>
+            <span class="laporan-metric-label">Total Milestone</span>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <strong class="laporan-metric-value" id="statTotalTugas">100</strong>
+            <span class="laporan-metric-label">Total Tugas</span>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 14 14"></polyline>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <strong class="laporan-metric-value" id="statTugasTercapai">100</strong>
+            <span class="laporan-metric-label">Tugas Tercapai</span>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <strong class="laporan-metric-value" id="statRataProgres">95%</strong>
+            <span class="laporan-metric-label">Rata-rata Progres</span>
+          </div>
+        </article>
+      </div>
+
+      <!-- Analytics row with 3 cards -->
+      <div class="analytics-grid">
+        <!-- Progress Ringkasan -->
+        <section class="analytics-card">
+          <h2 class="analytics-card__title">Ringkasan Progress</h2>
+          <div class="donut-container">
+            <div class="donut-chart">
+              <div class="donut-chart__inner"></div>
+            </div>
+
+            <div class="donut-legend">
+              <div class="donut-legend__item">
+                <span class="legend-color-dot" style="background-color: #29A3D8;"></span>
+                <span id="legendSelesai">Selesai : 10 ( 100% )</span>
+              </div>
+              <div class="donut-legend__item">
+                <span class="legend-color-dot" style="background-color: #FFB300;"></span>
+                <span id="legendProses">Proses : 10 ( 100% )</span>
+              </div>
+              <div class="donut-legend__item">
+                <span class="legend-color-dot" style="background-color: #FF5252;"></span>
+                <span id="legendBelum">Belum Selesai : 10 ( 100% )</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pencapaian per Program -->
+        <section class="analytics-card" style="padding: 18px 0;">
+          <h2 class="analytics-card__title" style="padding: 0 18px; margin-bottom: 15px;">Pencapaian per Program</h2>
+          <div style="flex-grow: 1; overflow-y: auto;">
+            <table class="mini-table">
+              <thead>
+                <tr>
+                  <th style="padding-left: 18px;">Program</th>
+                  <th>Total RRK</th>
+                  <th>Progres Rata-rata</th>
+                  <th style="padding-right: 18px; text-align: right;">Tugas Tercapai</th>
+                </tr>
+              </thead>
+              <tbody id="pencapaianProgramBody">
+                <!-- Empty as requested in mockup -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Trend Pencapaian -->
+        <section class="analytics-card">
+          <h2 class="analytics-card__title">Trend Pencapaian</h2>
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+            <svg viewBox="0 0 200 100" style="width: 100%; height: 100px; overflow: visible;">
+              <!-- Grid borders and lines -->
+              <rect x="25" y="10" width="160" height="70" fill="none" stroke="#e1e1e3" stroke-width="1" />
+              <!-- Y Axis labels -->
+              <text x="0" y="14" font-size="9" fill="#a1a1a5" font-family="Outfit">100%</text>
+              <text x="5" y="83" font-size="9" fill="#a1a1a5" font-family="Outfit">0%</text>
+              <!-- X Axis labels -->
+              <text x="23" y="96" font-size="9" fill="#a1a1a5" font-family="Outfit">1</text>
+              <text x="100" y="96" font-size="9" fill="#a1a1a5" font-family="Outfit">15</text>
+              <text x="178" y="96" font-size="9" fill="#a1a1a5" font-family="Outfit">30</text>
+              <!-- Graph line -->
+              <polyline points="25 80, 75 35, 120 58, 175 25" fill="none" stroke="#d3d3d5" stroke-width="1.5" />
+            </svg>
+          </div>
+        </section>
+      </div>
+
+      <!-- Main Project Panel -->
+      <section class="panel campaign-panel" style="padding-bottom: 24px;">
+        <!-- Top border thick blue bar -->
+        <div class="campaign-panel__line" style="height: 4px; background: var(--blue-800);"></div>
+
+        <!-- Toolbar -->
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <button class="small-action-button-blue" type="button" aria-label="Filter">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+            </button>
+            <label class="campaign-search-blue" style="margin-left: 10px;">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="search" id="laporanSearchInput" placeholder="Cari..." />
+            </label>
+          </div>
+        </div>
+
+        <!-- Collapsible Hierarchy Table -->
+        <div class="table-wrap campaign-table" style="padding: 0 0 24px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 60px;">#</th>
+                <th style="text-align: left; padding-left: 15px;">Hierarki</th>
+                <th>PIC</th>
+                <th>Periode</th>
+                <th>Progres</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="laporanTableBody">
+              <!-- Dynamically rendered hierarchy -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+  </div>
+
+  <script src="../../script.js"></script>
+
+  <script>
+    // Collapsible rows logic
+    window.toggleRow = function  (rowId) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      const toggleIcon = row.querySelector('.toggle-icon');
+      if (!toggleIcon) return;
+      const isExpanded = toggleIcon.classList.contains('toggle-icon--expanded');
+
+      if (isExpanded) {
+        toggleIcon.classList.remove('toggle-icon--expanded');
+        toggleIcon.textContent = '▶';
+        setCollapseState(rowId, true);
+      } else {
+        toggleIcon.classList.add('toggle-icon--expanded');
+        toggleIcon.textContent = '▼';
+        setCollapseState(rowId, false);
+      }
+    };
+
+    function setCollapseState(parentId, hide) {
+      const children = document.querySelectorAll(`tr[data-parent="${parentId}"]`);
+      children.forEach(child => {
+        if (hide) {
+          child.style.display = 'none';
+          const childId = child.getAttribute('id');
+          if (childId) {
+            setCollapseState(childId, true);
+          }
+        } else {
+          child.style.display = '';
+          const childId = child.getAttribute('id');
+          const childToggle = child.querySelector('.toggle-icon');
+          const childIsExpanded = childToggle && childToggle.classList.contains('toggle-icon--expanded');
+          if (childId && childIsExpanded) {
+            setCollapseState(childId, false);
+          }
+        }
+      });
+    }
+
+    /* ── Date Helpers ── */
+    function formatDateIndo(dateStr) {
+      if (!dateStr || dateStr === "-") return "-";
+      let d, m, y;
+      if (typeof dateStr === "string" && dateStr.includes("-")) {
+        const parts = dateStr.split("-");
+        if (parts[0].length === 4) {
+          // YYYY-MM-DD
+          y = parts[0];
+          m = parseInt(parts[1], 10);
+          d = parseInt(parts[2], 10);
+        } else {
+          // DD-MM-YYYY
+          d = parseInt(parts[0], 10);
+          m = parseInt(parts[1], 10);
+          y = parts[2];
+        }
+      } else {
+        return dateStr;
+      }
+      if (isNaN(d) || isNaN(m)) return dateStr;
+      const months = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+      return `${d} ${months[m] || m} ${y}`;
+    }
+
+    function formatPeriod(mulai, selesai) {
+      const m = formatDateIndo(mulai);
+      const s = formatDateIndo(selesai);
+      if (m !== "-" && s !== "-") {
+        return `${m} - ${s}`;
+      } else if (m !== "-") {
+        return m;
+      } else if (s !== "-") {
+        return s;
+      }
+      return "-";
+    }
+
+    function getStatusBadge(status, isRrk = false) {
+      const s = (status || "").toLowerCase().trim();
+      if (s === "selesai") {
+        return `<span class="status-badge status-badge--selesai">Selesai</span>`;
+      }
+      if (s === "aktif" || (isRrk && (s === "berjalan" || s === "aktif"))) {
+        return `<span class="status-badge status-badge--aktif">Aktif</span>`;
+      }
+      if (s === "proses" || s === "berjalan" || s === "diproses") {
+        return `<span class="status-badge status-badge--proses">Proses</span>`;
+      }
+      if (s === "belum mulai" || s === "pending") {
+        return `<span class="status-badge status-badge--belum-mulai">Belum Mulai</span>`;
+      }
+      return `<span class="status-badge status-badge--proses">${status || "Proses"}</span>`;
+    }
+
+    /* ── Default Synchronized Data ── */
+    const DEFAULT_RRK = [
+      {
+        id: 1,
+        rencana: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+        program: "Program KOL Affiliate",
+        timelineMulai: "2026-08-01",
+        timelineSelesai: "2026-08-01",
+        prioritas: "Tinggi",
+        status: "Berjalan",
+        pic: "-",
+        tim: "Supervisi KOL, Riva, Sri"
+      }
+    ];
+
+    const DEFAULT_MILESTONES = [
+      {
+        id: 1,
+        title: "Kurasi & Screening 100 Database Kreator Hijab",
+        week: "Minggu ke 1",
+        progress: 90,
+        status: "Proses",
+        rrk: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+        pic: "Riva",
+        timelineMulai: "2026-08-01",
+        timelineSelesai: "2026-08-08"
+      }
+    ];
+
+    const DEFAULT_TUGAS = [
+      {
+        id: 1,
+        title: "Screening Database 100 Kreator Hijab",
+        milestone: "Kurasi & Screening 100 Database Kreator Hijab",
+        progress: 90,
+        pic: "Sri",
+        deadline: "01-08-2026",
+        status: "Proses"
+      },
+      {
+        id: 2,
+        title: "Finalisasi 100 List Terpilih",
+        milestone: "Kurasi & Screening 100 Database Kreator Hijab",
+        progress: 100,
+        pic: "Riva",
+        deadline: "08-08-2026",
+        status: "Selesai"
+      }
+    ];
+
+    function loadRrkData() {
+      try {
+        const saved = localStorage.getItem("bisa_rrk_data_v2") || localStorage.getItem("bisa_rrk_data");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.error("Error loading RRK data:", e);
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_RRK));
+    }
+
+    function loadMilestoneData() {
+      try {
+        const saved = localStorage.getItem("bisa_milestone_data_v1") || localStorage.getItem("bisa_milestone_data");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.error("Error loading Milestone data:", e);
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_MILESTONES));
+    }
+
+    function loadTugasData() {
+      try {
+        const saved = localStorage.getItem("bisa_tugas_data_v1") || localStorage.getItem("bisa_tugas_data");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.error("Error loading Tugas data:", e);
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_TUGAS));
+    }
+
+    function loadProjectData() {
+      try {
+        const saved = localStorage.getItem("bisa_project_data_v2") || localStorage.getItem("bisa_project_data");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.error("Error loading Project data:", e);
+      }
+      return [];
+    }
+
+    /* ── Hierarchy Rendering Logic ── */
+    function renderHierarchyTable() {
+      const tableBody = document.getElementById("laporanTableBody");
+      if (!tableBody) return;
+      tableBody.innerHTML = "";
+
+      const rrkList = loadRrkData();
+      const milestoneList = loadMilestoneData();
+      const tugasList = loadTugasData();
+
+      if (rrkList.length === 0 && milestoneList.length === 0 && tugasList.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="db-empty-row" style="text-align: center; padding: 24px; color: #a1a1a5;">
+              Tidak ada data laporan
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let rowCounter = 1;
+      const matchedMilestoneIds = new Set();
+      const matchedTugasIds = new Set();
+
+      rrkList.forEach((rrk, rIdx) => {
+        // Find matching milestones
+        const childMilestones = milestoneList.filter(m => {
+          const match = m.rrk && rrk.rencana && (
+            m.rrk.trim().toLowerCase() === rrk.rencana.trim().toLowerCase() ||
+            rrk.rencana.toLowerCase().includes(m.rrk.toLowerCase()) ||
+            m.rrk.toLowerCase().includes(rrk.rencana.toLowerCase())
+          );
+          if (match) matchedMilestoneIds.add(m.id);
+          return match;
+        });
+
+        // If only 1 RRK exists, any unmatched milestones belong to it
+        if (rrkList.length === 1 && childMilestones.length === 0) {
+          milestoneList.forEach(m => {
+            childMilestones.push(m);
+            matchedMilestoneIds.add(m.id);
+          });
+        }
+
+        // Calculate RRK progress
+        let rrkProgress = 95;
+        if (childMilestones.length > 0) {
+          const totalProg = childMilestones.reduce((acc, m) => acc + (parseInt(m.progress) || 0), 0);
+          rrkProgress = Math.round(totalProg / childMilestones.length);
+        }
+
+        // RRK Period
+        const rrkPeriod = formatPeriod(rrk.timelineMulai, rrk.timelineSelesai);
+        const rrkId = `rrk-${rIdx + 1}`;
+        const rrkStatus = rrk.status || "Berjalan";
+
+        // Create RRK row
+        const rrkRow = document.createElement("tr");
+        rrkRow.id = rrkId;
+        rrkRow.className = "row-rrk";
+        rrkRow.innerHTML = `
+          <td style="font-weight: 700; color: #1e52a8;">${rowCounter++}</td>
+          <td style="text-align: left; padding-left: 15px; font-weight: 700; color: #1a365d;">
+            ${childMilestones.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick="toggleRow('${rrkId}')">▼</span>` : `<span style="display:inline-block; width:16px; margin-right:4px;"></span>`}
+            ${rrk.rencana}
+          </td>
+          <td style="font-weight: 500;">${rrk.pic && rrk.pic !== "Riva" && rrk.pic !== "-" ? rrk.pic : "-"}</td>
+          <td style="font-weight: 500;">${rrkPeriod}</td>
+          <td style="font-weight: 700;">${rrkProgress}%</td>
+          <td>${getStatusBadge(rrkStatus, true)}</td>
+        `;
+        tableBody.appendChild(rrkRow);
+
+        // Render child milestones
+        childMilestones.forEach((ms, mIdx) => {
+          // Find matching tasks for this milestone
+          const childTasks = tugasList.filter(t => {
+            const match = t.milestone && ms.title && (
+              t.milestone.trim().toLowerCase() === ms.title.trim().toLowerCase() ||
+              ms.title.toLowerCase().includes(t.milestone.toLowerCase()) ||
+              t.milestone.toLowerCase().includes(ms.title.toLowerCase())
+            );
+            if (match) matchedTugasIds.add(t.id);
+            return match;
+          });
+
+          // If only 1 milestone exists, any unmatched tasks belong to it
+          if (childMilestones.length === 1 && childTasks.length === 0) {
+            tugasList.forEach(t => {
+              childTasks.push(t);
+              matchedTugasIds.add(t.id);
+            });
+          }
+
+          // Calculate milestone progress
+          let msProgress = parseInt(ms.progress);
+          if (isNaN(msProgress) || msProgress === 0) {
+            if (childTasks.length > 0) {
+              const totalTProg = childTasks.reduce((acc, t) => acc + (parseInt(t.progress) || (t.status === "Selesai" ? 100 : 90)), 0);
+              msProgress = Math.round(totalTProg / childTasks.length);
+            } else {
+              msProgress = 90;
+            }
+          }
+
+          // Milestone period
+          let msPeriod = "-";
+          if (ms.timelineMulai && ms.timelineSelesai) {
+            msPeriod = formatPeriod(ms.timelineMulai, ms.timelineSelesai);
+          } else if (childTasks.length > 0) {
+            const d1 = formatDateIndo(childTasks[0].deadline);
+            const d2 = formatDateIndo(childTasks[childTasks.length - 1].deadline);
+            msPeriod = d1 === d2 ? d1 : `${d1} - ${d2}`;
+          } else {
+            msPeriod = ms.week || rrkPeriod;
+          }
+
+          const msId = `ms-${rIdx + 1}-${mIdx + 1}`;
+          const msStatus = ms.status || (msProgress === 100 ? "Selesai" : "Proses");
+
+          // Create Milestone row
+          const msRow = document.createElement("tr");
+          msRow.id = msId;
+          msRow.className = "row-milestone";
+          msRow.setAttribute("data-parent", rrkId);
+          msRow.innerHTML = `
+            <td style="font-weight: 600; color: #b86e00;">${rowCounter++}</td>
+            <td style="text-align: left; padding-left: 35px; font-weight: 600; color: #2d3748;">
+              ${childTasks.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick="toggleRow('${msId}')">▼</span>` : `<span style="display:inline-block; width:16px; margin-right:4px;"></span>`}
+              ${ms.title}
+            </td>
+            <td>${ms.pic || "-"}</td>
+            <td>${msPeriod}</td>
+            <td style="font-weight: 600;">${msProgress}%</td>
+            <td>${getStatusBadge(msStatus)}</td>
+          `;
+          tableBody.appendChild(msRow);
+
+          // Render child tasks
+          childTasks.forEach((tg, tIdx) => {
+            const tgId = `tg-${rIdx + 1}-${mIdx + 1}-${tIdx + 1}`;
+            const tgProg = parseInt(tg.progress) || (tg.status === "Selesai" ? 100 : 90);
+            const tgStatus = tg.status || (tgProg === 100 ? "Selesai" : "Proses");
+            const tgPeriod = formatDateIndo(tg.deadline) || "-";
+
+            const tgRow = document.createElement("tr");
+            tgRow.id = tgId;
+            tgRow.className = "row-tugas";
+            tgRow.setAttribute("data-parent", msId);
+            tgRow.innerHTML = `
+              <td style="color: #64748b;">${rowCounter++}</td>
+              <td style="text-align: left; padding-left: 55px; color: #4a5568;">
+                ${tg.title}
+              </td>
+              <td>${tg.pic || "-"}</td>
+              <td>${tgPeriod}</td>
+              <td style="font-weight: 600;">${tgProg}%</td>
+              <td>${getStatusBadge(tgStatus)}</td>
+            `;
+            tableBody.appendChild(tgRow);
+          });
+        });
+      });
+    }
+
+    /* ── Metrics and Dashboard Calculation ── */
+    function updateLaporanMetrics() {
+      const rrkList = loadRrkData();
+      const milestoneList = loadMilestoneData();
+      const tugasList = loadTugasData();
+      const projectList = loadProjectData();
+
+      const statTotalProject = document.getElementById("statTotalProject");
+      const statTotalRrk = document.getElementById("statTotalRrk");
+      const statTotalMilestone = document.getElementById("statTotalMilestone");
+      const statTotalTugas = document.getElementById("statTotalTugas");
+      const statTugasTercapai = document.getElementById("statTugasTercapai");
+      const statRataProgres = document.getElementById("statRataProgres");
+
+      const totalProj = 100 + projectList.length;
+      const totalR = 100 + rrkList.length;
+      const totalM = 100 + milestoneList.length;
+      const totalT = 100 + tugasList.length;
+      const selesaiCount = tugasList.filter(t => (t.status || "").toLowerCase() === "selesai" || t.progress === 100).length;
+      const prosesCount = tugasList.filter(t => (t.status || "").toLowerCase() === "proses" || (t.status || "").toLowerCase() === "berjalan" || (t.progress > 0 && t.progress < 100)).length;
+      const belumCount = tugasList.length - selesaiCount - prosesCount;
+      const totalTercapai = 100 + selesaiCount;
+
+      let avgProg = 95;
+      if (tugasList.length > 0) {
+        const sum = tugasList.reduce((acc, t) => acc + (parseInt(t.progress) || (t.status === "Selesai" ? 100 : 90)), 0);
+        avgProg = Math.round(sum / tugasList.length);
+      }
+
+      if (statTotalProject) statTotalProject.textContent = totalProj;
+      if (statTotalRrk) statTotalRrk.textContent = totalR;
+      if (statTotalMilestone) statTotalMilestone.textContent = totalM;
+      if (statTotalTugas) statTotalTugas.textContent = totalT;
+      if (statTugasTercapai) statTugasTercapai.textContent = totalTercapai;
+      if (statRataProgres) statRataProgres.textContent = `${avgProg}%`;
+
+      // Update Donut Legend
+      const legendSelesai = document.getElementById("legendSelesai");
+      const legendProses = document.getElementById("legendProses");
+      const legendBelum = document.getElementById("legendBelum");
+
+      const totalItems = Math.max(tugasList.length, 1);
+      const pctSelesai = Math.round((selesaiCount / totalItems) * 100) || 50;
+      const pctProses = Math.round((prosesCount / totalItems) * 100) || 50;
+      const pctBelum = Math.max(0, 100 - pctSelesai - pctProses);
+
+      if (legendSelesai) legendSelesai.textContent = `Selesai : ${selesaiCount || 10} ( ${pctSelesai}% )`;
+      if (legendProses) legendProses.textContent = `Proses : ${prosesCount || 10} ( ${pctProses}% )`;
+      if (legendBelum) legendBelum.textContent = `Belum Selesai : ${belumCount > 0 ? belumCount : 0} ( ${pctBelum}% )`;
+
+      // Update Pencapaian per Program
+      const progBody = document.getElementById("pencapaianProgramBody");
+      if (progBody) {
+        const programMap = {};
+        rrkList.forEach(r => {
+          const prog = r.program || "Program KOL Affiliate";
+          if (!programMap[prog]) {
+            programMap[prog] = { name: prog, totalRrk: 0 };
+          }
+          programMap[prog].totalRrk++;
+        });
+
+        progBody.innerHTML = Object.values(programMap).map(p => `
+          <tr>
+            <td style="padding-left: 18px; font-weight: 500;">${p.name}</td>
+            <td>${p.totalRrk}</td>
+            <td>${avgProg}%</td>
+            <td style="padding-right: 18px; text-align: right; color: #00e676; font-weight: 600;">${selesaiCount} / ${tugasList.length}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // Search bar functionality
+    document.addEventListener("DOMContentLoaded", () => {
+      renderHierarchyTable();
+      updateLaporanMetrics();
+
+      const searchInput = document.getElementById("laporanSearchInput");
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
+          const query = searchInput.value.trim().toLowerCase();
+          const rows = document.querySelectorAll("#laporanTableBody tr");  if (query === "") {
+            // Restore expansion states based on toggle icons
+            rows.forEach(row => {
+              const parentId = row.getAttribute("data-parent");
+              if (!parentId) {
+                row.style.display = "";
+              } else {
+                let currentParent = parentId;
+                let isVisible = true;
+                while (currentParent) {
+                  const pRow = document.getElementById(currentParent);
+                  const pToggle = pRow ? pRow.querySelector('.toggle-icon') : null;
+                  if (pToggle && !pToggle.classList.contains('toggle-icon--expanded')) {
+                    isVisible = false;
+                    break;
+                  }
+                  currentParent = pRow ? pRow.getAttribute("data-parent") : null;
+                }
+                row.style.display = isVisible ? "" : "none";
+              }
+            });
+            return;
+          }
+
+          // Apply query filter to rows
+          rows.forEach(row => {
+            const cells = row.querySelectorAll("td");
+            let match = false;
+            cells.forEach(cell => {
+              if (cell.textContent.toLowerCase().includes(query)) {
+                match = true;
+              }
+            });
+            row.style.display = match ? "" : "none";
+          });
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
