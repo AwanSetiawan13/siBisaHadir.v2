@@ -2440,6 +2440,16 @@
   // --------------------------------------------------------------
   // Branding (logo + avatar) dari Profil Perusahaan
   // --------------------------------------------------------------
+  function getMediaPrefix() {
+    const ref = document.querySelector('link[href*="style.css"], script[src*="script.js"]');
+    if (ref) {
+      const val = ref.getAttribute('href') || ref.getAttribute('src') || '';
+      const match = val.match(/^(\.\.\/)+/);
+      if (match) return match[0];
+    }
+    return './';
+  }
+
   function applyCompanyBranding() {
     const prof = readList(LS.PROFIL, {});
     const name = String(prof?.name || 'Bisa Media').trim() || 'Bisa Media';
@@ -2455,16 +2465,32 @@
     // logo + avatar
     const logo = String(prof?.logo_data_url || '').trim();
     const avatar = String(prof?.avatar_data_url || '').trim();
-
-    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
-    const logoSrc = logo || ((isSub ? '../' : './') + 'media/logo.png');
-    const avatarSrc = avatar || ((isSub ? '../' : './') + 'media/avatar.png');
+    const prefix = getMediaPrefix();
 
     document.querySelectorAll('img[data-ceo-brand-logo]').forEach((img) => {
-      if (img && img.getAttribute('src') !== logoSrc) img.setAttribute('src', logoSrc);
+      if (!img) return;
+      if (logo) {
+        if (img.getAttribute('src') !== logo) img.setAttribute('src', logo);
+      } else {
+        const cur = img.getAttribute('src') || '';
+        const proper = prefix + 'media/logo.png';
+        if (!cur || cur.indexOf('media/logo.png') !== -1 && cur !== proper) {
+          img.setAttribute('src', proper);
+        }
+      }
     });
+
     document.querySelectorAll('img[data-ceo-avatar]').forEach((img) => {
-      if (img && img.getAttribute('src') !== avatarSrc) img.setAttribute('src', avatarSrc);
+      if (!img) return;
+      if (avatar) {
+        if (img.getAttribute('src') !== avatar) img.setAttribute('src', avatar);
+      } else {
+        const cur = img.getAttribute('src') || '';
+        const proper = prefix + 'media/avatar.png';
+        if (!cur || cur.indexOf('media/avatar.png') !== -1 && cur !== proper) {
+          img.setAttribute('src', proper);
+        }
+      }
     });
   }
 
