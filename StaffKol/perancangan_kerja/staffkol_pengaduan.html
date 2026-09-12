@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengaduan - Bisa Media</title>
+  <link rel="stylesheet" href="../../style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* Custom design matching mockup exactly */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .status-badge--belum-diproses {
+      background-color: rgba(140, 140, 140, 0.1);
+      color: #8c8c8c;
+      border: 1px solid rgba(140, 140, 140, 0.3);
+    }
+    .status-badge--diproses {
+      background-color: rgba(34, 100, 198, 0.1);
+      color: #2264c6;
+      border: 1px solid rgba(34, 100, 198, 0.3);
+    }
+    .status-badge--selesai {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+
+
+    .btn-tambah-blue {
+      background-color: #29A3D8;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.15s ease;
+    }
+    .btn-tambah-blue:hover {
+      background-color: #1e87b7;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+    <aside id="sidebar" class="sidebar kol-sidebar"></aside>
+
+  <div class="dashboard-shell">
+        <header class="topbar hirezy-topbar"></header>
+
+    <main class="dashboard-content">
+      
+      <!-- Main Panel -->
+      <section class="panel campaign-panel" style="padding-bottom: 24px;">
+        <!-- Top border thick blue bar -->
+        <div class="campaign-panel__line" style="height: 4px; background: var(--blue-800);"></div>
+
+        <!-- Toolbar -->
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <!-- Left empty as requested in mockup -->
+          </div>
+          <div class="campaign-toolbar__right">
+            <button id="btnTambahPengaduan" class="btn-tambah-blue" type="button">
+              + Tambah
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap campaign-table" style="padding: 0 0 24px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 60px;">#</th>
+                <th>Tanggal</th>
+                <th>Pengaduan</th>
+                <th>Kategori</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="pengaduanTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+  </div>
+
+  <!-- Modal PopUp Tambah Pengaduan -->
+  <div id="pengaduanModal" class="modal-overlay">
+    <div class="modal-box modal-box--medium">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Tambah <strong style="font-weight: 700;">Pengaduan</strong></h2>
+        <button id="closePengaduanModal" class="modal-close" type="button" aria-label="Tutup popup" style="border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; background: #fff; font-weight: bold; cursor: pointer;">X</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <form id="pengaduanForm" class="modal-form-grid" style="grid-template-columns: repeat(12, 1fr); gap: 20px;">
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Pengaduan</label>
+          <input type="text" id="inputPengaduan" class="form-input" placeholder="Judul Pengaduan" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Kategori</label>
+          <select id="inputKategori" class="form-select" required>
+            <option value="" disabled selected hidden>Pilih Pengaduan</option>
+            <option value="Fasilitas">Fasilitas</option>
+            <option value="Layanan">Layanan</option>
+            <option value="Sistem">Sistem</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Deskripsi</label>
+          <input type="text" id="inputDeskripsi" class="form-input" placeholder="Deskripsi Pengaduan" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Lampiran</label>
+          <input type="file" id="inputLampiran" class="form-input" style="padding: 4px;" />
+        </div>
+
+        <div style="grid-column: span 12; margin-top: 15px; display: flex; justify-content: flex-end;">
+          <button class="btn-submit-blue-outline" type="submit" style="background-color: #fff; color: #29A3D8; border: 1.5px solid #29A3D8; padding: 10px 42px; border-radius: 6px; font-weight: 700; font-size: 15px; cursor: pointer; transition: background-color 0.15s ease;">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="../../script.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      /* ── LocalStorage Persistence & Default Demo Data ── */
+      const PENGADUAN_STORAGE_KEY = "bisa_pengaduan_data_v1";
+      const PENGADUAN_RESET_KEY = "bisa_pengaduan_reset_v1";
+
+      const DEFAULT_PENGADUAN = [
+        {
+          id: 1,
+          tanggal: "2026-08-15",
+          pengaduan: "Kendala Akses Upload Bukti Draft Konten Kreator",
+          kategori: "Sistem",
+          status: "Diproses",
+          deskripsi: "Server sering mengalami kendala timeout saat tim KOL mengunggah file draft video MP4 dan bukti postingan di atas 20MB, mohon dibantu optimasi kapasitas server.",
+          lampiran: "bukti_kendala_upload.png"
+        }
+      ];
+
+      // Reset legacy empty keys so user automatically gets exactly 1 demo data item
+      if (!localStorage.getItem(PENGADUAN_RESET_KEY)) {
+        try {
+          localStorage.removeItem("bisa_pengaduan_data");
+          localStorage.removeItem(PENGADUAN_STORAGE_KEY);
+          localStorage.setItem(PENGADUAN_RESET_KEY, "true");
+        } catch (e) {
+          console.warn("Could not clean legacy localStorage keys:", e);
+        }
+      }
+
+      function loadPengaduanData() {
+        try {
+          const saved = localStorage.getItem(PENGADUAN_STORAGE_KEY);
+          if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error("Error loading pengaduan data:", e);
+        }
+        try {
+          localStorage.setItem(PENGADUAN_STORAGE_KEY, JSON.stringify(DEFAULT_PENGADUAN));
+        } catch (e) { }
+        return JSON.parse(JSON.stringify(DEFAULT_PENGADUAN));
+      }
+
+      function savePengaduanData() {
+        try {
+          localStorage.setItem(PENGADUAN_STORAGE_KEY, JSON.stringify(pengaduanData));
+        } catch (e) {
+          console.error("Error saving pengaduan data:", e);
+        }
+      }
+
+      let pengaduanData = loadPengaduanData();
+
+      const tableBody = document.getElementById("pengaduanTableBody");
+      const pengaduanModal = document.getElementById("pengaduanModal");
+      const pengaduanForm = document.getElementById("pengaduanForm");
+      const btnTambah = document.getElementById("btnTambahPengaduan");
+      const btnClose = document.getElementById("closePengaduanModal");
+      const btnBatal = document.getElementById("btnBatal");
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "-";
+        const parts = dateStr.split("-");
+        if (parts.length !== 3) return dateStr;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+
+      function renderTable(dataToRender) {
+        tableBody.innerHTML = "";
+        
+        if (dataToRender.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="db-empty-row" style="text-align: center; padding: 24px; color: #a1a1a5;">
+                Tidak ada data pengaduan
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        dataToRender.forEach((item, index) => {
+          const row = document.createElement("tr");
+
+          let statusClass = "status-badge--belum-diproses";
+          if (item.status === "Diproses") statusClass = "status-badge--diproses";
+          if (item.status === "Selesai") statusClass = "status-badge--selesai";
+
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${formatDate(item.tanggal)}</td>
+            <td style="font-weight: 600; text-align: left; padding-left: 15px;">${item.pengaduan}</td>
+            <td>${item.kategori}</td>
+            <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+          `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function showModal() {
+        pengaduanModal.classList.add("is-active");
+      }
+
+      function hideModal() {
+        pengaduanModal.classList.remove("is-active");
+        pengaduanForm.reset();
+      }
+
+      btnTambah.addEventListener("click", showModal);
+      btnClose.addEventListener("click", hideModal);
+      if (btnBatal) {
+        btnBatal.addEventListener("click", hideModal);
+      }
+
+      pengaduanModal.addEventListener("click", (e) => {
+        if (e.target === pengaduanModal) hideModal();
+      });
+
+      pengaduanForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const pengaduan = document.getElementById("inputPengaduan").value;
+        const kategori = document.getElementById("inputKategori").value;
+        const deskripsi = document.getElementById("inputDeskripsi").value;
+        const tanggal = new Date().toISOString().split("T")[0];
+        const status = "Belum Diproses";
+
+        const nextId = pengaduanData.length > 0 ? Math.max(...pengaduanData.map(d => d.id)) + 1 : 1;
+        pengaduanData.push({
+          id: nextId,
+          tanggal,
+          pengaduan,
+          kategori,
+          status,
+          deskripsi
+        });
+        savePengaduanData();
+        if (window.ceoToast) {
+          window.ceoToast("Pengaduan berhasil ditambahkan", "success");
+        } else {
+          alert("Pengaduan berhasil ditambahkan");
+        }
+
+        hideModal();
+        renderTable(pengaduanData);
+      });
+
+      // Initial render with loaded demo data
+      renderTable(pengaduanData);
+    });
+  </script>
+  <script src="../staffkol_layout.js"></script>
+</body>
+
+</html>
+
+

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kehadiran - Bisa Media</title>
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="stylesheet" href="../../style.css" />
+  <!-- Boxicons for action icons -->
+  <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .status-badge--success {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+    .status-badge--warning {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+    .status-badge--danger {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+
+    /* Actions style from staffkol_rrk.html btn-view */
+    .btn-view {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease;
+      color: #29A3D8;
+    }
+    .btn-view:hover {
+      background-color: rgba(41, 163, 216, 0.08);
+    }
+
+    /* Align the Aksi header text and its cell contents to center */
+    #tblKehadiranV2 th:last-child,
+    .campaign-table th:last-child,
+    #tblKehadiranV2 td.tdActions,
+    .campaign-table td.tdActions {
+      text-align: center !important;
+      vertical-align: middle !important;
+      padding: 6px 12px !important;
+    }
+
+    /* 3-dots action button */
+    .tdActions .dropdown {
+      position: relative;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .tdActions button[data-bm-dots="true"],
+    .tdActions .dropdown-toggle {
+      background: transparent !important;
+      border: none !important;
+      cursor: pointer !important;
+      width: 32px !important;
+      height: 32px !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      color: #64748b !important;
+      box-shadow: none !important;
+      transition: background-color 0.15s ease, color 0.15s ease !important;
+    }
+    .tdActions button[data-bm-dots="true"]:hover,
+    .tdActions button[data-bm-dots="true"].show,
+    .tdActions .dropdown-toggle:hover,
+    .tdActions .dropdown-toggle.show {
+      background-color: rgba(67, 89, 113, 0.08) !important;
+      color: #334155 !important;
+    }
+    .tdActions button[data-bm-dots="true"] i,
+    .tdActions .dropdown-toggle i {
+      font-size: 20px !important;
+      line-height: 1 !important;
+      pointer-events: none;
+    }
+    .tdActions .dropdown-toggle::after {
+      display: none !important;
+    }
+
+    /* Dropdown popup menu matching screenshot */
+    .bm-table-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      margin: 0;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+      list-style: none;
+    }
+    .bm-table-action-menu.show {
+      display: block !important;
+    }
+    .bm-table-action-menu li {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .bm-table-action-menu .dropdown-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: 38px !important;
+      padding: 7px 12px !important;
+      border-radius: 6px !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      background: transparent !important;
+      border: none !important;
+      cursor: pointer !important;
+      text-align: left !important;
+      white-space: nowrap !important;
+      box-shadow: none !important;
+      transition: background-color 0.15s ease, color 0.15s ease !important;
+    }
+    .bm-table-action-menu .dropdown-item:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    .bm-table-action-menu .dropdown-item.text-danger {
+      color: #334155 !important;
+    }
+    .bm-table-action-menu .dropdown-item.text-danger:hover {
+      background-color: #fef2f2 !important;
+      color: #dc2626 !important;
+    }
+
+    /* Rounded blue icon box matching user screenshot */
+    .bm-table-action-menu .bm-menu-iconify {
+      width: 28px !important;
+      height: 28px !important;
+      border-radius: 6px !important;
+      background: #0076C5 !important;
+      color: #ffffff !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex: 0 0 28px !important;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.28) !important;
+      pointer-events: none;
+    }
+    .bm-table-action-menu .bm-menu-iconify i {
+      color: #ffffff !important;
+      font-size: 16px !important;
+      line-height: 1 !important;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+    <aside id="sidebar" class="sidebar kol-sidebar"></aside>
+
+  <div class="dashboard-shell">
+        <header class="topbar hirezy-topbar"></header>
+
+    <main class="dashboard-content">
+      
+      <!-- Metric Summary Cards outside Panel -->
+      <div class="milestone-metric-grid-new" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 29px; margin-bottom: 26px;">
+        
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Total Presensi</span>
+            <strong class="metric-value" id="ovKehadiranTotal">0</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(34, 100, 198, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #2264c6;">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <polyline points="16 11 18 13 22 9"></polyline>
+            </svg>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Status Terlambat</span>
+            <strong class="metric-value" id="ovKehadiranAttention">0</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(255, 179, 0, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #ffb300;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div>
+            <span class="metric-label">Check Out</span>
+            <strong class="metric-value" id="ovKehadiranComplete">0</strong>
+          </div>
+          <div class="metric-icon-box" style="background-color: rgba(76, 175, 80, 0.12); border-radius: 12px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: #4caf50;">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </div>
+        </article>
+
+      </div>
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left" style="gap: 8px; display: flex; align-items: center;">
+            <button id="btnExportKehadiran" class="small-action-button" type="button" aria-label="Export Excel" title="Export Excel">
+              <!-- Excel / Spreadsheet SVG -->
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="3" width="16" height="18" rx="1.5" fill="#1f72b6" stroke="#1f72b6" />
+                <line x1="12" y1="7" x2="17" y2="7" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="11" x2="17" y2="11" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="15" x2="17" y2="15" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#fff" stroke-width="1.2" />
+                <path d="M6 9l3 6M9 9l-3 6" stroke="#fff" stroke-width="1.8" />
+              </svg>
+            </button>
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterKehadiran" class="small-action-button" type="button" aria-label="Filter Status" title="Filter Status">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+              
+              <!-- Popover Content -->
+              <div id="filterStatusDropdown" class="filter-popover" style="width: 250px;">
+                <div class="filter-popover-form">
+                  <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+                    <label class="form-label" style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Status Check In</label>
+                    <div class="select-wrapper">
+                      <select id="filterStatusCheckIn" class="form-select" style="font-size: 12px; padding: 6px 10px; height: auto;">
+                        <option value="Semua">Semua</option>
+                        <option value="Tepat Waktu">Tepat Waktu</option>
+                        <option value="Terlambat">Terlambat</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 16px; text-align: left;">
+                    <label class="form-label" style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Status Check Out</label>
+                    <div class="select-wrapper">
+                      <select id="filterStatusCheckOut" class="form-select" style="font-size: 12px; padding: 6px 10px; height: auto;">
+                        <option value="Semua">Semua</option>
+                        <option value="Selesai">Selesai / Check Out</option>
+                        <option value="Belum Check Out">Belum Check Out</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <button id="resetFilterBtn" type="button" style="background: #f44336; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit';">Reset</button>
+                    <button id="applyStatusFilterBtn" type="button" style="background: #2264c6; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit';">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button id="btnCalendarKehadiran" class="small-action-button" type="button" aria-label="Pilih tanggal" title="Pilih Tanggal">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+                <path d="M8 3v4M16 3v4M4 9h16"></path>
+              </svg>
+            </button>
+            <input id="dateFilterKehadiran" type="text" data-date-col="2" data-filter-date="" data-filter-table="#tblKehadiranV2" data-popup-url="../../popup.html" style="display: none;" />
+          </div>
+        </div>
+
+        <div class="table-wrap campaign-table" style="padding: 0 0 24px;">
+          <table id="tblKehadiranV2">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Nama Pegawai</th>
+                <th>Tanggal</th>
+                <th>Check In</th>
+                <th>Photo Check In</th>
+                <th>Status Check In</th>
+                <th>Check Out</th>
+                <th>Photo Check Out</th>
+                <th>Status Check Out</th>
+                <th>Total Waktu</th>
+                <th>Tipe Shift</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Setiawan</td>
+                <td>2026-05-21</td>
+                <td>08:00</td>
+                <td><button class="btn btn-sm btn-outline-primary" type="button" data-photo-preview="1" data-photo-kind="check-in" data-preview-src="../../media/avatar.png" data-photo-address="Bisa Media MCN, Jl. Cisalak No. 47A, Sukamanah, Kec. Cipedes, Kab. Tasikmalaya, Jawa Barat 46131" data-photo-note="-" style="padding: 4px 10px; font-size: 11px; font-family: 'Outfit'; font-weight: 500; border-radius: 4px; border: 1px solid rgba(34, 100, 198, 0.4); color: #2264c6; background: rgba(34, 100, 198, 0.04); cursor: pointer;">Lihat Foto</button></td>
+                <td><span class="status-badge status-badge--success" style="background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">Tepat Waktu</span></td>
+                <td>17:00</td>
+                <td><button class="btn btn-sm btn-outline-primary" type="button" data-photo-preview="1" data-photo-kind="check-out" data-preview-src="../../media/avatar.png" data-photo-address="Bisa Media MCN, Jl. Cisalak No. 47A, Sukamanah, Kec. Cipedes, Kab. Tasikmalaya, Jawa Barat 46131" data-photo-note="-" style="padding: 4px 10px; font-size: 11px; font-family: 'Outfit'; font-weight: 500; border-radius: 4px; border: 1px solid rgba(34, 100, 198, 0.4); color: #2264c6; background: rgba(34, 100, 198, 0.04); cursor: pointer;">Lihat Foto</button></td>
+                <td><span class="status-badge status-badge--success" style="background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">Selesai</span></td>
+                <td>9 Jam</td>
+                <td>Shift Pagi</td>
+                <td class="tdActions">
+                  <div class="dropdown bm-action-dropdown">
+                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                      data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi">
+                      <i class="bx bx-dots-vertical-rounded"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu">
+                      <li>
+                        <button class="dropdown-item" type="button" data-action="view" title="Lihat">
+                          <span class="bm-menu-iconify"><i class="bx bx-show"></i></span>
+                          <span>Lihat</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <footer class="dashboard-footer"> 2026 Bisa Media</footer>
+  </div>
+
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="../../script.js"></script>
+  <script>
+    function exportTableToCSV(tableId, filename) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+
+      const rows = Array.from(table.querySelectorAll('tr'));
+      const csvData = [];
+
+      rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        const rowData = cells.map((cell, index) => {
+          if (index === cells.length - 1 && cell.textContent.trim().toLowerCase() === 'aksi') {
+            return null;
+          }
+          if (cell.classList.contains('tdActions')) {
+            return null;
+          }
+          let text = cell.textContent.trim();
+          text = text.replace(/"/g, '""');
+          if (text.includes(',') || text.includes('\n') || text.includes('"')) {
+            text = `"${text}"`;
+          }
+          return text;
+        }).filter(val => val !== null);
+
+        if (rowData.length > 0) {
+          csvData.push(rowData);
+        }
+      });
+
+      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvData.map(row => row.join(",")).join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      if (typeof showToast === 'function') {
+        showToast("File Excel berhasil diunduh");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnCalendar = document.getElementById('btnCalendarKehadiran');
+      const dateInput = document.getElementById('dateFilterKehadiran');
+      const btnFilter = document.getElementById('btnFilterKehadiran');
+      const btnExport = document.getElementById('btnExportKehadiran');
+
+      if (btnCalendar && dateInput) {
+        btnCalendar.addEventListener('click', (e) => {
+          e.preventDefault();
+          dateInput.click();
+        });
+      }
+
+      const filterDropdown = document.getElementById('filterStatusDropdown');
+      const selIn = document.getElementById('filterStatusCheckIn');
+      const selOut = document.getElementById('filterStatusCheckOut');
+      const btnApplyFilter = document.getElementById('applyStatusFilterBtn');
+      const btnResetFilter = document.getElementById('resetFilterBtn');
+
+      function filterKehadiranTable() {
+        const valIn = selIn ? selIn.value : 'Semua';
+        const valOut = selOut ? selOut.value : 'Semua';
+        const table = document.getElementById('tblKehadiranV2');
+        if (!table) return;
+        const rows = table.querySelectorAll('tbody tr');
+        
+        for (const tr of rows) {
+          const tds = tr.querySelectorAll('td');
+          if (tds.length < 10) continue;
+          const statusIn = tds[5].textContent.trim();
+          const statusOut = tds[8].textContent.trim();
+          
+          const matchIn = (valIn === 'Semua' || statusIn.includes(valIn));
+          const matchOut = (valOut === 'Semua' || statusOut.includes(valOut));
+          
+          if (matchIn && matchOut) {
+            tr.style.display = '';
+          } else {
+            tr.style.display = 'none';
+          }
+        }
+        
+        let n = 1;
+        for (const tr of rows) {
+          if (tr.style.display === 'none') continue;
+          const tdFirst = tr.querySelector('td');
+          if (tdFirst && /^\d+$/.test(tdFirst.textContent.trim())) {
+            tdFirst.textContent = String(n++);
+          }
+        }
+      }
+
+      function resetKehadiranTableFilter() {
+        if (selIn) selIn.value = 'Semua';
+        if (selOut) selOut.value = 'Semua';
+        filterKehadiranTable();
+      }
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          filterDropdown.classList.toggle('is-active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!filterDropdown.contains(e.target) && e.target !== btnFilter) {
+            filterDropdown.classList.remove('is-active');
+          }
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', () => {
+          filterKehadiranTable();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', () => {
+          resetKehadiranTableFilter();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+        });
+      }
+
+      // Add click filter for metric cards
+      const metricCards = document.querySelectorAll('.metric-card');
+      if (metricCards.length >= 3) {
+        // Card 1: Total Presensi
+        metricCards[0].style.cursor = 'pointer';
+        metricCards[0].addEventListener('click', () => {
+          resetKehadiranTableFilter();
+        });
+
+        // Card 2: Status Terlambat
+        metricCards[1].style.cursor = 'pointer';
+        metricCards[1].addEventListener('click', () => {
+          if (selIn) selIn.value = 'Terlambat';
+          if (selOut) selOut.value = 'Semua';
+          filterKehadiranTable();
+        });
+
+        // Card 3: Check Out (Selesai)
+        metricCards[2].style.cursor = 'pointer';
+        metricCards[2].addEventListener('click', () => {
+          if (selIn) selIn.value = 'Semua';
+          if (selOut) selOut.value = 'Selesai';
+          filterKehadiranTable();
+        });
+      }
+
+      if (btnExport) {
+        btnExport.addEventListener('click', (e) => {
+          e.preventDefault();
+          exportTableToCSV('tblKehadiranV2', 'data_kehadiran.csv');
+        });
+      }
+    });
+  </script>
+  <script src="../staffkol_layout.js"></script>
+</body>
+
+</html>

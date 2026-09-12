@@ -16960,7 +16960,7 @@
       }
 
       const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
-      window.location.href = isSub ? "spvkol_dashboard.html" : "SpvKol/spvkol_dashboard.html";
+      window.location.href = isSub ? "BM_dashboard.html" : "BM/BM_dashboard.html";
     });
   }
 
@@ -17026,49 +17026,69 @@
     showToast(`Dashboard bulan ${monthSelect.value}`);
   });
 
-  // Load sidebar toggle state from localStorage
+  // Load sidebar toggle state scoped by role and group title
+  const currentPath = window.location.pathname.toLowerCase();
+  const currentRole = currentPath.includes("/staffkol/")
+    ? "staffkol"
+    : currentPath.includes("/spvkol/")
+    ? "spvkol"
+    : "default";
+
   document.querySelectorAll(".nav-group").forEach((group, index) => {
-    const isCollapsed = localStorage.getItem(`nav-group-collapsed-${index}`);
-    if (isCollapsed !== null) {
-      if (isCollapsed === "true") {
-        group.classList.add("is-collapsed");
-      } else {
+    const title = group.querySelector(".nav-group__toggle span")?.textContent.trim() || String(index);
+    const hasActiveItem = !!group.querySelector(".nav-item--active");
+
+    if (hasActiveItem) {
+      // Group containing active page must be expanded
+      group.classList.remove("is-collapsed");
+    } else {
+      const saved = localStorage.getItem(`nav-group-${currentRole}-${title}`);
+      if (saved === "open") {
         group.classList.remove("is-collapsed");
+      } else {
+        group.classList.add("is-collapsed");
       }
     }
   });
 
   document.querySelectorAll(".nav-group__toggle").forEach((button, index) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (e) => {
+      e.preventDefault();
       const group = button.closest(".nav-group");
-      if (group) {
-        group.classList.toggle("is-collapsed");
-        const collapsed = group.classList.contains("is-collapsed");
-        localStorage.setItem(`nav-group-collapsed-${index}`, collapsed);
-      }
+      if (!group) return;
+      group.classList.toggle("is-collapsed");
+      const title = group.querySelector(".nav-group__toggle span")?.textContent.trim() || String(index);
+      const isNowCollapsed = group.classList.contains("is-collapsed");
+      localStorage.setItem(`nav-group-${currentRole}-${title}`, isNowCollapsed ? "collapsed" : "open");
     });
   });
 
-  // Load subgroup toggle state from localStorage
+  // Load subgroup toggle state
   document.querySelectorAll(".nav-subgroup").forEach((subgroup, index) => {
-    const isCollapsed = localStorage.getItem(`nav-subgroup-collapsed-${index}`);
-    if (isCollapsed !== null) {
-      if (isCollapsed === "true") {
-        subgroup.classList.add("is-collapsed");
-      } else {
+    const title = subgroup.querySelector(".nav-subgroup__toggle span")?.textContent.trim() || String(index);
+    const hasActiveItem = !!subgroup.querySelector(".nav-item--active");
+
+    if (hasActiveItem) {
+      subgroup.classList.remove("is-collapsed");
+    } else {
+      const saved = localStorage.getItem(`nav-subgroup-${currentRole}-${title}`);
+      if (saved === "open") {
         subgroup.classList.remove("is-collapsed");
+      } else {
+        subgroup.classList.add("is-collapsed");
       }
     }
   });
 
   document.querySelectorAll(".nav-subgroup__toggle").forEach((button, index) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (e) => {
+      e.preventDefault();
       const subgroup = button.closest(".nav-subgroup");
-      if (subgroup) {
-        subgroup.classList.toggle("is-collapsed");
-        const collapsed = subgroup.classList.contains("is-collapsed");
-        localStorage.setItem(`nav-subgroup-collapsed-${index}`, collapsed);
-      }
+      if (!subgroup) return;
+      subgroup.classList.toggle("is-collapsed");
+      const title = subgroup.querySelector(".nav-subgroup__toggle span")?.textContent.trim() || String(index);
+      const isNowCollapsed = subgroup.classList.contains("is-collapsed");
+      localStorage.setItem(`nav-subgroup-${currentRole}-${title}`, isNowCollapsed ? "collapsed" : "open");
     });
   });
 
