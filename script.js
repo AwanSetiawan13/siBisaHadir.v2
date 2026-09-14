@@ -17226,6 +17226,7 @@
       const nameInput = document.getElementById("kreatorNamaInput") || kreatorForm.querySelector("input[placeholder='Tambah Nama Kreator']");
       const alamatInput = document.getElementById("kreatorAlamatInput") || kreatorForm.querySelector("input[placeholder='Tambah Alamat']");
       const waInput = document.getElementById("kreatorWaInput") || kreatorForm.querySelector("input[placeholder='Tambah Nomor WA']");
+      const katSelect = document.getElementById("kreatorKategoriSelect");
       const katInput = document.getElementById("kategoriProdukVal");
       const katSpesifikInput = document.getElementById("kreatorKatSpesifikInput") || kreatorForm.querySelector("input[placeholder='Tambah Kategori Spesifik']");
       const tglAwalInput = document.getElementById("kreatorKontrakAwalInput");
@@ -17239,11 +17240,11 @@
       const alamatVal = alamatInput && alamatInput.value.trim() ? alamatInput.value.trim() : "Jakarta";
       const waVal = waInput && waInput.value.trim() ? waInput.value.trim() : "081234567890";
 
-      let katVal = katInput && katInput.value.trim() ? katInput.value.trim() : "";
+      let katVal = (katSelect && katSelect.value && katSelect.value.trim()) ? katSelect.value.trim() : (katInput && katInput.value.trim() ? katInput.value.trim() : "");
       if (!katVal && katSpesifikInput && katSpesifikInput.value.trim()) {
         katVal = katSpesifikInput.value.trim();
       }
-      if (!katVal) katVal = "Fashion";
+      if (!katVal) katVal = "Fashion Muslim";
       const katSpesifikVal = katSpesifikInput && katSpesifikInput.value.trim() ? katSpesifikInput.value.trim() : katVal;
 
       let kontrakAwal = (tglAwalInput && tglAwalInput.value) ? tglAwalInput.value : ((dateInputs.length > 0 && dateInputs[0].value) ? dateInputs[0].value : "01/01/2026");
