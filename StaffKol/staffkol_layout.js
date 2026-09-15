@@ -415,10 +415,14 @@
 
   // 4. Injects template into DOM
   function injectTemplate() {
-    // A. Inject/Replace Sidebar
-    let sidebarEl = document.getElementById('sidebar') || document.querySelector('.sidebar.kol-sidebar');
-    if (sidebarEl) {
-      sidebarEl.innerHTML = getSidebarHTML();
+    // A. Inject/Replace Sidebar using Unified Sidebar Engine if available
+    if (typeof window.bmRenderSidebar === 'function') {
+      window.bmRenderSidebar();
+    } else {
+      let sidebarEl = document.getElementById('sidebar') || document.querySelector('.sidebar.kol-sidebar');
+      if (sidebarEl) {
+        sidebarEl.innerHTML = getSidebarHTML();
+      }
     }
 
     // B. Inject/Replace Topbar (Navbar)
