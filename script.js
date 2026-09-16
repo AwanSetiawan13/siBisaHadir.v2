@@ -1,3 +1,387 @@
+/**
+ * Bisa Media Unified Sidebar Engine
+ * Renders Pixel-Perfect SaaS Navigation dynamically based on user_role (Admin, SPV KOL, Staff KOL)
+ */
+(function () {
+  'use strict';
+
+  if (window.__bmSidebarEngineLoaded) return;
+  window.__bmSidebarEngineLoaded = true;
+
+  function getProjectRootPrefix() {
+    const pathname = window.location.pathname.replace(/\\/g, '/');
+    const parts = pathname.split('/').filter(Boolean);
+    const idx = parts.findIndex(p => ['bm', 'spvkol', 'staffkol'].includes(p.toLowerCase()));
+    if (idx === -1) return '';
+    const depth = parts.length - 1 - idx;
+    return '../'.repeat(depth);
+  }
+
+  function getUserRole() {
+    let role = (localStorage.getItem('user_role') || '').toLowerCase().trim();
+    if (!['admin', 'spv_kol', 'staff_kol'].includes(role)) {
+      const p = window.location.pathname.toLowerCase();
+      if (p.includes('/bm/')) role = 'admin';
+      else if (p.includes('/staffkol/')) role = 'staff_kol';
+      else role = 'spv_kol';
+      localStorage.setItem('user_role', role);
+    }
+    return role;
+  }
+
+  const ROLE_NAMES = {
+    admin: 'Admin',
+    spv_kol: 'SPV KOL',
+    staff_kol: 'Staff KOL'
+  };
+
+  const ROLE_MENUS = {
+    admin: [
+      { section: 'UTAMA' },
+      { title: 'Beranda', icon: 'bx bx-home-circle', href: 'BM/BM_dashboard.html' },
+      { title: 'Kalender', icon: 'bx bx-calendar', href: 'BM/BM_kalender.html' },
+      { title: 'Panduan', icon: 'bx bx-book-content', href: 'BM/BM_panduan.html' },
+      { section: 'MANAJEMEN & OPERASIONAL' },
+      {
+        title: 'Data Karyawan',
+        icon: 'bx bx-user',
+        children: [
+          { title: 'Karyawan', href: 'BM/data_karyawan/BM_karyawan.html' },
+          { title: 'Kontrak Karyawan', href: 'BM/data_karyawan/BM_Kontrak.html' },
+          { title: 'Kegiatan Karyawan', href: 'BM/data_karyawan/BM_kegiatan_karyawan.html' }
+        ]
+      },
+      {
+        title: 'Tugas & Pekerjaan',
+        icon: 'bx bx-list-check',
+        children: [
+          { title: 'Instruksi Tugas', href: 'BM/tugas_pekerjaan/BM_instruksi_tugas.html' },
+          { title: 'RRK', href: 'BM/tugas_pekerjaan/BM_rrk.html' },
+          { title: 'Report Pengerjaan', href: 'BM/tugas_pekerjaan/BM_report_pengerjaan.html' }
+        ]
+      },
+      {
+        title: 'Absensi & Penilaian',
+        icon: 'bx bx-calendar-check',
+        children: [
+          { title: 'Kehadiran', href: 'BM/absensi/BM_kehadiran.html' },
+          { title: 'Presensi Istirahat', href: 'BM/absensi/BM_presensi_istirahat.html' },
+          { title: 'Presensi Lembur', href: 'BM/absensi/BM_presensi_lembur.html' },
+          { title: 'Skenario Jam Kerja', href: 'BM/absensi/BM_skenario_jam_kerja.html' },
+          { title: 'Penilaian Karyawan', href: 'BM/penilaian/BM_penilaian_karyawan.html' }
+        ]
+      },
+      {
+        title: 'Kelola Perusahaan',
+        icon: 'bx bx-buildings',
+        children: [
+          { title: 'Profil Perusahaan', href: 'BM/perusahaan/BM_profil_perusahaan.html' },
+          { title: 'Sub Perusahaan', href: 'BM/perusahaan/BM_subperusahaan.html' },
+          { title: 'Divisi', href: 'BM/perusahaan/BM_divisi.html' },
+          { title: 'Jabatan', href: 'BM/perusahaan/BM_jabatan.html' },
+          { title: 'Struktur', href: 'BM/perusahaan/BM_struktur_perusahaan.html' }
+        ]
+      }
+    ],
+
+    spv_kol: [
+      { section: 'UTAMA' },
+      { title: 'Beranda / Dashboard KOL', icon: 'bx bx-home-circle', href: 'SpvKol/spvkol_dashboard.html' },
+      { title: 'Kalender', icon: 'bx bx-calendar', href: 'SpvKol/spvkol_kalender.html' },
+      { title: 'Panduan', icon: 'bx bx-book-content', href: 'BM/BM_panduan.html' },
+      { section: 'OPERASIONAL KOL' },
+      {
+        title: 'Operasional KOL',
+        icon: 'bx bx-pie-chart-alt-2',
+        children: [
+          { title: 'Approval Sampel', href: 'SpvKol/operasional/spvkol_tracking_sampel.html' },
+          { title: 'Monitoring Campaign', href: 'SpvKol/operasional/spvkol_dashboard_campaign.html' },
+          { title: 'Campaign', href: 'SpvKol/operasional/spvkol_campaign.html' },
+          { title: 'Performa Kreator', href: 'SpvKol/operasional/spvkol_Performa_Kreator.html' }
+        ]
+      },
+      {
+        title: 'Manajemen Tim',
+        icon: 'bx bx-group',
+        children: [
+          { title: 'Data Staff KOL / Kreator', href: 'SpvKol/operasional/spvkol_kreator.html' },
+          { title: 'Penugasan / RRK', href: 'SpvKol/perancangan_kerja/spvkol_rrk.html' },
+          { title: 'Tugas', href: 'SpvKol/perancangan_kerja/spvkol_tugas.html' },
+          { title: 'Evaluasi Kinerja', href: 'SpvKol/kinerja/spvkol_evaluasi_kinerja.html' }
+        ]
+      },
+      {
+        title: 'Presensi & Jadwal Kerja',
+        icon: 'bx bx-calendar-check',
+        children: [
+          { title: 'Kehadiran', href: 'SpvKol/absensi/spvkol_kehadiran.html' },
+          { title: 'Presensi Istirahat', href: 'SpvKol/absensi/spvkol_presensi_istirahat.html' },
+          { title: 'Presensi Lembur', href: 'SpvKol/absensi/spvkol_presensi_lembur.html' }
+        ]
+      },
+      { section: 'DATA & DOKUMEN' },
+      {
+        title: 'Data Master',
+        icon: 'bx bx-data',
+        children: [
+          { title: 'Brand', href: 'SpvKol/data_master/spvkol_Brand.html' },
+          { title: 'Kategori Produk', href: 'SpvKol/data_master/master_pendukung/spvkol_Kategori_Produk.html' },
+          { title: 'Leads Kreator', href: 'SpvKol/data_master/master_pendukung/spvkol_Leads_Kreator.html' },
+          { title: 'Leveling Kreator', href: 'SpvKol/data_master/master_pendukung/spvkol_Leveling_Kreator.html' },
+          { title: 'Ads Account', href: 'SpvKol/data_master/master_pendukung/spvkol_Ads_Account.html' }
+        ]
+      },
+      {
+        title: 'Dokumen Kolaborasi',
+        icon: 'bx bx-folder',
+        children: [
+          { title: 'Folder', href: 'SpvKol/dokumen_kolaborasi/spvkol_folder.html' }
+        ]
+      }
+    ],
+
+    staff_kol: [
+      { section: 'UTAMA' },
+      { title: 'Beranda', icon: 'bx bx-home-circle', href: 'StaffKol/staffkol_dashboard.html' },
+      { title: 'Kalender', icon: 'bx bx-calendar', href: 'StaffKol/staffkol_kalender.html' },
+      { title: 'Panduan', icon: 'bx bx-book-content', href: 'BM/BM_panduan.html' },
+      { section: 'OPERASIONAL & TUGAS' },
+      {
+        title: 'Operasional',
+        icon: 'bx bx-package',
+        children: [
+          { title: 'Tracking Sampel', href: 'StaffKol/operasional/staffkol_tracking_sampel.html' },
+          { title: 'Data Kreator', href: 'StaffKol/operasional/staffkol_kreator.html' },
+          { title: 'Laporan Campaign', href: 'StaffKol/operasional/staffkol_dashboard_campaign.html' }
+        ]
+      },
+      {
+        title: 'Tugas Harian',
+        icon: 'bx bx-list-check',
+        children: [
+          { title: 'Instruksi Tugas', href: 'StaffKol/perancangan_kerja/staffkol_tugas.html' },
+          { title: 'Report Pengerjaan', href: 'StaffKol/perancangan_kerja/staffkol_laporan.html' }
+        ]
+      },
+      {
+        title: 'Presensi Saya',
+        icon: 'bx bx-calendar-check',
+        children: [
+          { title: 'Presensi Kehadiran', href: 'StaffKol/absensi/staffkol_kehadiran.html' },
+          { title: 'Presensi Istirahat', href: 'StaffKol/absensi/staffkol_presensi_istirahat.html' },
+          { title: 'Presensi Lembur', href: 'StaffKol/absensi/staffkol_presensi_lembur.html' }
+        ]
+      },
+      { section: 'DOKUMEN' },
+      {
+        title: 'Dokumen Kolaborasi',
+        icon: 'bx bx-folder',
+        children: [
+          { title: 'Folder', href: 'StaffKol/dokumen_kolaborasi/staffkol_folder.html' }
+        ]
+      }
+    ]
+  };
+
+  function isUrlActive(targetRelativePath) {
+    const currentFilename = window.location.pathname.split('/').pop().toLowerCase();
+    const targetFilename = targetRelativePath.split('/').pop().toLowerCase();
+    return currentFilename === targetFilename;
+  }
+
+  function renderSidebar() {
+    const sidebarEl = document.getElementById('sidebar') ||
+                      document.getElementById('layout-menu') ||
+                      document.querySelector('.kol-sidebar') ||
+                      document.querySelector('.layout-menu');
+    if (!sidebarEl) return;
+
+    const rootPrefix = getProjectRootPrefix();
+    const role = getUserRole();
+    const menuItems = ROLE_MENUS[role] || ROLE_MENUS.spv_kol;
+    const roleLabel = ROLE_NAMES[role] || 'SPV KOL';
+
+    sidebarEl.className = 'sidebar bm-unified-sidebar';
+
+    let navHtml = '';
+
+    menuItems.forEach((item) => {
+      if (item.section) {
+        navHtml += `<div class="bm-sidebar-section-header">${item.section}</div>`;
+        return;
+      }
+
+      if (item.children && Array.isArray(item.children)) {
+        const hasActive = item.children.some(ch => isUrlActive(ch.href));
+        const savedKey = `bm_nav_group_${role}_${item.title}`;
+        let isCollapsed = true;
+
+        if (hasActive) {
+          isCollapsed = false;
+        } else {
+          const savedState = localStorage.getItem(savedKey);
+          if (savedState === 'open') isCollapsed = false;
+        }
+
+        let childrenHtml = '';
+        item.children.forEach(child => {
+          const activeClass = isUrlActive(child.href) ? ' active' : '';
+          const targetHref = `${rootPrefix}${child.href}`;
+          childrenHtml += `
+            <a href="${targetHref}" class="bm-nav-subitem${activeClass}">
+              <i class="bx bxs-circle bm-sub-bullet"></i>
+              <span>${child.title}</span>
+            </a>
+          `;
+        });
+
+        navHtml += `
+          <div class="bm-nav-group ${isCollapsed ? 'is-collapsed' : ''}" data-group-key="${savedKey}">
+            <button type="button" class="bm-nav-group-toggle ${hasActive ? 'has-active' : ''}">
+              <div class="bm-nav-group-left">
+                <i class="bm-nav-icon ${item.icon}"></i>
+                <span class="bm-nav-text">${item.title}</span>
+              </div>
+              <i class="bx bx-chevron-down bm-nav-chevron"></i>
+            </button>
+            <div class="bm-nav-submenu">
+              ${childrenHtml}
+            </div>
+          </div>
+        `;
+      } else {
+        const activeClass = isUrlActive(item.href) ? ' active' : '';
+        const targetHref = `${rootPrefix}${item.href}`;
+        navHtml += `
+          <a href="${targetHref}" class="bm-nav-item${activeClass}">
+            <i class="bm-nav-icon ${item.icon}"></i>
+            <span class="bm-nav-text">${item.title}</span>
+          </a>
+        `;
+      }
+    });
+
+    const brandHomeHref = role === 'admin' ? `${rootPrefix}BM/BM_dashboard.html` :
+                          role === 'staff_kol' ? `${rootPrefix}StaffKol/staffkol_dashboard.html` :
+                          `${rootPrefix}SpvKol/spvkol_dashboard.html`;
+
+    sidebarEl.innerHTML = `
+      <div class="bm-sidebar-header">
+        <a href="${brandHomeHref}" class="bm-brand-link">
+          <div class="bm-brand-logo-wrap">
+            <img src="${rootPrefix}media/logo.png" alt="Logo Bisa Media" class="bm-brand-logo-img" />
+          </div>
+          <span class="bm-brand-title">bisa media</span>
+        </a>
+      </div>
+
+      <nav class="bm-sidebar-nav" aria-label="Menu Utama">
+        ${navHtml}
+      </nav>
+
+      <div class="bm-sidebar-footer">
+        <div class="bm-user-card">
+          <img src="${rootPrefix}media/avatar.png" alt="Rayi" class="bm-user-avatar" />
+          <div class="bm-user-info">
+            <span class="bm-user-name">Rayi</span>
+            <button type="button" class="bm-role-badge-btn" id="bmRoleBadgeBtn" title="Klik untuk berganti Role">
+              <span>${roleLabel}</span>
+              <i class="bx bx-chevron-up" style="font-size: 13px;"></i>
+            </button>
+          </div>
+          <a href="${rootPrefix}index.html" class="bm-logout-btn" id="bmSidebarLogoutBtn" title="Logout" aria-label="Logout">
+            <i class="bx bx-power-off"></i>
+          </a>
+
+          <!-- Role Selector Popup -->
+          <div class="bm-role-picker-popup" id="bmRolePickerPopup">
+            <button type="button" class="bm-role-opt ${role === 'admin' ? 'is-selected' : ''}" data-role="admin">
+              <span>Admin</span>
+              ${role === 'admin' ? '<i class="bx bx-check"></i>' : ''}
+            </button>
+            <button type="button" class="bm-role-opt ${role === 'spv_kol' ? 'is-selected' : ''}" data-role="spv_kol">
+              <span>SPV KOL</span>
+              ${role === 'spv_kol' ? '<i class="bx bx-check"></i>' : ''}
+            </button>
+            <button type="button" class="bm-role-opt ${role === 'staff_kol' ? 'is-selected' : ''}" data-role="staff_kol">
+              <span>Staff KOL</span>
+              ${role === 'staff_kol' ? '<i class="bx bx-check"></i>' : ''}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Bind Accordion Events
+    sidebarEl.querySelectorAll('.bm-nav-group-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const group = btn.closest('.bm-nav-group');
+        if (!group) return;
+        const key = group.getAttribute('data-group-key');
+        group.classList.toggle('is-collapsed');
+        const isNowCollapsed = group.classList.contains('is-collapsed');
+        if (key) {
+          localStorage.setItem(key, isNowCollapsed ? 'collapsed' : 'open');
+        }
+      });
+    });
+
+    // Bind Role Switcher Popup
+    const roleBadgeBtn = document.getElementById('bmRoleBadgeBtn');
+    const rolePopup = document.getElementById('bmRolePickerPopup');
+    if (roleBadgeBtn && rolePopup) {
+      roleBadgeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        rolePopup.classList.toggle('is-open');
+      });
+
+      rolePopup.querySelectorAll('.bm-role-opt').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+          e.preventDefault();
+          const targetRole = opt.getAttribute('data-role');
+          if (targetRole) {
+            localStorage.setItem('user_role', targetRole);
+            rolePopup.classList.remove('is-open');
+            // Redirect to target role's dashboard
+            const nextHome = targetRole === 'admin' ? `${rootPrefix}BM/BM_dashboard.html` :
+                             targetRole === 'staff_kol' ? `${rootPrefix}StaffKol/staffkol_dashboard.html` :
+                             `${rootPrefix}SpvKol/spvkol_dashboard.html`;
+            window.location.href = nextHome;
+          }
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.bm-user-card')) {
+          rolePopup.classList.remove('is-open');
+        }
+      });
+    }
+
+    // Bind Sidebar Toggle button (hamburger)
+    const sidebarToggle = document.getElementById('sidebarToggle') || document.querySelector('.layout-menu-toggle');
+    if (sidebarToggle) {
+      sidebarToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.body.classList.toggle('sidebar-collapsed');
+        document.body.classList.toggle('sidebar-open');
+      });
+    }
+  }
+
+  // Auto initialize on DOM ready or immediate
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderSidebar);
+  } else {
+    renderSidebar();
+  }
+
+  // Expose global render function if needed
+  window.bmRenderSidebar = renderSidebar;
+})();
+
 /* Owner custom JS (Sneat)
  *
  * Fitur:
@@ -16935,32 +17319,37 @@
     loginForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      const userVal = username.value.trim();
+      const userVal = username.value.trim().toLowerCase();
       const passVal = password.value.trim();
 
-      // Valid demo passwords
-      const validPasswords = ["123456", "admin", "password", "bisamedia", "bisa123"];
-
-      if (!userVal || !passVal || !validPasswords.includes(passVal)) {
+      if (!userVal || !passVal) {
         showLoginError();
-        if (!userVal) {
-          username.focus();
-        } else {
-          password.focus();
-        }
+        if (!userVal) username.focus();
+        else password.focus();
         return;
       }
 
       clearLoginError();
 
-      if (rememberMe.checked) {
+      if (rememberMe && rememberMe.checked) {
         localStorage.setItem("bisaMediaRememberedUser", userVal);
       } else {
         localStorage.removeItem("bisaMediaRememberedUser");
       }
 
-      const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
-      window.location.href = isSub ? "BM_dashboard.html" : "BM/BM_dashboard.html";
+      if ((userVal === 'admin@bisamedia.com' || userVal === 'admin') && (passVal === 'admin123' || passVal === '123456')) {
+        localStorage.setItem('user_role', 'admin');
+        window.location.href = 'BM/BM_dashboard.html';
+      } else if ((userVal === 'spv@bisamedia.com' || userVal === 'spv') && (passVal === 'spv123' || passVal === '123456')) {
+        localStorage.setItem('user_role', 'spv_kol');
+        window.location.href = 'SpvKol/spvkol_dashboard.html';
+      } else if ((userVal === 'staff@bisamedia.com' || userVal === 'staff') && (passVal === 'staff123' || passVal === '123456')) {
+        localStorage.setItem('user_role', 'staff_kol');
+        window.location.href = 'StaffKol/staffkol_dashboard.html';
+      } else {
+        showLoginError();
+        alert('Username atau password salah!\n\nAkun Login:\n- Admin: admin / admin123\n- SPV KOL: spv / spv123\n- Staff KOL: staff / staff123');
+      }
     });
   }
 
@@ -17226,6 +17615,7 @@
       const nameInput = document.getElementById("kreatorNamaInput") || kreatorForm.querySelector("input[placeholder='Tambah Nama Kreator']");
       const alamatInput = document.getElementById("kreatorAlamatInput") || kreatorForm.querySelector("input[placeholder='Tambah Alamat']");
       const waInput = document.getElementById("kreatorWaInput") || kreatorForm.querySelector("input[placeholder='Tambah Nomor WA']");
+      const katSelect = document.getElementById("kreatorKategoriSelect");
       const katInput = document.getElementById("kategoriProdukVal");
       const katSpesifikInput = document.getElementById("kreatorKatSpesifikInput") || kreatorForm.querySelector("input[placeholder='Tambah Kategori Spesifik']");
       const tglAwalInput = document.getElementById("kreatorKontrakAwalInput");
@@ -17239,11 +17629,11 @@
       const alamatVal = alamatInput && alamatInput.value.trim() ? alamatInput.value.trim() : "Jakarta";
       const waVal = waInput && waInput.value.trim() ? waInput.value.trim() : "081234567890";
 
-      let katVal = katInput && katInput.value.trim() ? katInput.value.trim() : "";
+      let katVal = (katSelect && katSelect.value && katSelect.value.trim()) ? katSelect.value.trim() : (katInput && katInput.value.trim() ? katInput.value.trim() : "");
       if (!katVal && katSpesifikInput && katSpesifikInput.value.trim()) {
         katVal = katSpesifikInput.value.trim();
       }
-      if (!katVal) katVal = "Fashion";
+      if (!katVal) katVal = "Fashion Muslim";
       const katSpesifikVal = katSpesifikInput && katSpesifikInput.value.trim() ? katSpesifikInput.value.trim() : katVal;
 
       let kontrakAwal = (tglAwalInput && tglAwalInput.value) ? tglAwalInput.value : ((dateInputs.length > 0 && dateInputs[0].value) ? dateInputs[0].value : "01/01/2026");
@@ -17766,4 +18156,4 @@ document.addEventListener("click", (e) => {
       d.classList.remove("is-active");
     });
   }
-});
+});
