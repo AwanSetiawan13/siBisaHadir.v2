@@ -148,8 +148,27 @@
           </div>
         </div>
 
+        <!-- Empty State Container (Sesuai Referensi Pengguna) -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Pengaduan</div>
+          <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan pengaduan baru.</div>
+        </div>
+
         <!-- Table -->
-        <div class="table-wrap campaign-table" style="padding: 0 0 24px;">
+        <div class="table-wrap campaign-table" id="tableContainerWrapper" style="padding: 0 0 24px;">
           <table>
             <thead>
               <tr>
@@ -290,11 +309,41 @@
       function renderTable(dataToRender) {
         tableBody.innerHTML = "";
         
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        if (typeof window.bmToggleEmptyState === 'function') {
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, pengaduanData.length === 0);
+        } else {
+          if (pengaduanData.length === 0) {
+            if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+            if (emptyTableState) {
+              emptyTableState.classList.remove("is-hidden");
+              emptyTableState.classList.add("is-visible");
+              emptyTableState.style.setProperty("display", "flex", "important");
+            }
+          } else {
+            if (tableWrapper) {
+              tableWrapper.style.removeProperty("display");
+              if (tableWrapper.style.display === "none") tableWrapper.style.display = "";
+            }
+            if (emptyTableState) {
+              emptyTableState.classList.add("is-hidden");
+              emptyTableState.classList.remove("is-visible");
+              emptyTableState.style.setProperty("display", "none", "important");
+            }
+          }
+        }
+
+        if (pengaduanData.length === 0) {
+          return;
+        }
+
         if (dataToRender.length === 0) {
           tableBody.innerHTML = `
             <tr>
-              <td colspan="5" class="db-empty-row" style="text-align: center; padding: 24px; color: #a1a1a5;">
-                Tidak ada data pengaduan
+              <td colspan="5" class="db-empty-row" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data pengaduan yang sesuai dengan pencarian atau filter.
               </td>
             </tr>
           `;

@@ -1,0 +1,2621 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Produk & Brands | Bisa Media</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- Boxicons for action icons -->
+  <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- SheetJS for client-side Excel (.xlsx, .xls, .csv) parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    /* ===== Styling Khusus Produk & Brands (Identik dengan Performa Kreator) ===== */
+    .dashboard-content {
+      padding: 24px;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .dashboard-heading {
+      margin-bottom: 20px;
+    }
+
+    .dashboard-heading h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+      margin: 0;
+    }
+
+    /* Panel Card Container */
+    .campaign-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+      position: relative;
+      overflow: visible;
+      margin-bottom: 24px;
+    }
+
+    .campaign-panel__line {
+      height: 4px;
+      background: #1c64f2;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      width: 100%;
+    }
+
+    /* Toolbar */
+    .campaign-toolbar {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .campaign-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .small-action-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 16px;
+    }
+
+    .small-action-button:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+
+    .small-action-button svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .campaign-search {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .campaign-search svg {
+      position: absolute;
+      left: 10px;
+      width: 15px;
+      height: 15px;
+      color: #94a3b8;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .campaign-search input {
+      height: 36px;
+      padding: 6px 12px 6px 34px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 12.5px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      transition: all 0.15s ease;
+      width: 180px;
+    }
+
+    .campaign-search input:focus {
+      width: 240px;
+      border-color: #1c64f2;
+      box-shadow: 0 0 0 3px rgba(28, 100, 242, 0.12);
+    }
+
+    .btn-tambah {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1c64f2;
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(28, 100, 242, 0.25);
+    }
+
+    .btn-tambah:hover {
+      background: #1a56db;
+      transform: translateY(-1px);
+    }
+
+    /* Filter Popover */
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+
+    .filter-popover {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      z-index: 50;
+      min-width: 260px;
+    }
+
+    .filter-popover.is-open {
+      display: block;
+    }
+
+    /* Table & Scroll */
+    .table-wrap {
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .campaign-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .campaign-table thead th {
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+      user-select: none;
+    }
+
+    .campaign-table tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f8fafc;
+      color: #334155;
+    }
+
+    .campaign-table tbody tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Checkbox Pin/Fix Column Header Button */
+    .th-pin-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .pin-check-btn {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .pin-check-btn input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .pin-check-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-indicator svg {
+      width: 11px;
+      height: 11px;
+      stroke: #ffffff;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-btn:hover .pin-check-indicator {
+      border-color: #1c64f2;
+      background: #eff6ff;
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked + .pin-check-indicator {
+      background: #1c64f2;
+      border-color: #1c64f2;
+      box-shadow: 0 1px 4px rgba(28, 100, 242, 0.35);
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked + .pin-check-indicator svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Fixed/Pinned Left Columns */
+    .campaign-table th:first-child,
+    .campaign-table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 11;
+      background: #f8fafc;
+      text-align: center;
+      min-width: 44px;
+      max-width: 48px;
+    }
+
+    .campaign-table td:first-child {
+      background: #ffffff;
+    }
+
+    .campaign-table tr:hover td:first-child {
+      background: #f8fafc;
+    }
+
+    .campaign-table th.col-pinned-sticky {
+      position: sticky;
+      z-index: 10;
+      background: #f8fafc !important;
+    }
+
+    .campaign-table td.col-pinned-sticky {
+      position: sticky;
+      z-index: 9;
+      background: #ffffff !important;
+    }
+
+    .campaign-table tr:hover td.col-pinned-sticky {
+      background: #f8fafc !important;
+    }
+
+    .campaign-table th.col-pinned-last,
+    .campaign-table td.col-pinned-last {
+      box-shadow: 5px 0 12px rgba(0, 0, 0, 0.06) !important;
+      border-right: 1px solid #cbd5e1 !important;
+    }
+
+    /* Sticky Aksi Column on the Right */
+    .campaign-table th.col-sticky-action,
+    .campaign-table td.col-sticky-action {
+      position: sticky;
+      right: 0;
+      z-index: 10;
+      box-shadow: -5px 0 12px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .campaign-table th.col-sticky-action {
+      background: #f8fafc !important;
+      border-left: 1px solid #e2e8f0;
+    }
+
+    .campaign-table td.col-sticky-action {
+      background: #ffffff !important;
+      border-left: 1px solid #e2e8f0;
+    }
+
+    .campaign-table tr:hover td.col-sticky-action {
+      background: #f8fafc !important;
+    }
+
+    /* Action Buttons */
+    .action-btn-group {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-action-sm {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 0;
+    }
+
+    .btn-action-view {
+      color: #0284c7;
+      border-color: #bae6fd;
+      background: #f0f9ff;
+    }
+
+    .btn-action-view:hover {
+      background: #0284c7;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn-action-edit {
+      color: #eab308;
+      border-color: #fef08a;
+      background: #fefce8;
+    }
+
+    .btn-action-edit:hover {
+      background: #eab308;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn-action-delete {
+      color: #ef4444;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+
+    .btn-action-delete:hover {
+      background: #ef4444;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .btn-action-sm svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+    }
+
+    /* ===== Form Panel Tambah Data (Excel & Paste Data) ===== */
+    .performa-form-container {
+      padding: 24px;
+    }
+
+    .form-row-top {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .form-row-mid {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .form-input,
+    .form-select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 12.5px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      background: #ffffff;
+      transition: all 0.15s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: #1c64f2;
+      box-shadow: 0 0 0 3px rgba(28, 100, 242, 0.12);
+    }
+
+    .file-upload-box {
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 8px;
+      background: #fafafa;
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      padding: 16px;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .file-upload-box:hover {
+      border-color: #107c41;
+      background: #f0fdf4;
+    }
+
+    .btn-choose-file {
+      padding: 7px 20px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #1e293b;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-choose-file:hover {
+      background: #f8fafc;
+      border-color: #107c41;
+      color: #107c41;
+    }
+
+    .preview-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      height: 160px;
+      overflow: hidden;
+      padding: 0;
+      font-size: 11.5px;
+      color: #334155;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .btn-submit-modal {
+      padding: 8px 24px;
+      background: #1c64f2;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(28, 100, 242, 0.25);
+    }
+
+    .btn-submit-modal:hover {
+      background: #1a56db;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.is-active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: 12px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      position: relative;
+      padding: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.15s;
+    }
+
+    .modal-close:hover {
+      color: #ef4444;
+    }
+
+    .modal-divider {
+      border: 0;
+      border-top: 1px dashed #e2e8f0;
+      margin: 14px 0 20px;
+    }
+
+    .modal-form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-readonly-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #1e293b;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar hirezy-topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 id="pageHeading">Produk &amp; Brand</h1>
+      </div>
+
+      <!-- Section Table Panel -->
+      <section id="tablePanel" class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <!-- Export Excel Button -->
+            <button id="btnExportExcel" class="small-action-button" type="button" aria-label="Export Excel" title="Export Excel">
+              <svg viewBox="0 0 24 24">
+                <rect x="4" y="3" width="16" height="18" rx="1.5" fill="#1f72b6" stroke="#1f72b6" />
+                <line x1="12" y1="7" x2="17" y2="7" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="11" x2="17" y2="11" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="15" x2="17" y2="15" stroke="#fff" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#fff" stroke-width="1.2" />
+                <path d="M6 9l3 6M9 9l-3 6" stroke="#fff" stroke-width="1.8" />
+              </svg>
+            </button>
+
+            <!-- Filter Button & Dropdown Popover -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterProdukBrand" class="small-action-button" type="button" aria-label="Filter" title="Filter Toko & Kreator">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <div id="filterProdukBrandDropdown" class="filter-popover" style="width: 260px;">
+                <div class="form-group" style="margin-bottom: 12px;">
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Nama Toko / Brand</label>
+                  <select id="filterNamaToko" class="form-select" style="font-size: 12px; padding: 6px 10px;">
+                    <option value="Semua">Semua Toko</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Nama Pengguna Kreator</label>
+                  <select id="filterKreator" class="form-select" style="font-size: 12px; padding: 6px 10px;">
+                    <option value="Semua">Semua Kreator</option>
+                  </select>
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                  <button id="resetFilterBtn" type="button" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">Reset</button>
+                  <button id="applyFilterBtn" type="button" style="background: #1c64f2; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">Terapkan</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Real-time Search Input -->
+            <label class="campaign-search">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="search" id="searchInput" placeholder="Cari...." />
+            </label>
+          </div>
+
+          <div class="campaign-toolbar__right">
+            <button id="btnTambahProdukBrand" class="btn-tambah" type="button">
+              <i class="bx bx-plus" style="font-size: 15px;"></i> Tambah
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State Container (Persis seperti referensi contoh) -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div style="font-weight: 700; font-size: 15.5px; color: #334155; margin-bottom: 6px;">
+            Belum ada data Produk &amp; Brand
+          </div>
+          <div style="font-size: 12.5px; color: #64748b;">
+            Klik tombol "Tambah" di atas untuk menambahkan data produk &amp; brand baru.
+          </div>
+        </div>
+
+        <!-- Table Container with 32 Metric Columns -->
+        <div class="table-wrap campaign-table" id="tableContainerWrapper">
+          <table id="tableProdukBrand">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th class="th-pinnable" data-col="tanggal">
+                  <div class="th-pin-wrapper">
+                    <span>Tanggal</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Tanggal agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="tanggal" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="nama_kreator">
+                  <div class="th-pin-wrapper">
+                    <span>Nama pengguna kreator</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Nama pengguna kreator">
+                      <input type="checkbox" class="chk-pin-col" data-col="nama_kreator" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th>Jumlah pengikut kreator</th>
+                <th class="th-pinnable" data-col="id_produk">
+                  <div class="th-pin-wrapper">
+                    <span>ID Produk</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom ID Produk">
+                      <input type="checkbox" class="chk-pin-col" data-col="id_produk" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th>Info produk</th>
+                <th>Kode Toko</th>
+                <th>ID Toko</th>
+                <th class="th-pinnable" data-col="nama_toko">
+                  <div class="th-pin-wrapper">
+                    <span>Nama toko</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Nama toko">
+                      <input type="checkbox" class="chk-pin-col" data-col="nama_toko" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th>GMV dari kreator</th>
+                <th>GMV dari LIVE kreator</th>
+                <th>GMV dari video afiliasi</th>
+                <th>Pesanan dari kreator</th>
+                <th>Pesanan dari LIVE kreator</th>
+                <th>Pesanan dari video kreator</th>
+                <th>GMV Langsung</th>
+                <th>GMV langsung dari LIVE</th>
+                <th>GMV langsung dari video</th>
+                <th>GMV langsung dari kartu produk</th>
+                <th>Produk yang terjual dari kreator</th>
+                <th>Pesanan langsung</th>
+                <th>Pesanan langsung dari LIVE</th>
+                <th>Pesanan langsung dari Video</th>
+                <th>Pesanan dari kartu produk</th>
+                <th>Produk yang terjual dari LIVE kreator</th>
+                <th>produk yang terjual dari video kreator</th>
+                <th>Produk terjual dari kartu produk</th>
+                <th>GMV pengembalian dana langsung</th>
+                <th>Barang yang dikembalikan dananya</th>
+                <th>CTR</th>
+                <th>CTOR (pesanan SKU)</th>
+                <th>GMV dari kreator mitra afiliasi</th>
+                <th>Pesanan dari kreator mitra afiliasi</th>
+                <th class="text-center col-sticky-action" style="width: 110px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyProdukBrand"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section Form Panel: Tambah Data (Input Excel & Preview) -->
+      <section id="formPanel" class="panel campaign-panel" style="display: none; position: relative;">
+        <button type="button" id="btnCancelTambah" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; line-height: 1; color: #94a3b8; cursor: pointer; transition: color 0.15s; z-index: 10;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+        <div class="campaign-panel__line"></div>
+
+        <div class="performa-form-container">
+          <form id="formTambahProdukBrand">
+            <!-- Row: Input Excel & Preview side-by-side -->
+            <div class="form-row-mid" style="margin-top: 4px;">
+              <div class="form-group" style="flex: 0 0 280px;">
+                <label class="form-label" style="font-weight: 700; color: #1e293b;">Input Excel</label>
+                
+                <!-- Box Upload File (Excel) -->
+                <div class="file-upload-box" id="fileUploadContainer">
+                  <svg viewBox="0 0 24 24" style="width: 32px; height: 32px; color: #16a34a; margin-bottom: 8px;" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="8" y1="13" x2="16" y2="13"></line>
+                    <line x1="8" y1="17" x2="16" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                  <span class="btn-choose-file" id="btnChooseFileText">Choose File</span>
+                  <span id="fileNameHint" style="font-size: 11.5px; color: #64748b; margin-top: 8px; text-align: center; max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Khusus file Excel (.xlsx, .xls)</span>
+                  <input type="file" id="fileInputExcel" style="display: none;" accept=".xlsx, .xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                </div>
+              </div>
+
+              <div class="form-group" style="flex: 1; min-width: 320px;">
+                <label class="form-label" style="font-weight: 700; color: #1e293b;">Preview</label>
+                <div class="preview-box" id="previewContainer">
+                  <!-- Rendered via JS: Card File Excel with text 'Lihat' -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button Row -->
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+              <button type="button" id="btnResetForm" style="padding: 8px 20px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 8px; font-weight: 600; cursor: pointer;">Batal</button>
+              <button class="btn-submit-modal" id="btnSubmitTambah" type="submit" disabled style="opacity: 0.5; cursor: not-allowed;">Submit</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+  </div>
+
+  <!-- ================= MODAL LIHAT FILE EXCEL ORIGINAL (FULL-SCREEN IN-BROWSER VIEWER) ================= -->
+  <div id="modalLihatExcelOri" class="modal-overlay">
+    <div class="modal-box" style="width: 98vw; max-width: 98vw; height: 96vh; max-height: 96vh; padding: 16px 20px; display: flex; flex-direction: column; border-radius: 12px; transition: all 0.2s ease;">
+      <!-- Header Bar -->
+      <div class="modal-header" style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; height: 36px; border-radius: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; display: flex; align-items: center; justify-content: center; color: #16a34a; flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: currentColor;"><path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.1v15.8q0 .35-.24.6-.25.25-.59.25H7.83q-.35 0-.6-.25-.24-.24-.24-.6V17H2.83q-.35 0-.59-.24Q2 16.5 2 16.16V7.84q0-.35.24-.59.24-.25.59-.25H7V4.1q0-.36.24-.6.25-.25.59-.25zM7 8.71H3.67v6.58H7zm7.5 4.54 2.27-3.67h-1.89l-1.39 2.5-1.38-2.5h-1.9l2.27 3.67-2.39 3.84h1.89l1.51-2.65 1.51 2.65h1.9zM20.33 4.9H8.67v14.2h11.66z"/></svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h2 class="modal-title" style="font-size: 16px; margin: 0;"><span id="modalExcelOriTitle" style="font-weight: 700; color: #1e293b;">Template_Import_Produk_Brand.xlsx</span></h2>
+              <span style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pratinjau Langsung • Tanpa Unduh</span>
+            </div>
+            <div style="font-size: 11.5px; color: #64748b;" id="modalExcelOriSubtitle">Menampilkan lembar kerja asli</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <!-- Search box -->
+          <div style="position: relative; display: inline-flex; align-items: center;">
+            <svg viewBox="0 0 24 24" style="position: absolute; left: 9px; width: 14px; height: 14px; color: #94a3b8; stroke: currentColor; fill: none; stroke-width: 2;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="excelOriSearchInput" placeholder="Cari di lembar kerja..." style="padding: 6px 10px 6px 30px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; width: 190px; outline: none;" />
+          </div>
+
+          <!-- Toggle Fullscreen Button -->
+          <button type="button" id="btnToggleFullViewExcel" onclick="window.toggleExcelFullscreen()" style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: #334155; transition: all 0.15s ease;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2;"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+            <span id="textToggleFull">Layar Penuh</span>
+          </button>
+
+          <!-- Close Modal Button -->
+          <button class="modal-close" type="button" aria-label="Tutup popup" onclick="document.getElementById('modalLihatExcelOri').classList.remove('is-active')">&times;</button>
+        </div>
+      </div>
+
+      <!-- Controls & Pagination Bar -->
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; font-size: 11.5px; color: #475569;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span>Menampilkan baris <strong><span id="excelRowStart">1</span>-<span id="excelRowEnd">100</span></strong> dari total <strong><span id="excelRowTotal">0</span></strong> baris data</span>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <span style="color: #64748b;">Per halaman:</span>
+            <button type="button" class="btn-page-size" data-size="50" onclick="window.setExcelPageSize(50)" style="padding: 2px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; cursor: pointer; background: #f1f5f9; color: #475569;">50</button>
+            <button type="button" class="btn-page-size" data-size="100" onclick="window.setExcelPageSize(100)" style="padding: 2px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; cursor: pointer; background: #16a34a; color: #ffffff; font-weight: 700;">100</button>
+            <button type="button" class="btn-page-size" data-size="250" onclick="window.setExcelPageSize(250)" style="padding: 2px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; cursor: pointer; background: #f1f5f9; color: #475569;">250</button>
+            <button type="button" class="btn-page-size" data-size="all" onclick="window.setExcelPageSize('all')" style="padding: 2px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11px; cursor: pointer; background: #f1f5f9; color: #475569;">Semua</button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <button type="button" id="btnExcelPrev" onclick="window.changeExcelPage(-1)" style="padding: 4px 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; cursor: pointer; font-size: 11px; font-weight: 600; color: #334155;">&laquo; Sebelumnya</button>
+          <span>Halaman <strong id="excelCurrentPage">1</strong> / <strong id="excelTotalPages">1</strong></span>
+          <button type="button" id="btnExcelNext" onclick="window.changeExcelPage(1)" style="padding: 4px 10px; border: 1px solid #cbd5e1; border-radius: 4px; background: #ffffff; cursor: pointer; font-size: 11px; font-weight: 600; color: #334155;">Selanjutnya &raquo;</button>
+        </div>
+      </div>
+
+      <!-- Modal Content: Scrollable Authentic Spreadsheet Table -->
+      <div id="modalExcelOriContent" style="flex: 1; min-height: 200px; overflow: auto; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff;">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Bottom Sheet Switcher Bar -->
+      <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-top: none; border-radius: 0 0 6px 6px; padding: 4px 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; flex-shrink: 0;">
+        <div id="excelSheetTabsContainer" style="display: flex; align-items: center; gap: 4px; overflow-x: auto;">
+          <!-- Dynamically populated sheet tabs -->
+        </div>
+        <div style="color: #64748b; font-size: 10.5px; display: flex; align-items: center; gap: 12px;">
+          <span>Format: Microsoft Excel (.xlsx)</span>
+          <button type="button" class="btn-cancel-modal" onclick="document.getElementById('modalLihatExcelOri').classList.remove('is-active')" style="padding: 4px 16px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 4px; font-weight: 600; cursor: pointer;">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL LIHAT DETAIL (32 FIELD) ================= -->
+  <div id="modalLihatProdukBrand" class="modal-overlay">
+    <div class="modal-box" style="max-width: 780px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Lihat <span style="font-weight: 700; color: #1c64f2;">Produk &amp; Brand</span></h2>
+        <button class="modal-close" type="button" aria-label="Tutup popup" onclick="document.getElementById('modalLihatProdukBrand').classList.remove('is-active')">&times;</button>
+      </div>
+      <div class="modal-divider"></div>
+      
+      <!-- 3-Column Grid for All 32 Fields Matching Mockup Image 5 -->
+      <div class="modal-form-grid" style="grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div class="form-group" style="grid-column: span 1.5;">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Tanggal</label>
+          <div class="field-readonly-box" id="viewTanggal">-</div>
+        </div>
+        <div class="form-group" style="grid-column: span 1.5;">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Nama pengguna kreator</label>
+          <div class="field-readonly-box" id="viewNamaKreator" style="color: #0284c7; background: #eff6ff; border-color: #bfdbfe;">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Jumlah pengikut kreator</label>
+          <div class="field-readonly-box" id="viewPengikut">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">ID Produk</label>
+          <div class="field-readonly-box" id="viewIdProduk">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Info produk</label>
+          <div class="field-readonly-box" id="viewInfoProduk">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Kode Toko</label>
+          <div class="field-readonly-box" id="viewKodeToko">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">ID Toko</label>
+          <div class="field-readonly-box" id="viewIdToko">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Nama toko</label>
+          <div class="field-readonly-box" id="viewNamaToko">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV dari kreator</label>
+          <div class="field-readonly-box" id="viewGmvKreator">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV dari LIVE kreator</label>
+          <div class="field-readonly-box" id="viewGmvLiveKreator">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV dari video afiliasi</label>
+          <div class="field-readonly-box" id="viewGmvVideoAfiliasi">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan dari kreator</label>
+          <div class="field-readonly-box" id="viewPesananKreator">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan dari LIVE kreator</label>
+          <div class="field-readonly-box" id="viewPesananLiveKreator">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan dari video kreator</label>
+          <div class="field-readonly-box" id="viewPesananVideoKreator">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV Langsung</label>
+          <div class="field-readonly-box" id="viewGmvLangsung">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV langsung dari LIVE</label>
+          <div class="field-readonly-box" id="viewGmvLangsungLive">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV langsung dari video</label>
+          <div class="field-readonly-box" id="viewGmvLangsungVideo">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV langsung dari kartu produk</label>
+          <div class="field-readonly-box" id="viewGmvLangsungKartu">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Produk yang terjual dari kreator</label>
+          <div class="field-readonly-box" id="viewTerjualKreator">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan langsung</label>
+          <div class="field-readonly-box" id="viewPesananLangsung">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan langsung dari LIVE</label>
+          <div class="field-readonly-box" id="viewPesananLangsungLive">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan langsung dari Video</label>
+          <div class="field-readonly-box" id="viewPesananLangsungVideo">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan dari kartu produk</label>
+          <div class="field-readonly-box" id="viewPesananKartu">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Produk yang terjual dari LIVE kreator</label>
+          <div class="field-readonly-box" id="viewTerjualLiveKreator">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">produk yang terjual dari video kreator</label>
+          <div class="field-readonly-box" id="viewTerjualVideoKreator">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Produk terjual dari kartu produk</label>
+          <div class="field-readonly-box" id="viewTerjualKartu">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV pengembalian dana langsung</label>
+          <div class="field-readonly-box" id="viewGmvRefundLangsung" style="color: #ef4444;">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Barang yang dikembalikan dananya</label>
+          <div class="field-readonly-box" id="viewBarangRefund" style="color: #ef4444;">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">CTR</label>
+          <div class="field-readonly-box" id="viewCtr">-</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">CTOR (pesanan SKU)</label>
+          <div class="field-readonly-box" id="viewCtor">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">GMV dari kreator mitra afiliasi</label>
+          <div class="field-readonly-box" id="viewGmvMitra">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="font-size: 11px; color: #64748b; text-transform: uppercase;">Pesanan dari kreator mitra afiliasi</label>
+          <div class="field-readonly-box" id="viewPesananMitra">-</div>
+        </div>
+      </div>
+
+      <div class="modal-divider" style="margin-top: 20px;"></div>
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="button" class="btn-cancel-modal" onclick="document.getElementById('modalLihatProdukBrand').classList.remove('is-active')" style="padding: 8px 24px; border: 1px solid #cbd5e1; background: #1c64f2; color: #ffffff; border-radius: 6px; font-weight: 600; cursor: pointer;">Lihat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL EDIT DATA ================= -->
+  <div id="modalEditProdukBrand" class="modal-overlay">
+    <div class="modal-box" style="max-width: 720px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit <span style="font-weight: 700; color: #1c64f2;">Produk &amp; Brand</span></h2>
+        <button class="modal-close" type="button" aria-label="Tutup popup" onclick="document.getElementById('modalEditProdukBrand').classList.remove('is-active')">&times;</button>
+      </div>
+      <div class="modal-divider"></div>
+      
+      <form id="formEditProdukBrand">
+        <input type="hidden" id="editRowId" />
+        <div class="modal-form-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px 18px;">
+          <div class="form-group">
+            <label class="form-label">Tanggal</label>
+            <input type="text" id="editTanggal" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama pengguna kreator</label>
+            <input type="text" id="editNamaKreator" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Jumlah pengikut kreator</label>
+            <input type="text" id="editPengikut" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">ID Produk</label>
+            <input type="text" id="editIdProduk" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Info produk</label>
+            <input type="text" id="editInfoProduk" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama toko</label>
+            <input type="text" id="editNamaToko" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">GMV dari kreator</label>
+            <input type="text" id="editGmvKreator" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pesanan dari kreator</label>
+            <input type="text" id="editPesananKreator" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">GMV Langsung</label>
+            <input type="text" id="editGmvLangsung" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Produk yang terjual dari kreator</label>
+            <input type="text" id="editTerjualKreator" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">CTR</label>
+            <input type="text" id="editCtr" class="form-input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">CTOR (pesanan SKU)</label>
+            <input type="text" id="editCtor" class="form-input" />
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-cancel-modal" onclick="document.getElementById('modalEditProdukBrand').classList.remove('is-active')" style="padding: 8px 20px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Batal</button>
+          <button type="submit" class="btn-submit-modal" style="padding: 8px 24px;">Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL KONFIRMASI HAPUS ================= -->
+  <div id="modalHapusProdukBrand" class="modal-overlay">
+    <div class="modal-box" style="max-width: 440px; text-align: center; padding: 28px 24px;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <i class="bx bx-trash" style="font-size: 28px;"></i>
+      </div>
+      <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Hapus Produk &amp; Brand</h3>
+      <p style="font-size: 13.5px; color: #64748b; line-height: 1.5; margin-bottom: 24px;">
+        Apakah Anda yakin ingin menghapus data untuk <strong id="deleteTargetText" style="color: #1e293b;">-</strong>? Tindakan ini tidak dapat dibatalkan.
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button type="button" class="btn-cancel-modal" onclick="document.getElementById('modalHapusProdukBrand').classList.remove('is-active')" style="flex: 1; padding: 10px 16px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Batal</button>
+        <button type="button" id="btnConfirmDelete" style="flex: 1; padding: 10px 16px; border: none; background: #ef4444; color: #fff; border-radius: 6px; font-weight: 600; cursor: pointer;">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" style="position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #ffffff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 99999; box-shadow: 0 10px 20px rgba(0,0,0,0.15); display: none; align-items: center; gap: 8px; transform: translateY(10px); transition: all 0.2s ease;">
+    <i class="bx bx-check-circle" style="color: #22c55e; font-size: 18px;"></i>
+    <span id="toastMessage">Operasi berhasil</span>
+  </div>
+
+  <!-- Sidebar & System Script -->
+  <script src="../../sidebar_engine.js"></script>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "bisa_produk_brand_list_v3";
+
+      // Bersihkan data dummy versi lama dari local storage browser
+      try {
+        localStorage.removeItem("bisa_produk_brand_list_v1");
+        localStorage.removeItem("bisa_produk_brand_list_v2");
+      } catch (e) {}
+
+      // Data dummy awal Produk & Brand (6 baris dengan data realistis)
+      const DEFAULT_DATA = [
+        {
+          id: 1,
+          tanggal: "18/05/2026",
+          nama_kreator: "@fauzan.lifestyle",
+          pengikut: "2.4M",
+          id_produk: "PID-99201",
+          info_produk: "Kemeja Kasual Pria Slim Fit Cotton",
+          kode_toko: "TK-01",
+          id_toko: "SHOP-8819",
+          nama_toko: "Bisa Fashion Official",
+          gmv_kreator: "Rp 18.500.000",
+          gmv_live_kreator: "Rp 12.000.000",
+          gmv_video_afiliasi: "Rp 6.500.000",
+          pesanan_kreator: "240",
+          pesanan_live_kreator: "150",
+          pesanan_video_kreator: "90",
+          gmv_langsung: "Rp 8.200.000",
+          gmv_langsung_live: "Rp 5.200.000",
+          gmv_langsung_video: "Rp 3.000.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "310",
+          pesanan_langsung: "120",
+          pesanan_langsung_live: "80",
+          pesanan_langsung_video: "40",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "190",
+          terjual_video_kreator: "120",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "4.8%",
+          ctor: "3.2%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 2,
+          tanggal: "18/05/2026",
+          nama_kreator: "@dinda.beauty",
+          pengikut: "1.8M",
+          id_produk: "PID-99202",
+          info_produk: "Serum Pencerah Wajah Vitamin C 30ml",
+          kode_toko: "TK-02",
+          id_toko: "SHOP-8820",
+          nama_toko: "Bisa Glow Skincare",
+          gmv_kreator: "Rp 24.100.000",
+          gmv_live_kreator: "Rp 16.500.000",
+          gmv_video_afiliasi: "Rp 7.600.000",
+          pesanan_kreator: "380",
+          pesanan_live_kreator: "260",
+          pesanan_video_kreator: "120",
+          gmv_langsung: "Rp 12.000.000",
+          gmv_langsung_live: "Rp 8.000.000",
+          gmv_langsung_video: "Rp 4.000.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "490",
+          pesanan_langsung: "180",
+          pesanan_langsung_live: "130",
+          pesanan_langsung_video: "50",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "320",
+          terjual_video_kreator: "170",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 250.000",
+          barang_refund: "2",
+          ctr: "5.2%",
+          ctor: "3.9%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 3,
+          tanggal: "17/05/2026",
+          nama_kreator: "@kevin_gadget",
+          pengikut: "950K",
+          id_produk: "PID-99203",
+          info_produk: "Earphone Wireless TWS Bass Boost",
+          kode_toko: "TK-03",
+          id_toko: "SHOP-8821",
+          nama_toko: "Bisa Tech Electronic",
+          gmv_kreator: "Rp 14.800.000",
+          gmv_live_kreator: "Rp 9.200.000",
+          gmv_video_afiliasi: "Rp 5.600.000",
+          pesanan_kreator: "195",
+          pesanan_live_kreator: "115",
+          pesanan_video_kreator: "80",
+          gmv_langsung: "Rp 5.400.000",
+          gmv_langsung_live: "Rp 3.200.000",
+          gmv_langsung_video: "Rp 2.200.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "210",
+          pesanan_langsung: "75",
+          pesanan_langsung_live: "45",
+          pesanan_langsung_video: "30",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "125",
+          terjual_video_kreator: "85",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "3.9%",
+          ctor: "2.8%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 4,
+          tanggal: "17/05/2026",
+          nama_kreator: "@maya.kuliner",
+          pengikut: "1.2M",
+          id_produk: "PID-99204",
+          info_produk: "Snack Keripik Pedas Daun Jeruk 200g",
+          kode_toko: "TK-04",
+          id_toko: "SHOP-8822",
+          nama_toko: "Bisa Snack Nusantara",
+          gmv_kreator: "Rp 9.600.000",
+          gmv_live_kreator: "Rp 6.400.000",
+          gmv_video_afiliasi: "Rp 3.200.000",
+          pesanan_kreator: "320",
+          pesanan_live_kreator: "210",
+          pesanan_video_kreator: "110",
+          gmv_langsung: "Rp 3.100.000",
+          gmv_langsung_live: "Rp 2.000.000",
+          gmv_langsung_video: "Rp 1.100.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "410",
+          pesanan_langsung: "140",
+          pesanan_langsung_live: "95",
+          pesanan_langsung_video: "45",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "265",
+          terjual_video_kreator: "145",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "6.1%",
+          ctor: "4.5%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 5,
+          tanggal: "16/05/2026",
+          nama_kreator: "@rina_hijab",
+          pengikut: "820K",
+          id_produk: "PID-99205",
+          info_produk: "Hijab Segiempat Paris Premium Voal",
+          kode_toko: "TK-01",
+          id_toko: "SHOP-8819",
+          nama_toko: "Bisa Fashion Official",
+          gmv_kreator: "Rp 11.200.000",
+          gmv_live_kreator: "Rp 7.800.000",
+          gmv_video_afiliasi: "Rp 3.400.000",
+          pesanan_kreator: "260",
+          pesanan_live_kreator: "175",
+          pesanan_video_kreator: "85",
+          gmv_langsung: "Rp 4.300.000",
+          gmv_langsung_live: "Rp 2.800.000",
+          gmv_langsung_video: "Rp 1.500.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "305",
+          pesanan_langsung: "110",
+          pesanan_langsung_live: "70",
+          pesanan_langsung_video: "40",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "195",
+          terjual_video_kreator: "110",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "4.4%",
+          ctor: "3.1%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 6,
+          tanggal: "16/05/2026",
+          nama_kreator: "@bima.fashion",
+          pengikut: "1.5M",
+          id_produk: "PID-99206",
+          info_produk: "Celana Chino Slim Fit Pria Stretch",
+          kode_toko: "TK-01",
+          id_toko: "SHOP-8819",
+          nama_toko: "Bisa Fashion Official",
+          gmv_kreator: "Rp 15.600.000",
+          gmv_live_kreator: "Rp 10.400.000",
+          gmv_video_afiliasi: "Rp 5.200.000",
+          pesanan_kreator: "210",
+          pesanan_live_kreator: "140",
+          pesanan_video_kreator: "70",
+          gmv_langsung: "Rp 6.800.000",
+          gmv_langsung_live: "Rp 4.500.000",
+          gmv_langsung_video: "Rp 2.300.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "260",
+          pesanan_langsung: "95",
+          pesanan_langsung_live: "65",
+          pesanan_langsung_video: "30",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "170",
+          terjual_video_kreator: "90",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "4.1%",
+          ctor: "2.9%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        }
+      ];
+
+      let produkBrandDb = DEFAULT_DATA;
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            produkBrandDb = parsed;
+          } else {
+            produkBrandDb = DEFAULT_DATA;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+          }
+        } else {
+          produkBrandDb = DEFAULT_DATA;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+        }
+      } catch (e) {
+        produkBrandDb = DEFAULT_DATA;
+      }
+
+      // Helper untuk menghapus seluruh data Produk & Brand
+      window.hapusSemuaDataProdukBrand = function() {
+        if (produkBrandDb.length === 0) {
+          showToast("Tabel data Produk & Brand sudah kosong.");
+          return;
+        }
+        if (confirm(`Apakah Anda yakin ingin menghapus seluruh ${produkBrandDb.length} data Produk & Brand?`)) {
+          produkBrandDb = [];
+          saveDb();
+          renderTable();
+          showToast("Seluruh data Produk & Brand berhasil dihapus.");
+        }
+      };
+
+      function saveDb() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(produkBrandDb));
+      }
+
+      // DOM Elements
+      const tbody = document.getElementById("tbodyProdukBrand");
+      const searchInput = document.getElementById("searchInput");
+      const btnFilter = document.getElementById("btnFilterProdukBrand");
+      const filterDropdown = document.getElementById("filterProdukBrandDropdown");
+      const filterNamaToko = document.getElementById("filterNamaToko");
+      const filterKreator = document.getElementById("filterKreator");
+      const applyFilterBtn = document.getElementById("applyFilterBtn");
+      const resetFilterBtn = document.getElementById("resetFilterBtn");
+
+      const btnTambah = document.getElementById("btnTambahProdukBrand");
+      const formPanel = document.getElementById("formPanel");
+      const tablePanel = document.getElementById("tablePanel");
+      const btnCancelTambah = document.getElementById("btnCancelTambah");
+      const btnResetForm = document.getElementById("btnResetForm");
+      const formTambah = document.getElementById("formTambahProdukBrand");
+      const fileUploadContainer = document.getElementById("fileUploadContainer");
+      const fileInputExcel = document.getElementById("fileInputExcel");
+      const fileNameHint = document.getElementById("fileNameHint");
+      const previewContainer = document.getElementById("previewContainer");
+
+      // Modals
+      const modalLihat = document.getElementById("modalLihatProdukBrand");
+      const modalEdit = document.getElementById("modalEditProdukBrand");
+      const formEdit = document.getElementById("formEditProdukBrand");
+      const modalHapus = document.getElementById("modalHapusProdukBrand");
+      const btnConfirmDelete = document.getElementById("btnConfirmDelete");
+      const deleteTargetText = document.getElementById("deleteTargetText");
+      let pendingDeleteId = null;
+
+      // Toast Helper
+      function showToast(msg) {
+        const toast = document.getElementById("toastNotification");
+        const toastMsg = document.getElementById("toastMessage");
+        if (toast && toastMsg) {
+          toastMsg.textContent = msg;
+          toast.style.display = "flex";
+          setTimeout(() => {
+            toast.style.transform = "translateY(0)";
+          }, 10);
+          setTimeout(() => {
+            toast.style.transform = "translateY(10px)";
+            setTimeout(() => { toast.style.display = "none"; }, 200);
+          }, 3000);
+        }
+      }
+
+      // Populate Filter Options
+      function updateFilterOptions() {
+        if (!filterNamaToko || !filterKreator) return;
+        const curToko = filterNamaToko.value;
+        const curKreator = filterKreator.value;
+
+        const tokoSet = new Set(produkBrandDb.map(d => d.nama_toko).filter(Boolean));
+        const kreatorSet = new Set(produkBrandDb.map(d => d.nama_kreator).filter(Boolean));
+
+        filterNamaToko.innerHTML = '<option value="Semua">Semua Toko</option>';
+        tokoSet.forEach(t => {
+          const opt = document.createElement("option");
+          opt.value = t;
+          opt.textContent = t;
+          if (t === curToko) opt.selected = true;
+          filterNamaToko.appendChild(opt);
+        });
+
+        filterKreator.innerHTML = '<option value="Semua">Semua Kreator</option>';
+        kreatorSet.forEach(k => {
+          const opt = document.createElement("option");
+          opt.value = k;
+          opt.textContent = k;
+          if (k === curKreator) opt.selected = true;
+          filterKreator.appendChild(opt);
+        });
+      }
+
+      // Render Table Data
+      function renderTable() {
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        updateFilterOptions();
+
+        const q = (searchInput ? searchInput.value : "").toLowerCase().trim();
+        const selToko = filterNamaToko ? filterNamaToko.value : "Semua";
+        const selKreator = filterKreator ? filterKreator.value : "Semua";
+
+        const filtered = produkBrandDb.filter(item => {
+          const matchToko = (selToko === "Semua" || item.nama_toko === selToko);
+          const matchKreator = (selKreator === "Semua" || item.nama_kreator === selKreator);
+          
+          let matchQuery = true;
+          if (q) {
+            const combined = Object.values(item).join(" ").toLowerCase();
+            matchQuery = combined.includes(q);
+          }
+          return matchToko && matchKreator && matchQuery;
+        });
+
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        // Jika data database memang masih kosong (0 baris), tampilkan tampilan persis seperti contoh
+        if (typeof window.bmToggleEmptyState === 'function') {
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, produkBrandDb.length === 0);
+        } else {
+          if (produkBrandDb.length === 0) {
+            if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+            if (emptyTableState) {
+              emptyTableState.classList.remove("is-hidden");
+              emptyTableState.classList.add("is-visible");
+              emptyTableState.style.setProperty("display", "flex", "important");
+            }
+          } else {
+            if (tableWrapper) {
+              tableWrapper.style.removeProperty("display");
+              if (tableWrapper.style.display === "none") tableWrapper.style.display = "";
+            }
+            if (emptyTableState) {
+              emptyTableState.classList.add("is-hidden");
+              emptyTableState.classList.remove("is-visible");
+              emptyTableState.style.setProperty("display", "none", "important");
+            }
+          }
+        }
+
+        if (produkBrandDb.length === 0) {
+          return;
+        }
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="35" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data Produk &amp; Brand yang sesuai dengan pencarian atau filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach((row, idx) => {
+          const tr = document.createElement("tr");
+          tr.setAttribute("data-id", row.id);
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td data-col="tanggal">${row.tanggal || "-"}</td>
+            <td data-col="nama_kreator" style="font-weight: 700; color: #0284c7;">${row.nama_kreator || "-"}</td>
+            <td>${row.pengikut || "-"}</td>
+            <td data-col="id_produk" style="font-weight: 600;">${row.id_produk || "-"}</td>
+            <td>${row.info_produk || "-"}</td>
+            <td>${row.kode_toko || "-"}</td>
+            <td>${row.id_toko || "-"}</td>
+            <td data-col="nama_toko" style="font-weight: 600; color: #0f172a;">${row.nama_toko || "-"}</td>
+            <td style="font-weight: 700; color: #1c64f2;">${row.gmv_kreator || "-"}</td>
+            <td>${row.gmv_live_kreator || "-"}</td>
+            <td>${row.gmv_video_afiliasi || "-"}</td>
+            <td>${row.pesanan_kreator || "-"}</td>
+            <td>${row.pesanan_live_kreator || "-"}</td>
+            <td>${row.pesanan_video_kreator || "-"}</td>
+            <td>${row.gmv_langsung || "-"}</td>
+            <td>${row.gmv_langsung_live || "-"}</td>
+            <td>${row.gmv_langsung_video || "-"}</td>
+            <td>${row.gmv_langsung_kartu || "-"}</td>
+            <td>${row.terjual_kreator || "-"}</td>
+            <td>${row.pesanan_langsung || "-"}</td>
+            <td>${row.pesanan_langsung_live || "-"}</td>
+            <td>${row.pesanan_langsung_video || "-"}</td>
+            <td>${row.pesanan_kartu || "-"}</td>
+            <td>${row.terjual_live_kreator || "-"}</td>
+            <td>${row.terjual_video_kreator || "-"}</td>
+            <td>${row.terjual_kartu || "-"}</td>
+            <td style="color: #ef4444; font-weight: 600;">${row.gmv_refund_langsung || "-"}</td>
+            <td style="color: #ef4444;">${row.barang_refund || "-"}</td>
+            <td>${row.ctr || "-"}</td>
+            <td>${row.ctor || "-"}</td>
+            <td>${row.gmv_mitra || "-"}</td>
+            <td>${row.pesanan_mitra || "-"}</td>
+            <td class="col-sticky-action text-center">
+              <div class="action-btn-group">
+                <button type="button" class="btn-action-sm btn-action-view btn-act-view" data-id="${row.id}" title="Lihat Detail">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+                <button type="button" class="btn-action-sm btn-action-edit btn-act-edit" data-id="${row.id}" title="Edit Data">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </button>
+                <button type="button" class="btn-action-sm btn-action-delete btn-act-delete" data-id="${row.id}" title="Hapus Data">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Trigger column pin positions after render
+        updatePinnedColumns();
+      }
+
+      // ================= COLUMN PIN / FREEZE FUNCTIONALITY =================
+      const PINNED_STORAGE_KEY = "bisa_produk_brand_pinned_cols";
+
+      function getSavedPinnedCols() {
+        try {
+          return JSON.parse(localStorage.getItem(PINNED_STORAGE_KEY)) || {
+            tanggal: true,
+            nama_kreator: true
+          };
+        } catch (e) {
+          return { tanggal: true, nama_kreator: true };
+        }
+      }
+
+      function savePinnedCols(obj) {
+        localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(obj));
+      }
+
+      function updatePinnedColumns() {
+        const table = document.getElementById("tableProdukBrand");
+        if (!table) return;
+
+        const firstCol = table.querySelector("th:first-child");
+        let currentLeft = firstCol ? firstCol.offsetWidth : 48;
+
+        const pinnableThs = Array.from(table.querySelectorAll("th.th-pinnable"));
+        let lastPinnedTh = null;
+
+        pinnableThs.forEach(th => {
+          const colName = th.getAttribute("data-col");
+          const chk = th.querySelector(".chk-pin-col");
+          const isPinned = chk && chk.checked;
+          const bodyTds = table.querySelectorAll(`tbody td[data-col="${colName}"]`);
+
+          if (isPinned) {
+            th.classList.add("col-pinned-sticky");
+            th.classList.remove("col-pinned-last");
+            th.style.left = currentLeft + "px";
+
+            bodyTds.forEach(td => {
+              td.classList.add("col-pinned-sticky");
+              td.classList.remove("col-pinned-last");
+              td.style.left = currentLeft + "px";
+            });
+
+            currentLeft += th.offsetWidth;
+            lastPinnedTh = { th, bodyTds };
+          } else {
+            th.classList.remove("col-pinned-sticky", "col-pinned-last");
+            th.style.left = "";
+            bodyTds.forEach(td => {
+              td.classList.remove("col-pinned-sticky", "col-pinned-last");
+              td.style.left = "";
+            });
+          }
+        });
+
+        if (lastPinnedTh) {
+          lastPinnedTh.th.classList.add("col-pinned-last");
+          lastPinnedTh.bodyTds.forEach(td => td.classList.add("col-pinned-last"));
+        }
+      }
+
+      function initPinnedColumns() {
+        const saved = getSavedPinnedCols();
+        document.querySelectorAll(".chk-pin-col").forEach(chk => {
+          const col = chk.getAttribute("data-col");
+          if (saved && saved[col]) {
+            chk.checked = true;
+          }
+          chk.addEventListener("change", () => {
+            const cur = getSavedPinnedCols();
+            cur[col] = chk.checked;
+            savePinnedCols(cur);
+            updatePinnedColumns();
+          });
+        });
+
+        window.addEventListener("resize", updatePinnedColumns);
+      }
+
+      // ================= SEARCH & FILTER EVENTS =================
+      if (searchInput) {
+        searchInput.addEventListener("input", renderTable);
+      }
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener("click", (e) => {
+          e.stopPropagation();
+          filterDropdown.classList.toggle("is-open");
+        });
+        document.addEventListener("click", (e) => {
+          if (!filterDropdown.contains(e.target) && e.target !== btnFilter) {
+            filterDropdown.classList.remove("is-open");
+          }
+        });
+      }
+
+      if (applyFilterBtn) {
+        applyFilterBtn.addEventListener("click", () => {
+          if (filterDropdown) filterDropdown.classList.remove("is-open");
+          renderTable();
+        });
+      }
+
+      if (resetFilterBtn) {
+        resetFilterBtn.addEventListener("click", () => {
+          if (filterNamaToko) filterNamaToko.value = "Semua";
+          if (filterKreator) filterKreator.value = "Semua";
+          if (filterDropdown) filterDropdown.classList.remove("is-open");
+          renderTable();
+        });
+      }
+
+      // ================= EXPORT EXCEL (.CSV) =================
+      const btnExport = document.getElementById("btnExportExcel");
+      if (btnExport) {
+        btnExport.addEventListener("click", () => {
+          if (produkBrandDb.length === 0) {
+            alert("Tidak ada data untuk diekspor!");
+            return;
+          }
+
+          const headers = [
+            "No", "Tanggal", "Nama pengguna kreator", "Jumlah pengikut kreator", "ID Produk",
+            "Info produk", "Kode Toko", "ID Toko", "Nama toko", "GMV dari kreator",
+            "GMV dari LIVE kreator", "GMV dari video afiliasi", "Pesanan dari kreator",
+            "Pesanan dari LIVE kreator", "Pesanan dari video kreator", "GMV Langsung",
+            "GMV langsung dari LIVE", "GMV langsung dari video", "GMV langsung dari kartu produk",
+            "Produk yang terjual dari kreator", "Pesanan langsung", "Pesanan langsung dari LIVE",
+            "Pesanan langsung dari Video", "Pesanan dari kartu produk", "Produk yang terjual dari LIVE kreator",
+            "produk yang terjual dari video kreator", "Produk terjual dari kartu produk",
+            "GMV pengembalian dana langsung", "Barang yang dikembalikan dananya", "CTR",
+            "CTOR (pesanan SKU)", "GMV dari kreator mitra afiliasi", "Pesanan dari kreator mitra afiliasi"
+          ];
+
+          let csvContent = "\uFEFF" + headers.join(",") + "\n";
+          produkBrandDb.forEach((r, idx) => {
+            const row = [
+              idx + 1,
+              `"${r.tanggal || ""}"`,
+              `"${r.nama_kreator || ""}"`,
+              `"${r.pengikut || ""}"`,
+              `"${r.id_produk || ""}"`,
+              `"${r.info_produk || ""}"`,
+              `"${r.kode_toko || ""}"`,
+              `"${r.id_toko || ""}"`,
+              `"${r.nama_toko || ""}"`,
+              `"${r.gmv_kreator || ""}"`,
+              `"${r.gmv_live_kreator || ""}"`,
+              `"${r.gmv_video_afiliasi || ""}"`,
+              `"${r.pesanan_kreator || ""}"`,
+              `"${r.pesanan_live_kreator || ""}"`,
+              `"${r.pesanan_video_kreator || ""}"`,
+              `"${r.gmv_langsung || ""}"`,
+              `"${r.gmv_langsung_live || ""}"`,
+              `"${r.gmv_langsung_video || ""}"`,
+              `"${r.gmv_langsung_kartu || ""}"`,
+              `"${r.terjual_kreator || ""}"`,
+              `"${r.pesanan_langsung || ""}"`,
+              `"${r.pesanan_langsung_live || ""}"`,
+              `"${r.pesanan_langsung_video || ""}"`,
+              `"${r.pesanan_kartu || ""}"`,
+              `"${r.terjual_live_kreator || ""}"`,
+              `"${r.terjual_video_kreator || ""}"`,
+              `"${r.terjual_kartu || ""}"`,
+              `"${r.gmv_refund_langsung || ""}"`,
+              `"${r.barang_refund || ""}"`,
+              `"${r.ctr || ""}"`,
+              `"${r.ctor || ""}"`,
+              `"${r.gmv_mitra || ""}"`,
+              `"${r.pesanan_mitra || ""}"`
+            ];
+            csvContent += row.join(",") + "\n";
+          });
+
+          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.setAttribute("href", url);
+          link.setAttribute("download", `Produk_Brands_${new Date().toISOString().slice(0, 10)}.csv`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast("Data berhasil diekspor ke file Excel/CSV");
+        });
+      }
+
+      // ================= FORM PANEL (+ TAMBAH) =================
+      let parsedImportRows = [];
+      let currentExcelFileName = "Template_Import_Produk_Brand.xlsx";
+      let currentExcelRawRows = [];
+      let currentExcelBlob = null;
+
+      // Template Data Excel Default (32 Kolom Lengkap Sesuai Dokumen)
+      const DEFAULT_EXCEL_TEMPLATE = [
+        [
+          "Tanggal", "Nama pengguna kreator", "Jumlah pengikut kreator", "ID Produk", "Info produk", 
+          "Kode Toko", "ID Toko", "Nama toko", "GMV dari kreator", "GMV dari LIVE kreator", 
+          "GMV dari video afiliasi", "Pesanan dari kreator", "Pesanan dari LIVE kreator", "Pesanan dari video kreator",
+          "GMV Langsung", "GMV langsung dari LIVE", "GMV langsung dari video", "GMV langsung dari kartu produk", 
+          "Produk yang terjual dari kreator", "Pesanan langsung", "Pesanan langsung LIVE", "Pesanan langsung video", 
+          "Pesanan langsung kartu produk", "Produk terjual dari LIVE kreator", "Produk terjual dari video kreator", 
+          "Produk terjual dari kartu produk kreator", "GMV refund langsung", "Barang refund pesanan langsung", 
+          "CTR", "CTOR (pesanan SKU)", "GMV mitra", "Pesanan mitra"
+        ],
+        [
+          "18/05/2026", "@fauzan.lifestyle", "2.4M", "PID-99201", "Kemeja Kasual Pria Slim Fit Cotton",
+          "TK-01", "SHOP-8819", "Bisa Fashion Official", "Rp 18.500.000", "Rp 12.000.000",
+          "Rp 6.500.000", "240", "150", "90",
+          "Rp 8.200.000", "Rp 5.200.000", "Rp 3.000.000", "Rp 0",
+          "310", "120", "80", "40",
+          "0", "190", "120",
+          "0", "Rp 0", "0",
+          "4.8%", "3.2%", "Rp 0", "0"
+        ],
+        [
+          "18/05/2026", "@dinda.beauty", "1.8M", "PID-99202", "Serum Pencerah Wajah Vitamin C 30ml",
+          "TK-02", "SHOP-8820", "Bisa Glow Skincare", "Rp 24.100.000", "Rp 16.500.000",
+          "Rp 7.600.000", "380", "260", "120",
+          "Rp 12.000.000", "Rp 8.000.000", "Rp 4.000.000", "Rp 0",
+          "490", "180", "130", "50",
+          "0", "320", "170",
+          "0", "Rp 0", "0",
+          "5.2%", "3.9%", "Rp 0", "0"
+        ],
+        [
+          "17/05/2026", "@kevin_gadget", "950K", "PID-99203", "Earphone Wireless TWS Bass Boost",
+          "TK-03", "SHOP-8821", "Bisa Tech Electronic", "Rp 14.800.000", "Rp 9.200.000",
+          "Rp 5.600.000", "195", "115", "80",
+          "Rp 5.400.000", "Rp 3.200.000", "Rp 2.200.000", "Rp 0",
+          "210", "75", "45", "30",
+          "0", "125", "85",
+          "0", "Rp 0", "0",
+          "3.9%", "2.8%", "Rp 0", "0"
+        ],
+        [
+          "17/05/2026", "@maya.kuliner", "1.2M", "PID-99204", "Snack Keripik Pedas Daun Jeruk 200g",
+          "TK-04", "SHOP-8822", "Bisa Snack Nusantara", "Rp 9.600.000", "Rp 6.400.000",
+          "Rp 3.200.000", "320", "210", "110",
+          "Rp 3.100.000", "Rp 2.000.000", "Rp 1.100.000", "Rp 0",
+          "410", "140", "95", "45",
+          "0", "265", "145",
+          "0", "Rp 0", "0",
+          "6.1%", "4.5%", "Rp 0", "0"
+        ],
+        [
+          "16/05/2026", "@rina_hijab", "820K", "PID-99205", "Hijab Segiempat Paris Premium Voal",
+          "TK-01", "SHOP-8819", "Bisa Fashion Official", "Rp 11.200.000", "Rp 7.800.000",
+          "Rp 3.400.000", "260", "175", "85",
+          "Rp 4.300.000", "Rp 2.800.000", "Rp 1.500.000", "Rp 0",
+          "305", "110", "70", "40",
+          "0", "195", "110",
+          "0", "Rp 0", "0",
+          "4.4%", "3.1%", "Rp 0", "0"
+        ]
+      ];
+
+      function resetSubmitButtonState(enabled) {
+        const submitBtn = document.getElementById("btnSubmitTambah") || document.querySelector("#formTambahProdukBrand button[type='submit']");
+        if (submitBtn) {
+          submitBtn.disabled = !enabled;
+          submitBtn.style.opacity = enabled ? "1" : "0.5";
+          submitBtn.style.cursor = enabled ? "pointer" : "not-allowed";
+        }
+      }
+
+      function parseExcelRowsToDb(rawRows) {
+        if (!rawRows || rawRows.length === 0) {
+          parsedImportRows = [];
+          return;
+        }
+        const dataRows = rawRows.slice(1).filter(r => Array.isArray(r) && r.some(cell => String(cell || "").trim() !== ""));
+        parsedImportRows = dataRows.map((cols, i) => {
+          return {
+            id: Date.now() + Math.floor(Math.random() * 1000) + i,
+            tanggal: String(cols[0] || new Date().toLocaleDateString("id-ID")),
+            nama_kreator: String(cols[1] || "@kreator.baru"),
+            pengikut: String(cols[2] || "100.000"),
+            id_produk: String(cols[3] || `PID-00${i + 6}`),
+            info_produk: String(cols[4] || "Produk Afiliasi"),
+            kode_toko: String(cols[5] || "TK-01"),
+            id_toko: String(cols[6] || "SHOP-99001"),
+            nama_toko: String(cols[7] || "Bisa Media Official"),
+            gmv_kreator: String(cols[8] || "Rp 0"),
+            gmv_live_kreator: String(cols[9] || "Rp 0"),
+            gmv_video_afiliasi: String(cols[10] || "Rp 0"),
+            pesanan_kreator: String(cols[11] || "0"),
+            pesanan_live_kreator: String(cols[12] || "0"),
+            pesanan_video_kreator: String(cols[13] || "0"),
+            gmv_langsung: String(cols[14] || "Rp 0"),
+            gmv_langsung_live: String(cols[15] || "Rp 0"),
+            gmv_langsung_video: String(cols[16] || "Rp 0"),
+            gmv_langsung_kartu: String(cols[17] || "Rp 0"),
+            terjual_kreator: String(cols[18] || "0"),
+            pesanan_langsung: String(cols[19] || "0"),
+            pesanan_langsung_live: String(cols[20] || "0"),
+            pesanan_langsung_video: String(cols[21] || "0"),
+            pesanan_kartu: String(cols[22] || "0"),
+            terjual_live_kreator: String(cols[23] || "0"),
+            terjual_video_kreator: String(cols[24] || "0"),
+            terjual_kartu: String(cols[25] || "0"),
+            gmv_refund_langsung: String(cols[26] || "Rp 0"),
+            barang_refund: String(cols[27] || "0"),
+            ctr: String(cols[28] || "0%"),
+            ctor: String(cols[29] || "0%"),
+            gmv_mitra: String(cols[30] || "Rp 0"),
+            pesanan_mitra: String(cols[31] || "0")
+          };
+        });
+      }
+
+      // Render Kotak Pratinjau Kosong (Sebelum File Dipilih / Setelah Disubmit)
+      function renderEmptyPreview() {
+        if (!previewContainer) return;
+        previewContainer.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; padding: 16px 12px; text-align: center; color: #94a3b8; gap: 8px;">
+            <div style="width: 42px; height: 42px; border-radius: 10px; background: #f8fafc; border: 1.5px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+              <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+            </div>
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: #64748b;">Belum Ada File Excel</div>
+              <div style="font-size: 11px; color: #94a3b8; margin-top: 3px;">Pratinjau file akan muncul di sini setelah Anda memilih file (.xlsx, .xls)</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Render Simpel di Kotak Preview: Ikon Excel, Nama File, Teks "Lihat", dan Tombol Hapus Pilihan
+      function renderPreviewCard(fileName, metaText = "Microsoft Excel (.xlsx)") {
+        if (!previewContainer) return;
+
+        previewContainer.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; padding: 14px; text-align: center; gap: 8px; position: relative;">
+            <button type="button" onclick="window.clearExcelUpload()" title="Hapus dan kosongkan file" style="position: absolute; top: 4px; right: 6px; background: none; border: none; font-size: 18px; color: #94a3b8; cursor: pointer; padding: 2px 6px; border-radius: 4px; line-height: 1; transition: all 0.15s ease;" onmouseover="this.style.color='#ef4444';this.style.background='#fef2f2';" onmouseout="this.style.color='#94a3b8';this.style.background='none';">&times;</button>
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: #f0fdf4; border: 1.5px solid #bbf7d0; display: flex; align-items: center; justify-content: center; color: #16a34a; flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: currentColor;"><path d="M21.17 3.25Q21.5 3.25 21.76 3.5 22 3.74 22 4.1v15.8q0 .35-.24.6-.25.25-.59.25H7.83q-.35 0-.6-.25-.24-.24-.24-.6V17H2.83q-.35 0-.59-.24Q2 16.5 2 16.16V7.84q0-.35.24-.59.24-.25.59-.25H7V4.1q0-.36.24-.6.25-.25.59-.25zM7 8.71H3.67v6.58H7zm7.5 4.54 2.27-3.67h-1.89l-1.39 2.5-1.38-2.5h-1.9l2.27 3.67-2.39 3.84h1.89l1.51-2.65 1.51 2.65h1.9zM20.33 4.9H8.67v14.2h11.66z"/></svg>
+            </div>
+            <div>
+              <div id="previewFileNameText" style="font-size: 13.5px; font-weight: 700; color: #1e293b; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                ${fileName}
+              </div>
+              <div id="previewFileMetaText" style="font-size: 11.5px; color: #64748b; margin-top: 3px;">
+                ${metaText}
+              </div>
+            </div>
+            <div style="margin-top: 2px;">
+              <button type="button" id="btnLihatExcelOri" onclick="window.openExcelOriModal()" style="display: inline-flex; align-items: center; gap: 6px; background: none; border: none; color: #16a34a; font-size: 13.5px; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 4px 10px; border-radius: 4px; transition: all 0.15s ease;" onmouseover="this.style.background='#f0fdf4';this.style.color='#15803d';" onmouseout="this.style.background='none';this.style.color='#16a34a';">
+                <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                Lihat
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // ================= IN-BROWSER EXCEL VIEWER STATE & LOGIC =================
+      const excelViewerState = {
+        fileName: "Template_Import_Produk_Brand.xlsx",
+        fileSizeText: "14.2 KB",
+        allSheets: {},
+        sheetNames: [],
+        activeSheet: "",
+        headers: [],
+        allDataRows: [],
+        filteredRows: [],
+        page: 1,
+        pageSize: 100,
+        searchQuery: "",
+        isFullscreen: false
+      };
+
+      function initExcelViewerWithData(fileName, fileSizeText, sheetsObj) {
+        excelViewerState.fileName = fileName;
+        excelViewerState.fileSizeText = fileSizeText;
+        excelViewerState.allSheets = sheetsObj || {};
+        excelViewerState.sheetNames = Object.keys(sheetsObj || {});
+        excelViewerState.activeSheet = excelViewerState.sheetNames[0] || "Sheet1";
+        excelViewerState.searchQuery = "";
+        excelViewerState.page = 1;
+
+        const searchInput = document.getElementById("excelOriSearchInput");
+        if (searchInput) searchInput.value = "";
+
+        loadActiveSheetData();
+        renderExcelSheetTabs();
+        applyExcelFilterAndRender();
+      }
+
+      function loadActiveSheetData() {
+        const raw = excelViewerState.allSheets[excelViewerState.activeSheet] || [];
+        if (raw.length > 0) {
+          excelViewerState.headers = raw[0] || [];
+          excelViewerState.allDataRows = raw.slice(1).filter(r => Array.isArray(r) && r.some(cell => String(cell || "").trim() !== ""));
+        } else {
+          excelViewerState.headers = [];
+          excelViewerState.allDataRows = [];
+        }
+      }
+
+      window.switchExcelSheet = function(sheetName) {
+        if (!excelViewerState.allSheets[sheetName]) return;
+        excelViewerState.activeSheet = sheetName;
+        excelViewerState.page = 1;
+        loadActiveSheetData();
+        renderExcelSheetTabs();
+        applyExcelFilterAndRender();
+      };
+
+      function applyExcelFilterAndRender() {
+        const q = (excelViewerState.searchQuery || "").trim().toLowerCase();
+        if (!q) {
+          excelViewerState.filteredRows = excelViewerState.allDataRows;
+        } else {
+          excelViewerState.filteredRows = excelViewerState.allDataRows.filter(row => {
+            return row.some(cell => String(cell !== undefined && cell !== null ? cell : "").toLowerCase().includes(q));
+          });
+        }
+
+        const totalRows = excelViewerState.filteredRows.length;
+        const ps = excelViewerState.pageSize === "all" ? Math.max(1, totalRows) : (parseInt(excelViewerState.pageSize, 10) || 100);
+        const totalPages = Math.max(1, Math.ceil(totalRows / ps));
+        if (excelViewerState.page > totalPages) excelViewerState.page = totalPages;
+        if (excelViewerState.page < 1) excelViewerState.page = 1;
+
+        renderExcelOriPage();
+      }
+
+      function getColAlphabet(idx) {
+        let name = "";
+        let num = idx;
+        while (num >= 0) {
+          name = String.fromCharCode((num % 26) + 65) + name;
+          num = Math.floor(num / 26) - 1;
+        }
+        return name;
+      }
+
+      function renderExcelOriPage() {
+        const totalRows = excelViewerState.filteredRows.length;
+        const ps = excelViewerState.pageSize === "all" ? Math.max(1, totalRows) : (parseInt(excelViewerState.pageSize, 10) || 100);
+        const totalPages = Math.max(1, Math.ceil(totalRows / ps));
+        const page = excelViewerState.page;
+
+        const startIdx = totalRows === 0 ? 0 : (page - 1) * ps;
+        const endIdx = totalRows === 0 ? 0 : Math.min(startIdx + ps, totalRows);
+
+        const rowStartEl = document.getElementById("excelRowStart");
+        const rowEndEl = document.getElementById("excelRowEnd");
+        const rowTotalEl = document.getElementById("excelRowTotal");
+        const curPageEl = document.getElementById("excelCurrentPage");
+        const totPagesEl = document.getElementById("excelTotalPages");
+        const btnPrev = document.getElementById("btnExcelPrev");
+        const btnNext = document.getElementById("btnExcelNext");
+        const titleEl = document.getElementById("modalExcelOriTitle");
+        const subtitleEl = document.getElementById("modalExcelOriSubtitle");
+
+        if (rowStartEl) rowStartEl.textContent = totalRows === 0 ? "0" : String(startIdx + 1);
+        if (rowEndEl) rowEndEl.textContent = String(endIdx);
+        if (rowTotalEl) rowTotalEl.textContent = String(totalRows);
+        if (curPageEl) curPageEl.textContent = String(page);
+        if (totPagesEl) totPagesEl.textContent = String(totalPages);
+
+        if (btnPrev) {
+          btnPrev.disabled = page <= 1;
+          btnPrev.style.opacity = page <= 1 ? "0.45" : "1";
+          btnPrev.style.cursor = page <= 1 ? "not-allowed" : "pointer";
+        }
+        if (btnNext) {
+          btnNext.disabled = page >= totalPages;
+          btnNext.style.opacity = page >= totalPages ? "0.45" : "1";
+          btnNext.style.cursor = page >= totalPages ? "not-allowed" : "pointer";
+        }
+
+        if (titleEl) titleEl.textContent = excelViewerState.fileName;
+        if (subtitleEl) {
+          const sheetLabel = excelViewerState.activeSheet ? `Lembar: "${excelViewerState.activeSheet}" • ` : "";
+          subtitleEl.textContent = `${sheetLabel}${totalRows} baris data • Dokumen Asli Terbaca Online Tanpa Unduh`;
+        }
+
+        const contentEl = document.getElementById("modalExcelOriContent");
+        if (!contentEl) return;
+
+        if (totalRows === 0 && excelViewerState.headers.length === 0) {
+          contentEl.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #64748b; font-size: 13px; gap: 8px; padding: 40px;">
+              <svg viewBox="0 0 24 24" style="width: 36px; height: 36px; stroke: currentColor; fill: none; stroke-width: 1.5;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>Tidak ada data di lembar kerja ini.</span>
+            </div>
+          `;
+          return;
+        }
+
+        const headers = excelViewerState.headers || [];
+        const pageRows = excelViewerState.filteredRows.slice(startIdx, endIdx);
+
+        let html = `
+          <div style="width: 100%; height: 100%; overflow: auto; position: relative;">
+            <table style="width: 100%; border-collapse: collapse; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 11.5px; text-align: left; white-space: nowrap;">
+              <thead>
+                <tr style="background: #f8fafc; position: sticky; top: 0; z-index: 5; box-shadow: 0 1px 2px rgba(0,0,0,0.06);">
+                  <th style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: 700; color: #475569; text-align: center; width: 46px; min-width: 46px; background: #e2e8f0; position: sticky; left: 0; z-index: 6;">#</th>
+                  ${headers.map((h, colIdx) => `
+                    <th style="padding: 8px 14px; border: 1px solid #cbd5e1; font-weight: 700; color: #0f172a; background: #f1f5f9; min-width: 130px;">
+                      <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="display: inline-block; background: #e2e8f0; color: #475569; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; font-family: monospace;">${getColAlphabet(colIdx)}</span>
+                        <span>${h !== undefined && h !== null ? h : ''}</span>
+                      </div>
+                    </th>
+                  `).join('')}
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+        if (pageRows.length === 0) {
+          html += `
+            <tr>
+              <td colspan="${headers.length + 1}" style="text-align: center; padding: 30px; color: #64748b; font-size: 12.5px;">
+                Pencarian "${excelViewerState.searchQuery}" tidak menemukan baris yang cocok.
+              </td>
+            </tr>
+          `;
+        } else {
+          pageRows.forEach((row, rSubIdx) => {
+            const rowNumber = startIdx + rSubIdx + 1;
+            const bg = rSubIdx % 2 === 0 ? "#ffffff" : "#f8fafc";
+            html += `
+              <tr style="background: ${bg}; transition: background 0.1s ease;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='${bg}'">
+                <td style="padding: 6px 10px; border: 1px solid #cbd5e1; color: #64748b; font-weight: 700; text-align: center; background: #f8fafc; position: sticky; left: 0; z-index: 2; font-family: monospace; font-size: 11px;">${rowNumber}</td>
+                ${headers.map((_, colIdx) => {
+                  const cellVal = row[colIdx] !== undefined && row[colIdx] !== null ? String(row[colIdx]) : "";
+                  return `<td style="padding: 6px 14px; border: 1px solid #e2e8f0; color: #1e293b; max-width: 320px; overflow: hidden; text-overflow: ellipsis;">${cellVal}</td>`;
+                }).join('')}
+              </tr>
+            `;
+          });
+        }
+
+        html += `
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        contentEl.innerHTML = html;
+      }
+
+      function renderExcelSheetTabs() {
+        const tabsContainer = document.getElementById("excelSheetTabsContainer");
+        if (!tabsContainer) return;
+
+        const sheets = excelViewerState.sheetNames;
+        if (!sheets || sheets.length === 0) {
+          tabsContainer.innerHTML = `<span style="color: #64748b; font-style: italic;">Sheet1</span>`;
+          return;
+        }
+
+        tabsContainer.innerHTML = sheets.map(sheet => {
+          const isActive = sheet === excelViewerState.activeSheet;
+          const escapedSheet = sheet.replace(/'/g, "\\'");
+          return `
+            <button type="button" onclick="window.switchExcelSheet('${escapedSheet}')" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border: 1px solid ${isActive ? '#16a34a' : '#cbd5e1'}; background: ${isActive ? '#ffffff' : '#f8fafc'}; color: ${isActive ? '#16a34a' : '#475569'}; font-weight: ${isActive ? '700' : '500'}; border-radius: 4px 4px 0 0; border-bottom: ${isActive ? '2px solid #16a34a' : '1px solid #cbd5e1'}; cursor: pointer; font-size: 11.5px; transition: all 0.15s ease;">
+              <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+              ${sheet}
+            </button>
+          `;
+        }).join('');
+      }
+
+      window.toggleExcelFullscreen = function() {
+        const modal = document.getElementById("modalLihatExcelOri");
+        if (!modal) return;
+        const box = modal.querySelector(".modal-box");
+        const btnText = document.getElementById("textToggleFull");
+        excelViewerState.isFullscreen = !excelViewerState.isFullscreen;
+
+        if (excelViewerState.isFullscreen) {
+          box.style.width = "100vw";
+          box.style.maxWidth = "100vw";
+          box.style.height = "100vh";
+          box.style.maxHeight = "100vh";
+          box.style.borderRadius = "0";
+          box.style.padding = "10px 14px";
+          if (btnText) btnText.textContent = "Layar Normal";
+        } else {
+          box.style.width = "98vw";
+          box.style.maxWidth = "98vw";
+          box.style.height = "96vh";
+          box.style.maxHeight = "96vh";
+          box.style.borderRadius = "12px";
+          box.style.padding = "16px 20px";
+          if (btnText) btnText.textContent = "Layar Penuh";
+        }
+      };
+
+      window.setExcelPageSize = function(size) {
+        excelViewerState.pageSize = size;
+        excelViewerState.page = 1;
+
+        document.querySelectorAll(".btn-page-size").forEach(btn => {
+          const btnSize = btn.getAttribute("data-size");
+          if (String(btnSize) === String(size)) {
+            btn.style.background = "#16a34a";
+            btn.style.color = "#ffffff";
+            btn.style.fontWeight = "700";
+          } else {
+            btn.style.background = "#f1f5f9";
+            btn.style.color = "#475569";
+            btn.style.fontWeight = "normal";
+          }
+        });
+
+        applyExcelFilterAndRender();
+      };
+
+      window.changeExcelPage = function(delta) {
+        const totalRows = excelViewerState.filteredRows.length;
+        const ps = excelViewerState.pageSize === "all" ? Math.max(1, totalRows) : (parseInt(excelViewerState.pageSize, 10) || 100);
+        const totalPages = Math.max(1, Math.ceil(totalRows / ps));
+        const newPage = excelViewerState.page + delta;
+        if (newPage >= 1 && newPage <= totalPages) {
+          excelViewerState.page = newPage;
+          renderExcelOriPage();
+        }
+      };
+
+      // Handler Membuka Modal File Excel Asli ("tanpa unduh bisa lihat file asli yang saya input & bisa lihat full")
+      window.openExcelOriModal = function() {
+        if (!currentExcelFileName || !currentExcelRawRows || currentExcelRawRows.length === 0) {
+          showToast("Belum ada file Excel yang dipilih.");
+          return;
+        }
+        const modal = document.getElementById("modalLihatExcelOri");
+        if (modal) {
+          modal.classList.add("is-active");
+          applyExcelFilterAndRender();
+        }
+      };
+
+      // Live search filter input listener
+      const excelSearchInputEl = document.getElementById("excelOriSearchInput");
+      if (excelSearchInputEl) {
+        excelSearchInputEl.addEventListener("input", function(e) {
+          excelViewerState.searchQuery = e.target.value;
+          excelViewerState.page = 1;
+          applyExcelFilterAndRender();
+        });
+      }
+
+      function resetFileFormState() {
+        if (fileInputExcel) fileInputExcel.value = "";
+        if (fileNameHint) {
+          fileNameHint.innerHTML = "Khusus file Excel (.xlsx, .xls)";
+          fileNameHint.style.color = "#64748b";
+        }
+        parsedImportRows = [];
+        currentExcelFileName = "";
+        currentExcelRawRows = [];
+        currentExcelBlob = null;
+        renderEmptyPreview();
+        resetSubmitButtonState(false);
+      }
+
+      window.clearExcelUpload = function() {
+        resetFileFormState();
+        showToast("Pilihan file Excel telah dibersihkan.");
+      };
+
+      if (btnTambah) {
+        btnTambah.addEventListener("click", () => {
+          formPanel.style.display = "block";
+          tablePanel.style.display = "none";
+          resetFileFormState();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      }
+
+      function closeFormPanel() {
+        formPanel.style.display = "none";
+        tablePanel.style.display = "block";
+        formTambah.reset();
+        resetFileFormState();
+      }
+
+      if (btnCancelTambah) btnCancelTambah.addEventListener("click", closeFormPanel);
+      if (btnResetForm) btnResetForm.addEventListener("click", closeFormPanel);
+
+      function processExcelFile(file) {
+        if (!file) return;
+
+        const parts = file.name.split(".");
+        const ext = parts.length > 1 ? parts.pop().toLowerCase().trim() : "";
+
+        if (ext !== "xlsx" && ext !== "xls") {
+          if (fileInputExcel) fileInputExcel.value = "";
+          parsedImportRows = [];
+          currentExcelBlob = null;
+          resetSubmitButtonState(false);
+
+          if (fileNameHint) {
+            fileNameHint.innerHTML = `<span style="color: #dc2626; font-weight: 600;">&times; File '${file.name}' ditolak</span>`;
+          }
+          if (previewContainer) {
+            previewContainer.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #dc2626; font-size: 12px; text-align: center; padding: 16px;">
+                Format file tidak didukung! Sistem hanya menerima file Microsoft Excel (.xlsx atau .xls).
+              </div>
+            `;
+          }
+          showToast(`File '${file.name}' ditolak! Khusus file Microsoft Excel (.xlsx / .xls).`);
+          return;
+        }
+
+        if (fileNameHint) {
+          fileNameHint.innerHTML = `<span style="color: #16a34a; font-weight: 600;">&#10003; ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>`;
+        }
+
+        const reader = new FileReader();
+
+        if (typeof XLSX !== "undefined") {
+          reader.onload = function (evt) {
+            try {
+              const data = new Uint8Array(evt.target.result);
+              const workbook = XLSX.read(data, { type: "array" });
+              if (!workbook || !workbook.SheetNames || workbook.SheetNames.length === 0) {
+                throw new Error("Sheet Excel kosong");
+              }
+
+              // Parse ALL sheets for authentic full-viewing experience
+              const allSheets = {};
+              workbook.SheetNames.forEach(sheetName => {
+                const worksheet = workbook.Sheets[sheetName];
+                allSheets[sheetName] = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+              });
+
+              const firstSheetName = workbook.SheetNames[0];
+              const rawRows = allSheets[firstSheetName] || [];
+
+              currentExcelFileName = file.name;
+              currentExcelRawRows = rawRows;
+              currentExcelBlob = file;
+
+              parseExcelRowsToDb(rawRows);
+              const sizeKB = (file.size / 1024).toFixed(1) + " KB";
+              renderPreviewCard(file.name, `${sizeKB} • File Excel Asli Terverifikasi`);
+              initExcelViewerWithData(file.name, `${sizeKB} • ${workbook.SheetNames.length} Sheet`, allSheets);
+              resetSubmitButtonState(true);
+              showToast(`File '${file.name}' siap! Klik 'Lihat' pada preview untuk membuka viewer penuh.`);
+            } catch (err) {
+              console.error("SheetJS parse error:", err);
+              if (fileInputExcel) fileInputExcel.value = "";
+              parsedImportRows = [];
+              currentExcelBlob = null;
+              resetSubmitButtonState(false);
+
+              if (fileNameHint) {
+                fileNameHint.innerHTML = `<span style="color: #dc2626; font-weight: 600;">&times; File Excel tidak sah / rusak</span>`;
+              }
+              if (previewContainer) {
+                previewContainer.innerHTML = `
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #dc2626; font-size: 12px; text-align: center; padding: 16px;">
+                    File '${file.name}' tidak dapat dibaca sebagai file spreadsheet Excel yang valid.
+                  </div>
+                `;
+              }
+              showToast("File tidak dapat dibaca sebagai spreadsheet Excel yang valid!");
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          showToast("Pustaka pembaca Excel sedang dimuat, silakan coba sesaat lagi.");
+        }
+      }
+
+      if (fileUploadContainer) {
+        fileUploadContainer.addEventListener("click", function (e) {
+          if (fileInputExcel) {
+            fileInputExcel.value = "";
+            fileInputExcel.click();
+          }
+        });
+
+        fileUploadContainer.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          fileUploadContainer.style.borderColor = "#16a34a";
+          fileUploadContainer.style.background = "#f0fdf4";
+        });
+        fileUploadContainer.addEventListener("dragleave", function (e) {
+          e.preventDefault();
+          fileUploadContainer.style.borderColor = "";
+          fileUploadContainer.style.background = "";
+        });
+        fileUploadContainer.addEventListener("drop", function (e) {
+          e.preventDefault();
+          fileUploadContainer.style.borderColor = "";
+          fileUploadContainer.style.background = "";
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            processExcelFile(e.dataTransfer.files[0]);
+          }
+        });
+      }
+
+      if (fileInputExcel) {
+        fileInputExcel.addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) processExcelFile(file);
+        });
+      }
+
+      // Handle Submit Form Tambah
+      if (formTambah) {
+        formTambah.addEventListener("submit", function (e) {
+          e.preventDefault();
+          if (!parsedImportRows || parsedImportRows.length === 0) {
+            showToast("Harap pilih file Excel (.xlsx / .xls) yang valid terlebih dahulu!");
+            return;
+          }
+
+          // Masukkan ke database
+          produkBrandDb.unshift(...parsedImportRows);
+          saveDb();
+          renderTable();
+          closeFormPanel();
+          showToast(`Berhasil menambahkan ${parsedImportRows.length} data Produk & Brand dari file Excel.`);
+        });
+      }
+
+      // ================= ACTIONS (LIHAT / EDIT / HAPUS) =================
+      if (tbody) {
+        tbody.addEventListener("click", function (e) {
+          const btnView = e.target.closest(".btn-act-view");
+          const btnEdit = e.target.closest(".btn-act-edit");
+          const btnDel = e.target.closest(".btn-act-delete");
+
+          // 1. LIHAT MODAL (32 FIELD DISPLAY)
+          if (btnView) {
+            e.stopPropagation();
+            const id = btnView.getAttribute("data-id");
+            const item = produkBrandDb.find(d => String(d.id) === String(id));
+            if (item && modalLihat) {
+              document.getElementById("viewTanggal").textContent = item.tanggal || "-";
+              document.getElementById("viewNamaKreator").textContent = item.nama_kreator || "-";
+              document.getElementById("viewPengikut").textContent = item.pengikut || "-";
+              document.getElementById("viewIdProduk").textContent = item.id_produk || "-";
+              document.getElementById("viewInfoProduk").textContent = item.info_produk || "-";
+              document.getElementById("viewKodeToko").textContent = item.kode_toko || "-";
+              document.getElementById("viewIdToko").textContent = item.id_toko || "-";
+              document.getElementById("viewNamaToko").textContent = item.nama_toko || "-";
+              document.getElementById("viewGmvKreator").textContent = item.gmv_kreator || "-";
+              document.getElementById("viewGmvLiveKreator").textContent = item.gmv_live_kreator || "-";
+              document.getElementById("viewGmvVideoAfiliasi").textContent = item.gmv_video_afiliasi || "-";
+              document.getElementById("viewPesananKreator").textContent = item.pesanan_kreator || "-";
+              document.getElementById("viewPesananLiveKreator").textContent = item.pesanan_live_kreator || "-";
+              document.getElementById("viewPesananVideoKreator").textContent = item.pesanan_video_kreator || "-";
+              document.getElementById("viewGmvLangsung").textContent = item.gmv_langsung || "-";
+              document.getElementById("viewGmvLangsungLive").textContent = item.gmv_langsung_live || "-";
+              document.getElementById("viewGmvLangsungVideo").textContent = item.gmv_langsung_video || "-";
+              document.getElementById("viewGmvLangsungKartu").textContent = item.gmv_langsung_kartu || "-";
+              document.getElementById("viewTerjualKreator").textContent = item.terjual_kreator || "-";
+              document.getElementById("viewPesananLangsung").textContent = item.pesanan_langsung || "-";
+              document.getElementById("viewPesananLangsungLive").textContent = item.pesanan_langsung_live || "-";
+              document.getElementById("viewPesananLangsungVideo").textContent = item.pesanan_langsung_video || "-";
+              document.getElementById("viewPesananKartu").textContent = item.pesanan_kartu || "-";
+              document.getElementById("viewTerjualLiveKreator").textContent = item.terjual_live_kreator || "-";
+              document.getElementById("viewTerjualVideoKreator").textContent = item.terjual_video_kreator || "-";
+              document.getElementById("viewTerjualKartu").textContent = item.terjual_kartu || "-";
+              document.getElementById("viewGmvRefundLangsung").textContent = item.gmv_refund_langsung || "-";
+              document.getElementById("viewBarangRefund").textContent = item.barang_refund || "-";
+              document.getElementById("viewCtr").textContent = item.ctr || "-";
+              document.getElementById("viewCtor").textContent = item.ctor || "-";
+              document.getElementById("viewGmvMitra").textContent = item.gmv_mitra || "-";
+              document.getElementById("viewPesananMitra").textContent = item.pesanan_mitra || "-";
+
+              modalLihat.classList.add("is-active");
+            }
+            return;
+          }
+
+          // 2. EDIT MODAL
+          if (btnEdit) {
+            e.stopPropagation();
+            const id = btnEdit.getAttribute("data-id");
+            const item = produkBrandDb.find(d => String(d.id) === String(id));
+            if (item && modalEdit) {
+              document.getElementById("editRowId").value = item.id;
+              document.getElementById("editTanggal").value = item.tanggal || "";
+              document.getElementById("editNamaKreator").value = item.nama_kreator || "";
+              document.getElementById("editPengikut").value = item.pengikut || "";
+              document.getElementById("editIdProduk").value = item.id_produk || "";
+              document.getElementById("editInfoProduk").value = item.info_produk || "";
+              document.getElementById("editNamaToko").value = item.nama_toko || "";
+              document.getElementById("editGmvKreator").value = item.gmv_kreator || "";
+              document.getElementById("editPesananKreator").value = item.pesanan_kreator || "";
+              document.getElementById("editGmvLangsung").value = item.gmv_langsung || "";
+              document.getElementById("editTerjualKreator").value = item.terjual_kreator || "";
+              document.getElementById("editCtr").value = item.ctr || "";
+              document.getElementById("editCtor").value = item.ctor || "";
+
+              modalEdit.classList.add("is-active");
+            }
+            return;
+          }
+
+          // 3. HAPUS MODAL
+          if (btnDel) {
+            e.stopPropagation();
+            const id = btnDel.getAttribute("data-id");
+            const item = produkBrandDb.find(d => String(d.id) === String(id));
+            if (item && modalHapus) {
+              pendingDeleteId = item.id;
+              if (deleteTargetText) {
+                deleteTargetText.textContent = `${item.nama_kreator} - ${item.info_produk} (${item.tanggal})`;
+              }
+              modalHapus.classList.add("is-active");
+            }
+            return;
+          }
+        });
+      }
+
+      // Handle Edit Form Submission
+      if (formEdit) {
+        formEdit.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const id = document.getElementById("editRowId").value;
+          const idx = produkBrandDb.findIndex(d => String(d.id) === String(id));
+          if (idx !== -1) {
+            produkBrandDb[idx].tanggal = document.getElementById("editTanggal").value;
+            produkBrandDb[idx].nama_kreator = document.getElementById("editNamaKreator").value;
+            produkBrandDb[idx].pengikut = document.getElementById("editPengikut").value;
+            produkBrandDb[idx].id_produk = document.getElementById("editIdProduk").value;
+            produkBrandDb[idx].info_produk = document.getElementById("editInfoProduk").value;
+            produkBrandDb[idx].nama_toko = document.getElementById("editNamaToko").value;
+            produkBrandDb[idx].gmv_kreator = document.getElementById("editGmvKreator").value;
+            produkBrandDb[idx].pesanan_kreator = document.getElementById("editPesananKreator").value;
+            produkBrandDb[idx].gmv_langsung = document.getElementById("editGmvLangsung").value;
+            produkBrandDb[idx].terjual_kreator = document.getElementById("editTerjualKreator").value;
+            produkBrandDb[idx].ctr = document.getElementById("editCtr").value;
+            produkBrandDb[idx].ctor = document.getElementById("editCtor").value;
+
+            saveDb();
+            renderTable();
+            modalEdit.classList.remove("is-active");
+            showToast("Perubahan data Produk & Brand berhasil disimpan.");
+          }
+        });
+      }
+
+      // Handle Delete Confirmation
+      if (btnConfirmDelete) {
+        btnConfirmDelete.addEventListener("click", function () {
+          if (!pendingDeleteId) return;
+          produkBrandDb = produkBrandDb.filter(d => String(d.id) !== String(pendingDeleteId));
+          saveDb();
+          renderTable();
+          if (modalHapus) modalHapus.classList.remove("is-active");
+          pendingDeleteId = null;
+          showToast("Data Produk & Brand berhasil dihapus.");
+        });
+      }
+
+      // Initial Render & Setup
+      renderTable();
+      initPinnedColumns();
+      resetFileFormState();
+    })();
+  </script>
+</body>
+
+</html>
