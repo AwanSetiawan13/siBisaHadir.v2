@@ -99,13 +99,21 @@
         ]
       },
       { 
-        type: 'group', label: 'Oprasional', icon: 'briefcase', id: 'm-spv-oprasional',
+        type: 'group', label: 'Operasional', icon: 'briefcase', id: 'm-spv-operasional',
         children: [
           { label: 'Dashboard Campaign', link: 'SpvKol/operasional/spvkol_dashboard_campaign.html' },
           { label: 'Campaign', link: 'SpvKol/operasional/spvkol_campaign.html' },
           { label: 'Kreator', link: 'SpvKol/operasional/spvkol_kreator.html' },
           { label: 'Tracking Sampel', link: 'SpvKol/operasional/spvkol_tracking_sampel.html' },
           { label: 'Performa Kreator', link: 'SpvKol/operasional/spvkol_Performa_Kreator.html' }
+        ]
+      },
+      { 
+        type: 'group', label: 'Brands', icon: 'brand', id: 'm-spv-brands',
+        children: [
+          { label: 'Dashboard Brands', link: 'SpvKol/brand/spvkol_dashboard_brand.html' },
+          { label: 'Data Brands', link: 'SpvKol/brand/spvkol_data_brand.html' },
+          { label: 'Produk & Brands', link: 'SpvKol/brand/spvkol_produk_brand.html' }
         ]
       },
 
@@ -139,7 +147,6 @@
       {
         type: 'group', label: 'Data Master', icon: 'tag', id: 'm-spv-master',
         children: [
-          { label: 'Brand', link: 'SpvKol/data_master/spvkol_Brand.html' },
           { label: 'Kategori Produk', link: 'SpvKol/data_master/master_pendukung/spvkol_Kategori_Produk.html' },
           { label: 'Leads Kreator', link: 'SpvKol/data_master/master_pendukung/spvkol_Leads_Kreator.html' },
           { label: 'Leveling Kreator', link: 'SpvKol/data_master/master_pendukung/spvkol_Leveling_Kreator.html' },
@@ -203,23 +210,47 @@
     ]
   };
 
-  // 4. Koleksi Ikon Modern Monoline (24x24, Bold 2.2px Stroke, Corporate Style)
-  const icons = {
-    home: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="8.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="5.5" rx="2"/><rect x="13.5" y="11.5" width="7.5" height="9.5" rx="2"/><rect x="3" y="14.5" width="7.5" height="6.5" rx="2"/></svg>`,
-    calendar: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
-    book: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 016.5 2H20v20H6.5a2.5 2.5 0 01-2.5-2.5z"/><path d="M6 6h10"/><path d="M6 10h10"/><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/></svg>`,
-    spv: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L3 7v6c0 5.5 3.8 10 9 11 5.2-1 9-5.5 9-11V7l-9-5z"/><circle cx="12" cy="11" r="2.5"/></svg>`,
-    staff: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21v-2a6.5 6.5 0 0113 0v2"/></svg>`,
-    users: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="3.5"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a3.5 3.5 0 010 6.75"/></svg>`,
-    task: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>`,
-    clock: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>`,
-    star: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-    folder: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>`,
-    buildings: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M9 16h2M13 16h2"/><path d="M10 21v-3h4v3"/></svg>`,
-    briefcase: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="3"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="2" y1="12" x2="22" y2="12"/></svg>`,
-    chart: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/><path d="M3 20h18"/></svg>`,
-    tag: `<svg class="app-nav-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>`
+  // 4. Koleksi Mapping Ikon Lucide Modern (24x24, Clean & Consistent)
+  const lucideIconMap = {
+    home: 'layout-dashboard',
+    calendar: 'calendar-days',
+    book: 'book-open',
+    spv: 'user-check',
+    staff: 'users',
+    users: 'users',
+    task: 'clipboard-list',
+    clock: 'clock',
+    star: 'star',
+    folder: 'folder',
+    buildings: 'building-2',
+    briefcase: 'package-check',
+    chart: 'trending-up',
+    tag: 'tags',
+    brand: 'sparkles'
   };
+
+  function renderLucideIcon(key) {
+    const iconName = lucideIconMap[key] || key || 'circle';
+    return `<i data-lucide="${iconName}" class="app-nav-icon" style="width: 18px; height: 18px; flex-shrink: 0;"></i>`;
+  }
+
+  function triggerLucideIcons() {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    } else {
+      let script = document.querySelector('script[src*="lucide"]');
+      if (!script) {
+        script = document.createElement('script');
+        script.src = 'https://unpkg.com/lucide@latest';
+        document.head.appendChild(script);
+      }
+      script.addEventListener('load', function () {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          window.lucide.createIcons();
+        }
+      });
+    }
+  }
 
   // Toggle Group Handler dengan Animasi Halus
   window.bmToggleGroup = function (el) {
@@ -256,7 +287,7 @@
       menuHtml += `
         <li style="list-style:none;margin:0 0 3px 0;padding:0;">
           <a href="${fullLink}" class="app-nav-item ${isActive ? 'is-active' : ''}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;font-size:13px;text-decoration:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);${isActive ? 'background-color:#0284c7;color:#ffffff;font-weight:600;box-shadow:0 3px 8px rgba(2,132,199,0.25);' : 'color:#475569;font-weight:500;'}">
-            ${icons[m.icon] || ''}
+            ${renderLucideIcon(m.icon)}
             <span>${m.label}</span>
           </a>
         </li>`;
@@ -282,10 +313,10 @@
                class="app-group-header" tabindex="0"
                style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;font-size:12.5px;font-weight:600;color:#334155;cursor:pointer;border-radius:8px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
             <div style="display:flex;align-items:center;gap:8px;">
-              ${icons[m.icon] || ''}
+              ${renderLucideIcon(m.icon)}
               <span>${m.label}</span>
             </div>
-            <svg class="chev" style="width:13px;height:13px;color:#94a3b8;transition:transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);transform:${isGroupActive ? 'rotate(0deg)' : 'rotate(-90deg)'};" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+            <i data-lucide="chevron-down" class="chev" style="width:14px;height:14px;color:#94a3b8;transition:transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);transform:${isGroupActive ? 'rotate(0deg)' : 'rotate(-90deg)'};flex-shrink:0;"></i>
           </div>
           <ul id="${m.id}" class="sidebar-submenu ${isGroupActive ? 'is-expanded' : ''}">${subHtml}</ul>
         </li>`;
@@ -485,38 +516,90 @@
         }
       }
     </style>
-    <div id="app-sidebar-inner">
-      <div>
-        <!-- Logo Brand (Aesthetic, Larger & Prominent) -->
-        <a href="${homeLink}" class="sidebar-brand-header" style="padding:18px 16px 14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f5f9;text-decoration:none;">
-          <div class="brand-logo-frame" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1.5px solid #bae6fd;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(2, 132, 199, 0.12);flex-shrink:0;transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
-            <img src="${rootPrefix}media/logo.png" style="width:30px;height:30px;object-fit:contain;" alt="Logo Bisa Media" onerror="this.style.display='none'" />
-          </div>
-          <div style="display:flex;flex-direction:column;justify-content:center;">
-            <span style="font-size:20.5px;font-weight:800;color:#0f172a;letter-spacing:-0.7px;font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;line-height:1.15;">Bisa Media</span>
-            <span style="font-size:9.5px;font-weight:700;color:#0284c7;letter-spacing:1.1px;text-transform:uppercase;margin-top:2px;">MCN Platform</span>
-          </div>
-        </a>
-        <!-- Scrollable Navigation Menu -->
-        <div id="app-sidebar-box" style="overflow-y:auto;max-height:calc(100vh - 142px);padding:6px 10px;">
-          <ul style="margin:0;padding:0;list-style:none;">${menuHtml}</ul>
+    <div id="app-sidebar-inner" style="height:100vh;max-height:100vh;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;">
+      <!-- Logo Brand (Aesthetic, Larger & Prominent) -->
+      <a href="${homeLink}" class="sidebar-brand-header" style="padding:18px 16px 14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f5f9;text-decoration:none;flex-shrink:0;">
+        <div class="brand-logo-frame" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1.5px solid #bae6fd;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(2, 132, 199, 0.12);flex-shrink:0;transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
+          <img src="${rootPrefix}media/logo.png" style="width:30px;height:30px;object-fit:contain;" alt="Logo Bisa Media" onerror="this.style.display='none'" />
         </div>
+        <div style="display:flex;flex-direction:column;justify-content:center;">
+          <span style="font-size:20.5px;font-weight:800;color:#0f172a;letter-spacing:-0.7px;font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;line-height:1.15;">Bisa Media</span>
+          <span style="font-size:9.5px;font-weight:700;color:#0284c7;letter-spacing:1.1px;text-transform:uppercase;margin-top:2px;">MCN Platform</span>
+        </div>
+      </a>
+      <!-- Scrollable Navigation Menu (Direct flex child: takes available height) -->
+      <div id="app-sidebar-box" style="overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0;padding:6px 10px;scrollbar-width:thin;">
+        <ul style="margin:0;padding:0;list-style:none;">${menuHtml}</ul>
       </div>
-      <!-- User Footer Card -->
-      <div style="padding:10px 14px;border-top:1px solid #f1f5f9;background:#fafafa;display:flex;align-items:center;justify-content:space-between;">
+      <!-- Sidebar Footer (Profile & Logout - Neatly docked at bottom of sidebar) -->
+      <div style="padding:12px 14px;border-top:1px solid #f1f5f9;background:#fafafa;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <img src="${rootPrefix}media/avatar.png" style="width:30px;height:30px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'" />
+          <img src="${rootPrefix}media/avatar.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #e0f2fe;" onerror="this.style.display='none'" />
           <div>
-            <div style="font-size:12.5px;font-weight:600;color:#1e293b;">Rayi</div>
-            <div style="font-size:10px;color:#0284c7;font-weight:700;letter-spacing:0.5px;">${role.replace('_', ' ').toUpperCase()}</div>
+            <div style="font-size:12.5px;font-weight:700;color:#1e293b;line-height:1.3;">Rayi</div>
+            <div style="font-size:9.5px;color:#0284c7;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;">${role.replace(/_/g, ' ')}</div>
           </div>
         </div>
-        <a href="${rootPrefix}login.html" title="Logout" style="color:#94a3b8;display:flex;align-items:center;text-decoration:none;padding:4px;border-radius:6px;transition:color 0.15s ease;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">
-          <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <a href="${rootPrefix}login.html" title="Logout" style="color:#94a3b8;display:flex;align-items:center;text-decoration:none;padding:6px;border-radius:8px;transition:background 0.15s,color 0.15s;" onmouseover="this.style.color='#ef4444';this.style.background='#fef2f2'" onmouseout="this.style.color='#94a3b8';this.style.background='transparent'">
+          <i data-lucide="log-out" style="width: 17px; height: 17px; flex-shrink: 0;"></i>
         </a>
       </div>
     </div>
   `;
+
+  // ── Sidebar smooth transition style injection ───────────────────────
+  (function injectSidebarTransitionCSS() {
+    if (document.getElementById('bm-sidebar-transition-css')) return;
+    const s = document.createElement('style');
+    s.id = 'bm-sidebar-transition-css';
+    s.textContent = `
+      #app-sidebar {
+        transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), width 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.22s ease;
+        will-change: transform, width;
+      }
+      body.sidebar-collapsed #app-sidebar {
+        width: 0 !important;
+        overflow: hidden !important;
+        transform: translateX(-100%) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      .dashboard-shell, .layout-page, .layout-container {
+        transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1), width 0.28s cubic-bezier(0.4,0,0.2,1) !important;
+      }
+      body.sidebar-collapsed .dashboard-shell,
+      body.sidebar-collapsed .layout-page,
+      body.sidebar-collapsed .layout-container {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+      #app-sidebar .app-nav-item, #app-sidebar .app-sub-item {
+        transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease !important;
+      }
+      .icon-button--menu span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        background: currentColor;
+        border-radius: 2px;
+        transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+        transform-origin: center;
+      }
+      body.sidebar-collapsed .icon-button--menu span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+      body.sidebar-collapsed .icon-button--menu span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+      body.sidebar-collapsed .icon-button--menu span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+      #sidebar-backdrop {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.35);
+        z-index: 1039;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.25s ease;
+        backdrop-filter: blur(2px);
+      }
+      #sidebar-backdrop.is-visible { opacity: 1; pointer-events: auto; }
+    `;
+    document.head.appendChild(s);
+  })();
 
   // 5. Render Sidebar & Layout Offset
   function renderAppSidebar() {
@@ -536,14 +619,28 @@
     }
     container.innerHTML = sidebarDOM;
 
-    // Reset & Rapikan Layout Utama (Mencegah Double Margin & Celah Lebar)
+    // Render Lucide Icons untuk elemen menu sidebar
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      lucide.createIcons();
+    } else {
+      triggerLucideIcons();
+    }
+
+    // Restore sidebar collapsed state from localStorage
+    const wasCollapsed = localStorage.getItem('bm-sidebar-collapsed') === 'true';
+    if (wasCollapsed && window.innerWidth >= 1024) {
+      document.body.classList.add('sidebar-collapsed');
+    }
+
+    // Reset & Rapikan Layout Utama
     const shell = document.querySelector('.dashboard-shell') || 
                   document.querySelector('.layout-page') || 
                   document.querySelector('.layout-container');
     if (shell) {
+      const collapsed = document.body.classList.contains('sidebar-collapsed');
       if (window.innerWidth >= 1024) {
-        shell.style.setProperty('margin-left', '240px', 'important');
-        shell.style.setProperty('width', 'calc(100% - 240px)', 'important');
+        shell.style.setProperty('margin-left', collapsed ? '0' : '240px', 'important');
+        shell.style.setProperty('width', collapsed ? '100%' : 'calc(100% - 240px)', 'important');
       } else {
         shell.style.setProperty('margin-left', '0', 'important');
         shell.style.setProperty('width', '100%', 'important');
@@ -602,6 +699,373 @@
         setTimeout(() => existingBar.remove(), 250);
       }, 150);
     }
+
+    // 5b. SPV KOL Unified Navbar Upgrade (Mirrors StaffKol Hirezy Topbar)
+    if (role === 'spv_kol') {
+      renderSpvKolNavbar();
+      initSpvTablePagination();
+    }
+
+    // 5c. Render Dedicated Consistent Footer Template
+    renderAppFooter();
+  }
+
+  // Helper: Dedicated App Footer Template
+  function renderAppFooter() {
+    const shell = document.querySelector('.dashboard-shell') || 
+                  document.querySelector('.layout-page') || 
+                  document.querySelector('.layout-container');
+    if (!shell) return;
+
+    // Pastikan container utama adalah flex column dengan min-height: 100vh
+    shell.style.setProperty('min-height', '100vh', 'important');
+    shell.style.setProperty('display', 'flex', 'important');
+    shell.style.setProperty('flex-direction', 'column', 'important');
+    shell.style.setProperty('box-sizing', 'border-box', 'important');
+
+    const main = shell.querySelector('main') || shell.querySelector('.dashboard-content') || shell.querySelector('.content-wrapper');
+    if (main) {
+      main.style.setProperty('flex', '1 0 auto', 'important');
+    }
+
+    const footerTemplateHTML = `
+      <footer class="app-footer-template" style="margin-top:auto !important;flex-shrink:0 !important;width:100% !important;padding:18px 24px !important;border-top:1px solid #eef2f6 !important;text-align:center !important;font-family:'Plus Jakarta Sans',system-ui,sans-serif !important;color:#94a3b8 !important;font-size:12px !important;font-weight:500 !important;letter-spacing:0.2px !important;background:transparent !important;box-sizing:border-box !important;">
+        &copy; 2026&nbsp; <strong>PT. Bisa Media Grup</strong> &nbsp;&bull;&nbsp; All rights reserved.
+      </footer>
+    `;
+
+    // Hapus footer lama agar tidak duplikat atau bertumpuk
+    shell.querySelectorAll('footer.dashboard-footer, footer.app-footer, footer.footer, .app-footer-template').forEach(el => el.remove());
+    shell.insertAdjacentHTML('beforeend', footerTemplateHTML);
+  }
+
+  // Helper: SPV KOL Dynamic Table Pagination
+  function initSpvTablePagination() {
+    setTimeout(function () {
+      const tables = document.querySelectorAll('.dashboard-shell table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard), main table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard)');
+      tables.forEach(table => {
+        const scrollWrap = table.closest('.table-wrap') || table.closest('.table-responsive') || table.closest('.campaign-scroll-table-wrap');
+        const parent = scrollWrap || table.parentElement;
+
+        if (!parent) return;
+
+        // Jika pagination sebelumnya terlanjur dimasukkan di dalam scroll container, pindahkan ke luar
+        if (scrollWrap) {
+          const insidePag = scrollWrap.querySelector(':scope > .hirezy-pagination-wrap');
+          if (insidePag) {
+            scrollWrap.after(insidePag);
+            return;
+          }
+        }
+
+        // Jangan buat duplikat jika pagination sudah ada setelah scroll container atau di dalam parent
+        if ((scrollWrap && scrollWrap.nextElementSibling && scrollWrap.nextElementSibling.classList.contains('hirezy-pagination-wrap')) ||
+            parent.querySelector(':scope > .hirezy-pagination-wrap')) {
+          return;
+        }
+
+        const tbody = table.querySelector('tbody');
+        const rows = tbody ? Array.from(tbody.querySelectorAll('tr:not(.db-empty-row)')) : [];
+        const total = rows.length;
+        if (total === 0 && !table.id) return;
+
+        let pageSize = 10;
+        let currentPage = 1;
+
+        const pagWrap = document.createElement('div');
+        pagWrap.className = 'hirezy-pagination-wrap';
+
+        function renderPaginationUI() {
+          const allRows = tbody ? Array.from(tbody.querySelectorAll('tr:not(.db-empty-row):not(.hirezy-empty-search-row)')) : [];
+          const activeRows = allRows.filter(r => r.getAttribute('data-search-hidden') !== 'true');
+          const currentTotal = activeRows.length;
+          const totalPages = Math.max(1, Math.ceil(currentTotal / pageSize));
+
+          if (currentPage > totalPages) currentPage = totalPages;
+          if (currentPage < 1) currentPage = 1;
+
+          const start = currentTotal === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+          const end = Math.min(currentPage * pageSize, currentTotal);
+
+          // Sembunyikan baris yang tidak lolos pencarian
+          allRows.forEach(row => {
+            if (row.getAttribute('data-search-hidden') === 'true') {
+              row.style.display = 'none';
+            }
+          });
+
+          // Atur visibilitas baris aktif sesuai halaman saat ini
+          activeRows.forEach((row, idx) => {
+            const shouldShow = (idx >= (currentPage - 1) * pageSize && idx < currentPage * pageSize);
+            row.style.display = shouldShow ? '' : 'none';
+          });
+
+          // Tampilkan pesan kosong jika pencarian tidak menemukan data sama sekali
+          let emptySearchRow = tbody.querySelector('.hirezy-empty-search-row');
+          if (allRows.length > 0 && currentTotal === 0) {
+            if (!emptySearchRow) {
+              emptySearchRow = document.createElement('tr');
+              emptySearchRow.className = 'hirezy-empty-search-row';
+              const colCount = (table.querySelector('thead tr') ? table.querySelector('thead tr').children.length : 8) || 8;
+              emptySearchRow.innerHTML = `<td colspan="${colCount}" style="text-align:center;padding:32px 16px;color:#94a3b8;font-weight:500;">Tidak ditemukan data yang sesuai dengan pencarian</td>`;
+              tbody.appendChild(emptySearchRow);
+            }
+            emptySearchRow.style.display = '';
+          } else if (emptySearchRow) {
+            emptySearchRow.style.display = 'none';
+          }
+
+          // Tombol nomor halaman 1, 2, 3 dst HANYA muncul jika data lebih dari 1 lembar (totalPages > 1)
+          let buttonsHtml = '';
+          if (totalPages > 1) {
+            buttonsHtml += `
+              <button class="hirezy-page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="prev" aria-label="Sebelumnya" title="Sebelumnya">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              </button>
+            `;
+
+            if (totalPages <= 7) {
+              for (let p = 1; p <= totalPages; p++) {
+                buttonsHtml += `<button class="hirezy-page-btn ${p === currentPage ? 'is-active' : ''}" data-page="${p}">${p}</button>`;
+              }
+            } else {
+              // Standard 5-page sliding window with ellipsis
+              let pages = [];
+              if (currentPage <= 4) {
+                pages = [1, 2, 3, 4, 5, '...', totalPages];
+              } else if (currentPage >= totalPages - 3) {
+                pages = [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+              } else {
+                pages = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+              }
+
+              pages.forEach(p => {
+                if (p === '...') {
+                  buttonsHtml += `<span class="hirezy-page-dots">&hellip;</span>`;
+                } else {
+                  buttonsHtml += `<button class="hirezy-page-btn ${p === currentPage ? 'is-active' : ''}" data-page="${p}">${p}</button>`;
+                }
+              });
+            }
+
+            buttonsHtml += `
+              <button class="hirezy-page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="next" aria-label="Berikutnya" title="Berikutnya">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+              </button>
+            `;
+          }
+
+          pagWrap.innerHTML = `
+            <div class="hirezy-pagination-left">
+              <div class="hirezy-pagination-info">
+                Menampilkan <b>${start}</b> - <b>${end}</b> dari <b>${currentTotal}</b> data
+              </div>
+              <div class="hirezy-pagination-size">
+                <span class="hirezy-size-label">Tampilkan:</span>
+                <select class="hirezy-page-size-select" aria-label="Pilih jumlah data per halaman">
+                  <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
+                  <option value="30" ${pageSize === 30 ? 'selected' : ''}>30</option>
+                  <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+                </select>
+                <span class="hirezy-size-unit">data</span>
+              </div>
+            </div>
+            ${totalPages > 1 ? `<div class="hirezy-pagination-btns">${buttonsHtml}</div>` : ''}
+          `;
+
+          const sizeSelect = pagWrap.querySelector('.hirezy-page-size-select');
+          if (sizeSelect) {
+            sizeSelect.addEventListener('change', function () {
+              pageSize = parseInt(this.value, 10) || 10;
+              currentPage = 1;
+              renderPaginationUI();
+            });
+          }
+        }
+
+        // Integrasi instan dengan Search Bar tabel lokal jika ada
+        const tableContainer = table.closest('section') || table.closest('.dashboard-content') || table.closest('main') || parent;
+        const searchInput = tableContainer.querySelector('.campaign-search input, .table-search input, input[type="search"]:not(#menuSearch)');
+        if (searchInput && !searchInput.__paginationBound) {
+          searchInput.__paginationBound = true;
+          searchInput.addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            const allRows = tbody ? Array.from(tbody.querySelectorAll('tr:not(.db-empty-row):not(.hirezy-empty-search-row)')) : [];
+            allRows.forEach(row => {
+              const text = row.textContent.toLowerCase();
+              if (!q || text.includes(q)) {
+                row.removeAttribute('data-search-hidden');
+              } else {
+                row.setAttribute('data-search-hidden', 'true');
+              }
+            });
+            currentPage = 1;
+            renderPaginationUI();
+          });
+        }
+
+        pagWrap.addEventListener('click', function (e) {
+          const btn = e.target.closest('.hirezy-page-btn');
+          if (!btn || btn.disabled) return;
+          const action = btn.getAttribute('data-page');
+          const allRows = tbody ? Array.from(tbody.querySelectorAll('tr:not(.db-empty-row):not(.hirezy-empty-search-row)')) : [];
+          const activeRows = allRows.filter(r => r.getAttribute('data-search-hidden') !== 'true');
+          const currentTotal = activeRows.length;
+          const totalPages = Math.max(1, Math.ceil(currentTotal / pageSize));
+
+          if (action === 'prev') {
+            if (currentPage > 1) { currentPage--; renderPaginationUI(); }
+          } else if (action === 'next') {
+            if (currentPage < totalPages) { currentPage++; renderPaginationUI(); }
+          } else {
+            const p = parseInt(action, 10);
+            if (p && p !== currentPage) {
+              currentPage = p;
+              renderPaginationUI();
+            }
+          }
+        });
+
+        table.addEventListener('tableDataUpdated', function () {
+          renderPaginationUI();
+        });
+
+        if (tbody && window.MutationObserver) {
+          const observer = new MutationObserver(function (mutations) {
+            const hasChildChanges = mutations.some(m => m.type === 'childList');
+            if (hasChildChanges) {
+              renderPaginationUI();
+            }
+          });
+          observer.observe(tbody, { childList: true });
+        }
+
+        renderPaginationUI();
+        if (scrollWrap) {
+          scrollWrap.after(pagWrap);
+        } else {
+          parent.appendChild(pagWrap);
+        }
+      });
+    }, 150);
+  }
+
+  // Helper: Render SPV KOL Unified Topbar
+  function renderSpvKolNavbar() {
+    let topbarEl = document.querySelector('header.topbar');
+    if (!topbarEl) {
+      const shell = document.querySelector('.dashboard-shell');
+      if (shell) {
+        topbarEl = document.createElement('header');
+        topbarEl.className = 'topbar hirezy-topbar';
+        shell.prepend(topbarEl);
+      }
+    }
+    if (!topbarEl) return;
+
+    topbarEl.classList.add('hirezy-topbar');
+
+    const spvTitles = {
+      'spvkol_dashboard.html': 'Dashboard',
+      'spvkol_kalender.html': 'Kalender',
+      'spvkol_kehadiran.html': 'Kehadiran',
+      'spvkol_presensi_istirahat.html': 'Presensi Istirahat',
+      'spvkol_presensi_lembur.html': 'Presensi Lembur',
+      'spvkol_skenario_jam_kerja.html': 'Skenario Jam Kerja',
+      'spvkol_karyawan.html': 'Data Karyawan',
+      'spvkol_kreator.html': 'Data Kreator',
+      'spvkol_folder.html': 'My Folders',
+      'spvkol_evaluasi_kinerja.html': 'Evaluasi Kinerja',
+      'spvkol_target_capaian.html': 'Target & Capaian',
+      'spvkol_campaign.html': 'Campaign',
+      'spvkol_dashboard_campaign.html': 'Dashboard Campaign',
+      'spvkol_operasional.html': 'Operasional',
+      'spvkol_tracking_sampel.html': 'Tracking Sampel',
+      'spvkol_Performa_Kreator.html': 'Performa Kreator',
+      'spvkol_rrk.html': 'RRK',
+      'spvkol_Milestone.html': 'Milestone',
+      'spvkol_tugas.html': 'Tugas',
+      'spvkol_project.html': 'Project',
+      'spvkol_laporan.html': 'Laporan',
+      'spvkol_pengaduan.html': 'Pengaduan',
+      'spvkol_Brand.html': 'Data Brands',
+      'spvkol_dashboard_brand.html': 'Dashboard Brands',
+      'spvkol_data_brand.html': 'Data Brands',
+      'spvkol_produk_brand.html': 'Produk & Brands',
+      'spvkol_Ads_Account.html': 'Ads Account',
+      'spvkol_Kategori_Produk.html': 'Kategori Produk',
+      'spvkol_Leads_Kreator.html': 'Leads Kreator',
+      'spvkol_Leveling_Kreator.html': 'Leveling Kreator',
+      'spvkol_rencana_karier.html': 'Rencana Karier',
+      'spvkol_upgrade_skill.html': 'Upgrade Skill'
+    };
+
+    const pageTitle = spvTitles[currentFile] || (document.title ? document.title.split('|')[0].trim() : 'Dashboard');
+
+    topbarEl.innerHTML = `
+      <div class="topbar__left hirezy-topbar-left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <h2 class="hirezy-page-title">${pageTitle}</h2>
+      </div>
+
+      <div class="topbar__actions hirezy-topbar-right">
+        <div class="hirezy-search-box">
+          <i data-lucide="search" class="hirezy-search-icon" style="width: 17px; height: 17px; stroke: #94a3b8; flex-shrink: 0;"></i>
+          <input id="menuSearch" class="hirezy-search-input" type="search" placeholder="Cari menu atau fitur..." />
+        </div>
+
+        <button class="hirezy-icon-btn" type="button" aria-label="Pesan" title="Pesan">
+          <i data-lucide="message-square" style="width: 18px; height: 18px; stroke: #64748b;"></i>
+        </button>
+
+        <button class="hirezy-icon-btn" type="button" aria-label="Notifikasi" title="Notifikasi">
+          <i data-lucide="bell" style="width: 18px; height: 18px; stroke: #64748b;"></i>
+          <span class="hirezy-notif-dot"></span>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false">
+            <div class="hirezy-avatar-box">
+              <img src="${rootPrefix}media/avatar.png" alt="SPV KOL" class="hirezy-avatar-img" data-ceo-avatar=""
+                onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80'" />
+            </div>
+            <div class="hirezy-user-text">
+              <span class="hirezy-user-name">Supervisi KOL</span>
+              <span class="hirezy-user-role">SPV &bull; Bisa Media</span>
+            </div>
+            <i data-lucide="chevron-down" class="hirezy-chevron-down" style="width: 15px; height: 15px; stroke: #64748b; flex-shrink: 0;"></i>
+          </button>
+
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="${rootPrefix}media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Supervisi KOL</span>
+                <span class="user-menu-dropdown__role">SPV KOL &bull; PT. Bisa Media</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="${rootPrefix}BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <i data-lucide="home" class="user-menu-dropdown__icon" style="width: 18px; height: 18px;"></i>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="${rootPrefix}login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <i data-lucide="log-out" class="user-menu-dropdown__icon" style="width: 18px; height: 18px;"></i>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   // 6. Smooth Feature Transition Handler (Navigasi Antar-Fitur Sangat Halus & Responsif)
@@ -666,24 +1130,48 @@
     }
   });
 
-  // 7. Responsive Mobile / Tablet Drawer Toggle Handler
+  // 7. Sidebar Toggle Handler — Desktop: Fullscreen Collapse | Mobile: Drawer
   document.addEventListener('click', function (e) {
     const toggleBtn = e.target.closest('#sidebarToggle, .layout-menu-toggle, [data-action="toggle-sidebar"]');
     if (toggleBtn) {
       e.preventDefault();
-      const sidebar = document.getElementById('app-sidebar');
-      const backdrop = document.getElementById('sidebar-backdrop');
-      if (sidebar) {
-        const isOpen = sidebar.classList.toggle('is-open');
-        if (backdrop) {
-          if (isOpen) backdrop.classList.add('is-visible');
-          else backdrop.classList.remove('is-visible');
+
+      if (window.innerWidth >= 1024) {
+        // ── Desktop: Toggle fullscreen collapse ────────────────────
+        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('bm-sidebar-collapsed', isCollapsed ? 'true' : 'false');
+
+        // Update shell margin/width with smooth transition
+        const shell = document.querySelector('.dashboard-shell') ||
+                      document.querySelector('.layout-page') ||
+                      document.querySelector('.layout-container');
+        if (shell) {
+          shell.style.setProperty('margin-left', isCollapsed ? '0' : '240px', 'important');
+          shell.style.setProperty('width', isCollapsed ? '100%' : 'calc(100% - 240px)', 'important');
+        }
+
+        // Update topbar width too
+        document.querySelectorAll('.dashboard-shell .topbar').forEach(el => {
+          el.style.setProperty('margin-left', '24px', 'important');
+          el.style.setProperty('width', 'calc(100% - 48px)', 'important');
+        });
+
+      } else {
+        // ── Mobile: Drawer toggle ──────────────────────────────────
+        const sidebar = document.getElementById('app-sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (sidebar) {
+          const isOpen = sidebar.classList.toggle('is-open');
+          if (backdrop) {
+            if (isOpen) backdrop.classList.add('is-visible');
+            else backdrop.classList.remove('is-visible');
+          }
         }
       }
       return;
     }
 
-    // Klik pada backdrop menutup drawer
+    // Klik pada backdrop menutup drawer (mobile)
     const backdropEl = e.target.closest('#sidebar-backdrop');
     if (backdropEl) {
       const sidebar = document.getElementById('app-sidebar');
@@ -704,6 +1192,43 @@
     }
   });
 
+  // 8. User Menu Dropdown Toggle (Topbar Profile)
+  document.addEventListener('click', function (e) {
+    const userBtn = e.target.closest('#userMenuButton');
+    const dropdown = document.getElementById('userMenuDropdown');
+    if (userBtn && dropdown) {
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle('is-open');
+      dropdown.classList.toggle('show', isOpen);
+      userBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      return;
+    }
+    if (dropdown && !e.target.closest('#userMenuDropdown')) {
+      dropdown.classList.remove('is-open');
+      dropdown.classList.remove('show');
+      const btn = document.getElementById('userMenuButton');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // 9. Instant Topbar Menu Search
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'menuSearch') {
+      const q = e.target.value.toLowerCase().trim();
+      document.querySelectorAll('#app-sidebar .app-nav-item, #app-sidebar .app-sub-item, .sidebar-nav .nav-item').forEach(function (item) {
+        const text = item.textContent.toLowerCase();
+        item.style.display = (!q || text.includes(q)) ? '' : 'none';
+      });
+      if (q) {
+        document.querySelectorAll('#app-sidebar .app-nav-group, .sidebar-nav .nav-group').forEach(function (g) {
+          g.classList.add('is-open');
+          g.classList.remove('is-collapsed');
+        });
+      }
+    }
+  });
+
   // Handle resize event untuk responsivitas dinamis
   window.addEventListener('resize', function () {
     const shell = document.querySelector('.dashboard-shell') || 
@@ -711,8 +1236,9 @@
                   document.querySelector('.layout-container');
     if (shell) {
       if (window.innerWidth >= 1024) {
-        shell.style.setProperty('margin-left', '240px', 'important');
-        shell.style.setProperty('width', 'calc(100% - 240px)', 'important');
+        const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+        shell.style.setProperty('margin-left', isCollapsed ? '0' : '240px', 'important');
+        shell.style.setProperty('width', isCollapsed ? '100%' : 'calc(100% - 240px)', 'important');
       } else {
         shell.style.setProperty('margin-left', '0', 'important');
         shell.style.setProperty('width', '100%', 'important');
@@ -726,6 +1252,379 @@
     renderAppSidebar();
   }
 
+  // Helper Global Minimalist Empty State Component (Sesuai Referensi Pengguna)
+  window.getAppEmptyStateHTML = function(title, subtitle) {
+    return `
+      <div class="app-empty-state">
+        <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+          <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+          <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+          <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+          <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+          <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+          <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+          <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+          <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+          <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+          <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+          <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+        </svg>
+        <div class="app-empty-state__title">${title}</div>
+        <div class="app-empty-state__subtitle">${subtitle || ''}</div>
+      </div>
+    `.trim();
+  };
+
+  // Universal Empty State Supervisor
+  function initAppEmptyStateSupervisor() {
+    function getContextTitle(card, table) {
+      if (table && table.getAttribute('data-empty-title')) {
+        return table.getAttribute('data-empty-title');
+      }
+      const headerTitle = card ? card.querySelector('.card-header h5, .card-header h4, .campaign-panel__title, .dashboard-heading h1, .db-attendance-header h2, .db-topk-header h2, .card-title-italic, .card-title-caps, .brand-card-title, h1, h2, h3, h4, h5') : null;
+      if (headerTitle) {
+        let text = headerTitle.textContent.trim();
+        // Bersihkan prefix atau counter (misal: BM / Data Karyawan)
+        text = text.replace(/^[A-Z0-9_-]+\s*\/\s*/i, '').replace(/\([0-9]+\)/g, '').trim();
+        if (text) {
+          if (/^belum ada/i.test(text)) return text;
+          if (/kehadiran/i.test(text)) return 'Belum ada data kehadiran';
+          if (/^data /i.test(text)) return 'Belum ada ' + text;
+          return 'Belum ada data ' + text;
+        }
+      }
+      const docTitle = document.title.split('-')[0].split('|')[0].trim();
+      if (docTitle) {
+        if (/^data /i.test(docTitle)) return 'Belum ada ' + docTitle;
+        return 'Belum ada data ' + docTitle;
+      }
+      return 'Belum ada data';
+    }
+
+    function getContextSubtitle(title, card) {
+      const addBtn = card ? card.querySelector('.btn-tambah, #btnAddKaryawan, button.crud-add-btn, [id*="btnTambah"], [id*="btnAdd"]') : null;
+      let btnLabel = '+ Tambah';
+      if (addBtn) {
+        const t = addBtn.textContent.trim();
+        if (t) btnLabel = t.startsWith('+') ? t : '+ ' + t;
+      }
+      const cleanTitle = title.replace(/^Belum ada (data )?/i, '').toLowerCase();
+      return `Klik tombol "${btnLabel}" di atas untuk menambahkan ${cleanTitle} baru.`;
+    }
+
+    function isCardSearching(card, table) {
+      const inputs = card ? Array.from(card.querySelectorAll('input[type="search"], input.menu-search, input[data-search-table], .bm-searchbox input, .campaign-search input, input[placeholder*="Cari"]')) : [];
+      return inputs.some(inp => inp.value && inp.value.trim() !== '');
+    }
+
+    function updateEmptyStateForTable(table) {
+      if (!table || table.closest('#app-calendar, .flatpickr-calendar, .datepicker, .mini-table, .modal, .modal-box, .db-calendar-table, .db-calendar-card')) return;
+      
+      const parentWrap = table.closest('.table-wrap, .table-responsive, #tableContainerWrapper, .campaign-scroll-table-wrap, .db-attendance-table-wrap, .db-topk-table-wrap, .table-scroll-wrap') || table.parentElement;
+      const card = parentWrap ? (parentWrap.closest('.card, .campaign-panel, .panel, section, main, .db-attendance-card, .db-top-kreator-card, .brand-card-box, .campaign-white-card') || parentWrap.parentElement) : null;
+      if (!card) return;
+
+      const isDashboardTable = !!(
+        window.location.pathname.toLowerCase().includes('dashboard') ||
+        table.closest('.db-attendance-table-wrap, .db-topk-table-wrap, .brand-leaderboard-grid, .brand-card-box, [class*="dashboard"], [id*="dashboard"], .campaign-white-card, .db-attendance-card, .db-top-kreator-card') ||
+        table.classList.contains('db-attendance-table') ||
+        table.classList.contains('db-topk-table') ||
+        table.classList.contains('brand-table-clean') ||
+        table.classList.contains('bm-att-table') ||
+        table.classList.contains('dotted-table') ||
+        table.getAttribute('data-preserve-header') === 'true' ||
+        table.getAttribute('data-inline-empty') === 'true'
+      );
+
+      let emptyEl = card.querySelector(':scope > #emptyTableState, :scope > .app-empty-state') || card.querySelector('#emptyTableState, .app-empty-state');
+      const pag = card.querySelector('.hirezy-pagination-wrap');
+      const tbody = table.querySelector('tbody');
+      const rows = tbody ? Array.from(tbody.querySelectorAll('tr')) : [];
+
+      let hasSearchRow = false;
+      const validRows = rows.filter(r => {
+        if (r.classList.contains('hirezy-empty-search-row') || r.classList.contains('db-empty-row') || r.classList.contains('app-empty-table-row')) {
+          if (r.classList.contains('hirezy-empty-search-row')) hasSearchRow = true;
+          return false;
+        }
+        const tds = r.querySelectorAll('td');
+        if (tds.length === 1 && r.querySelector('td[colspan]')) {
+          const txt = r.textContent.trim().toLowerCase();
+          if (txt.includes('sesuai') || txt.includes('pencarian') || txt.includes('filter') || txt.includes('tidak ditemukan')) {
+            hasSearchRow = true;
+            return false;
+          }
+          if (txt.includes('belum ada') || txt.includes('tidak ada') || txt.includes('kosong')) return false;
+        }
+        return true;
+      });
+
+      const searching = hasSearchRow || isCardSearching(card, table);
+
+      if (isDashboardTable) {
+        // UNTUK DASHBOARD: Pastikan parentWrap dan urutan header tabel (thead) selalu tampil utuh
+        parentWrap.style.removeProperty('display');
+        if (parentWrap.style.display === 'none') parentWrap.style.display = '';
+        table.style.removeProperty('display');
+        if (table.style.display === 'none') table.style.display = '';
+
+        // Sembunyikan emptyEl eksternal di luar tabel jika ada
+        if (emptyEl) {
+          emptyEl.classList.add('is-hidden');
+          emptyEl.classList.remove('is-visible');
+          emptyEl.style.setProperty('display', 'none', 'important');
+        }
+
+        if (validRows.length > 0) {
+          // Ada data: hapus baris empty state internal dalam tbody
+          if (tbody) {
+            tbody.querySelectorAll('.app-empty-table-row, .db-empty-row').forEach(row => row.remove());
+          }
+          if (pag) pag.style.removeProperty('display');
+        } else if (searching) {
+          // Sedang memfilter/mencari
+          if (tbody) {
+            tbody.querySelectorAll('.app-empty-table-row').forEach(row => row.remove());
+          }
+          if (pag) pag.style.setProperty('display', 'none', 'important');
+        } else {
+          // Benar-benar kosong (0 record) di dashboard: Tampilkan urutan tabel (thead) + baris empty state dalam tbody
+          if (tbody) {
+            const ths = table.querySelectorAll('thead tr:first-child > th, thead tr:first-child > td');
+            const colCount = ths.length || 7;
+            const title = getContextTitle(card, table);
+            let emptyRow = tbody.querySelector('.app-empty-table-row, .db-empty-row');
+            const innerHtml = `
+              <td colspan="${colCount}">
+                <div class="app-empty-table-box">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+                    <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+                    <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+                    <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+                    <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+                    <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+                    <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+                    <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+                    <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+                    <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+                    <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+                  </svg>
+                  <div class="app-empty-table-title">${title}</div>
+                  <div class="app-empty-table-subtitle">Belum ada data yang tercatat saat ini.</div>
+                </div>
+              </td>
+            `;
+            if (!emptyRow) {
+              emptyRow = document.createElement('tr');
+              emptyRow.className = 'app-empty-table-row db-empty-row';
+              emptyRow.innerHTML = innerHtml;
+              tbody.appendChild(emptyRow);
+            } else {
+              emptyRow.className = 'app-empty-table-row db-empty-row';
+              emptyRow.innerHTML = innerHtml;
+              emptyRow.style.removeProperty('display');
+            }
+          }
+          if (pag) pag.style.setProperty('display', 'none', 'important');
+        }
+        return;
+      }
+
+      if (validRows.length > 0) {
+        // Data ada! Pastikan empty state tersembunyi sepenuhnya dan tabel tampil
+        if (emptyEl) {
+          emptyEl.classList.add('is-hidden');
+          emptyEl.classList.remove('is-visible');
+          emptyEl.style.setProperty('display', 'none', 'important');
+        }
+        parentWrap.style.removeProperty('display');
+        if (parentWrap.style.display === 'none') parentWrap.style.display = '';
+        if (pag) pag.style.removeProperty('display');
+      } else if (searching) {
+        // Sedang memfilter atau mencari: jangan tampilkan empty state database global
+        if (emptyEl) {
+          emptyEl.classList.add('is-hidden');
+          emptyEl.classList.remove('is-visible');
+          emptyEl.style.setProperty('display', 'none', 'important');
+        }
+        parentWrap.style.removeProperty('display');
+        if (parentWrap.style.display === 'none') parentWrap.style.display = '';
+        if (pag) pag.style.setProperty('display', 'none', 'important');
+      } else {
+        // Benar-benar kosong (0 record)
+        if (!emptyEl) {
+          emptyEl = document.createElement('div');
+          emptyEl.id = 'emptyTableState';
+          emptyEl.className = 'app-empty-state';
+          const title = getContextTitle(card, table);
+          const sub = getContextSubtitle(title, card);
+          emptyEl.innerHTML = `
+            <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+              <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+              <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+              <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+              <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+              <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+              <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+              <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+              <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+              <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+              <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+              <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+            </svg>
+            <div class="app-empty-state__title">${title}</div>
+            <div class="app-empty-state__subtitle">${sub}</div>
+          `;
+          parentWrap.before(emptyEl);
+        }
+        emptyEl.classList.remove('is-hidden');
+        emptyEl.classList.add('is-visible');
+        emptyEl.style.setProperty('display', 'flex', 'important');
+        parentWrap.style.setProperty('display', 'none', 'important');
+        if (pag) pag.style.setProperty('display', 'none', 'important');
+      }
+    }
+
+    function updateEmptyStateForGrid(cardGrid) {
+      if (!cardGrid) return;
+      const card = cardGrid.closest('.card, .campaign-panel, .panel, section, main') || cardGrid.parentElement;
+      if (!card) return;
+
+      let emptyEl = card.querySelector(':scope > #emptyTableState, :scope > .app-empty-state') || card.querySelector('#emptyTableState, .app-empty-state');
+      const cards = Array.from(cardGrid.children).filter(c => !c.classList.contains('app-empty-state') && !c.id.includes('empty'));
+      const searching = isCardSearching(card, null);
+
+      if (cards.length > 0) {
+        if (emptyEl) {
+          emptyEl.classList.add('is-hidden');
+          emptyEl.classList.remove('is-visible');
+          emptyEl.style.setProperty('display', 'none', 'important');
+        }
+        cardGrid.style.removeProperty('display');
+        if (cardGrid.style.display === 'none') cardGrid.style.display = '';
+      } else if (searching) {
+        if (emptyEl) {
+          emptyEl.classList.add('is-hidden');
+          emptyEl.classList.remove('is-visible');
+          emptyEl.style.setProperty('display', 'none', 'important');
+        }
+        cardGrid.style.removeProperty('display');
+      } else {
+        if (!emptyEl) {
+          emptyEl = document.createElement('div');
+          emptyEl.id = 'emptyTableState';
+          emptyEl.className = 'app-empty-state';
+          const title = getContextTitle(card, null);
+          const sub = getContextSubtitle(title, card);
+          emptyEl.innerHTML = `
+            <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+              <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+              <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+              <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+              <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+              <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+              <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+              <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+              <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+              <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+              <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+              <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+            </svg>
+            <div class="app-empty-state__title">${title}</div>
+            <div class="app-empty-state__subtitle">${sub}</div>
+          `;
+          cardGrid.before(emptyEl);
+        }
+        emptyEl.classList.remove('is-hidden');
+        emptyEl.classList.add('is-visible');
+        emptyEl.style.setProperty('display', 'flex', 'important');
+        cardGrid.style.setProperty('display', 'none', 'important');
+      }
+    }
+
+    function checkAll() {
+      document.querySelectorAll('table:not(.mini-table)').forEach(updateEmptyStateForTable);
+      document.querySelectorAll('.milestone-card-grid, #tugasCardGrid, #milestoneCardGrid').forEach(updateEmptyStateForGrid);
+    }
+
+    window.bmToggleEmptyState = function(emptyEl, wrapperEl, isEmpty) {
+      const empty = typeof emptyEl === 'string' ? document.querySelector(emptyEl) : emptyEl;
+      const wrap = typeof wrapperEl === 'string' ? document.querySelector(wrapperEl) : wrapperEl;
+      if (isEmpty) {
+        if (wrap) wrap.style.setProperty('display', 'none', 'important');
+        if (empty) {
+          empty.classList.remove('is-hidden');
+          empty.classList.add('is-visible');
+          empty.style.setProperty('display', 'flex', 'important');
+        }
+      } else {
+        if (wrap) {
+          wrap.style.removeProperty('display');
+          if (wrap.style.display === 'none') wrap.style.display = '';
+        }
+        if (empty) {
+          empty.classList.add('is-hidden');
+          empty.classList.remove('is-visible');
+          empty.style.setProperty('display', 'none', 'important');
+        }
+      }
+    };
+
+    window.bmUpdateEmptyState = function(target) {
+      if (!target) {
+        checkAll();
+      } else if (target.tagName === 'TABLE') {
+        updateEmptyStateForTable(target);
+      } else if (target.classList && target.classList.contains('milestone-card-grid')) {
+        updateEmptyStateForGrid(target);
+      } else {
+        checkAll();
+      }
+    };
+
+    // Eksekusi awal dan bertahap
+    checkAll();
+    window.addEventListener('load', checkAll);
+    setTimeout(checkAll, 150);
+    setTimeout(checkAll, 600);
+
+    if (window.MutationObserver) {
+      const observer = new MutationObserver(function (mutations) {
+        let needsCheck = false;
+        for (let i = 0; i < mutations.length; i++) {
+          const m = mutations[i];
+          if (m.type === 'childList') {
+            const target = m.target;
+            if (target && (target.tagName === 'TBODY' || (target.classList && (target.classList.contains('milestone-card-grid') || target.classList.contains('table-responsive') || target.classList.contains('table-wrap'))))) {
+              needsCheck = true;
+              break;
+            }
+          }
+        }
+        if (needsCheck) {
+          checkAll();
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAppEmptyStateSupervisor);
+  } else {
+    initAppEmptyStateSupervisor();
+  }
+
   window.bmRenderSidebar = renderAppSidebar;
   window.bmRenderSidebarEngine = renderAppSidebar;
+  window.renderAppFooter = renderAppFooter;
+  window.initHirezyPagination = initSpvTablePagination;
+
+  // Inisialisasi Lucide Icons
+  if (window.lucide) {
+    lucide.createIcons();
+  } else {
+    triggerLucideIcons();
+  }
 })();

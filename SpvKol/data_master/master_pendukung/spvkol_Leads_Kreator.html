@@ -104,7 +104,26 @@
           </div>
         </div>
 
-        <div class="table-wrap campaign-table">
+        <!-- Empty State Container (Sesuai Referensi Pengguna) -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Leads Kreator</div>
+          <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan status baru.</div>
+        </div>
+
+        <div class="table-wrap campaign-table" id="tableContainerWrapper">
           <table id="tblLeadsKreator">
             <thead>
               <tr>
@@ -277,11 +296,41 @@
           return item.status && item.status.toLowerCase().includes(q);
         });
 
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        if (typeof window.bmToggleEmptyState === 'function') {
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, leadsDb.length === 0);
+        } else {
+          if (leadsDb.length === 0) {
+            if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+            if (emptyTableState) {
+              emptyTableState.classList.remove("is-hidden");
+              emptyTableState.classList.add("is-visible");
+              emptyTableState.style.setProperty("display", "flex", "important");
+            }
+          } else {
+            if (tableWrapper) {
+              tableWrapper.style.removeProperty("display");
+              if (tableWrapper.style.display === "none") tableWrapper.style.display = "";
+            }
+            if (emptyTableState) {
+              emptyTableState.classList.add("is-hidden");
+              emptyTableState.classList.remove("is-visible");
+              emptyTableState.style.setProperty("display", "none", "important");
+            }
+          }
+        }
+
+        if (leadsDb.length === 0) {
+          return;
+        }
+
         if (filtered.length === 0) {
           tableBody.innerHTML = `
             <tr>
-              <td colspan="3" style="text-align: center; padding: 36px 16px; color: #94a3b8; font-size: 13.5px;">
-                Belum ada data leads kreator. Klik <strong>+ Tambah</strong> untuk menambahkan status baru.
+              <td colspan="3" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data leads kreator yang sesuai dengan pencarian.
               </td>
             </tr>
           `;

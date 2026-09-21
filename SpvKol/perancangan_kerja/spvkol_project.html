@@ -427,6 +427,119 @@
     .chat-send-btn svg {
       transform: rotate(-30deg);
     }
+
+    /* Detail Panel Tabs (Clean, zero scrollbars/arrows, consistent with RRK, Milestone, Tugas) */
+    .detail-tabs-nav {
+      background: #ffffff !important;
+      border-bottom: 2px solid #e2e8f0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      gap: 24px !important;
+      align-items: center !important;
+      overflow: visible !important;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .detail-tabs-nav::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    .detail-tab {
+      background: none !important;
+      border: none !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      color: #64748b !important;
+      cursor: pointer !important;
+      padding: 12px 2px !important;
+      height: auto !important;
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      border-bottom: 2.5px solid transparent !important;
+      margin-bottom: -2px !important;
+      transition: all 0.2s ease !important;
+      font-family: 'Outfit', sans-serif !important;
+      white-space: nowrap !important;
+    }
+    .detail-tab:hover {
+      color: #1e293b !important;
+    }
+    .detail-tab.active {
+      font-weight: 700 !important;
+      color: #2865b5 !important;
+      border-bottom-color: #2865b5 !important;
+    }
+
+    /* Project Metadata Grid Card */
+    .project-meta-card {
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .project-meta-card:hover {
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    /* Detail Progress Card */
+    .detail-progress-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+    .detail-progress-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .detail-progress-percent {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #2865b5;
+      font-family: 'Outfit', sans-serif;
+    }
+    .detail-progress-track {
+      width: 100%;
+      height: 7px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .detail-progress-bar {
+      height: 100%;
+      background: #2865b5;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* Detail Content Box */
+    .detail-content-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .detail-content-box-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+    .detail-content-box-text {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #475569;
+    }
   </style>
 </head>
 
@@ -603,99 +716,204 @@
         </div>
       </section>
 
-      <!-- Project Detail Panel (initially hidden) -->
-      <section id="projectDetailPanel" class="panel campaign-panel" style="display: none; padding-bottom: 30px;">
+      <!-- Project Detail Modal -->
+      <!-- Project Detail Modal (Consistent with RRK, Milestone, and Tugas) -->
+      <div id="projectDetailModal" class="modal-overlay" style="z-index: 2147483000;">
         <input type="hidden" id="currentActiveProjectId" value="" />
-        <!-- Top border thick blue bar -->
-        <div class="campaign-panel__line" style="height: 4px; background: var(--blue-800);"></div>
+        <div class="modal-box modal-box--large" style="width: 860px; max-width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; border-radius: 12px; background: #fff;">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h2 class="modal-title" style="font-weight: 500; font-size: 16px; color: #17171a;">Detail
+              <strong style="font-weight: 700;">Project</strong>
+            </h2>
+            <button id="closeProjectDetailModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+          </div>
 
-        <div style="padding: 24px 30px; position: relative;">
-          <!-- Close/Back Button -->
-          <button id="btnBackToProjectList" class="modal-close" style="top: 24px; right: 30px; position: absolute;"
-            type="button" aria-label="Kembali">&times;</button>
+          <div class="modal-divider"></div>
 
-          <h2 id="detailTitle"
-            style="font-size: 24px; font-weight: 700; font-style: italic; color: #4c4c4c; margin: 0 0 20px;">Pemuatan Konten Podcast</h2>
+          <!-- Structured Information Header Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px;">
+            <div style="flex: 1; min-width: 0;">
+              <h3 id="detailTitle" style="margin: 0 0 6px; font-size: 17px; font-weight: 800; color: #1e293b; font-family: 'Outfit', sans-serif; line-height: 1.4;">-</h3>
+              <span id="detailDateBadge" style="display: inline-block; font-size: 11.5px; font-weight: 700; background: #35a9d2; color: #fff; padding: 2px 10px; border-radius: 4px;">-</span>
+            </div>
+            <div id="detailStatusBadgeWrapper" style="flex-shrink: 0;">
+              <span id="detailStatusBadge" class="status-badge status-badge--selesai" style="font-size: 12.5px; padding: 4px 14px; border-radius: 6px;">Selesai</span>
+            </div>
+          </div>
 
-          <div
-            style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-bottom: 20px; font-size: 13px; color: #333;">
-            <!-- Column 1 -->
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; align-items: start;">
-                <span style="width: 100px; color: #555; font-weight: 500;">Deskripsi</span>
-                <span style="margin-right: 8px;">:</span>
-                <span id="detailDesc" style="flex: 1;">-</span>
+          <!-- Structured Metadata Information Cards (Clean 2-Column Responsive Grid) -->
+          <div class="project-meta-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+            <!-- PIC Project -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(99, 102, 241, 0.12); color: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-user-pin"></i>
               </div>
-              <div style="display: flex; align-items: center;">
-                <span style="width: 100px; color: #555; font-weight: 500;">Deadline</span>
-                <span style="margin-right: 8px;">:</span>
-                <span id="detailDeadline">-</span>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">PIC Project</div>
+                <div id="detailPic" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
               </div>
             </div>
 
-            <!-- Column 2 -->
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-              <div style="display: flex; align-items: center;">
-                <span style="width: 100px; color: #555; font-weight: 500;">PIC</span>
-                <span style="margin-right: 8px;">:</span>
-                <span id="detailPic">-</span>
+            <!-- Timeline Mulai -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(41, 163, 216, 0.12); color: #29A3D8; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-calendar"></i>
               </div>
-              <div style="display: flex; align-items: start;">
-                <span style="width: 100px; color: #555; font-weight: 500;">TIM</span>
-                <span style="margin-right: 8px;">:</span>
-                <div id="detailTim" style="display: flex; flex-direction: column; gap: 4px;">
-                  <span>-</span>
-                </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Tanggal Mulai</div>
+                <div id="detailTimelineMulai" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+
+            <!-- Batas Waktu (Deadline) -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-time-five"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Batas Waktu (Deadline)</div>
+                <div id="detailDeadline" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+
+            <!-- Status Realisasi -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-check-circle"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Status Realisasi</div>
+                <div id="detailStatusCard" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+
+            <!-- Anggota Tim Project -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(168, 85, 247, 0.12); color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-group"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Anggota Tim Project</div>
+                <div id="detailTim" style="font-size: 13px; font-weight: 700; color: #1e293b; line-height: 1.4;">-</div>
+              </div>
+            </div>
+
+            <!-- Dokumen Lampiran Status -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(245, 158, 11, 0.12); color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-paperclip"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Dokumen Lampiran</div>
+                <div id="detailDokumenStatus" style="font-size: 13px; font-weight: 700; color: #1e293b;">-</div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Toolbar Section (Inside the SAME panel) -->
-        <div
-          style="background: #efefef; border-top: 1px solid #dcdcdc; border-bottom: 1px solid #dcdcdc; padding: 6px 30px; display: flex; align-items: center; justify-content: space-between;">
-          <div style="display: flex; align-items: center;">
-            <!-- Filter Button -->
-            <button class="small-action-button-blue" type="button" aria-label="Filter" style="margin-right: 6px;">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-              </svg>
+          <!-- Progress Overview Card -->
+          <div class="detail-progress-card" style="margin-bottom: 20px;">
+            <div class="detail-progress-card-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="bx bx-trending-up" style="color: #2865b5; font-size: 18px;"></i>
+                <span style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Outfit', sans-serif;">Kemajuan Project</span>
+              </div>
+              <span id="detailProgressText" class="detail-progress-percent">0%</span>
+            </div>
+            <div class="detail-progress-track">
+              <div id="detailProgressFill" class="detail-progress-bar" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Modern Tabs Navigation Bar (Clean, zero scrollbars/arrows) -->
+          <div class="detail-tabs-nav">
+            <button class="detail-tab detail-tab-btn active" data-tab="rincian" type="button">
+              <i class="bx bx-file-blank" style="font-size: 16px;"></i> Rincian Project
             </button>
-
-            <!-- Search Bar -->
-            <label class="campaign-search-blue">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="search" placeholder="Cari..." />
-            </label>
+            <button class="detail-tab detail-tab-btn" data-tab="subtasks" type="button">
+              <i class="bx bx-list-check" style="font-size: 16px;"></i> Daftar Sub-Tugas
+            </button>
+            <button class="detail-tab detail-tab-btn" data-tab="dokument" type="button">
+              <i class="bx bx-paperclip" style="font-size: 16px;"></i> Dokumen Lampiran
+            </button>
+            <button class="detail-tab detail-tab-btn" data-tab="catatan" type="button">
+              <i class="bx bx-notepad" style="font-size: 16px;"></i> Catatan
+            </button>
           </div>
 
-          <!-- Tambah Tugas button inside detailed view -->
-          <button id="btnTambahTugasFromDetail" class="btn-tambah-blue" type="button" style="background-color: #29A3D8; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12.5px;">Tambah Tugas</button>
-        </div>
+          <!-- Tab Content Area -->
+          <div id="detailTabContent" class="detail-tab-container">
+            <!-- Tab: Rincian Project -->
+            <div id="tab-rincian" class="tab-pane">
+              <div class="detail-content-box">
+                <div class="detail-content-box-title">
+                  <i class="bx bx-file" style="color: #2865b5; font-size: 16px;"></i>
+                  <span>Deskripsi Lingkup & Sasaran Project</span>
+                </div>
+                <p id="detailDesc" class="detail-content-box-text">-</p>
+              </div>
+            </div>
 
-        <!-- Table Section -->
-        <div class="table-wrap campaign-table" style="padding: 0 0 24px;">
-          <table style="width: 100%;">
-            <thead>
-              <tr>
-                <th style="width: 60px;">#</th>
-                <th>Nama Tugas</th>
-                <th style="width: 150px; text-align: center;">Status</th>
-                <th>Bukti</th>
-                <th>Revisi</th>
-              </tr>
-            </thead>
-            <tbody id="detailProjectTasksTableBody">
-              <!-- Grouped list rendered via JS -->
-            </tbody>
-          </table>
+            <!-- Tab: Sub-tasks Section -->
+            <div id="tab-subtasks" class="tab-pane" style="display: none;">
+              <div class="detail-sub-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 13.5px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif;">
+                    <i class="bx bx-list-check" style="color: #2865b5; font-size: 17px; vertical-align: -2px; margin-right: 4px;"></i>Daftar Sub-Tugas Project
+                  </span>
+                </div>
+                <!-- Tambah Tugas button -->
+                <button id="btnTambahTugasFromDetail" class="btn-tambah" type="button" style="height: 34px; padding: 0 14px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 6px; background: #2865b5; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                  <i class="bx bx-plus" style="font-size: 16px;"></i> Tambah Tugas
+                </button>
+              </div>
+
+              <!-- Table Section -->
+              <div class="table-wrap campaign-table" style="padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <table style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">#</th>
+                      <th>Nama Tugas</th>
+                      <th style="width: 150px; text-align: center;">Status</th>
+                      <th>Bukti</th>
+                      <th>Revisi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailProjectTasksTableBody">
+                    <!-- Grouped list rendered via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Tab: Dokumen Lampiran -->
+            <div id="tab-dokument" class="tab-pane" style="display: none;">
+              <div id="detailDokumenContainer">
+                <p style="margin: 0; color: #64748b; font-size: 13.5px;" id="detailDokumenText">Belum ada dokumen yang diunggah.</p>
+              </div>
+            </div>
+
+            <!-- Tab: Catatan -->
+            <div id="tab-catatan" class="tab-pane" style="display: none;">
+              <div class="detail-content-box">
+                <div class="detail-content-box-title">
+                  <i class="bx bx-notepad" style="color: #2865b5; font-size: 16px;"></i>
+                  <span>Catatan & Evaluasi Pelaksanaan</span>
+                </div>
+                <p id="detailCatatanText" class="detail-content-box-text">Belum ada catatan.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer with Tutup button only (View-only focus consistent with RRK, Milestone, and Tugas) -->
+          <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 20px; padding-top: 14px; border-top: 1px dashed #cbd5e1; width: 100%;">
+            <button type="button" id="btnCloseProjectDetail" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; padding: 9px 28px; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; font-family: 'Outfit', sans-serif;"
+              onmouseover="this.style.background='#e2e8f0';"
+              onmouseout="this.style.background='#f1f5f9';">Tutup</button>
+          </div>
         </div>
-      </section>
+      </div>
     </main>
 
     <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
@@ -706,7 +924,7 @@
     <div class="modal-box modal-box--medium">
       <div class="modal-header">
         <h2 class="modal-title" id="modalTitle">Tambah <strong style="font-weight: 700;">Project</strong></h2>
-        <button id="closeProjectModal" class="modal-close" type="button" aria-label="Tutup popup" style="border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; background: #fff; font-weight: bold; cursor: pointer;">X</button>
+        <button id="closeProjectModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
       </div>
 
       <div class="modal-divider"></div>
@@ -941,8 +1159,12 @@
           <input type="text" id="inputCatatan" class="form-input" placeholder="Tambah Catatan" />
         </div>
 
-        <div style="grid-column: span 12; margin-top: 15px; display: flex; justify-content: flex-end;">
-          <button class="btn-submit-blue-outline" type="submit" style="background-color: #fff; color: #29A3D8; border: 1.5px solid #29A3D8; padding: 10px 42px; border-radius: 6px; font-weight: 700; font-size: 15px; cursor: pointer; transition: background-color 0.15s ease;">Submit</button>
+        <div class="modal-footer"
+          style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ababaf; width: 100%; grid-column: span 12;">
+          <button class="btn-save-modal" id="btnSubmitProject" type="submit"
+            style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;"
+            onmouseover="this.style.background='#29A3D8';this.style.color='#fff';"
+            onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Simpan</button>
         </div>
       </form>
     </div>
@@ -967,11 +1189,11 @@
   </div>
 
   <!-- Modal PopUp Tambah Tugas (Nested under project detail view) -->
-  <div id="tugasProjectModal" class="modal-overlay">
+  <div id="tugasProjectModal" class="modal-overlay" style="z-index: 2147483010;">
     <div class="modal-box modal-box--medium" style="max-width: 500px; padding: 24px;">
       <div class="modal-header">
-        <h2 class="modal-title" id="tugasModalTitle">Tambah <strong style="font-weight: 700;">Tugass</strong></h2>
-        <button id="closeTugasProjectModal" class="modal-close" type="button" aria-label="Tutup popup" style="border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; background: #fff; font-weight: bold; cursor: pointer;">X</button>
+        <h2 class="modal-title" id="tugasModalTitle">Tambah <strong style="font-weight: 700;">Tugas</strong></h2>
+        <button id="closeTugasProjectModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
       </div>
 
       <div class="modal-divider" style="margin: 15px 0; border-top: 1px dashed #dcdcdc;"></div>
@@ -989,8 +1211,11 @@
           <input type="text" id="inputTugasName" class="form-input" style="width: 100%;" placeholder="Masukkan Tugas" required />
         </div>
 
-        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-          <button class="btn-submit-blue-outline" type="submit" style="background-color: #fff; color: #29A3D8; border: 1.5px solid #29A3D8; padding: 8px 30px; border-radius: 6px; font-weight: 700; font-size: 14px; cursor: pointer; transition: background-color 0.15s ease;">Submit</button>
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px dashed #ababaf; padding-top: 14px;">
+          <button class="btn-save-modal" type="submit"
+            style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;"
+            onmouseover="this.style.background='#29A3D8';this.style.color='#fff';"
+            onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Simpan</button>
         </div>
       </form>
     </div>
@@ -1437,6 +1662,32 @@
         return `${parts[2]}-${parts[1]}-${parts[0]}`;
       }
 
+      function formatTanggalBulanTahun(dateStr) {
+        if (!dateStr) return "-";
+        const clean = dateStr.trim();
+        const parts = clean.split("-");
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        // Format dd-mm-yyyy (e.g. 12-12-2026)
+        if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+          const d = parts[0];
+          const m = parseInt(parts[1], 10);
+          const y = parts[2];
+          if (m >= 1 && m <= 12) {
+            return `${d} ${monthNames[m - 1]} ${y}`;
+          }
+        }
+        // Format yyyy-mm-dd (e.g. 2026-09-01)
+        if (parts.length === 3 && parts[0].length === 4) {
+          const y = parts[0];
+          const m = parseInt(parts[1], 10);
+          const d = parts[2];
+          if (m >= 1 && m <= 12) {
+            return `${d} ${monthNames[m - 1]} ${y}`;
+          }
+        }
+        return clean;
+      }
+
       function updateCounts() {
         const berjalanCount = projectData.filter(item => item.status === "Berjalan").length;
         const selesaiCount = projectData.filter(item => item.status === "Selesai").length;
@@ -1451,8 +1702,10 @@
       }
 
       const mainPanel = document.getElementById("mainProjectPanel");
-      const detailPanel = document.getElementById("projectDetailPanel");
-      const btnBackToProjectList = document.getElementById("btnBackToProjectList");
+      const projectDetailModal = document.getElementById("projectDetailModal");
+      const closeProjectDetailModal = document.getElementById("closeProjectDetailModal");
+      const btnCloseProjectDetail = document.getElementById("btnCloseProjectDetail");
+      const btnEditProjectFromDetail = document.getElementById("btnEditProjectFromDetail");
       const btnTambahTugasFromDetail = document.getElementById("btnTambahTugasFromDetail");
 
       const tugasProjectModal = document.getElementById("tugasProjectModal");
@@ -1537,20 +1790,64 @@
         document.getElementById("currentActiveProjectId").value = item.id;
         activeChatId = item.id;
 
-        // Set info
+        // Header Title & Badges
         document.getElementById("detailTitle").textContent = item.namaProject;
-        document.getElementById("detailDesc").textContent = item.deskripsi || "-";
-        document.getElementById("detailDeadline").textContent = formatDate(item.timelineSelesai) || "-";
-        document.getElementById("detailPic").textContent = item.pic || "-";
+        
+        const dateBadge = document.getElementById("detailDateBadge");
+        if (dateBadge) {
+          dateBadge.textContent = formatTanggalBulanTahun(item.timelineSelesai);
+        }
+
+        const statusVal = item.status || "Belum Mulai";
+        const statusBadge = document.getElementById("detailStatusBadge");
+        if (statusBadge) {
+          statusBadge.textContent = statusVal;
+          statusBadge.className = "status-badge";
+          if (statusVal === "Selesai") {
+            statusBadge.classList.add("status-badge--selesai");
+          } else if (statusVal === "Berjalan" || statusVal === "Diproses") {
+            statusBadge.classList.add("status-badge--berjalan");
+          } else {
+            statusBadge.classList.add("status-badge--belum-mulai");
+          }
+        }
+
+        // 2-Column Metadata Cards
+        if (document.getElementById("detailPic")) {
+          document.getElementById("detailPic").textContent = item.pic || "-";
+        }
+        if (document.getElementById("detailTimelineMulai")) {
+          document.getElementById("detailTimelineMulai").textContent = formatTanggalBulanTahun(item.timelineMulai) || "-";
+        }
+        if (document.getElementById("detailDeadline")) {
+          document.getElementById("detailDeadline").textContent = formatTanggalBulanTahun(item.timelineSelesai) || "-";
+        }
+        
+        const detailStatusCard = document.getElementById("detailStatusCard");
+        if (detailStatusCard) {
+          let sStyle = "background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;";
+          if (statusVal === "Selesai") sStyle = "background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;";
+          else if (statusVal === "Berjalan" || statusVal === "Diproses") sStyle = "background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;";
+          detailStatusCard.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; ${sStyle}">${statusVal}</span>`;
+        }
 
         const detailTimWrapper = document.getElementById("detailTim");
         if (detailTimWrapper) {
-          const teams = item.tim ? item.tim.split(',').map(t => t.trim()).filter(Boolean) : [];
+          const teams = (item.tim || item.pic || "").split(',').map(t => t.trim()).filter(Boolean);
           if (teams.length > 0) {
-            detailTimWrapper.innerHTML = teams.map(t => `<span>${t}</span>`).join('');
+            detailTimWrapper.innerHTML = teams.map(t => `
+              <span style="display: inline-flex; align-items: center; gap: 4px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600; color: #475569; margin-right: 4px; margin-bottom: 4px;">
+                <i class="bx bx-user" style="color: #a855f7;"></i> ${t}
+              </span>
+            `).join('');
           } else {
-            detailTimWrapper.innerHTML = `<span>-</span>`;
+            detailTimWrapper.textContent = "-";
           }
+        }
+
+        const detailDokumenStatus = document.getElementById("detailDokumenStatus");
+        if (detailDokumenStatus) {
+          detailDokumenStatus.textContent = item.dokumen ? item.dokumen : ((item.subtasks && item.subtasks.some(s => s.bukti !== "-")) ? "Lampiran Sub-Tugas" : "Tidak ada dokumen");
         }
 
         // Initialize subtasks if not already present
@@ -1562,10 +1859,73 @@
           ];
         }
 
-        // Populate dropdown for "Tambah Tugas" for this project
-        populateTugasTimDropdown(item);
+        // Calculate and display Progress Overview
+        const subtasks = item.subtasks || [];
+        const selesaiCount = subtasks.filter(s => s.status === "Selesai").length;
+        const progressVal = subtasks.length > 0 ? Math.round((selesaiCount / subtasks.length) * 100) : (item.status === "Selesai" ? 100 : (item.status === "Berjalan" ? 50 : 0));
+        const progressText = document.getElementById("detailProgressText");
+        const progressFill = document.getElementById("detailProgressFill");
+        if (progressText) progressText.textContent = `${progressVal}%`;
+        if (progressFill) progressFill.style.width = `${progressVal}%`;
 
+        // Tab: Rincian Project
+        if (document.getElementById("detailDesc")) {
+          document.getElementById("detailDesc").textContent = item.deskripsi || "-";
+        }
+
+        // Tab: Sub-tasks Table
+        populateTugasTimDropdown(item);
         renderDetailTable(item.subtasks);
+
+        // Tab: Dokumen Lampiran
+        const detailDokumenContainer = document.getElementById("detailDokumenContainer");
+        if (detailDokumenContainer) {
+          let docs = [];
+          if (item.dokumen) {
+            docs.push({ name: item.dokumen, label: "Dokumen Utama Project" });
+          }
+          (item.subtasks || []).forEach(s => {
+            if (s.bukti && s.bukti !== "-") {
+              docs.push({ name: s.bukti, label: `Lampiran: ${s.name}` });
+            }
+          });
+          if (docs.length > 0) {
+            detailDokumenContainer.innerHTML = docs.map(d => `
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <i class="bx bxs-file-pdf" style="color: #ef4444; font-size: 22px;"></i>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600; color: #1e293b;">${d.name}</div>
+                    <div style="font-size: 11px; color: #64748b;">${d.label}</div>
+                  </div>
+                </div>
+                <a href="#" style="font-size: 12px; color: #2865b5; font-weight: 600; text-decoration: underline;">Unduh File</a>
+              </div>
+            `).join("");
+          } else {
+            detailDokumenContainer.innerHTML = `<p style="margin: 0; color: #64748b; font-size: 13.5px;">Belum ada dokumen yang diunggah.</p>`;
+          }
+        }
+
+        // Tab: Catatan
+        const detailCatatanText = document.getElementById("detailCatatanText");
+        if (detailCatatanText) {
+          detailCatatanText.textContent = item.catatan || `Project "${item.namaProject}" terpantau berjalan dengan PIC ${item.pic || 'terkait'}. Catatan koordinasi dan evaluasi dapat diperbarui secara berkala.`;
+        }
+
+        // Reset active tab to 'rincian'
+        const allDetailTabs = document.querySelectorAll("#projectDetailModal .detail-tab");
+        allDetailTabs.forEach(t => {
+          if (t.getAttribute("data-tab") === "rincian") {
+            t.classList.add("active");
+          } else {
+            t.classList.remove("active");
+          }
+        });
+        const allDetailPanes = document.querySelectorAll("#projectDetailModal .tab-pane");
+        allDetailPanes.forEach(p => p.style.display = "none");
+        const rincianPane = document.getElementById("tab-rincian");
+        if (rincianPane) rincianPane.style.display = "block";
 
         // Show chat widget
         const chatWidget = document.getElementById("chatWidget");
@@ -1574,23 +1934,49 @@
         }
         renderChatHistory();
 
-        // Toggle Views
-        if (mainPanel) mainPanel.style.display = "none";
-        if (detailPanel) detailPanel.style.display = "block";
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // Open Detail Modal
+        if (projectDetailModal) {
+          projectDetailModal.classList.add("is-active");
+        }
       }
 
-      if (btnBackToProjectList) {
-        btnBackToProjectList.addEventListener("click", (e) => {
-          e.stopPropagation();
-          if (detailPanel) detailPanel.style.display = "none";
-          if (mainPanel) mainPanel.style.display = "block";
+      function hideProjectDetailModal() {
+        if (projectDetailModal) {
+          projectDetailModal.classList.remove("is-active");
+        }
+      }
 
-          // Hide chat widget and popup
-          const chatWidget = document.getElementById("chatWidget");
-          if (chatWidget) chatWidget.style.display = "none";
-          const chatPopup = document.getElementById("chatPopup");
-          if (chatPopup) chatPopup.style.display = "none";
+      // Detail Modal Tab Switching Handlers
+      const detailModalTabs = document.querySelectorAll("#projectDetailModal .detail-tab");
+      detailModalTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          const tabKey = tab.getAttribute("data-tab");
+          detailModalTabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+
+          const panes = document.querySelectorAll("#projectDetailModal .tab-pane");
+          panes.forEach(p => p.style.display = "none");
+
+          const activePane = document.getElementById(`tab-${tabKey}`);
+          if (activePane) activePane.style.display = "block";
+        });
+      });
+
+      if (closeProjectDetailModal) closeProjectDetailModal.addEventListener("click", hideProjectDetailModal);
+      if (btnCloseProjectDetail) btnCloseProjectDetail.addEventListener("click", hideProjectDetailModal);
+      if (projectDetailModal) {
+        projectDetailModal.addEventListener("click", (e) => {
+          if (e.target === projectDetailModal) hideProjectDetailModal();
+        });
+      }
+
+      if (btnEditProjectFromDetail) {
+        btnEditProjectFromDetail.addEventListener("click", () => {
+          const currentProjectId = parseInt(document.getElementById("currentActiveProjectId").value);
+          if (currentProjectId) {
+            hideProjectDetailModal();
+            window.openEditProjectById(currentProjectId);
+          }
         });
       }
 

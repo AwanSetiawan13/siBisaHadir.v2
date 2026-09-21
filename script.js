@@ -1575,6 +1575,15 @@
     badge.className = `badge bg-label-${variant || 'warning'}`;
   }
 
+  function safeJsonParse(s, fallback) {
+    try {
+      const v = JSON.parse(String(s || ''));
+      return v ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
   function getRowFields(row, table) {
     const { ths, aksiIdx } = getTableMeta(table);
     const tds = $$('td', row);
@@ -10093,6 +10102,7 @@
       row.remove();
       renumber(table);
       persistForceCrudTable(table);
+      if (table?.id === 'tblPenilaianKaryawan') updatePenilaianEmptyState(table);
       hideModal();
     };
     showModal(modal);
@@ -10302,16 +10312,52 @@
     writeStorageArray(PENILAIAN_STORAGE_KEY, rows);
   }
 
+  function updatePenilaianEmptyState(table) {
+    const tbl = table || document.getElementById('tblPenilaianKaryawan');
+    if (!tbl) return;
+    const card = tbl.closest('.card') || tbl.parentElement;
+    const emptyState = document.getElementById('emptyTableState') || card?.querySelector('.app-empty-state');
+    const wrapper = document.getElementById('tableContainerWrapper') || tbl.closest('.table-responsive');
+    const rows = tbl.querySelectorAll('tbody tr');
+    const hasData = rows.length > 0;
+    if (typeof window.bmToggleEmptyState === 'function') {
+      window.bmToggleEmptyState(emptyState, wrapper, !hasData);
+    } else {
+      if (!hasData) {
+        if (emptyState) {
+          emptyState.classList.remove('is-hidden');
+          emptyState.classList.add('is-visible');
+          emptyState.style.setProperty('display', 'flex', 'important');
+        }
+        if (wrapper) wrapper.style.setProperty('display', 'none', 'important');
+      } else {
+        if (emptyState) {
+          emptyState.classList.add('is-hidden');
+          emptyState.classList.remove('is-visible');
+          emptyState.style.setProperty('display', 'none', 'important');
+        }
+        if (wrapper) {
+          wrapper.style.removeProperty('display');
+          if (wrapper.style.display === 'none') wrapper.style.display = '';
+        }
+      }
+    }
+  }
+
   function restorePenilaianRows() {
     const table = document.getElementById('tblPenilaianKaryawan');
     const config = TABLE_CONFIG.tblPenilaianKaryawan;
     const tbody = table?.querySelector?.('tbody');
     if (!table || !config || !tbody) return;
     const rows = readStorageArray(PENILAIAN_STORAGE_KEY);
-    if (!rows.length) return;
+    if (!rows.length) {
+      updatePenilaianEmptyState(table);
+      return;
+    }
     tbody.innerHTML = '';
     rows.forEach((item) => writePenilaianRow(table, null, item, 'restore'));
     renumber(table);
+    updatePenilaianEmptyState(table);
   }
 
   function rowToPenilaianData(row) {
@@ -10528,6 +10574,7 @@
     if (mode === 'add' || mode === 'restore') table.querySelector('tbody').appendChild(tr);
     if (mode !== 'restore') savePenilaianRecord(payload);
     renumber(table);
+    updatePenilaianEmptyState(table);
   }
 
   function openPenilaianCrud(mode, table, row) {
