@@ -4,9 +4,8 @@
  */
 (function () {
   'use strict';
-
-  if (window.__bmSidebarEngineLoaded) return;
-  window.__bmSidebarEngineLoaded = true;
+  // Obsolete sidebar disabled: sidebar is exclusively rendered by sidebar_engine.js
+  return;
 
   function getProjectRootPrefix() {
     const pathname = window.location.pathname.replace(/\\/g, '/');
@@ -201,6 +200,9 @@
     const menuItems = ROLE_MENUS[role] || ROLE_MENUS.spv_kol;
     const roleLabel = ROLE_NAMES[role] || 'SPV KOL';
 
+    /**
+     * Legacy sidebar code removed - sidebar is now centrally managed by sidebar_engine.js
+     */
     sidebarEl.className = 'sidebar bm-unified-sidebar';
 
     let navHtml = '';

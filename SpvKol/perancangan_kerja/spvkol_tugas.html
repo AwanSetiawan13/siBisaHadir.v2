@@ -1397,9 +1397,9 @@
       }
 
       window.openDetailTugasById = function(id) {
-        const item = tugasData.find(t => t.id === id);
+        const item = tugasData.find(t => String(t.id) === String(id));
         if (!item) return;
-        currentActiveTugasId = id;
+        currentActiveTugasId = item.id;
 
         // Header Title & Badges
         if (detailTitle) detailTitle.textContent = item.title;
@@ -1806,6 +1806,15 @@
       populateMilestoneOptions();
       renderCards();
 
+      // Auto-open Detail Modal if navigated with ?openDetail=ID
+      const urlParams = new URLSearchParams(window.location.search);
+      const openDetailId = urlParams.get('openDetail');
+      if (openDetailId) {
+        setTimeout(() => {
+          window.openDetailTugasById(openDetailId);
+        }, 120);
+      }
+
       // Search bar event
       const searchInput = document.querySelector(".campaign-search input");
       if (searchInput) {
@@ -1958,7 +1967,7 @@
       </svg>
     </button>
   </div>
-  <script src="../../sidebar_engine.js"></script>
+  <script src="../../sidebar_engine.js?v=4"></script>
 </body>
 
 </html>

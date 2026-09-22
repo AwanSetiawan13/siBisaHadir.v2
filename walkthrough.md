@@ -49,7 +49,7 @@ Menambahkan label pengelompokan menu kategori kecil/muted uppercase untuk naviga
 - **26 Halaman SPV KOL**:
   - **Root (Depth 0)**: [spvkol_dashboard.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/spvkol_dashboard.html), [spvkol_kalender.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/spvkol_kalender.html)
   - **Absensi**: [spvkol_kehadiran.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/absensi/spvkol_kehadiran.html), [spvkol_presensi_istirahat.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/absensi/spvkol_presensi_istirahat.html), [spvkol_presensi_lembur.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/absensi/spvkol_presensi_lembur.html)
-  - **Operasional**: [spvkol_dashboard_campaign.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_dashboard_campaign.html), [spvkol_campaign.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_campaign.html), [spvkol_kreator.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_kreator.html), [spvkol_tracking_sampel.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_tracking_sampel.html), [spvkol_Performa_Kreator.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_Performa_Kreator.html)
+  - **Operasional**: [spvkol_dashboard_campaign.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_dashboard_campaign.html), [spvkol_campaign.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_campaign.html), [spvkol_kreator.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_kreator.html), [spvkol_tracking_kreator.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_tracking_kreator.html), [spvkol_tracking_sampel.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_tracking_sampel.html), [spvkol_Performa_Kreator.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/operasional/spvkol_Performa_Kreator.html)
   - **Dokumen & Kolaborasi**: [spvkol_folder.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/dokumen_kolaborasi/spvkol_folder.html)
   - **Perancangan Kerja**: [spvkol_rrk.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/perancangan_kerja/spvkol_rrk.html), [spvkol_Milestone.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/perancangan_kerja/spvkol_Milestone.html), [spvkol_tugas.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/perancangan_kerja/spvkol_tugas.html), [spvkol_project.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/perancangan_kerja/spvkol_project.html), [spvkol_laporan.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/perancangan_kerja/spvkol_laporan.html), [spvkol_pengaduan.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/perancangan_kerja/spvkol_pengaduan.html)
   - **Kinerja**: [spvkol_evaluasi_kinerja.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/kinerja/spvkol_evaluasi_kinerja.html), [spvkol_target_capaian.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/kinerja/spvkol_target_capaian.html), [spvkol_upgrade_skill.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/kinerja/spvkol_upgrade_skill.html), [spvkol_rencana_karier.html](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/SpvKol/kinerja/spvkol_rencana_karier.html)
@@ -526,3 +526,33 @@ Sesuai permintaan terbaru pengguna (*"masih banyak fitur data sudah ada tapi mal
 - **`spvkol_produk_brand.html`** (0 data): Empty state **muncul presisi di tengah**, dan tabel tersembunyi rapi.
 - **`staffkol_campaign.html`** (ada data campaign): Tabel dan tombol aksi tampil penuh tanpa gangguan empty state.
 - **`BM_kehadiran.html`** (ada data absensi): Tabel presensi tampil bersih tanpa gangguan empty state.
+
+---
+
+## 17. Modernisasi & Penyempurnaan Visual Laporan Supervisi KOL (`spvkol_laporan.html`)
+
+Sesuai arahan pengguna untuk:
+1. Menata ulang tampilan analitik laporan agar lebih terstruktur dan menghilangkan cacat visual (scrollbar horizontal tebal).
+2. Memperbagus grafik donut ("pizza grafik") menjadi proporsional, bergradasi modern, dengan tipografi premium.
+3. Menghidupkan grafik garis ("Trend Pencapaian") menjadi visualisasi trafik dinamis, neon-glow curve, area gradient, dan titik data interaktif.
+
+### Rincian Peningkatan:
+
+1. **Card 1: Pizza Grafik / Donut Chart Modern (`Ringkasan Progress`)**
+   - **Donut SVG Segmented**: Menggantikan conic-gradient kuno dengan lingkaran Donut SVG bersudut bulat (*rounded caps*), ketebalan seimbang (12px), dan warna Tailored SaaS:
+     - Biru Sky (`#0284C7`) untuk Selesai.
+     - Amber Gold (`#F59E0B`) untuk Proses.
+     - Rose Coral (`#EF4444`) untuk Belum Selesai.
+   - **Center Hole Counter**: Menampilkan total tugas dinamis (`104 TOTAL TUGAS`) dengan font Google Fonts `Outfit` tebal dan bersih di tengah donut.
+   - **Modern Legend Chips**: 3 chip horizontal terstruktur dengan dot warna bercahaya (*glow*), angka kuantitas, dan badge persentase berlatar belakang transparan lembut.
+
+2. **Card 2: Eliminasi Total Scrollbar Horizontal (`Pencapaian per Program`)**
+   - **Pencegahan Pagination Liar**: Memperbarui [`sidebar_engine.js`](file:///d:/SOFTWARE/laragon/www/siBisaHadir.v2/sidebar_engine.js) agar tabel mini di dalam `.analytics-card` dan berkelas `.no-pagination` tidak diinjeksi bar pagination yang memicu scrollbar horizontal abu-abu tebal.
+   - **Tata Letak Tabel Modern**: Mengatur padding dan lebar kolom proporsional (Program, RRK, Progres dengan mini-bar gradien halus, dan badge Tercapai hijau emerald `✓ 2/4`).
+
+3. **Card 3: Grafik Trafik Hidup & Interaktif (`Trend Pencapaian`)**
+   - **Area Spline Chart**: Menggantikan polyline statis abu-abu kaku dengan kurva bezier halus (*cubic bezier curve*).
+   - **Gradien & Glowing Neon**: Latar belakang kurva diisi gradien biru cyan (`#0284C7` memudar ke transparan), garis atas memiliki stroke tebal 3px dengan efek neon glow lembut (`drop-shadow(0 4px 8px rgba(2, 132, 199, 0.35))`).
+   - **Titik Koordinat Bersinar**: 5 data node di Hari 1, 7, 15, 22, dan 30 dengan ring luar putih dan titik biru cyan di tengahnya.
+   - **Indikator Pertumbuhan**: Menambahkan pill badge `▲ +14.2%` hijau mint di pojok kanan atas kartu.
+

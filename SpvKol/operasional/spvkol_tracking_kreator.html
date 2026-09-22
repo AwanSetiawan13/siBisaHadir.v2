@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tracking Kreator | Bisa Media</title>
+  <link rel="stylesheet" href="../../style.css" />
+  <!-- Boxicons for action icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
+    rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .status-badge--success {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+
+    .status-badge--warning {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+
+    .status-badge--danger {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+
+    /* Direct Action Button 'Lihat' */
+    .btn-action-view {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      color: #0284c7;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(2, 132, 199, 0.06);
+    }
+
+    .btn-action-view:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-action-view:active {
+      transform: translateY(0);
+    }
+
+    /* ===== Responsive Metric Grid for 4 Cards ===== */
+    .tracking-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    @media (max-width: 1200px) {
+      .tracking-metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .tracking-metric-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== SweetAlert2 Custom Styling for Bisa Media ===== */
+    .swal2-bisa-popup {
+      font-family: 'Outfit', sans-serif !important;
+      border-radius: 14px !important;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
+      padding: 26px 22px !important;
+    }
+
+    .swal2-bisa-popup .swal2-title {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 19px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin-top: 12px !important;
+    }
+
+    .swal2-bisa-popup .swal2-html-container {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      color: #64748b !important;
+      line-height: 1.55 !important;
+      margin-top: 8px !important;
+    }
+
+    .swal2-bisa-popup .swal2-confirm,
+    .swal2-bisa-popup .swal2-cancel {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+      padding: 9px 22px !important;
+      box-shadow: none !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+
+    /* ===== Kreator Modal 12-Column Responsive Grid Layout ===== */
+    .kreator-modal-box {
+      max-width: 720px !important;
+      width: 100% !important;
+      padding: 24px 26px !important;
+      border-radius: 12px !important;
+      background: #ffffff !important;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18) !important;
+    }
+
+    .kreator-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .modal-close-boxed {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #64748b;
+      font-size: 20px;
+      line-height: 1;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .modal-close-boxed:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    .kreator-grid-layout {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .kreator-grid-layout .col-12 {
+      grid-column: span 12;
+    }
+
+    .kreator-grid-layout .col-6 {
+      grid-column: span 6;
+    }
+
+    .kreator-grid-layout .col-4 {
+      grid-column: span 4;
+    }
+
+    @media (max-width: 640px) {
+      .kreator-grid-layout .col-4,
+      .kreator-grid-layout .col-6 {
+        grid-column: span 12;
+      }
+    }
+
+    .kreator-foto-card-section {
+      grid-column: span 12;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
+    .kreator-avatar-circle-wrap {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      border: 2px solid #e2e8f0;
+      overflow: hidden;
+      background: #f8fafc;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kreator-avatar-circle-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .kreator-modal-footer {
+      grid-column: span 12;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px dashed #ababaf;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* ===== Search Bar Styling (Sama Persis dengan Campaign & Data Kreator) ===== */
+    .dashboard-body .campaign-search.campaign-search-bar {
+      display: inline-flex !important;
+      align-items: center !important;
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 8px !important;
+      padding: 0 10px !important;
+      height: 38px !important;
+      width: 280px !important;
+      transition: all 0.2s ease-in-out !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+      position: relative !important;
+      cursor: text !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:hover {
+      border-color: #94a3b8 !important;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within {
+      width: 320px !important;
+      border-color: #29A3D8 !important;
+      box-shadow: 0 0 0 3px rgba(41, 163, 216, 0.16), 0 2px 4px rgba(41, 163, 216, 0.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__icon {
+      width: 16px !important;
+      height: 16px !important;
+      min-width: 16px !important;
+      min-height: 16px !important;
+      max-width: 16px !important;
+      max-height: 16px !important;
+      color: #64748b !important;
+      stroke: #64748b !important;
+      stroke-width: 2.2 !important;
+      fill: none !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 8px 0 2px !important;
+      box-sizing: content-box !important;
+      transition: all 0.2s ease !important;
+      pointer-events: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within .campaign-search-bar__icon {
+      color: #29A3D8 !important;
+      stroke: #29A3D8 !important;
+      transform: scale(1.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input {
+      flex: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #1e293b !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input::placeholder {
+      color: #94a3b8 !important;
+      font-weight: 400 !important;
+      font-size: 13px !important;
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear {
+      width: 17px !important;
+      height: 17px !important;
+      border: none !important;
+      background: #e2e8f0 !important;
+      border-radius: 50% !important;
+      color: #475569 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin-left: 6px !important;
+      flex-shrink: 0 !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear:hover {
+      background: #cbd5e1 !important;
+      color: #0f172a !important;
+      transform: scale(1.1) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear svg {
+      width: 9px !important;
+      height: 9px !important;
+      min-width: 9px !important;
+      min-height: 9px !important;
+      stroke-width: 2.8 !important;
+      stroke: currentColor !important;
+      fill: none !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar hirezy-topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Tracking Kreator</h1>
+      </div>
+
+      <!-- ================= 1. Metric Summary Cards (Sama Persis Format Data Kreator) ================= -->
+      <div class="milestone-metric-grid-new tracking-metric-grid">
+
+        <!-- Card 1: Aktif Konten & Live -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Aktif Konten & Live">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Aktif Konten &amp; Live</span>
+            <strong class="metric-value" id="metricAktifKontenLive">0</strong>
+          </div>
+        </article>
+
+        <!-- Card 2: Aktif Live -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Aktif Live">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polygon points="23 7 16 12 23 17 23 7"></polygon>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Aktif Live</span>
+            <strong class="metric-value" id="metricAktifLive">0</strong>
+          </div>
+        </article>
+
+        <!-- Card 3: Aktif Konten -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Aktif Konten">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Aktif Konten</span>
+            <strong class="metric-value" id="metricAktifKonten">0</strong>
+          </div>
+        </article>
+
+        <!-- Card 4: Tidak Aktif -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Tidak Aktif">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <line x1="18" y1="8" x2="22" y2="12"></line>
+              <line x1="22" y1="8" x2="18" y2="12"></line>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Tidak Aktif</span>
+            <strong class="metric-value" id="metricTidakAktif">0</strong>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- ================= 2. Panel Table Section ================= -->
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterCampaign" class="small-action-button" type="button" aria-label="Filter Data">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown Filter Popover -->
+              <div id="filterCampaignDropdown" class="filter-popover">
+                <form id="filterCampaignForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">Kategori Produk</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterKategoriSelect">
+                        <option value="" disabled selected hidden>Pilih Kategori</option>
+                        <option value="">Semua Kategori</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="beauty">Beauty &amp; Care</option>
+                        <option value="food">Food &amp; Beverage</option>
+                        <option value="lifestyle">Lifestyle</option>
+                        <option value="electronic">Elektronik</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Aktivitas</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterAktivitasSelect">
+                        <option value="" disabled selected hidden>Pilih Aktivitas</option>
+                        <option value="">Semua Aktivitas</option>
+                        <option value="Aktif Konten & Live">Aktif Konten &amp; Live</option>
+                        <option value="Aktif Live">Aktif Live</option>
+                        <option value="Aktif Konten">Aktif Konten</option>
+                        <option value="Tidak Aktif">Tidak Aktif</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Leads</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterLeadsSelect">
+                        <option value="" disabled selected hidden>Pilih Leads</option>
+                        <option value="">Semua Leads</option>
+                        <option value="member">Member</option>
+                        <option value="member_mahasiswa">Member &amp; Mahasiswa</option>
+                        <option value="smartc">SmartC</option>
+                        <option value="markom">Markom</option>
+                        <option value="bootcamp">Bootcamp</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+                    <button type="reset" class="btn-reset" id="btnResetFilter"
+                      style="background-color: #f44336; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px;">Reset</button>
+                    <button type="submit" class="btn-simpan"
+                      style="background-color: #2264c6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px; margin: 0;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Real-time Search Input -->
+            <div class="campaign-search campaign-search-bar" id="campaignSearchBar">
+              <svg class="campaign-search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="searchKreatorInput" class="campaign-search-bar__input" placeholder="Cari Kreator, Username, Kategori..." autocomplete="off" />
+              <button type="button" id="clearSearchKreatorBtn" class="campaign-search-bar__clear" title="Hapus pencarian" aria-label="Hapus pencarian" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="campaign-toolbar__right">
+            <!-- Read-only monitoring view: no add button -->
+          </div>
+        </div>
+
+        <!-- Empty State Container -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Tracking Kreator</div>
+          <div class="app-empty-state__subtitle">Data kreator yang tersimpan akan otomatis muncul pada tabel monitoring ini.</div>
+        </div>
+
+        <!-- Table Container (Tanpa Kolom Status, Aksi Hanya Lihat) -->
+        <div class="table-wrap campaign-table" id="tableContainerWrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>UID</th>
+                <th>Username</th>
+                <th>Nama Kreator</th>
+                <th>Kategori Produk</th>
+                <th>Masa Kontrak</th>
+                <th class="text-center" style="text-align: center; width: 100px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="trackingTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+  </div>
+
+  <!-- ================= Modal PopUp Lihat Data Kreator ================= -->
+  <div id="kreatorViewModal" class="modal-overlay">
+    <div class="modal-box kreator-modal-box">
+      <div class="kreator-modal-header">
+        <h2 class="modal-title"><i>Lihat</i> <span style="font-weight: 700;">Data Kreator</span></h2>
+        <button id="closeKreatorViewModalTop" class="modal-close-boxed" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider" style="margin-bottom: 14px;"></div>
+
+      <div class="kreator-grid-layout">
+        <!-- Foto Centered -->
+        <div class="kreator-foto-card-section">
+          <span class="form-label" style="font-size: 12.5px; font-weight: 600; color: #475569; margin-bottom: 6px;">Foto Kreator</span>
+          <div class="kreator-avatar-circle-wrap" id="viewKreatorFotoBox" style="pointer-events: none;">
+            <img id="viewKreatorFotoImg" src="../../media/avatar.png" alt="Foto Kreator" />
+          </div>
+        </div>
+
+        <!-- UID Full Row (Span 12) -->
+        <div class="form-group col-12">
+          <label class="form-label">UID</label>
+          <input type="text" id="viewKreatorUidInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <!-- Row 2: Username, Nama, WA (Span 4 each) -->
+        <div class="form-group col-4">
+          <label class="form-label">Username</label>
+          <input type="text" id="viewKreatorUsernameInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group col-4">
+          <label class="form-label">Nama Kreator</label>
+          <input type="text" id="viewKreatorNamaInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group col-4">
+          <label class="form-label">Nomor Whatsapp</label>
+          <input type="text" id="viewKreatorWaInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <!-- Row 3: Alamat, Email, Leads (Span 4 each) -->
+        <div class="form-group col-4">
+          <label class="form-label">Alamat</label>
+          <input type="text" id="viewKreatorAlamatInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group col-4">
+          <label class="form-label">Email</label>
+          <input type="email" id="viewKreatorEmailInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group col-4">
+          <label class="form-label">Leads Kreator</label>
+          <input type="text" id="viewKreatorLeadsInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <!-- Row 4: Kategori Produk, Spesifik (Span 6 each) -->
+        <div class="form-group col-6">
+          <label class="form-label">Kategori Produk</label>
+          <input type="text" id="viewKreatorKategoriInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group col-6">
+          <label class="form-label">Spesifik</label>
+          <input type="text" id="viewKreatorKatSpesifikInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <!-- Row 5: Kontrak Awal, Kontrak Akhir (Span 6 each) -->
+        <div class="form-group col-6">
+          <label class="form-label">Kontrak Awal</label>
+          <input type="text" id="viewKreatorKontrakAwalInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group col-6">
+          <label class="form-label">Kontrak Akhir</label>
+          <input type="text" id="viewKreatorKontrakAkhirInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <!-- Row 6: Aktivitas, CM (Span 6 each) -->
+        <div class="form-group col-6">
+          <label class="form-label">Aktivitas</label>
+          <input type="text" id="viewKreatorAktivitasInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group col-6">
+          <label class="form-label">CM</label>
+          <input type="text" id="viewKreatorCmInput" class="form-input" readonly
+            style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <div class="kreator-modal-footer">
+          <button type="button" class="btn-reset" id="btnTutupViewModal"
+            style="background-color: #64748b; color: #fff; border: none; padding: 9px 24px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Outfit';">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../../sidebar_engine.js?v=999"></script>
+  <script src="../spvkol_layout.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v9";
+
+      const DEFAULT_KREATOR = [
+        {
+          id: 1,
+          uid: "UID-0001",
+          username: "@aura.beauty",
+          nama: "Aura Cantika",
+          alamat: "Jl. R.E. Martadinata No. 88, Tasikmalaya",
+          nomorWa: "081234567890",
+          kategori: "Fashion Muslim",
+          kategoriSpesifik: "Hijab Pashmina & Segi Empat",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          aktivitas: "Aktif Konten & Live",
+          cm: "Rizal",
+          leads: "Member",
+          email: "auracantika@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png"
+        },
+        {
+          id: 2,
+          uid: "UID-0002",
+          username: "@clarissa.style",
+          nama: "Clarissa Putri",
+          alamat: "Jl. Anggrek No. 88, Surabaya",
+          nomorWa: "081377889900",
+          kategori: "Fashion Muslim",
+          kategoriSpesifik: "Hijab Bergo & Khimar",
+          masaKontrak: "01/03/2026 - 30/09/2026",
+          kontrakAwal: "2026-03-01",
+          kontrakAkhir: "2026-09-30",
+          status: "Tenggang",
+          aktivitas: "Aktif Live",
+          cm: "Setiawan",
+          leads: "SmartC",
+          email: "clarissa@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png"
+        },
+        {
+          id: 3,
+          uid: "UID-0003",
+          username: "@bima.fashion",
+          nama: "Bima Sakti",
+          alamat: "Jl. Mawar No. 45, Bandung",
+          nomorWa: "081298765432",
+          kategori: "Fashion Muslim",
+          kategoriSpesifik: "Hijab Instan & Sport",
+          masaKontrak: "01/01/2026 - 31/08/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-08-31",
+          status: "Berhenti",
+          aktivitas: "Tidak Aktif",
+          cm: "Dinda Pratama",
+          leads: "Member & Mahasiswa",
+          email: "bima@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png"
+        }
+      ];
+
+      let kreatorDb = DEFAULT_KREATOR;
+      try {
+        const saved = localStorage.getItem(KREATOR_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            kreatorDb = parsed.map((item, idx) => {
+              if (!item.aktivitas) {
+                if (item.status === 'Berhenti') item.aktivitas = 'Tidak Aktif';
+                else if (idx % 3 === 0) item.aktivitas = 'Aktif Konten & Live';
+                else if (idx % 3 === 1) item.aktivitas = 'Aktif Live';
+                else item.aktivitas = 'Aktif Konten';
+              }
+              return item;
+            });
+          }
+        } else {
+          localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(DEFAULT_KREATOR));
+        }
+      } catch (e) {
+        kreatorDb = DEFAULT_KREATOR;
+      }
+
+      const trackingTableBody = document.getElementById("trackingTableBody");
+      const searchKreatorInput = document.getElementById("searchKreatorInput");
+      const clearSearchKreatorBtn = document.getElementById("clearSearchKreatorBtn");
+      const filterCampaignBtn = document.getElementById("btnFilterCampaign");
+      const filterCampaignDropdown = document.getElementById("filterCampaignDropdown");
+      const filterCampaignForm = document.getElementById("filterCampaignForm");
+      const btnResetFilter = document.getElementById("btnResetFilter");
+      const modalView = document.getElementById("kreatorViewModal");
+
+      let currentFilterKategori = "";
+      let currentFilterAktivitas = "";
+      let currentFilterLeads = "";
+
+      function updateTrackingMetrics() {
+        let countAktifKontenLive = 0;
+        let countAktifLive = 0;
+        let countAktifKonten = 0;
+        let countTidakAktif = 0;
+
+        kreatorDb.forEach(k => {
+          const akt = (k.aktivitas || "").toLowerCase().trim();
+          if (akt === "aktif konten & live" || (akt.includes("konten") && akt.includes("live"))) {
+            countAktifKontenLive++;
+          } else if (akt === "aktif live" || akt.includes("live")) {
+            countAktifLive++;
+          } else if (akt === "aktif konten" || akt.includes("konten")) {
+            countAktifKonten++;
+          } else {
+            countTidakAktif++;
+          }
+        });
+
+        const elAKL = document.getElementById("metricAktifKontenLive");
+        const elAL = document.getElementById("metricAktifLive");
+        const elAK = document.getElementById("metricAktifKonten");
+        const elTA = document.getElementById("metricTidakAktif");
+
+        if (elAKL) elAKL.textContent = countAktifKontenLive;
+        if (elAL) elAL.textContent = countAktifLive;
+        if (elAK) elAK.textContent = countAktifKonten;
+        if (elTA) elTA.textContent = countTidakAktif;
+      }
+
+      function renderTrackingTable(query = "") {
+        if (!trackingTableBody) return;
+        trackingTableBody.innerHTML = "";
+        updateTrackingMetrics();
+
+        const q = (query || "").trim().toLowerCase();
+        const filtered = kreatorDb.filter(k => {
+          if (q) {
+            const matchQ = (k.uid && k.uid.toLowerCase().includes(q)) ||
+              (k.username && k.username.toLowerCase().includes(q)) ||
+              (k.nama && k.nama.toLowerCase().includes(q)) ||
+              (k.kategori && k.kategori.toLowerCase().includes(q)) ||
+              (k.aktivitas && k.aktivitas.toLowerCase().includes(q)) ||
+              (k.cm && k.cm.toLowerCase().includes(q));
+            if (!matchQ) return false;
+          }
+          if (currentFilterKategori) {
+            const kt = (k.kategori || "").toLowerCase();
+            if (!kt.includes(currentFilterKategori)) return false;
+          }
+          if (currentFilterAktivitas) {
+            const akt = (k.aktivitas || "").toLowerCase();
+            if (!akt.includes(currentFilterAktivitas)) return false;
+          }
+          if (currentFilterLeads) {
+            const ld = (k.leads || "").toLowerCase();
+            if (!ld.includes(currentFilterLeads)) return false;
+          }
+          return true;
+        });
+
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        if (kreatorDb.length === 0) {
+          if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+          if (emptyTableState) emptyTableState.style.setProperty("display", "flex", "important");
+          return;
+        } else {
+          if (tableWrapper) tableWrapper.style.removeProperty("display");
+          if (emptyTableState) emptyTableState.style.setProperty("display", "none", "important");
+        }
+
+        if (filtered.length === 0) {
+          trackingTableBody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data Tracking Kreator yang sesuai dengan pencarian atau filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach((item, index) => {
+          const row = document.createElement("tr");
+          const fotoUrl = (item.foto && item.foto !== "../../media/logo.png") ? item.foto : "../../media/avatar.png";
+
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td style="font-weight: 600; color: #1e293b;">${item.uid || "-"}</td>
+            <td>
+              <div class="kreator-user-cell" style="display: flex; align-items: center; gap: 10px;">
+                <img src="${fotoUrl}" 
+                     alt="${item.username || 'Foto'}" 
+                     class="kreator-table-avatar" 
+                     data-photo-preview="1"
+                     data-photo-kind="kreator"
+                     data-preview-src="${fotoUrl}"
+                     data-photo-src="${fotoUrl}"
+                     data-photo-title="Lihat Foto Kreator - ${item.username || item.nama || ''}"
+                     data-photo-meta="Foto profil ${item.nama || item.username || 'Kreator'}"
+                     data-photo-address="${item.alamat || 'Bisa Media MCN, Tasikmalaya'}"
+                     data-photo-note="${item.kategori ? ('Kategori: ' + item.kategori + (item.kategoriSpesifik ? ' - ' + item.kategoriSpesifik : '')) : '-'}"
+                     style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0; background: #f8fafc; cursor: pointer; transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;" 
+                     onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)';"
+                     onmouseout="this.style.transform='scale(1)';this.style.boxShadow='none';"
+                     title="Klik untuk lihat foto"
+                     onerror="this.onerror=null; this.src='../../media/avatar.png';" />
+                <span class="kreator-table-username" style="font-weight: 500; color: #1e293b;">${item.username || "-"}</span>
+              </div>
+            </td>
+            <td>${item.nama || "-"}</td>
+            <td>${item.kategori || "-"}</td>
+            <td>${item.masaKontrak || "-"}</td>
+            <td class="tdActions text-center" style="text-align: center;">
+              <button type="button" class="btn-action-view btn-act-view" data-id="${item.id}" title="Lihat Data Kreator">
+                <i class="bx bx-show" style="font-size: 15px;"></i>
+                <span>Lihat</span>
+              </button>
+            </td>
+          `;
+          trackingTableBody.appendChild(row);
+        });
+      }
+
+      function openViewModal(item) {
+        if (!item) return;
+        document.getElementById("viewKreatorUidInput").value = item.uid || "-";
+        document.getElementById("viewKreatorUsernameInput").value = item.username || "-";
+        document.getElementById("viewKreatorNamaInput").value = item.nama || "-";
+        document.getElementById("viewKreatorWaInput").value = item.nomorWa || "-";
+        document.getElementById("viewKreatorAlamatInput").value = item.alamat || "-";
+        document.getElementById("viewKreatorEmailInput").value = item.email || "-";
+        document.getElementById("viewKreatorLeadsInput").value = item.leads || "-";
+        document.getElementById("viewKreatorKategoriInput").value = item.kategori || "-";
+        document.getElementById("viewKreatorKatSpesifikInput").value = item.kategoriSpesifik || item.kategori || "-";
+        document.getElementById("viewKreatorKontrakAwalInput").value = item.kontrakAwal || "-";
+        document.getElementById("viewKreatorKontrakAkhirInput").value = item.kontrakAkhir || "-";
+        document.getElementById("viewKreatorAktivitasInput").value = item.aktivitas || "Aktif Konten & Live";
+        document.getElementById("viewKreatorCmInput").value = item.cm || "Rizal";
+
+        const fotoUrl = (item.foto && item.foto !== "../../media/logo.png") ? item.foto : "../../media/avatar.png";
+        const imgEl = document.getElementById("viewKreatorFotoImg");
+        if (imgEl) imgEl.src = fotoUrl;
+
+        if (modalView) modalView.classList.add("is-active");
+      }
+
+      // Event delegation for table action clicks
+      if (trackingTableBody) {
+        trackingTableBody.addEventListener("click", function (e) {
+          const avatarBtn = e.target.closest(".kreator-table-avatar");
+          if (avatarBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const src = avatarBtn.getAttribute("data-photo-src") || avatarBtn.src;
+            const title = avatarBtn.getAttribute("data-photo-title") || "Lihat Foto Kreator";
+            const meta = avatarBtn.getAttribute("data-photo-meta") || "Preview foto kreator";
+            const address = avatarBtn.getAttribute("data-photo-address") || "Bisa Media MCN, Tasikmalaya";
+            const note = avatarBtn.getAttribute("data-photo-note") || "-";
+            if (typeof window.openPhotoModal === "function") {
+              window.openPhotoModal(src, title, meta, address, note);
+            }
+            return;
+          }
+
+          const btnView = e.target.closest(".btn-act-view");
+          if (btnView) {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = btnView.getAttribute("data-id");
+            const item = kreatorDb.find(k => String(k.id) === String(id));
+            if (item) {
+              openViewModal(item);
+            }
+            document.querySelectorAll(".bm-table-action-menu.show").forEach(menu => {
+              menu.classList.remove("show");
+            });
+            return;
+          }
+
+          const dotsBtn = e.target.closest("[data-bm-dots='true']");
+          if (dotsBtn) {
+            e.stopPropagation();
+            const menu = dotsBtn.closest(".bm-action-dropdown")?.querySelector(".bm-table-action-menu");
+            if (!menu) return;
+            const isOpen = menu.classList.contains("show");
+            document.querySelectorAll(".bm-table-action-menu.show").forEach(m => m.classList.remove("show"));
+            if (!isOpen) {
+              menu.classList.add("show");
+            }
+          }
+        });
+      }
+
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest(".bm-action-dropdown")) {
+          document.querySelectorAll(".bm-table-action-menu.show").forEach(menu => {
+            menu.classList.remove("show");
+          });
+        }
+      });
+
+      // Search Events
+      if (searchKreatorInput) {
+        searchKreatorInput.addEventListener("input", function () {
+          const val = this.value;
+          if (clearSearchKreatorBtn) {
+            clearSearchKreatorBtn.style.display = val.length > 0 ? "inline-flex" : "none";
+          }
+          renderTrackingTable(val);
+        });
+      }
+
+      if (clearSearchKreatorBtn) {
+        clearSearchKreatorBtn.addEventListener("click", function () {
+          if (searchKreatorInput) {
+            searchKreatorInput.value = "";
+            this.style.display = "none";
+            searchKreatorInput.focus();
+            renderTrackingTable("");
+          }
+        });
+      }
+
+      // Filter Events
+      if (filterCampaignBtn && filterCampaignDropdown) {
+        filterCampaignBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          filterCampaignDropdown.classList.toggle("is-active");
+        });
+
+        document.addEventListener("click", function (e) {
+          if (!filterCampaignDropdown.contains(e.target) && !filterCampaignBtn.contains(e.target)) {
+            filterCampaignDropdown.classList.remove("is-active");
+          }
+        });
+      }
+
+      if (filterCampaignForm) {
+        filterCampaignForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const katSelect = document.getElementById("filterKategoriSelect");
+          const aktSelect = document.getElementById("filterAktivitasSelect");
+          const leadsSelect = document.getElementById("filterLeadsSelect");
+
+          currentFilterKategori = katSelect ? katSelect.value.toLowerCase().trim() : "";
+          currentFilterAktivitas = aktSelect ? aktSelect.value.toLowerCase().trim() : "";
+          currentFilterLeads = leadsSelect ? leadsSelect.value.toLowerCase().trim() : "";
+
+          if (filterCampaignDropdown) filterCampaignDropdown.classList.remove("is-active");
+          renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener("click", function () {
+          currentFilterKategori = "";
+          currentFilterAktivitas = "";
+          currentFilterLeads = "";
+          if (filterCampaignDropdown) filterCampaignDropdown.classList.remove("is-active");
+          setTimeout(() => {
+            renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+          }, 50);
+        });
+      }
+
+      // Close modal handlers
+      const btnCloseTop = document.getElementById("closeKreatorViewModalTop");
+      const btnCloseBtm = document.getElementById("btnTutupViewModal");
+
+      if (btnCloseTop) {
+        btnCloseTop.addEventListener("click", function () {
+          if (modalView) modalView.classList.remove("is-active");
+        });
+      }
+      if (btnCloseBtm) {
+        btnCloseBtm.addEventListener("click", function () {
+          if (modalView) modalView.classList.remove("is-active");
+        });
+      }
+      if (modalView) {
+        modalView.addEventListener("click", function (e) {
+          if (e.target === modalView) {
+            modalView.classList.remove("is-active");
+          }
+        });
+      }
+
+      // Initial Render
+      renderTrackingTable();
+    });
+  </script>
+</body>
+
+</html>

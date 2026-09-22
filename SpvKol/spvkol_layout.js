@@ -29,6 +29,7 @@
     'spvkol_skenario_jam_kerja.html': 'Skenario Jam Kerja',
     'spvkol_karyawan.html': 'Data Karyawan',
     'spvkol_kreator.html': 'Data Kreator',
+    'spvkol_tracking_kreator.html': 'Tracking Kreator',
     'spvkol_folder.html': 'My Folders',
     'spvkol_evaluasi_kinerja.html': 'Evaluasi Kinerja',
     'spvkol_target_capaian.html': 'Target & Capaian',

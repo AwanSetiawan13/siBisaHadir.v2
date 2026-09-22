@@ -2096,7 +2096,7 @@
 
       window.openViewProjectById = function (id) {
         closeAllProjectActionMenus();
-        const item = projectData.find(p => p.id === Number(id));
+        const item = projectData.find(p => String(p.id) === String(id));
         if (item) openDetailPanel(item);
       };
 
@@ -2470,6 +2470,15 @@
 
       updateCounts();
       renderTable(projectData);
+
+      // Auto-open Detail Modal if navigated with ?openDetail=ID
+      const urlParams = new URLSearchParams(window.location.search);
+      const openDetailId = urlParams.get('openDetail');
+      if (openDetailId) {
+        setTimeout(() => {
+          window.openViewProjectById(openDetailId);
+        }, 120);
+      }
     });
   </script>
 
@@ -2503,7 +2512,7 @@
       </svg>
     </button>
   </div>
-  <script src="../../sidebar_engine.js"></script>
+  <script src="../../sidebar_engine.js?v=4"></script>
 </body>
 
 </html>
