@@ -4,6 +4,15 @@
 
   window.__bmSidebarEngineLoaded = true;
 
+  // Preload SweetAlert2 CDN agar selalu siap seketika saat dibutuhkan
+  (function preloadSweetAlert() {
+    if (!window.Swal && !document.querySelector('script[src*="sweetalert2"]')) {
+      const swalScript = document.createElement('script');
+      swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+      document.head.appendChild(swalScript);
+    }
+  })();
+
   // 1. Tentukan Root Prefix secara dinamis
   let depth = 1;
   const normalizedPath = window.location.pathname.replace(/\\/g, '/');
@@ -103,7 +112,8 @@
         children: [
           { label: 'Dashboard Campaign', link: 'SpvKol/operasional/spvkol_dashboard_campaign.html' },
           { label: 'Campaign', link: 'SpvKol/operasional/spvkol_campaign.html' },
-          { label: 'Kreator', link: 'SpvKol/operasional/spvkol_kreator.html' },
+          { label: 'Data Creator', link: 'SpvKol/operasional/spvkol_kreator.html' },
+          { label: 'Tracking Kreator', link: 'SpvKol/operasional/spvkol_tracking_kreator.html' },
           { label: 'Tracking Sampel', link: 'SpvKol/operasional/spvkol_tracking_sampel.html' },
           { label: 'Performa Kreator', link: 'SpvKol/operasional/spvkol_Performa_Kreator.html' }
         ]
@@ -327,6 +337,25 @@
   if (role === 'spv_kol') homeLink = `${rootPrefix}SpvKol/spvkol_dashboard.html`;
   else if (role === 'staff_kol') homeLink = `${rootPrefix}StaffKol/staffkol_dashboard.html`;
 
+  // Info Akun & Keterangan Portal Sesuai Login dan Halaman yang Dibuka
+  const roleDisplayNames = {
+    admin: 'Rayi (Admin)',
+    spv_kol: 'Rayi',
+    staff_kol: 'Rayi (Staff)'
+  };
+  const portalLabels = {
+    admin: 'Beranda Admin',
+    spv_kol: 'Beranda SPV KOL',
+    staff_kol: 'Beranda Staff KOL'
+  };
+
+  const currentUserName = localStorage.getItem('user_name') || roleDisplayNames[role] || 'Rayi';
+  const currentPortalLabel = portalLabels[role] || 'Beranda SPV KOL';
+  const rawAvatar = localStorage.getItem('user_avatar');
+  const currentAvatar = (rawAvatar && !rawAvatar.includes('undefined'))
+    ? (rawAvatar.startsWith('http') ? rawAvatar : rootPrefix + rawAvatar.replace(/^\/+/, ''))
+    : `${rootPrefix}media/avatar.png`;
+
   const sidebarDOM = `
     <style>
       #app-sidebar-box {
@@ -507,6 +536,46 @@
       }
 
       /* Responsivitas: Desktop (>= 1024px) */
+      /* Logout Button Styling at the bottom of sidebar */
+      .sidebar-logout-btn {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        padding: 8px 12px !important;
+        border-radius: 8px !important;
+        border: 1px solid #fee2e2 !important;
+        background: #fff5f5 !important;
+        color: #ef4444 !important;
+        text-decoration: none !important;
+        font-size: 12.5px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-sizing: border-box !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+      }
+      .sidebar-logout-btn:hover {
+        background: #fee2e2 !important;
+        border-color: #fca5a5 !important;
+        color: #dc2626 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.15) !important;
+      }
+      .sidebar-logout-btn:active {
+        transform: translateY(0) !important;
+      }
+      .sidebar-logout-btn svg {
+        transition: transform 0.2s ease;
+        stroke: currentColor !important;
+        fill: none !important;
+      }
+      .sidebar-logout-btn:hover svg {
+        transform: translateX(2px);
+      }
+
       @media (min-width: 1024px) {
         #app-sidebar-inner {
           transform: translateX(0) !important;
@@ -531,23 +600,38 @@
       <div id="app-sidebar-box" style="overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0;padding:6px 10px;scrollbar-width:thin;">
         <ul style="margin:0;padding:0;list-style:none;">${menuHtml}</ul>
       </div>
-      <!-- Sidebar Footer (Profile & Logout - Neatly docked at bottom of sidebar) -->
-      <div style="padding:12px 14px;border-top:1px solid #f1f5f9;background:#fafafa;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <img src="${rootPrefix}media/avatar.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #e0f2fe;" onerror="this.style.display='none'" />
-          <div>
-            <div style="font-size:12.5px;font-weight:700;color:#1e293b;line-height:1.3;">Rayi</div>
-            <div style="font-size:9.5px;color:#0284c7;font-weight:700;letter-spacing:0.6px;text-transform:uppercase;">${role.replace(/_/g, ' ')}</div>
+      <!-- Sidebar Footer (Logout Fixed Directly Above SPV KOL Profile) -->
+      <div id="sidebar-footer-fixed" style="padding:10px 12px 12px 12px;border-top:1px solid #f1f5f9;background:#fafafa;display:flex;flex-direction:column;gap:8px;flex-shrink:0;overflow:visible;z-index:10;position:relative;">
+        <!-- 1. Tombol Logout (Fixed tepat di atas profil SPV KOL) -->
+        <a href="${rootPrefix}login.html" class="sidebar-logout-btn" title="Logout" id="sidebar-logout-link" style="display:flex !important;align-items:center !important;justify-content:flex-start !important;gap:9px !important;width:100% !important;padding:8px 12px !important;border-radius:9px !important;border:1px solid #fee2e2 !important;background:#fff5f5 !important;color:#ef4444 !important;text-decoration:none !important;font-size:12.5px !important;font-weight:600 !important;cursor:pointer !important;box-sizing:border-box !important;visibility:visible !important;opacity:1 !important;transition:all 0.2s ease !important;"
+           onmouseover="this.style.background='#fee2e2';this.style.borderColor='#fca5a5';this.style.color='#dc2626'"
+           onmouseout="this.style.background='#fff5f5';this.style.borderColor='#fee2e2';this.style.color='#ef4444'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0;display:block !important;visibility:visible !important;width:16px !important;height:16px !important;" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span style="color:#ef4444 !important;font-size:12.5px !important;font-weight:600 !important;">Logout</span>
+        </a>
+
+        <!-- 2. Profil Akun & Keterangan Portal yang Sedang Dibuka (Di bawah Logout) -->
+        <div class="sidebar-user-card" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,0.02);position:relative;overflow:hidden;">
+          <div style="position:relative;flex-shrink:0;">
+            <img src="${currentAvatar}" alt="${currentUserName}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #e0f2fe;display:block;" onerror="this.src='${rootPrefix}media/avatar.png'" />
+            <span style="position:absolute;bottom:0;right:0;width:9px;height:9px;background-color:#22c55e;border:2px solid #ffffff;border-radius:50%;" title="Online / Aktif"></span>
+          </div>
+          <div style="overflow:hidden;flex:1;min-width:0;">
+            <div style="font-size:12.5px;font-weight:700;color:#0f172a;line-height:1.25;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;" title="${currentUserName}">${currentUserName}</div>
+            <div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
+              <span style="font-size:9.5px;color:#0284c7;font-weight:700;letter-spacing:0.4px;text-transform:uppercase;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;background:#f0f9ff;padding:1.5px 6px;border-radius:4px;border:1px solid #e0f2fe;display:inline-block;">${currentPortalLabel}</span>
+            </div>
           </div>
         </div>
-        <a href="${rootPrefix}login.html" title="Logout" style="color:#94a3b8;display:flex;align-items:center;text-decoration:none;padding:6px;border-radius:8px;transition:background 0.15s,color 0.15s;" onmouseover="this.style.color='#ef4444';this.style.background='#fef2f2'" onmouseout="this.style.color='#94a3b8';this.style.background='transparent'">
-          <i data-lucide="log-out" style="width: 17px; height: 17px; flex-shrink: 0;"></i>
-        </a>
       </div>
     </div>
   `;
 
-  // ── Sidebar smooth transition style injection ───────────────────────
+  // ── Sidebar smooth transition & SweetAlert2 style injection ─────────
   (function injectSidebarTransitionCSS() {
     if (document.getElementById('bm-sidebar-transition-css')) return;
     const s = document.createElement('style');
@@ -597,6 +681,77 @@
         backdrop-filter: blur(2px);
       }
       #sidebar-backdrop.is-visible { opacity: 1; pointer-events: auto; }
+
+      /* Sticky Fixed Floating Topbar Navbar */
+      .dashboard-shell {
+        overflow: visible !important;
+      }
+      body {
+        overflow-x: hidden;
+      }
+      .topbar,
+      header.topbar,
+      .topbar.hirezy-topbar,
+      header.topbar.hirezy-topbar {
+        position: sticky !important;
+        top: 14px !important;
+        z-index: 990 !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.07) !important;
+      }
+
+      /* SweetAlert2 Theme Customization for Bisa Media */
+      .swal2-bisa-popup {
+        font-family: 'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        border-radius: 16px !important;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
+        padding: 26px 24px !important;
+      }
+      .swal2-bisa-popup .swal2-title {
+        font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+        font-size: 19px !important;
+        font-weight: 700 !important;
+        color: #0f172a !important;
+        margin-top: 10px !important;
+      }
+      .swal2-bisa-popup .swal2-html-container {
+        font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+        font-size: 13.5px !important;
+        color: #64748b !important;
+        line-height: 1.55 !important;
+        margin-top: 8px !important;
+      }
+      .swal2-bisa-popup .swal2-actions {
+        gap: 10px !important;
+        margin-top: 20px !important;
+      }
+      .swal2-bisa-popup .swal2-confirm,
+      .swal2-bisa-popup .swal2-cancel {
+        font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        border-radius: 10px !important;
+        padding: 10px 22px !important;
+        box-shadow: none !important;
+        transition: all 0.18s ease !important;
+        cursor: pointer !important;
+      }
+      .swal2-bisa-popup .swal2-confirm:hover {
+        background-color: #dc2626 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
+      }
+      .swal2-bisa-popup .swal2-cancel:hover {
+        background-color: #64748b !important;
+        color: #ffffff !important;
+      }
+      .swal2-container {
+        z-index: 9999999 !important;
+      }
     `;
     document.head.appendChild(s);
   })();
@@ -675,10 +830,17 @@
       el.style.setProperty('box-sizing', 'border-box', 'important');
     });
 
-    document.querySelectorAll('.dashboard-shell .topbar').forEach(el => {
+    document.querySelectorAll('.dashboard-shell .topbar, header.topbar, .topbar').forEach(el => {
+      el.style.setProperty('position', 'sticky', 'important');
+      el.style.setProperty('top', '14px', 'important');
+      el.style.setProperty('z-index', '990', 'important');
+      el.style.setProperty('background', 'rgba(255, 255, 255, 0.96)', 'important');
+      el.style.setProperty('backdrop-filter', 'blur(12px)', 'important');
+      el.style.setProperty('-webkit-backdrop-filter', 'blur(12px)', 'important');
+      el.style.setProperty('box-shadow', '0 4px 20px rgba(15, 23, 42, 0.07)', 'important');
       el.style.setProperty('margin-left', '24px', 'important');
       el.style.setProperty('margin-right', '24px', 'important');
-      el.style.setProperty('margin-top', '18px', 'important');
+      el.style.setProperty('margin-top', '14px', 'important');
       el.style.setProperty('width', 'calc(100% - 48px)', 'important');
       el.style.setProperty('box-sizing', 'border-box', 'important');
     });
@@ -742,8 +904,9 @@
   // Helper: SPV KOL Dynamic Table Pagination
   function initSpvTablePagination() {
     setTimeout(function () {
-      const tables = document.querySelectorAll('.dashboard-shell table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard), main table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard)');
+      const tables = document.querySelectorAll('.dashboard-shell table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard):not(.mini-table):not(.no-pagination), main table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard):not(.mini-table):not(.no-pagination)');
       tables.forEach(table => {
+        if (table.closest('.analytics-card') || table.classList.contains('mini-table') || table.classList.contains('no-pagination')) return;
         const scrollWrap = table.closest('.table-wrap') || table.closest('.table-responsive') || table.closest('.campaign-scroll-table-wrap');
         const parent = scrollWrap || table.parentElement;
 
@@ -974,6 +1137,7 @@
       'spvkol_skenario_jam_kerja.html': 'Skenario Jam Kerja',
       'spvkol_karyawan.html': 'Data Karyawan',
       'spvkol_kreator.html': 'Data Kreator',
+      'spvkol_tracking_kreator.html': 'Tracking Kreator',
       'spvkol_folder.html': 'My Folders',
       'spvkol_evaluasi_kinerja.html': 'Evaluasi Kinerja',
       'spvkol_target_capaian.html': 'Target & Capaian',
@@ -1228,6 +1392,78 @@
       }
     }
   });
+
+  // 10. Universal SweetAlert2 Logout Confirmation
+  window.bmConfirmLogout = function (logoutUrl) {
+    const targetUrl = logoutUrl || (rootPrefix + 'login.html');
+
+    function executeSwal() {
+      if (!window.Swal) {
+        if (confirm('Apakah Anda yakin ingin logout dari sistem Bisa Media?')) {
+          window.location.href = targetUrl;
+        }
+        return;
+      }
+
+      Swal.fire({
+        title: 'Konfirmasi Logout',
+        text: 'Apakah Anda yakin ingin keluar dari sistem Bisa Media?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#94a3b8',
+        confirmButtonText: 'Ya, Logout',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        focusCancel: true,
+        customClass: {
+          popup: 'swal2-bisa-popup'
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Berhasil Logout',
+            text: 'Mengarahkan ke halaman login...',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 900,
+            timerProgressBar: true,
+            customClass: {
+              popup: 'swal2-bisa-popup'
+            }
+          }).then(() => {
+            window.location.href = targetUrl;
+          });
+        }
+      });
+    }
+
+    if (window.Swal && typeof window.Swal.fire === 'function') {
+      executeSwal();
+    } else {
+      let script = document.querySelector('script[src*="sweetalert2"]');
+      if (!script) {
+        script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+        document.head.appendChild(script);
+      }
+      script.addEventListener('load', executeSwal);
+      setTimeout(function () {
+        if (!window.Swal) executeSwal();
+      }, 800);
+    }
+  };
+
+  // Intercept all clicks to logout elements across the application
+  document.addEventListener('click', function (e) {
+    const logoutEl = e.target.closest('.sidebar-logout-btn, #sidebar-logout-link, .user-menu-dropdown__item--danger, a[href$="login.html"], a[href*="login.html"], [data-action="logout"], .btn-logout, a.dropdown-item[href*="login.html"]');
+    if (logoutEl) {
+      e.preventDefault();
+      e.stopPropagation();
+      const href = logoutEl.getAttribute('href') || (rootPrefix + 'login.html');
+      window.bmConfirmLogout(href);
+    }
+  }, true);
 
   // Handle resize event untuk responsivitas dinamis
   window.addEventListener('resize', function () {
@@ -1628,3 +1864,4 @@
     triggerLucideIcons();
   }
 })();
+

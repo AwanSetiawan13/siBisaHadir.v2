@@ -1208,7 +1208,7 @@
       let currentDetailMilestone = null;
 
       window.openDetailMilestoneById = function (id) {
-        const item = milestoneData.find(m => m.id === Number(id));
+        const item = milestoneData.find(m => String(m.id) === String(id));
         if (!item) return;
         currentDetailMilestone = item;
 
@@ -1565,6 +1565,15 @@
 
       renderCards();
 
+      // Auto-open Detail Modal if navigated with ?openDetail=ID
+      const urlParams = new URLSearchParams(window.location.search);
+      const openDetailId = urlParams.get('openDetail');
+      if (openDetailId) {
+        setTimeout(() => {
+          window.openDetailMilestoneById(openDetailId);
+        }, 120);
+      }
+
       // Floating Chat Trigger and Logic
       let activeChatId = "general";
       const chatHistories = {
@@ -1709,7 +1718,7 @@
       </svg>
     </button>
   </div>
-  <script src="../../sidebar_engine.js"></script>
+  <script src="../../sidebar_engine.js?v=4"></script>
 </body>
 
 </html>

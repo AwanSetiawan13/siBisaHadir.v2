@@ -19,9 +19,10 @@ function getSpvSidebar(prefix, mediaPrefix, logoutHref, activePage) {
   const isDashCampaign = activePage === 'spvkol_dashboard_campaign.html' ? ' nav-item--active' : '';
   const isCampaign = activePage === 'spvkol_campaign.html' ? ' nav-item--active' : '';
   const isKreator = activePage === 'spvkol_kreator.html' ? ' nav-item--active' : '';
+  const isTrackingKreator = activePage === 'spvkol_tracking_kreator.html' ? ' nav-item--active' : '';
   const isTrackingSampel = activePage === 'spvkol_tracking_sampel.html' ? ' nav-item--active' : '';
   const isPerformaKreator = activePage === 'spvkol_Performa_Kreator.html' ? ' nav-item--active' : '';
-  const isOperasionalGroup = (isDashCampaign || isCampaign || isKreator || isTrackingSampel || isPerformaKreator) ? '' : ' is-collapsed';
+  const isOperasionalGroup = (isDashCampaign || isCampaign || isKreator || isTrackingKreator || isTrackingSampel || isPerformaKreator) ? '' : ' is-collapsed';
 
   // OPERASIONAL KOL - Dokumen & Kolaborasi
   const isFolder = activePage === 'spvkol_folder.html' ? ' nav-item--active' : '';
@@ -176,7 +177,17 @@ function getSpvSidebar(prefix, mediaPrefix, logoutHref, activePage) {
               <circle cx="17" cy="9" r="2"></circle>
               <path d="M15.5 14.5c2.7-.3 4.4 1.2 5 4"></path>
             </svg>
-            <span>Kreator</span>
+            <span>Data Creator</span>
+          </a>
+
+          <a class="nav-item${isTrackingKreator}" href="${prefix}operasional/spvkol_tracking_kreator.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Tracking Kreator</span>
           </a>
 
           <a class="nav-item${isTrackingSampel}" href="${prefix}operasional/spvkol_tracking_sampel.html">
