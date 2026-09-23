@@ -683,11 +683,13 @@
       #sidebar-backdrop.is-visible { opacity: 1; pointer-events: auto; }
 
       /* Sticky Fixed Floating Topbar Navbar */
-      .dashboard-shell {
-        overflow: visible !important;
+      html, body {
+        overflow-x: clip !important;
       }
-      body {
-        overflow-x: hidden;
+      .dashboard-shell,
+      .layout-page,
+      .layout-container {
+        overflow: visible !important;
       }
       .topbar,
       header.topbar,
@@ -696,12 +698,12 @@
         position: sticky !important;
         top: 14px !important;
         z-index: 990 !important;
-        background: rgba(255, 255, 255, 0.96) !important;
+        background: rgba(255, 255, 255, 0.98) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
         border: 1px solid #e2e8f0 !important;
         border-radius: 12px !important;
-        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.07) !important;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08) !important;
       }
 
       /* SweetAlert2 Theme Customization for Bisa Media */
