@@ -322,6 +322,12 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      background: #ffffff;
+      padding: 8px 0 10px 0;
+      border-bottom: 1.5px solid #f1f5f9;
     }
     .brand-sampel-title {
       font-size: 16px;
@@ -1319,7 +1325,7 @@
               <div style="display: flex; align-items: center; justify-content: space-between;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <label class="sampel-field-label" style="font-size: 13px; font-weight: 700; color: #1e293b; margin: 0;">Tabel Varian & Stok</label>
-                  <span style="font-size: 11.5px; color: #64748b; font-weight: 500;">(Varian 1: Warna, Varian 2: Ukuran / Tipe, Stok Ready)</span>
+                  <span style="font-size: 11.5px; color: #64748b; font-weight: 500;">(Varian 1 & 2 Opsional, Stok Ready)</span>
                 </div>
                 <button type="button" class="btn-tambah-varian-row" title="Tambah baris varian baru">
                   <i class="bx bx-plus" style="font-size: 15px;"></i>
@@ -1331,8 +1337,8 @@
                 <table class="sampel-varian-table">
                   <thead>
                     <tr>
-                      <th style="width: 35%;">Varian 1 (Warna)</th>
-                      <th style="width: 35%;">Varian 2 (Ukuran / Tipe)</th>
+                      <th style="width: 35%;">Varian 1 (Opsional)</th>
+                      <th style="width: 35%;">Varian 2 (Opsional)</th>
                       <th style="width: 20%;">Stok</th>
                       <th style="width: 10%; text-align: center;">Aksi</th>
                     </tr>
@@ -1362,10 +1368,10 @@
           tbody.innerHTML = variantRows.map((r, idx) => `
             <tr class="varian-row-item" data-idx="${idx}">
               <td>
-                <input type="text" class="sampel-table-input var-v1-input" placeholder="Warna (cth: Hitam)" value="${(r.varian1 || '').replace(/"/g, '&quot;')}" />
+                <input type="text" class="sampel-table-input var-v1-input" placeholder="Varian 1 (Opsional)" value="${(r.varian1 || '').replace(/"/g, '&quot;')}" />
               </td>
               <td>
-                <input type="text" class="sampel-table-input var-v2-input" placeholder="Ukuran/Tipe (cth: M / L / All Size)" value="${(r.varian2 || '').replace(/"/g, '&quot;')}" />
+                <input type="text" class="sampel-table-input var-v2-input" placeholder="Varian 2 (Opsional)" value="${(r.varian2 || '').replace(/"/g, '&quot;')}" />
               </td>
               <td>
                 <input type="number" min="0" class="sampel-table-input var-stok-input" placeholder="0" value="${r.stok !== undefined ? String(r.stok).replace(/"/g, '&quot;') : ''}" />
@@ -2055,7 +2061,7 @@
                         <span>PID: <span class="view-sampel-pid-tag">${s.pid || '-'}</span></span>
                         ${s.type ? `<span>Type: <span class="view-sampel-pid-tag" style="background:#e0f2fe;color:#0284c7;">${s.type}</span></span>` : ''}
                         ${s.stok ? `<span>Stok: <span class="view-sampel-pid-tag">${s.stok}</span></span>` : ''}
-                        ${s.komisi ? `<span>Komisi: <span class="view-sampel-pid-tag" style="background:#fef3c7;color:#d97706;">${s.komisi}</span></span>` : ''}
+                        ${s.komisi ? `<span>Komisi: <span class="view-sampel-pid-tag" style="background:#fef3c7;color:#d97706;">${String(s.komisi).trim().endsWith('%') ? String(s.komisi).trim() : `${String(s.komisi).trim()}%`}</span></span>` : ''}
                         ${s.periode ? `<span>Periode: <span class="view-sampel-pid-tag">${s.periode}</span></span>` : ''}
                       </div>
                       ${variantDisplayHtml}
@@ -2240,7 +2246,10 @@
             const type = card.querySelector(".sampel-type-input")?.value.trim() || "";
             const link = card.querySelector(".sampel-link-input")?.value.trim() || "";
             let stok = card.querySelector(".sampel-stok-input")?.value.trim() || "";
-            const komisi = card.querySelector(".sampel-komisi-input")?.value.trim() || "";
+            let komisi = card.querySelector(".sampel-komisi-input")?.value.trim() || "";
+            if (komisi && !komisi.endsWith("%")) {
+              komisi = komisi + "%";
+            }
             const periode = card.querySelector(".sampel-periode-input")?.value.trim() || "";
             const publish = card.querySelector(".sampel-publish-input")?.value.trim() || "Aktif";
 

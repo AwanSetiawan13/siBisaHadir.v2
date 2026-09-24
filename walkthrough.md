@@ -556,3 +556,50 @@ Sesuai arahan pengguna untuk:
    - **Titik Koordinat Bersinar**: 5 data node di Hari 1, 7, 15, 22, dan 30 dengan ring luar putih dan titik biru cyan di tengahnya.
    - **Indikator Pertumbuhan**: Menambahkan pill badge `▲ +14.2%` hijau mint di pojok kanan atas kartu.
 
+---
+
+## 18. Pembaruan Desain Modal "Lihat Tracking Kreator" (`spvkol_tracking_kreator.html`)
+
+Sesuai permintaan dan gambar referensi dari pengguna, tampilan popup modal saat mengklik tombol **"Lihat"** pada tabel Tracking Kreator telah diperbarui secara penuh:
+
+### Rincian Tampilan Baru:
+1. **Header & Penutup**:
+   - Judul: `Lihat Tracking Kreator` dengan font `Lihat` (*italic*) dan `Tracking Kreator` (*sans-serif 600*).
+   - Tombol tutup kotak kecil `x` dengan border halus di pojok kanan atas.
+   - Garis pembatas putus-putus (*dashed line*) di bawah header.
+2. **Foto Kreator (Top Centered)**:
+   - Label `Foto` terpusat di bagian atas.
+   - Kartu berbingkai persegi melengkung (`140px x 130px`) dengan padding dan `object-fit: contain;`, memastikan seluruh foto profil (kepala hingga pakaian) tampil utuh, proporsional, dan tidak terpotong.
+3. **Level Kreator Terhubung Dinamis dengan Data Master**:
+   - Kolom **Level Kreator** dan **Target GMV** kini diambil secara otomatis dari Data Master (*Leveling Kreator* di `spvkol_Leveling_Kreator.html` / `bisa_leveling_kreator_list_v5`), seperti *Top Kreator*, *Semi Top Creator*, *New Growth*, dan *Incubate*.
+4. **Metrik Kinerja Terintegrasi Otomatis dari Performa Kreator**:
+   - **GMV Berjalan**: Diambil langsung dari metrik total GMV kreator di modul **Performa Kreator** (`spvkol_Performa_Kreator.html`).
+   - **Siaran Live & Video**: Diambil dari total sesi siaran live dan jumlah video aktif dari data Performa Kreator.
+   - **Progres GMV**: Dihitung secara cerdas dan realtime berdasarkan rasio `(GMV Berjalan / Target GMV) * 100%`.
+   - **GMV Berjalan (Ads / Partner)** & **Keaktifan**: Disinkronkan dengan performa partner GMV dan status keaktifan broadcast/konten kreator.
+5. **Struktur Grid Form Read-Only (10 Baris)**:
+   - **Baris 1 (Full Width / Span 12)**: `UID` (placeholder: "UID", ikon chevron).
+   - **Baris 2 (3 Kolom / Span 4)**: `Username` (ikon chevron), `Nama Kreator`, `Nomor Whatsapp`.
+   - **Baris 3 (3 Kolom / Span 4)**: `Alamat`, `Email`, `Leads Kreator`.
+   - **Baris 4 (2 Kolom / Span 6)**: `Kategori Produk`, `Spesifik`.
+   - **Baris 5 (2 Kolom / Span 6)**: `Kontrak Awal` (ikon chevron), `Kontrak Akhir`.
+   - **Baris 6 (2 Kolom / Span 6)**: `Status` (ikon chevron), `CM`.
+   - **Baris 7 (3 Kolom / Span 4)**: `Level Kreator` (dari Data Master), `Target GMV` (dari Data Master), `Progres GMV` (otomatis kalkulasi).
+   - **Baris 8 (3 Kolom / Span 4)**: `GMV Berjalan` (dari Performa Kreator), `Siaran Live` (dari Performa Kreator), `Video` (dari Performa Kreator).
+   - **Baris 9 (2 Kolom / Span 6)**: `GMV Berjalan` (Ads/Partner GMV), `Keaktifan` (status aktivitas konten/live).
+6. **Footer Modal**:
+   - Tombol outline kanan bawah: `Keluar` bergaris biru `#29A3D8`, background putih, efek hover biru solid yang elegan.
+
+---
+
+## 19. Penambahan Tombol Kalender & Filter Rentang Tanggal di Performa Kreator (`spvkol_Performa_Kreator.html`)
+
+Sesuai permintaan dan gambar referensi dari pengguna:
+1. **Penyelarasan Toolbar Lengkap**:
+   - `[ xE ]` **Tombol Excel Hijau** (.btn-excel-green) untuk ekspor CSV.
+   - `[ ⚚ ]` **Tombol Filter Biru** (`#29A3D8`) dengan popover filter Username Kreator & Estimasi Komisi.
+   - `[ 📅 ]` **Tombol Kalender Biru** (`#29A3D8`) dengan popover filter rentang tanggal (*Dari Tanggal* & *Sampai Tanggal*).
+   - `[ 🔍 ]` **Bilah Pencarian Realtime** (`.campaign-search-bar`) dengan ikon kaca pembesar dan tombol reset silang (*clear button*).
+2. **Interaktivitas & Filter Tanggal**:
+   - Memfilter baris tabel performa secara dinamis berdasarkan rentang tanggal yang dipilih pengguna.
+   - Menampilkan badge indikator merah saat filter tanggal atau status aktif.
