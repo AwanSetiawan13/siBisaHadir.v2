@@ -716,36 +716,7 @@
   <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
-    <header class="topbar">
-      <div class="topbar__left">
-        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
-          aria-label="Buka atau tutup sidebar">
-          <span></span><span></span><span></span>
-        </button>
-
-        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="10.5" cy="10.5" r="6"></circle>
-          <path d="M15 15l5 5"></path>
-        </svg>
-
-        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
-      </div>
-
-      <div class="topbar__actions">
-        <button class="icon-button" type="button" aria-label="Notifikasi">
-          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 4.36 6 6.92 6 10v5l-2 2v1h16v-1l-2-2z"></path>
-          </svg>
-        </button>
-        <div class="profile-card">
-          <img src="../../media/avatar.png" alt="User profile" class="profile-card__avatar" />
-          <div class="profile-card__info">
-            <span class="profile-card__name">Setiawan</span>
-            <span class="profile-card__role">SPV KOL</span>
-          </div>
-        </div>
-      </div>
-    </header>
+    <header class="topbar hirezy-topbar"></header>
 
     <main class="dashboard-content">
       <section class="panel campaign-panel">
@@ -862,7 +833,7 @@
 
         <!-- Empty State Container (Sesuai Standar Data Kreator & Campaign) -->
         <div id="emptyTableState" class="app-empty-state" style="display: none;">
-          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+          <svg class="app-empty-state__icon" width="42" height="42" style="width: 42px; height: 42px; max-width: 42px; max-height: 42px;" viewBox="0 0 24 24">
             <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
             <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
             <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
@@ -1562,15 +1533,35 @@
         const totalItems = filtered.length;
         const isEmpty = totalItems === 0;
 
+        if (typeof window.bmToggleEmptyState === 'function') {
+          window.bmToggleEmptyState(emptyState, tableWrapper, isEmpty);
+        } else {
+          if (isEmpty) {
+            if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+            if (emptyState) {
+              emptyState.classList.remove("is-hidden");
+              emptyState.classList.add("is-visible");
+              emptyState.style.setProperty("display", "flex", "important");
+            }
+          } else {
+            if (tableWrapper) {
+              tableWrapper.classList.remove("is-hidden");
+              tableWrapper.classList.add("is-visible");
+              tableWrapper.style.removeProperty("display");
+            }
+            if (emptyState) {
+              emptyState.classList.remove("is-visible");
+              emptyState.classList.add("is-hidden");
+              emptyState.style.setProperty("display", "none", "important");
+            }
+          }
+        }
+
         if (isEmpty) {
-          if (tableWrapper) tableWrapper.style.display = "none";
           if (paginationWrap) paginationWrap.style.display = "none";
-          if (emptyState) emptyState.style.display = "flex";
           return;
         } else {
-          if (tableWrapper) tableWrapper.style.display = "block";
           if (paginationWrap) paginationWrap.style.display = "flex";
-          if (emptyState) emptyState.style.display = "none";
         }
 
         // Pagination calculation
