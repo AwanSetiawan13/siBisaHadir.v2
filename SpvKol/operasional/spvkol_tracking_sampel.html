@@ -479,16 +479,17 @@
     .log-riwayat-container {
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      overflow: hidden;
+      overflow-x: auto;
       background: #ffffff;
       margin-top: 14px;
+      -webkit-overflow-scrolling: touch;
     }
 
     .log-riwayat-header-bar {
       background-color: #f1f5f9;
-      padding: 9px 14px;
+      padding: 10px 16px;
       border-bottom: 1px solid #cbd5e1;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #334155;
       font-family: 'Outfit', sans-serif;
@@ -500,19 +501,21 @@
       text-align: left;
       font-size: 13px;
       font-family: 'Outfit', sans-serif;
+      min-width: 680px;
     }
 
     .log-riwayat-table th {
-      padding: 9px 14px;
+      padding: 10px 14px;
       font-size: 12px;
       font-weight: 600;
       color: #475569;
-      background: #ffffff;
+      background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
     }
 
     .log-riwayat-table td {
-      padding: 8px 14px;
+      padding: 10px 14px;
       color: #334155;
       border-bottom: 1px solid #f1f5f9;
       vertical-align: middle;
@@ -1046,7 +1049,7 @@
 
   <!-- Modal PopUp Lihat Tracking Sampel (Matching Image 2) -->
   <div id="modalLihatTrackingSampel" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 820px; width: 95%;">
       <!-- Modal Header -->
       <div class="modal-header">
         <h2 class="modal-title">
@@ -1106,10 +1109,11 @@
         <table class="log-riwayat-table">
           <thead>
             <tr>
-              <th style="width: 25%;">Status Sampel</th>
-              <th style="width: 25%; text-align: center;">Lampiran</th>
-              <th style="width: 25%; text-align: center;">Keterangan</th>
-              <th style="width: 25%; text-align: right;">Waktu</th>
+              <th style="width: 130px; min-width: 120px;">Status Sampel</th>
+              <th style="width: 150px; min-width: 140px;">Diupdate Oleh</th>
+              <th style="width: 90px; text-align: center;">Lampiran</th>
+              <th style="min-width: 200px;">Keterangan</th>
+              <th style="width: 140px; text-align: right;">Waktu</th>
             </tr>
           </thead>
           <tbody id="viewLogRiwayatTbody">
@@ -1613,6 +1617,7 @@
                     logRiwayat: [
                       {
                         status: "Request",
+                        diupdateOleh: "Supervisi KOL",
                         lampiran: "-",
                         keterangan: `Pengajuan sampel campaign ${brandName}`,
                         waktu: `${todayStr} ${timeStr}`
@@ -2071,6 +2076,17 @@
             const lampiran = logItem ? logItem.lampiran : "-";
             const keterangan = logItem ? logItem.keterangan : "-";
             const waktu = logItem ? logItem.waktu : "-";
+            const isFilled = waktu && waktu !== "-";
+            const diupdateOleh = logItem ? (logItem.diupdateOleh || (isFilled ? "Supervisi KOL" : "-")) : (isFilled ? "Supervisi KOL" : "-");
+
+            let diupdateHtml = '<span style="color: #94a3b8;">-</span>';
+            if (isFilled && diupdateOleh && diupdateOleh !== "-") {
+              diupdateHtml = `
+                <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600; background: rgba(41, 163, 216, 0.08); color: #0284c7; border: 1px solid rgba(41, 163, 216, 0.2); font-family: 'Outfit', sans-serif;">
+                  <i class="bx bx-user" style="font-size: 13px;"></i> ${diupdateOleh}
+                </span>
+              `;
+            }
 
             let lampiranHtml = '<span style="color: #94a3b8;">-</span>';
             if (lampiran && lampiran !== "-") {
@@ -2083,10 +2099,11 @@
 
             return `
               <tr>
-                <td style="font-weight: 500; color: #1e293b;">${stName}</td>
-                <td style="text-align: center;">${lampiranHtml}</td>
-                <td style="text-align: center; color: #64748b;">${keterangan || "-"}</td>
-                <td style="text-align: right; color: #475569; font-size: 12.5px;">${waktu || "-"}</td>
+                <td style="font-weight: 600; color: #1e293b; white-space: nowrap;">${stName}</td>
+                <td style="vertical-align: middle; white-space: nowrap;">${diupdateHtml}</td>
+                <td style="text-align: center; white-space: nowrap;">${lampiranHtml}</td>
+                <td style="color: #475569; line-height: 1.45; white-space: normal; word-break: break-word;">${keterangan || "-"}</td>
+                <td style="text-align: right; color: #475569; font-size: 12.5px; white-space: nowrap;">${waktu || "-"}</td>
               </tr>
             `;
           }).join("");
@@ -2599,12 +2616,14 @@
 
             if (existingLog) {
               existingLog.waktu = nowStr;
+              existingLog.diupdateOleh = "Supervisi KOL";
               if (ketOpsional) existingLog.keterangan = ketOpsional;
               if (fileName && fileName !== "-") existingLog.lampiran = fileName;
               if (dataUrl) existingLog.lampiranDataUrl = dataUrl;
             } else {
               item.logRiwayat.push({
                 status: newStatus,
+                diupdateOleh: "Supervisi KOL",
                 lampiran: fileName || "-",
                 lampiranDataUrl: dataUrl || null,
                 keterangan: ketOpsional || "-",
