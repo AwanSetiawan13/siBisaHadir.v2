@@ -875,7 +875,7 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v9";
+      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v10";
 
       const DEFAULT_KREATOR = [
         {
@@ -897,10 +897,10 @@
           email: "auracantika@gmail.com",
           password: "password123",
           foto: "../../media/avatar.png",
-          level: "Top Kreator",
-          targetGmv: "Rp. 210.000.000",
-          progresGmv: "75%",
-          gmvBerjalan: "Rp 37.500.000",
+          level: "TOP",
+          targetGmv: "Rp 100.000.000",
+          progresGmv: "150%",
+          gmvBerjalan: "Rp 150.000.000",
           siaranLive: "48 Jam",
           video: "18 Video",
           adsHandling: "Handling A",
@@ -913,8 +913,8 @@
           nama: "Clarissa Putri",
           alamat: "Jl. Anggrek No. 88, Surabaya",
           nomorWa: "081377889900",
-          kategori: "Beauty & Care",
-          kategoriSpesifik: "Skincare Glow",
+          kategori: "-",
+          kategoriSpesifik: "-",
           masaKontrak: "01/03/2026 - 30/09/2026",
           kontrakAwal: "01/03/2026",
           kontrakAkhir: "30/09/2026",
@@ -925,10 +925,10 @@
           email: "clarissa@gmail.com",
           password: "password123",
           foto: "../../media/avatar.png",
-          level: "Semi Top Creator",
-          targetGmv: "Rp. 50.000.000",
-          progresGmv: "60%",
-          gmvBerjalan: "Rp 21.000.000",
+          level: "SEMI TOP",
+          targetGmv: "Rp 50.000.000",
+          progresGmv: "70%",
+          gmvBerjalan: "Rp 35.000.000",
           siaranLive: "32 Jam",
           video: "12 Video",
           adsHandling: "Handling B",
@@ -943,23 +943,51 @@
           nomorWa: "081298765432",
           kategori: "Fashion Muslim",
           kategoriSpesifik: "Hijab Instan & Sport",
-          masaKontrak: "01/01/2026 - 31/08/2026",
+          masaKontrak: "01/01/2026 - 31/12/2026",
           kontrakAwal: "01/01/2026",
-          kontrakAkhir: "31/08/2026",
-          status: "Berhenti",
-          aktivitas: "Tidak Aktif",
+          kontrakAkhir: "31/12/2026",
+          status: "Bind",
+          aktivitas: "Aktif Konten",
           cm: "Dinda Pratama",
           leads: "Member & Mahasiswa",
           email: "bima@gmail.com",
           password: "password123",
           foto: "../../media/avatar.png",
-          level: "New Growth",
-          targetGmv: "Rp. 5.000.000",
-          progresGmv: "25%",
-          gmvBerjalan: "Rp 20.000.000",
+          level: "NEW GROWTH",
+          targetGmv: "Rp 40.000.000",
+          progresGmv: "113%",
+          gmvBerjalan: "Rp 45.200.000",
           siaranLive: "10 Jam",
-          video: "4 Video",
+          video: "24 Video",
           adsHandling: "Handling C",
+          keaktifan: "Aktif Konten"
+        },
+        {
+          id: 4,
+          uid: "UID-0004",
+          username: "@dina.hijabstyle",
+          nama: "Dina Syahrini",
+          alamat: "Jl. Cendana No. 12, Tasikmalaya",
+          nomorWa: "081399887766",
+          kategori: "Fashion Muslim",
+          kategoriSpesifik: "Hijab Casual & Daily",
+          masaKontrak: "01/01/2026 - 31/08/2026",
+          kontrakAwal: "01/01/2026",
+          kontrakAkhir: "31/08/2026",
+          status: "Berhenti",
+          aktivitas: "Tidak Aktif",
+          cm: "Setiawan",
+          leads: "Member",
+          email: "dina@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "INCUBATE",
+          targetGmv: "Rp 15.000.000",
+          progresGmv: "56%",
+          gmvBerjalan: "Rp 8.500.000",
+          siaranLive: "4 Jam",
+          video: "6 Video",
+          adsHandling: "Handling D",
           keaktifan: "Tidak Aktif"
         }
       ];
@@ -970,15 +998,7 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            kreatorDb = parsed.map((item, idx) => {
-              if (!item.aktivitas) {
-                if (item.status === 'Berhenti') item.aktivitas = 'Tidak Aktif';
-                else if (idx % 3 === 0) item.aktivitas = 'Aktif Konten & Live';
-                else if (idx % 3 === 1) item.aktivitas = 'Aktif Live';
-                else item.aktivitas = 'Aktif Konten';
-              }
-              return item;
-            });
+            kreatorDb = parsed;
           }
         } else {
           localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(DEFAULT_KREATOR));
@@ -1000,6 +1020,21 @@
       let currentFilterAktivitas = "";
       let currentFilterLeads = "";
 
+      function getCreatorActivityStatus(item) {
+        if (!item) return "Tidak Aktif";
+        if (item.status === "Berhenti") return "Tidak Aktif";
+        const perf = getCreatorPerformance(item);
+        if (perf) {
+          const liveNum = Number(perf.live_broadcasts) || (perf.live_gmv && perf.live_gmv !== "Rp 0" ? 1 : 0);
+          const videoNum = Number(perf.videos) || (perf.video_gmv && perf.video_gmv !== "Rp 0" ? 1 : 0);
+          if (liveNum > 0 && videoNum > 0) return "Aktif Konten & Live";
+          if (liveNum > 0) return "Aktif Live";
+          if (videoNum > 0) return "Aktif Konten";
+          return "Tidak Aktif";
+        }
+        return "Tidak Aktif";
+      }
+
       function updateTrackingMetrics() {
         let countAktifKontenLive = 0;
         let countAktifLive = 0;
@@ -1007,7 +1042,7 @@
         let countTidakAktif = 0;
 
         kreatorDb.forEach(k => {
-          const akt = (k.aktivitas || "").toLowerCase().trim();
+          const akt = getCreatorActivityStatus(k).toLowerCase().trim();
           if (akt === "aktif konten & live" || (akt.includes("konten") && akt.includes("live"))) {
             countAktifKontenLive++;
           } else if (akt === "aktif live" || akt.includes("live")) {
@@ -1037,12 +1072,13 @@
 
         const q = (query || "").trim().toLowerCase();
         const filtered = kreatorDb.filter(k => {
+          const aktStatus = getCreatorActivityStatus(k);
           if (q) {
             const matchQ = (k.uid && k.uid.toLowerCase().includes(q)) ||
               (k.username && k.username.toLowerCase().includes(q)) ||
               (k.nama && k.nama.toLowerCase().includes(q)) ||
               (k.kategori && k.kategori.toLowerCase().includes(q)) ||
-              (k.aktivitas && k.aktivitas.toLowerCase().includes(q)) ||
+              aktStatus.toLowerCase().includes(q) ||
               (k.cm && k.cm.toLowerCase().includes(q));
             if (!matchQ) return false;
           }
@@ -1051,7 +1087,7 @@
             if (!kt.includes(currentFilterKategori)) return false;
           }
           if (currentFilterAktivitas) {
-            const akt = (k.aktivitas || "").toLowerCase();
+            const akt = aktStatus.toLowerCase();
             if (!akt.includes(currentFilterAktivitas)) return false;
           }
           if (currentFilterLeads) {
@@ -1154,30 +1190,32 @@
         ];
       }
 
-      function getCreatorLevelFromMaster(item, index) {
+      function getCreatorLevelFromMaster(item, perf) {
+        if (!perf || !perf.gmv) {
+          return { nama: "-", gmv: "-" };
+        }
+
         const masterList = getLevelingMaster();
         if (!masterList || masterList.length === 0) {
-          return { nama: item.level || item.levelingKreator || "Top Kreator", gmv: item.targetGmv || "Rp. 210.000.000" };
+          return { nama: "-", gmv: "-" };
         }
 
-        // 1. Cek jika kreator sudah memiliki level yang cocok dengan nama master
-        const rawLevel = (item.level || item.levelingKreator || "").trim().toLowerCase();
-        if (rawLevel) {
-          const found = masterList.find(m => m.nama && (m.nama.toLowerCase() === rawLevel || rawLevel.includes(m.nama.toLowerCase()) || m.nama.toLowerCase().includes(rawLevel)));
-          if (found) {
-            return { nama: found.nama, gmv: found.gmv || item.targetGmv || "Rp. 0" };
+        // Hitung tier berdasarkan GMV berjalan dari data performa
+        const gmvNum = parseRupiahNum(perf.gmv);
+        for (const m of masterList) {
+          const mGmv = parseRupiahNum(m.gmv);
+          if (gmvNum >= mGmv) {
+            return { nama: m.nama, gmv: m.gmv };
           }
         }
-
-        // 2. Jika level belum diset atau memakai label lama, petakan secara berurutan ke data master
-        const idx = typeof index === "number" && index >= 0 ? index : ((Number(item.id) || 1) - 1);
-        const matched = masterList[idx % masterList.length] || masterList[0];
-        return { nama: matched.nama, gmv: matched.gmv || "Rp. 0" };
+        const lastTier = masterList[masterList.length - 1];
+        return { nama: lastTier.nama, gmv: lastTier.gmv || "Rp 0" };
       }
 
       // Fungsi untuk mengambil dataset Performa Kreator dari localStorage atau fallback default
       function getPerformaDb() {
         const PERFORMA_KEYS = [
+          "bisa_performa_kreator_list_v6",
           "bisa_performa_kreator_list_v5",
           "bisa_performa_kreator_list_v4",
           "bisa_performa_kreator_list_v3",
@@ -1230,15 +1268,29 @@
             live_gmv: "Rp 32.000.000",
             video_gmv: "Rp 13.200.000",
             live_broadcasts: "10",
-            videos: "4",
+            videos: "24",
             partner_gmv: "Rp 20.000.000",
             direct_gmv: "Rp 25.200.000",
             followers: "125.400"
+          },
+          {
+            id: 4,
+            uid: "UID-0004",
+            username: "@dina.hijabstyle",
+            gmv: "Rp 8.500.000",
+            live_gmv: "Rp 5.000.000",
+            video_gmv: "Rp 3.500.000",
+            live_broadcasts: "4",
+            videos: "6",
+            partner_gmv: "Rp 3.000.000",
+            direct_gmv: "Rp 5.500.000",
+            followers: "45.000"
           }
         ];
       }
 
-      function getCreatorPerformance(item, index) {
+      function getCreatorPerformance(item) {
+        if (!item) return null;
         const performaList = getPerformaDb();
         if (!performaList || performaList.length === 0) return null;
 
@@ -1256,9 +1308,8 @@
           if (found) return found;
         }
 
-        // 3. Fallback berdasarkan index
-        const idx = typeof index === "number" && index >= 0 ? index : ((Number(item.id) || 1) - 1);
-        return performaList[idx % performaList.length] || performaList[0];
+        // 3. Jika tidak ada di data performa (kreator baru input), data performa masih kosong (null)
+        return null;
       }
 
       function parseRupiahNum(str) {
@@ -1277,58 +1328,46 @@
 
       function openViewModal(item) {
         if (!item) return;
-        const itemIdx = kreatorDb.findIndex(k => String(k.id) === String(item.id));
-        const levelInfo = getCreatorLevelFromMaster(item, itemIdx);
-        const perf = getCreatorPerformance(item, itemIdx);
+        const perf = getCreatorPerformance(item);
+        const levelInfo = getCreatorLevelFromMaster(item, perf);
+        const hasPerformance = Boolean(perf);
 
-        // Ambil metrik performa aktual dari Performa Kreator
-        const gmvBerjalan = (perf && perf.gmv) ? perf.gmv : (item.gmvBerjalan || "Rp 37.500.000");
-        const targetGmv = levelInfo.gmv || item.targetGmv || "Rp. 210.000.000";
-        const progresGmv = calculateProgressGmv(gmvBerjalan, targetGmv);
+        // Metrik performa hanya muncul jika performa kreatornya sudah ada di Performa Kreator
+        const gmvBerjalan = (perf && perf.gmv) ? perf.gmv : "-";
+        const targetGmv = (hasPerformance && levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : "-";
+        const progresGmv = (hasPerformance && gmvBerjalan !== "-" && targetGmv !== "-") ? calculateProgressGmv(gmvBerjalan, targetGmv) : "-";
         
-        let siaranLive = item.siaranLive || "48 Jam";
+        let siaranLive = "-";
         if (perf) {
-          if (perf.live_broadcasts) {
-            siaranLive = perf.live_broadcasts + " Siaran Live";
-          } else if (perf.live_gmv) {
-            siaranLive = "Live " + perf.live_gmv;
-          }
+          siaranLive = perf.live_broadcasts ? (perf.live_broadcasts + " Jam") : (perf.live_gmv ? ("Live " + perf.live_gmv) : "-");
         }
 
-        let videoCount = item.video || "18 Video";
+        let videoCount = "-";
         if (perf) {
-          if (perf.videos) {
-            videoCount = perf.videos + " Video";
-          } else if (perf.video_gmv) {
-            videoCount = "Video " + perf.video_gmv;
-          }
+          videoCount = perf.videos ? (perf.videos + " Video") : (perf.video_gmv ? ("Video " + perf.video_gmv) : "-");
         }
 
-        const adsHandling = (perf && (perf.partner_gmv || perf.direct_gmv)) ? (perf.partner_gmv || perf.direct_gmv) : (item.adsHandling || "Handling A");
-
-        let keaktifanStatus = item.keaktifan || item.aktivitas || "Aktif Konten & Live";
+        let adsHandling = "-";
         if (perf) {
-          const liveNum = Number(perf.live_broadcasts) || 0;
-          const videoNum = Number(perf.videos) || 0;
-          if (liveNum > 0 && videoNum > 0) keaktifanStatus = "Aktif Konten & Live";
-          else if (liveNum > 0) keaktifanStatus = "Aktif Live";
-          else if (videoNum > 0) keaktifanStatus = "Aktif Konten";
+          adsHandling = perf.partner_gmv || perf.direct_gmv || "Handling A";
         }
 
-        document.getElementById("viewKreatorUidInput").value = item.uid || (perf && perf.uid) || "";
-        document.getElementById("viewKreatorUsernameInput").value = item.username || (perf && perf.username) || "";
+        const keaktifanStatus = getCreatorActivityStatus(item);
+
+        document.getElementById("viewKreatorUidInput").value = item.uid || "";
+        document.getElementById("viewKreatorUsernameInput").value = item.username || "";
         document.getElementById("viewKreatorNamaInput").value = item.nama || "";
         document.getElementById("viewKreatorWaInput").value = item.nomorWa || "";
         document.getElementById("viewKreatorAlamatInput").value = item.alamat || "";
         document.getElementById("viewKreatorEmailInput").value = item.email || "";
-        document.getElementById("viewKreatorLeadsInput").value = item.leads || "";
-        document.getElementById("viewKreatorKategoriInput").value = item.kategori || "";
-        document.getElementById("viewKreatorKatSpesifikInput").value = item.kategoriSpesifik || "";
-        document.getElementById("viewKreatorKontrakAwalInput").value = item.kontrakAwal || "";
-        document.getElementById("viewKreatorKontrakAkhirInput").value = item.kontrakAkhir || "";
+        document.getElementById("viewKreatorLeadsInput").value = item.leads || "-";
+        document.getElementById("viewKreatorKategoriInput").value = item.kategori || "-";
+        document.getElementById("viewKreatorKatSpesifikInput").value = item.kategoriSpesifik || item.kategori || "-";
+        document.getElementById("viewKreatorKontrakAwalInput").value = item.kontrakAwal || "-";
+        document.getElementById("viewKreatorKontrakAkhirInput").value = item.kontrakAkhir || "-";
         document.getElementById("viewKreatorStatusInput").value = item.status || "Bind";
-        document.getElementById("viewKreatorCmInput").value = item.cm || "Rizal";
-        document.getElementById("viewKreatorLevelInput").value = levelInfo.nama || "Top Kreator";
+        document.getElementById("viewKreatorCmInput").value = item.cm || "-";
+        document.getElementById("viewKreatorLevelInput").value = hasPerformance ? (levelInfo.nama || "-") : "-";
         document.getElementById("viewKreatorTargetGmvInput").value = targetGmv;
         document.getElementById("viewKreatorProgresGmvInput").value = progresGmv;
         document.getElementById("viewKreatorGmvBerjalanInput").value = gmvBerjalan;
@@ -1398,10 +1437,42 @@
         });
       }
 
+      function populateTrackingLeadsFilter() {
+        const leadsSelect = document.getElementById("filterLeadsSelect");
+        if (!leadsSelect) return;
+        const currentVal = leadsSelect.value;
+        let leadsList = [];
+        try {
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v5");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              leadsList = parsed.map(l => (typeof l === "string" ? l : (l.status || l.nama || l.namaLeads))).filter(Boolean);
+            }
+          }
+        } catch (e) {}
+        if (leadsList.length === 0) {
+          leadsList = ["Member", "Member & Mahasiswa", "SmartC", "Markom", "Bootcamp"];
+        }
+        leadsList = Array.from(new Set(leadsList));
+
+        leadsSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Leads</option><option value="">Semua Leads</option>';
+        leadsList.forEach(lead => {
+          const opt = document.createElement("option");
+          opt.value = lead.toLowerCase();
+          opt.textContent = lead;
+          if (currentVal && lead.toLowerCase() === currentVal.toLowerCase()) {
+            opt.selected = true;
+          }
+          leadsSelect.appendChild(opt);
+        });
+      }
+
       // Filter Events
       if (filterCampaignBtn && filterCampaignDropdown) {
         filterCampaignBtn.addEventListener("click", function (e) {
           e.stopPropagation();
+          populateTrackingLeadsFilter();
           filterCampaignDropdown.classList.toggle("is-active");
         });
 

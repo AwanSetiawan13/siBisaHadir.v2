@@ -1132,6 +1132,69 @@
       }
       window.populateKreatorCategories = populateKreatorCategories;
 
+      // Leads Kreator Dynamic Data from Master Pendukung (LocalStorage - Real Time)
+      function populateKreatorLeads(selectedVal = "") {
+        const selectEl = document.getElementById("kreatorLeadsSelect");
+        const filterSelects = document.querySelectorAll("#filterCampaignDropdown select");
+        const filterSelect = filterSelects && filterSelects.length > 2 ? filterSelects[2] : null;
+
+        let leadsList = [];
+        try {
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v5");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              leadsList = parsed.map(l => (typeof l === "string" ? l : (l.status || l.nama || l.namaLeads))).filter(Boolean);
+            }
+          }
+        } catch (e) {}
+
+        if (leadsList.length === 0) {
+          leadsList = ["Member", "Member & Mahasiswa", "SmartC", "Markom", "Bootcamp"];
+        }
+
+        // Deduplicate leads
+        leadsList = Array.from(new Set(leadsList));
+
+        if (selectedVal && !leadsList.includes(selectedVal)) {
+          leadsList.unshift(selectedVal);
+        }
+
+        if (selectEl) {
+          selectEl.innerHTML = '<option value="" disabled selected hidden>Pilih Leads</option>';
+          leadsList.forEach(lead => {
+            const opt = document.createElement("option");
+            opt.value = lead;
+            opt.textContent = lead;
+            if (selectedVal && lead.toLowerCase() === selectedVal.toLowerCase()) {
+              opt.selected = true;
+            }
+            selectEl.appendChild(opt);
+          });
+          if (selectedVal) {
+            selectEl.value = selectedVal;
+          } else {
+            selectEl.selectedIndex = 0;
+          }
+        }
+
+        // Also populate filter dropdown if available
+        if (filterSelect) {
+          const currentFilter = filterSelect.value;
+          filterSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Leads</option>';
+          leadsList.forEach(lead => {
+            const opt = document.createElement("option");
+            opt.value = lead.toLowerCase();
+            opt.textContent = lead;
+            if (currentFilter && lead.toLowerCase() === currentFilter.toLowerCase()) {
+              opt.selected = true;
+            }
+            filterSelect.appendChild(opt);
+          });
+        }
+      }
+      window.populateKreatorLeads = populateKreatorLeads;
+
       function parseDateString(dateStr) {
         if (!dateStr || typeof dateStr !== "string") return null;
         const s = dateStr.trim();
@@ -1192,7 +1255,7 @@
       window.calculateKreatorStatus = calculateKreatorStatus;
 
       // Storage key bumped to v9 for CM support
-      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v9";
+      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v10";
       window.KREATOR_STORAGE_KEY = KREATOR_STORAGE_KEY;
 
       const DEFAULT_KREATOR = [
@@ -1213,7 +1276,14 @@
           leads: "Member",
           email: "auracantika@gmail.com",
           password: "password123",
-          foto: "../../media/avatar.png"
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 100.000.000",
+          gmvBerjalan: "Rp 150.000.000",
+          progresGmv: "150%",
+          siaranLive: "48 Jam",
+          video: "18 Video",
+          aktivitas: "Aktif Konten & Live"
         },
         {
           id: 2,
@@ -1232,7 +1302,14 @@
           leads: "SmartC",
           email: "clarissa@gmail.com",
           password: "password123",
-          foto: "../../media/avatar.png"
+          foto: "../../media/avatar.png",
+          level: "SEMI TOP",
+          targetGmv: "Rp 50.000.000",
+          gmvBerjalan: "Rp 35.000.000",
+          progresGmv: "70%",
+          siaranLive: "32 Jam",
+          video: "12 Video",
+          aktivitas: "Aktif Live"
         },
         {
           id: 3,
@@ -1243,15 +1320,48 @@
           nomorWa: "081298765432",
           kategori: "Fashion Muslim",
           kategoriSpesifik: "Hijab Instan & Sport",
-          masaKontrak: "01/01/2026 - 31/08/2026",
+          masaKontrak: "01/01/2026 - 31/12/2026",
           kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-08-31",
-          status: "Berhenti",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
           cm: "Dinda Pratama",
           leads: "Member & Mahasiswa",
           email: "bima@gmail.com",
           password: "password123",
-          foto: "../../media/avatar.png"
+          foto: "../../media/avatar.png",
+          level: "NEW GROWTH",
+          targetGmv: "Rp 40.000.000",
+          gmvBerjalan: "Rp 45.200.000",
+          progresGmv: "113%",
+          siaranLive: "10 Jam",
+          video: "24 Video",
+          aktivitas: "Aktif Konten"
+        },
+        {
+          id: 4,
+          uid: "UID-0004",
+          username: "@dina.hijabstyle",
+          nama: "Dina Syahrini",
+          alamat: "Jl. Cendana No. 12, Tasikmalaya",
+          nomorWa: "081399887766",
+          kategori: "Fashion Muslim",
+          kategoriSpesifik: "Hijab Casual & Daily",
+          masaKontrak: "01/01/2026 - 31/08/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-08-31",
+          status: "Berhenti",
+          cm: "Setiawan",
+          leads: "Member",
+          email: "dina@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "INCUBATE",
+          targetGmv: "Rp 15.000.000",
+          gmvBerjalan: "Rp 8.500.000",
+          progresGmv: "56%",
+          siaranLive: "4 Jam",
+          video: "6 Video",
+          aktivitas: "Tidak Aktif"
         }
       ];
 
@@ -1334,11 +1444,11 @@
         if (kSubBtn) kSubBtn.textContent = "Simpan";
 
         resetCustomCategory();
+        populateKreatorLeads("");
 
         const uidInp = document.getElementById("kreatorUidInput");
         if (uidInp) {
-          const nextNum = kreatorDb.length + 1;
-          uidInp.value = "UID-" + String(nextNum).padStart(4, '0');
+          uidInp.value = "";
         }
 
         const previewImg = document.getElementById("kreatorFotoPreviewImg");
@@ -1348,8 +1458,6 @@
           window.setSelectedKreatorFoto("");
         }
 
-        const leadsSelect = document.getElementById("kreatorLeadsSelect");
-        if (leadsSelect) leadsSelect.selectedIndex = 0;
         const statusSelect = document.getElementById("kreatorStatusSelect");
         if (statusSelect) statusSelect.selectedIndex = 0;
         const cmSelect = document.getElementById("kreatorCmSelect");
@@ -1387,6 +1495,7 @@
         if (katSpesifikInp) katSpesifikInp.value = item.kategoriSpesifik || item.kategori || "";
 
         setKreatorCategoryValue(item.kategori || "");
+        populateKreatorLeads(item.leads || "");
 
         const tglAwalInp = document.getElementById("kreatorKontrakAwalInput");
         if (tglAwalInp) tglAwalInp.value = item.kontrakAwal || "";
@@ -1412,17 +1521,6 @@
             if (cmSelect.options[i].value.toLowerCase() === item.cm.toLowerCase() ||
               cmSelect.options[i].text.toLowerCase() === item.cm.toLowerCase()) {
               cmSelect.selectedIndex = i;
-              break;
-            }
-          }
-        }
-
-        const leadsSelect = document.getElementById("kreatorLeadsSelect");
-        if (leadsSelect && item.leads) {
-          for (let i = 0; i < leadsSelect.options.length; i++) {
-            if (leadsSelect.options[i].text.toLowerCase() === item.leads.toLowerCase() ||
-              leadsSelect.options[i].value.toLowerCase() === item.leads.toLowerCase()) {
-              leadsSelect.selectedIndex = i;
               break;
             }
           }
@@ -2030,7 +2128,16 @@
         });
       }
 
+      const btnFilterCamp = document.getElementById("btnFilterCampaign");
+      if (btnFilterCamp) {
+        btnFilterCamp.addEventListener("click", () => {
+          populateKreatorCategories();
+          populateKreatorLeads();
+        });
+      }
+
       populateKreatorCategories();
+      populateKreatorLeads();
       renderKreatorTable();
     })();
   </script>

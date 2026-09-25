@@ -542,6 +542,67 @@
       }
       window.populateKreatorCategories = populateKreatorCategories;
 
+      // Leads Kreator Dynamic Data from Master Pendukung (LocalStorage - Real Time)
+      function populateKreatorLeads(selectedVal = "") {
+        const selectEl = document.getElementById("kreatorLeadsSelect");
+        const filterSelects = document.querySelectorAll("#filterCampaignDropdown select");
+        const filterSelect = filterSelects && filterSelects.length > 2 ? filterSelects[2] : null;
+
+        let leadsList = [];
+        try {
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v5");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              leadsList = parsed.map(l => (typeof l === "string" ? l : (l.status || l.nama || l.namaLeads))).filter(Boolean);
+            }
+          }
+        } catch (e) {}
+
+        if (leadsList.length === 0) {
+          leadsList = ["Member", "Member & Mahasiswa", "SmartC", "Markom", "Bootcamp"];
+        }
+
+        leadsList = Array.from(new Set(leadsList));
+
+        if (selectedVal && !leadsList.includes(selectedVal)) {
+          leadsList.unshift(selectedVal);
+        }
+
+        if (selectEl) {
+          selectEl.innerHTML = '<option value="" disabled selected hidden>Pilih Leads</option>';
+          leadsList.forEach(lead => {
+            const opt = document.createElement("option");
+            opt.value = lead;
+            opt.textContent = lead;
+            if (selectedVal && lead.toLowerCase() === selectedVal.toLowerCase()) {
+              opt.selected = true;
+            }
+            selectEl.appendChild(opt);
+          });
+          if (selectedVal) {
+            selectEl.value = selectedVal;
+          } else {
+            selectEl.selectedIndex = 0;
+          }
+        }
+
+        if (filterSelect) {
+          const currentFilter = filterSelect.value;
+          filterSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Leads</option>';
+          leadsList.forEach(lead => {
+            const opt = document.createElement("option");
+            opt.value = lead.toLowerCase();
+            opt.textContent = lead;
+            if (currentFilter && lead.toLowerCase() === currentFilter.toLowerCase()) {
+              opt.selected = true;
+            }
+            filterSelect.appendChild(opt);
+          });
+        }
+      }
+      window.populateKreatorLeads = populateKreatorLeads;
+
       // Helper hitung status kontrak otomatis:
       // - Berhenti: jika sudah melewati tanggal berakhir kontrak (endDate < today)
       // - Tenggang: jika kontrak tinggal sebulan lagi atau kurang (endDate <= 1 bulan ke depan)
