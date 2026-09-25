@@ -473,6 +473,66 @@
       background: #f0f9ff;
       border-color: #0284c7;
     }
+    /* Thumbnail with Eye Overlay on Hover */
+    .sampel-foto-thumb-wrap {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1.5px solid #0284c7;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #f8fafc;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .sampel-foto-thumb-wrap:hover {
+      transform: scale(1.12);
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+      border-color: #0369a1;
+    }
+    .sampel-foto-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.2s ease;
+    }
+    .sampel-foto-thumb-wrap:hover img {
+      filter: brightness(0.8);
+    }
+    .sampel-foto-thumb-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      opacity: 0.35;
+      transition: opacity 0.2s ease, background 0.2s ease;
+      pointer-events: none;
+    }
+    .sampel-foto-thumb-wrap:hover .sampel-foto-thumb-overlay {
+      opacity: 1;
+      background: rgba(15, 23, 42, 0.55);
+    }
+    .sampel-foto-thumb-overlay i {
+      font-size: 15px;
+      color: #ffffff;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+      transition: transform 0.2s ease;
+    }
+    .sampel-foto-thumb-wrap:hover .sampel-foto-thumb-overlay i {
+      transform: scale(1.15);
+    }
     .sampel-foto-actions {
       display: flex;
       align-items: center;
@@ -1237,6 +1297,25 @@
           }
         }
 
+        function normalizeMonthName(p) {
+          if (!p) return "";
+          const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+          const clean = String(p).trim();
+          const found = months.find(m => m.toLowerCase() === clean.toLowerCase());
+          if (found) return found;
+          // If date format like YYYY-MM-DD or DD/MM/YYYY
+          if (clean.includes("-") || clean.includes("/")) {
+            const parts = clean.split(/[-/]/);
+            if (parts.length === 3) {
+              let monthNum = 0;
+              if (parts[0].length === 4) monthNum = parseInt(parts[1], 10);
+              else monthNum = parseInt(parts[1], 10);
+              if (monthNum >= 1 && monthNum <= 12) return months[monthNum - 1];
+            }
+          }
+          return clean;
+        }
+
         const rowId = `sampel-card-${sampelIndex++}`;
         const card = document.createElement("div");
         card.className = "sampel-card-item";
@@ -1245,6 +1324,7 @@
         const currentFoto = sampleData.foto || "";
         const currentType = sampleData.type || "";
         const currentPublish = sampleData.publish || "Aktif";
+        const currentPeriode = normalizeMonthName(sampleData.periode || "");
 
         card.innerHTML = `
           <div class="sampel-card-topbar">
@@ -1270,10 +1350,15 @@
               <input type="file" accept="image/*" class="sampel-file-input" style="display: none;" />
               <div class="sampel-foto-box" id="fotoBox-${rowId}">
                 <button type="button" class="btn-choose-file-styled">Choose File</button>
-                <div class="sampel-foto-actions" id="fotoActions-${rowId}" style="display: ${currentFoto ? 'flex' : 'none'};">
-                  <button type="button" class="btn-action-icon-styled btn-action-view btn-sampel-view" title="Lihat Foto">
-                    <i class="bx bx-show" style="font-size: 15px;"></i>
-                  </button>
+                <div class="sampel-foto-actions" id="fotoActions-${rowId}" style="display: ${currentFoto ? 'flex' : 'none'}; align-items: center; gap: 6px;">
+                  <div class="sampel-foto-thumb-wrap" id="fotoThumbWrap-${rowId}" title="Klik untuk melihat foto">
+                    <img id="fotoThumb-${rowId}" 
+                         src="${currentFoto || ''}" 
+                         alt="Foto Sampel" />
+                    <div class="sampel-foto-thumb-overlay">
+                      <i class="bx bx-show"></i>
+                    </div>
+                  </div>
                   <button type="button" class="btn-action-icon-styled btn-action-del btn-sampel-del" title="Hapus Foto">
                     <i class="bx bx-trash" style="font-size: 15px;"></i>
                   </button>
@@ -1281,7 +1366,7 @@
               </div>
             </div>
 
-            <!-- Row 2: Type, Link Produk, Stok -->
+            <!-- Row 2: Type, Link Produk, Total Stok -->
             <div class="sampel-field-group">
               <label class="sampel-field-label">Type</label>
               <select class="sampel-field-input sampel-type-input" style="cursor: pointer;">
@@ -1297,8 +1382,8 @@
             </div>
 
             <div class="sampel-field-group">
-              <label class="sampel-field-label">Stok</label>
-              <input type="text" class="sampel-field-input sampel-stok-input" placeholder="xxx" value="${sampleData.stok ? sampleData.stok.replace(/"/g, '&quot;') : ''}" />
+              <label class="sampel-field-label">Total Stok</label>
+              <input type="text" class="sampel-field-input sampel-stok-input" placeholder="0" value="0" readonly disabled style="background: #f1f5f9 !important; color: #475569 !important; cursor: not-allowed !important; border-color: #cbd5e1 !important; font-weight: 700 !important;" />
             </div>
 
             <!-- Row 3: komisi %, Periode, Publish -->
@@ -1309,7 +1394,21 @@
 
             <div class="sampel-field-group">
               <label class="sampel-field-label">Periode</label>
-              <input type="date" class="sampel-field-input sampel-periode-input" value="${sampleData.periode ? sampleData.periode.replace(/"/g, '&quot;') : ''}" style="cursor: pointer; width: 100%; font-family: 'Outfit', sans-serif;" />
+              <select class="sampel-field-input sampel-periode-input" style="cursor: pointer; width: 100%; font-family: 'Outfit', sans-serif;">
+                <option value="" ${!currentPeriode ? 'selected' : ''} disabled hidden>Pilih Bulan</option>
+                <option value="Januari" ${currentPeriode === 'Januari' ? 'selected' : ''}>Januari</option>
+                <option value="Februari" ${currentPeriode === 'Februari' ? 'selected' : ''}>Februari</option>
+                <option value="Maret" ${currentPeriode === 'Maret' ? 'selected' : ''}>Maret</option>
+                <option value="April" ${currentPeriode === 'April' ? 'selected' : ''}>April</option>
+                <option value="Mei" ${currentPeriode === 'Mei' ? 'selected' : ''}>Mei</option>
+                <option value="Juni" ${currentPeriode === 'Juni' ? 'selected' : ''}>Juni</option>
+                <option value="Juli" ${currentPeriode === 'Juli' ? 'selected' : ''}>Juli</option>
+                <option value="Agustus" ${currentPeriode === 'Agustus' ? 'selected' : ''}>Agustus</option>
+                <option value="September" ${currentPeriode === 'September' ? 'selected' : ''}>September</option>
+                <option value="Oktober" ${currentPeriode === 'Oktober' ? 'selected' : ''}>Oktober</option>
+                <option value="November" ${currentPeriode === 'November' ? 'selected' : ''}>November</option>
+                <option value="Desember" ${currentPeriode === 'Desember' ? 'selected' : ''}>Desember</option>
+              </select>
             </div>
 
             <div class="sampel-field-group">
@@ -1355,6 +1454,14 @@
         const tbody = card.querySelector(".sampel-varian-tbody");
         const btnAddVar = card.querySelector(".btn-tambah-varian-row");
 
+        function updateTotalStokFromVariants() {
+          const total = variantRows.reduce((sum, r) => sum + (parseInt(r.stok, 10) || 0), 0);
+          const mainStokInp = card.querySelector(".sampel-stok-input");
+          if (mainStokInp) {
+            mainStokInp.value = total;
+          }
+        }
+
         function renderVariantTable() {
           if (variantRows.length === 0) {
             tbody.innerHTML = `
@@ -1362,6 +1469,7 @@
                 <td colspan="4">Belum ada data varian. Klik tombol "+ Tambah Varian" untuk menambahkan.</td>
               </tr>
             `;
+            updateTotalStokFromVariants();
             return;
           }
 
@@ -1406,6 +1514,14 @@
                 if (variantRows[idx]) variantRows[idx].stok = inpStok.value;
                 updateTotalStokFromVariants();
               });
+              inpStok.addEventListener("change", () => {
+                if (variantRows[idx]) variantRows[idx].stok = inpStok.value;
+                updateTotalStokFromVariants();
+              });
+              inpStok.addEventListener("keyup", () => {
+                if (variantRows[idx]) variantRows[idx].stok = inpStok.value;
+                updateTotalStokFromVariants();
+              });
             }
           });
 
@@ -1423,14 +1539,8 @@
               updateTotalStokFromVariants();
             };
           });
-        }
 
-        function updateTotalStokFromVariants() {
-          const total = variantRows.reduce((sum, r) => sum + (parseInt(r.stok, 10) || 0), 0);
-          const mainStokInp = card.querySelector(".sampel-stok-input");
-          if (mainStokInp && total > 0) {
-            mainStokInp.value = total;
-          }
+          updateTotalStokFromVariants();
         }
 
         if (btnAddVar) {
@@ -1440,6 +1550,7 @@
             const defaultColor = lastRow ? (lastRow.varian1 || "") : "";
             variantRows.push({ varian1: defaultColor, varian2: "", stok: "" });
             renderVariantTable();
+            updateTotalStokFromVariants();
             // Focus on the new row's varian 2 input
             const newRows = tbody.querySelectorAll(".varian-row-item");
             if (newRows.length > 0) {
@@ -1451,6 +1562,7 @@
         }
 
         renderVariantTable();
+        updateTotalStokFromVariants();
 
         // Expose variants for form submission serialization
         card._getVariants = () => {
@@ -1468,7 +1580,8 @@
         const chooseBtn = card.querySelector(".btn-choose-file-styled");
         const hiddenFoto = card.querySelector(".sampel-foto-data");
         const fotoActions = card.querySelector(`#fotoActions-${rowId}`);
-        const viewBtn = card.querySelector(".btn-sampel-view");
+        const fotoThumbWrap = card.querySelector(`#fotoThumbWrap-${rowId}`);
+        const fotoThumb = card.querySelector(`#fotoThumb-${rowId}`);
         const delBtn = card.querySelector(".btn-sampel-del");
 
         chooseBtn.addEventListener("click", (e) => {
@@ -1482,6 +1595,12 @@
             const reader = new FileReader();
             reader.onload = function (evt) {
               hiddenFoto.value = evt.target.result;
+              if (fotoThumb) {
+                fotoThumb.src = evt.target.result;
+              }
+              if (fotoThumbWrap) {
+                fotoThumbWrap.style.display = "inline-flex";
+              }
               if (fotoActions) fotoActions.style.display = "flex";
             };
             reader.readAsDataURL(file);
@@ -1494,12 +1613,18 @@
             e.stopPropagation();
             hiddenFoto.value = "";
             fileInp.value = "";
+            if (fotoThumb) {
+              fotoThumb.src = "";
+            }
+            if (fotoThumbWrap) {
+              fotoThumbWrap.style.display = "none";
+            }
             if (fotoActions) fotoActions.style.display = "none";
           });
         }
 
-        if (viewBtn) {
-          viewBtn.addEventListener("click", (e) => {
+        if (fotoThumbWrap) {
+          fotoThumbWrap.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
             const src = hiddenFoto.value;
@@ -1517,18 +1642,6 @@
             if (pTitle) pTitle.textContent = nameVal;
             if (pMeta) pMeta.textContent = sPid;
             if (pModal) pModal.classList.add("is-active");
-          });
-        }
-
-        // Periode Date Picker Click Handler
-        const periodeInp = card.querySelector(".sampel-periode-input");
-        if (periodeInp) {
-          periodeInp.addEventListener("click", () => {
-            try {
-              if (typeof periodeInp.showPicker === "function") {
-                periodeInp.showPicker();
-              }
-            } catch (e) {}
           });
         }
 

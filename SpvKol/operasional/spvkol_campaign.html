@@ -1247,8 +1247,8 @@
         <div class="form-group span-2">
           <label class="form-label">PIC</label>
           <input type="text" name="pic" id="campaignPicVal" class="form-input"
-            placeholder="Nama PIC"
-            style="background-color: #f2f3f5; border-color: #ccd1d9; cursor: not-allowed;" readonly value="Setiawan" />
+            placeholder="Nama PIC Otomatis"
+            style="background-color: #f2f3f5; border-color: #ccd1d9; cursor: not-allowed;" readonly value="" />
         </div>
 
         <!-- Row 3: Tanggal Mulai, Tanggal Selesai, Status Campaign -->
@@ -2765,6 +2765,14 @@
             pid: ""
           };
         }
+        const matchParen = str.match(/^(.*?)\s*\((.*?)\)$/);
+        if (matchParen) {
+          return {
+            nama: matchParen[1].trim(),
+            varian: matchParen[2].trim(),
+            pid: ""
+          };
+        }
         return { nama: str, varian: "", pid: "" };
       }
 
@@ -4019,21 +4027,14 @@
       window.showToast = showToast;
 
       // Campaign table rendering logic with localStorage persistence
-      const CAMPAIGN_STORAGE_KEY = "bisa_campaign_list_v11";
-      if (!localStorage.getItem("bisa_campaign_reset_v11")) {
+      const CAMPAIGN_STORAGE_KEY = "bisa_campaign_list_v12";
+      if (!localStorage.getItem("bisa_campaign_reset_v12")) {
         try {
-          localStorage.removeItem("bisa_campaign_list");
-          localStorage.removeItem("bisa_campaign_list_v2");
-          localStorage.removeItem("bisa_campaign_list_v3");
-          localStorage.removeItem("bisa_campaign_list_v4");
-          localStorage.removeItem("bisa_campaign_list_v5");
-          localStorage.removeItem("bisa_campaign_list_v6");
-          localStorage.removeItem("bisa_campaign_list_v7");
-          localStorage.removeItem("bisa_campaign_list_v8");
-          localStorage.removeItem("bisa_campaign_list_v9");
-          localStorage.removeItem("bisa_campaign_list_v10");
+          ['bisa_campaign_list', 'bisa_campaign_list_v2', 'bisa_campaign_list_v3', 'bisa_campaign_list_v4', 'bisa_campaign_list_v5', 'bisa_campaign_list_v6', 'bisa_campaign_list_v7', 'bisa_campaign_list_v8', 'bisa_campaign_list_v9', 'bisa_campaign_list_v10', 'bisa_campaign_list_v11'].forEach(k => {
+            try { localStorage.removeItem(k); } catch(e){}
+          });
           localStorage.removeItem(CAMPAIGN_STORAGE_KEY);
-          localStorage.setItem("bisa_campaign_reset_v11", "true");
+          localStorage.setItem("bisa_campaign_reset_v12", "true");
         } catch (e) { }
       }
 
@@ -4056,10 +4057,23 @@
           priority: "High",
           linkReport: "https://bisamedia.id/report/cmp001",
           statusSampel: "Diterima",
-          targetGmv: "Rp 50.000.000",
+          targetGmv: "Rp 100.000.000",
           pic: "Setiawan",
-          kreator: "Bima Sakti",
+          kreator: "Aura Cantika, Bima Sakti",
           kreatorDetails: [
+            {
+              id: "1",
+              name: "Aura Cantika",
+              username: "@aura.beauty",
+              category: "Fashion Muslim",
+              kategoriSpesifik: "Hijab Pashmina & Segi Empat",
+              status: "Bind",
+              foto: "../../media/avatar.png",
+              samples: [
+                "Pashmina Ceruty Baby Doll - Hitam",
+                "Segi Empat Paris Premium - Navy"
+              ]
+            },
             {
               id: "3",
               name: "Bima Sakti",
@@ -4069,8 +4083,7 @@
               status: "Bind",
               foto: "../../media/avatar.png",
               samples: [
-                "Pashmina Ceruty Baby Doll - Hitam",
-                "Segi Empat Paris Premium - Navy"
+                "Bergo Maryam Diamond Crepe - Mocca"
               ]
             }
           ],
@@ -4078,30 +4091,103 @@
             {
               id: "h_001",
               campaignId: "CMP-001",
-              namaKreator: "Aura Cantika",
-              username: "@aura.beauty",
-              kategoriSpesifik: "Hijab Pashmina & Segi Empat",
-              keterangan: "Dikeluarkan karena tidak sesuai kriteria campaign",
-              tanggal: "23/09/2026",
+              namaKreator: "Clarissa Putri",
+              username: "@clarissa.style",
+              kategoriSpesifik: "Hijab Bergo & Khimar",
+              keterangan: "Dikeluarkan dari campaign karena pergantian fokus kategori ke Beauty",
+              tanggal: "22/09/2026",
               samples: [
-                { nama: "Pashmina Ceruty Baby Doll", varian: "Hitam", pid: "PID 001", statusSampel: "Dipakai" },
-                { nama: "Segi Empat Paris Premium", varian: "Navy", pid: "PID 001", statusSampel: "Dikirim" },
-                { nama: "Bergo Maryam Diamond Crepe", varian: "Mocca", pid: "PID 001", statusSampel: "Diterima" }
+                { nama: "Hijab Instan Jersey Sport", varian: "Abu Muda", pid: "PID 004", statusSampel: "Rusak" }
               ]
             },
             {
               id: "h_002",
               campaignId: "CMP-001",
-              namaKreator: "Clarissa Putri",
-              username: "@clarissa.style",
-              kategoriSpesifik: "Hijab Bergo & Khimar",
-              keterangan: "Produk rusak saat pengiriman",
-              tanggal: "22/09/2026",
+              namaKreator: "Dina Syahrini",
+              username: "@dina.hijabstyle",
+              kategoriSpesifik: "Hijab Casual & Daily",
+              keterangan: "Masa kontrak campaign selesai",
+              tanggal: "31/08/2026",
               samples: [
-                { nama: "Hijab Instan Jersey Sport", varian: "Abu Muda", pid: "PID 004", statusSampel: "Rusak" }
+                { nama: "Pashmina Ceruty Baby Doll", varian: "Navy", pid: "PID 001", statusSampel: "Retur" }
               ]
             }
           ]
+        },
+        {
+          id: "CMP-002",
+          idCampaign: "CMP-002",
+          brand: "Bisa Glow Skincare",
+          pid: "PID 010",
+          kategori: "Beauty & Care - Glowing Serum",
+          jenis: "Live",
+          tanggalMulai: "01/09/2026",
+          tanggalSelesai: "30/09/2026",
+          tanggal: "01/09/2026 - 30/09/2026",
+          statusCampaign: "Running",
+          jenisKolaborasi: "Commission Based + GMV",
+          adsSupport: "Ads Top Up",
+          adsHandling: "Top Up",
+          adsOperating: "Seller",
+          priority: "Medium",
+          linkReport: "https://bisamedia.id/report/cmp002",
+          statusSampel: "Diterima",
+          targetGmv: "Rp 80.000.000",
+          pic: "Dinda Pratama",
+          kreator: "Clarissa Putri",
+          kreatorDetails: [
+            {
+              id: "2",
+              name: "Clarissa Putri",
+              username: "@clarissa.style",
+              category: "Beauty & Care",
+              kategoriSpesifik: "Skincare Glow Routine",
+              status: "Tenggang",
+              foto: "../../media/avatar.png",
+              samples: [
+                "Serum Pencerah Vitamin C 30ml - Regular",
+                "Moisturizer Gel Ceramide 50g - Gentle Barrier"
+              ]
+            }
+          ],
+          riwayatAktifitas: []
+        },
+        {
+          id: "CMP-003",
+          idCampaign: "CMP-003",
+          brand: "Bisa Fashion Official",
+          pid: "PID 020",
+          kategori: "Fashion Muslim - Modern Wear",
+          jenis: "Video",
+          tanggalMulai: "15/09/2026",
+          tanggalSelesai: "15/10/2026",
+          tanggal: "15/09/2026 - 15/10/2026",
+          statusCampaign: "Running",
+          jenisKolaborasi: "Barter Product + Commission",
+          adsSupport: "Organic Boost",
+          adsHandling: "Self Service",
+          adsOperating: "Seller",
+          priority: "Medium",
+          linkReport: "https://bisamedia.id/report/cmp003",
+          statusSampel: "Diterima",
+          targetGmv: "Rp 50.000.000",
+          pic: "Fauzan Syahrul",
+          kreator: "Bima Sakti",
+          kreatorDetails: [
+            {
+              id: "3",
+              name: "Bima Sakti",
+              username: "@bima.fashion",
+              category: "Fashion Muslim",
+              kategoriSpesifik: "Kemeja & Pakaian Pria",
+              status: "Bind",
+              foto: "../../media/avatar.png",
+              samples: [
+                "Kemeja Pria Slim Fit Cotton - Putih"
+              ]
+            }
+          ],
+          riwayatAktifitas: []
         }
       ];
 
@@ -4430,6 +4516,34 @@
         }
       }
 
+      function getPicForCategory(categoryName) {
+        if (!categoryName) return "";
+        try {
+          const saved = localStorage.getItem("spv_kategori_produk_v1");
+          let list = [];
+          if (saved) {
+            list = JSON.parse(saved);
+          }
+          if (!Array.isArray(list) || list.length === 0) {
+            list = [
+              { kategori: "Fashion Muslim", pic: "Setiawan" },
+              { kategori: "Beauty & Care", pic: "Amanda" },
+              { kategori: "Food & Beverage", pic: "Dimas" },
+              { kategori: "Mom & Baby", pic: "Clarissa" }
+            ];
+          }
+          const cleanCat = categoryName.toLowerCase().trim();
+          const matched = list.find(k => {
+            const kName = (k.kategori || k.namaKategori || "").toLowerCase().trim();
+            return kName === cleanCat || cleanCat.includes(kName) || kName.includes(cleanCat);
+          });
+          if (matched && matched.pic) {
+            return matched.pic;
+          }
+        } catch (e) {}
+        return "Setiawan";
+      }
+
       if (campaignBrandSelect) {
         campaignBrandSelect.addEventListener("change", () => {
           const selectedBrandName = campaignBrandSelect.value;
@@ -4437,14 +4551,15 @@
           const matchedBrand = brands.find(b => b.nama && b.nama.toLowerCase() === selectedBrandName.toLowerCase());
 
           // Kategori otomatis menyesuaikan Brand/Seller yang dipilih
+          const detectedCategory = (matchedBrand && matchedBrand.kategori) ? matchedBrand.kategori : (selectedBrandName ? "Fashion Muslim" : "");
           if (kategoriProdukVal) {
-            kategoriProdukVal.value = (matchedBrand && matchedBrand.kategori) ? matchedBrand.kategori : "Fashion Muslim - Hijab";
+            kategoriProdukVal.value = detectedCategory;
           }
 
-          // PIC otomatis menyesuaikan Brand/Seller jika ada (hanya lihat saja)
+          // PIC otomatis menyesuaikan Kategori Produk dari data master
           const picInput = document.getElementById("campaignPicVal");
-          if (picInput && matchedBrand && matchedBrand.pic) {
-            picInput.value = matchedBrand.pic;
+          if (picInput) {
+            picInput.value = detectedCategory ? getPicForCategory(detectedCategory) : "";
           }
 
           // Update header judul kategori di bagian kreator
@@ -5029,12 +5144,12 @@
               if (kategoriProdukVal) {
                 const brands = getBrandDatabase();
                 const matched = brands.find(b => b.nama && b.nama.toLowerCase() === (item.brand || "").toLowerCase());
-                kategoriProdukVal.value = item.kategori || (matched && matched.kategori) || "Fashion Muslim - Hijab";
+                kategoriProdukVal.value = item.kategori || (matched && matched.kategori) || "Fashion Muslim";
               }
 
               const elPicVal = document.getElementById("campaignPicVal");
               if (elPicVal) {
-                elPicVal.value = item.pic || "Setiawan";
+                elPicVal.value = item.pic || getPicForCategory(kategoriProdukVal ? kategoriProdukVal.value : "");
               }
 
               setCustomDropdownValue('jenisCampWrap', 'jenisCampInput', 'jenisCampItemsContainer', 'jenisCampClearBtn', 'jenisCampVal', item.jenis || 'Live');
@@ -5159,9 +5274,106 @@
         });
       }
 
+      function syncCampaignSamplesToTracking(campaign) {
+        if (!campaign) return;
+        const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v5";
+        let trackingList = [];
+        try {
+          const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) trackingList = parsed;
+          }
+        } catch (e) {
+          console.error("Error reading tracking data for sync:", e);
+        }
+
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, "0");
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const yyyy = now.getFullYear();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const min = String(now.getMinutes()).padStart(2, "0");
+        const todayStr = `${dd}/${mm}/${yyyy}`;
+        const timeStr = `${hh}:${min}`;
+
+        const brandName = campaign.brand || "Bisa Media Brand";
+        const campaignPid = campaign.pid || "PID 001";
+        const campId = campaign.idCampaign || campaign.id || ("CMP-" + Date.now());
+        const kreators = Array.isArray(campaign.kreatorDetails) ? campaign.kreatorDetails : [];
+
+        let hasNewOrUpdated = false;
+
+        kreators.forEach(k => {
+          let kHandle = (k.username || k.name || "Kreator").trim();
+          if (!kHandle.startsWith("@")) kHandle = "@" + kHandle.toLowerCase().replace(/\s+/g, ".");
+
+          const samples = Array.isArray(k.samples) ? k.samples : [];
+          samples.forEach((s) => {
+            const parsed = parseSampleItem(s);
+            const sampleName = parsed.nama || "Sampel Produk";
+            const sampleVarian = parsed.varian || "Standar";
+            const samplePid = parsed.pid || campaignPid;
+
+            const existingIdx = trackingList.findIndex(t =>
+              (t.campaignId === campId || t.brand === brandName) &&
+              t.kreator && t.kreator.toLowerCase() === kHandle.toLowerCase() &&
+              t.sampel && t.sampel.toLowerCase() === sampleName.toLowerCase() &&
+              (t.varian || "").toLowerCase() === sampleVarian.toLowerCase()
+            );
+
+            if (existingIdx === -1) {
+              const nextId = "TRK-" + (trackingList.length + 1).toString().padStart(3, "0");
+              const newTrackItem = {
+                id: nextId,
+                brand: brandName,
+                sampel: sampleName,
+                pid: samplePid,
+                type: "Campaign",
+                kreator: kHandle,
+                varian: sampleVarian,
+                keterangan: "Diambil",
+                statusSampel: "Request",
+                tanggal: todayStr,
+                campaignId: campId,
+                logRiwayat: [
+                  {
+                    status: "Request",
+                    lampiran: "-",
+                    keterangan: `Pengajuan sampel campaign ${brandName}`,
+                    waktu: `${todayStr} ${timeStr}`
+                  },
+                  { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "-" },
+                  { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "-" },
+                  { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
+                  { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+                  { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+                  { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+                ]
+              };
+              trackingList.unshift(newTrackItem);
+              hasNewOrUpdated = true;
+            } else {
+              trackingList[existingIdx].brand = brandName;
+              trackingList[existingIdx].pid = samplePid;
+              trackingList[existingIdx].campaignId = campId;
+              hasNewOrUpdated = true;
+            }
+          });
+        });
+
+        if (hasNewOrUpdated) {
+          try {
+            localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(trackingList));
+          } catch (e) {
+            console.error("Error saving synced tracking data:", e);
+          }
+        }
+      }
+
       function getCampaignFormData() {
         const idCampInput = document.getElementById("campaignIdInput") || campaignForm.querySelector("input[placeholder='Nomor ID Campaign']");
-        const idCampVal = idCampInput && idCampInput.value.trim() ? idCampInput.value.trim() : ("CMP-" + String(Date.now()).slice(-4));
+        const idCampVal = idCampInput && idCampInput.value.trim() ? idCampInput.value.trim() : "";
 
         const brandSelect = document.getElementById("campaignBrandSelect") || campaignForm.querySelector("select");
         let brandVal = "Bisa Hijab Official";
@@ -5174,7 +5386,7 @@
         let pidVal = (pidInput && pidInput.value.trim()) || (pidHidden && pidHidden.value.trim()) || "PID 001";
 
         const catInput = document.getElementById("kategoriProdukVal");
-        let categoryVal = catInput && catInput.value ? catInput.value : "Fashion Muslim - Hijab";
+        let categoryVal = catInput && catInput.value ? catInput.value : "";
 
         const jenisHidden = document.getElementById("jenisCampVal");
         const jenisInput = document.getElementById("jenisCampInput");
@@ -5214,7 +5426,7 @@
         let targetGmvVal = targetGmvInput && targetGmvInput.value.trim() ? targetGmvInput.value.trim() : "Rp 50.000.000";
 
         const picInput = document.getElementById("campaignPicVal");
-        let picVal = picInput && picInput.value.trim() ? picInput.value.trim() : "Setiawan";
+        let picVal = picInput && picInput.value.trim() ? picInput.value.trim() : (categoryVal ? getPicForCategory(categoryVal) : "Setiawan");
 
         const selectedKreatorList = allKreatorList
           .filter(k => selectedKreatorIds.has(k.id))
@@ -5262,7 +5474,7 @@
         }
         const picInput = document.getElementById("campaignPicVal");
         if (picInput) {
-          picInput.value = "Setiawan";
+          picInput.value = "";
         }
         updatePidOptionsForBrand("", "");
 
@@ -5290,8 +5502,8 @@
 
         const idCampInput = document.getElementById("campaignIdInput");
         if (idCampInput) {
-          const nextNum = campaignDb.length + 1;
-          idCampInput.value = "CMP-" + String(nextNum).padStart(3, '0');
+          idCampInput.value = "";
+          idCampInput.placeholder = "Nomor ID Campaign";
         }
 
         if (campaignModalTitle) {
@@ -5353,6 +5565,7 @@
               campaignDb[idx].kreatorDetails = isRunning ? (data.kreatorDetails || []) : (data.kreatorDetails || []);
             }
             saveCampaignDb();
+            syncCampaignSamplesToTracking(campaignDb[idx]);
             renderCampaignTable();
 
             if (typeof Swal !== "undefined") {
@@ -5397,6 +5610,7 @@
 
             campaignDb.unshift(newCamp);
             saveCampaignDb();
+            syncCampaignSamplesToTracking(newCamp);
             renderCampaignTable();
 
             if (typeof Swal !== "undefined") {

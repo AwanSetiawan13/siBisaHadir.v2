@@ -1226,6 +1226,54 @@
     </div>
   </div>
 
+  <!-- Modal PopUp Preview Lampiran Tracking Sampel -->
+  <div id="modalPreviewLampiran" class="modal-overlay" style="z-index: 100000;">
+    <div class="modal-box" style="max-width: 540px; width: 95%; border-radius: 12px; overflow: hidden; background: #fff;">
+      <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #e2e8f0;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(2, 132, 199, 0.1); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+            <i class="bx bx-image"></i>
+          </div>
+          <div>
+            <h2 class="modal-title" style="font-size: 16px; font-weight: 700; color: #1e293b; margin: 0;">Lihat <span style="color: #0284c7;">Lampiran</span></h2>
+            <p id="previewLampiranSubTitle" style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">Detail bukti lampiran tracking sampel</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close" aria-label="Tutup popup" onclick="document.getElementById('modalPreviewLampiran').classList.remove('is-active')" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+
+      <div style="padding: 20px; background: #f8fafc;">
+        <!-- Metadata Pill Bar -->
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; background: #ffffff; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <div style="font-size: 12px; color: #64748b;">Status: <strong id="previewLampiranStatus" style="color: #0284c7;">-</strong></div>
+          <div style="color: #cbd5e1;">•</div>
+          <div style="font-size: 12px; color: #64748b;">File: <strong id="previewLampiranFileName" style="color: #1e293b;">-</strong></div>
+        </div>
+
+        <!-- Image / Document Preview Box -->
+        <div id="previewLampiranContainer" style="background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 240px; max-height: 380px; overflow: hidden; position: relative;">
+          <img id="previewLampiranImg" src="" alt="Preview Lampiran" style="max-width: 100%; max-height: 320px; object-fit: contain; border-radius: 6px; display: none;" />
+          <div id="previewLampiranDocPlaceholder" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 20px;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(2, 132, 199, 0.1); color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+              <i class="bx bx-file"></i>
+            </div>
+            <div>
+              <div id="previewLampiranDocName" style="font-weight: 700; color: #1e293b; font-size: 14px;">dokumen.png</div>
+              <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Bukti lampiran telah tersimpan dan diverifikasi di sistem.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; padding: 14px 20px; border-top: 1px dashed #ababaf; background: #fff;">
+        <button type="button" onclick="document.getElementById('modalPreviewLampiran').classList.remove('is-active')"
+          style="background: #ffffff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;"
+          onmouseover="this.style.background='#29A3D8';this.style.color='#fff';"
+          onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toastNotification" class="toast-notification">
     <div id="toastIconWrap" style="width: 26px; height: 26px; border-radius: 50%; background: #dcfce7; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -1244,45 +1292,30 @@
 
   <script>
     (function () {
-      const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v2";
+      const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v5";
+      try {
+        localStorage.removeItem("bisa_tracking_sampel_list");
+        localStorage.removeItem("bisa_tracking_sampel_list_v2");
+        localStorage.removeItem("bisa_tracking_sampel_list_v3");
+        localStorage.removeItem("bisa_tracking_sampel_list_v4");
+      } catch (e) {}
 
-      // Default Mock Data Matching Images 1, 2, 3, 4
+      // Default Mock Data Matching Brands, Creators & Campaigns (100% Berelasi)
       const DEFAULT_TRACKING_DATA = [
         {
           id: "TRK-001",
-          brand: "Ansya Hijab",
-          sampel: "Pashmina Viscose",
-          pid: "1733174269690545381",
-          type: "Campaign",
-          kreator: "alenna.sf",
-          varian: "Bundling 3Pcs Pashmina...",
-          keterangan: "Diambil",
-          statusSampel: "Diterima",
-          tanggal: "23/09/2026",
-          logRiwayat: [
-            { status: "Request", lampiran: "-", keterangan: "-", waktu: "19/09/2026 09:30" },
-            { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "19/09/2026 14:15" },
-            { status: "Diterima", lampiran: "foto_resi.png", keterangan: "Sampel diterima dengan baik", waktu: "23/09/2026 11:00" },
-            { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
-            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
-            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
-            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
-          ]
-        },
-        {
-          id: "TRK-002",
           brand: "Bisa Hijab Official",
           sampel: "Pashmina Ceruty Baby Doll",
           pid: "PID 001",
           type: "Campaign",
-          kreator: "aura.beauty",
-          varian: "Hitam",
+          kreator: "@aura.beauty",
+          varian: "Hitam (Standar)",
           keterangan: "Diambil",
           statusSampel: "Dipakai",
           tanggal: "23/09/2026",
           logRiwayat: [
-            { status: "Request", lampiran: "-", keterangan: "-", waktu: "18/09/2026 10:00" },
-            { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "19/09/2026 11:20" },
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel campaign Bisa Hijab", waktu: "18/09/2026 10:00" },
+            { status: "Dikirim", lampiran: "resi_jnt.jpg", keterangan: "Nomor resi JNT-8899221", waktu: "19/09/2026 11:20" },
             { status: "Diterima", lampiran: "bukti_terima.jpg", keterangan: "Diterima oleh kreator", waktu: "21/09/2026 15:45" },
             { status: "Dipakai", lampiran: "-", keterangan: "Sedang dipakai untuk konten Live", waktu: "23/09/2026 09:00" },
             { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
@@ -1291,21 +1324,42 @@
           ]
         },
         {
-          id: "TRK-003",
+          id: "TRK-002",
           brand: "Bisa Hijab Official",
           sampel: "Segi Empat Paris Premium",
           pid: "PID 002",
           type: "Campaign",
-          kreator: "clarissa.style",
-          varian: "Navy",
+          kreator: "@aura.beauty",
+          varian: "Navy (115x115 cm)",
           keterangan: "Diambil",
-          statusSampel: "Dikirim",
+          statusSampel: "Diterima",
           tanggal: "22/09/2026",
           logRiwayat: [
-            { status: "Request", lampiran: "-", keterangan: "-", waktu: "20/09/2026 13:00" },
-            { status: "Dikirim", lampiran: "resi_jnt.jpg", keterangan: "Nomor resi JNT-889922", waktu: "22/09/2026 10:30" },
-            { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Request", lampiran: "-", keterangan: "Request sampel hijab segi empat", waktu: "19/09/2026 13:00" },
+            { status: "Dikirim", lampiran: "resi_sicepat.jpg", keterangan: "Nomor resi SICEPAT-889922", waktu: "20/09/2026 10:30" },
+            { status: "Diterima", lampiran: "foto_resi.png", keterangan: "Sampel diterima dengan baik", waktu: "22/09/2026 14:00" },
             { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-003",
+          brand: "Bisa Glow Skincare",
+          sampel: "Serum Pencerah Vitamin C 30ml",
+          pid: "PID 010",
+          type: "Campaign",
+          kreator: "@clarissa.style",
+          varian: "30ml Regular",
+          keterangan: "Diambil",
+          statusSampel: "Dipakai",
+          tanggal: "23/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel campaign glowing", waktu: "17/09/2026 09:00" },
+            { status: "Dikirim", lampiran: "resi_sicepat.jpg", keterangan: "Resi SICEPAT-33211", waktu: "18/09/2026 14:00" },
+            { status: "Diterima", lampiran: "bukti_unboxing.jpg", keterangan: "Diterima lengkap dengan kemasan aman", waktu: "20/09/2026 11:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Sedang dijadwalkan Live skincare", waktu: "23/09/2026 10:00" },
             { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
@@ -1314,17 +1368,17 @@
         {
           id: "TRK-004",
           brand: "Bisa Glow Skincare",
-          sampel: "Serum Pencerah Vitamin C 30ml",
-          pid: "PID 010",
-          type: "Endorsement",
-          kreator: "dinda.glow",
-          varian: "30ml Regular",
-          keterangan: "Belum",
-          statusSampel: "Request",
+          sampel: "Moisturizer Gel Ceramide 50g",
+          pid: "PID 011",
+          type: "Campaign",
+          kreator: "@clarissa.style",
+          varian: "50g Gentle Barrier",
+          keterangan: "Diambil",
+          statusSampel: "Dikirim",
           tanggal: "23/09/2026",
           logRiwayat: [
-            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel endorsement", waktu: "23/09/2026 08:30" },
-            { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Request", lampiran: "-", keterangan: "Sampel pendamping serum", waktu: "21/09/2026 10:00" },
+            { status: "Dikirim", lampiran: "resi_jne.jpg", keterangan: "Nomor resi JNE-990112", waktu: "23/09/2026 08:30" },
             { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
@@ -1334,43 +1388,127 @@
         },
         {
           id: "TRK-005",
-          brand: "Bisa Fashion Official",
-          sampel: "Kemeja Pria Slim Fit Cotton",
-          pid: "PID 020",
+          brand: "Bisa Hijab Official",
+          sampel: "Bergo Maryam Diamond Crepe",
+          pid: "PID 003",
           type: "Campaign",
-          kreator: "bima.fashion",
-          varian: "Putih (Size L)",
-          keterangan: "Tidak Diambil",
-          statusSampel: "Retur",
-          tanggal: "21/09/2026",
+          kreator: "@bima.fashion",
+          varian: "Mocca (Size M)",
+          keterangan: "Diambil",
+          statusSampel: "Dipakai",
+          tanggal: "22/09/2026",
           logRiwayat: [
-            { status: "Request", lampiran: "-", keterangan: "-", waktu: "15/09/2026 11:00" },
-            { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "16/09/2026 14:00" },
-            { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "18/09/2026 16:30" },
-            { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
-            { status: "Retur", lampiran: "resi_retur.jpg", keterangan: "Kreator batal kolaborasi", waktu: "21/09/2026 10:15" },
+            { status: "Request", lampiran: "-", keterangan: "Request sampel hijab instan", waktu: "16/09/2026 11:00" },
+            { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "17/09/2026 14:00" },
+            { status: "Diterima", lampiran: "bukti_terima_bima.jpg", keterangan: "Diterima oleh kreator", waktu: "19/09/2026 16:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Dipakai untuk konten video VT", waktu: "22/09/2026 13:00" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
           ]
         },
         {
           id: "TRK-006",
+          brand: "Bisa Fashion Official",
+          sampel: "Kemeja Pria Slim Fit Cotton",
+          pid: "PID 020",
+          type: "Campaign",
+          kreator: "@bima.fashion",
+          varian: "Putih (Size L)",
+          keterangan: "Diambil",
+          statusSampel: "Diterima",
+          tanggal: "21/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel kemeja pria", waktu: "18/09/2026 09:00" },
+            { status: "Dikirim", lampiran: "resi_antaraja.jpg", keterangan: "Nomor resi ANTR-4455", waktu: "19/09/2026 11:00" },
+            { status: "Diterima", lampiran: "terima_kemeja.jpg", keterangan: "Diterima ukuran pas", waktu: "21/09/2026 15:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-007",
           brand: "Bisa Hijab Official",
           sampel: "Hijab Instan Jersey Sport",
           pid: "PID 004",
           type: "Campaign",
-          kreator: "aura.beauty",
+          kreator: "@clarissa.style",
           varian: "Abu Muda",
           keterangan: "Diambil",
           statusSampel: "Rusak",
           tanggal: "20/09/2026",
           logRiwayat: [
-            { status: "Request", lampiran: "-", keterangan: "-", waktu: "16/09/2026 09:00" },
+            { status: "Request", lampiran: "-", keterangan: "Request sampel sport hijab", waktu: "16/09/2026 09:00" },
             { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "17/09/2026 13:00" },
             { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "19/09/2026 11:00" },
             { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Rusak", lampiran: "foto_cacat.jpg", keterangan: "Kain robek saat unboxing", waktu: "20/09/2026 15:20" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-008",
+          brand: "Bisa Hijab Official",
+          sampel: "Pashmina Ceruty Baby Doll",
+          pid: "PID 001",
+          type: "Campaign",
+          kreator: "@dina.hijabstyle",
+          varian: "Navy (Jumbo)",
+          keterangan: "Tidak Diambil",
+          statusSampel: "Retur",
+          tanggal: "25/08/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel awal", waktu: "20/08/2026 10:00" },
+            { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "21/08/2026 12:00" },
+            { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "23/08/2026 14:00" },
+            { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Retur", lampiran: "resi_retur.jpg", keterangan: "Kreator selesai kontrak & retur sampel", waktu: "25/08/2026 11:00" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-009",
+          brand: "Bisa Hijab Official",
+          sampel: "Pashmina Silk Plisket Premium",
+          pid: "PID 005",
+          type: "Endorsement",
+          kreator: "@aura.beauty",
+          varian: "Rosegold",
+          keterangan: "Belum",
+          statusSampel: "Request",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel endorsement silk plisket", waktu: "24/09/2026 09:15" },
+            { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-010",
+          brand: "Bisa Glow Skincare",
+          sampel: "Serum Pencerah Vitamin C 30ml",
+          pid: "PID 010",
+          type: "Endorsement",
+          kreator: "@clarissa.style",
+          varian: "50ml Refill",
+          keterangan: "Diambil",
+          statusSampel: "Dikirim",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan refill serum untuk endorsement", waktu: "22/09/2026 14:00" },
+            { status: "Dikirim", lampiran: "resi_jnt_refill.jpg", keterangan: "Nomor resi JNT-771122", waktu: "24/09/2026 08:45" },
+            { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
           ]
         }
@@ -1399,6 +1537,110 @@
           console.error("Error saving tracking data:", e);
         }
       }
+
+      // Auto-sync samples added to creators in campaigns into tracking data
+      function syncFromCampaignDatabase() {
+        try {
+          const campRaw = localStorage.getItem("bisa_campaign_list_v12") || localStorage.getItem("bisa_campaign_list_v11");
+          if (!campRaw) return;
+          const campaigns = JSON.parse(campRaw);
+          if (!Array.isArray(campaigns)) return;
+
+          let hasChanges = false;
+          const now = new Date();
+          const dd = String(now.getDate()).padStart(2, "0");
+          const mm = String(now.getMonth() + 1).padStart(2, "0");
+          const yyyy = now.getFullYear();
+          const hh = String(now.getHours()).padStart(2, "0");
+          const min = String(now.getMinutes()).padStart(2, "0");
+          const todayStr = `${dd}/${mm}/${yyyy}`;
+          const timeStr = `${hh}:${min}`;
+
+          function parseSampStr(item) {
+            if (typeof item === "object" && item !== null) {
+              return { nama: item.nama || item.sampleName || "Sampel", varian: item.varian || item.variant || "", pid: item.pid || "" };
+            }
+            const str = String(item || "").trim();
+            if (str.includes(" - ")) {
+              const parts = str.split(" - ");
+              return { nama: parts[0].trim(), varian: parts.slice(1).join(" - ").trim(), pid: "" };
+            }
+            const m = str.match(/^(.*?)\s*\((.*?)\)$/);
+            if (m) {
+              return { nama: m[1].trim(), varian: m[2].trim(), pid: "" };
+            }
+            return { nama: str, varian: "", pid: "" };
+          }
+
+          campaigns.forEach(camp => {
+            const brandName = camp.brand || "Bisa Media Brand";
+            const campPid = camp.pid || "PID 001";
+            const campId = camp.idCampaign || camp.id;
+            const kreators = Array.isArray(camp.kreatorDetails) ? camp.kreatorDetails : [];
+
+            kreators.forEach(k => {
+              let kHandle = (k.username || k.name || "Kreator").trim();
+              if (!kHandle.startsWith("@")) kHandle = "@" + kHandle.toLowerCase().replace(/\s+/g, ".");
+
+              const samples = Array.isArray(k.samples) ? k.samples : [];
+              samples.forEach(s => {
+                const parsed = parseSampStr(s);
+                const sampleName = parsed.nama || "Sampel Produk";
+                const sampleVarian = parsed.varian || "Standar";
+                const samplePid = parsed.pid || campPid;
+
+                const exists = trackingData.some(t =>
+                  (t.campaignId === campId || t.brand === brandName) &&
+                  t.kreator && t.kreator.toLowerCase() === kHandle.toLowerCase() &&
+                  t.sampel && t.sampel.toLowerCase() === sampleName.toLowerCase() &&
+                  (t.varian || "").toLowerCase() === sampleVarian.toLowerCase()
+                );
+
+                if (!exists) {
+                  const nextId = "TRK-" + (trackingData.length + 1).toString().padStart(3, "0");
+                  const newEntry = {
+                    id: nextId,
+                    brand: brandName,
+                    sampel: sampleName,
+                    pid: samplePid,
+                    type: "Campaign",
+                    kreator: kHandle,
+                    varian: sampleVarian,
+                    keterangan: "Diambil",
+                    statusSampel: "Request",
+                    tanggal: todayStr,
+                    campaignId: campId,
+                    logRiwayat: [
+                      {
+                        status: "Request",
+                        lampiran: "-",
+                        keterangan: `Pengajuan sampel campaign ${brandName}`,
+                        waktu: `${todayStr} ${timeStr}`
+                      },
+                      { status: "Dikirim", lampiran: "-", keterangan: "-", waktu: "-" },
+                      { status: "Diterima", lampiran: "-", keterangan: "-", waktu: "-" },
+                      { status: "Dipakai", lampiran: "-", keterangan: "-", waktu: "-" },
+                      { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+                      { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+                      { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+                    ]
+                  };
+                  trackingData.unshift(newEntry);
+                  hasChanges = true;
+                }
+              });
+            });
+          });
+
+          if (hasChanges) {
+            saveTrackingData();
+          }
+        } catch (e) {
+          console.error("Error syncing campaigns into tracking:", e);
+        }
+      }
+
+      syncFromCampaignDatabase();
 
       // DOM Elements
       const tableBody = document.getElementById("trackingSampelTableBody");
@@ -1582,6 +1824,7 @@
         pagedData.forEach((item, index) => {
           const globalIndex = startIndex + index + 1;
           const cleanKreator = String(item.kreator || "").replace(/^@/, "");
+          const displayKreator = cleanKreator ? `@${cleanKreator}` : "-";
           const tr = document.createElement("tr");
 
           tr.innerHTML = `
@@ -1589,7 +1832,7 @@
             <td style="font-weight: 600;">${item.brand || "-"}</td>
             <td>${item.sampel || "-"}</td>
             <td>${item.type || "-"}</td>
-            <td><span style="font-weight: 500; color: #1e293b;">${cleanKreator}</span></td>
+            <td><span style="font-weight: 500; color: #1e293b;">${displayKreator}</span></td>
             <td class="text-center">
               <span class="status-badge ${getStatusBadgeClass(item.statusSampel)}">${item.statusSampel || "-"}</span>
             </td>
@@ -1810,7 +2053,10 @@
         if (elSampel) elSampel.value = item.sampel || "-";
         if (elPid) elPid.value = item.pid || "-";
         if (elType) elType.value = item.type || "-";
-        if (elKreator) elKreator.value = String(item.kreator || "").replace(/^@/, "");
+        if (elKreator) {
+          const kName = String(item.kreator || "").replace(/^@/, "");
+          elKreator.value = kName ? `@${kName}` : "-";
+        }
         if (elVarian) elVarian.value = item.varian || "-";
         if (elKeterangan) elKeterangan.value = item.keterangan || "-";
         if (elStatus) elStatus.value = item.statusSampel || "-";
@@ -1829,12 +2075,8 @@
             let lampiranHtml = '<span style="color: #94a3b8;">-</span>';
             if (lampiran && lampiran !== "-") {
               lampiranHtml = `
-                <button type="button" title="Lihat Lampiran (${lampiran})" style="background: transparent; border: none; cursor: pointer; color: #0284c7; padding: 2px;">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                  </svg>
+                <button type="button" class="btn-lampiran-eye" onclick="window.previewLampiran('${item.id}', '${stName}')" title="Lihat Lampiran (${lampiran})" style="background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.25); border-radius: 6px; cursor: pointer; color: #0284c7; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s ease;" onmouseover="this.style.background='rgba(2, 132, 199, 0.18)'; this.style.transform='scale(1.06)';" onmouseout="this.style.background='rgba(2, 132, 199, 0.08)'; this.style.transform='scale(1)';">
+                  <i class="bx bx-show"></i>
                 </button>
               `;
             }
@@ -1851,6 +2093,50 @@
         }
 
         if (modalLihat) modalLihat.classList.add("is-active");
+      };
+
+      // Global Action: Preview Lampiran (Modal Eye Icon)
+      window.previewLampiran = function (itemId, statusName) {
+        const item = trackingData.find(t => String(t.id) === String(itemId));
+        if (!item) return;
+        const logItem = Array.isArray(item.logRiwayat) ? item.logRiwayat.find(l => l.status && l.status.toLowerCase() === statusName.toLowerCase()) : null;
+        const fileName = (logItem && logItem.lampiran && logItem.lampiran !== "-") ? logItem.lampiran : "lampiran_bukti.png";
+        const fileDataUrl = logItem ? logItem.lampiranDataUrl : null;
+
+        const modalPreview = document.getElementById("modalPreviewLampiran");
+        const statusEl = document.getElementById("previewLampiranStatus");
+        const fileNameEl = document.getElementById("previewLampiranFileName");
+        const subTitleEl = document.getElementById("previewLampiranSubTitle");
+        const imgEl = document.getElementById("previewLampiranImg");
+        const docPlaceholder = document.getElementById("previewLampiranDocPlaceholder");
+        const docNameEl = document.getElementById("previewLampiranDocName");
+
+        if (statusEl) statusEl.textContent = statusName;
+        if (fileNameEl) fileNameEl.textContent = fileName;
+        if (subTitleEl) subTitleEl.textContent = `${item.sampel || 'Sampel'} (${item.brand || 'Brand'}) • ${item.kreator || ''}`;
+        if (docNameEl) docNameEl.textContent = fileName;
+
+        if (fileDataUrl) {
+          if (imgEl) {
+            imgEl.src = fileDataUrl;
+            imgEl.style.display = "block";
+          }
+          if (docPlaceholder) docPlaceholder.style.display = "none";
+        } else {
+          const isImg = /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(fileName);
+          if (isImg) {
+            if (imgEl) {
+              imgEl.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260"><rect width="100%" height="100%" fill="%23f8fafc" rx="8"/><rect x="20" y="20" width="360" height="220" fill="%23ffffff" rx="6" stroke="%23cbd5e1" stroke-width="1.5"/><path d="M40 50 h320 M40 80 h200 M40 110 h260 M40 140 h180" stroke="%23e2e8f0" stroke-width="8" stroke-linecap="round"/><circle cx="320" cy="180" r="28" fill="%23e0f2fe"/><path d="M310 180 l8 8 l16 -16" stroke="%230284c7" stroke-width="3" fill="none" stroke-linecap="round"/><text x="40" y="195" font-family="sans-serif" font-size="13" font-weight="bold" fill="%230284c7">BUKTI RESI / FOTO SAMPEL</text><text x="40" y="215" font-family="sans-serif" font-size="11" fill="%2364748b">${encodeURIComponent(fileName)}</text></svg>`;
+              imgEl.style.display = "block";
+            }
+            if (docPlaceholder) docPlaceholder.style.display = "none";
+          } else {
+            if (imgEl) imgEl.style.display = "none";
+            if (docPlaceholder) docPlaceholder.style.display = "flex";
+          }
+        }
+
+        if (modalPreview) modalPreview.classList.add("is-active");
       };
 
       // Global Action: Edit
@@ -1880,7 +2166,10 @@
         if (elSampel) elSampel.value = item.sampel || "-";
         if (elPid) elPid.value = item.pid || "-";
         if (elType) elType.value = item.type || "-";
-        if (elKreator) elKreator.value = String(item.kreator || "").replace(/^@/, "");
+        if (elKreator) {
+          const kName = String(item.kreator || "").replace(/^@/, "");
+          elKreator.value = kName ? `@${kName}` : "-";
+        }
         if (elVarian) elVarian.value = item.varian || "-";
 
         if (elKeteranganSelect) elKeteranganSelect.value = item.keterangan || "Diambil";
@@ -2296,33 +2585,51 @@
           const newStatus = document.getElementById("editStatusSelect")?.value || "Diterima";
           const ketOpsional = document.getElementById("editKeteranganOpsionalInput")?.value.trim() || "";
           const fileInput = document.getElementById("editLampiranFile");
-          const fileName = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0].name : (newStatus === "Diterima" ? "foto_bukti.png" : "-");
+          const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+          const fileName = file ? file.name : (newStatus === "Diterima" ? "foto_bukti.png" : "-");
 
-          item.keterangan = newKeterangan;
-          item.statusSampel = newStatus;
+          const saveAndClose = (dataUrl) => {
+            item.keterangan = newKeterangan;
+            item.statusSampel = newStatus;
 
-          // Update or add log entry for this status
-          if (!Array.isArray(item.logRiwayat)) item.logRiwayat = [];
-          const nowStr = new Date().toLocaleDateString("id-ID") + " " + new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }).replace('.', ':');
-          const existingLog = item.logRiwayat.find(l => l.status && l.status.toLowerCase() === newStatus.toLowerCase());
+            // Update or add log entry for this status
+            if (!Array.isArray(item.logRiwayat)) item.logRiwayat = [];
+            const nowStr = new Date().toLocaleDateString("id-ID") + " " + new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' }).replace('.', ':');
+            const existingLog = item.logRiwayat.find(l => l.status && l.status.toLowerCase() === newStatus.toLowerCase());
 
-          if (existingLog) {
-            existingLog.waktu = nowStr;
-            if (ketOpsional) existingLog.keterangan = ketOpsional;
-            if (fileName && fileName !== "-") existingLog.lampiran = fileName;
+            if (existingLog) {
+              existingLog.waktu = nowStr;
+              if (ketOpsional) existingLog.keterangan = ketOpsional;
+              if (fileName && fileName !== "-") existingLog.lampiran = fileName;
+              if (dataUrl) existingLog.lampiranDataUrl = dataUrl;
+            } else {
+              item.logRiwayat.push({
+                status: newStatus,
+                lampiran: fileName || "-",
+                lampiranDataUrl: dataUrl || null,
+                keterangan: ketOpsional || "-",
+                waktu: nowStr
+              });
+            }
+
+            saveTrackingData();
+            renderTable();
+            if (modalEdit) modalEdit.classList.remove("is-active");
+            showToast("Data Tracking Sampel berhasil disimpan", "success");
+          };
+
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+              saveAndClose(evt.target.result);
+            };
+            reader.onerror = function () {
+              saveAndClose(null);
+            };
+            reader.readAsDataURL(file);
           } else {
-            item.logRiwayat.push({
-              status: newStatus,
-              lampiran: fileName || "-",
-              keterangan: ketOpsional || "-",
-              waktu: nowStr
-            });
+            saveAndClose(null);
           }
-
-          saveTrackingData();
-          renderTable();
-          if (modalEdit) modalEdit.classList.remove("is-active");
-          showToast("Data Tracking Sampel berhasil disimpan", "success");
         });
       }
 
