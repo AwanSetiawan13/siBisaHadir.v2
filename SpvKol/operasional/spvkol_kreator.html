@@ -1231,19 +1231,31 @@
               ? '<option value="" disabled selected hidden>Pilih Kategori Produk 1</option>'
               : `<option value="">-- Pilih Kategori Produk ${num} (Opsional) --</option>`;
 
+            let hasMatched = false;
             categoryNames.forEach(cat => {
               const opt = document.createElement("option");
               opt.value = cat;
               opt.textContent = cat;
-              if (valKat && cat.toLowerCase() === valKat.toLowerCase()) {
+              if (valKat && cat.toLowerCase().trim() === valKat.toLowerCase().trim()) {
                 opt.selected = true;
+                hasMatched = true;
               }
               katEl.appendChild(opt);
             });
 
-            if (valKat) {
+            // If valKat exists but was not present in standard master categoryNames, append it dynamically
+            if (valKat && !hasMatched && valKat !== "-" && valKat !== "Kategori Produk") {
+              const opt = document.createElement("option");
+              opt.value = valKat;
+              opt.textContent = valKat;
+              opt.selected = true;
+              katEl.appendChild(opt);
+              hasMatched = true;
+            }
+
+            if (valKat && hasMatched) {
               katEl.value = valKat;
-              const matchedPic = categoryToPicMap[valKat.toLowerCase()] || "";
+              const matchedPic = categoryToPicMap[valKat.toLowerCase().trim()] || (values[`pic${num}`] || "");
               if (picInp) picInp.value = matchedPic;
             } else if (isReq) {
               katEl.selectedIndex = 0;
@@ -1259,7 +1271,7 @@
               if (picInp) {
                 if (selectedCat) {
                   const freshData = getMasterCategoriesAndPics();
-                  const matchedPic = freshData.categoryToPicMap[selectedCat.toLowerCase()] || "";
+                  const matchedPic = freshData.categoryToPicMap[selectedCat.toLowerCase().trim()] || "";
                   picInp.value = matchedPic;
                 } else {
                   picInp.value = "";
@@ -1410,7 +1422,7 @@
       window.calculateKreatorStatus = calculateKreatorStatus;
 
       // Storage key bumped to v11 for multi-category and removal of CM
-      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v11";
+      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v12";
       window.KREATOR_STORAGE_KEY = KREATOR_STORAGE_KEY;
 
       const DEFAULT_KREATOR = [
@@ -1421,15 +1433,15 @@
           nama: "Aura Cantika",
           alamat: "Jl. R.E. Martadinata No. 88, Tasikmalaya",
           nomorWa: "081234567890",
-          kategori: "Fashion Muslim, Beauty & Care",
+          kategori: "Fashion Muslim",
           kategori1: "Fashion Muslim",
           pic1: "Setiawan",
-          kategori2: "Beauty & Care",
-          pic2: "Amanda",
+          kategori2: "",
+          pic2: "",
           kategori3: "",
           pic3: "",
-          kategoriSpesifik: "Hijab Fashion, Beauty Care",
-          spesifik: "Hijab Fashion, Beauty Care",
+          kategoriSpesifik: "Hijab Pashmina & Segi Empat",
+          spesifik: "Hijab Pashmina & Segi Empat",
           masaKontrak: "01/01/2026 - 31/12/2026",
           kontrakAwal: "2026-01-01",
           kontrakAkhir: "2026-12-31",
@@ -1517,15 +1529,15 @@
           nama: "Dina Syahrini",
           alamat: "Jl. Cendana No. 12, Tasikmalaya",
           nomorWa: "081399887766",
-          kategori: "Fashion Muslim, Food & Beverage",
-          kategori1: "Fashion Muslim",
-          pic1: "Setiawan",
-          kategori2: "Food & Beverage",
-          pic2: "Dimas",
+          kategori: "Food & Beverage",
+          kategori1: "Food & Beverage",
+          pic1: "Dimas",
+          kategori2: "",
+          pic2: "",
           kategori3: "",
           pic3: "",
-          kategoriSpesifik: "Hijab Daily & Gamis",
-          spesifik: "Hijab Daily & Gamis",
+          kategoriSpesifik: "Snack & Minuman",
+          spesifik: "Snack & Minuman",
           masaKontrak: "01/01/2026 - 31/08/2026",
           kontrakAwal: "2026-01-01",
           kontrakAkhir: "2026-08-31",
@@ -1544,6 +1556,23 @@
         }
       ];
 
+      // Ensure clean 1-category dummy data reset once
+      if (!localStorage.getItem("bisa_kreator_clean_v12")) {
+        try {
+          const oldKeys = [
+            "bisa_kreator_list_v11",
+            "bisa_kreator_list_v10",
+            "bisa_kreator_list_v9",
+            "bisa_kreator_list_v8",
+            "bisa_kreator_list_v7",
+            "bisa_kreator_list"
+          ];
+          oldKeys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
+          localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(DEFAULT_KREATOR));
+          localStorage.setItem("bisa_kreator_clean_v12", "true");
+        } catch(e){}
+      }
+
       let kreatorDb = DEFAULT_KREATOR;
       try {
         const saved = localStorage.getItem(KREATOR_STORAGE_KEY);
@@ -1555,44 +1584,7 @@
             kreatorDb = [];
           }
         } else {
-          // Migration from older keys (v10, v8)
-          const olderSaved = localStorage.getItem("bisa_kreator_list_v10") || localStorage.getItem("bisa_kreator_list_v8");
-          if (olderSaved) {
-            try {
-              const oldList = JSON.parse(olderSaved);
-              if (Array.isArray(oldList) && oldList.length > 0) {
-                const { categoryToPicMap } = getMasterCategoriesAndPics();
-                kreatorDb = oldList.map(item => {
-                  let k1 = item.kategori1 || "";
-                  let k2 = item.kategori2 || "";
-                  let k3 = item.kategori3 || "";
-                  if (!k1 && item.kategori && item.kategori !== "-") {
-                    const splitK = item.kategori.split(",").map(s => s.trim());
-                    k1 = splitK[0] || "Fashion Muslim";
-                    k2 = splitK[1] || "";
-                    k3 = splitK[2] || "";
-                  }
-                  if (!k1) k1 = "Fashion Muslim";
-                  const p1 = item.pic1 || categoryToPicMap[k1.toLowerCase()] || "Setiawan";
-                  const p2 = item.pic2 || (k2 ? categoryToPicMap[k2.toLowerCase()] || "" : "");
-                  const p3 = item.pic3 || (k3 ? categoryToPicMap[k3.toLowerCase()] || "" : "");
-                  const combined = [k1, k2, k3].filter(Boolean).join(", ");
-                  return {
-                    ...item,
-                    kategori: combined,
-                    kategori1: k1,
-                    pic1: p1,
-                    kategori2: k2,
-                    pic2: p2,
-                    kategori3: k3,
-                    pic3: p3,
-                    kategoriSpesifik: item.kategoriSpesifik || item.spesifik || "",
-                    spesifik: item.kategoriSpesifik || item.spesifik || ""
-                  };
-                });
-              }
-            } catch (e) {}
-          }
+          kreatorDb = DEFAULT_KREATOR;
           localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(kreatorDb));
         }
       } catch (e) {
@@ -1685,19 +1677,59 @@
         if (waInp) waInp.value = item.nomorWa || "";
 
         // Extract 3 categories & PICs
-        let kat1 = item.kategori1 || "";
+        let kat1 = (item.kategori1 && item.kategori1 !== "-" && item.kategori1 !== "Kategori Produk") ? item.kategori1.trim() : "";
         let pic1 = item.pic1 || "";
-        let kat2 = item.kategori2 || "";
+        let kat2 = (item.kategori2 && item.kategori2 !== "-" && item.kategori2 !== "Kategori Produk") ? item.kategori2.trim() : "";
         let pic2 = item.pic2 || "";
-        let kat3 = item.kategori3 || "";
+        let kat3 = (item.kategori3 && item.kategori3 !== "-" && item.kategori3 !== "Kategori Produk") ? item.kategori3.trim() : "";
         let pic3 = item.pic3 || "";
 
-        if (!kat1 && item.kategori && item.kategori !== "-") {
-          const splitCats = item.kategori.split(",").map(s => s.trim());
-          kat1 = splitCats[0] || "";
-          kat2 = splitCats[1] || "";
-          kat3 = splitCats[2] || "";
+        // If item has comma-separated categories in `kategori`, fill any missing slot
+        if (item.kategori && item.kategori !== "-") {
+          const splitCats = item.kategori.split(",").map(s => s.trim()).filter(c => c && c !== "-" && c !== "Kategori Produk");
+          if (!kat1 && splitCats[0]) kat1 = splitCats[0];
+          if (!kat2 && splitCats[1]) kat2 = splitCats[1];
+          if (!kat3 && splitCats[2]) kat3 = splitCats[2];
         }
+
+        // Also check if creator is assigned to any campaigns with another category
+        try {
+          const campSaved = localStorage.getItem("bisa_campaign_list_v1");
+          if (campSaved) {
+            const campList = JSON.parse(campSaved);
+            if (Array.isArray(campList)) {
+              const cId = String(item.id || item.uid || '');
+              const cName = String(item.nama || item.name || '').toLowerCase().trim();
+              const cUser = String(item.username || '').replace(/^@/, '').toLowerCase().trim();
+
+              campList.forEach(camp => {
+                let isInCamp = false;
+                if (Array.isArray(camp.kreatorDetails)) {
+                  isInCamp = camp.kreatorDetails.some(kd =>
+                    (kd.id && String(kd.id) === cId) ||
+                    (kd.name && kd.name.toLowerCase().trim() === cName) ||
+                    (kd.username && kd.username.replace(/^@/, '').toLowerCase().trim() === cUser)
+                  );
+                }
+                if (!isInCamp && camp.kreator && typeof camp.kreator === 'string') {
+                  const kNames = camp.kreator.split(',').map(s => s.toLowerCase().trim());
+                  if (kNames.includes(cName)) isInCamp = true;
+                }
+
+                if (isInCamp && camp.kategori && camp.kategori.trim() !== "" && camp.kategori !== "-") {
+                  const campCat = camp.kategori.trim();
+                  const existing = [kat1.toLowerCase(), kat2.toLowerCase(), kat3.toLowerCase()].filter(Boolean);
+                  if (!existing.some(ex => ex === campCat.toLowerCase() || campCat.toLowerCase().includes(ex) || ex.includes(campCat.toLowerCase()))) {
+                    if (!kat1) kat1 = campCat;
+                    else if (!kat2) kat2 = campCat;
+                    else if (!kat3) kat3 = campCat;
+                  }
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
         const { categoryToPicMap } = getMasterCategoriesAndPics();
         if (!pic1 && kat1) pic1 = categoryToPicMap[kat1.toLowerCase()] || "";
         if (!pic2 && kat2) pic2 = categoryToPicMap[kat2.toLowerCase()] || "";
@@ -2030,19 +2062,57 @@
               if (elWa) elWa.value = item.nomorWa || "-";
 
               // 3 Categories & PICs
-              let k1 = item.kategori1 || "";
+              let k1 = (item.kategori1 && item.kategori1 !== "-" && item.kategori1 !== "Kategori Produk") ? item.kategori1.trim() : "";
               let p1 = item.pic1 || "";
-              let k2 = item.kategori2 || "";
+              let k2 = (item.kategori2 && item.kategori2 !== "-" && item.kategori2 !== "Kategori Produk") ? item.kategori2.trim() : "";
               let p2 = item.pic2 || "";
-              let k3 = item.kategori3 || "";
+              let k3 = (item.kategori3 && item.kategori3 !== "-" && item.kategori3 !== "Kategori Produk") ? item.kategori3.trim() : "";
               let p3 = item.pic3 || "";
 
-              if (!k1 && item.kategori && item.kategori !== "-") {
-                const splitCats = item.kategori.split(",").map(s => s.trim());
-                k1 = splitCats[0] || "";
-                k2 = splitCats[1] || "";
-                k3 = splitCats[2] || "";
+              if (item.kategori && item.kategori !== "-") {
+                const splitCats = item.kategori.split(",").map(s => s.trim()).filter(c => c && c !== "-" && c !== "Kategori Produk");
+                if (!k1 && splitCats[0]) k1 = splitCats[0];
+                if (!k2 && splitCats[1]) k2 = splitCats[1];
+                if (!k3 && splitCats[2]) k3 = splitCats[2];
               }
+
+              try {
+                const campSaved = localStorage.getItem("bisa_campaign_list_v1");
+                if (campSaved) {
+                  const campList = JSON.parse(campSaved);
+                  if (Array.isArray(campList)) {
+                    const cId = String(item.id || item.uid || '');
+                    const cName = String(item.nama || item.name || '').toLowerCase().trim();
+                    const cUser = String(item.username || '').replace(/^@/, '').toLowerCase().trim();
+
+                    campList.forEach(camp => {
+                      let isInCamp = false;
+                      if (Array.isArray(camp.kreatorDetails)) {
+                        isInCamp = camp.kreatorDetails.some(kd =>
+                          (kd.id && String(kd.id) === cId) ||
+                          (kd.name && kd.name.toLowerCase().trim() === cName) ||
+                          (kd.username && kd.username.replace(/^@/, '').toLowerCase().trim() === cUser)
+                        );
+                      }
+                      if (!isInCamp && camp.kreator && typeof camp.kreator === 'string') {
+                        const kNames = camp.kreator.split(',').map(s => s.toLowerCase().trim());
+                        if (kNames.includes(cName)) isInCamp = true;
+                      }
+
+                      if (isInCamp && camp.kategori && camp.kategori.trim() !== "" && camp.kategori !== "-") {
+                        const campCat = camp.kategori.trim();
+                        const existing = [k1.toLowerCase(), k2.toLowerCase(), k3.toLowerCase()].filter(Boolean);
+                        if (!existing.some(ex => ex === campCat.toLowerCase() || campCat.toLowerCase().includes(ex) || ex.includes(campCat.toLowerCase()))) {
+                          if (!k1) k1 = campCat;
+                          else if (!k2) k2 = campCat;
+                          else if (!k3) k3 = campCat;
+                        }
+                      }
+                    });
+                  }
+                }
+              } catch (e) {}
+
               const { categoryToPicMap } = getMasterCategoriesAndPics();
               if (!p1 && k1) p1 = categoryToPicMap[k1.toLowerCase()] || "-";
               if (!p2 && k2) p2 = categoryToPicMap[k2.toLowerCase()] || "-";
