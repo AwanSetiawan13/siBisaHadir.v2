@@ -134,7 +134,7 @@
 
     /* ===== Kreator View Modal Specific Styling ===== */
     .kreator-modal-box {
-      max-width: 660px !important;
+      max-width: 760px !important;
       width: 95% !important;
       max-height: 90vh !important;
       overflow-y: auto !important;
@@ -364,6 +364,49 @@
 
     .btn-keluar-outline:active {
       transform: translateY(0) !important;
+    }
+
+    /* ===== Table Styling for Keikutsertaan Campaign ===== */
+    .kreator-campaign-table-container {
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+    }
+
+    .kreator-campaign-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .kreator-campaign-table thead th {
+      background: #f8fafc;
+      border-bottom: 1.5px solid #cbd5e1;
+      color: #1e293b;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 12.5px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .kreator-campaign-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      font-size: 12.5px;
+      vertical-align: middle;
+    }
+
+    .kreator-campaign-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .kreator-campaign-table tbody tr:hover td {
+      background: #f8fafc;
     }
 
     /* ===== Search Bar Styling (Sama Persis dengan Campaign & Data Kreator) ===== */
@@ -761,17 +804,23 @@
           </div>
         </div>
 
-        <!-- Row 4: Kategori Produk, Spesifik (Span 6 each) -->
-        <div class="kreator-field-group col-6">
+        <!-- Row 4: Kategori Produk, PIC, Spesifik (Span 4 each) -->
+        <div class="kreator-field-group col-4">
           <label>Kategori Produk</label>
           <div class="kreator-field-input-wrap">
             <input type="text" id="viewKreatorKategoriInput" class="kreator-field-input" placeholder="kategori" readonly />
           </div>
         </div>
-        <div class="kreator-field-group col-6">
+        <div class="kreator-field-group col-4">
+          <label>PIC</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorPicInput" class="kreator-field-input" placeholder="PIC" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
           <label>Spesifik</label>
           <div class="kreator-field-input-wrap">
-            <input type="text" id="viewKreatorKatSpesifikInput" class="kreator-field-input" placeholder="" readonly />
+            <input type="text" id="viewKreatorKatSpesifikInput" class="kreator-field-input" placeholder="spesifik" readonly />
           </div>
         </div>
 
@@ -790,18 +839,32 @@
           </div>
         </div>
 
-        <!-- Row 6: Status, CM (Span 6 each) -->
-        <div class="kreator-field-group col-6">
+        <!-- Row 6: Status (Span 12 - CM Dihapus) -->
+        <div class="kreator-field-group col-12">
           <label>Status</label>
           <div class="kreator-field-input-wrap">
             <input type="text" id="viewKreatorStatusInput" class="kreator-field-input has-chevron" placeholder="Status" readonly />
             <span class="kreator-input-chevron">&#709;</span>
           </div>
         </div>
-        <div class="kreator-field-group col-6">
-          <label>CM</label>
-          <div class="kreator-field-input-wrap">
-            <input type="text" id="viewKreatorCmInput" class="kreator-field-input" placeholder="Status" readonly />
+
+        <!-- Section: Keikutsertaan Campaign (Table sesuai update gambar) -->
+        <div class="kreator-field-group col-12" style="margin-top: 4px; margin-bottom: 6px;">
+          <label style="font-size: 13.5px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif;">Keikutsertaan Campaign</label>
+          <div class="kreator-campaign-table-container">
+            <table class="kreator-campaign-table">
+              <thead>
+                <tr>
+                  <th style="width: 25%;">Tanggal</th>
+                  <th style="width: 22%;">ID Campaign</th>
+                  <th style="width: 25%;">Brand/Seller</th>
+                  <th style="width: 28%;">Keterangan</th>
+                </tr>
+              </thead>
+              <tbody id="viewKreatorCampaignTableBody">
+                <!-- Dynamically Populated from Campaign Data -->
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -875,7 +938,14 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v10";
+      const KREATOR_STORAGE_KEYS = [
+        "bisa_kreator_list_v12",
+        "bisa_kreator_list_v11",
+        "bisa_kreator_list_v10",
+        "bisa_kreator_list_v9",
+        "bisa_kreator_list_v8",
+        "bisa_kreator_list"
+      ];
 
       const DEFAULT_KREATOR = [
         {
@@ -886,25 +956,25 @@
           alamat: "Jl. R.E. Martadinata No. 88, Tasikmalaya",
           nomorWa: "081234567890",
           kategori: "Fashion Muslim",
-          kategoriSpesifik: "Hijab Pashmina & Segi Empat",
+          kategori1: "Fashion Muslim",
+          pic1: "Setiawan",
+          kategoriSpesifik: "Fashion Muslim",
+          spesifik: "Fashion Muslim",
           masaKontrak: "01/01/2026 - 31/12/2026",
           kontrakAwal: "01/01/2026",
           kontrakAkhir: "31/12/2026",
           status: "Bind",
-          aktivitas: "Aktif Konten & Live",
-          cm: "Rizal",
           leads: "Member",
           email: "auracantika@gmail.com",
           password: "password123",
           foto: "../../media/avatar.png",
-          level: "TOP",
-          targetGmv: "Rp 100.000.000",
-          progresGmv: "150%",
+          level: "Semi Top Creator",
+          targetGmv: "Rp 50.000.000",
+          progresGmv: "100%",
           gmvBerjalan: "Rp 150.000.000",
           siaranLive: "48 Jam",
           video: "18 Video",
-          adsHandling: "Handling A",
-          keaktifan: "Aktif Konten & Live"
+          aktivitas: "Aktif Konten & Live"
         },
         {
           id: 2,
@@ -913,26 +983,26 @@
           nama: "Clarissa Putri",
           alamat: "Jl. Anggrek No. 88, Surabaya",
           nomorWa: "081377889900",
-          kategori: "-",
-          kategoriSpesifik: "-",
+          kategori: "Beauty & Care",
+          kategori1: "Beauty & Care",
+          pic1: "Amanda",
+          kategoriSpesifik: "Skincare Serum & Toner",
+          spesifik: "Skincare Serum & Toner",
           masaKontrak: "01/03/2026 - 30/09/2026",
           kontrakAwal: "01/03/2026",
           kontrakAkhir: "30/09/2026",
           status: "Tenggang",
-          aktivitas: "Aktif Live",
-          cm: "Setiawan",
           leads: "SmartC",
           email: "clarissa@gmail.com",
           password: "password123",
           foto: "../../media/avatar.png",
-          level: "SEMI TOP",
+          level: "Semi Top Creator",
           targetGmv: "Rp 50.000.000",
           progresGmv: "70%",
           gmvBerjalan: "Rp 35.000.000",
           siaranLive: "32 Jam",
           video: "12 Video",
-          adsHandling: "Handling B",
-          keaktifan: "Aktif Live"
+          aktivitas: "Aktif Live"
         },
         {
           id: 3,
@@ -942,25 +1012,25 @@
           alamat: "Jl. Mawar No. 45, Bandung",
           nomorWa: "081298765432",
           kategori: "Fashion Muslim",
+          kategori1: "Fashion Muslim",
+          pic1: "Setiawan",
           kategoriSpesifik: "Hijab Instan & Sport",
+          spesifik: "Hijab Instan & Sport",
           masaKontrak: "01/01/2026 - 31/12/2026",
           kontrakAwal: "01/01/2026",
           kontrakAkhir: "31/12/2026",
           status: "Bind",
-          aktivitas: "Aktif Konten",
-          cm: "Dinda Pratama",
           leads: "Member & Mahasiswa",
           email: "bima@gmail.com",
           password: "password123",
           foto: "../../media/avatar.png",
-          level: "NEW GROWTH",
+          level: "New Growth",
           targetGmv: "Rp 40.000.000",
           progresGmv: "113%",
           gmvBerjalan: "Rp 45.200.000",
           siaranLive: "10 Jam",
           video: "24 Video",
-          adsHandling: "Handling C",
-          keaktifan: "Aktif Konten"
+          aktivitas: "Aktif Konten"
         },
         {
           id: 4,
@@ -970,41 +1040,214 @@
           alamat: "Jl. Cendana No. 12, Tasikmalaya",
           nomorWa: "081399887766",
           kategori: "Fashion Muslim",
+          kategori1: "Fashion Muslim",
+          pic1: "Setiawan",
           kategoriSpesifik: "Hijab Casual & Daily",
+          spesifik: "Hijab Casual & Daily",
           masaKontrak: "01/01/2026 - 31/08/2026",
           kontrakAwal: "01/01/2026",
           kontrakAkhir: "31/08/2026",
           status: "Berhenti",
-          aktivitas: "Tidak Aktif",
-          cm: "Setiawan",
           leads: "Member",
           email: "dina@gmail.com",
           password: "password123",
           foto: "../../media/avatar.png",
-          level: "INCUBATE",
+          level: "Incubate",
           targetGmv: "Rp 15.000.000",
           progresGmv: "56%",
           gmvBerjalan: "Rp 8.500.000",
           siaranLive: "4 Jam",
           video: "6 Video",
-          adsHandling: "Handling D",
-          keaktifan: "Tidak Aktif"
+          aktivitas: "Tidak Aktif"
         }
       ];
 
-      let kreatorDb = DEFAULT_KREATOR;
-      try {
-        const saved = localStorage.getItem(KREATOR_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            kreatorDb = parsed;
-          }
-        } else {
-          localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(DEFAULT_KREATOR));
+      function getKreatorDb() {
+        for (const k of KREATOR_STORAGE_KEYS) {
+          try {
+            const saved = localStorage.getItem(k);
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
         }
-      } catch (e) {
-        kreatorDb = DEFAULT_KREATOR;
+        return DEFAULT_KREATOR;
+      }
+
+      let kreatorDb = getKreatorDb();
+
+      // ================= Campaign Database & Creator Experience Sync =================
+      const CAMPAIGN_STORAGE_KEYS = [
+        "bisa_campaign_list_v12",
+        "bisa_campaign_list_v11",
+        "bisa_campaign_list_v10",
+        "bisa_campaign_list_v9",
+        "bisa_campaign_list_v8",
+        "bisa_campaign_list_v7",
+        "bisa_campaign_list_v6",
+        "bisa_campaign_list_v5",
+        "bisa_campaign_list_v4",
+        "bisa_campaign_list_v3",
+        "bisa_campaign_list_v2",
+        "bisa_campaign_list"
+      ];
+
+      const DEFAULT_CAMPAIGNS_FALLBACK = [
+        {
+          id: "CMP-001",
+          idCampaign: "CMP-001",
+          brand: "Bisa Hijab Official",
+          tanggal: "01/09/2026 - 30/09/2026",
+          tanggalMulai: "01/09/2026",
+          tanggalSelesai: "30/09/2026",
+          statusCampaign: "Running",
+          kreator: "Aura Cantika, Bima Sakti",
+          kreatorDetails: [
+            { id: 1, name: "Aura Cantika", username: "@aura.beauty" },
+            { id: 3, name: "Bima Sakti", username: "@bima.fashion" }
+          ],
+          riwayatAktifitas: []
+        },
+        {
+          id: "CMP-002",
+          idCampaign: "CMP-002",
+          brand: "Glow Beauty Care",
+          tanggal: "01/08/2026 - 31/08/2026",
+          tanggalMulai: "01/08/2026",
+          tanggalSelesai: "31/08/2026",
+          statusCampaign: "Selesai",
+          kreator: "Aura Cantika, Clarissa Putri",
+          kreatorDetails: [
+            { id: 1, name: "Aura Cantika", username: "@aura.beauty" },
+            { id: 2, name: "Clarissa Putri", username: "@clarissa.style" }
+          ],
+          riwayatAktifitas: []
+        },
+        {
+          id: "CMP-003",
+          idCampaign: "CMP-003",
+          brand: "Tasik Fashion Store",
+          tanggal: "15/07/2026 - 15/08/2026",
+          tanggalMulai: "15/07/2026",
+          tanggalSelesai: "15/08/2026",
+          statusCampaign: "Selesai",
+          kreator: "Dina Syahrini",
+          kreatorDetails: [],
+          riwayatAktifitas: [
+            {
+              id: "h_1",
+              campaignId: "CMP-003",
+              namaKreator: "Dina Syahrini",
+              username: "@dina.hijabstyle",
+              keterangan: "Tidak mencapai target GMV & tidak aktif siaran live sesuai jadwal",
+              tanggal: "10/08/2026"
+            }
+          ]
+        }
+      ];
+
+      function getCampaignDatabase() {
+        for (const key of CAMPAIGN_STORAGE_KEYS) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
+        }
+        return DEFAULT_CAMPAIGNS_FALLBACK;
+      }
+
+      function getCreatorCampaignHistory(item) {
+        if (!item) return [];
+        const campaigns = getCampaignDatabase();
+        const cId = String(item.id || item.uid || '').toLowerCase().trim();
+        const cUid = String(item.uid || '').toLowerCase().trim();
+        const cName = String(item.nama || item.name || '').toLowerCase().trim();
+        const cUser = String(item.username || '').replace(/^@/, '').toLowerCase().trim();
+
+        const historyList = [];
+        const seenCampKeys = new Set();
+
+        campaigns.forEach(camp => {
+          const campId = camp.idCampaign || camp.id || "CMP-001";
+          const brandName = camp.brand || "-";
+          const tgl = camp.tanggal || (camp.tanggalMulai ? `${camp.tanggalMulai} - ${camp.tanggalSelesai || ''}` : "-");
+          const statusCamp = (camp.statusCampaign || "Running").trim();
+
+          // 1. Cek apakah kreator aktif / berpartisipasi dalam campaign ini
+          let isParticipating = false;
+          if (Array.isArray(camp.kreatorDetails) && camp.kreatorDetails.length > 0) {
+            isParticipating = camp.kreatorDetails.some(kd => {
+              const kdId = String(kd.id || kd.uid || '').toLowerCase().trim();
+              const kdName = String(kd.name || kd.nama || '').toLowerCase().trim();
+              const kdUser = String(kd.username || '').replace(/^@/, '').toLowerCase().trim();
+              return (cId && kdId === cId) || (cUid && kdId === cUid) || (cName && kdName === cName) || (cUser && kdUser === cUser);
+            });
+          }
+          if (!isParticipating && camp.kreator && typeof camp.kreator === 'string') {
+            const names = camp.kreator.split(',').map(s => s.toLowerCase().trim());
+            if (cName && names.includes(cName)) isParticipating = true;
+          }
+
+          if (isParticipating) {
+            let ketText = "Sedang Berjalan";
+            let ketType = "running";
+            const stLower = statusCamp.toLowerCase();
+            if (stLower === "selesai" || stLower === "completed" || stLower === "finished") {
+              ketText = "Campaign Selesai";
+              ketType = "selesai";
+            } else if (stLower === "planning" || stLower === "draft") {
+              ketText = "Planning";
+              ketType = "planning";
+            } else if (stLower === "pending") {
+              ketText = "Pending";
+              ketType = "pending";
+            } else {
+              ketText = statusCamp;
+            }
+
+            historyList.push({
+              tanggal: tgl,
+              idCampaign: campId,
+              brand: brandName,
+              keterangan: ketText,
+              type: ketType,
+              isEjected: false
+            });
+            seenCampKeys.add(campId + "_" + (cId || cName));
+          }
+
+          // 2. Cek apakah kreator memiliki riwayat dikeluarkan dari campaign ini
+          if (Array.isArray(camp.riwayatAktifitas) && camp.riwayatAktifitas.length > 0) {
+            camp.riwayatAktifitas.forEach(r => {
+              const rName = String(r.namaKreator || r.nama || '').toLowerCase().trim();
+              const rUser = String(r.username || '').replace(/^@/, '').toLowerCase().trim();
+              const rId = String(r.kreatorId || r.id || '').toLowerCase().trim();
+              const isMatch = (cName && rName === cName) || (cUser && rUser === cUser) || (cId && rId === cId) || (cUid && rId === cUid);
+              if (isMatch) {
+                const rTgl = r.tanggal || tgl;
+                const rKet = r.keterangan ? r.keterangan : "Dikeluarkan dari campaign";
+                historyList.push({
+                  tanggal: rTgl,
+                  idCampaign: r.campaignId || campId,
+                  brand: brandName,
+                  keterangan: rKet,
+                  type: "dikeluarkan",
+                  isEjected: true
+                });
+              }
+            });
+          }
+        });
+
+        return historyList;
       }
 
       const trackingTableBody = document.getElementById("trackingTableBody");
@@ -1041,6 +1284,8 @@
         let countAktifKonten = 0;
         let countTidakAktif = 0;
 
+        kreatorDb = getKreatorDb();
+
         kreatorDb.forEach(k => {
           const akt = getCreatorActivityStatus(k).toLowerCase().trim();
           if (akt === "aktif konten & live" || (akt.includes("konten") && akt.includes("live"))) {
@@ -1067,6 +1312,7 @@
 
       function renderTrackingTable(query = "") {
         if (!trackingTableBody) return;
+        kreatorDb = getKreatorDb();
         trackingTableBody.innerHTML = "";
         updateTrackingMetrics();
 
@@ -1078,12 +1324,15 @@
               (k.username && k.username.toLowerCase().includes(q)) ||
               (k.nama && k.nama.toLowerCase().includes(q)) ||
               (k.kategori && k.kategori.toLowerCase().includes(q)) ||
-              aktStatus.toLowerCase().includes(q) ||
-              (k.cm && k.cm.toLowerCase().includes(q));
+              (k.kategori1 && k.kategori1.toLowerCase().includes(q)) ||
+              (k.kategori2 && k.kategori2.toLowerCase().includes(q)) ||
+              (k.kategori3 && k.kategori3.toLowerCase().includes(q)) ||
+              (k.kategoriSpesifik && k.kategoriSpesifik.toLowerCase().includes(q)) ||
+              aktStatus.toLowerCase().includes(q);
             if (!matchQ) return false;
           }
           if (currentFilterKategori) {
-            const kt = (k.kategori || "").toLowerCase();
+            const kt = (k.kategori || k.kategori1 || "").toLowerCase();
             if (!kt.includes(currentFilterKategori)) return false;
           }
           if (currentFilterAktivitas) {
@@ -1148,8 +1397,8 @@
                 <span class="kreator-table-username" style="font-weight: 500; color: #1e293b;">${item.username || "-"}</span>
               </div>
             </td>
-            <td>${item.nama || "-"}</td>
-            <td>${item.kategori || "-"}</td>
+            <td>${item.nama || item.name || "-"}</td>
+            <td>${item.kategori || item.kategori1 || "-"}</td>
             <td>${item.masaKontrak || "-"}</td>
             <td class="tdActions text-center" style="text-align: center;">
               <button type="button" class="btn-action-view btn-act-view" data-id="${item.id}" title="Lihat Tracking Kreator">
@@ -1192,15 +1441,14 @@
 
       function getCreatorLevelFromMaster(item, perf) {
         if (!perf || !perf.gmv) {
-          return { nama: "-", gmv: "-" };
+          return { nama: item.level || "Semi Top Creator", gmv: item.targetGmv || "Rp 50.000.000" };
         }
 
         const masterList = getLevelingMaster();
         if (!masterList || masterList.length === 0) {
-          return { nama: "-", gmv: "-" };
+          return { nama: item.level || "-", gmv: item.targetGmv || "-" };
         }
 
-        // Hitung tier berdasarkan GMV berjalan dari data performa
         const gmvNum = parseRupiahNum(perf.gmv);
         for (const m of masterList) {
           const mGmv = parseRupiahNum(m.gmv);
@@ -1212,7 +1460,7 @@
         return { nama: lastTier.nama, gmv: lastTier.gmv || "Rp 0" };
       }
 
-      // Fungsi untuk mengambil dataset Performa Kreator dari localStorage atau fallback default
+      // Dataset Performa Kreator
       function getPerformaDb() {
         const PERFORMA_KEYS = [
           "bisa_performa_kreator_list_v6",
@@ -1294,21 +1542,18 @@
         const performaList = getPerformaDb();
         if (!performaList || performaList.length === 0) return null;
 
-        // 1. Cari berdasarkan kecocokan Username
         if (item.username) {
           const cleanUser = item.username.toLowerCase().replace(/[@\s]/g, "");
           const found = performaList.find(p => p.username && p.username.toLowerCase().replace(/[@\s]/g, "") === cleanUser);
           if (found) return found;
         }
 
-        // 2. Cari berdasarkan kecocokan UID
         if (item.uid) {
           const cleanUid = item.uid.toLowerCase().replace(/[-\s]/g, "");
           const found = performaList.find(p => p.uid && p.uid.toLowerCase().replace(/[-\s]/g, "") === cleanUid);
           if (found) return found;
         }
 
-        // 3. Jika tidak ada di data performa (kreator baru input), data performa masih kosong (null)
         return null;
       }
 
@@ -1326,54 +1571,129 @@
         return percent + "%";
       }
 
+      function getPicForCategory(cat) {
+        if (!cat) return "Setiawan";
+        const lower = String(cat).toLowerCase();
+        if (lower.includes("fashion") || lower.includes("muslim")) return "Setiawan";
+        if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin")) return "Amanda";
+        if (lower.includes("food") || lower.includes("beverage") || lower.includes("kuliner") || lower.includes("snack")) return "Dimas";
+        if (lower.includes("mom") || lower.includes("baby") || lower.includes("anak")) return "Clarissa";
+        if (lower.includes("electronic") || lower.includes("elektronik") || lower.includes("tech")) return "Dimas";
+        return "Setiawan";
+      }
+
       function openViewModal(item) {
         if (!item) return;
         const perf = getCreatorPerformance(item);
         const levelInfo = getCreatorLevelFromMaster(item, perf);
-        const hasPerformance = Boolean(perf);
 
-        // Metrik performa hanya muncul jika performa kreatornya sudah ada di Performa Kreator
-        const gmvBerjalan = (perf && perf.gmv) ? perf.gmv : "-";
-        const targetGmv = (hasPerformance && levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : "-";
-        const progresGmv = (hasPerformance && gmvBerjalan !== "-" && targetGmv !== "-") ? calculateProgressGmv(gmvBerjalan, targetGmv) : "-";
+        const gmvBerjalan = (perf && perf.gmv) ? perf.gmv : (item.gmvBerjalan || "-");
+        const targetGmv = (levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : (item.targetGmv || "Rp 50.000.000");
+        const progresGmv = (gmvBerjalan !== "-" && targetGmv !== "-") ? calculateProgressGmv(gmvBerjalan, targetGmv) : (item.progresGmv || "100%");
         
-        let siaranLive = "-";
+        let siaranLive = item.siaranLive || "-";
         if (perf) {
-          siaranLive = perf.live_broadcasts ? (perf.live_broadcasts + " Jam") : (perf.live_gmv ? ("Live " + perf.live_gmv) : "-");
+          siaranLive = perf.live_broadcasts ? (perf.live_broadcasts + " Jam") : (perf.live_gmv ? ("Live " + perf.live_gmv) : siaranLive);
         }
 
-        let videoCount = "-";
+        let videoCount = item.video || "-";
         if (perf) {
-          videoCount = perf.videos ? (perf.videos + " Video") : (perf.video_gmv ? ("Video " + perf.video_gmv) : "-");
+          videoCount = perf.videos ? (perf.videos + " Video") : (perf.video_gmv ? ("Video " + perf.video_gmv) : videoCount);
         }
 
-        let adsHandling = "-";
-        if (perf) {
-          adsHandling = perf.partner_gmv || perf.direct_gmv || "Handling A";
-        }
-
+        let adsPartnerGmv = (perf && perf.partner_gmv) ? perf.partner_gmv : (item.gmvPartner || "Rp 37.500.000");
         const keaktifanStatus = getCreatorActivityStatus(item);
 
         document.getElementById("viewKreatorUidInput").value = item.uid || "";
         document.getElementById("viewKreatorUsernameInput").value = item.username || "";
-        document.getElementById("viewKreatorNamaInput").value = item.nama || "";
+        document.getElementById("viewKreatorNamaInput").value = item.nama || item.name || "";
         document.getElementById("viewKreatorWaInput").value = item.nomorWa || "";
         document.getElementById("viewKreatorAlamatInput").value = item.alamat || "";
         document.getElementById("viewKreatorEmailInput").value = item.email || "";
-        document.getElementById("viewKreatorLeadsInput").value = item.leads || "-";
-        document.getElementById("viewKreatorKategoriInput").value = item.kategori || "-";
-        document.getElementById("viewKreatorKatSpesifikInput").value = item.kategoriSpesifik || item.kategori || "-";
+        document.getElementById("viewKreatorLeadsInput").value = item.leads || "Member";
+        
+        const rawKat = item.kategori || item.kategori1 || "-";
+        document.getElementById("viewKreatorKategoriInput").value = rawKat;
+        
+        const picVal = item.pic1 || item.pic || getPicForCategory(rawKat);
+        const picInp = document.getElementById("viewKreatorPicInput");
+        if (picInp) picInp.value = picVal || "Setiawan";
+
+        document.getElementById("viewKreatorKatSpesifikInput").value = item.kategoriSpesifik || item.spesifik || item.kategori || "-";
         document.getElementById("viewKreatorKontrakAwalInput").value = item.kontrakAwal || "-";
         document.getElementById("viewKreatorKontrakAkhirInput").value = item.kontrakAkhir || "-";
         document.getElementById("viewKreatorStatusInput").value = item.status || "Bind";
-        document.getElementById("viewKreatorCmInput").value = item.cm || "-";
-        document.getElementById("viewKreatorLevelInput").value = hasPerformance ? (levelInfo.nama || "-") : "-";
+        
+        // Populate Keikutsertaan Campaign Table
+        const campTbody = document.getElementById("viewKreatorCampaignTableBody");
+        if (campTbody) {
+          campTbody.innerHTML = "";
+          const historyList = getCreatorCampaignHistory(item);
+
+          if (historyList.length === 0) {
+            campTbody.innerHTML = `
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 22px 14px; color: #94a3b8; font-style: italic; background: #ffffff;">
+                  Belum ada data keikutsertaan campaign
+                </td>
+              </tr>
+            `;
+          } else {
+            historyList.forEach(hist => {
+              const tr = document.createElement("tr");
+
+              let ketBadgeHtml = "";
+              if (hist.isEjected || hist.type === "dikeluarkan") {
+                const alasanSafe = (hist.keterangan || "Tidak ada keterangan tambahan.").replace(/"/g, "&quot;");
+                const campSafe = ((hist.idCampaign || "") + " - " + (hist.brand || "")).replace(/"/g, "&quot;");
+                ketBadgeHtml = `
+                  <div style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="display: inline-flex; align-items: center; gap: 4px; color: #dc2626; font-weight: 600; font-size: 11.5px; background: #fef2f2; border: 1px solid #fecaca; padding: 2.5px 8px; border-radius: 4px;">
+                      <i class="bx bx-user-x" style="font-size: 13px;"></i> Dikeluarkan
+                    </span>
+                    <button type="button" class="btn-view-alasan-ejected" data-alasan="${alasanSafe}" data-camp="${campSafe}" title="Lihat Keterangan Dikeluarkan" style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #fecaca; background: #ffffff; color: #dc2626; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(220,38,38,0.06);">
+                      <i class="bx bx-show" style="font-size: 13px;"></i>
+                    </button>
+                  </div>
+                `;
+              } else if (hist.type === "selesai" || hist.keterangan.toLowerCase().includes("selesai")) {
+                ketBadgeHtml = `
+                  <span style="display: inline-flex; align-items: center; gap: 5px; color: #16a34a; font-weight: 600; font-size: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 3px 9px; border-radius: 4px;">
+                    <i class="bx bx-check-circle" style="font-size: 14px;"></i> Campaign Selesai
+                  </span>
+                `;
+              } else if (hist.type === "running" || hist.keterangan.toLowerCase().includes("berjalan")) {
+                ketBadgeHtml = `
+                  <span style="display: inline-flex; align-items: center; gap: 5px; color: #0284c7; font-weight: 600; font-size: 12px; background: #f0f9ff; border: 1px solid #bae6fd; padding: 3px 9px; border-radius: 4px;">
+                    <i class="bx bx-time-five" style="font-size: 13px;"></i> Sedang Berjalan
+                  </span>
+                `;
+              } else {
+                ketBadgeHtml = `
+                  <span style="display: inline-flex; align-items: center; gap: 5px; color: #d97706; font-weight: 600; font-size: 12px; background: #fffbeb; border: 1px solid #fde68a; padding: 3px 9px; border-radius: 4px;">
+                    <i class="bx bx-calendar" style="font-size: 13px;"></i> ${hist.keterangan}
+                  </span>
+                `;
+              }
+
+              tr.innerHTML = `
+                <td style="font-weight: 500; color: #334155;">${hist.tanggal || "-"}</td>
+                <td style="font-weight: 600; color: #1e293b;">${hist.idCampaign || "-"}</td>
+                <td style="font-weight: 500; color: #334155;">${hist.brand || "-"}</td>
+                <td>${ketBadgeHtml}</td>
+              `;
+              campTbody.appendChild(tr);
+            });
+          }
+        }
+
+        document.getElementById("viewKreatorLevelInput").value = levelInfo.nama || item.level || "Semi Top Creator";
         document.getElementById("viewKreatorTargetGmvInput").value = targetGmv;
         document.getElementById("viewKreatorProgresGmvInput").value = progresGmv;
         document.getElementById("viewKreatorGmvBerjalanInput").value = gmvBerjalan;
         document.getElementById("viewKreatorSiaranLiveInput").value = siaranLive;
         document.getElementById("viewKreatorVideoInput").value = videoCount;
-        document.getElementById("viewKreatorAdsHandlingInput").value = adsHandling;
+        document.getElementById("viewKreatorAdsHandlingInput").value = adsPartnerGmv;
         document.getElementById("viewKreatorKeaktifanInput").value = keaktifanStatus;
 
         const fotoUrl = (item.foto && item.foto !== "../../media/logo.png") ? item.foto : "../../media/avatar.png";
@@ -1382,6 +1702,42 @@
 
         if (modalView) modalView.classList.add("is-active");
       }
+
+      // Event delegation for table action clicks and reason popups
+      document.addEventListener("click", function (e) {
+        const btnAlasan = e.target.closest(".btn-view-alasan-ejected");
+        if (btnAlasan) {
+          e.preventDefault();
+          e.stopPropagation();
+          const alasan = btnAlasan.getAttribute("data-alasan") || "Tidak ada keterangan tambahan.";
+          const camp = btnAlasan.getAttribute("data-camp") || "Campaign";
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              title: 'Keterangan Dikeluarkan',
+              html: `
+                <div style="text-align: left; font-size: 13px; color: #334155; line-height: 1.6;">
+                  <div style="margin-bottom: 8px; font-weight: 600; color: #1e293b;">
+                    Campaign: <span style="font-weight: 400; color: #64748b;">${camp}</span>
+                  </div>
+                  <div style="padding: 12px 14px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; color: #991b1b; font-weight: 500;">
+                    ${alasan}
+                  </div>
+                </div>
+              `,
+              icon: 'info',
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Tutup',
+              customClass: {
+                popup: 'swal2-bisa-popup'
+              }
+            });
+          } else {
+            alert(`Keterangan Dikeluarkan (${camp}):\n\n${alasan}`);
+          }
+          return;
+        }
+      });
 
       // Event delegation for table action clicks
       if (trackingTableBody) {
@@ -1406,7 +1762,8 @@
             e.preventDefault();
             e.stopPropagation();
             const id = btnView.getAttribute("data-id");
-            const item = kreatorDb.find(k => String(k.id) === String(id));
+            kreatorDb = getKreatorDb();
+            const item = kreatorDb.find(k => String(k.id) === String(id) || String(k.uid) === String(id));
             if (item) {
               openViewModal(item);
             }

@@ -15,6 +15,35 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 3px 8px !important;
+      border-radius: 6px !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+    }
+    .status-badge--success {
+      background-color: rgba(0, 230, 118, 0.1) !important;
+      color: #059669 !important;
+      border: 1px solid rgba(0, 230, 118, 0.3) !important;
+    }
+    .status-badge--warning {
+      background-color: rgba(255, 179, 0, 0.12) !important;
+      color: #d97706 !important;
+      border: 1px solid rgba(255, 179, 0, 0.35) !important;
+    }
+    .status-badge--danger {
+      background-color: rgba(255, 82, 82, 0.1) !important;
+      color: #e11d48 !important;
+      border: 1px solid rgba(255, 82, 82, 0.3) !important;
+    }
+
     /* Toolbar & Custom Select Extensions */
     .btn-excel-green {
       background: #f0fdf4 !important;
@@ -420,12 +449,37 @@
       color: #0369a1;
       border: 1px solid #bae6fd;
       border-radius: 6px;
-      padding: 2px 8px;
-      font-size: 11px;
+      padding: 3px 8px;
+      font-size: 11.5px;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .kreator-filter-tag:hover {
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    }
+
+    .kreator-filter-tag-close {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      margin-left: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      opacity: 0.75;
+      transition: all 0.15s ease;
+    }
+
+    .kreator-filter-tag-close:hover {
+      opacity: 1;
+      background: rgba(0,0,0,0.12);
     }
 
     /* Filter Popover matching Wireframe 2 */
@@ -561,16 +615,67 @@
       background: #0284c7;
     }
 
+    .kreator-table-pagination {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kreator-page-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      font-family: 'Outfit', sans-serif;
+      padding: 0;
+      outline: none;
+      user-select: none;
+    }
+
+    .kreator-page-btn:hover:not(:disabled):not(.is-active) {
+      border-color: #bae6fd;
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .kreator-page-btn.is-active {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(14, 165, 233, 0.35);
+    }
+
+    .kreator-page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      border-color: #e2e8f0;
+      background: #f8fafc;
+      color: #94a3b8;
+    }
+
     .kreator-dropdown-table {
       display: none;
       border-top: 1px solid #e2e8f0;
       background: #fff;
-      max-height: 280px;
-      overflow-y: auto;
     }
 
     .kreator-dropdown-table.is-open {
       display: block;
+    }
+
+    #kreatorTableRowsList {
+      max-height: 240px;
+      overflow-y: auto;
     }
 
     .kreator-table-header {
@@ -623,16 +728,30 @@
     }
 
     .kreator-cat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2.5px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      line-height: 1.4;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      cursor: default;
+    }
+
+    .kreator-cat-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    }
+
+    .kreator-cat-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
       display: inline-block;
-      background: #f1f5f9;
-      color: #334155;
-      border: 1px solid #e2e8f0;
-      border-radius: 4px;
-      padding: 2px 7px;
-      font-size: 11px;
-      font-weight: 500;
-      margin-right: 4px;
-      margin-bottom: 2px;
+      flex-shrink: 0;
     }
 
     .kreator-btn-minus {
@@ -1618,6 +1737,12 @@
 
                     <!-- Filter Popover (Mockup Gambar 2) -->
                     <div id="kreatorFilterPopover" class="kreator-filter-popover">
+                      <!-- Filter Popover Header with Title & Close Icon Button -->
+                      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                        <span style="font-size: 13px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif;">Filter Kreator</span>
+                        <button type="button" id="btnCloseFilterKreator" style="background: transparent; border: none; font-size: 20px; line-height: 1; color: #94a3b8; cursor: pointer; padding: 2px 6px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease;" onmouseover="this.style.color='#ef4444'; this.style.backgroundColor='#fee2e2';" onmouseout="this.style.color='#94a3b8'; this.style.backgroundColor='transparent';" title="Tutup Filter">&times;</button>
+                      </div>
+
                       <!-- Kategori Filter Section -->
                       <div class="kreator-filter-section">
                         <div class="kreator-filter-section-title">Kategori</div>
@@ -1700,10 +1825,28 @@
                 <div id="kreatorTableRowsList">
                   <!-- Populated by JS -->
                 </div>
-                <!-- Dropdown Footer with Button Pilih at bottom right -->
-                <div class="kreator-dropdown-footer" style="display: flex; justify-content: flex-end; align-items: center; padding: 10px 18px; border-top: 1px solid #e2e8f0; background: #f8fafc; gap: 10px;">
-                  <button type="button" id="btnBatalPilihKreator" style="background: transparent; border: 1px solid #cbd5e1; color: #64748b; border-radius: 6px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif;">Batal</button>
-                  <button type="button" id="btnKonfirmasiPilihKreator" style="background: #29A3D8; border: none; color: #fff; border-radius: 6px; padding: 6px 22px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;">Pilih</button>
+                <!-- Dropdown Footer with Page Size Selector, Pagination & Action Buttons -->
+                <div class="kreator-dropdown-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; border-top: 1px solid #e2e8f0; background: #f8fafc; gap: 10px; flex-wrap: wrap;">
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <!-- Page Size Selector: 5 / 10 / 20 -->
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #64748b; font-family: 'Outfit', sans-serif;">
+                      <span>Tampilkan:</span>
+                      <select id="kreatorPageSizeSelect" style="background: #fff; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 4px 8px; font-size: 12px; font-weight: 600; color: #1e293b; outline: none; cursor: pointer; font-family: 'Outfit', sans-serif;">
+                        <option value="5" selected>5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                      </select>
+                    </div>
+
+                    <!-- Pagination Navigation matching Mockup (< 1 2 >) -->
+                    <div id="kreatorTablePaginationWrap" class="kreator-table-pagination">
+                      <!-- Populated dynamically by JS -->
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" id="btnBatalPilihKreator" style="background: transparent; border: 1px solid #cbd5e1; color: #64748b; border-radius: 6px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif;">Batal</button>
+                    <button type="button" id="btnKonfirmasiPilihKreator" style="background: #29A3D8; border: none; color: #fff; border-radius: 6px; padding: 6px 22px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;">Pilih</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -3414,9 +3557,10 @@
       }
 
       // Ensure clean 1-category dummy data reset once
-      if (!localStorage.getItem("bisa_kreator_clean_v12")) {
+      if (!localStorage.getItem("bisa_kreator_clean_v13")) {
         try {
           const oldKeys = [
+            "bisa_kreator_list_v12",
             "bisa_kreator_list_v11",
             "bisa_kreator_list_v10",
             "bisa_kreator_list_v9",
@@ -3425,7 +3569,7 @@
             "bisa_kreator_list"
           ];
           oldKeys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
-          localStorage.setItem("bisa_kreator_clean_v12", "true");
+          localStorage.setItem("bisa_kreator_clean_v13", "true");
         } catch(e){}
       }
 
@@ -3463,6 +3607,16 @@
           },
           {
             id: "4",
+            name: "Dina Syahrini",
+            username: "@dina.hijabstyle",
+            category: "Food & Beverage",
+            categories: ["Food & Beverage"],
+            kategoriSpesifik: "Snack & Minuman",
+            status: "Bind",
+            foto: "../../media/avatar.png"
+          },
+          {
+            id: "5",
             name: "Dinda Safitri",
             username: "@dinda.glow",
             category: "Beauty & Care",
@@ -3472,7 +3626,7 @@
             foto: "../../media/avatar.png"
           },
           {
-            id: "5",
+            id: "6",
             name: "Nadia Syifa",
             username: "@nadia.skincare",
             category: "Beauty & Care",
@@ -3482,7 +3636,7 @@
             foto: "../../media/avatar.png"
           },
           {
-            id: "6",
+            id: "7",
             name: "Fauzi Ramadhan",
             username: "@fauzi.style",
             category: "Fashion Muslim",
@@ -3492,7 +3646,7 @@
             foto: "../../media/avatar.png"
           },
           {
-            id: "7",
+            id: "8",
             name: "Siti Rahma",
             username: "@siti.momandbaby",
             category: "Mom & Baby",
@@ -3502,7 +3656,7 @@
             foto: "../../media/avatar.png"
           },
           {
-            id: "8",
+            id: "9",
             name: "Rian Pratama",
             username: "@rian.gadget",
             category: "Electronics",
@@ -3510,11 +3664,72 @@
             kategoriSpesifik: "Aksesoris & Smart Device",
             status: "Bind",
             foto: "../../media/avatar.png"
+          },
+          {
+            id: "10",
+            name: "Maya Anggraini",
+            username: "@maya.hijab",
+            category: "Fashion Muslim",
+            categories: ["Fashion Muslim"],
+            kategoriSpesifik: "Gamis & Dress Muslim",
+            status: "Bind",
+            foto: "../../media/avatar.png"
+          },
+          {
+            id: "11",
+            name: "Kevin Sanjaya",
+            username: "@kevin.tech",
+            category: "Electronics",
+            categories: ["Electronics"],
+            kategoriSpesifik: "Audio & Smartwatch",
+            status: "Bind",
+            foto: "../../media/avatar.png"
+          },
+          {
+            id: "12",
+            name: "Zahra Amalia",
+            username: "@zahra.skincare",
+            category: "Beauty & Care",
+            categories: ["Beauty & Care"],
+            kategoriSpesifik: "Facial Wash & Toner",
+            status: "Bind",
+            foto: "../../media/avatar.png"
+          },
+          {
+            id: "13",
+            name: "Rahmat Hidayat",
+            username: "@rahmat.kuliner",
+            category: "Food & Beverage",
+            categories: ["Food & Beverage"],
+            kategoriSpesifik: "Frozen Food & Camilan",
+            status: "Bind",
+            foto: "../../media/avatar.png"
+          },
+          {
+            id: "14",
+            name: "Putri Maharani",
+            username: "@putri.mom",
+            category: "Mom & Baby",
+            categories: ["Mom & Baby"],
+            kategoriSpesifik: "Susu & Botol Bayi",
+            status: "Bind",
+            foto: "../../media/avatar.png"
+          },
+          {
+            id: "15",
+            name: "Aldi Pratama",
+            username: "@aldi.menswear",
+            category: "Fashion Muslim",
+            categories: ["Fashion Muslim"],
+            kategoriSpesifik: "Koko Pria & Sarung",
+            status: "Bind",
+            foto: "../../media/avatar.png"
           }
         ];
 
         try {
           const keysToTry = [
+            "bisa_kreator_list_v13",
             "bisa_kreator_list_v12",
             "bisa_kreator_list_v11",
             "bisa_kreator_list_v10",
@@ -3708,6 +3923,7 @@
       const kreatorSearchWrap = document.getElementById("kreatorSearchWrap");
       const searchKreatorInput = document.getElementById("searchKreatorInput");
       const btnToggleFilterKreator = document.getElementById("btnToggleFilterKreator");
+      const btnCloseFilterKreator = document.getElementById("btnCloseFilterKreator");
       const kreatorFilterPopover = document.getElementById("kreatorFilterPopover");
       const filterKatSearchInput = document.getElementById("filterKatSearchInput");
       const filterKatOptionsList = document.getElementById("filterKatOptionsList");
@@ -3718,12 +3934,70 @@
       const kreatorActiveFilterChips = document.getElementById("kreatorActiveFilterChips");
       const kreatorDropdownTable = document.getElementById("kreatorDropdownTable");
       const kreatorTableRowsList = document.getElementById("kreatorTableRowsList");
+      const kreatorTablePaginationWrap = document.getElementById("kreatorTablePaginationWrap");
+      const kreatorPageSizeSelect = document.getElementById("kreatorPageSizeSelect");
       const kreatorSelectAllTableCb = document.getElementById("kreatorSelectAllTableCb");
       const selectedKreatorRowsContainer = document.getElementById("selectedKreatorRowsContainer");
       const kreatorSelectedSectionWrap = document.getElementById("kreatorSelectedSectionWrap");
       const kreatorSearchBoxWrap = document.getElementById("kreatorSearchBoxWrap");
       const btnKonfirmasiPilihKreator = document.getElementById("btnKonfirmasiPilihKreator");
       const btnBatalPilihKreator = document.getElementById("btnBatalPilihKreator");
+
+      let currentKreatorPage = 1;
+      let kreatorPerPage = 5;
+
+      // Unified Category Style & Dot Indicator helper matching Data Kreator
+      function getKreatorCatPillStyle(catName) {
+        if (!catName || catName === "-") return { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0", dot: "#94a3b8" };
+        const lower = String(catName).toLowerCase();
+        if (lower.includes("fashion") || lower.includes("muslim") || lower.includes("hijab") || lower.includes("pakaian") || lower.includes("outfit")) {
+          return { bg: "#e0f2fe", color: "#0369a1", border: "#bae6fd", dot: "#0284c7" };
+        }
+        if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin") || lower.includes("kosmetik") || lower.includes("makeup") || lower.includes("glowing") || lower.includes("cantik")) {
+          return { bg: "#fce7f3", color: "#be185d", border: "#fbcfe8", dot: "#db2777" };
+        }
+        if (lower.includes("food") || lower.includes("beverage") || lower.includes("makan") || lower.includes("minum") || lower.includes("kuliner") || lower.includes("snack") || lower.includes("f&b")) {
+          return { bg: "#fef3c7", color: "#b45309", border: "#fde68a", dot: "#f59e0b" };
+        }
+        if (lower.includes("baby") || lower.includes("mom") || lower.includes("anak") || lower.includes("ibu") || lower.includes("kids")) {
+          return { bg: "#ede9fe", color: "#6d28d9", border: "#ddd6fe", dot: "#8b5cf6" };
+        }
+        if (lower.includes("elektronik") || lower.includes("electronic") || lower.includes("gadget") || lower.includes("tech") || lower.includes("hp")) {
+          return { bg: "#dcfce7", color: "#15803d", border: "#bbf7d0", dot: "#22c55e" };
+        }
+        if (lower.includes("home") || lower.includes("living") || lower.includes("rumah") || lower.includes("dekor")) {
+          return { bg: "#ffedd5", color: "#c2410c", border: "#fed7aa", dot: "#f97316" };
+        }
+        if (lower.includes("health") || lower.includes("sehat") || lower.includes("kesehatan") || lower.includes("herbal") || lower.includes("medis")) {
+          return { bg: "#ccfbf1", color: "#0f766e", border: "#99f6e4", dot: "#14b8a6" };
+        }
+        if (lower.includes("sport") || lower.includes("olahraga") || lower.includes("gym") || lower.includes("fitness")) {
+          return { bg: "#e0e7ff", color: "#4338ca", border: "#c7d2fe", dot: "#6366f1" };
+        }
+        if (lower.includes("otomotif") || lower.includes("motor") || lower.includes("mobil")) {
+          return { bg: "#f1f5f9", color: "#334155", border: "#cbd5e1", dot: "#64748b" };
+        }
+
+        // Deterministic pastel palette for other custom categories
+        const fallbacks = [
+          { bg: "#f0fdf4", color: "#166534", border: "#bbf7d0", dot: "#22c55e" },
+          { bg: "#fdf4ff", color: "#86198f", border: "#f5d0fe", dot: "#a21caf" },
+          { bg: "#ecfeff", color: "#155e75", border: "#a5f3fc", dot: "#06b6d4" },
+          { bg: "#fff7ed", color: "#9a3412", border: "#ffedd5", dot: "#ea580c" },
+          { bg: "#f8fafc", color: "#475569", border: "#e2e8f0", dot: "#64748b" }
+        ];
+        let hash = 0;
+        for (let i = 0; i < catName.length; i++) hash = (hash * 31 + catName.charCodeAt(i)) % fallbacks.length;
+        return fallbacks[Math.abs(hash)];
+      }
+
+      if (kreatorPageSizeSelect) {
+        kreatorPageSizeSelect.addEventListener("change", (e) => {
+          kreatorPerPage = parseInt(e.target.value, 10) || 5;
+          currentKreatorPage = 1;
+          renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
+        });
+      }
 
       function openKreatorDropdownTable() {
         if (!kreatorDropdownTable) return;
@@ -3745,7 +4019,7 @@
         closeKreatorFilterPopover();
       }
 
-      // Filter Popover Toggle
+      // Filter Popover Toggle & Close
       if (btnToggleFilterKreator) {
         btnToggleFilterKreator.addEventListener("click", (e) => {
           e.stopPropagation();
@@ -3756,6 +4030,13 @@
           } else {
             openKreatorFilterPopover();
           }
+        });
+      }
+
+      if (btnCloseFilterKreator) {
+        btnCloseFilterKreator.addEventListener("click", (e) => {
+          e.stopPropagation();
+          closeKreatorFilterPopover();
         });
       }
 
@@ -3820,6 +4101,7 @@
             } else {
               selectedFilterCategories.delete(cat);
             }
+            currentKreatorPage = 1;
             updateHasilFilterDisplay();
             renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
           });
@@ -3844,6 +4126,7 @@
             } else {
               selectedFilterRiwayat.delete(cb.value);
             }
+            currentKreatorPage = 1;
             updateHasilFilterDisplay();
             renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
           });
@@ -3855,6 +4138,7 @@
         btnFilterTampilkanSemua.addEventListener("click", () => {
           selectedFilterCategories.clear();
           selectedFilterRiwayat.clear();
+          currentKreatorPage = 1;
           if (filterKatSearchInput) filterKatSearchInput.value = "";
           populateCategoryFilterOptions();
           if (filterRiwayatOptionsList) {
@@ -3894,11 +4178,19 @@
         }
 
         selectedFilterCategories.forEach(cat => {
+          const style = getKreatorCatPillStyle(cat);
           const chip = document.createElement("span");
           chip.className = "kreator-filter-tag";
-          chip.innerHTML = `${cat} <span style="cursor: pointer; font-weight: bold; margin-left: 2px;">&times;</span>`;
-          chip.querySelector("span").addEventListener("click", () => {
+          chip.style.background = style.bg;
+          chip.style.borderColor = style.border;
+          chip.style.color = style.color;
+          chip.innerHTML = `
+            <span>${cat}</span>
+            <span class="kreator-filter-tag-close" title="Hapus filter">&times;</span>
+          `;
+          chip.querySelector(".kreator-filter-tag-close").addEventListener("click", () => {
             selectedFilterCategories.delete(cat);
+            currentKreatorPage = 1;
             populateCategoryFilterOptions(filterKatSearchInput ? filterKatSearchInput.value : "");
             updateHasilFilterDisplay();
             renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
@@ -3912,9 +4204,13 @@
           chip.style.background = "#fef3c7";
           chip.style.borderColor = "#fde68a";
           chip.style.color = "#b45309";
-          chip.innerHTML = `${rw} <span style="cursor: pointer; font-weight: bold; margin-left: 2px;">&times;</span>`;
-          chip.querySelector("span").addEventListener("click", () => {
+          chip.innerHTML = `
+            <span>${rw}</span>
+            <span class="kreator-filter-tag-close" title="Hapus filter">&times;</span>
+          `;
+          chip.querySelector(".kreator-filter-tag-close").addEventListener("click", () => {
             selectedFilterRiwayat.delete(rw);
+            currentKreatorPage = 1;
             if (filterRiwayatOptionsList) {
               const cb = filterRiwayatOptionsList.querySelector(`.kreator-riwayat-cb[value="${rw}"]`);
               if (cb) cb.checked = false;
@@ -3936,6 +4232,7 @@
           openKreatorDropdownTable();
         });
         searchKreatorInput.addEventListener("input", (e) => {
+          currentKreatorPage = 1;
           openKreatorDropdownTable();
           renderKreatorTableRows(e.target.value);
         });
@@ -4516,6 +4813,10 @@
           return true;
         });
 
+        const totalPages = Math.ceil(filtered.length / kreatorPerPage) || 1;
+        if (currentKreatorPage > totalPages) currentKreatorPage = totalPages;
+        if (currentKreatorPage < 1) currentKreatorPage = 1;
+
         if (kreatorSelectAllTableCb) {
           kreatorSelectAllTableCb.checked = filtered.length > 0 && filtered.every(k => tempSelectedKreatorIds.has(k.id));
         }
@@ -4526,10 +4827,15 @@
               Tidak ada kreator yang sesuai dengan filter.
             </div>
           `;
+          renderKreatorPagination(0, 1);
           return;
         }
 
-        filtered.forEach(k => {
+        const startIndex = (currentKreatorPage - 1) * kreatorPerPage;
+        const endIndex = startIndex + kreatorPerPage;
+        const pageItems = filtered.slice(startIndex, endIndex);
+
+        pageItems.forEach(k => {
           const isChecked = tempSelectedKreatorIds.has(k.id);
           const pengalaman = getCreatorPengalaman(k);
           const rowDiv = document.createElement("div");
@@ -4539,23 +4845,13 @@
 
           // Format Category Badges with distinct colors
           function getCategoryPillBadge(catName) {
-            if (!catName || catName === "-") return `<span class="kreator-cat-pill" style="color: #94a3b8;">-</span>`;
-            const lower = catName.toLowerCase();
-            let pillStyle = "background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0;";
-            if (lower.includes("fashion") || lower.includes("muslim") || lower.includes("hijab")) {
-              pillStyle = "background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;";
-            } else if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin")) {
-              pillStyle = "background: #fce7f3; color: #be185d; border: 1px solid #fbcfe8;";
-            } else if (lower.includes("food") || lower.includes("beverage") || lower.includes("makan")) {
-              pillStyle = "background: #fef3c7; color: #b45309; border: 1px solid #fde68a;";
-            } else if (lower.includes("baby") || lower.includes("mom") || lower.includes("anak")) {
-              pillStyle = "background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe;";
-            } else if (lower.includes("elektronik") || lower.includes("electronic") || lower.includes("gadget")) {
-              pillStyle = "background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;";
-            } else if (lower.includes("home") || lower.includes("living")) {
-              pillStyle = "background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa;";
-            }
-            return `<span class="kreator-cat-pill" style="${pillStyle}">${catName}</span>`;
+            if (!catName || catName === "-") return `<span style="color: #94a3b8; font-size: 11px;">-</span>`;
+            const style = getKreatorCatPillStyle(catName);
+            return `
+              <span class="kreator-cat-pill" style="background: ${style.bg}; color: ${style.color}; border: 1px solid ${style.border};">
+                ${catName}
+              </span>
+            `;
           }
 
           let catBadgesHtml = "-";
@@ -4626,6 +4922,70 @@
 
           kreatorTableRowsList.appendChild(rowDiv);
         });
+
+        renderKreatorPagination(totalPages, currentKreatorPage);
+      }
+
+      function renderKreatorPagination(totalPages, currentPage) {
+        if (!kreatorTablePaginationWrap) return;
+        kreatorTablePaginationWrap.innerHTML = "";
+        if (totalPages <= 0) return;
+
+        // Prev Button (<)
+        const prevBtn = document.createElement("button");
+        prevBtn.type = "button";
+        prevBtn.className = "kreator-page-btn";
+        prevBtn.title = "Halaman Sebelumnya";
+        prevBtn.disabled = currentPage <= 1;
+        prevBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        `;
+        prevBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (currentKreatorPage > 1) {
+            currentKreatorPage--;
+            renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
+          }
+        });
+        kreatorTablePaginationWrap.appendChild(prevBtn);
+
+        // Page Numbers (1, 2, ...)
+        for (let p = 1; p <= totalPages; p++) {
+          const pBtn = document.createElement("button");
+          pBtn.type = "button";
+          pBtn.className = `kreator-page-btn ${p === currentPage ? 'is-active' : ''}`;
+          pBtn.textContent = p;
+          pBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (currentKreatorPage !== p) {
+              currentKreatorPage = p;
+              renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
+            }
+          });
+          kreatorTablePaginationWrap.appendChild(pBtn);
+        }
+
+        // Next Button (>)
+        const nextBtn = document.createElement("button");
+        nextBtn.type = "button";
+        nextBtn.className = "kreator-page-btn";
+        nextBtn.title = "Halaman Berikutnya";
+        nextBtn.disabled = currentPage >= totalPages;
+        nextBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        `;
+        nextBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (currentKreatorPage < totalPages) {
+            currentKreatorPage++;
+            renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
+          }
+        });
+        kreatorTablePaginationWrap.appendChild(nextBtn);
       }
 
       if (kreatorSelectAllTableCb) {
@@ -4702,36 +5062,21 @@
           const rowWrap = document.createElement("div");
           rowWrap.style.cssText = "display: grid; grid-template-columns: 1.1fr 1.2fr; gap: 20px; align-items: start; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; position: relative;";
 
-          function getSelCategoryPillBadge(catName, extraSpec) {
+          function getSelCategoryPillBadge(catName) {
             if (!catName || catName === "-") return `<span style="color: #94a3b8; font-size: 11px;">-</span>`;
-            const lower = catName.toLowerCase();
-            let pillStyle = "background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0;";
-            if (lower.includes("fashion") || lower.includes("muslim") || lower.includes("hijab")) {
-              pillStyle = "background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;";
-            } else if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin") || lower.includes("glowing")) {
-              pillStyle = "background: #fce7f3; color: #be185d; border: 1px solid #fbcfe8;";
-            } else if (lower.includes("food") || lower.includes("beverage") || lower.includes("makan")) {
-              pillStyle = "background: #fef3c7; color: #b45309; border: 1px solid #fde68a;";
-            } else if (lower.includes("baby") || lower.includes("mom") || lower.includes("anak")) {
-              pillStyle = "background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe;";
-            } else if (lower.includes("elektronik") || lower.includes("electronic") || lower.includes("gadget")) {
-              pillStyle = "background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;";
-            } else if (lower.includes("home") || lower.includes("living")) {
-              pillStyle = "background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa;";
-            }
-            const label = extraSpec && !catName.toLowerCase().includes(extraSpec.toLowerCase()) ? `${catName} - ${extraSpec}` : catName;
-            return `<span class="kreator-cat-pill" style="${pillStyle}; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; display: inline-block;">${label}</span>`;
+            const style = getKreatorCatPillStyle(catName);
+            return `
+              <span class="kreator-cat-pill" style="background: ${style.bg}; color: ${style.color}; border: 1px solid ${style.border}; font-size: 11px; padding: 2.5px 8px; border-radius: 6px;">
+                ${catName}
+              </span>
+            `;
           }
 
           let selCatBadges = "-";
           if (Array.isArray(k.categories) && k.categories.length > 0 && k.categories[0] !== "-") {
-            selCatBadges = k.categories.map((c, idx) => {
-              const spec = (idx === 0 && k.kategoriSpesifik && k.kategoriSpesifik !== "-" && !k.kategoriSpesifik.includes(",")) ? k.kategoriSpesifik : "";
-              return getSelCategoryPillBadge(c, spec);
-            }).join(" ");
+            selCatBadges = k.categories.map(c => getSelCategoryPillBadge(c)).join(" ");
           } else if (k.category && k.category !== "-") {
-            const spec = (k.kategoriSpesifik && k.kategoriSpesifik !== "-" && !k.kategoriSpesifik.includes(",")) ? k.kategoriSpesifik : "";
-            selCatBadges = getSelCategoryPillBadge(k.category, spec);
+            selCatBadges = getSelCategoryPillBadge(k.category);
           }
 
           // Left Column: Creator info + minus button

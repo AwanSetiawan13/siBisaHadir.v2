@@ -237,6 +237,31 @@
       grid-column: span 4;
     }
 
+    .kreator-cat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      line-height: 1.4;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      cursor: default;
+    }
+    .kreator-cat-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    }
+    .kreator-cat-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
     .kreator-category-3col {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -518,7 +543,7 @@
         style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 29px; margin-bottom: 26px;">
 
         <article class="metric-card">
-          <div class="metric-icon-box" title="Kreator Aktif">
+          <div class="metric-icon-box" title="Bind">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -528,13 +553,28 @@
             </svg>
           </div>
           <div>
-            <span class="metric-label">Kreator Aktif</span>
+            <span class="metric-label">Bind</span>
             <strong class="metric-value" id="metricKreatorAktif">0</strong>
           </div>
         </article>
 
         <article class="metric-card">
-          <div class="metric-icon-box" title="Kreator Tidak Aktif">
+          <div class="metric-icon-box" title="Tenggang">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Tenggang</span>
+            <strong class="metric-value" id="metricKreatorPerhatian">0</strong>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Berhenti">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -544,23 +584,8 @@
             </svg>
           </div>
           <div>
-            <span class="metric-label">Kreator Tidak Aktif</span>
+            <span class="metric-label">Berhenti</span>
             <strong class="metric-value" id="metricKreatorTidakAktif">0</strong>
-          </div>
-        </article>
-
-        <article class="metric-card">
-          <div class="metric-icon-box" title="Perlu Perhatian">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-              <line x1="12" y1="9" x2="12" y2="13"></line>
-              <line x1="12" y1="17" x2="12.01" y2="17"></line>
-            </svg>
-          </div>
-          <div>
-            <span class="metric-label">Perlu Perhatian</span>
-            <strong class="metric-value" id="metricKreatorPerhatian">0</strong>
           </div>
         </article>
 
@@ -681,8 +706,8 @@
                 <th>UID</th>
                 <th>Username</th>
                 <th>Nama Kreator</th>
-                <th>Spesifik</th>
                 <th>Kategori Produk</th>
+                <th>Spesifik</th>
                 <th>Masa Kontrak</th>
                 <th>Status</th>
                 <th class="text-center" style="text-align: center;">Aksi</th>
@@ -1265,17 +1290,48 @@
               if (picInp) picInp.value = "";
             }
 
-            // Real-time update of PIC text input on category change
+            // Real-time update of PIC text input on category change & duplicate category check
             katEl.onchange = function () {
               const selectedCat = this.value;
-              if (picInp) {
-                if (selectedCat) {
-                  const freshData = getMasterCategoriesAndPics();
-                  const matchedPic = freshData.categoryToPicMap[selectedCat.toLowerCase().trim()] || "";
-                  picInp.value = matchedPic;
-                } else {
-                  picInp.value = "";
+              if (selectedCat) {
+                // Check if this category is already selected in other category dropdowns
+                const otherSets = sets.filter(s => s.num !== num);
+                const duplicateSet = otherSets.find(s => {
+                  const el = s.katEl;
+                  return el && el.value && el.value.toLowerCase().trim() === selectedCat.toLowerCase().trim();
+                });
+
+                if (duplicateSet) {
+                  if (typeof Swal !== "undefined") {
+                    Swal.fire({
+                      icon: 'warning',
+                      title: 'Kategori Tidak Boleh Sama!',
+                      text: `Kategori "${selectedCat}" sudah dipilih pada Kategori ${duplicateSet.num}. Silakan pilih kategori yang berbeda.`,
+                      confirmButtonColor: '#29A3D8',
+                      confirmButtonText: 'Mengerti',
+                      customClass: {
+                        popup: 'swal2-bisa-popup'
+                      }
+                    });
+                  } else {
+                    alert(`Kategori "${selectedCat}" sudah dipilih pada Kategori ${duplicateSet.num}. Silakan pilih kategori yang berbeda.`);
+                  }
+
+                  // Reset dropdown to default empty state
+                  if (isReq) {
+                    this.selectedIndex = 0;
+                  } else {
+                    this.value = "";
+                  }
+                  if (picInp) picInp.value = "";
+                  return;
                 }
+
+                const freshData = getMasterCategoriesAndPics();
+                const matchedPic = freshData.categoryToPicMap[selectedCat.toLowerCase().trim()] || "";
+                if (picInp) picInp.value = matchedPic;
+              } else {
+                if (picInp) picInp.value = "";
               }
             };
           }
@@ -1422,7 +1478,7 @@
       window.calculateKreatorStatus = calculateKreatorStatus;
 
       // Storage key bumped to v11 for multi-category and removal of CM
-      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v12";
+      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v13";
       window.KREATOR_STORAGE_KEY = KREATOR_STORAGE_KEY;
 
       const DEFAULT_KREATOR = [
@@ -1553,13 +1609,366 @@
           siaranLive: "4 Jam",
           video: "6 Video",
           aktivitas: "Tidak Aktif"
+        },
+        {
+          id: 5,
+          uid: "UID-0005",
+          username: "@dinda.glow",
+          nama: "Dinda Safitri",
+          alamat: "Jl. Sukajadi No. 101, Bandung",
+          nomorWa: "081211223344",
+          kategori: "Beauty & Care",
+          kategori1: "Beauty & Care",
+          pic1: "Amanda",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Serum & Skincare",
+          spesifik: "Serum & Skincare",
+          masaKontrak: "01/02/2026 - 31/12/2026",
+          kontrakAwal: "2026-02-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "dinda@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 80.000.000",
+          gmvBerjalan: "Rp 92.000.000",
+          progresGmv: "115%",
+          siaranLive: "36 Jam",
+          video: "14 Video",
+          aktivitas: "Aktif Konten & Live"
+        },
+        {
+          id: 6,
+          uid: "UID-0006",
+          username: "@nadia.skincare",
+          nama: "Nadia Syifa",
+          alamat: "Jl. Pajajaran No. 23, Bogor",
+          nomorWa: "081233445566",
+          kategori: "Beauty & Care",
+          kategori1: "Beauty & Care",
+          pic1: "Amanda",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Sunscreen & Moisturizer",
+          spesifik: "Sunscreen & Moisturizer",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "nadia@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "SEMI TOP",
+          targetGmv: "Rp 60.000.000",
+          gmvBerjalan: "Rp 65.000.000",
+          progresGmv: "108%",
+          siaranLive: "28 Jam",
+          video: "16 Video",
+          aktivitas: "Aktif Live"
+        },
+        {
+          id: 7,
+          uid: "UID-0007",
+          username: "@fauzi.style",
+          nama: "Fauzi Ramadhan",
+          alamat: "Jl. Dipati Ukur No. 55, Bandung",
+          nomorWa: "081344556677",
+          kategori: "Fashion Muslim",
+          kategori1: "Fashion Muslim",
+          pic1: "Setiawan",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Kemeja & Celana Pria",
+          spesifik: "Kemeja & Celana Pria",
+          masaKontrak: "01/01/2026 - 30/11/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-11-30",
+          status: "Bind",
+          leads: "Mahasiswa",
+          email: "fauzi@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "NEW GROWTH",
+          targetGmv: "Rp 45.000.000",
+          gmvBerjalan: "Rp 40.000.000",
+          progresGmv: "88%",
+          siaranLive: "18 Jam",
+          video: "20 Video",
+          aktivitas: "Aktif Konten"
+        },
+        {
+          id: 8,
+          uid: "UID-0008",
+          username: "@siti.momandbaby",
+          nama: "Siti Rahma",
+          alamat: "Jl. Dago No. 78, Bandung",
+          nomorWa: "081255667788",
+          kategori: "Mom & Baby",
+          kategori1: "Mom & Baby",
+          pic1: "Amanda",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Pakaian & Perlengkapan Bayi",
+          spesifik: "Pakaian & Perlengkapan Bayi",
+          masaKontrak: "01/03/2026 - 31/12/2026",
+          kontrakAwal: "2026-03-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "siti@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 70.000.000",
+          gmvBerjalan: "Rp 75.000.000",
+          progresGmv: "107%",
+          siaranLive: "30 Jam",
+          video: "15 Video",
+          aktivitas: "Aktif Konten & Live"
+        },
+        {
+          id: 9,
+          uid: "UID-0009",
+          username: "@rian.gadget",
+          nama: "Rian Pratama",
+          alamat: "Jl. Gatot Subroto No. 12, Jakarta",
+          nomorWa: "081266778899",
+          kategori: "Electronics",
+          kategori1: "Electronics",
+          pic1: "Dimas",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Aksesoris & Smart Device",
+          spesifik: "Aksesoris & Smart Device",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "SmartC",
+          email: "rian@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 120.000.000",
+          gmvBerjalan: "Rp 135.000.000",
+          progresGmv: "112%",
+          siaranLive: "40 Jam",
+          video: "22 Video",
+          aktivitas: "Aktif Live"
+        },
+        {
+          id: 10,
+          uid: "UID-0010",
+          username: "@maya.hijab",
+          nama: "Maya Anggraini",
+          alamat: "Jl. Merdeka No. 44, Tasikmalaya",
+          nomorWa: "081277889911",
+          kategori: "Fashion Muslim",
+          kategori1: "Fashion Muslim",
+          pic1: "Setiawan",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Gamis & Dress Muslim",
+          spesifik: "Gamis & Dress Muslim",
+          masaKontrak: "01/02/2026 - 31/12/2026",
+          kontrakAwal: "2026-02-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "maya@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "NEW GROWTH",
+          targetGmv: "Rp 35.000.000",
+          gmvBerjalan: "Rp 38.000.000",
+          progresGmv: "108%",
+          siaranLive: "14 Jam",
+          video: "18 Video",
+          aktivitas: "Aktif Konten"
+        },
+        {
+          id: 11,
+          uid: "UID-0011",
+          username: "@kevin.tech",
+          nama: "Kevin Sanjaya",
+          alamat: "Jl. Asia Afrika No. 90, Bandung",
+          nomorWa: "081288991122",
+          kategori: "Electronics",
+          kategori1: "Electronics",
+          pic1: "Dimas",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Audio & Smartwatch",
+          spesifik: "Audio & Smartwatch",
+          masaKontrak: "01/01/2026 - 30/09/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-09-30",
+          status: "Bind",
+          leads: "Member",
+          email: "kevin@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "SEMI TOP",
+          targetGmv: "Rp 55.000.000",
+          gmvBerjalan: "Rp 50.000.000",
+          progresGmv: "91%",
+          siaranLive: "20 Jam",
+          video: "15 Video",
+          aktivitas: "Aktif Konten & Live"
+        },
+        {
+          id: 12,
+          uid: "UID-0012",
+          username: "@zahra.skincare",
+          nama: "Zahra Amalia",
+          alamat: "Jl. Cihampelas No. 32, Bandung",
+          nomorWa: "081299112233",
+          kategori: "Beauty & Care",
+          kategori1: "Beauty & Care",
+          pic1: "Amanda",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Facial Wash & Toner",
+          spesifik: "Facial Wash & Toner",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "zahra@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 90.000.000",
+          gmvBerjalan: "Rp 105.000.000",
+          progresGmv: "116%",
+          siaranLive: "38 Jam",
+          video: "20 Video",
+          aktivitas: "Aktif Live"
+        },
+        {
+          id: 13,
+          uid: "UID-0013",
+          username: "@rahmat.kuliner",
+          nama: "Rahmat Hidayat",
+          alamat: "Jl. Buah Batu No. 15, Bandung",
+          nomorWa: "081311223344",
+          kategori: "Food & Beverage",
+          kategori1: "Food & Beverage",
+          pic1: "Dimas",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Frozen Food & Camilan",
+          spesifik: "Frozen Food & Camilan",
+          masaKontrak: "01/02/2026 - 31/10/2026",
+          kontrakAwal: "2026-02-01",
+          kontrakAkhir: "2026-10-31",
+          status: "Bind",
+          leads: "Member",
+          email: "rahmat@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "NEW GROWTH",
+          targetGmv: "Rp 30.000.000",
+          gmvBerjalan: "Rp 32.000.000",
+          progresGmv: "106%",
+          siaranLive: "12 Jam",
+          video: "14 Video",
+          aktivitas: "Aktif Konten"
+        },
+        {
+          id: 14,
+          uid: "UID-0014",
+          username: "@putri.mom",
+          nama: "Putri Maharani",
+          alamat: "Jl. Setiabudi No. 110, Bandung",
+          nomorWa: "081322334455",
+          kategori: "Mom & Baby",
+          kategori1: "Mom & Baby",
+          pic1: "Amanda",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Susu & Botol Bayi",
+          spesifik: "Susu & Botol Bayi",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "SmartC",
+          email: "putrim@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "SEMI TOP",
+          targetGmv: "Rp 65.000.000",
+          gmvBerjalan: "Rp 60.000.000",
+          progresGmv: "92%",
+          siaranLive: "24 Jam",
+          video: "12 Video",
+          aktivitas: "Aktif Live"
+        },
+        {
+          id: 15,
+          uid: "UID-0015",
+          username: "@aldi.menswear",
+          nama: "Aldi Pratama",
+          alamat: "Jl. Surapati No. 67, Bandung",
+          nomorWa: "081333445566",
+          kategori: "Fashion Muslim",
+          kategori1: "Fashion Muslim",
+          pic1: "Setiawan",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Koko Pria & Sarung",
+          spesifik: "Koko Pria & Sarung",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "aldi@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "NEW GROWTH",
+          targetGmv: "Rp 40.000.000",
+          gmvBerjalan: "Rp 42.000.000",
+          progresGmv: "105%",
+          siaranLive: "16 Jam",
+          video: "18 Video",
+          aktivitas: "Aktif Konten"
         }
       ];
 
       // Ensure clean 1-category dummy data reset once
-      if (!localStorage.getItem("bisa_kreator_clean_v12")) {
+      if (!localStorage.getItem("bisa_kreator_clean_v13")) {
         try {
           const oldKeys = [
+            "bisa_kreator_list_v12",
             "bisa_kreator_list_v11",
             "bisa_kreator_list_v10",
             "bisa_kreator_list_v9",
@@ -1569,7 +1978,7 @@
           ];
           oldKeys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
           localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(DEFAULT_KREATOR));
-          localStorage.setItem("bisa_kreator_clean_v12", "true");
+          localStorage.setItem("bisa_kreator_clean_v13", "true");
         } catch(e){}
       }
 
@@ -1924,15 +2333,64 @@
             });
           }
 
+          // Helper to get distinct modern color styles for each category
+          function getKreatorCatPillStyle(catName) {
+            if (!catName || catName === "-") return { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0", dot: "#94a3b8" };
+            const lower = String(catName).toLowerCase();
+            if (lower.includes("fashion") || lower.includes("muslim") || lower.includes("hijab") || lower.includes("pakaian") || lower.includes("outfit")) {
+              return { bg: "#e0f2fe", color: "#0369a1", border: "#bae6fd", dot: "#0284c7" };
+            }
+            if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin") || lower.includes("kosmetik") || lower.includes("makeup") || lower.includes("cantik")) {
+              return { bg: "#fce7f3", color: "#be185d", border: "#fbcfe8", dot: "#db2777" };
+            }
+            if (lower.includes("food") || lower.includes("beverage") || lower.includes("makan") || lower.includes("minum") || lower.includes("kuliner") || lower.includes("snack") || lower.includes("f&b")) {
+              return { bg: "#fef3c7", color: "#b45309", border: "#fde68a", dot: "#f59e0b" };
+            }
+            if (lower.includes("baby") || lower.includes("mom") || lower.includes("anak") || lower.includes("ibu") || lower.includes("kids")) {
+              return { bg: "#ede9fe", color: "#6d28d9", border: "#ddd6fe", dot: "#8b5cf6" };
+            }
+            if (lower.includes("elektronik") || lower.includes("electronic") || lower.includes("gadget") || lower.includes("tech") || lower.includes("hp")) {
+              return { bg: "#dcfce7", color: "#15803d", border: "#bbf7d0", dot: "#22c55e" };
+            }
+            if (lower.includes("home") || lower.includes("living") || lower.includes("rumah") || lower.includes("dekor")) {
+              return { bg: "#ffedd5", color: "#c2410c", border: "#fed7aa", dot: "#f97316" };
+            }
+            if (lower.includes("health") || lower.includes("sehat") || lower.includes("kesehatan") || lower.includes("herbal") || lower.includes("medis")) {
+              return { bg: "#ccfbf1", color: "#0f766e", border: "#99f6e4", dot: "#14b8a6" };
+            }
+            if (lower.includes("sport") || lower.includes("olahraga") || lower.includes("gym") || lower.includes("fitness")) {
+              return { bg: "#e0e7ff", color: "#4338ca", border: "#c7d2fe", dot: "#6366f1" };
+            }
+            if (lower.includes("otomotif") || lower.includes("motor") || lower.includes("mobil")) {
+              return { bg: "#f1f5f9", color: "#334155", border: "#cbd5e1", dot: "#64748b" };
+            }
+
+            // Deterministic pastel palette for other custom categories
+            const fallbacks = [
+              { bg: "#f0fdf4", color: "#166534", border: "#bbf7d0", dot: "#22c55e" },
+              { bg: "#fdf4ff", color: "#86198f", border: "#f5d0fe", dot: "#a21caf" },
+              { bg: "#ecfeff", color: "#155e75", border: "#a5f3fc", dot: "#06b6d4" },
+              { bg: "#fff7ed", color: "#9a3412", border: "#ffedd5", dot: "#ea580c" },
+              { bg: "#f8fafc", color: "#475569", border: "#e2e8f0", dot: "#64748b" }
+            ];
+            let hash = 0;
+            for (let i = 0; i < catName.length; i++) hash = (hash * 31 + catName.charCodeAt(i)) % fallbacks.length;
+            return fallbacks[Math.abs(hash)];
+          }
+
           let kategoriHtml = "-";
           if (categories.length > 0) {
             kategoriHtml = `
               <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
-                ${categories.map((c, idx) => `
-                  <span class="status-badge" style="background: ${idx === 0 ? 'rgba(41, 163, 216, 0.12)' : 'rgba(100, 116, 139, 0.1)'}; color: ${idx === 0 ? '#0284c7' : '#475569'}; border: 1px solid ${idx === 0 ? 'rgba(41, 163, 216, 0.3)' : 'rgba(203, 213, 225, 0.6)'}; font-size: 11px; padding: 2px 7px;" title="${c.pic ? 'PIC: ' + c.pic : ''}">
-                    ${c.name}
-                  </span>
-                `).join('')}
+                ${categories.map((c) => {
+                  const style = getKreatorCatPillStyle(c.name);
+                  const picTitle = c.pic ? `PIC: ${c.pic}` : '';
+                  return `
+                    <span class="kreator-cat-pill" style="background: ${style.bg}; color: ${style.color}; border: 1px solid ${style.border};" title="${picTitle}">
+                      ${c.name}
+                    </span>
+                  `;
+                }).join('')}
               </div>
             `;
           }
@@ -1965,8 +2423,8 @@
               </div>
             </td>
             <td>${item.nama || "-"}</td>
-            <td><span style="color: #334155; font-weight: 500;">${spesifikText}</span></td>
             <td>${kategoriHtml}</td>
+            <td><span style="color: #334155; font-weight: 500;">${spesifikText}</span></td>
             <td>${item.masaKontrak || "-"}</td>
             <td><span class="status-badge ${statusClass}">${item.status || "Bind"}</span></td>
             <td class="tdActions text-center">
@@ -2246,6 +2704,27 @@
             });
           } else {
             alert("Mohon lengkapi semua kolom yang wajib diisi (termasuk Kategori 1).");
+          }
+          return;
+        }
+
+        // Duplicate Category Validation: Kategori 1, 2, 3 tidak boleh sama
+        const activeCategories = [kat1Val, kat2Val, kat3Val].filter(Boolean).map(c => c.toLowerCase().trim());
+        const uniqueCategories = new Set(activeCategories);
+        if (uniqueCategories.size !== activeCategories.length) {
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Kategori Tidak Boleh Sama!',
+              text: 'Kategori yang dipilih tidak boleh sama (duplikat). Mohon pilih kategori yang berbeda pada Kategori 1, 2, atau 3.',
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Perbaiki Kategori',
+              customClass: {
+                popup: 'swal2-bisa-popup'
+              }
+            });
+          } else {
+            alert('Kategori yang dipilih tidak boleh sama (duplikat). Mohon pilih kategori yang berbeda.');
           }
           return;
         }
