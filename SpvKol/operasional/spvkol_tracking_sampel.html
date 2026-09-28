@@ -1086,6 +1086,21 @@
           <input type="text" id="viewKreatorInput" class="form-input is-readonly" readonly />
         </div>
 
+        <!-- Kategori Produk & PIC Section (Dynamic Rows: 1, 2, or 3 based on creator) -->
+        <div id="viewTrackingCategoriesSection" class="form-group span-6" style="margin-top: 2px; margin-bottom: 2px;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px;">
+            <div style="font-weight: 700; font-size: 13px; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+              <span style="display: inline-flex; align-items: center; gap: 6px;">
+                <i class="bx bx-category" style="color: #29A3D8; font-size: 16px;"></i> Kategori Produk &amp; PIC
+              </span>
+              <span style="font-size: 11.5px; font-weight: 500; color: #64748b;">Maksimal 3 Kategori (Kategori 1 Wajib, 2 &amp; 3 Opsional)</span>
+            </div>
+            <div id="viewTrackingCategoriesWrap" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+        </div>
+
         <!-- Row 3 -->
         <div class="form-group span-2">
           <label class="form-label">Varian</label>
@@ -2034,6 +2049,110 @@
         }
       };
 
+      // Category & PIC Resolution for Creator
+      function getPicForCategory(cat) {
+        if (!cat) return "Setiawan";
+        const lower = String(cat).toLowerCase();
+        if (lower.includes("fashion") || lower.includes("muslim")) return "Setiawan";
+        if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin")) return "Amanda";
+        if (lower.includes("food") || lower.includes("beverage") || lower.includes("kuliner") || lower.includes("snack")) return "Dimas";
+        if (lower.includes("mom") || lower.includes("baby") || lower.includes("anak")) return "Clarissa";
+        if (lower.includes("electronic") || lower.includes("elektronik") || lower.includes("tech")) return "Dimas";
+        return "Setiawan";
+      }
+
+      function getCreatorDetailsForTracking(creatorHandleOrName) {
+        if (!creatorHandleOrName) return null;
+        const searchStr = String(creatorHandleOrName).trim().toLowerCase().replace(/^@/, "");
+        if (!searchStr) return null;
+
+        const storageKeys = [
+          "bisa_kreator_list_v13",
+          "bisa_kreator_list_v12",
+          "bisa_kreator_list_v11",
+          "bisa_kreator_list_v10",
+          "bisa_kreator_list_v9",
+          "bisa_kreator_list_v8",
+          "bisa_kreator_list",
+          "bisa_tracking_kreator_list_v6",
+          "bisa_tracking_kreator_list_v5",
+          "bisa_tracking_kreator_list_v4",
+          "bisa_tracking_kreator_list_v3",
+          "bisa_tracking_kreator_list_v2",
+          "bisa_tracking_kreator_list"
+        ];
+
+        for (const key of storageKeys) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const list = JSON.parse(raw);
+              if (Array.isArray(list)) {
+                const found = list.find(k => {
+                  const u = String(k.username || "").toLowerCase().replace(/^@/, "").trim();
+                  const n = String(k.nama || k.name || k.kreator || "").toLowerCase().trim();
+                  return u === searchStr || n === searchStr || (searchStr && (u.includes(searchStr) || n.includes(searchStr) || searchStr.includes(u)));
+                });
+                if (found) return found;
+              }
+            }
+          } catch (e) {}
+        }
+
+        // Default mock creators fallback
+        const defaultCreators = [
+          { username: "@aura.beauty", nama: "Aura Cantika", kategori1: "Fashion Muslim", pic1: "Setiawan", kategori2: "", pic2: "", kategori3: "", pic3: "" },
+          { username: "@clarissa.style", nama: "Clarissa Putri", kategori1: "Beauty & Care", pic1: "Amanda", kategori2: "", pic2: "", kategori3: "", pic3: "" },
+          { username: "@bima.fashion", nama: "Bima Sakti", kategori1: "Fashion Muslim", pic1: "Setiawan", kategori2: "", pic2: "", kategori3: "", pic3: "" },
+          { username: "@dina.hijabstyle", nama: "Dina Syahrini", kategori1: "Food & Beverage", pic1: "Dimas", kategori2: "", pic2: "", kategori3: "", pic3: "" },
+          { username: "@rani.skincare", nama: "Rani Maharani", kategori1: "Beauty & Care", pic1: "Amanda", kategori2: "", pic2: "", kategori3: "", pic3: "" },
+          { username: "@kevin.tech", nama: "Kevin Sanjaya", kategori1: "Electronics", pic1: "Dimas", kategori2: "", pic2: "", kategori3: "", pic3: "" },
+          { username: "@nisa.gamis", nama: "Nisa Sabyan", kategori1: "Fashion Muslim", pic1: "Setiawan", kategori2: "", pic2: "", kategori3: "", pic3: "" },
+          { username: "@maya.baby", nama: "Maya Septha", kategori1: "Mom & Baby", pic1: "Clarissa", kategori2: "", pic2: "", kategori3: "", pic3: "" }
+        ];
+
+        return defaultCreators.find(k => {
+          const u = String(k.username || "").toLowerCase().replace(/^@/, "").trim();
+          const n = String(k.nama || "").toLowerCase().trim();
+          return u === searchStr || n === searchStr || (searchStr && (u.includes(searchStr) || n.includes(searchStr) || searchStr.includes(u)));
+        }) || null;
+      }
+
+      function extractCreatorCategorySlots(creatorObj, fallbackCategory) {
+        const slots = [];
+        if (creatorObj) {
+          if (creatorObj.kategori1 && creatorObj.kategori1.trim() && creatorObj.kategori1 !== "-" && creatorObj.kategori1 !== "Kategori Produk") {
+            slots.push({ name: creatorObj.kategori1.trim(), pic: creatorObj.pic1 || getPicForCategory(creatorObj.kategori1) });
+          }
+          if (creatorObj.kategori2 && creatorObj.kategori2.trim() && creatorObj.kategori2 !== "-" && creatorObj.kategori2 !== "Kategori Produk") {
+            slots.push({ name: creatorObj.kategori2.trim(), pic: creatorObj.pic2 || getPicForCategory(creatorObj.kategori2) });
+          }
+          if (creatorObj.kategori3 && creatorObj.kategori3.trim() && creatorObj.kategori3 !== "-" && creatorObj.kategori3 !== "Kategori Produk") {
+            slots.push({ name: creatorObj.kategori3.trim(), pic: creatorObj.pic3 || getPicForCategory(creatorObj.kategori3) });
+          }
+
+          if (slots.length === 0 && creatorObj.kategori && creatorObj.kategori !== "-") {
+            const rawKat = String(creatorObj.kategori).trim();
+            if (rawKat.includes(",")) {
+              rawKat.split(",").map(s => s.trim()).filter(Boolean).forEach((c, idx) => {
+                if (c && c !== "-" && c !== "Kategori Produk") {
+                  slots.push({ name: c, pic: idx === 0 ? (creatorObj.pic1 || creatorObj.pic || getPicForCategory(c)) : getPicForCategory(c) });
+                }
+              });
+            } else if (rawKat && rawKat !== "Kategori Produk") {
+              slots.push({ name: rawKat, pic: creatorObj.pic1 || creatorObj.pic || getPicForCategory(rawKat) });
+            }
+          }
+        }
+
+        if (slots.length === 0) {
+          const catName = fallbackCategory || "Fashion Muslim";
+          slots.push({ name: catName, pic: getPicForCategory(catName) });
+        }
+
+        return slots;
+      }
+
       // Global Action: View
       window.openViewTrackingById = function (id, e) {
         if (e) {
@@ -2065,6 +2184,47 @@
         if (elVarian) elVarian.value = item.varian || "-";
         if (elKeterangan) elKeterangan.value = item.keterangan || "-";
         if (elStatus) elStatus.value = item.statusSampel || "-";
+
+        // Dynamically populate Kategori Produk & PIC slots (1, 2, or 3 based on creator)
+        const catWrap = document.getElementById("viewTrackingCategoriesWrap");
+        if (catWrap) {
+          const creatorObj = getCreatorDetailsForTracking(item.kreator);
+          let defaultCat = "Fashion Muslim";
+          if (item.brand && (item.brand.toLowerCase().includes("glow") || item.brand.toLowerCase().includes("skin") || item.brand.toLowerCase().includes("beauty"))) {
+            defaultCat = "Beauty & Care";
+          } else if (item.brand && item.brand.toLowerCase().includes("hijab")) {
+            defaultCat = "Fashion Muslim";
+          }
+          const catSlots = extractCreatorCategorySlots(creatorObj, defaultCat);
+
+          catWrap.innerHTML = catSlots.map((slot, index) => {
+            const slotNum = index + 1;
+            const isFirst = index === 0;
+            const badgeHtml = isFirst
+              ? `<span class="status-badge status-badge--success" style="padding: 1px 6px; font-size: 9.5px; background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; border-radius: 4px; font-weight: 600;">Wajib</span>`
+              : `<span style="font-size: 10.5px; color: #94a3b8; font-weight: 500;">Opsional</span>`;
+            const borderStyle = isFirst
+              ? `border: 1.5px solid #93c5fd; box-shadow: 0 1px 2px rgba(0,0,0,0.02);`
+              : `border: 1px solid #e2e8f0;`;
+            const requiredStar = isFirst ? `<span style="color: #ef4444;">*</span>` : ``;
+
+            return `
+              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; align-items: flex-end; background: #ffffff; ${borderStyle} border-radius: 8px; padding: 10px 12px;">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <label class="form-label" style="font-size: 12px; font-weight: 600; margin: 0; color: #1e293b;">Kategori ${slotNum} ${requiredStar}</label>
+                    ${badgeHtml}
+                  </div>
+                  <input type="text" class="form-input is-readonly" value="${slot.name || '-'}" readonly style="background-color: #f8fafc; cursor: default; font-size: 13px; height: 38px; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; color: #1e293b; box-sizing: border-box;" />
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #1e293b; display: block;">PIC Kategori ${slotNum}</label>
+                  <input type="text" class="form-input is-readonly" value="${slot.pic || getPicForCategory(slot.name)}" readonly placeholder="PIC otomatis terisi" style="background-color: #f1f5f9; cursor: default; font-size: 13px; font-weight: 500; height: 38px; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; color: #1e293b; box-sizing: border-box;" />
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
 
         // Populate Log Riwayat Table (Image 2)
         if (logTbody) {
