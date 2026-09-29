@@ -822,7 +822,7 @@
               </div>
 
               <!-- Baris Kategori 2 (Opsional) -->
-              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
+              <div id="wrapKategori2Row" style="display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
                 <div>
                   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                     <label class="form-label" style="font-size: 12px; font-weight: 600; margin: 0;">Kategori 2</label>
@@ -838,10 +838,15 @@
                   <label class="form-label" style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">PIC Kategori 2</label>
                   <input type="text" id="kreatorPic2Input" class="form-input" readonly placeholder="PIC otomatis terisi" style="background-color: #f1f5f9; cursor: default; font-size: 13px; font-weight: 500; height: 38px; color: #1e293b;" />
                 </div>
+                <div id="wrapBtnDeleteKategori2" style="display: none; align-items: center;">
+                  <button type="button" id="btnDeleteKategori2" class="btn-delete-cat" onclick="handleDeleteKategoriSlot(2)" title="Hapus Kategori 2" style="height: 38px; width: 38px; min-width: 38px; border: 1.5px solid #fecaca; background: #fef2f2; color: #ef4444; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2'; this.style.borderColor='#f87171'; this.style.transform='scale(1.04)';" onmouseout="this.style.background='#fef2f2'; this.style.borderColor='#fecaca'; this.style.transform='scale(1)';">
+                    <i class="bx bx-trash" style="font-size: 18px;"></i>
+                  </button>
+                </div>
               </div>
 
               <!-- Baris Kategori 3 (Opsional) -->
-              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
+              <div id="wrapKategori3Row" style="display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
                 <div>
                   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                     <label class="form-label" style="font-size: 12px; font-weight: 600; margin: 0;">Kategori 3</label>
@@ -857,6 +862,11 @@
                   <label class="form-label" style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">PIC Kategori 3</label>
                   <input type="text" id="kreatorPic3Input" class="form-input" readonly placeholder="PIC otomatis terisi" style="background-color: #f1f5f9; cursor: default; font-size: 13px; font-weight: 500; height: 38px; color: #1e293b;" />
                 </div>
+                <div id="wrapBtnDeleteKategori3" style="display: none; align-items: center;">
+                  <button type="button" id="btnDeleteKategori3" class="btn-delete-cat" onclick="handleDeleteKategoriSlot(3)" title="Hapus Kategori 3" style="height: 38px; width: 38px; min-width: 38px; border: 1.5px solid #fecaca; background: #fef2f2; color: #ef4444; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='#fee2e2'; this.style.borderColor='#f87171'; this.style.transform='scale(1.04)';" onmouseout="this.style.background='#fef2f2'; this.style.borderColor='#fecaca'; this.style.transform='scale(1)';">
+                    <i class="bx bx-trash" style="font-size: 18px;"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -869,9 +879,8 @@
           <div class="form-group col-6">
             <label class="form-label">Status</label>
             <div class="select-wrapper">
-              <select id="kreatorStatusSelect" class="form-select" required>
-                <option value="" disabled selected hidden>Pilih Status</option>
-                <option value="Bind">Bind</option>
+              <select id="kreatorStatusSelect" class="form-select" required style="background-color: #f1f5f9; color: #64748b; cursor: not-allowed; pointer-events: none;">
+                <option value="Bind" selected>Bind</option>
                 <option value="Tenggang">Tenggang</option>
                 <option value="Berhenti">Berhenti</option>
               </select>
@@ -1333,9 +1342,16 @@
               } else {
                 if (picInp) picInp.value = "";
               }
+              if (typeof updateKategoriDeleteButtonsVisibility === "function") {
+                updateKategoriDeleteButtonsVisibility();
+              }
             };
           }
         });
+
+        if (typeof updateKategoriDeleteButtonsVisibility === "function") {
+          updateKategoriDeleteButtonsVisibility();
+        }
 
         // Also populate toolbar filter dropdown
         const filterSelect = document.querySelector("#filterCampaignDropdown select");
@@ -1354,6 +1370,190 @@
         }
       }
       window.populateKreatorCategories = populateKreatorCategories;
+
+      function updateKategoriDeleteButtonsVisibility() {
+        const isEditing = !!window.editingKreatorId;
+        const kat2Val = document.getElementById("kreatorKategori2Select")?.value.trim();
+        const kat3Val = document.getElementById("kreatorKategori3Select")?.value.trim();
+
+        const wrapBtn2 = document.getElementById("wrapBtnDeleteKategori2");
+        const wrapBtn3 = document.getElementById("wrapBtnDeleteKategori3");
+
+        if (wrapBtn2) {
+          wrapBtn2.style.display = (isEditing && kat2Val && kat2Val !== "-") ? "inline-flex" : "none";
+        }
+        if (wrapBtn3) {
+          wrapBtn3.style.display = (isEditing && kat3Val && kat3Val !== "-") ? "inline-flex" : "none";
+        }
+      }
+      window.updateKategoriDeleteButtonsVisibility = updateKategoriDeleteButtonsVisibility;
+
+      function handleDeleteKategoriSlot(slotNum) {
+        const isEditing = !!window.editingKreatorId;
+        if (!isEditing) return;
+
+        const creator = kreatorDb.find(k => String(k.id) === String(window.editingKreatorId));
+        if (!creator) return;
+
+        const sel = document.getElementById(`kreatorKategori${slotNum}Select`);
+        const pic = document.getElementById(`kreatorPic${slotNum}Input`);
+        const catValue = sel ? sel.value.trim() : "";
+
+        if (!catValue || catValue === "-") {
+          return;
+        }
+
+        // Check if creator is currently active/running in any campaign under this category
+        const CAMPAIGN_STORAGE_KEYS = [
+          "bisa_campaign_list_v13",
+          "bisa_campaign_list_v12",
+          "bisa_campaign_list_v11",
+          "bisa_campaign_list_v10",
+          "bisa_campaign_list_v9",
+          "bisa_campaign_list_v8",
+          "bisa_campaign_list_v7",
+          "bisa_campaign_list_v6",
+          "bisa_campaign_list_v5",
+          "bisa_campaign_list_v4",
+          "bisa_campaign_list_v3",
+          "bisa_campaign_list_v2",
+          "bisa_campaign_list_v1",
+          "bisa_campaign_list"
+        ];
+
+        let allCampaigns = [];
+        for (const key of CAMPAIGN_STORAGE_KEYS) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                allCampaigns = parsed;
+                break;
+              }
+            }
+          } catch (e) {}
+        }
+
+        const cId = String(creator.id || creator.uid || '');
+        const cName = String(creator.nama || creator.name || '').toLowerCase().trim();
+        const cUser = String(creator.username || '').replace(/^@/, '').toLowerCase().trim();
+        const targetCatLower = catValue.toLowerCase().trim();
+
+        // Check if any campaign is currently Running with this creator in this category
+        const runningCampaign = allCampaigns.find(camp => {
+          const statusCamp = String(camp.statusCampaign || '').toLowerCase().trim();
+          if (statusCamp !== 'running') return false;
+
+          let isInCamp = false;
+          if (Array.isArray(camp.kreatorDetails)) {
+            isInCamp = camp.kreatorDetails.some(kd =>
+              (kd.id && String(kd.id) === cId) ||
+              (kd.name && kd.name.toLowerCase().trim() === cName) ||
+              (kd.username && kd.username.replace(/^@/, '').toLowerCase().trim() === cUser)
+            );
+          }
+          if (!isInCamp && camp.kreator && typeof camp.kreator === 'string') {
+            const kNames = camp.kreator.split(',').map(s => s.replace(/^@/, '').toLowerCase().trim());
+            if (kNames.includes(cName) || kNames.includes(cUser)) isInCamp = true;
+          }
+
+          if (!isInCamp) return false;
+
+          // Check category matching
+          const campCat = String(camp.kategori || camp.category || '').toLowerCase().trim();
+          if (campCat && (campCat === targetCatLower || campCat.includes(targetCatLower) || targetCatLower.includes(campCat))) {
+            return true;
+          }
+
+          if (Array.isArray(camp.kreatorDetails)) {
+            const kdMatch = camp.kreatorDetails.find(kd =>
+              ((kd.id && String(kd.id) === cId) ||
+              (kd.name && kd.name.toLowerCase().trim() === cName) ||
+              (kd.username && kd.username.replace(/^@/, '').toLowerCase().trim() === cUser)) &&
+              kd.category && String(kd.category).toLowerCase().trim() === targetCatLower
+            );
+            if (kdMatch) return true;
+          }
+
+          // Check brand keywords matching category
+          const bLower = String(camp.brand || '').toLowerCase();
+          if (targetCatLower.includes('hijab') || targetCatLower.includes('fashion')) {
+            if (bLower.includes('hijab') || bLower.includes('fashion') || bLower.includes('gamis') || bLower.includes('clothing')) return true;
+          }
+          if (targetCatLower.includes('beauty') || targetCatLower.includes('care') || targetCatLower.includes('skin')) {
+            if (bLower.includes('glow') || bLower.includes('beauty') || bLower.includes('skin') || bLower.includes('cosmetic')) return true;
+          }
+          if (targetCatLower.includes('food') || targetCatLower.includes('beverage')) {
+            if (bLower.includes('food') || bLower.includes('snack') || bLower.includes('kuliner') || bLower.includes('resto')) return true;
+          }
+          if (targetCatLower.includes('mom') || targetCatLower.includes('baby')) {
+            if (bLower.includes('baby') || bLower.includes('kids') || bLower.includes('anak') || bLower.includes('mom')) return true;
+          }
+          if (targetCatLower.includes('electronic') || targetCatLower.includes('tech')) {
+            if (bLower.includes('tech') || bLower.includes('gadget') || bLower.includes('electronic')) return true;
+          }
+
+          return false;
+        });
+
+        if (runningCampaign) {
+          // CASE A: Creator is currently running on this campaign category -> BLOCK & SHOW SWEETALERT
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Kategori Sedang Running!',
+              html: `Kreator <strong>${creator.nama || creator.username}</strong> saat ini sedang running pada Campaign <strong>${runningCampaign.brand || runningCampaign.idCampaign || 'Campaign'}</strong> dengan kategori <strong>${catValue}</strong>.<br><br><span style="font-size: 13px; color: #64748b;">Jika ingin menghapus kategori ini, silakan hapus atau selesaikan partisipasi kreator pada menu <strong>Campaign</strong> terlebih dahulu.</span>`,
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Mengerti',
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+          } else {
+            alert(`Kreator ${creator.nama} sedang running di campaign ${runningCampaign.brand} pada kategori ${catValue}. Silakan hapus di campaign terlebih dahulu.`);
+          }
+          return;
+        }
+
+        // CASE B: Campaign already completed / finished or no running campaign -> CONFIRM & ALLOW DELETE
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            title: `Hapus Kategori ${slotNum}?`,
+            html: `Apakah Anda yakin ingin menghapus kategori <strong>${catValue}</strong> dari kreator <strong>${creator.nama || creator.username}</strong>?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              if (sel) sel.value = "";
+              if (pic) pic.value = "";
+              updateKategoriDeleteButtonsVisibility();
+              Swal.fire({
+                icon: 'success',
+                title: 'Kategori Berhasil Dihapus!',
+                html: `Kategori <strong>${catValue}</strong> berhasil dihapus. Jangan lupa klik <strong>Simpan Perubahan</strong> untuk menyimpan data.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'OK',
+                timer: 2200,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
+        } else {
+          if (confirm(`Hapus kategori ${catValue}?`)) {
+            if (sel) sel.value = "";
+            if (pic) pic.value = "";
+            updateKategoriDeleteButtonsVisibility();
+          }
+        }
+      }
+      window.handleDeleteKategoriSlot = handleDeleteKategoriSlot;
 
       // Leads Kreator Dynamic Data from Master Pendukung (LocalStorage - Real Time)
       function populateKreatorLeads(selectedVal = "") {
@@ -1451,6 +1651,7 @@
       }
 
       function calculateKreatorStatus(item) {
+        if (!item) return "Bind";
         const endDate = getKreatorEndDate(item);
         if (!endDate) {
           return item.status || "Bind";
@@ -1466,14 +1667,15 @@
           return "Berhenti";
         }
 
-        const oneMonthLater = new Date(today);
-        oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+        // H - 1 Bulan otomatis berubah menjadi Tenggang
+        const hMinus1Month = new Date(end);
+        hMinus1Month.setMonth(hMinus1Month.getMonth() - 1);
 
-        if (end <= oneMonthLater) {
+        if (today >= hMinus1Month) {
           return "Tenggang";
         }
 
-        return "Bind";
+        return item.status || "Bind";
       }
       window.calculateKreatorStatus = calculateKreatorStatus;
 
@@ -2054,8 +2256,19 @@
           window.setSelectedKreatorFoto("");
         }
 
+        // Status abu-abu & terkunci Bind saat input awal
         const statusSelect = document.getElementById("kreatorStatusSelect");
-        if (statusSelect) statusSelect.selectedIndex = 0;
+        if (statusSelect) {
+          statusSelect.value = "Bind";
+          statusSelect.style.backgroundColor = "#f1f5f9";
+          statusSelect.style.color = "#64748b";
+          statusSelect.style.cursor = "not-allowed";
+          statusSelect.style.pointerEvents = "none";
+        }
+
+        if (typeof updateKategoriDeleteButtonsVisibility === "function") {
+          updateKategoriDeleteButtonsVisibility();
+        }
       }
       window.resetKreatorForm = resetKreatorForm;
 
@@ -2146,6 +2359,9 @@
 
         populateKreatorCategories({ kat1, pic1, kat2, pic2, kat3, pic3 });
         populateKreatorLeads(item.leads || "");
+        if (typeof updateKategoriDeleteButtonsVisibility === "function") {
+          updateKategoriDeleteButtonsVisibility();
+        }
 
         const katSpesifikInp = document.getElementById("kreatorKatSpesifikInput");
         if (katSpesifikInp) {
@@ -2159,16 +2375,16 @@
         const tglAkhirInp = document.getElementById("kreatorKontrakAkhirInput");
         if (tglAkhirInp) tglAkhirInp.value = item.kontrakAkhir || "";
 
+        // Saat Edit, status DAPAT diedit kembali (aktif & warna normal)
         const statusSelect = document.getElementById("kreatorStatusSelect");
         if (statusSelect) {
-          const currentStatus = calculateKreatorStatus(item);
-          for (let i = 0; i < statusSelect.options.length; i++) {
-            if (statusSelect.options[i].text.toLowerCase() === currentStatus.toLowerCase() ||
-              statusSelect.options[i].value.toLowerCase() === currentStatus.toLowerCase()) {
-              statusSelect.selectedIndex = i;
-              break;
-            }
-          }
+          statusSelect.style.backgroundColor = "#ffffff";
+          statusSelect.style.color = "#1e293b";
+          statusSelect.style.cursor = "pointer";
+          statusSelect.style.pointerEvents = "auto";
+
+          const currentStatus = item.status || calculateKreatorStatus(item);
+          statusSelect.value = currentStatus;
         }
 
         const emailInp = document.getElementById("kreatorEmailInput");
@@ -2685,12 +2901,13 @@
         const katSpesifikVal = document.getElementById("kreatorKatSpesifikInput")?.value.trim() || "";
         const tglAwalVal = document.getElementById("kreatorKontrakAwalInput")?.value.trim() || "";
         const tglAkhirVal = document.getElementById("kreatorKontrakAkhirInput")?.value.trim() || "";
-        const statusVal = document.getElementById("kreatorStatusSelect")?.value.trim() || "";
+        const rawStatus = document.getElementById("kreatorStatusSelect")?.value.trim();
+        const statusVal = window.editingKreatorId ? (rawStatus || "Bind") : "Bind";
         const passVal = document.getElementById("kreatorPassword")?.value.trim() || "password123";
         const fotoVal = document.getElementById("kreatorFotoData")?.value.trim() || "../../media/avatar.png";
 
         // Form Validation: Kategori 1 wajib diisi, Kategori 2 & 3 opsional
-        if (!uidVal || !userVal || !namaVal || !waVal || !alamatVal || !emailVal || !leadsVal || !kat1Val || !tglAwalVal || !tglAkhirVal || !statusVal) {
+        if (!uidVal || !userVal || !namaVal || !waVal || !alamatVal || !emailVal || !leadsVal || !kat1Val || !tglAwalVal || !tglAkhirVal) {
           if (typeof Swal !== "undefined") {
             Swal.fire({
               icon: 'warning',
@@ -2924,8 +3141,15 @@
         });
       }
 
-      // Otomatis sinkronkan status select di modal saat tanggal akhir kontrak diubah
+      // Otomatis sinkronkan status select di modal saat tanggal akhir kontrak diubah (hanya jika mode edit)
       function autoUpdateStatusSelect() {
+        if (!window.editingKreatorId) {
+          const statusSelect = document.getElementById("kreatorStatusSelect");
+          if (statusSelect) {
+            statusSelect.value = "Bind";
+          }
+          return;
+        }
         const tglAkhirInp = document.getElementById("kreatorKontrakAkhirInput");
         const statusSelect = document.getElementById("kreatorStatusSelect");
         if (!tglAkhirInp || !statusSelect) return;
@@ -2933,13 +3157,7 @@
         if (!val) return;
 
         const computed = calculateKreatorStatus({ kontrakAkhir: val });
-        for (let i = 0; i < statusSelect.options.length; i++) {
-          if (statusSelect.options[i].text.toLowerCase() === computed.toLowerCase() ||
-            statusSelect.options[i].value.toLowerCase() === computed.toLowerCase()) {
-            statusSelect.selectedIndex = i;
-            break;
-          }
-        }
+        statusSelect.value = computed;
       }
 
       const tglAkhirInp = document.getElementById("kreatorKontrakAkhirInput");

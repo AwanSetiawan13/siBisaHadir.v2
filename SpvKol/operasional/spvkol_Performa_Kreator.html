@@ -6,11 +6,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Performa Kreator | Bisa Media</title>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="../../style.css" />
   <!-- Boxicons for action icons -->
   <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
   <style>
+    /* ===== SweetAlert2 Custom Styling for Bisa Media ===== */
+    .swal2-bisa-popup {
+      font-family: 'Outfit', sans-serif !important;
+      border-radius: 14px !important;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
+      padding: 26px 22px !important;
+    }
+
+    .swal2-bisa-popup .swal2-title {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 19px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin-top: 12px !important;
+    }
+
+    .swal2-bisa-popup .swal2-html-container {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      color: #64748b !important;
+      line-height: 1.55 !important;
+      margin-top: 8px !important;
+    }
+
+    .swal2-bisa-popup .swal2-confirm,
+    .swal2-bisa-popup .swal2-cancel {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+      padding: 9px 22px !important;
+      box-shadow: none !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+
     /* Toolbar Green Excel Button */
     .btn-excel-green {
       background: #f0fdf4 !important;
@@ -1445,10 +1486,43 @@
             const id = btnDel.getAttribute("data-id");
             const item = performaDb.find(p => p.id === id);
             if (item) {
-              pendingDeletePerformaId = item.id;
-              const elText = document.getElementById("deletePerformaUsernameText");
-              if (elText) elText.textContent = `${item.username} (${item.tanggal})`;
-              if (modalHapusPerforma) modalHapusPerforma.classList.add("is-active");
+              if (typeof Swal !== "undefined") {
+                Swal.fire({
+                  title: 'Hapus Data Performa?',
+                  html: `Apakah Anda yakin ingin menghapus data performa untuk <strong>${item.username || ''}</strong> (${item.tanggal || ''})?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#ef4444',
+                  cancelButtonColor: '#94a3b8',
+                  confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+                  cancelButtonText: 'Batal',
+                  reverseButtons: true,
+                  focusCancel: true,
+                  customClass: { popup: 'swal2-bisa-popup' }
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    performaDb = performaDb.filter(p => p.id !== item.id);
+                    savePerformaDb();
+                    renderPerformaTable();
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Berhasil Dihapus!',
+                      html: `Data performa <strong>${item.username || ''}</strong> berhasil dihapus.`,
+                      confirmButtonColor: '#29A3D8',
+                      confirmButtonText: 'Selesai',
+                      timer: 2000,
+                      timerProgressBar: true,
+                      customClass: { popup: 'swal2-bisa-popup' }
+                    });
+                    if (typeof showToast === "function") showToast("Data performa berhasil dihapus", "success");
+                  }
+                });
+              } else {
+                pendingDeletePerformaId = item.id;
+                const elText = document.getElementById("deletePerformaUsernameText");
+                if (elText) elText.textContent = `${item.username} (${item.tanggal})`;
+                if (modalHapusPerforma) modalHapusPerforma.classList.add("is-active");
+              }
             }
             return;
           }
@@ -1472,7 +1546,20 @@
             savePerformaDb();
             renderPerformaTable();
             if (modalEditPerforma) modalEditPerforma.classList.remove("is-active");
-            if (typeof showToast === "function") showToast("Data performa berhasil diperbarui");
+
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Diperbarui!',
+                html: `Data performa <strong>${performaDb[idx].username}</strong> berhasil diperbarui.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+            if (typeof showToast === "function") showToast("Data performa berhasil diperbarui", "success");
           }
         });
       }
@@ -1585,6 +1672,224 @@
             this.style.display = "none";
             searchInput.focus();
             renderPerformaTable();
+          }
+        });
+      }
+
+      // Tambah Performa Form & Panel Toggle Handlers
+      const btnTambahPerforma = document.getElementById("btnTambahPerforma");
+      const btnCancelTambahPerforma = document.getElementById("btnCancelTambahPerforma");
+      const tablePanel = document.getElementById("tablePanel");
+      const formPanel = document.getElementById("formPanel");
+      const performaForm = document.getElementById("performaForm");
+      const performaFormatSelect = document.getElementById("performaFormatSelect");
+      const fileUploadContainer = document.getElementById("fileUploadContainer");
+      const performaFileInput = document.getElementById("performaFileInput");
+      const performaPasteInput = document.getElementById("performaPasteInput");
+      const previewBox = document.getElementById("previewBox");
+
+      if (btnTambahPerforma && tablePanel && formPanel) {
+        btnTambahPerforma.addEventListener("click", () => {
+          tablePanel.style.display = "none";
+          formPanel.style.display = "block";
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      if (btnCancelTambahPerforma && tablePanel && formPanel) {
+        btnCancelTambahPerforma.addEventListener("click", () => {
+          formPanel.style.display = "none";
+          tablePanel.style.display = "block";
+        });
+      }
+
+      if (performaFormatSelect) {
+        performaFormatSelect.addEventListener("change", function () {
+          if (this.value === "Paste_Data") {
+            if (fileUploadContainer) fileUploadContainer.style.display = "none";
+            if (performaPasteInput) performaPasteInput.style.display = "block";
+            if (performaFileInput) performaFileInput.removeAttribute("required");
+            if (performaPasteInput) performaPasteInput.setAttribute("required", "required");
+          } else {
+            if (fileUploadContainer) fileUploadContainer.style.display = "flex";
+            if (performaPasteInput) performaPasteInput.style.display = "none";
+            if (performaFileInput) performaFileInput.setAttribute("required", "required");
+            if (performaPasteInput) performaPasteInput.removeAttribute("required");
+          }
+        });
+      }
+
+      if (fileUploadContainer && performaFileInput) {
+        fileUploadContainer.addEventListener("click", () => {
+          performaFileInput.click();
+        });
+        performaFileInput.addEventListener("change", function () {
+          if (this.files && this.files[0]) {
+            const fileName = this.files[0].name;
+            const chooseBtn = fileUploadContainer.querySelector(".btn-choose-file");
+            if (chooseBtn) chooseBtn.textContent = fileName;
+            if (previewBox) {
+              previewBox.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0284c7; font-weight: 600;">
+                  <i class="bx bxs-file-doc" style="font-size: 20px;"></i>
+                  <span>${fileName} (${(this.files[0].size / 1024).toFixed(1)} KB)</span>
+                </div>
+              `;
+            }
+          }
+        });
+      }
+
+      if (performaForm) {
+        performaForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const tglInp = this.querySelector('input[type="text"], input[type="date"]');
+          const tglVal = tglInp ? tglInp.value : "";
+          const fmtVal = performaFormatSelect ? performaFormatSelect.value : "Excel";
+
+          const newItem = {
+            id: Date.now(),
+            tanggal: tglVal ? (tglVal.includes("-") ? tglVal.split("-").reverse().join("/") : tglVal) : "28/09/2026",
+            uid: `UID-00${Math.floor(10 + Math.random() * 90)}`,
+            username: "@kreator.baru",
+            followers: "50.000",
+            gmv: "Rp 25.000.000",
+            pesanan: "500",
+            live_gmv: "Rp 15.000.000",
+            video_gmv: "Rp 10.000.000",
+            live_orders: "300",
+            video_orders: "200",
+            ctr_live: "4.5%",
+            ctr_video: "3.2%",
+            direct_gmv: "Rp 18.000.000",
+            direct_live: "Rp 10.000.000",
+            direct_video: "Rp 8.000.000",
+            direct_orders: "350",
+            sold: "650",
+            direct_live_orders: "200",
+            live_sold: "400",
+            direct_video_orders: "150",
+            video_sold: "250",
+            kreator_sold: "650",
+            komisi: "Rp 2.500.000",
+            dasar: "10%",
+            live_views: "15.000",
+            views: "35.000",
+            live_broadcasts: "12",
+            videos: "8",
+            partner_gmv: "Rp 7.000.000",
+            partner_orders: "150"
+          };
+
+          performaDb.unshift(newItem);
+          savePerformaDb();
+          renderPerformaTable();
+
+          if (formPanel) formPanel.style.display = "none";
+          if (tablePanel) tablePanel.style.display = "block";
+          performaForm.reset();
+          if (previewBox) previewBox.innerHTML = "";
+          const chooseBtn = fileUploadContainer?.querySelector(".btn-choose-file");
+          if (chooseBtn) chooseBtn.textContent = "Choose File";
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil Ditambahkan!',
+              html: `Data performa kreator (${fmtVal}) berhasil ditambahkan ke dalam sistem.`,
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Selesai',
+              timer: 2200,
+              timerProgressBar: true,
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+          }
+        });
+      }
+
+      // Toolbar: Excel Export (CSV)
+      const btnExportExcel = document.getElementById("btnExportExcel");
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener("click", () => {
+          if (!performaDb || performaDb.length === 0) {
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: 'info',
+                title: 'Data Kosong',
+                text: 'Tidak ada data performa kreator untuk diekspor.',
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+            return;
+          }
+
+          const headers = [
+            "No", "Tanggal", "UID", "Username", "Followers", "GMV Afiliasi",
+            "Pesanan Afiliasi", "Live GMV", "Video GMV", "Live Orders", "Video Orders",
+            "CTR Live", "CTR Video", "Direct GMV", "Direct Live", "Direct Video",
+            "Direct Orders", "Sold", "Direct Live Orders", "Live Sold", "Direct Video Orders",
+            "Video Sold", "Kreator Sold", "Est Komisi", "Dasar Komisi", "Tayangan Live",
+            "Tayangan", "Siaran Live", "Video", "Partner GMV", "Partner Orders"
+          ];
+
+          const rows = performaDb.map((item, idx) => [
+            idx + 1,
+            `"${(item.tanggal || '').replace(/"/g, '""')}"`,
+            `"${(item.uid || '').replace(/"/g, '""')}"`,
+            `"${(item.username || '').replace(/"/g, '""')}"`,
+            `"${(item.followers || '').replace(/"/g, '""')}"`,
+            `"${(item.gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.pesanan || '').replace(/"/g, '""')}"`,
+            `"${(item.live_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.video_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.live_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.video_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.ctr_live || '').replace(/"/g, '""')}"`,
+            `"${(item.ctr_video || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_live || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_video || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.sold || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_live_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.live_sold || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_video_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.video_sold || '').replace(/"/g, '""')}"`,
+            `"${(item.kreator_sold || '').replace(/"/g, '""')}"`,
+            `"${(item.komisi || '').replace(/"/g, '""')}"`,
+            `"${(item.dasar || '').replace(/"/g, '""')}"`,
+            `"${(item.live_views || '').replace(/"/g, '""')}"`,
+            `"${(item.views || '').replace(/"/g, '""')}"`,
+            `"${(item.live_broadcasts || '').replace(/"/g, '""')}"`,
+            `"${(item.videos || '').replace(/"/g, '""')}"`,
+            `"${(item.partner_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.partner_orders || '').replace(/"/g, '""')}"`
+          ]);
+
+          const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\r\n");
+          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.setAttribute("href", url);
+          const todayStr = new Date().toISOString().split("T")[0];
+          link.setAttribute("download", `data_performa_kreator_${todayStr}.csv`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Export Berhasil!',
+              text: 'Data performa kreator berhasil diekspor ke Excel (.csv).',
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Selesai',
+              timer: 2000,
+              timerProgressBar: true,
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
           }
         });
       }
