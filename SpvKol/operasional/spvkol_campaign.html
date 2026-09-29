@@ -3568,6 +3568,16 @@
         return false;
       }
 
+      function cleanCategoryOnly(cat) {
+        if (!cat || cat === "-") return "-";
+        let clean = String(cat).trim();
+        const parts = clean.split(/[\-\–\—\:\|]/);
+        if (parts.length > 0 && parts[0].trim()) {
+          clean = parts[0].trim();
+        }
+        return clean || "-";
+      }
+
       // Ensure clean 1-category dummy data reset once
       if (!localStorage.getItem("bisa_kreator_clean_v13")) {
         try {
@@ -3758,29 +3768,30 @@
                 const mapped = parsed.map(k => {
                   const rawCategories = [];
                   if (k.kategori1 && k.kategori1.trim() !== "" && k.kategori1.trim() !== "-" && k.kategori1 !== "Kategori Produk") {
-                    rawCategories.push(k.kategori1.trim());
+                    rawCategories.push(cleanCategoryOnly(k.kategori1.trim()));
                   }
                   if (k.kategori2 && k.kategori2.trim() !== "" && k.kategori2.trim() !== "-" && k.kategori2 !== "Kategori Produk") {
-                    rawCategories.push(k.kategori2.trim());
+                    rawCategories.push(cleanCategoryOnly(k.kategori2.trim()));
                   }
                   if (k.kategori3 && k.kategori3.trim() !== "" && k.kategori3.trim() !== "-" && k.kategori3 !== "Kategori Produk") {
-                    rawCategories.push(k.kategori3.trim());
+                    rawCategories.push(cleanCategoryOnly(k.kategori3.trim()));
                   }
                   if (rawCategories.length === 0) {
                     const singleCat = k.kategori || k.category || "";
                     if (singleCat && singleCat.trim() !== "" && singleCat.trim() !== "-" && singleCat !== "Kategori Produk") {
                       if (singleCat.includes(",")) {
                         singleCat.split(",").forEach(sc => {
-                          const clean = sc.trim();
+                          const clean = cleanCategoryOnly(sc.trim());
                           if (clean && clean !== "-" && clean !== "Kategori Produk") rawCategories.push(clean);
                         });
                       } else {
-                        rawCategories.push(singleCat.trim());
+                        rawCategories.push(cleanCategoryOnly(singleCat.trim()));
                       }
                     }
                   }
-                  const categories = rawCategories.length > 0 ? rawCategories : ["-"];
-                  const primaryCat = categories[0];
+                  const cleanedRaw = rawCategories.map(c => cleanCategoryOnly(c)).filter(c => c && c !== "-");
+                  const categories = cleanedRaw.length > 0 ? Array.from(new Set(cleanedRaw)) : ["-"];
+                  const primaryCat = categories[0] || "-";
                   const rawSpec = k.kategoriSpesifik || k.spesifik || "";
                   const cleanSpec = (rawSpec && rawSpec.trim() !== "" && rawSpec !== "-" && rawSpec !== "Kategori Spesifik") ? rawSpec.trim() : "-";
                   return {
@@ -3958,10 +3969,21 @@
       let currentKreatorPage = 1;
       let kreatorPerPage = 5;
 
+      function cleanCategoryOnly(cat) {
+        if (!cat || cat === "-") return "-";
+        let clean = String(cat).trim();
+        if (clean.includes(" - ")) clean = clean.split(" - ")[0].trim();
+        else if (clean.includes(" – ")) clean = clean.split(" – ")[0].trim();
+        else if (clean.includes(" : ")) clean = clean.split(" : ")[0].trim();
+        else if (clean.includes(" | ")) clean = clean.split(" | ")[0].trim();
+        return clean;
+      }
+
       // Unified Category Style & Dot Indicator helper matching Data Kreator
       function getKreatorCatPillStyle(catName) {
         if (!catName || catName === "-") return { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0", dot: "#94a3b8" };
-        const lower = String(catName).toLowerCase();
+        const clean = cleanCategoryOnly(catName);
+        const lower = String(clean).toLowerCase();
         if (lower.includes("fashion") || lower.includes("muslim") || lower.includes("hijab") || lower.includes("pakaian") || lower.includes("outfit")) {
           return { bg: "#e0f2fe", color: "#0369a1", border: "#bae6fd", dot: "#0284c7" };
         }
@@ -4277,6 +4299,7 @@
 
       function addCategoryToKreatorInStorage(creatorId, newCategory) {
         if (!newCategory || !creatorId) return;
+        newCategory = cleanCategoryOnly(newCategory);
         const kIdStr = String(creatorId);
         const targetPic = getPicForCategory(newCategory);
 
@@ -4532,6 +4555,7 @@
 
       function replaceCategorySlotInStorage(creatorId, slotNumber, newCategory) {
         if (!newCategory || !creatorId || !slotNumber) return;
+        newCategory = cleanCategoryOnly(newCategory);
         const kIdStr = String(creatorId);
         const targetPic = getPicForCategory(newCategory);
         const targetK = allKreatorList.find(k => String(k.id) === kIdStr || (k.name && k.name.toLowerCase() === kIdStr.toLowerCase()));
@@ -4906,20 +4930,22 @@
 
           // Format Category Badges with distinct colors
           function getCategoryPillBadge(catName) {
-            if (!catName || catName === "-") return `<span style="color: #94a3b8; font-size: 11px;">-</span>`;
-            const style = getKreatorCatPillStyle(catName);
+            const cleanCat = cleanCategoryOnly(catName);
+            if (!cleanCat || cleanCat === "-") return `<span style="color: #94a3b8; font-size: 11px;">-</span>`;
+            const style = getKreatorCatPillStyle(cleanCat);
             return `
               <span class="kreator-cat-pill" style="background: ${style.bg}; color: ${style.color}; border: 1px solid ${style.border};">
-                ${catName}
+                ${cleanCat}
               </span>
             `;
           }
 
           let catBadgesHtml = "-";
           if (Array.isArray(k.categories) && k.categories.length > 0 && k.categories[0] !== "-") {
-            catBadgesHtml = k.categories.map(cat => getCategoryPillBadge(cat)).join("");
+            const uniqueCats = Array.from(new Set(k.categories.map(cat => cleanCategoryOnly(cat)).filter(c => c && c !== "-")));
+            catBadgesHtml = uniqueCats.length > 0 ? uniqueCats.map(cat => getCategoryPillBadge(cat)).join("") : "-";
           } else if (k.category && k.category !== "-") {
-            catBadgesHtml = getCategoryPillBadge(k.category);
+            catBadgesHtml = getCategoryPillBadge(cleanCategoryOnly(k.category));
           }
 
           // Status Badge Style
@@ -5121,39 +5147,41 @@
           const assignedSamples = kreatorSampleMap[k.id];
 
           const rowWrap = document.createElement("div");
-          rowWrap.style.cssText = "display: grid; grid-template-columns: 1.1fr 1.2fr; gap: 20px; align-items: start; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; position: relative;";
+          rowWrap.style.cssText = "display: grid; grid-template-columns: 1fr 1.15fr; gap: 18px; align-items: start; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; position: relative;";
 
           function getSelCategoryPillBadge(catName) {
-            if (!catName || catName === "-") return `<span style="color: #94a3b8; font-size: 11px;">-</span>`;
-            const style = getKreatorCatPillStyle(catName);
+            const cleanCat = cleanCategoryOnly(catName);
+            if (!cleanCat || cleanCat === "-") return `<span style="color: #94a3b8; font-size: 11px;">-</span>`;
+            const style = getKreatorCatPillStyle(cleanCat);
             return `
-              <span class="kreator-cat-pill" style="background: ${style.bg}; color: ${style.color}; border: 1px solid ${style.border}; font-size: 11px; padding: 2.5px 8px; border-radius: 6px;">
-                ${catName}
+              <span class="kreator-cat-pill" style="background: ${style.bg}; color: ${style.color}; border: 1px solid ${style.border}; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 600; white-space: nowrap;">
+                ${cleanCat}
               </span>
             `;
           }
 
           let selCatBadges = "-";
           if (Array.isArray(k.categories) && k.categories.length > 0 && k.categories[0] !== "-") {
-            selCatBadges = k.categories.map(c => getSelCategoryPillBadge(c)).join(" ");
+            const uniqueCats = Array.from(new Set(k.categories.map(c => cleanCategoryOnly(c)).filter(c => c && c !== "-")));
+            selCatBadges = uniqueCats.length > 0 ? uniqueCats.map(c => getSelCategoryPillBadge(c)).join(" ") : "-";
           } else if (k.category && k.category !== "-") {
-            selCatBadges = getSelCategoryPillBadge(k.category);
+            selCatBadges = getSelCategoryPillBadge(cleanCategoryOnly(k.category));
           }
 
           // Left Column: Creator info + minus button
           const leftCol = document.createElement("div");
-          leftCol.style.cssText = "display: flex; align-items: flex-start; gap: 10px; margin-top: 6px;";
+          leftCol.style.cssText = "display: flex; align-items: flex-start; gap: 10px; margin-top: 6px; min-width: 0;";
           leftCol.innerHTML = `
             <button type="button" class="kreator-btn-minus" title="Hapus kreator" aria-label="Hapus kreator" style="width: 22px; height: 22px; border: 1.5px solid #94a3b8; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; background: #fff; color: #64748b; cursor: pointer; flex-shrink: 0; padding: 0; margin-top: 2px;">
               <svg width="10" height="2" viewBox="0 0 10 2" fill="currentColor">
                 <rect width="10" height="2" rx="1" />
               </svg>
             </button>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 14px; font-weight: 600; color: #1e293b; line-height: 1.2;">${k.name}</span>
+            <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <span style="font-size: 14px; font-weight: 600; color: #1e293b; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${k.name}</span>
               <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <span style="font-size: 11.5px; color: #0284c7; font-weight: 500;">${k.username}</span>
-                <div style="display: inline-flex; align-items: center; gap: 3px;">${selCatBadges}</div>
+                <div style="display: inline-flex; align-items: center; gap: 3px; flex-wrap: wrap;">${selCatBadges}</div>
               </div>
             </div>
           `;
@@ -5165,7 +5193,7 @@
 
           // Right Column: Vertical list of Sample rows + Tambah Sampel row
           const rightCol = document.createElement("div");
-          rightCol.style.cssText = "display: flex; flex-direction: column; gap: 8px; position: relative;";
+          rightCol.style.cssText = "display: flex; flex-direction: column; gap: 8px; position: relative; min-width: 0;";
 
           let activeSwapIndex = null;
 
@@ -5173,18 +5201,18 @@
           assignedSamples.forEach((sName, sIdx) => {
             const parsed = parseSampleItem(sName);
             const sampleRow = document.createElement("div");
-            sampleRow.style.cssText = "display: flex; align-items: center; gap: 8px; width: 100%;";
+            sampleRow.style.cssText = "display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0;";
             sampleRow.innerHTML = `
-              <div class="sample-pill-btn" style="flex: 1; min-height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: all 0.15s ease;">
-                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                  <span style="font-size: 12.5px; color: #1e293b; font-weight: 500;">${parsed.nama}</span>
-                  ${parsed.varian ? `<span style="font-size: 11px; font-weight: 600; color: #0284c7; background: #e0f2fe; border: 1px solid #bae6fd; padding: 1px 7px; border-radius: 4px;">${parsed.varian}</span>` : ''}
+              <div class="sample-pill-btn" title="${parsed.nama}${parsed.varian ? ' - ' + parsed.varian : ''}" style="flex: 1; min-width: 0; height: 36px; min-height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: all 0.15s ease; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; overflow: hidden; margin-right: 6px;">
+                  <span style="font-size: 12px; color: #1e293b; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${parsed.nama}</span>
+                  ${parsed.varian ? `<span style="font-size: 10.5px; font-weight: 600; color: #0284c7; background: #e0f2fe; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">${parsed.varian}</span>` : ''}
                 </div>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-left: 8px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </div>
-              <button type="button" class="btn-sample-delete" title="Hapus sampel" style="width: 36px; height: 36px; border: 1.5px solid #ef4444; border-radius: 6px; background: #fff; color: #ef4444; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.15s ease;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">
+              <button type="button" class="btn-sample-delete" title="Hapus sampel" style="width: 36px; height: 36px; min-height: 36px; border: 1.5px solid #ef4444; border-radius: 6px; background: #fff; color: #ef4444; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-sizing: border-box; transition: all 0.15s ease;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='#fff'">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -5214,15 +5242,15 @@
 
           // 2. Tambah Sampel Row
           const addRow = document.createElement("div");
-          addRow.style.cssText = "display: flex; align-items: center; gap: 8px; width: 100%; position: relative;";
+          addRow.style.cssText = "display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0; position: relative;";
           addRow.innerHTML = `
-            <div class="sample-add-trigger" style="flex: 1; height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: all 0.15s ease;">
-              <span style="font-size: 12.5px; color: #94a3b8; font-weight: 400;">Tambah Sampel</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-left: 8px;">
+            <div class="sample-add-trigger" style="flex: 1; min-width: 0; height: 36px; min-height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: all 0.15s ease; box-sizing: border-box;">
+              <span style="font-size: 12px; color: #94a3b8; font-weight: 400;">Tambah Sampel</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </div>
-            <button type="button" class="btn-sample-add-plus" title="Tambah sampel" style="width: 36px; height: 36px; border: 1.5px solid #29A3D8; border-radius: 6px; background: #fff; color: #29A3D8; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.15s ease;" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background='#fff'">
+            <button type="button" class="btn-sample-add-plus" title="Tambah sampel" style="width: 36px; height: 36px; min-height: 36px; border: 1.5px solid #29A3D8; border-radius: 6px; background: #fff; color: #29A3D8; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; box-sizing: border-box; transition: all 0.15s ease;" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background='#fff'">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -7259,7 +7287,7 @@
 
       function syncCampaignSamplesToTracking(campaign) {
         if (!campaign) return;
-        const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v5";
+        const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v11";
         let trackingList = [];
         try {
           const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
@@ -7296,7 +7324,25 @@
             const parsed = parseSampleItem(s);
             const sampleName = parsed.nama || "Sampel Produk";
             const sampleVarian = parsed.varian || "Standar";
-            const samplePid = parsed.pid || campaignPid;
+            
+            // Resolve sample PID from brand database if not in parsed
+            let samplePid = parsed.pid;
+            if (!samplePid) {
+              try {
+                const brands = getBrandDatabase();
+                const bObj = brands.find(b => b.nama && b.nama.toLowerCase() === brandName.toLowerCase());
+                if (bObj && Array.isArray(bObj.sampel)) {
+                  const sObj = bObj.sampel.find(item => {
+                    const sN = (typeof item === 'string' ? item : (item.nama || '')).trim().toLowerCase();
+                    return sN === sampleName.toLowerCase();
+                  });
+                  if (sObj && typeof sObj === 'object' && sObj.pid) {
+                    samplePid = sObj.pid;
+                  }
+                }
+              } catch (err) {}
+            }
+            if (!samplePid) samplePid = campaignPid;
 
             const existingIdx = trackingList.findIndex(t =>
               (t.campaignId === campId || t.brand === brandName) &&
@@ -7306,7 +7352,14 @@
             );
 
             if (existingIdx === -1) {
-              const nextId = "TRK-" + (trackingList.length + 1).toString().padStart(3, "0");
+              let maxNum = 0;
+              trackingList.forEach(t => {
+                if (t.id && t.id.startsWith("TRK-")) {
+                  const num = parseInt(t.id.replace("TRK-", ""), 10);
+                  if (!isNaN(num) && num > maxNum) maxNum = num;
+                }
+              });
+              const nextId = "TRK-" + (maxNum + 1).toString().padStart(3, "0");
               const newTrackItem = {
                 id: nextId,
                 brand: brandName,
@@ -7412,17 +7465,24 @@
         const picInput = document.getElementById("campaignPicVal");
         let picVal = picInput && picInput.value.trim() ? picInput.value.trim() : (categoryVal ? getPicForCategory(categoryVal) : "Setiawan");
 
+        allKreatorList = getAllKreators();
         const selectedKreatorList = allKreatorList
-          .filter(k => selectedKreatorIds.has(k.id))
-          .map(k => ({
-            id: k.id,
-            name: k.name,
-            username: k.username,
-            kategoriSpesifik: k.kategoriSpesifik,
-            status: k.status,
-            foto: k.foto,
-            samples: kreatorSampleMap[k.id] || []
-          }));
+          .filter(k => selectedKreatorIds.has(k.id) || selectedKreatorIds.has(String(k.id)) || (typeof k.id === 'string' && selectedKreatorIds.has(Number(k.id))))
+          .map(k => {
+            const kIdStr = String(k.id);
+            const sList = kreatorSampleMap[kIdStr] || kreatorSampleMap[k.id] || [];
+            return {
+              id: k.id,
+              name: k.name,
+              username: k.username,
+              category: k.category,
+              categories: k.categories,
+              kategoriSpesifik: k.kategoriSpesifik,
+              status: k.status,
+              foto: k.foto,
+              samples: Array.isArray(sList) ? [...sList] : []
+            };
+          });
 
         return {
           idCampaign: idCampVal,
@@ -7549,8 +7609,8 @@
               campaignDb[idx].statusSampel = data.statusSampel;
               campaignDb[idx].targetGmv = data.targetGmv;
               campaignDb[idx].pic = data.pic;
-              campaignDb[idx].kreator = isRunning ? kreatorVal : (data.kreatorDetails && data.kreatorDetails.length > 0 ? kreatorVal : "-");
-              campaignDb[idx].kreatorDetails = isRunning ? (data.kreatorDetails || []) : (data.kreatorDetails || []);
+              campaignDb[idx].kreator = kreatorVal;
+              campaignDb[idx].kreatorDetails = data.kreatorDetails || [];
             }
             saveCampaignDb();
             syncCampaignSamplesToTracking(campaignDb[idx]);
@@ -7592,8 +7652,8 @@
               statusSampel: data.statusSampel,
               targetGmv: data.targetGmv,
               pic: data.pic,
-              kreator: isRunning ? kreatorVal : "-",
-              kreatorDetails: isRunning ? data.kreatorDetails : []
+              kreator: kreatorVal,
+              kreatorDetails: data.kreatorDetails || []
             };
 
             campaignDb.unshift(newCamp);
@@ -7965,6 +8025,9 @@
       // Initial Bootstrap
       populateBrandDropdowns();
       updatePidOptionsForBrand(campaignBrandSelect ? campaignBrandSelect.value : "", "");
+      if (Array.isArray(campaignDb)) {
+        campaignDb.forEach(c => syncCampaignSamplesToTracking(c));
+      }
       renderCampaignTable();
     })();
   </script>

@@ -1563,7 +1563,7 @@
       // Auto-sync samples added to creators in campaigns into tracking data
       function syncFromCampaignDatabase() {
         try {
-          const campRaw = localStorage.getItem("bisa_campaign_list_v12") || localStorage.getItem("bisa_campaign_list_v11");
+          const campRaw = localStorage.getItem("bisa_campaign_list_v13") || localStorage.getItem("bisa_campaign_list_v12") || localStorage.getItem("bisa_campaign_list_v11");
           if (!campRaw) return;
           const campaigns = JSON.parse(campRaw);
           if (!Array.isArray(campaigns)) return;
@@ -1594,6 +1594,22 @@
             return { nama: str, varian: "", pid: "" };
           }
 
+          function getBrandDbForSync() {
+            try {
+              const keys = ["bisa_brand_list_v10", "bisa_brand_list_v9", "bisa_brand_list_v8", "bisa_brand_list_v7", "bisa_brand_list"];
+              for (const k of keys) {
+                const s = localStorage.getItem(k);
+                if (s) {
+                  const p = JSON.parse(s);
+                  if (Array.isArray(p) && p.length > 0) return p;
+                }
+              }
+            } catch(e) {}
+            return [];
+          }
+
+          const brandDb = getBrandDbForSync();
+
           campaigns.forEach(camp => {
             const brandName = camp.brand || "Bisa Media Brand";
             const campPid = camp.pid || "PID 001";
@@ -1609,7 +1625,21 @@
                 const parsed = parseSampStr(s);
                 const sampleName = parsed.nama || "Sampel Produk";
                 const sampleVarian = parsed.varian || "Standar";
-                const samplePid = parsed.pid || campPid;
+                
+                let samplePid = parsed.pid;
+                if (!samplePid && brandDb.length > 0) {
+                  const bObj = brandDb.find(b => b.nama && b.nama.toLowerCase() === brandName.toLowerCase());
+                  if (bObj && Array.isArray(bObj.sampel)) {
+                    const sObj = bObj.sampel.find(item => {
+                      const sN = (typeof item === 'string' ? item : (item.nama || '')).trim().toLowerCase();
+                      return sN === sampleName.toLowerCase();
+                    });
+                    if (sObj && typeof sObj === 'object' && sObj.pid) {
+                      samplePid = sObj.pid;
+                    }
+                  }
+                }
+                if (!samplePid) samplePid = campPid;
 
                 const exists = trackingData.some(t =>
                   (t.campaignId === campId || t.brand === brandName) &&
@@ -1619,7 +1649,14 @@
                 );
 
                 if (!exists) {
-                  const nextId = "TRK-" + (trackingData.length + 1).toString().padStart(3, "0");
+                  let maxNum = 0;
+                  trackingData.forEach(t => {
+                    if (t.id && t.id.startsWith("TRK-")) {
+                      const num = parseInt(t.id.replace("TRK-", ""), 10);
+                      if (!isNaN(num) && num > maxNum) maxNum = num;
+                    }
+                  });
+                  const nextId = "TRK-" + (maxNum + 1).toString().padStart(3, "0");
                   const newEntry = {
                     id: nextId,
                     brand: brandName,
@@ -2874,6 +2911,32 @@
           }, 3000);
         }
       }
+
+      function refreshTrackingData() {
+        const saved = localStorage.getItem(TRACKING_STORAGE_KEY);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) trackingData = parsed;
+          } catch(err) {}
+        }
+        syncFromCampaignDatabase();
+        renderTable();
+      }
+
+      window.addEventListener('storage', (e) => {
+        if (!e.key || e.key === "bisa_campaign_list_v13" || e.key === TRACKING_STORAGE_KEY) {
+          refreshTrackingData();
+        }
+      });
+
+      window.addEventListener('focus', refreshTrackingData);
+      window.addEventListener('pageshow', refreshTrackingData);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          refreshTrackingData();
+        }
+      });
 
       populateBrandFilterOptions();
       renderTable();
