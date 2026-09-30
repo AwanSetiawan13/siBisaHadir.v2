@@ -878,13 +878,7 @@
           </div>
           <div class="form-group col-6">
             <label class="form-label">Status</label>
-            <div class="select-wrapper">
-              <select id="kreatorStatusSelect" class="form-select" required style="background-color: #f1f5f9; color: #64748b; cursor: not-allowed; pointer-events: none;">
-                <option value="Bind" selected>Bind</option>
-                <option value="Tenggang">Tenggang</option>
-                <option value="Berhenti">Berhenti</option>
-              </select>
-            </div>
+            <input type="text" id="kreatorStatusSelect" class="form-input" readonly value="Bind" style="background-color: #f0fdf4; color: #16a34a; border-color: #bbf7d0; font-weight: 700; cursor: default; transition: all 0.2s ease;" />
           </div>
 
           <!-- Kontrak Awal & Kontrak Akhir (2 Columns - Span 6 each) -->
@@ -1652,30 +1646,54 @@
 
       function calculateKreatorStatus(item) {
         if (!item) return "Bind";
+
+        // Parse start date
+        let startDate = null;
+        if (item.kontrakAwal) {
+          startDate = parseDateString(item.kontrakAwal);
+        } else if (item.masaKontrak && item.masaKontrak.includes("-")) {
+          const parts = item.masaKontrak.split("-");
+          if (parts.length >= 2) {
+            startDate = parseDateString(parts[0].trim());
+          }
+        }
+        if (startDate) {
+          startDate.setHours(0, 0, 0, 0);
+        }
+
+        // Parse end date
         const endDate = getKreatorEndDate(item);
         if (!endDate) {
           return item.status || "Bind";
         }
+        const end = new Date(endDate);
+        end.setHours(0, 0, 0, 0);
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const end = new Date(endDate);
-        end.setHours(0, 0, 0, 0);
+        // Jika ada Kontrak Awal dan Kontrak Akhir yang dipilih:
+        if (startDate && !isNaN(startDate.getTime()) && !isNaN(end.getTime())) {
+          const diffDays = Math.round((end.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+          // Jika selisih kontrak di bawah / kurang dari atau sama dengan 30 hari -> Tenggang
+          if (diffDays <= 30) {
+            return "Tenggang";
+          }
+          // Jika selisih kontrak lebih dari 30 hari -> Bind
+          return "Bind";
+        }
 
+        // Jika hanya ada tanggal akhir kontrak:
         if (end < today) {
           return "Berhenti";
         }
 
-        // H - 1 Bulan otomatis berubah menjadi Tenggang
-        const hMinus1Month = new Date(end);
-        hMinus1Month.setMonth(hMinus1Month.getMonth() - 1);
-
-        if (today >= hMinus1Month) {
+        const remainingDays = Math.round((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        if (remainingDays <= 30) {
           return "Tenggang";
         }
 
-        return item.status || "Bind";
+        return "Bind";
       }
       window.calculateKreatorStatus = calculateKreatorStatus;
 
@@ -2224,6 +2242,31 @@
         }
       }
 
+      function updateStatusSelectStyle(status) {
+        const statusSelect = document.getElementById("kreatorStatusSelect");
+        if (!statusSelect) return;
+        const s = (status || statusSelect.value || "").trim().toLowerCase();
+
+        if (s === "tenggang") {
+          statusSelect.style.setProperty("background-color", "#fffbeb", "important");
+          statusSelect.style.setProperty("color", "#d97706", "important");
+          statusSelect.style.setProperty("border-color", "#fde68a", "important");
+          statusSelect.style.setProperty("font-weight", "700", "important");
+        } else if (s === "berhenti") {
+          statusSelect.style.setProperty("background-color", "#fef2f2", "important");
+          statusSelect.style.setProperty("color", "#dc2626", "important");
+          statusSelect.style.setProperty("border-color", "#fecaca", "important");
+          statusSelect.style.setProperty("font-weight", "700", "important");
+        } else {
+          // Default: "Bind" (Soft green)
+          statusSelect.style.setProperty("background-color", "#f0fdf4", "important");
+          statusSelect.style.setProperty("color", "#16a34a", "important");
+          statusSelect.style.setProperty("border-color", "#bbf7d0", "important");
+          statusSelect.style.setProperty("font-weight", "700", "important");
+        }
+      }
+      window.updateStatusSelectStyle = updateStatusSelectStyle;
+
       function resetKreatorForm() {
         window.editingKreatorId = null;
         const kId = document.getElementById("kreatorId");
@@ -2256,12 +2299,11 @@
           window.setSelectedKreatorFoto("");
         }
 
-        // Status abu-abu & terkunci Bind saat input awal
+        // Tampilan status sesuai nilai Bind saat form di-reset
         const statusSelect = document.getElementById("kreatorStatusSelect");
         if (statusSelect) {
           statusSelect.value = "Bind";
-          statusSelect.style.backgroundColor = "#f1f5f9";
-          statusSelect.style.color = "#64748b";
+          updateStatusSelectStyle("Bind");
           statusSelect.style.cursor = "not-allowed";
           statusSelect.style.pointerEvents = "none";
         }
@@ -2375,16 +2417,14 @@
         const tglAkhirInp = document.getElementById("kreatorKontrakAkhirInput");
         if (tglAkhirInp) tglAkhirInp.value = item.kontrakAkhir || "";
 
-        // Saat Edit, status DAPAT diedit kembali (aktif & warna normal)
+        // Saat Edit, status DAPAT diedit kembali (aktif & visual style sesuai status)
         const statusSelect = document.getElementById("kreatorStatusSelect");
         if (statusSelect) {
-          statusSelect.style.backgroundColor = "#ffffff";
-          statusSelect.style.color = "#1e293b";
-          statusSelect.style.cursor = "pointer";
-          statusSelect.style.pointerEvents = "auto";
-
           const currentStatus = item.status || calculateKreatorStatus(item);
           statusSelect.value = currentStatus;
+          updateStatusSelectStyle(currentStatus);
+          statusSelect.style.cursor = "pointer";
+          statusSelect.style.pointerEvents = "auto";
         }
 
         const emailInp = document.getElementById("kreatorEmailInput");
@@ -2805,7 +2845,32 @@
               }
               if (elTglAwal) elTglAwal.value = item.kontrakAwal || "-";
               if (elTglAkhir) elTglAkhir.value = item.kontrakAkhir || "-";
-              if (elStatus) elStatus.value = item.status || "-";
+              if (elStatus) {
+                const stVal = item.status || "-";
+                elStatus.value = stVal;
+                const sLow = stVal.toLowerCase();
+                if (sLow === "tenggang") {
+                  elStatus.style.backgroundColor = "#fffbeb";
+                  elStatus.style.color = "#d97706";
+                  elStatus.style.borderColor = "#fde68a";
+                  elStatus.style.fontWeight = "700";
+                } else if (sLow === "berhenti") {
+                  elStatus.style.backgroundColor = "#fef2f2";
+                  elStatus.style.color = "#dc2626";
+                  elStatus.style.borderColor = "#fecaca";
+                  elStatus.style.fontWeight = "700";
+                } else if (sLow === "bind" || sLow === "aktif") {
+                  elStatus.style.backgroundColor = "#f0fdf4";
+                  elStatus.style.color = "#16a34a";
+                  elStatus.style.borderColor = "#bbf7d0";
+                  elStatus.style.fontWeight = "700";
+                } else {
+                  elStatus.style.backgroundColor = "#f8fafc";
+                  elStatus.style.color = "#1e293b";
+                  elStatus.style.borderColor = "#e2e8f0";
+                  elStatus.style.fontWeight = "500";
+                }
+              }
               if (elLeads) elLeads.value = item.leads || "-";
               if (elEmail) elEmail.value = item.email || "-";
 
@@ -2902,7 +2967,8 @@
         const tglAwalVal = document.getElementById("kreatorKontrakAwalInput")?.value.trim() || "";
         const tglAkhirVal = document.getElementById("kreatorKontrakAkhirInput")?.value.trim() || "";
         const rawStatus = document.getElementById("kreatorStatusSelect")?.value.trim();
-        const statusVal = window.editingKreatorId ? (rawStatus || "Bind") : "Bind";
+        const computedStatus = calculateKreatorStatus({ kontrakAwal: tglAwalVal, kontrakAkhir: tglAkhirVal });
+        const statusVal = rawStatus || computedStatus || "Bind";
         const passVal = document.getElementById("kreatorPassword")?.value.trim() || "password123";
         const fotoVal = document.getElementById("kreatorFotoData")?.value.trim() || "../../media/avatar.png";
 
@@ -3141,23 +3207,33 @@
         });
       }
 
-      // Otomatis sinkronkan status select di modal saat tanggal akhir kontrak diubah (hanya jika mode edit)
+      // Otomatis sinkronkan status select di modal saat tanggal awal / akhir kontrak diubah
       function autoUpdateStatusSelect() {
-        if (!window.editingKreatorId) {
-          const statusSelect = document.getElementById("kreatorStatusSelect");
-          if (statusSelect) {
-            statusSelect.value = "Bind";
-          }
-          return;
-        }
+        const tglAwalInp = document.getElementById("kreatorKontrakAwalInput");
         const tglAkhirInp = document.getElementById("kreatorKontrakAkhirInput");
         const statusSelect = document.getElementById("kreatorStatusSelect");
-        if (!tglAkhirInp || !statusSelect) return;
-        const val = tglAkhirInp.value.trim();
-        if (!val) return;
+        if (!statusSelect) return;
 
-        const computed = calculateKreatorStatus({ kontrakAkhir: val });
+        const tglAwal = tglAwalInp ? tglAwalInp.value.trim() : "";
+        const tglAkhir = tglAkhirInp ? tglAkhirInp.value.trim() : "";
+
+        if (!tglAkhir && !tglAwal) {
+          statusSelect.value = "Bind";
+          updateStatusSelectStyle("Bind");
+          return;
+        }
+
+        const computed = calculateKreatorStatus({ kontrakAwal: tglAwal, kontrakAkhir: tglAkhir });
         statusSelect.value = computed;
+        updateStatusSelectStyle(computed);
+      }
+
+      const tglAwalInp = document.getElementById("kreatorKontrakAwalInput");
+      if (tglAwalInp) {
+        tglAwalInp.addEventListener("input", autoUpdateStatusSelect);
+        tglAwalInp.addEventListener("change", autoUpdateStatusSelect);
+        tglAwalInp.addEventListener("blur", autoUpdateStatusSelect);
+        tglAwalInp.addEventListener("keyup", autoUpdateStatusSelect);
       }
 
       const tglAkhirInp = document.getElementById("kreatorKontrakAkhirInput");
@@ -3165,6 +3241,14 @@
         tglAkhirInp.addEventListener("input", autoUpdateStatusSelect);
         tglAkhirInp.addEventListener("change", autoUpdateStatusSelect);
         tglAkhirInp.addEventListener("blur", autoUpdateStatusSelect);
+        tglAkhirInp.addEventListener("keyup", autoUpdateStatusSelect);
+      }
+
+      const kreatorStatusSelectEl = document.getElementById("kreatorStatusSelect");
+      if (kreatorStatusSelectEl) {
+        kreatorStatusSelectEl.addEventListener("change", function () {
+          updateStatusSelectStyle(this.value);
+        });
       }
 
       // Filter Form popover
