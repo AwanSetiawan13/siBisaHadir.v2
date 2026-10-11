@@ -14,6 +14,9 @@
     <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
+    .col-sticky-action { position: sticky !important; right: 0; z-index: 10; background-color: #ffffff; box-shadow: -2px 0 5px rgba(0,0,0,0.03); border-left: 1px solid #e2e8f0 !important; }
+    th.col-sticky-action { background-color: #f8fafc !important; }
+    tr:hover td.col-sticky-action { background-color: #f8fafc !important; }
     .status-badge {
       display: inline-block;
       padding: 4px 10px;
@@ -710,7 +713,7 @@
                 <th>Spesifik</th>
                 <th>Masa Kontrak</th>
                 <th>Status</th>
-                <th class="text-center" style="text-align: center;">Aksi</th>
+                <th class="text-center col-sticky-action" style="text-align: center;">Aksi</th>
               </tr>
             </thead>
             <tbody id="kreatorTableBody"></tbody>
@@ -720,7 +723,7 @@
 
     </main>
 
-    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+    <footer class="dashboard-footer">Â© 2026 Bisa Media</footer>
   </div>
 
     <!-- Modal PopUp Tambah Kreator -->
@@ -798,7 +801,7 @@
           <div class="col-12" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin: 2px 0;">
             <div style="font-weight: 600; font-size: 13px; color: #1e293b; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
               <span style="display: flex; align-items: center; gap: 6px;"><i class="bx bx-category" style="color: #29A3D8; font-size: 16px;"></i> Kategori Produk & PIC</span>
-              <span style="font-size: 11px; font-weight: 500; color: #64748b;">Maksimal 3 Kategori (Kategori 1 Wajib, 2 & 3 Opsional)</span>
+              <button type="button" id="btnTambahKategori" onclick="showNextKategori()" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; border-radius: 4px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px;"><i class="bx bx-plus"></i> Tambah</button>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -807,7 +810,7 @@
                 <div>
                   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                     <label class="form-label" style="font-size: 12px; font-weight: 600; margin: 0;">Kategori 1 <span style="color: #ef4444;">*</span></label>
-                    <span class="status-badge status-badge--success" style="padding: 1px 6px; font-size: 9.5px;">Wajib</span>
+                    
                   </div>
                   <div class="select-wrapper">
                     <select id="kreatorKategori1Select" class="form-select" style="font-size: 13px; height: 38px;" required>
@@ -822,11 +825,11 @@
               </div>
 
               <!-- Baris Kategori 2 (Opsional) -->
-              <div id="wrapKategori2Row" style="display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
+              <div id="wrapKategori2Row" style="display: none; grid-template-columns: 1.2fr 1fr auto; gap: 10px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
                 <div>
                   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                     <label class="form-label" style="font-size: 12px; font-weight: 600; margin: 0;">Kategori 2</label>
-                    <span style="font-size: 10.5px; color: #94a3b8; font-weight: 500;">Opsional</span>
+                    
                   </div>
                   <div class="select-wrapper">
                     <select id="kreatorKategori2Select" class="form-select" style="font-size: 13px; height: 38px;">
@@ -846,11 +849,11 @@
               </div>
 
               <!-- Baris Kategori 3 (Opsional) -->
-              <div id="wrapKategori3Row" style="display: grid; grid-template-columns: 1.2fr 1fr auto; gap: 10px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
+              <div id="wrapKategori3Row" style="display: none; grid-template-columns: 1.2fr 1fr auto; gap: 10px; align-items: flex-end; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
                 <div>
                   <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
                     <label class="form-label" style="font-size: 12px; font-weight: 600; margin: 0;">Kategori 3</label>
-                    <span style="font-size: 10.5px; color: #94a3b8; font-weight: 500;">Opsional</span>
+                    
                   </div>
                   <div class="select-wrapper">
                     <select id="kreatorKategori3Select" class="form-select" style="font-size: 13px; height: 38px;">
@@ -877,7 +880,10 @@
             <input type="text" id="kreatorKatSpesifikInput" class="form-input" placeholder="Misal: Hijab Fashion, Skincare, dll" />
           </div>
           <div class="form-group col-6">
-            <label class="form-label">Status</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin: 0;">Status</label>
+              <button type="button" id="btnStatusBerhenti" onclick="promptBerhenti()" style="display: none; padding: 2px 8px; font-size: 11px; font-weight: 600; cursor: pointer; color: #ef4444; background: #fee2e2; border: 1px solid #fecaca; border-radius: 4px;">Berhenti</button>
+            </div>
             <input type="text" id="kreatorStatusSelect" class="form-input" readonly value="Bind" style="background-color: #f0fdf4; color: #16a34a; border-color: #bbf7d0; font-weight: 700; cursor: default; transition: all 0.2s ease;" />
           </div>
 
@@ -991,7 +997,7 @@
 
           <div style="display: flex; flex-direction: column; gap: 10px;">
             <!-- Kolom Kategori 1 View -->
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px;">
+            <div id="wrapViewKategori1Row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px;">
               <div>
                 <label class="form-label" style="font-size: 11.5px; margin-bottom: 4px;">Kategori 1</label>
                 <input type="text" id="viewKreatorKategori1Input" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-size: 13px; height: 36px;" />
@@ -1003,7 +1009,7 @@
             </div>
 
             <!-- Kolom Kategori 2 View -->
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
+            <div id="wrapViewKategori2Row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
               <div>
                 <label class="form-label" style="font-size: 11.5px; margin-bottom: 4px;">Kategori 2</label>
                 <input type="text" id="viewKreatorKategori2Input" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-size: 13px; height: 36px;" />
@@ -1015,7 +1021,7 @@
             </div>
 
             <!-- Kolom Kategori 3 View -->
-            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
+            <div id="wrapViewKategori3Row" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px;">
               <div>
                 <label class="form-label" style="font-size: 11.5px; margin-bottom: 4px;">Kategori 3</label>
                 <input type="text" id="viewKreatorKategori3Input" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-size: 13px; height: 36px;" />
@@ -1035,7 +1041,10 @@
             style="background-color: #f8fafc; cursor: default;" />
         </div>
         <div class="form-group col-6">
-          <label class="form-label">Status</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label class="form-label" style="margin: 0;">Status</label>
+              <button type="button" id="btnStatusBerhenti" onclick="promptBerhenti()" style="display: none; padding: 2px 8px; font-size: 11px; font-weight: 600; cursor: pointer; color: #ef4444; background: #fee2e2; border: 1px solid #fecaca; border-radius: 4px;">Berhenti</button>
+            </div>
           <input type="text" id="viewKreatorStatusInput" class="form-input" readonly
             style="background-color: #f8fafc; cursor: default;" />
         </div>
@@ -1526,7 +1535,9 @@
             if (result.isConfirmed) {
               if (sel) sel.value = "";
               if (pic) pic.value = "";
+              document.getElementById("wrapKategori" + slotNum + "Row").style.display = "none";
               updateKategoriDeleteButtonsVisibility();
+              if (typeof updateBtnTambahVisibility === "function") updateBtnTambahVisibility();
               Swal.fire({
                 icon: 'success',
                 title: 'Kategori Berhasil Dihapus!',
@@ -1542,12 +1553,67 @@
         } else {
           if (confirm(`Hapus kategori ${catValue}?`)) {
             if (sel) sel.value = "";
-            if (pic) pic.value = "";
-            updateKategoriDeleteButtonsVisibility();
+              if (pic) pic.value = "";
+              document.getElementById("wrapKategori" + slotNum + "Row").style.display = "none";
+              updateKategoriDeleteButtonsVisibility();
+              if (typeof updateBtnTambahVisibility === "function") updateBtnTambahVisibility();
           }
         }
       }
       window.handleDeleteKategoriSlot = handleDeleteKategoriSlot;
+
+            window.promptBerhenti = function() {
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            title: "Berhentikan Kreator?",
+            text: "Apakah Anda yakin ingin mengubah status kreator ini menjadi Berhenti?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ef4444",
+            cancelButtonColor: "#94a3b8",
+            confirmButtonText: "Ya, Berhenti",
+            cancelButtonText: "Batal",
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const statusEl = document.getElementById("kreatorStatusSelect");
+              if (statusEl) {
+                statusEl.value = "Berhenti";
+                if (typeof updateStatusSelectStyle === 'function') updateStatusSelectStyle("Berhenti");
+                document.getElementById("btnStatusBerhenti").style.display = "none";
+              }
+            }
+          });
+        }
+      };
+
+      window.showNextKategori = function() {
+        const wrap2 = document.getElementById('wrapKategori2Row');
+        const wrap3 = document.getElementById('wrapKategori3Row');
+        const btnTambah = document.getElementById('btnTambahKategori');
+        
+        if (wrap2.style.display === 'none') {
+          wrap2.style.display = 'grid';
+          if (wrap3.style.display === 'grid') {
+            btnTambah.style.display = 'none';
+          }
+        } else if (wrap3.style.display === 'none') {
+          wrap3.style.display = 'grid';
+          btnTambah.style.display = 'none';
+        }
+      };
+
+      function updateBtnTambahVisibility() {
+        const wrap2 = document.getElementById('wrapKategori2Row');
+        const wrap3 = document.getElementById('wrapKategori3Row');
+        const btnTambah = document.getElementById('btnTambahKategori');
+        if (!btnTambah) return;
+        if (wrap2 && wrap3 && wrap2.style.display === 'grid' && wrap3.style.display === 'grid') {
+            btnTambah.style.display = 'none';
+        } else {
+            btnTambah.style.display = 'flex';
+        }
+      }
 
       // Leads Kreator Dynamic Data from Master Pendukung (LocalStorage - Real Time)
       function populateKreatorLeads(selectedVal = "") {
@@ -1557,7 +1623,7 @@
 
         let leadsList = [];
         try {
-          const saved = localStorage.getItem("bisa_leads_kreator_list_v5");
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
           if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -1698,7 +1764,7 @@
       window.calculateKreatorStatus = calculateKreatorStatus;
 
       // Storage key bumped to v11 for multi-category and removal of CM
-      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v13";
+      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v21";
       window.KREATOR_STORAGE_KEY = KREATOR_STORAGE_KEY;
 
       const DEFAULT_KREATOR = [
@@ -1766,422 +1832,6 @@
           video: "12 Video",
           aktivitas: "Aktif Live"
         },
-        {
-          id: 3,
-          uid: "UID-0003",
-          username: "@bima.fashion",
-          nama: "Bima Sakti",
-          alamat: "Jl. Mawar No. 45, Bandung",
-          nomorWa: "081298765432",
-          kategori: "Fashion Muslim",
-          kategori1: "Fashion Muslim",
-          pic1: "Setiawan",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Men Fashion & Gamis",
-          spesifik: "Men Fashion & Gamis",
-          masaKontrak: "01/01/2026 - 31/12/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "Member & Mahasiswa",
-          email: "bima@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "NEW GROWTH",
-          targetGmv: "Rp 40.000.000",
-          gmvBerjalan: "Rp 45.200.000",
-          progresGmv: "113%",
-          siaranLive: "10 Jam",
-          video: "24 Video",
-          aktivitas: "Aktif Konten"
-        },
-        {
-          id: 4,
-          uid: "UID-0004",
-          username: "@dina.hijabstyle",
-          nama: "Dina Syahrini",
-          alamat: "Jl. Cendana No. 12, Tasikmalaya",
-          nomorWa: "081399887766",
-          kategori: "Food & Beverage",
-          kategori1: "Food & Beverage",
-          pic1: "Dimas",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Snack & Minuman",
-          spesifik: "Snack & Minuman",
-          masaKontrak: "01/01/2026 - 31/08/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-08-31",
-          status: "Berhenti",
-          leads: "Member",
-          email: "dina@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "INCUBATE",
-          targetGmv: "Rp 15.000.000",
-          gmvBerjalan: "Rp 8.500.000",
-          progresGmv: "56%",
-          siaranLive: "4 Jam",
-          video: "6 Video",
-          aktivitas: "Tidak Aktif"
-        },
-        {
-          id: 5,
-          uid: "UID-0005",
-          username: "@dinda.glow",
-          nama: "Dinda Safitri",
-          alamat: "Jl. Sukajadi No. 101, Bandung",
-          nomorWa: "081211223344",
-          kategori: "Beauty & Care",
-          kategori1: "Beauty & Care",
-          pic1: "Amanda",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Serum & Skincare",
-          spesifik: "Serum & Skincare",
-          masaKontrak: "01/02/2026 - 31/12/2026",
-          kontrakAwal: "2026-02-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "Member",
-          email: "dinda@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "TOP",
-          targetGmv: "Rp 80.000.000",
-          gmvBerjalan: "Rp 92.000.000",
-          progresGmv: "115%",
-          siaranLive: "36 Jam",
-          video: "14 Video",
-          aktivitas: "Aktif Konten & Live"
-        },
-        {
-          id: 6,
-          uid: "UID-0006",
-          username: "@nadia.skincare",
-          nama: "Nadia Syifa",
-          alamat: "Jl. Pajajaran No. 23, Bogor",
-          nomorWa: "081233445566",
-          kategori: "Beauty & Care",
-          kategori1: "Beauty & Care",
-          pic1: "Amanda",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Sunscreen & Moisturizer",
-          spesifik: "Sunscreen & Moisturizer",
-          masaKontrak: "01/01/2026 - 31/12/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "Member",
-          email: "nadia@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "SEMI TOP",
-          targetGmv: "Rp 60.000.000",
-          gmvBerjalan: "Rp 65.000.000",
-          progresGmv: "108%",
-          siaranLive: "28 Jam",
-          video: "16 Video",
-          aktivitas: "Aktif Live"
-        },
-        {
-          id: 7,
-          uid: "UID-0007",
-          username: "@fauzi.style",
-          nama: "Fauzi Ramadhan",
-          alamat: "Jl. Dipati Ukur No. 55, Bandung",
-          nomorWa: "081344556677",
-          kategori: "Fashion Muslim",
-          kategori1: "Fashion Muslim",
-          pic1: "Setiawan",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Kemeja & Celana Pria",
-          spesifik: "Kemeja & Celana Pria",
-          masaKontrak: "01/01/2026 - 30/11/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-11-30",
-          status: "Bind",
-          leads: "Mahasiswa",
-          email: "fauzi@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "NEW GROWTH",
-          targetGmv: "Rp 45.000.000",
-          gmvBerjalan: "Rp 40.000.000",
-          progresGmv: "88%",
-          siaranLive: "18 Jam",
-          video: "20 Video",
-          aktivitas: "Aktif Konten"
-        },
-        {
-          id: 8,
-          uid: "UID-0008",
-          username: "@siti.momandbaby",
-          nama: "Siti Rahma",
-          alamat: "Jl. Dago No. 78, Bandung",
-          nomorWa: "081255667788",
-          kategori: "Mom & Baby",
-          kategori1: "Mom & Baby",
-          pic1: "Amanda",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Pakaian & Perlengkapan Bayi",
-          spesifik: "Pakaian & Perlengkapan Bayi",
-          masaKontrak: "01/03/2026 - 31/12/2026",
-          kontrakAwal: "2026-03-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "Member",
-          email: "siti@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "TOP",
-          targetGmv: "Rp 70.000.000",
-          gmvBerjalan: "Rp 75.000.000",
-          progresGmv: "107%",
-          siaranLive: "30 Jam",
-          video: "15 Video",
-          aktivitas: "Aktif Konten & Live"
-        },
-        {
-          id: 9,
-          uid: "UID-0009",
-          username: "@rian.gadget",
-          nama: "Rian Pratama",
-          alamat: "Jl. Gatot Subroto No. 12, Jakarta",
-          nomorWa: "081266778899",
-          kategori: "Electronics",
-          kategori1: "Electronics",
-          pic1: "Dimas",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Aksesoris & Smart Device",
-          spesifik: "Aksesoris & Smart Device",
-          masaKontrak: "01/01/2026 - 31/12/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "SmartC",
-          email: "rian@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "TOP",
-          targetGmv: "Rp 120.000.000",
-          gmvBerjalan: "Rp 135.000.000",
-          progresGmv: "112%",
-          siaranLive: "40 Jam",
-          video: "22 Video",
-          aktivitas: "Aktif Live"
-        },
-        {
-          id: 10,
-          uid: "UID-0010",
-          username: "@maya.hijab",
-          nama: "Maya Anggraini",
-          alamat: "Jl. Merdeka No. 44, Tasikmalaya",
-          nomorWa: "081277889911",
-          kategori: "Fashion Muslim",
-          kategori1: "Fashion Muslim",
-          pic1: "Setiawan",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Gamis & Dress Muslim",
-          spesifik: "Gamis & Dress Muslim",
-          masaKontrak: "01/02/2026 - 31/12/2026",
-          kontrakAwal: "2026-02-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "Member",
-          email: "maya@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "NEW GROWTH",
-          targetGmv: "Rp 35.000.000",
-          gmvBerjalan: "Rp 38.000.000",
-          progresGmv: "108%",
-          siaranLive: "14 Jam",
-          video: "18 Video",
-          aktivitas: "Aktif Konten"
-        },
-        {
-          id: 11,
-          uid: "UID-0011",
-          username: "@kevin.tech",
-          nama: "Kevin Sanjaya",
-          alamat: "Jl. Asia Afrika No. 90, Bandung",
-          nomorWa: "081288991122",
-          kategori: "Electronics",
-          kategori1: "Electronics",
-          pic1: "Dimas",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Audio & Smartwatch",
-          spesifik: "Audio & Smartwatch",
-          masaKontrak: "01/01/2026 - 30/09/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-09-30",
-          status: "Bind",
-          leads: "Member",
-          email: "kevin@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "SEMI TOP",
-          targetGmv: "Rp 55.000.000",
-          gmvBerjalan: "Rp 50.000.000",
-          progresGmv: "91%",
-          siaranLive: "20 Jam",
-          video: "15 Video",
-          aktivitas: "Aktif Konten & Live"
-        },
-        {
-          id: 12,
-          uid: "UID-0012",
-          username: "@zahra.skincare",
-          nama: "Zahra Amalia",
-          alamat: "Jl. Cihampelas No. 32, Bandung",
-          nomorWa: "081299112233",
-          kategori: "Beauty & Care",
-          kategori1: "Beauty & Care",
-          pic1: "Amanda",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Facial Wash & Toner",
-          spesifik: "Facial Wash & Toner",
-          masaKontrak: "01/01/2026 - 31/12/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "Member",
-          email: "zahra@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "TOP",
-          targetGmv: "Rp 90.000.000",
-          gmvBerjalan: "Rp 105.000.000",
-          progresGmv: "116%",
-          siaranLive: "38 Jam",
-          video: "20 Video",
-          aktivitas: "Aktif Live"
-        },
-        {
-          id: 13,
-          uid: "UID-0013",
-          username: "@rahmat.kuliner",
-          nama: "Rahmat Hidayat",
-          alamat: "Jl. Buah Batu No. 15, Bandung",
-          nomorWa: "081311223344",
-          kategori: "Food & Beverage",
-          kategori1: "Food & Beverage",
-          pic1: "Dimas",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Frozen Food & Camilan",
-          spesifik: "Frozen Food & Camilan",
-          masaKontrak: "01/02/2026 - 31/10/2026",
-          kontrakAwal: "2026-02-01",
-          kontrakAkhir: "2026-10-31",
-          status: "Bind",
-          leads: "Member",
-          email: "rahmat@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "NEW GROWTH",
-          targetGmv: "Rp 30.000.000",
-          gmvBerjalan: "Rp 32.000.000",
-          progresGmv: "106%",
-          siaranLive: "12 Jam",
-          video: "14 Video",
-          aktivitas: "Aktif Konten"
-        },
-        {
-          id: 14,
-          uid: "UID-0014",
-          username: "@putri.mom",
-          nama: "Putri Maharani",
-          alamat: "Jl. Setiabudi No. 110, Bandung",
-          nomorWa: "081322334455",
-          kategori: "Mom & Baby",
-          kategori1: "Mom & Baby",
-          pic1: "Amanda",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Susu & Botol Bayi",
-          spesifik: "Susu & Botol Bayi",
-          masaKontrak: "01/01/2026 - 31/12/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "SmartC",
-          email: "putrim@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "SEMI TOP",
-          targetGmv: "Rp 65.000.000",
-          gmvBerjalan: "Rp 60.000.000",
-          progresGmv: "92%",
-          siaranLive: "24 Jam",
-          video: "12 Video",
-          aktivitas: "Aktif Live"
-        },
-        {
-          id: 15,
-          uid: "UID-0015",
-          username: "@aldi.menswear",
-          nama: "Aldi Pratama",
-          alamat: "Jl. Surapati No. 67, Bandung",
-          nomorWa: "081333445566",
-          kategori: "Fashion Muslim",
-          kategori1: "Fashion Muslim",
-          pic1: "Setiawan",
-          kategori2: "",
-          pic2: "",
-          kategori3: "",
-          pic3: "",
-          kategoriSpesifik: "Koko Pria & Sarung",
-          spesifik: "Koko Pria & Sarung",
-          masaKontrak: "01/01/2026 - 31/12/2026",
-          kontrakAwal: "2026-01-01",
-          kontrakAkhir: "2026-12-31",
-          status: "Bind",
-          leads: "Member",
-          email: "aldi@gmail.com",
-          password: "password123",
-          foto: "../../media/avatar.png",
-          level: "NEW GROWTH",
-          targetGmv: "Rp 40.000.000",
-          gmvBerjalan: "Rp 42.000.000",
-          progresGmv: "105%",
-          siaranLive: "16 Jam",
-          video: "18 Video",
-          aktivitas: "Aktif Konten"
-        }
       ];
 
       // Ensure clean 1-category dummy data reset once
@@ -2231,6 +1881,7 @@
       function syncKreatorStatuses() {
         let changed = false;
         kreatorDb.forEach(k => {
+          if (window.editingKreatorId && k.id === window.editingKreatorId && k.status === "Berhenti") return; // Prevent overwriting
           const computed = calculateKreatorStatus(k);
           if (k.status !== computed) {
             k.status = computed;
@@ -2425,6 +2076,14 @@
           updateStatusSelectStyle(currentStatus);
           statusSelect.style.cursor = "pointer";
           statusSelect.style.pointerEvents = "auto";
+          const btnBerhenti = document.getElementById("btnStatusBerhenti");
+          if (btnBerhenti) {
+             if (currentStatus !== "Berhenti") {
+               btnBerhenti.style.display = "block";
+             } else {
+               btnBerhenti.style.display = "none";
+             }
+          }
         }
 
         const emailInp = document.getElementById("kreatorEmailInput");
@@ -2683,7 +2342,7 @@
             <td><span style="color: #334155; font-weight: 500;">${spesifikText}</span></td>
             <td>${item.masaKontrak || "-"}</td>
             <td><span class="status-badge ${statusClass}">${item.status || "Bind"}</span></td>
-            <td class="tdActions text-center">
+            <td class="tdActions text-center col-sticky-action">
               <div class="dropdown bm-action-dropdown">
                 <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
                   data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi">
@@ -2838,6 +2497,14 @@
               if (elPic2) elPic2.value = p2 || "-";
               if (elKat3) elKat3.value = k3 || "-";
               if (elPic3) elPic3.value = p3 || "-";
+
+              const wrapKat1 = document.getElementById("wrapViewKategori1Row");
+              const wrapKat2 = document.getElementById("wrapViewKategori2Row");
+              const wrapKat3 = document.getElementById("wrapViewKategori3Row");
+
+              if (wrapKat1) wrapKat1.style.display = "grid";
+              if (wrapKat2) wrapKat2.style.display = (k2 && k2 !== "-") ? "grid" : "none";
+              if (wrapKat3) wrapKat3.style.display = (k3 && k3 !== "-") ? "grid" : "none";
 
               if (elKatSpesifik) {
                 const sVal = item.kategoriSpesifik || item.spesifik || "";
@@ -3046,12 +2713,12 @@
           password: passVal,
           foto: fotoVal,
           level: (existingItem && existingItem.level) ? existingItem.level : "New Growth",
-          targetGmv: (existingItem && existingItem.targetGmv) ? existingItem.targetGmv : "Rp 40.000.000",
+          targetGmv: (existingItem && existingItem.targetGmv) ? existingItem.targetGmv : "Rp 0",
           gmvBerjalan: (existingItem && existingItem.gmvBerjalan) ? existingItem.gmvBerjalan : "Rp 0",
           progresGmv: (existingItem && existingItem.progresGmv) ? existingItem.progresGmv : "0%",
           siaranLive: (existingItem && existingItem.siaranLive) ? existingItem.siaranLive : "0 Jam",
           video: (existingItem && existingItem.video) ? existingItem.video : "0 Video",
-          aktivitas: (existingItem && existingItem.aktivitas) ? existingItem.aktivitas : (statusVal === "Berhenti" ? "Tidak Aktif" : "Aktif Konten & Live")
+          aktivitas: (existingItem && existingItem.aktivitas) ? existingItem.aktivitas : "Belum Ada Aktivitas"
         };
 
         const modal = document.getElementById("kreatorModal");

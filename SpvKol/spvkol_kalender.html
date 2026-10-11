@@ -13,73 +13,10 @@
                   <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
-    <header class="topbar">
-      <div class="topbar__left">
-        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
-          aria-label="Buka atau tutup sidebar">
-          <span></span><span></span><span></span>
-        </button>
-
-        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="10.5" cy="10.5" r="6"></circle>
-          <path d="M15 15l5 5"></path>
-        </svg>
-
-        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
-      </div>
-
-      <div class="topbar__actions">
-        <button class="icon-button" type="button" aria-label="Notifikasi">
-          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 17h14"></path>
-            <path d="M8 17v-7a4 4 0 118 0v7"></path>
-            <path d="M10 20h4"></path>
-          </svg>
-        </button>
-
-        <div class="topbar-user-dropdown-wrap">
-          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
-            <img src="../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
-          </button>
-          <div id="userMenuDropdown" class="user-menu-dropdown">
-            <div class="user-menu-dropdown__header">
-              <img src="../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
-              <div class="user-menu-dropdown__info">
-                <span class="user-menu-dropdown__name">Supervisi KOL</span>
-                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
-              </div>
-            </div>
-            <div class="user-menu-dropdown__divider"></div>
-            <a href="../BM/BM_dashboard.html" class="user-menu-dropdown__item">
-              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-              </svg>
-              <div class="user-menu-dropdown__item-text">
-                <span class="user-menu-dropdown__title">Kembali</span>
-                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
-              </div>
-            </a>
-            <a href="../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
-              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              <div class="user-menu-dropdown__item-text">
-                <span class="user-menu-dropdown__title">Logout</span>
-                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-    </header>
+    <header class="topbar"></header>
 
     <main class="dashboard-content">
-      <div class="dashboard-heading">
-        <h1>Kalender</h1>
-      </div>
+      
 
       <!-- ===== Main Layout (2 Columns) ===== -->
       <div class="db-calendar-page-layout">
@@ -134,9 +71,9 @@
             <!-- Schedule Items for Selected Date -->
             <div class="db-sched-item" id="sched-item-1">
               <div class="db-sched-info">
-                <strong id="sched-title-1">Meeting</strong>
-                <span id="sched-desc-1">Bersama Bisa Hijab Official</span>
-                <span id="sched-time-1" style="font-weight: bold; color: var(--blue-700);">09.00 - 12.00</span>
+                <strong id="sched-title-1" style="font-style: italic;">Diskusii dengan A terkait keberjalannya Campaign A</strong>
+                <span id="sched-desc-1">Meeting</span>
+                <span id="sched-time-1" style="font-weight: bold; color: var(--blue-700);">09.00 - 11.00</span>
               </div>
             </div>
           </div>
@@ -276,12 +213,16 @@
       const selectedDateLabel = document.getElementById("selectedDateLabel");
 
       // Initial dummy schedule database
+      const todayDay = now.getDate();
       const scheduleDb = {
+        [String(todayDay)]: [
+          { id: 1, title: "<i>Diskusi dengan Brand A terkait dengan Keberjalannya Campaign A</i>", desc: "Meeting", time: "09.00 - 11.00", status: "pending" }
+        ],
         "12": [
-          { id: 1, title: "Meeting", desc: "Bersama Bisa Hijab Official", time: "09.00 - 12.00", status: "pending" }
+          { id: 2, title: "Meeting", desc: "Bersama Bisa Hijab Official", time: "09.00 - 12.00", status: "pending" }
         ]
       };
-      let schedIdCounter = 2;
+      let schedIdCounter = 3;
 
       function formatDateLabel(year, month, day) {
         const d = new Date(year, month, day);
@@ -366,19 +307,19 @@
           
           let badgeBg = "#ffcc00";
           let badgeColor = "#111";
-          if (item.title.includes("Meeting")) {
+          if (item.title.includes("Meeting") || (item.desc && item.desc.includes("Meeting"))) {
             badgeBg = "#ffcc00";
             badgeColor = "#111";
-          } else if (item.title.includes("Visit")) {
+          } else if (item.title.includes("Visit") || (item.desc && item.desc.includes("Visit"))) {
             badgeBg = "#2196f3";
             badgeColor = "#fff";
-          } else if (item.title.includes("HR")) {
+          } else if (item.title.includes("HR") || (item.desc && item.desc.includes("HR"))) {
             badgeBg = "#9c27b0";
             badgeColor = "#fff";
-          } else if (item.title.includes("Deadline")) {
+          } else if (item.title.includes("Deadline") || (item.desc && item.desc.includes("Deadline"))) {
             badgeBg = "#f44336";
             badgeColor = "#fff";
-          } else if (item.title.includes("Tanggal Merah")) {
+          } else if (item.title.includes("Tanggal Merah") || (item.desc && item.desc.includes("Tanggal Merah"))) {
             badgeBg = "#ff5252";
             badgeColor = "#fff";
           } else {
@@ -388,7 +329,7 @@
 
           // Strip type prefix if present
           const displayTitle = item.title.replace(/^\[.*?\]\s*/, "");
-          const typeLabel = item.title.match(/^\[(.*?)\]/) ? item.title.match(/^\[(.*?)\]/)[1] : "Kegiatan";
+          const typeLabel = item.title.match(/^\[(.*?)\]/) ? item.title.match(/^\[(.*?)\]/)[1] : (item.desc || "Kegiatan");
 
           const div = document.createElement("div");
           div.className = "db-activity-item";
@@ -715,5 +656,7 @@
 </body>
 
 </html>
+
+
 
 
