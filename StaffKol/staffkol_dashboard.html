@@ -352,6 +352,23 @@
     </main>
   </div>
 
+  
+  <!-- Modal PopUp Foto Profil Kreator -->
+  <div id="creatorAvatarModal" class="modal-overlay" style="z-index: 99999;">
+    <div class="modal-box" style="width: 360px; max-width: 90%; text-align: center; padding: 24px; border-radius: 14px; background: #fff; box-shadow: 0 20px 45px rgba(0,0,0,0.2);">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1;">
+        <h2 id="creatorAvatarModalTitle" class="modal-title" style="font-size: 16px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif;">Foto Profil Kreator</h2>
+        <button class="modal-close" type="button" aria-label="Tutup" onclick="document.getElementById('creatorAvatarModal').classList.remove('is-active')" style="background: transparent; border: none; font-size: 22px; cursor: pointer; color: #94a3b8;">&times;</button>
+      </div>
+      <div style="display: flex; justify-content: center; align-items: center; margin: 20px 0;">
+        <img id="creatorAvatarModalImg" src="" alt="Profile" style="width: 170px; height: 170px; border-radius: 50%; object-fit: cover; border: 4px solid #bae6fd; box-shadow: 0 10px 25px rgba(0,0,0,0.12);" />
+      </div>
+      <div id="creatorAvatarModalName" style="font-size: 16px; font-weight: 700; color: #0284c7; font-family: 'Outfit', sans-serif; margin-top: 4px;">-</div>
+      <div style="margin-top: 20px;">
+        <button type="button" class="btn-cancel-modal" onclick="document.getElementById('creatorAvatarModal').classList.remove('is-active')" style="background: #29A3D8; color: #fff; border: none; border-radius: 8px; padding: 9px 24px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; font-family: 'Outfit', sans-serif; transition: all 0.15s ease;">Tutup</button>
+      </div>
+    </div>
+  </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../script.js"></script>
   <script>
@@ -417,6 +434,37 @@
       renderCalendar();
     })();
 
+    window.openCreatorAvatarPopup = function (name, imgSrc) {
+      if (typeof Swal !== "undefined") {
+        Swal.fire({
+          title: "<strong>" + name + "</strong>",
+          html: "<div style='font-size: 13.5px; color: #64748b; margin-top: 4px; font-family: \"Outfit\", sans-serif;'>Foto Profil TOP Kreator</div>",
+          imageUrl: imgSrc,
+          imageWidth: 200,
+          imageHeight: 200,
+          imageAlt: name,
+          showCloseButton: true,
+          confirmButtonText: 'Tutup',
+          confirmButtonColor: '#29A3D8',
+          customClass: {
+            popup: 'swal2-bisa-popup',
+            image: 'swal2-creator-avatar-preview'
+          }
+        });
+      } else {
+        const modal = document.getElementById("creatorAvatarModal");
+        const modalImg = document.getElementById("creatorAvatarModalImg");
+        const modalName = document.getElementById("creatorAvatarModalName");
+        const modalTitle = document.getElementById("creatorAvatarModalTitle");
+        if (modal && modalImg && modalName) {
+          modalImg.src = imgSrc;
+          modalName.textContent = name;
+          if (modalTitle) modalTitle.textContent = "Foto Profil " + name;
+          modal.classList.add("is-active");
+        }
+      }
+    };
+
     /* ===== TOP Kreator Chart (Canvas) & Table Dynamic Rendering ===== */
     (function () {
       const canvas = document.getElementById("topKreatorChart");
@@ -450,6 +498,19 @@
           { name: "kreator.baru", gmv: 6, gmvLabel: "Rp 6.000.000" },
           { name: "kreator.game", gmv: 5, gmvLabel: "Rp 5.000.000" }
         ]
+      };
+
+            const creatorAvatars = {
+        "kreator.top": "../media/avatar.png",
+        "kreator.super": "../media/creator-bima.svg",
+        "kreator.kece": "../media/creator-alya.svg",
+        "kreator.hits": "../media/creator-caca.svg",
+        "kreator.cantik": "../media/creator-alya.svg",
+        "kreator.ganteng": "../media/creator-bima.svg",
+        "kreator.style": "../media/creator-caca.svg",
+        "kreator.vlog": "../media/avatar.png",
+        "kreator.game": "../media/creator-bima.svg",
+        "kreator.baru": "../media/creator-alya.svg"
       };
 
       const tableBody = document.getElementById("topKreatorBody");
@@ -526,9 +587,13 @@
               row.style.backgroundColor = "rgba(41, 163, 217, 0.08)";
             }
 
+            const avatarSrc = creatorAvatars[item.name] || "../media/avatar.png";
+
             row.innerHTML = `
+
               <td>${index + 1}.</td>
-              <td><span class="db-topk-avatar"></span></td>
+
+              <td><span class="db-topk-avatar" style="cursor: pointer;" title="Klik untuk memperbesar foto profil" onclick="event.stopPropagation(); window.openCreatorAvatarPopup('${item.name}', '${avatarSrc}');"><img src="${avatarSrc}" alt="${item.name}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; display: block;" onerror="this.src='../media/avatar.png'"></span></td>
               <td style="text-align: left; font-weight: 600; color: ${isSelected ? 'var(--blue-700)' : '#4c4c4c'}">${item.name}</td>
               <td style="color: #2e7d32; font-weight: 600;">${item.gmvLabel}</td>
             `;

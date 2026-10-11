@@ -582,7 +582,7 @@
     const text = String(message || '').replace(/\s+/g, ' ').trim();
     if (!text) return '';
 
-    const quoted = text.match(/["“”]([^"“”]+)["“”]/);
+    const quoted = text.match(/["â€œâ€]([^"â€œâ€]+)["â€œâ€]/);
     if (quoted && quoted[1]) return normalizeFeatureTitle(quoted[1]);
 
     return normalizeFeatureTitle(
@@ -1640,7 +1640,7 @@
     const table = row.closest('table');
     const tableId = table ? String(table.id).trim() : '';
 
-    if (tableId === 'tblKehadiranV2' || tableId === 'tblIstirahatV2' || tableId === 'tblLemburV2') {
+    let isSpv = window.location.pathname.toLowerCase().includes("spvkol"); if (false) {
       let html = '<div class="d-flex justify-content-center gap-1">';
       if (config.view) {
         html += '<button class="btn-view" title="Lihat" type="button" style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; transition: background-color 0.15s ease; color: #29A3D8;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>';
@@ -6728,7 +6728,7 @@
       const end = String(ev.end || '').trim();
       const type = String(ev.type || '').trim();
       const time = start || end ? `${start || '--:--'}${end ? ` - ${end}` : ''}` : 'Jadwal fleksibel';
-      return type ? `${time} • ${type}` : time;
+      return type ? `${time} â€¢ ${type}` : time;
     };
 
     setText('dashTotalEmployees', totalEmp);
@@ -6749,7 +6749,7 @@
     const nextEl = document.getElementById('dashNextEvent');
     const heroEvent = nextEvents[0] || null;
     if (nextEl) {
-      nextEl.textContent = heroEvent ? `${heroEvent.date || '-'} • ${formatEventTime(heroEvent)} • ${heroEvent.title || 'Jadwal'}` : '-';
+      nextEl.textContent = heroEvent ? `${heroEvent.date || '-'} â€¢ ${formatEventTime(heroEvent)} â€¢ ${heroEvent.title || 'Jadwal'}` : '-';
     }
 
     const heroTitleEl = document.getElementById('dashHeroNextTitle');
@@ -6757,7 +6757,7 @@
     const heroTypeEl = document.getElementById('dashHeroNextType');
     const heroNoteEl = document.getElementById('dashHeroNextNote');
     if (heroTitleEl) heroTitleEl.textContent = heroEvent?.title || 'Belum ada jadwal';
-    if (heroMetaEl) heroMetaEl.textContent = heroEvent ? `${heroEvent.date || '-'} • ${formatEventTime(heroEvent)}` : '-';
+    if (heroMetaEl) heroMetaEl.textContent = heroEvent ? `${heroEvent.date || '-'} â€¢ ${formatEventTime(heroEvent)}` : '-';
     if (heroTypeEl) heroTypeEl.textContent = heroEvent?.type || '-';
     if (heroNoteEl) heroNoteEl.textContent = heroEvent?.note || 'Belum ada catatan';
 
@@ -7350,7 +7350,7 @@
     }
 
     function maskPassword(value) {
-      return String(value || '').trim() ? '••••••••' : '-';
+      return String(value || '').trim() ? 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' : '-';
     }
 
     function ensureFilePreviewControl(inputId, linkId) {
@@ -7792,7 +7792,7 @@
       });
       fillSelectOptions(jabEl, filtered.map((row) => ({
         value: row.id,
-        label: `${bmOptionLabel(row, 'Jabatan')} — ${bmEmployeeNamesForJabatan(row.id).join(', ') || 'Belum ada karyawan'}`,
+        label: `${bmOptionLabel(row, 'Jabatan')} â€” ${bmEmployeeNamesForJabatan(row.id).join(', ') || 'Belum ada karyawan'}`,
       })), 'Pilih jabatan');
       if (initial.jabatan_id && filtered.some((row) => String(row.id) === initial.jabatan_id)) jabEl.value = initial.jabatan_id;
       else if (filtered[0]) jabEl.value = filtered[0].id;
@@ -7835,7 +7835,7 @@
       <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
           <h5 class="mb-0">Pilih Akses ${escapeHtml(featureTitle)}</h5>
-          <small class="text-muted">Pilih bertahap: Sub Perusahaan → Divisi → Jabatan.</small>
+          <small class="text-muted">Pilih bertahap: Sub Perusahaan â†’ Divisi â†’ Jabatan.</small>
         </div>
         <button class="btn btn-sm btn-outline-secondary d-none" type="button" data-bm-gate-reset>Ganti Pilihan</button>
       </div>
@@ -8102,7 +8102,7 @@
               <div class="row g-3">
                 <div class="col-12">
                   <div class="alert alert-info mb-0">
-                    RRK dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan → Divisi → Jabatan.
+                    RRK dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan â†’ Divisi â†’ Jabatan.
                   </div>
                 </div>
                 <div class="col-12"><label class="form-label">Rancangan Rencana Kerja</label><textarea id="bmRrkRancangan" class="form-control" rows="4" placeholder="Isi rancangan rencana kerja"></textarea></div>
@@ -8256,7 +8256,7 @@
               <div class="row g-3">
                 <div class="col-12">
                   <div class="alert alert-info mb-0">
-                    Report dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan → Divisi → Jabatan.
+                    Report dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan â†’ Divisi â†’ Jabatan.
                   </div>
                 </div>
                 <div class="col-md-4"><label class="form-label">Tanggal</label><input id="bmReportTanggal" class="form-control" type="date" /></div>
@@ -9427,12 +9427,17 @@
     if (activeTableActionButton) {
       activeTableActionButton.classList.remove('show');
       activeTableActionButton.setAttribute('aria-expanded', 'false');
+      const td = activeTableActionButton.closest('.tdActions, .col-sticky-action');
+      if (td) td.style.zIndex = '';
     }
     activeTableActionMenu = null;
     activeTableActionButton = null;
   }
 
   function positionTableActionMenu(button, menu) {
+    const td = button.closest('.tdActions, .col-sticky-action');
+    if (td) td.style.zIndex = '9999';
+
     menu.style.display = 'block';
     menu.classList.add('show');
     menu.style.position = 'fixed';
@@ -9499,9 +9504,9 @@
       row.appendChild(cell);
     }
 
-    const isDots = Boolean(config?.dotsMenu || ['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(row.closest('table')?.id));
-    if (isDots) {
-      cell.className = 'tdActions text-center';
+    let isSpv = window.location.pathname.toLowerCase().includes("spvkol"); const isDots = Boolean(isSpv || config?.dotsMenu || ['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(row.closest('table')?.id));
+    if (isDots || isSpv) {
+      cell.className = 'tdActions text-center col-sticky-action';
       cell.innerHTML = `
         <div class="dropdown bm-action-dropdown">
           <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
@@ -9701,7 +9706,7 @@
 
   function fieldFromCell(cell, header, index, table, row) {
     const photoBtn = cell.querySelector('[data-photo-preview], [data-preview-src], [data-photo-src]');
-    if (table.id === 'tblKehadiranV2' && /photo|foto/i.test(header) && photoBtn) {
+    if (['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(table.id) && /photo|foto/i.test(header) && photoBtn) {
       const rawSrc = photoBtn.dataset.photoSrc || photoBtn.dataset.previewSrc || '';
       const employeeName = normalizeText(row?.children?.[1]?.textContent || 'Pegawai');
       const dateText = normalizeText(row?.children?.[2]?.textContent || '');
@@ -9714,7 +9719,7 @@
         type: 'photo',
         photoSrc: isImagePath(rawSrc) ? rawSrc : fallbackPhotoSrc(),
         photoTitle: `${header} - ${employeeName}`,
-        photoMeta: `${employeeName}${dateText ? ' · ' + dateText : ''} · ${kind}`,
+        photoMeta: `${employeeName}${dateText ? ' Â· ' + dateText : ''} Â· ${kind}`,
         photoAddress: address,
         photoNote: note,
         excludeFromTable: false,
@@ -9762,8 +9767,8 @@
   }
 
   function normalizeLemburFields(fields) {
-    const checkIn = fields.find((field) => /check in/i.test(field.label));
-    const checkOut = fields.find((field) => /check out/i.test(field.label));
+    const checkIn = fields.find((field) => /^check in$/i.test(field.label.trim()));
+    const checkOut = fields.find((field) => /^check out$/i.test(field.label.trim()));
     let total = fields.find((field) => /total waktu/i.test(field.label));
     if (!total) {
       total = { label: 'Total Waktu', value: '', excludeFromTable: false };
@@ -11713,8 +11718,8 @@
   function cleanGoogleTitle(title, link) {
     let clean = decodeHtmlEntity(String(title || ''))
       .replace(/\s+/g, ' ')
-      .replace(/\s[-–|]\sGoogle\s+(Docs|Sheets|Drive).*$/i, '')
-      .replace(/\s[-–|]\sGoogle.*$/i, '')
+      .replace(/\s[-â€“|]\sGoogle\s+(Docs|Sheets|Drive).*$/i, '')
+      .replace(/\s[-â€“|]\sGoogle.*$/i, '')
       .trim();
 
     const blockedTitles = [
@@ -15141,7 +15146,7 @@
         '<div class="bm-upload-file-popup-head">',
         '<div>',
         '<h5>' + name + '</h5>',
-        '<small>PDF Preview • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
+        '<small>PDF Preview â€¢ ' + size + ' â€¢ ' + escapeHtml(todayText) + '</small>',
         '</div>',
         '</div>',
         '<iframe class="bm-upload-file-frame" src="' + src + '" title="' + name + '"></iframe>',
@@ -15155,7 +15160,7 @@
         '<div class="bm-upload-file-popup-head">',
         '<div>',
         '<h5>' + name + '</h5>',
-        '<small>Image Preview • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
+        '<small>Image Preview â€¢ ' + size + ' â€¢ ' + escapeHtml(todayText) + '</small>',
         '</div>',
         '</div>',
         '<div class="bm-upload-file-image-wrap"><img src="' + src + '" alt="' + name + '" /></div>',
@@ -15171,7 +15176,7 @@
       '<div class="bm-upload-file-popup-head">',
       '<div>',
       '<h5>' + name + '</h5>',
-      '<small>' + escapeHtml(label) + ' • ' + size + ' • ' + escapeHtml(todayText) + '</small>',
+      '<small>' + escapeHtml(label) + ' â€¢ ' + size + ' â€¢ ' + escapeHtml(todayText) + '</small>',
       '</div>',
       '</div>',
       '<div class="bm-upload-file-placeholder">',
@@ -16444,19 +16449,19 @@
 
   function iconFallback(icon) {
     var value = String(icon || '').toLowerCase();
-    if (value.indexOf('folder') >= 0) return '📁';
-    if (value.indexOf('excel') >= 0 || value.indexOf('sheet') >= 0 || value.indexOf('spreadsheet') >= 0) return '▦';
+    if (value.indexOf('folder') >= 0) return 'ðŸ“';
+    if (value.indexOf('excel') >= 0 || value.indexOf('sheet') >= 0 || value.indexOf('spreadsheet') >= 0) return 'â–¦';
     if (value.indexOf('word') >= 0) return 'W';
     if (value.indexOf('pdf') >= 0) return 'PDF';
-    if (value.indexOf('image') >= 0 || value.indexOf('gallery') >= 0) return '▧';
+    if (value.indexOf('image') >= 0 || value.indexOf('gallery') >= 0) return 'â–§';
     if (value.indexOf('google') >= 0 || value.indexOf('drive') >= 0) return 'G';
-    if (value.indexOf('share') >= 0) return '↗';
-    if (value.indexOf('star') >= 0) return '★';
-    if (value.indexOf('delete') >= 0) return '×';
-    if (value.indexOf('edit') >= 0 || value.indexOf('rename') >= 0) return '✎';
-    if (value.indexOf('copy') >= 0) return '⧉';
-    if (value.indexOf('dots') >= 0) return '⋮';
-    return '•';
+    if (value.indexOf('share') >= 0) return 'â†—';
+    if (value.indexOf('star') >= 0) return 'â˜…';
+    if (value.indexOf('delete') >= 0) return 'Ã—';
+    if (value.indexOf('edit') >= 0 || value.indexOf('rename') >= 0) return 'âœŽ';
+    if (value.indexOf('copy') >= 0) return 'â§‰';
+    if (value.indexOf('dots') >= 0) return 'â‹®';
+    return 'â€¢';
   }
 
   function applyIconFallbacks(scope) {
@@ -18069,6 +18074,7 @@
 
   if (calendarCampaignModal) {
     // Open Calendar Modal
+
     btnCalendarCampaign?.addEventListener("click", () => {
       calendarCampaignModal.classList.add("is-active");
     });
@@ -18206,3 +18212,8 @@ document.addEventListener("click", (e) => {
     });
   }
 });
+
+
+
+
+

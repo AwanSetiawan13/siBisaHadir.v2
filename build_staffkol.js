@@ -8,7 +8,7 @@ const staffKolDir = path.join(rootDir, 'StaffKol');
 function getFullSidebar(prefix, activePage) {
   const isDash = activePage === 'staffkol_dashboard.html' ? ' nav-item--active' : '';
   const isKalender = activePage === 'staffkol_kalender.html' ? ' nav-item--active' : '';
-  
+
   const isKehadiran = activePage === 'staffkol_kehadiran.html' ? ' nav-item--active' : '';
   const isIstirahat = activePage === 'staffkol_presensi_istirahat.html' ? ' nav-item--active' : '';
   const isLembur = activePage === 'staffkol_presensi_lembur.html' ? ' nav-item--active' : '';

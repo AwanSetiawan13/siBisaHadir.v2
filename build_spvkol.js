@@ -177,7 +177,7 @@ function getSpvSidebar(prefix, mediaPrefix, logoutHref, activePage) {
               <circle cx="17" cy="9" r="2"></circle>
               <path d="M15.5 14.5c2.7-.3 4.4 1.2 5 4"></path>
             </svg>
-            <span>Data Creator</span>
+            <span>Data Kreator</span>
           </a>
 
           <a class="nav-item${isTrackingKreator}" href="${prefix}operasional/spvkol_tracking_kreator.html">

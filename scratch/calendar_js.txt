@@ -1,0 +1,212 @@
+const btnCalendarKehadiran = document.getElementById("btnCalendarKehadiran");
+      const calendarKehadiranModal = document.getElementById("calendarKehadiranModal");
+      const closeCalendarKehadiranModal = document.getElementById("closeCalendarKehadiranModal");
+      const btnCancelCalendarKehadiran = document.getElementById("btnCancelCalendarKehadiran");
+      const btnApplyCalendarKehadiran = document.getElementById("btnApplyCalendarKehadiran");
+      const selectedRangeTextKehadiran = document.getElementById("selectedRangeTextKehadiran");
+      const calendarActiveBadge = document.getElementById("calendarActiveBadge");
+
+      let calTempStart = null;
+      let calTempEnd = null;
+
+      if (btnCalendarKehadiran && calendarKehadiranModal) {
+        btnCalendarKehadiran.addEventListener("click", () => {
+          calendarKehadiranModal.classList.add("is-active");
+          updateCalendarHighlight();
+        });
+      }
+
+      if (closeCalendarKehadiranModal && calendarKehadiranModal) {
+        closeCalendarKehadiranModal.addEventListener("click", () => {
+          calendarKehadiranModal.classList.remove("is-active");
+        });
+      }
+
+      if (btnCancelCalendarKehadiran && calendarKehadiranModal) {
+        btnCancelCalendarKehadiran.addEventListener("click", () => {
+          calendarKehadiranModal.classList.remove("is-active");
+        });
+      }
+
+      function updateCalendarHighlight() {
+        const month1Box = calendarKehadiranModal?.querySelectorAll(".calendar-month-box")[0];
+        const month2Box = calendarKehadiranModal?.querySelectorAll(".calendar-month-box")[1];
+
+        [month1Box, month2Box].forEach((box, bIdx) => {
+          if (!box) return;
+          const monthIdx = bIdx === 0 ? 7 : 8; // Agustus (7), September (8)
+          const year = 2026;
+          const daySpans = box.querySelectorAll(".calendar-days span:not(.day-muted)");
+
+          daySpans.forEach(s => {
+            const d = parseInt(s.textContent.trim(), 10);
+            if (isNaN(d)) return;
+            const curDate = new Date(year, monthIdx, d);
+
+            s.classList.remove("selected-start", "selected-end", "day-selected-range", "day-active");
+
+            if (calTempStart && !calTempEnd) {
+              if (curDate.getTime() === calTempStart.getTime()) {
+                s.classList.add("selected-start");
+              }
+            } else if (calTempStart && calTempEnd) {
+              if (curDate.getTime() === calTempStart.getTime()) {
+                s.classList.add("selected-start");
+              } else if (curDate.getTime() === calTempEnd.getTime()) {
+                s.classList.add("selected-end");
+              } else if (curDate > calTempStart && curDate < calTempEnd) {
+                s.classList.add("day-selected-range");
+              }
+            }
+          });
+        });
+
+        if (selectedRangeTextKehadiran) {
+          if (!calTempStart && !calTempEnd) {
+            selectedRangeTextKehadiran.textContent = "Semua Tanggal";
+          } else if (calTempStart && !calTempEnd) {
+            selectedRangeTextKehadiran.textContent = formatDateDisplay(calTempStart);
+          } else if (calTempStart && calTempEnd) {
+            selectedRangeTextKehadiran.textContent = `${formatDateDisplay(calTempStart)} - ${formatDateDisplay(calTempEnd)}`;
+          }
+        }
+      }
+
+      function formatDateDisplay(d) {
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        return `${dd}/${mm}/${d.getFullYear()}`;
+      }
+
+      const quickOptionBtns = calendarKehadiranModal?.querySelectorAll(".quick-option-btn");
+      quickOptionBtns?.forEach(btn => {
+        btn.addEventListener("click", () => {
+          quickOptionBtns.forEach(b => b.classList.remove("is-active"));
+          btn.classList.add("is-active");
+
+          const rangeType = btn.getAttribute("data-range");
+          const now = new Date(2026, 8, 17); // Fixed anchor date
+
+          if (rangeType === "all") {
+            calTempStart = null;
+            calTempEnd = null;
+          } else if (rangeType === "today") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          } else if (rangeType === "yesterday") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          } else if (rangeType === "7days") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          } else if (rangeType === "30days") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          } else if (rangeType === "thisMonth") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          } else if (rangeType === "lastMonth") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+          }
+
+          updateCalendarHighlight();
+        });
+      });
+
+      // Dual Calendar clicking days
+      const month1Box = calendarKehadiranModal?.querySelectorAll(".calendar-month-box")[0];
+      const month2Box = calendarKehadiranModal?.querySelectorAll(".calendar-month-box")[1];
+
+      function handleCalendarDayClick(year, monthIdx, dayNum) {
+        const clickedDate = new Date(year, monthIdx, dayNum);
+        quickOptionBtns?.forEach(b => b.classList.remove("is-active"));
+
+        if (!calTempStart || (calTempStart && calTempEnd)) {
+          calTempStart = clickedDate;
+          calTempEnd = null;
+        } else if (calTempStart && !calTempEnd) {
+          if (clickedDate.getTime() >= calTempStart.getTime()) {
+            calTempEnd = clickedDate;
+          } else {
+            calTempEnd = calTempStart;
+            calTempStart = clickedDate;
+          }
+        }
+        updateCalendarHighlight();
+      }
+
+      if (month1Box) {
+        month1Box.querySelectorAll(".calendar-days span:not(.day-muted)").forEach(s => {
+          s.addEventListener("click", () => {
+            const d = parseInt(s.textContent.trim(), 10);
+            if (!isNaN(d)) handleCalendarDayClick(2026, 7, d);
+          });
+        });
+      }
+
+      if (month2Box) {
+        month2Box.querySelectorAll(".calendar-days span:not(.day-muted)").forEach(s => {
+          s.addEventListener("click", () => {
+            const d = parseInt(s.textContent.trim(), 10);
+            if (!isNaN(d)) handleCalendarDayClick(2026, 8, d);
+          });
+        });
+      }
+
+      if (btnApplyCalendarKehadiran) {
+        btnApplyCalendarKehadiran.addEventListener("click", () => {
+          if (calTempStart && calTempEnd) {
+            /* activeDateRange set */
+            
+            btnCalendarKehadiran?.classList.add("btn-calendar-active");
+          } else if (calTempStart && !calTempEnd) {
+            /* activeDateRange set */
+            
+            btnCalendarKehadiran?.classList.add("btn-calendar-active");
+          } else {
+            /* activeDateRange set */
+            
+            btnCalendarKehadiran?.classList.remove("btn-calendar-active");
+          }
+
+          calendarKehadiranModal.classList.remove("is-active");
+          
+        });
+      }
+
+      // Toolbar: Real-time Search
+      const searchCampaignInput = document.getElementById("searchCampaignInput");
+      const clearSearchCampaignBtn = document.getElementById("clearSearchCampaignBtn");
+
+      if (searchCampaignInput) {
+        searchCampaignInput.addEventListener("input", (e) => {
+          searchQuery = e.target.value.trim();
+          if (clearSearchCampaignBtn) {
+            clearSearchCampaignBtn.style.display = searchQuery.length > 0 ? "inline-flex" : "none";
+          }
+          
+        });
+      }
+
+      if (clearSearchCampaignBtn && searchCampaignInput) {
+        clearSearchCampaignBtn.addEventListener("click", () => {
+          searchCampaignInput.value = "";
+          clearSearchCampaignBtn.style.display = "none";
+          searchQuery = "";
+          
+          searchCampaignInput.focus();
+        });
+      }
+
+      // Initial Bootstrap
+      populateBrandDropdowns();
+      updatePidOptionsForBrand(campaignBrandSelect ? campaignBrandSelect.value : "", "");
+      if (Array.isArray(campaignDb)) {
+        campaignDb.forEach(c => syncCampaignSamplesToTracking(c));
+      }
+      
+    })();
+  
+
+
