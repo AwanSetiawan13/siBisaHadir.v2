@@ -15,6 +15,45 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
+    /* ===== SweetAlert2 Custom Styling for Bisa Media ===== */
+    .swal2-bisa-popup {
+      font-family: 'Outfit', sans-serif !important;
+      border-radius: 14px !important;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
+      padding: 26px 22px !important;
+    }
+
+    .swal2-bisa-popup .swal2-title {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 19px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin-top: 12px !important;
+    }
+
+    .swal2-bisa-popup .swal2-html-container {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      color: #64748b !important;
+      line-height: 1.55 !important;
+      margin-top: 8px !important;
+    }
+
+    .swal2-bisa-popup .swal2-confirm,
+    .swal2-bisa-popup .swal2-cancel {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+      padding: 9px 22px !important;
+      box-shadow: none !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+
     .col-sticky-action {
       position: sticky !important;
       right: 0;
@@ -26,10 +65,96 @@
 
     th.col-sticky-action {
       background-color: #f8fafc !important;
+      z-index: 16 !important;
     }
 
     tr:hover td.col-sticky-action {
       background-color: #f8fafc !important;
+    }
+
+    /* Checkbox Pin/Fix Column Header Button (Sesuai Konsep Performa Kreator) */
+    .th-pin-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .pin-check-btn {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .pin-check-btn input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .pin-check-indicator {
+      width: 17px;
+      height: 17px;
+      border-radius: 4px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-indicator svg {
+      width: 11px;
+      height: 11px;
+      stroke: #ffffff;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-btn:hover .pin-check-indicator {
+      border-color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked+.pin-check-indicator {
+      background: #0284c7;
+      border-color: #0284c7;
+      box-shadow: 0 1px 4px rgba(2, 132, 199, 0.35);
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked+.pin-check-indicator svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Fixed/Pinned Left Columns saat di-ceklis */
+    .campaign-table th.col-pinned-sticky {
+      position: sticky !important;
+      z-index: 15 !important;
+      background: #f8fafc !important;
+    }
+
+    .campaign-table td.col-pinned-sticky {
+      position: sticky !important;
+      z-index: 9 !important;
+      background: #ffffff !important;
+    }
+
+    .campaign-table tr:hover td.col-pinned-sticky {
+      background: #f8fafc !important;
+    }
+
+    .campaign-table th.col-pinned-last,
+    .campaign-table td.col-pinned-last {
+      box-shadow: 5px 0 12px rgba(0, 0, 0, 0.08) !important;
+      border-right: 1px solid #cbd5e1 !important;
     }
 
     .status-badge {
@@ -375,7 +500,7 @@
 
 
 
-      <section class="panel campaign-panel">
+      <section id="tablePanel" class="panel campaign-panel">
         <div class="campaign-panel__line"></div>
 
         <div class="campaign-toolbar">
@@ -437,18 +562,87 @@
             </div>
           </div>
 
-          <div class="campaign-toolbar__right"></div>
+          <div class="campaign-toolbar__right">
+            <button id="btnTambahReport" class="btn-tambah" style="margin-right: 14px;" type="button">
+              + Tambah
+            </button>
+          </div>
         </div>
 
         <div class="table-wrap campaign-table" id="tableContainerWrapper" style="overflow-x: auto;">
           <table id="tblStaffLaporanCampaign">
             <thead>
               <tr>
-                <th style="width: 50px;">ID</th>
-                <th>Kreator</th>
-                <th>ID LIVE</th>
-                <th>LIVE</th>
-                <th>Waktu mulai</th>
+                <th class="th-pinnable" data-col="id" style="width: 70px;">
+                  <div class="th-pin-wrapper">
+                    <span>ID</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom ID agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="id" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="kreator">
+                  <div class="th-pin-wrapper">
+                    <span>Kreator</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Kreator agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="kreator" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="idLive">
+                  <div class="th-pin-wrapper">
+                    <span>ID LIVE</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom ID LIVE agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="idLive" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="live">
+                  <div class="th-pin-wrapper">
+                    <span>LIVE</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom LIVE agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="live" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="waktuMulai">
+                  <div class="th-pin-wrapper">
+                    <span>Waktu mulai</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Waktu mulai agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="waktuMulai" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
                 <th>GMV dari kreator</th>
                 <th>GMV Langsung</th>
                 <th>Produk yang terjual dari kreator</th>
@@ -470,6 +664,43 @@
               <!-- Dynamically Populated -->
             </tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- Form Panel for Tambah Laporan Campaign (Input Data dan Preview) -->
+      <section id="formPanel" class="panel campaign-panel" style="display: none; position: relative;">
+        <button type="button" id="btnCancelTambahReport"
+          style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; line-height: 1; color: #a5a5aa; cursor: pointer; transition: color 0.15s; z-index: 10;"
+          onmouseover="this.style.color='#ff5252'" onmouseout="this.style.color='#a5a5aa'">&times;</button>
+        <div class="campaign-panel__line"></div>
+
+        <div class="performa-form-container">
+          <form id="reportForm">
+            <!-- Row: Input Data and Preview -->
+            <div class="form-row-mid" style="margin-top: 6px;">
+              <div class="form-group" style="flex: 0 0 250px;">
+                <label class="form-label">Input Data</label>
+                <div class="file-upload-box" id="fileUploadContainer">
+                  <span class="btn-choose-file">Choose File</span>
+                  <input type="file" id="reportFileInput" style="display: none;" accept=".xlsx,.xls,.csv" required />
+                </div>
+                <textarea class="form-input" id="reportPasteInput" rows="4" placeholder="Tempel data di sini..."
+                  style="display: none; width: 100%; height: 80px; resize: none; padding: 8px; border: 1px solid #c5c5c8; border-radius: 6px;"></textarea>
+              </div>
+
+              <div class="form-group" style="flex: 1;">
+                <label class="form-label">Preview</label>
+                <div class="preview-box" id="previewBox">
+                  <!-- File preview will appear here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button Row -->
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+              <button class="btn-submit-modal" type="submit">Submit</button>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -623,8 +854,10 @@
     (function () {
       'use strict';
 
+      const STORAGE_KEY = "bisa_staffkol_laporan_campaign_v2";
+
       // Seed data report campaign live TikTok Shop
-      const REPORT_LIVE_DATA = [
+      const DEFAULT_REPORT_LIVE_DATA = [
         {
           id: 1,
           kreatorNama: "Aura Cantika",
@@ -765,6 +998,29 @@
         }
       ];
 
+      let reportDb = DEFAULT_REPORT_LIVE_DATA;
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            reportDb = parsed;
+          }
+        } else {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_REPORT_LIVE_DATA));
+        }
+      } catch (e) {
+        reportDb = DEFAULT_REPORT_LIVE_DATA;
+      }
+
+      function saveReportDb() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(reportDb));
+        } catch (e) {
+          console.error("Error saving reportDb:", e);
+        }
+      }
+
       function formatRupiah(num) {
         if (isNaN(num)) return "Rp 0";
         return "Rp " + Math.round(num).toLocaleString('id-ID');
@@ -782,21 +1038,25 @@
       const filterGmvSelect = document.getElementById("filterGmvSelect");
 
       // Populate filter dropdowns
-      if (filterKreatorSelect) {
-        const uniqueKreators = Array.from(new Set(REPORT_LIVE_DATA.map(d => d.kreatorNama)));
+      function populateKreatorFilter() {
+        if (!filterKreatorSelect) return;
+        const currentVal = filterKreatorSelect.value;
+        filterKreatorSelect.innerHTML = '<option value="">Semua Kreator</option>';
+        const uniqueKreators = Array.from(new Set(reportDb.map(d => d.kreatorNama).filter(Boolean)));
         uniqueKreators.forEach(k => {
           const opt = document.createElement("option");
           opt.value = k;
           opt.textContent = k;
+          if (k === currentVal) opt.selected = true;
           filterKreatorSelect.appendChild(opt);
         });
       }
 
-      // Update Metric Values (Label tetap dikosongkan)
+      // Update Metric Values
       function updateMetrics(list) {
-        const totalGmv = list.reduce((acc, curr) => acc + curr.gmvKreator, 0);
-        const totalProduk = list.reduce((acc, curr) => acc + curr.produkTerjual, 0);
-        const totalPenonton = list.reduce((acc, curr) => acc + curr.penonton, 0);
+        const totalGmv = list.reduce((acc, curr) => acc + (Number(curr.gmvKreator) || 0), 0);
+        const totalProduk = list.reduce((acc, curr) => acc + (Number(curr.produkTerjual) || 0), 0);
+        const totalPenonton = list.reduce((acc, curr) => acc + (Number(curr.penonton) || 0), 0);
 
         const el1 = document.getElementById("metricLaporan1");
         const el2 = document.getElementById("metricLaporan2");
@@ -813,22 +1073,23 @@
         const selKreator = (filterKreatorSelect?.value || "").toLowerCase().trim();
         const selGmv = filterGmvSelect?.value || "";
 
-        const filtered = REPORT_LIVE_DATA.filter(item => {
+        const filtered = reportDb.filter(item => {
           // Search query match
           const matchQuery = !q ||
-            item.kreatorNama.toLowerCase().includes(q) ||
-            item.kreatorUser.toLowerCase().includes(q) ||
-            item.idLive.toLowerCase().includes(q) ||
-            item.liveTitle.toLowerCase().includes(q);
+            (item.kreatorNama && item.kreatorNama.toLowerCase().includes(q)) ||
+            (item.kreatorUser && item.kreatorUser.toLowerCase().includes(q)) ||
+            (item.idLive && String(item.idLive).toLowerCase().includes(q)) ||
+            (item.liveTitle && item.liveTitle.toLowerCase().includes(q));
 
           // Kreator filter match
-          const matchKreator = !selKreator || item.kreatorNama.toLowerCase() === selKreator;
+          const matchKreator = !selKreator || (item.kreatorNama && item.kreatorNama.toLowerCase() === selKreator);
 
           // GMV filter match
           let matchGmv = true;
-          if (selGmv === "high") matchGmv = item.gmvKreator > 30000000;
-          else if (selGmv === "medium") matchGmv = item.gmvKreator >= 15000000 && item.gmvKreator <= 30000000;
-          else if (selGmv === "low") matchGmv = item.gmvKreator < 15000000;
+          const gmvNum = Number(item.gmvKreator) || 0;
+          if (selGmv === "high") matchGmv = gmvNum > 30000000;
+          else if (selGmv === "medium") matchGmv = gmvNum >= 15000000 && gmvNum <= 30000000;
+          else if (selGmv === "low") matchGmv = gmvNum < 15000000;
 
           return matchQuery && matchKreator && matchGmv;
         });
@@ -852,7 +1113,7 @@
               <td style="font-weight: 600; color: #64748b;">${item.id}</td>
               <td>
                 <div style="display: flex; align-items: center; gap: 9px;">
-                  <img src="${item.kreatorFoto}" alt="${item.kreatorNama}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0;" />
+                  <img src="${item.kreatorFoto || '../../media/avatar.png'}" alt="${item.kreatorNama}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0;" />
                   <div>
                     <strong style="color: #0f172a; display: block; font-size: 13px;">${item.kreatorNama}</strong>
                     <span style="font-size: 11.5px; color: #64748b;">${item.kreatorUser}</span>
@@ -892,6 +1153,9 @@
             openDetailModal(id);
           });
         });
+
+        updatePinnedColumns();
+        setTimeout(updatePinnedColumns, 20);
       }
 
       function setFieldValue(id, val) {
@@ -902,7 +1166,7 @@
       }
 
       function openDetailModal(id) {
-        const item = REPORT_LIVE_DATA.find(d => d.id === id);
+        const item = reportDb.find(d => Number(d.id) === Number(id));
         if (!item) return;
 
         setFieldValue("modalLiveTitle", item.liveTitle);
@@ -991,7 +1255,253 @@
         });
       }
 
-      // Initial Render
+      // ═══════════════════════════════════════════════════════════════════
+      // Tambah Laporan Campaign (Input Data & Preview Controller)
+      // Mirip persis dengan fitur spvkol_Performa_Kreator.html
+      // ═══════════════════════════════════════════════════════════════════
+      const btnTambahReport = document.getElementById("btnTambahReport");
+      const btnCancelTambahReport = document.getElementById("btnCancelTambahReport");
+      const tablePanel = document.getElementById("tablePanel");
+      const formPanel = document.getElementById("formPanel");
+      const reportForm = document.getElementById("reportForm");
+      const fileUploadContainer = document.getElementById("fileUploadContainer");
+      const reportFileInput = document.getElementById("reportFileInput");
+      const previewBox = document.getElementById("previewBox");
+
+      if (btnTambahReport && tablePanel && formPanel) {
+        btnTambahReport.addEventListener("click", () => {
+          tablePanel.style.display = "none";
+          formPanel.style.display = "block";
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      if (btnCancelTambahReport && tablePanel && formPanel) {
+        btnCancelTambahReport.addEventListener("click", () => {
+          formPanel.style.display = "none";
+          tablePanel.style.display = "block";
+        });
+      }
+
+      if (fileUploadContainer && reportFileInput) {
+        fileUploadContainer.addEventListener("click", () => {
+          reportFileInput.click();
+        });
+
+        reportFileInput.addEventListener("change", function () {
+          if (this.files && this.files[0]) {
+            const file = this.files[0];
+            const fileName = file.name;
+            const chooseBtn = fileUploadContainer.querySelector(".btn-choose-file");
+            if (chooseBtn) chooseBtn.textContent = fileName;
+            if (previewBox) {
+              previewBox.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0284c7; font-weight: 600;">
+                  <i class="bx bxs-file-doc" style="font-size: 20px;"></i>
+                  <span>${fileName} (${(file.size / 1024).toFixed(1)} KB)</span>
+                </div>
+              `;
+            }
+          }
+        });
+
+        // Drag & drop support
+        ['dragenter', 'dragover'].forEach(eventName => {
+          fileUploadContainer.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileUploadContainer.style.borderColor = "#29A3D8";
+            fileUploadContainer.style.background = "#f0f9ff";
+          }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+          fileUploadContainer.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileUploadContainer.style.borderColor = "";
+            fileUploadContainer.style.background = "";
+          }, false);
+        });
+
+        fileUploadContainer.addEventListener('drop', (e) => {
+          const dt = e.dataTransfer;
+          const files = dt.files;
+          if (files && files.length) {
+            reportFileInput.files = files;
+            const event = new Event('change');
+            reportFileInput.dispatchEvent(event);
+          }
+        });
+      }
+
+      if (reportForm) {
+        reportForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const today = new Date();
+          const dd = String(today.getDate()).padStart(2, '0');
+          const mm = String(today.getMonth() + 1).padStart(2, '0');
+          const yyyy = today.getFullYear();
+          const hh = String(today.getHours()).padStart(2, '0');
+          const min = String(today.getMinutes()).padStart(2, '0');
+          const defaultDate = `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+
+          const file = reportFileInput?.files ? reportFileInput.files[0] : null;
+          const fileName = file ? file.name : "";
+          const baseName = fileName ? fileName.replace(/\.[^/.]+$/, "") : "";
+          const cleanTitle = baseName ? `LIVE CAMPAIGN - ${baseName.toUpperCase()}` : "MEGA LIVE SHOPPING DISKON SPESIAL";
+
+          const newId = reportDb.length > 0 ? Math.max(...reportDb.map(d => Number(d.id) || 0)) + 1 : 1;
+          const newItem = {
+            id: newId,
+            kreatorNama: "Kreator Baru",
+            kreatorUser: "@kreator.baru",
+            kreatorFoto: "../../media/avatar.png",
+            idLive: String(74290000000000000 + Math.floor(Math.random() * 99999999)),
+            liveTitle: cleanTitle,
+            waktuMulai: defaultDate,
+            gmvKreator: 32500000,
+            gmvLangsung: 28200000,
+            produkTerjual: 560,
+            penonton: 18900,
+            gpmSesi: 1719576,
+            rasioKetukTayang: 14.5,
+            pesananSku: 590,
+            pembeli: 495,
+            durasi: "02:45:00",
+            tayangan: 61000,
+            komentar: 2850,
+            dibagikan: 1100,
+            suka: 41500,
+            hargaRataRata: 58035
+          };
+
+          reportDb.unshift(newItem);
+          saveReportDb();
+          populateKreatorFilter();
+          renderTable();
+
+          if (formPanel) formPanel.style.display = "none";
+          if (tablePanel) tablePanel.style.display = "block";
+          reportForm.reset();
+          if (previewBox) previewBox.innerHTML = "";
+          const chooseBtn = fileUploadContainer?.querySelector(".btn-choose-file");
+          if (chooseBtn) chooseBtn.textContent = "Choose File";
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil Ditambahkan!',
+              html: `Data laporan campaign berhasil ditambahkan ke dalam sistem.`,
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Selesai',
+              timer: 2200,
+              timerProgressBar: true,
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+          }
+        });
+      }
+
+      // ═══════════════════════════════════════════════════════════════════
+      // PINNED / FIXED COLUMNS CONTROLLER (Sesuai Konsep Performa Kreator)
+      // ═══════════════════════════════════════════════════════════════════
+      const PIN_STORAGE_KEY = "bisa_staffkol_laporan_pinned_cols_v1";
+
+      function getSavedPinnedCols() {
+        try {
+          const saved = localStorage.getItem(PIN_STORAGE_KEY);
+          return saved ? JSON.parse(saved) : {};
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function savePinnedCols(map) {
+        try {
+          localStorage.setItem(PIN_STORAGE_KEY, JSON.stringify(map));
+        } catch (e) { }
+      }
+
+      function updatePinnedColumns() {
+        const table = document.getElementById("tblStaffLaporanCampaign");
+        if (!table) return;
+
+        const colConfig = [
+          { key: "id", colIdx: 0 },
+          { key: "kreator", colIdx: 1 },
+          { key: "idLive", colIdx: 2 },
+          { key: "live", colIdx: 3 },
+          { key: "waktuMulai", colIdx: 4 }
+        ];
+
+        let currentLeft = 0;
+
+        colConfig.forEach(cfg => {
+          const chk = document.querySelector(`.chk-pin-col[data-col="${cfg.key}"]`);
+          const isPinned = chk ? chk.checked : false;
+
+          const th = table.querySelector(`thead tr th:nth-child(${cfg.colIdx + 1})`);
+          const tds = table.querySelectorAll(`tbody tr td:nth-child(${cfg.colIdx + 1})`);
+
+          if (isPinned) {
+            const width = th ? th.getBoundingClientRect().width : 110;
+            if (th) {
+              th.classList.add("col-pinned-sticky");
+              th.style.left = currentLeft + "px";
+            }
+            tds.forEach(td => {
+              td.classList.add("col-pinned-sticky");
+              td.style.left = currentLeft + "px";
+            });
+            currentLeft += width;
+          } else {
+            if (th) {
+              th.classList.remove("col-pinned-sticky");
+              th.style.left = "";
+            }
+            tds.forEach(td => {
+              td.classList.remove("col-pinned-sticky");
+              td.style.left = "";
+            });
+          }
+        });
+
+        // Manage .col-pinned-last for divider shadow
+        table.querySelectorAll(".col-pinned-last").forEach(el => el.classList.remove("col-pinned-last"));
+        const pinnedThs = table.querySelectorAll("thead tr th.col-pinned-sticky");
+        if (pinnedThs.length > 0) {
+          pinnedThs[pinnedThs.length - 1].classList.add("col-pinned-last");
+          table.querySelectorAll("tbody tr").forEach(r => {
+            const pinnedTds = r.querySelectorAll("td.col-pinned-sticky");
+            if (pinnedTds.length > 0) {
+              pinnedTds[pinnedTds.length - 1].classList.add("col-pinned-last");
+            }
+          });
+        }
+      }
+
+      function initPinnedColsEvents() {
+        const saved = getSavedPinnedCols();
+        document.querySelectorAll(".chk-pin-col").forEach(chk => {
+          const col = chk.getAttribute("data-col");
+          if (saved && saved[col]) {
+            chk.checked = true;
+          }
+          chk.addEventListener("change", () => {
+            const currentSaved = getSavedPinnedCols();
+            currentSaved[col] = chk.checked;
+            savePinnedCols(currentSaved);
+            updatePinnedColumns();
+          });
+        });
+
+        window.addEventListener("resize", updatePinnedColumns);
+      }
+
+      // Initial Setup
+      initPinnedColsEvents();
+      populateKreatorFilter();
       renderTable();
     })();
   </script>
