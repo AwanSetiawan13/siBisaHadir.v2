@@ -5,37 +5,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard Campaign | Staff KOL - Bisa Media</title>
-  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="../../style.css" />
-  <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
   <style>
-    /* Specific styles for Dashboard Campaign */
+    /* Specific styles for Dashboard Campaign - 100% Consistent with siBisaHadir Blue Theme */
     .campaign-db-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 22px;
     }
-    
+
     .campaign-db-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1e293b;
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
       margin: 0;
-      letter-spacing: -0.2px;
+      letter-spacing: -0.3px;
+      font-family: 'Outfit', sans-serif;
     }
 
     .month-pill-select {
       background-color: #29a0dc;
       color: #ffffff;
       border: none;
-      padding: 7px 16px 7px 18px;
+      padding: 8px 18px 8px 20px;
       border-radius: 6px;
       font-family: 'Outfit', sans-serif;
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
@@ -72,12 +71,14 @@
       pointer-events: none;
     }
 
-    /* 8 Metric Cards Grid (2 rows x 4 cols) */
-    .metric-grid-8 {
+    /* Top Metric Cards Grid & 4 Tier Performance Grid */
+    .metric-grid-4,
+    .level-grid-4 {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 18px;
       margin-bottom: 22px;
+      width: 100%;
     }
 
     .metric-card-clean {
@@ -85,13 +86,16 @@
       border: 1px solid #e2e8f0;
       border-top: 4px solid var(--blue-800, #2865b5);
       border-radius: 12px;
-      padding: 20px 24px;
+      padding: 16px 18px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
-      gap: 20px;
+      gap: 14px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05);
       transition: transform 0.18s ease, box-shadow 0.18s ease;
+      min-height: 165px;
+      box-sizing: border-box;
+      height: 100%;
     }
 
     .metric-card-clean:hover {
@@ -102,10 +106,11 @@
     }
 
     .metric-content-clean {
-      order: 2;
       display: flex;
       flex-direction: column;
       gap: 3px;
+      flex: 1;
+      min-width: 0;
     }
 
     .metric-title-clean {
@@ -115,22 +120,51 @@
       margin: 0;
       text-transform: none;
       letter-spacing: normal;
-      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .metric-number-clean {
-      font-size: 26px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 800;
       color: #0f172a;
       line-height: 1.2;
-      letter-spacing: -0.02em;
       font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .metric-trend-clean {
+      font-size: 11.5px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    .metric-trend-clean.up {
+      color: #059669;
+    }
+
+    .metric-trend-clean.down {
+      color: #e11d48;
+    }
+
+    .metric-trend-clean i {
+      font-style: normal;
+      color: #64748b;
+      font-weight: 500;
     }
 
     .metric-icon-box-blue {
       order: 1;
-      width: 54px;
-      height: 54px;
+      width: 46px;
+      height: 46px;
       background: #1c88e3;
       border-radius: 12px;
       display: flex;
@@ -142,62 +176,182 @@
     }
 
     .metric-icon-box-blue svg {
-      width: 28px;
-      height: 28px;
+      width: 22px;
+      height: 22px;
       stroke: #ffffff;
       stroke-width: 2.3;
     }
 
-    /* Mid Section: Campaign Table + Donut */
-    .mid-campaign-section {
-      display: grid;
-      grid-template-columns: 1.7fr 1fr;
-      gap: 18px;
-      margin-bottom: 22px;
+    .tier-card-clean {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 4px solid var(--blue-800, #2865b5);
+      border-radius: 12px;
+      padding: 16px 18px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      min-height: 165px;
+      box-sizing: border-box;
+      height: 100%;
     }
 
+    .tier-card-clean:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .tier-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px dotted #cbd5e1;
+    }
+
+    .tier-title-clean {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1c88e3;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .tier-count-clean {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .tier-icon-small {
+      width: 34px;
+      height: 34px;
+      width: 36px;
+      height: 36px;
+      background: #1c88e3;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 2px 5px rgba(28, 136, 227, 0.2);
+    }
+
+    .tier-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .tier-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      padding-bottom: 6px;
+      border-bottom: 1px dotted #f1f5f9;
+    }
+
+    .tier-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .tier-row b {
+      color: #64748b;
+      font-weight: 600;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .tier-row i {
+      color: #0f172a;
+      font-weight: 700;
+      font-style: normal;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      white-space: nowrap;
+      min-width: 76px;
+      text-align: right;
+    }
+
+    .tier-row .mini-badge {
+      min-width: 44px;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+
+    /* White Cards & Tables */
     .campaign-white-card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      padding: 18px 22px;
+      padding: 20px 24px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+      margin-bottom: 22px;
     }
 
     .card-title-italic {
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       font-style: italic;
       color: #0f172a;
-      margin: 0 0 10px 0;
+      margin: 0 0 12px 0;
     }
 
     .card-title-caps {
-      font-size: 13.5px;
+      font-size: 14.5px;
       font-weight: 700;
       font-style: italic;
       color: #0f172a;
       text-transform: uppercase;
       letter-spacing: 0.3px;
-      margin: 0 0 10px 0;
+      margin: 0 0 12px 0;
     }
 
     .dotted-divider {
       border-top: 1px dotted #cbd5e1;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    /* Mid 2-Column Section */
+    .mid-campaign-section {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 275px;
+      gap: 18px;
+      margin-bottom: 22px;
+      align-items: stretch;
+    }
+
+    .mid-campaign-section>.campaign-white-card {
+      margin-bottom: 0 !important;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
     }
 
     .dotted-table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 13.5px;
     }
 
     .dotted-table th {
-      font-size: 11.5px;
+      font-size: 12.5px;
       font-style: italic;
-      font-weight: 600;
-      color: #334155;
-      padding: 8px 10px;
+      font-weight: 700;
+      color: #1e293b;
+      padding: 10px 12px;
       border-bottom: 1px dotted #cbd5e1;
       text-align: left;
       white-space: nowrap;
@@ -209,9 +363,9 @@
     }
 
     .dotted-table td {
-      font-size: 12.5px;
+      font-size: 13.5px;
       color: #334155;
-      padding: 10px 10px;
+      padding: 11px 12px;
       border-bottom: 1px solid #f1f5f9;
     }
 
@@ -219,319 +373,1605 @@
       border-bottom: none;
     }
 
-    /* Donut chart widget */
+    /* =========================================================
+       PREMIUM CREATOR DONUT / PIE CARD (Modern SaaS Aesthetics)
+       ========================================================= */
+    .total-kreator-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .card-title-modern {
+      font-size: 16.5px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+      letter-spacing: -0.2px;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .card-subtitle-modern {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+      margin: 2px 0 0 0;
+    }
+
+    .badge-total-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0.2px;
+      flex-shrink: 0;
+    }
+
+    .clean-divider {
+      height: 1px;
+      background: #f1f5f9;
+      margin: 12px 0 16px 0;
+    }
+
     .donut-card-content {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100%;
-      min-height: 240px;
+      gap: 16px;
+      width: 100%;
     }
 
     .donut-svg-wrap {
       position: relative;
-      width: 180px;
-      height: 180px;
+      width: 140px;
+      height: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 14px;
+      filter: drop-shadow(0 4px 12px rgba(15, 23, 42, 0.05));
     }
 
-    .donut-legend-wrap {
+    .donut-svg-wrap svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+      overflow: visible;
+    }
+
+    .donut-segment {
+      transition: stroke-width 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+      cursor: pointer;
+    }
+
+    .donut-segment:hover {
+      stroke-width: 20px !important;
+      opacity: 0.92;
+    }
+
+    .donut-center-badge {
+      position: absolute;
+      inset: 26px;
+      background: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04), inset 0 1px 2px rgba(0, 0, 0, 0.02);
+      border: 1px solid #f1f5f9;
+      pointer-events: none;
+    }
+
+    .donut-center-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.5px;
+    }
+
+    .donut-center-lbl {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 3px;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .creator-stats-chips {
+      display: grid;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
-      gap: 6px 10px;
-      font-size: 10px;
-      color: #94a3b8;
-      font-weight: 500;
+      gap: 10px;
+      width: 100%;
     }
 
-    .legend-bullet-item {
-      display: inline-flex;
+    .creator-chip {
+      border-radius: 10px;
+      padding: 8px;
+      flex: 1 1 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: default;
+      border: 1px solid transparent;
+    }
+
+    .creator-chip:hover {
+      transform: translateY(-2px);
+    }
+
+    .creator-chip-top {
+      display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 4px;
     }
 
-    .legend-bullet-item .dot {
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chip-label {
+      font-size: 11px;
+      font-weight: 600;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .chip-pct {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .chip-value {
+      font-size: 17px;
+      font-size: 19px;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+
+    /* Bind - Ocean Blue */
+    .creator-chip--bind {
+      background: #f0f9ff;
+      border-color: #e0f2fe;
+    }
+
+    .creator-chip--bind:hover {
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+      border-color: #bae6fd;
+    }
+
+    .creator-chip--bind .chip-dot {
+      background: #0284c7;
+    }
+
+    .creator-chip--bind .chip-label {
+      color: #0369a1;
+    }
+
+    .creator-chip--bind .chip-pct {
+      background: rgba(2, 132, 199, 0.12);
+      color: #0284c7;
+    }
+
+    .creator-chip--bind .chip-value {
+      color: #0c4a6e;
+    }
+
+    /* Tenggang - Sun Amber */
+    .creator-chip--tenggang {
+      background: #fffbeb;
+      border-color: #fef3c7;
+    }
+
+    .creator-chip--tenggang:hover {
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
+      border-color: #fde68a;
+    }
+
+    .creator-chip--tenggang .chip-dot {
+      background: #f59e0b;
+    }
+
+    .creator-chip--tenggang .chip-label {
+      color: #b45309;
+    }
+
+    .creator-chip--tenggang .chip-pct {
+      background: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+    }
+
+    .creator-chip--tenggang .chip-value {
+      color: #78350f;
+    }
+
+    /* Berhenti - Rose Coral */
+    .creator-chip--berhenti {
+      background: #fff1f2;
+      border-color: #ffe4e6;
+    }
+
+    .creator-chip--berhenti:hover {
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.12);
+      border-color: #fecdd3;
+    }
+
+    .creator-chip--berhenti .chip-dot {
+      background: #f43f5e;
+    }
+
+    .creator-chip--berhenti .chip-label {
+      color: #be123c;
+    }
+
+    .creator-chip--berhenti .chip-pct {
+      background: rgba(244, 63, 94, 0.12);
+      color: #e11d48;
+    }
+
+    .creator-chip--berhenti .chip-value {
+      color: #881337;
+    }
+
+    /* Toolbar Actions */
+    .campaign-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .campaign-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .small-action-button {
+      width: 38px;
+      height: 38px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .small-action-button:hover {
+      border-color: #1c88e3;
+      color: #1c88e3;
+      background: rgba(28, 136, 227, 0.08);
+    }
+
+    .campaign-search {
+      height: 38px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      background: #ffffff;
+      gap: 6px;
+    }
+
+    .campaign-search:focus-within {
+      border-color: #1c88e3;
+      box-shadow: 0 0 0 2px rgba(28, 136, 227, 0.2);
+    }
+
+    .campaign-search input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: #1e293b;
+      font-family: inherit;
+      width: 170px;
+    }
+
+    .campaign-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .campaign-stats>div {
+      padding: 6px 12px;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: #64748b;
+    }
+
+    .campaign-stats strong {
+      font-weight: 800;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .id-chip {
+      font-family: monospace;
+      font-weight: 700;
+      color: #1c88e3;
+      background: rgba(28, 136, 227, 0.08);
+      border: 1px solid rgba(28, 136, 227, 0.2);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+
+    /* =========================================================
+       CAMPAIGN CONTROL - SIMPLE, ELEGAN & ESTETIK (Minimalist SaaS)
+       ========================================================= */
+    .cc-card {
+      background: #ffffff;
+      border: 1px solid #eef2f6;
+      border-radius: 12px;
+      padding: 22px 26px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .cc-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f1f5f9;
+      flex-wrap: wrap;
+    }
+
+    .cc-title-area {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cc-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.2px;
+      margin: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .cc-desc {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    /* Minimalist Aesthetic Status Chips (Total, Running, Overdue, Attention) */
+    .cc-status-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cc-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      transition: all 0.15s ease;
+      cursor: default;
+    }
+
+    .cc-pill .cc-val {
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+    }
+
+    .cc-dot {
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      display: inline-block;
+      flex-shrink: 0;
     }
 
-    /* Responsive */
-    @media (max-width: 1200px) {
-      .metric-grid-8 {
+    /* Pill variants - Soft, subtle, pastel and refined */
+    .cc-pill--total {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #475569;
+    }
+
+    .cc-pill--total .cc-val {
+      color: #0f172a;
+    }
+
+    .cc-pill--running {
+      background: #f0fdf4;
+      border-color: #dcfce7;
+      color: #166534;
+    }
+
+    .cc-pill--running .cc-dot {
+      background-color: #16a34a;
+    }
+
+    .cc-pill--running .cc-val {
+      color: #15803d;
+    }
+
+    .cc-pill--overdue {
+      background: #fef2f2;
+      border-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .cc-pill--overdue .cc-dot {
+      background-color: #dc2626;
+    }
+
+    .cc-pill--overdue .cc-val {
+      color: #b91c1c;
+    }
+
+    .cc-pill--attention {
+      background: #fffbeb;
+      border-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .cc-pill--attention .cc-dot {
+      background-color: #d97706;
+    }
+
+    .cc-pill--attention .cc-val {
+      color: #b45309;
+    }
+
+    /* Minimalist Action Controls */
+    .cc-controls-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    .cc-controls-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .cc-search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 7px 14px;
+      width: 260px;
+      transition: all 0.2s ease;
+    }
+
+    .cc-search-box:focus-within {
+      background: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.08);
+    }
+
+    .cc-search-input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13.5px;
+      color: #0f172a;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .cc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      height: 36px;
+    }
+
+    .cc-btn:hover {
+      background: #f8fafc;
+      color: #0284c7;
+      border-color: #cbd5e1;
+    }
+
+    .cc-meta-count {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1024px) {
+      .metric-grid-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .level-grid-4 {
         grid-template-columns: repeat(2, 1fr);
       }
+
       .mid-campaign-section {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 275px;
+        gap: 18px;
+        margin-bottom: 22px;
+        align-items: stretch;
+      }
+
+      .mid-campaign-section>.campaign-white-card {
+        margin-bottom: 0 !important;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
       }
     }
 
-    @media (max-width: 640px) {
-      .metric-grid-8 {
-        grid-template-columns: 1fr;
-      }
+    /* Sticky Aksi Column */
+    .campaign-table th.col-sticky-action,
+    .campaign-table td.col-sticky-action,
+    table th.col-sticky-action,
+    table td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10 !important;
+      background-color: #fff !important;
+      border-left: 1px solid #cbd5e1 !important;
+      padding-left: 20px !important;
+      padding-right: 20px !important;
+    }
+
+    .campaign-table th.col-sticky-action,
+    table th.col-sticky-action {
+      background-color: #f8fafc !important;
+      z-index: 11 !important;
     }
   </style>
 </head>
 
 <body class="dashboard-body">
-        <aside id="app-sidebar"></aside>
+  <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
-        <header class="topbar hirezy-topbar"></header>
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna"
+            aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Setiawan</span>
+                <span class="user-menu-dropdown__role">Staff KOL</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
 
     <main class="dashboard-content">
-      <!-- Header with Title and Month Pill Selector -->
-      <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;"><div class="month-pill-wrapper">
-          <select id="monthSelect" class="month-pill-select" aria-label="Pilih bulan">
-            <option value="Januari">Januari</option>
-            <option value="Februari">Februari</option>
-            <option value="Maret">Maret</option>
-            <option value="April">April</option>
-            <option value="Mei">Mei</option>
-            <option value="Juni">Juni</option>
-            <option value="Juli">Juli</option>
-            <option value="Agustus" selected>Agustus</option>
-            <option value="September">September</option>
-            <option value="Oktober">Oktober</option>
-            <option value="November">November</option>
-            <option value="Desember">Desember</option>
-          </select>
-        </div></div>
 
-      <!-- 8 Metric Cards Grid -->
-      <section class="metric-grid-8">
-        <!-- 1. TOTAL CAMPAIGN -->
+
+
+
+
+
+
+
+
+
+
+
+
+      <!-- 1. Top 3 Metric Cards Grid -->
+      <section class="metric-grid-4">
+        <!-- GMV Sebelumnya -->
         <article class="metric-card-clean">
           <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-              <polyline points="2 17 12 22 22 17"></polyline>
-              <polyline points="2 12 12 17 22 12"></polyline>
-            </svg>
-          </div>
-          <div class="metric-content-clean">
-            <span class="metric-title-clean">Total Campaign</span>
-            <strong class="metric-number-clean">0</strong>
-          </div>
-        </article>
-
-        <!-- 2. CAMPAIGN RUNNING -->
-        <article class="metric-card-clean">
-          <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-            </svg>
-          </div>
-          <div class="metric-content-clean">
-            <span class="metric-title-clean">Campaign Running</span>
-            <strong class="metric-number-clean">0</strong>
-          </div>
-        </article>
-
-        <!-- 3. TOTAL TARGET GMV -->
-        <article class="metric-card-clean">
-          <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+              stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="6" r="6"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="metric-content-clean">
+            <span class="metric-title-clean">GMV Sebelumnya</span>
+            <strong class="metric-number-clean">100.000.000</strong>
+            <span class="metric-trend-clean up">&uarr; <i>20% Bulan Ini</i></span>
+          </div>
+        </article>
+
+        <!-- Target GMV -->
+        <article class="metric-card-clean">
+          <div class="metric-icon-box-blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <circle cx="12" cy="12" r="6"></circle>
               <circle cx="12" cy="12" r="2"></circle>
             </svg>
           </div>
           <div class="metric-content-clean">
-            <span class="metric-title-clean">Total Target GMV</span>
-            <strong class="metric-number-clean">0</strong>
+            <span class="metric-title-clean">Target GMV</span>
+            <strong class="metric-number-clean">100.000.000</strong>
+            <span class="metric-trend-clean up">&uarr; <i>20% Bulan Ini</i></span>
           </div>
         </article>
 
-        <!-- 4. REALISASI GMV -->
+        <!-- GMV Berjalan -->
         <article class="metric-card-clean">
           <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+              stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"></circle>
               <path d="M12 6v12M15 9.5a2.5 2.5 0 0 0-5 0c0 2.5 5 1.5 5 4a2.5 2.5 0 0 1-5 0"></path>
             </svg>
           </div>
           <div class="metric-content-clean">
-            <span class="metric-title-clean">Realisasi GMV</span>
-            <strong class="metric-number-clean">0</strong>
+            <span class="metric-title-clean">GMV Berjalan</span>
+            <strong class="metric-number-clean">100.000.000</strong>
+            <span class="metric-trend-clean down">&darr; <i>20% Bulan Ini</i></span>
           </div>
         </article>
 
-        <!-- 5. PROGRESS GMV -->
+        <!-- GAP GMV -->
         <article class="metric-card-clean">
           <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
           </div>
           <div class="metric-content-clean">
-            <span class="metric-title-clean">Progress GMV</span>
-            <strong class="metric-number-clean">0</strong>
-          </div>
-        </article>
-
-        <!-- 6. TOTAL VALUE/BUDGET -->
-        <article class="metric-card-clean">
-          <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="5" width="20" height="14" rx="3"></rect>
-              <path d="M2 10h20"></path>
-              <circle cx="16" cy="15" r="1"></circle>
-            </svg>
-          </div>
-          <div class="metric-content-clean">
-            <span class="metric-title-clean">Total Value / Budget</span>
-            <strong class="metric-number-clean">0</strong>
-          </div>
-        </article>
-
-        <!-- 7. SAMPEL DITERIMA -->
-        <article class="metric-card-clean">
-          <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 8v13H3V8"></path>
-              <path d="M1 3h22v5H1z"></path>
-              <path d="M10 12l2 2 4-4"></path>
-            </svg>
-          </div>
-          <div class="metric-content-clean">
-            <span class="metric-title-clean">Sampel Diterima</span>
-            <strong class="metric-number-clean">0</strong>
-          </div>
-        </article>
-
-        <!-- 8. GAP TARGET -->
-        <article class="metric-card-clean">
-          <div class="metric-icon-box-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
-              <polyline points="17 18 23 18 23 12"></polyline>
-            </svg>
-          </div>
-          <div class="metric-content-clean">
-            <span class="metric-title-clean">Gap Target</span>
-            <strong class="metric-number-clean">0</strong>
+            <span class="metric-title-clean">GAP GMV</span>
+            <strong class="metric-number-clean">100%</strong>
+            <span class="metric-trend-clean down">&darr; <i>0% Bulan Ini</i></span>
           </div>
         </article>
       </section>
 
-      <!-- Mid Section: Campaign (Left) & Donut Chart (Right) -->
+      <!-- 2. 4 Tier Performance Grid -->
+      <section class="level-grid-4">
+        <!-- TOP Tier -->
+        <article class="tier-card-clean">
+          <div class="tier-card-head">
+            <div>
+              <div class="tier-title-clean">TOP</div>
+              <div class="tier-count-clean">100</div>
+            </div>
+            <div class="tier-icon-small">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 8l4 4 4-7 4 7 4-4-1.5 10h-13z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="tier-card-body">
+            <div class="tier-row"><b>GMV Video</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+            <div class="tier-row"><b>GMV Live</b><i>1.000.000</i><em class="mini-badge mini-badge--red">&darr; 10%</em>
+            </div>
+            <div class="tier-row"><b>Total GMV</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+          </div>
+        </article>
+
+        <!-- SEMI TOP Tier -->
+        <article class="tier-card-clean">
+          <div class="tier-card-head">
+            <div>
+              <div class="tier-title-clean">SEMI TOP</div>
+              <div class="tier-count-clean">100</div>
+            </div>
+            <div class="tier-icon-small">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path>
+                <path d="M6 6l3 3M15 15l3 3M18 6l-3 3M9 15l-3 3"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="tier-card-body">
+            <div class="tier-row"><b>GMV Video</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+            <div class="tier-row"><b>GMV Live</b><i>1.000.000</i><em class="mini-badge mini-badge--red">&darr; 10%</em>
+            </div>
+            <div class="tier-row"><b>Total GMV</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+          </div>
+        </article>
+
+        <!-- NEW GROWTH Tier -->
+        <article class="tier-card-clean">
+          <div class="tier-card-head">
+            <div>
+              <div class="tier-title-clean">NEW GROWTH</div>
+              <div class="tier-count-clean">100</div>
+            </div>
+            <div class="tier-icon-small">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 21V10"></path>
+                <path d="M12 13c-4 0-6-2-6-6 4 0 6 2 6 6z"></path>
+                <path d="M12 16c4 0 6-2 6-6-4 0-6 2-6 6z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="tier-card-body">
+            <div class="tier-row"><b>GMV Video</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+            <div class="tier-row"><b>GMV Live</b><i>1.000.000</i><em class="mini-badge mini-badge--red">&darr; 10%</em>
+            </div>
+            <div class="tier-row"><b>Total GMV</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+          </div>
+        </article>
+
+        <!-- INCUBATE Tier -->
+        <article class="tier-card-clean">
+          <div class="tier-card-head">
+            <div>
+              <div class="tier-title-clean">INCUBATE</div>
+              <div class="tier-count-clean">100</div>
+            </div>
+            <div class="tier-icon-small">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 3h6"></path>
+                <path d="M10 3v5l-5 9a2 2 0 001.7 3h10.6A2 2 0 0019 17l-5-9V3"></path>
+                <path d="M8 15h8"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="tier-card-body">
+            <div class="tier-row"><b>GMV Video</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+            <div class="tier-row"><b>GMV Live</b><i>1.000.000</i><em class="mini-badge mini-badge--red">&darr; 10%</em>
+            </div>
+            <div class="tier-row"><b>Total GMV</b><i>1.000.000</i><em class="mini-badge mini-badge--green">&uarr;
+                10%</em></div>
+          </div>
+        </article>
+      </section>
+
+      <!-- 3. Mid Section: Ringkasan Per PIC + Total Kreator Donut -->
       <section class="mid-campaign-section">
-        <!-- Left Panel: Campaign Table -->
-        <article class="campaign-white-card">
-          <h2 class="card-title-italic">Campaign</h2>
+        <!-- Ringkasan Per PIC Table -->
+        <div class="campaign-white-card">
+          <h2 class="card-title-italic">Ringkasan Per PIC</h2>
           <div class="dotted-divider"></div>
-          <div class="table-wrap" style="overflow-x: auto;">
+          <div class="table-wrap">
             <table class="dotted-table">
               <thead>
                 <tr>
-                  <th class="text-center" style="width: 40px;">#</th>
-                  <th>Status</th>
-                  <th>Jumlah</th>
+                  <th class="text-center" style="width: 35px;">#</th>
+                  <th>PIC</th>
+                  <th class="text-center">Campaign</th>
+                  <th class="text-center">% Pencapaian</th>
                   <th>Target GMV</th>
-                  <th>Realisasi GMV</th>
+                  <th class="text-center">Total PID</th>
+                  <th class="text-center">Total Kreator</th>
+                  <th>GMV Berjalan</th>
                 </tr>
               </thead>
               <tbody>
-                <!-- Empty state matching image layout -->
                 <tr>
-                  <td colspan="5" style="height: 160px; text-align: center; color: #94a3b8; font-style: italic;">
-                    <!-- Spacious clean body area -->
-                  </td>
+                  <td class="text-center">1</td>
+                  <td style="font-weight: 600;">Setiawan</td>
+                  <td class="text-center">1</td>
+                  <td class="text-center" style="font-weight: 700; color: #059669;">85%</td>
+                  <td>100.000.000</td>
+                  <td class="text-center">4</td>
+                  <td class="text-center">2</td>
+                  <td style="font-weight: 700;">85.000.000</td>
                 </tr>
+                <tr>
+                  <td class="text-center">2</td>
+                  <td style="font-weight: 600;">Dinda Pratama</td>
+                  <td class="text-center">1</td>
+                  <td class="text-center" style="font-weight: 700; color: #059669;">81%</td>
+                  <td>80.000.000</td>
+                  <td class="text-center">3</td>
+                  <td class="text-center">1</td>
+                  <td style="font-weight: 700;">65.000.000</td>
+                </tr>
+
               </tbody>
             </table>
           </div>
-        </article>
+        </div>
 
-        <!-- Right Panel: Donut Chart -->
-        <article class="campaign-white-card">
-          <div class="donut-card-content">
-            <div class="donut-svg-wrap">
-              <svg width="170" height="170" viewBox="0 0 200 200">
-                <!-- Outer Ring Segments -->
-                <!-- Red Segment (Top Right) -->
-                <circle cx="100" cy="100" r="62" fill="transparent" stroke="#ef4444" stroke-width="26"
-                  stroke-dasharray="97.4 292.15" stroke-dashoffset="0" transform="rotate(-45 100 100)" />
-                <!-- Yellow Segment (Bottom Right) -->
-                <circle cx="100" cy="100" r="62" fill="transparent" stroke="#facc15" stroke-width="26"
-                  stroke-dasharray="97.4 292.15" stroke-dashoffset="-97.4" transform="rotate(-45 100 100)" />
-                <!-- Sky Blue / Cyan Segment (Left Side) -->
-                <circle cx="100" cy="100" r="62" fill="transparent" stroke="#29a0dc" stroke-width="26"
-                  stroke-dasharray="194.8 194.75" stroke-dashoffset="-194.8" transform="rotate(-45 100 100)" />
-                
-                <!-- Center 100% Text -->
-                <text x="100" y="110" text-anchor="middle" font-size="28" font-weight="800"
-                  font-family="'Outfit', sans-serif" fill="#0f172a">100%</text>
-              </svg>
+        <!-- TOTAL KREATOR Donut Card -->
+        <div class="campaign-white-card total-kreator-card"
+          style="display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 0; padding: 16px 18px; height: 100%; box-sizing: border-box;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h2 class="card-title-italic"
+                style="margin: 0; font-size: 14.5px; font-weight: 700; color: #0f172a; font-family: 'Outfit', sans-serif;">
+                Total Kreator</h2>
+              <span
+                style="font-size: 11px; font-weight: 700; font-family: 'Outfit', sans-serif; color: #16a34a; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 10px;">300
+                Kreator</span>
             </div>
+            <div class="dotted-divider" style="margin-bottom: 10px;"></div>
 
-            <!-- Legend with small colored dots -->
-            <div class="donut-legend-wrap">
-              <span class="legend-bullet-item"><span class="dot" style="background: #cbd5e1;"></span> Planning</span>
-              <span class="legend-bullet-item"><span class="dot" style="background: #facc15;"></span> Briefing</span>
-              <span class="legend-bullet-item"><span class="dot" style="background: #29a0dc;"></span> Running</span>
-              <span class="legend-bullet-item"><span class="dot" style="background: #cbd5e1;"></span> Review</span>
-              <span class="legend-bullet-item"><span class="dot" style="background: #cbd5e1;"></span> Done</span>
-              <span class="legend-bullet-item"><span class="dot" style="background: #cbd5e1;"></span> Hold</span>
-              <span class="legend-bullet-item"><span class="dot" style="background: #ef4444;"></span> Cancel</span>
+            <div
+              style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; margin-bottom: 8px;">
+              <div
+                style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 5px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div
+                  style="font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #0369a1; line-height: 1.1;">
+                  100</div>
+                <div
+                  style="font-size: 10.5px; font-weight: 600; color: #0284c7; white-space: nowrap; margin-top: 2px; font-family: 'Outfit', sans-serif;">
+                  Bind</div>
+              </div>
+              <div
+                style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 5px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div
+                  style="font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #b45309; line-height: 1.1;">
+                  100</div>
+                <div
+                  style="font-size: 10.5px; font-weight: 600; color: #d97706; white-space: nowrap; margin-top: 2px; font-family: 'Outfit', sans-serif;">
+                  Tenggang</div>
+              </div>
+              <div
+                style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 6px; padding: 5px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <div
+                  style="font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #be123c; line-height: 1.1;">
+                  100</div>
+                <div
+                  style="font-size: 10.5px; font-weight: 600; color: #e11d48; white-space: nowrap; margin-top: 2px; font-family: 'Outfit', sans-serif;">
+                  Berhenti</div>
+              </div>
             </div>
           </div>
-        </article>
+
+          <div style="display: flex; justify-content: center; align-items: center; padding: 2px 0; flex: 1;">
+            <div
+              style="position: relative; width: 98px; height: 98px; display: flex; align-items: center; justify-content: center;">
+              <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; transform: rotate(-90deg);">
+                <!-- Bind (Cyan): 33% -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#0284c7" stroke-width="16"
+                  stroke-dasharray="75.4 226.2" stroke-dashoffset="0" />
+                <!-- Tenggang (Yellow): 33% -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#f59e0b" stroke-width="16"
+                  stroke-dasharray="75.4 226.2" stroke-dashoffset="-75.4" />
+                <!-- Berhenti (Red): 33% -->
+                <circle cx="50" cy="50" r="36" fill="transparent" stroke="#f43f5e" stroke-width="16"
+                  stroke-dasharray="75.4 226.2" stroke-dashoffset="-150.8" />
+              </svg>
+              <div
+                style="position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <span
+                  style="font-size: 17px; font-weight: 800; font-family: 'Outfit', sans-serif; color: #0f172a; line-height: 1;">300</span>
+                <span
+                  style="font-size: 8px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'Outfit', sans-serif; margin-top: 1px;">TOTAL</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <!-- Bottom Full Width Panel: TOP / PRIORITY CAMPAIGN CONTROL -->
-      <section class="campaign-white-card" style="margin-bottom: 30px;">
-        <h2 class="card-title-caps">TOP / PRIORITY CAMPAIGN CONTROL</h2>
+      <!-- 4. Ringkasan Status Campaign -->
+      <div class="campaign-white-card">
+        <h2 class="card-title-italic">Ringkasan Status Campaign</h2>
         <div class="dotted-divider"></div>
-        <div class="table-wrap" style="overflow-x: auto;">
+        <div class="table-wrap">
+          <table class="dotted-table">
+            <thead>
+              <tr>
+                <th class="text-center" style="width: 35px;">#</th>
+                <th>Status</th>
+                <th class="text-center">Campaign</th>
+                <th class="text-center">% Pencapaian</th>
+                <th>Target GMV</th>
+                <th class="text-center">Total PID</th>
+                <th class="text-center">Total Kreator</th>
+                <th>GMV Berjalan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-center">1</td>
+                <td><span class="status-badge status-badge--success"
+                    style="background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); padding: 3px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">Running</span>
+                </td>
+                <td class="text-center">1</td>
+                <td class="text-center" style="font-weight: 700; color: #059669;">85%</td>
+                <td>500.000.000</td>
+                <td class="text-center">48</td>
+                <td class="text-center">35</td>
+                <td style="font-weight: 700;">425.000.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 5. CAMPAIGN CONTROL -->
+      <div class="cc-card">
+        <!-- Minimalist Header & Elegant Status Pills -->
+        <div class="cc-top-bar">
+          <div class="cc-title-area">
+            <h2 class="cc-title">Campaign Control</h2>
+          </div>
+
+          <div class="cc-status-strip">
+            <div class="cc-pill cc-pill--total" title="Total Campaign">
+              <span>Total Campaign</span>
+              <span class="cc-val">100</span>
+            </div>
+            <div class="cc-pill cc-pill--running" title="Campaign Sedang Berjalan">
+              <span class="cc-dot"></span>
+              <span>Running</span>
+              <span class="cc-val">100</span>
+            </div>
+            <div class="cc-pill cc-pill--overdue" title="Campaign Melewati Batas Waktu">
+              <span class="cc-dot"></span>
+              <span>Overdue</span>
+              <span class="cc-val">100</span>
+            </div>
+            <div class="cc-pill cc-pill--attention" title="Campaign Perlu Perhatian">
+              <span class="cc-dot"></span>
+              <span>Attention</span>
+              <span class="cc-val">100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sleek & Simple Action Controls -->
+        <div class="cc-controls-bar">
+          <div class="cc-controls-left">
+            <div class="cc-search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="search" placeholder="Cari ID, Brand, PIC..." class="cc-search-input" />
+            </div>
+
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterCampaign" class="cc-btn" type="button" aria-label="Filter" title="Filter Data">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                <span>Filter</span>
+              </button>
+
+              <!-- Dropdown Popover Filter -->
+              <div id="filterCampaignDropdown" class="filter-popover">
+                <form id="filterCampaignForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">PIC</label>
+                    <select class="form-select">
+                      <option value="" disabled selected hidden>Pilih PIC</option>
+                      <option value="setiawan">Setiawan</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select class="form-select">
+                      <option value="" disabled selected hidden>Pilih Status</option>
+                      <option value="planning">Planning</option>
+                      <option value="briefing">Briefing</option>
+                      <option value="running">Running</option>
+                      <option value="done">Done</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select class="form-select">
+                      <option value="" disabled selected hidden>Pilih Priority</option>
+                      <option value="high">High</option>
+                      <option value="medium">Medium</option>
+                      <option value="low">Low</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Jenis Campaign</label>
+                    <select class="form-select">
+                      <option value="" disabled selected hidden>Pilih Jenis Campaign</option>
+                      <option value="Live">Live</option>
+                      <option value="Video">Video</option>
+                      <option value="Live + Video">Live + Video</option>
+                      <option value="Seeding">Seeding</option>
+                      <option value="GMV Max">GMV Max</option>
+                      <option value="PayDay Campaign">PayDay Campaign</option>
+                      <option value="Flash Sale">Flash Sale</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Brand/Seller</label>
+                    <select class="form-select">
+                      <option value="" disabled selected hidden>Pilih Brand/Seller</option>
+                      <option value="brand1">Bisa Hijab Official</option>
+                      <option value="brand2">Brand B</option>
+                    </select>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end;">
+                    <button type="reset" class="btn-reset"
+                      style="background-color: #f44336; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; flex: 1; height: 36px; font-family: 'Outfit', sans-serif;">Reset</button>
+                    <button type="submit" class="btn-simpan"
+                      style="background-color: #1c88e3; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; flex: 1; height: 36px; font-family: 'Outfit', sans-serif;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <button id="btnCalendarCampaign" class="cc-btn" type="button" aria-label="Pilih tanggal"
+              title="Pilih Tanggal">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Pilih Tanggal</span>
+            </button>
+          </div>
+
+
+
+
+        </div>
+
+        <div class="table-wrap">
           <table class="dotted-table">
             <thead>
               <tr>
                 <th class="text-center" style="width: 35px;">#</th>
                 <th>ID Campaign</th>
-                <th>Nama Campaign</th>
-                <th>Brand</th>
-                <th>Kreator</th>
+                <th>Brand / Seller</th>
                 <th>PIC</th>
+                <th>Jenis</th>
+                <th class="text-center">Priority</th>
+                <th class="text-center">Status</th>
                 <th>Mulai</th>
                 <th>Selesai</th>
+                <th class="text-center">Sisa Hari</th>
+                <th class="text-center">Total PID</th>
+                <th class="text-center">Total Kreator</th>
                 <th>Target GMV</th>
-                <th>Realisasi GMV</th>
-                <th>Progress</th>
-                <th>Status</th>
-                <th>Next Action</th>
+                <th>GMV Realisasi</th>
+                <th class="text-center">Achievement</th>
+                <th class="text-center">Status GMV</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Empty state matching image layout -->
               <tr>
-                <td colspan="13" style="height: 180px; text-align: center; color: #94a3b8; font-style: italic;">
-                  <!-- Spacious clean body area -->
+                <td class="text-center">1</td>
+                <td><span class="id-chip">CMP-001</span></td>
+                <td style="font-weight: 600;">Bisa Hijab Official</td>
+                <td>Setiawan</td>
+                <td>Live + Video</td>
+                <td class="text-center"><span class="status-badge status-badge--danger"
+                    style="background-color: rgba(255, 82, 82, 0.1); color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.3); padding: 3px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">High</span>
                 </td>
+                <td class="text-center"><span class="status-badge status-badge--success"
+                    style="background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); padding: 3px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">Running</span>
+                </td>
+                <td>01/09/2026</td>
+                <td>30/09/2026</td>
+                <td class="text-center">22 Hari</td>
+                <td class="text-center">48</td>
+                <td class="text-center">35</td>
+                <td style="font-weight: 600;">500.000.000</td>
+                <td style="font-weight: 600;">425.000.000</td>
+                <td class="text-center" style="font-weight: 700; color: #059669;">85%</td>
+                <td class="text-center"><span class="status-badge status-badge--success"
+                    style="background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); padding: 3px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">On
+                    Track</span></td>
               </tr>
             </tbody>
           </table>
         </div>
-      </section>
-
-      <footer style="color: #64748b; font-size: 13px; margin-top: 24px; padding-bottom: 24px;">
-        &copy; 2026 Bisa Media
-      </footer>
+      </div>
     </main>
+
+    <footer class="dashboard-footer"> 2026 Bisa Media</footer>
   </div>
 
+
+
+  <!-- Modal PopUp Kalender Campaign -->
+  <div id="calendarCampaignModal" class="modal-overlay">
+    <div class="modal-box modal-box--large" style="width: 820px; max-width: 95%;">
+      <div class="modal-header">
+        <h2 class="modal-title">Pilih Tanggal</h2>
+        <button id="closeCalendarModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <div class="calendar-picker-body">
+        <!-- Left Quick Options -->
+        <div class="calendar-quick-options">
+          <button type="button" class="quick-option-btn" data-range="all">Semua Tanggal</button>
+          <button type="button" class="quick-option-btn" data-range="today">Hari ini</button>
+          <button type="button" class="quick-option-btn" data-range="yesterday">Kemarin</button>
+          <button type="button" class="quick-option-btn" data-range="7days">7 hari terakhir</button>
+          <button type="button" class="quick-option-btn" data-range="30days">30 hari terakhir</button>
+          <button type="button" class="quick-option-btn is-active" data-range="thisMonth">Oktober</button>
+          <button type="button" class="quick-option-btn" data-range="lastMonth">Bulan lalu</button>
+
+        </div>
+
+        <!-- Right Side: Dual Calendars -->
+        <div class="calendar-months-container">
+          <!-- Month 1: Agustus -->
+          <div class="calendar-month-box">
+            <div class="calendar-month-header">
+              <span class="nav-arrow">&laquo;</span>
+              <span class="month-title">2026 - 10</span>
+              <span class="nav-arrow">&lsaquo;</span>
+            </div>
+            <div class="calendar-weekdays">
+              <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span
+                class="weekend">Sab</span><span class="weekend">Min</span>
+            </div>
+            <div class="calendar-days">
+              <span class="day-muted">27</span>
+              <span class="day-muted">28</span>
+              <span class="day-muted">29</span>
+              <span class="day-muted">30</span>
+              <span class="day-muted">31</span>
+              <span class="day-active selected-start">1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+              <span>6</span>
+              <span>7</span>
+              <span>8</span>
+              <span>9</span>
+              <span>10</span>
+              <span>11</span>
+              <span>12</span>
+              <span>13</span>
+              <span>14</span>
+              <span>15</span>
+              <span>16</span>
+              <span>17</span>
+              <span>18</span>
+              <span>19</span>
+              <span>20</span>
+              <span>21</span>
+              <span>22</span>
+              <span>23</span>
+              <span>24</span>
+              <span>25</span>
+              <span>26</span>
+              <span>27</span>
+              <span>28</span>
+              <span>29</span>
+              <span>30</span>
+              <span>31</span>
+              <span class="day-muted">1</span>
+              <span class="day-muted">2</span>
+              <span class="day-muted">3</span>
+              <span class="day-muted">4</span>
+              <span class="day-muted">5</span>
+              <span class="day-muted">6</span>
+            </div>
+          </div>
+
+          <!-- Month 2: September -->
+          <div class="calendar-month-box">
+            <div class="calendar-month-header">
+              <span class="nav-arrow">&rsaquo;</span>
+              <span class="month-title">2026 - 10</span>
+              <span class="nav-arrow">&raquo;</span>
+            </div>
+            <div class="calendar-weekdays">
+              <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span
+                class="weekend">Sab</span><span class="weekend">Min</span>
+            </div>
+            <div class="calendar-days">
+              <span class="day-muted">31</span>
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+              <span>6</span>
+              <span>7</span>
+              <span>8</span>
+              <span>9</span>
+              <span>10</span>
+              <span>11</span>
+              <span>12</span>
+              <span>13</span>
+              <span>14</span>
+              <span>15</span>
+              <span>16</span>
+              <span class="day-active selected-end">17</span>
+              <span>18</span>
+              <span>19</span>
+              <span>20</span>
+              <span>21</span>
+              <span>22</span>
+              <span>23</span>
+              <span>24</span>
+              <span>25</span>
+              <span>26</span>
+              <span>27</span>
+              <span>28</span>
+              <span>29</span>
+              <span>30</span>
+              <span class="day-muted">1</span>
+              <span class="day-muted">2</span>
+              <span class="day-muted">3</span>
+              <span class="day-muted">4</span>
+              <span class="day-muted">5</span>
+              <span class="day-muted">6</span>
+              <span class="day-muted">7</span>
+              <span class="day-muted">8</span>
+              <span class="day-muted">9</span>
+              <span class="day-muted">10</span>
+              <span class="day-muted">11</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar-picker-footer">
+        <div class="selected-range-info">
+          Dipilih: <span id="selectedRangeText">Bulan ini</span>
+        </div>
+        <div class="calendar-footer-buttons">
+          <button type="button" id="btnResetCalendar"
+            style="background:none;border:1px solid #e2e8f0;color:#94a3b8;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;margin-right:auto;transition:all 0.2s;">&#8635;
+            Reset</button>
+          <button type="button" class="btn-calendar-cancel" id="btnCancelCalendar">Batal</button>
+          <button type="button" class="btn-calendar-apply" id="btnApplyCalendar">Terapkan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../../script.js"></script>
-  <script src="../staffkol_layout.js"></script>
-  <script src="../../sidebar_engine.js?v=4"></script>
+  <script src="../../sidebar_engine.js?v=999"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Metric card marquee logic
+      document.querySelectorAll('.metric-card-clean').forEach(card => {
+        const numEl = card.querySelector('.metric-number-clean');
+        if (!numEl) return;
+
+        let originalText = numEl.textContent;
+
+        card.addEventListener('mouseenter', () => {
+          if (numEl.scrollWidth > numEl.clientWidth) {
+            numEl.innerHTML = `<marquee scrollamount="4" style="width: 100%; border: none; outline: none; margin: 0; padding: 0;">${originalText}</marquee>`;
+            numEl.style.textOverflow = 'clip';
+          }
+        });
+
+        card.addEventListener('mouseleave', () => {
+          if (numEl.querySelector('marquee')) {
+            numEl.innerHTML = originalText;
+            numEl.style.textOverflow = 'ellipsis';
+          }
+        });
+      });
+
+      // Calendar Logic for Dashboard Campaign
+      const calendarCampaignModal = document.getElementById("calendarCampaignModal");
+      const btnCancelCalendar = document.getElementById("btnCancelCalendar");
+      const selectedRangeText = document.getElementById("selectedRangeText");
+
+      let calTempStart = new Date(2026, 9, 1);
+      let calTempEnd = new Date(2026, 9, 31);
+
+      if (btnCancelCalendar && calendarCampaignModal) {
+        btnCancelCalendar.addEventListener("click", () => {
+          calendarCampaignModal.classList.remove("is-active");
+        });
+      }
+
+      function updateCalendarHighlight() {
+        const month1Box = calendarCampaignModal?.querySelectorAll(".calendar-month-box")[0];
+        const month2Box = calendarCampaignModal?.querySelectorAll(".calendar-month-box")[1];
+
+        [month1Box, month2Box].forEach((box, bIdx) => {
+          if (!box) return;
+          const monthIdx = bIdx === 0 ? 8 : 9; // September (8), Oktober (9)
+          const year = 2026;
+          const daySpans = box.querySelectorAll(".calendar-days span:not(.day-muted)");
+
+          daySpans.forEach(s => {
+            const d = parseInt(s.textContent.trim(), 10);
+            if (isNaN(d)) return;
+            const curDate = new Date(year, monthIdx, d);
+
+            s.classList.remove("selected-start", "selected-end", "day-selected-range", "day-active");
+
+            if (calTempStart && !calTempEnd) {
+              if (curDate.getTime() === calTempStart.getTime()) {
+                s.classList.add("selected-start");
+              }
+            } else if (calTempStart && calTempEnd) {
+              if (curDate.getTime() === calTempStart.getTime()) {
+                s.classList.add("selected-start");
+              } else if (curDate.getTime() === calTempEnd.getTime()) {
+                s.classList.add("selected-end");
+              } else if (curDate > calTempStart && curDate < calTempEnd) {
+                s.classList.add("day-selected-range");
+              }
+            }
+          });
+        });
+
+        if (selectedRangeText) {
+          if (!calTempStart && !calTempEnd) {
+            selectedRangeText.textContent = "Semua Tanggal";
+          } else if (calTempStart && !calTempEnd) {
+            selectedRangeText.textContent = formatDateDisplay(calTempStart);
+          } else if (calTempStart && calTempEnd) {
+            selectedRangeText.textContent = `${formatDateDisplay(calTempStart)} - ${formatDateDisplay(calTempEnd)}`;
+          }
+          if (calTempStart && calTempEnd && calTempStart.getTime() === new Date(2026, 9, 1).getTime() && calTempEnd.getTime() === new Date(2026, 9, 31).getTime()) {
+            selectedRangeText.textContent = "Oktober";
+          }
+        }
+      }
+
+      function formatDateDisplay(d) {
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        return `${dd}/${mm}/${d.getFullYear()}`;
+      }
+
+      const quickOptionBtns = calendarCampaignModal?.querySelectorAll(".quick-option-btn");
+      quickOptionBtns?.forEach(btn => {
+        btn.addEventListener("click", () => {
+          quickOptionBtns.forEach(b => b.classList.remove("is-active"));
+          btn.classList.add("is-active");
+
+          const rangeType = btn.getAttribute("data-range");
+          const now = new Date(2026, 9, 10); // Anchor date: Oct 10 2026
+
+          if (rangeType === "all") {
+            calTempStart = null;
+            calTempEnd = null;
+          } else if (rangeType === "today") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          } else if (rangeType === "yesterday") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+          } else if (rangeType === "7days") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          } else if (rangeType === "30days") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          } else if (rangeType === "thisMonth") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          } else if (rangeType === "lastMonth") {
+            calTempStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            calTempEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+          }
+
+          updateCalendarHighlight();
+        });
+      });
+
+      function handleCalendarDayClick(year, monthIdx, dayNum) {
+        const clickedDate = new Date(year, monthIdx, dayNum);
+        quickOptionBtns?.forEach(b => b.classList.remove("is-active"));
+
+        if (!calTempStart || (calTempStart && calTempEnd)) {
+          calTempStart = clickedDate;
+          calTempEnd = null;
+        } else if (calTempStart && !calTempEnd) {
+          if (clickedDate.getTime() >= calTempStart.getTime()) {
+            calTempEnd = clickedDate;
+          } else {
+            calTempEnd = calTempStart;
+            calTempStart = clickedDate;
+          }
+        }
+        updateCalendarHighlight();
+      }
+
+      const m1Box = calendarCampaignModal?.querySelectorAll(".calendar-month-box")[0];
+      const m2Box = calendarCampaignModal?.querySelectorAll(".calendar-month-box")[1];
+
+      if (m1Box) {
+        m1Box.querySelectorAll(".calendar-days span:not(.day-muted)").forEach(s => {
+          s.addEventListener("click", () => {
+            const d = parseInt(s.textContent.trim(), 10);
+            if (!isNaN(d)) handleCalendarDayClick(2026, 8, d); // Sept
+          });
+        });
+      }
+      if (m2Box) {
+        m2Box.querySelectorAll(".calendar-days span:not(.day-muted)").forEach(s => {
+          s.addEventListener("click", () => {
+            const d = parseInt(s.textContent.trim(), 10);
+            if (!isNaN(d)) handleCalendarDayClick(2026, 9, d); // Oct
+          });
+        });
+      }
+
+      // Initialize highlight immediately on load
+      if (calendarCampaignModal) {
+        updateCalendarHighlight();
+      }
+
+      // Close modal on X button
+      const closeCalendarModal = document.getElementById("closeCalendarModal");
+      if (closeCalendarModal) {
+        closeCalendarModal.addEventListener("click", () => {
+          calendarCampaignModal.classList.remove("is-active");
+        });
+      }
+
+      // Reset: kembali ke default Oktober
+      const btnResetCalendar = document.getElementById("btnResetCalendar");
+      if (btnResetCalendar) {
+        btnResetCalendar.addEventListener("click", () => {
+          calTempStart = new Date(2026, 9, 1);
+          calTempEnd = new Date(2026, 9, 31);
+          quickOptionBtns?.forEach(b => b.classList.remove("is-active"));
+          const thisMonthBtn = calendarCampaignModal?.querySelector(".quick-option-btn[data-range='thisMonth']");
+          if (thisMonthBtn) thisMonthBtn.classList.add("is-active");
+          updateCalendarHighlight();
+        });
+      }
+
+      // Terapkan: update topbar text and close modal
+      const btnApplyCalendar = document.getElementById("btnApplyCalendar");
+      if (btnApplyCalendar) {
+        btnApplyCalendar.addEventListener("click", () => {
+          const txtTop = document.getElementById("txtCalendarTop");
+          if (txtTop) {
+            const activeBtn = calendarCampaignModal.querySelector(".quick-option-btn.is-active");
+            if (activeBtn && activeBtn.getAttribute("data-range") === "thisMonth") {
+              txtTop.textContent = "Oktober";
+            } else if (activeBtn && activeBtn.getAttribute("data-range") === "lastMonth") {
+              txtTop.textContent = "September";
+            } else if (activeBtn && activeBtn.getAttribute("data-range") === "all") {
+              txtTop.textContent = "Semua Tanggal";
+            } else if (calTempStart && calTempEnd) {
+              txtTop.textContent = `${formatDateDisplay(calTempStart)} – ${formatDateDisplay(calTempEnd)}`;
+            } else if (calTempStart) {
+              txtTop.textContent = formatDateDisplay(calTempStart);
+            } else {
+              txtTop.textContent = "Semua Tanggal";
+            }
+          }
+          calendarCampaignModal.classList.remove("is-active");
+        });
+      }
+    });
+  </script>
 </body>
+
 </html>

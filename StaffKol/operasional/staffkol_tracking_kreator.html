@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tracking Kreator | Staff KOL - Bisa Media</title>
+  <link rel="stylesheet" href="../../style.css" />
+  <!-- Boxicons for action icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
+    rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* Actions style for eye/view icon */
+    .btn-view {
+      background: rgba(41, 163, 216, 0.08);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      color: #29A3D8;
+    }
+    .btn-view:hover {
+      background-color: #29A3D8;
+      color: #ffffff;
+      border-color: #29A3D8;
+      box-shadow: 0 2px 6px rgba(41, 163, 216, 0.25);
+    }
+    .btn-view i {
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .col-sticky-action { position: sticky !important; right: 0; z-index: 10; background-color: #ffffff; box-shadow: -2px 0 5px rgba(0,0,0,0.03); border-left: 1px solid #e2e8f0 !important; }
+    th.col-sticky-action { background-color: #f8fafc !important; }
+    tr:hover td.col-sticky-action { background-color: #f8fafc !important; }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .status-badge--success {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+
+    .status-badge--warning {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+
+    .status-badge--danger {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+
+    /* Direct Action Button 'Lihat' */
+    .btn-action-view {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      color: #0284c7;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(2, 132, 199, 0.06);
+    }
+
+    .btn-action-view:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-action-view:active {
+      transform: translateY(0);
+    }
+
+    /* ===== Responsive Metric Grid for 4 Cards ===== */
+    .tracking-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    @media (max-width: 1200px) {
+      .tracking-metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .tracking-metric-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===== SweetAlert2 Custom Styling for Bisa Media ===== */
+    .swal2-bisa-popup {
+      font-family: 'Outfit', sans-serif !important;
+      border-radius: 14px !important;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
+      padding: 26px 22px !important;
+    }
+
+    .swal2-bisa-popup .swal2-title {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 19px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin-top: 12px !important;
+    }
+
+    .swal2-bisa-popup .swal2-html-container {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      color: #64748b !important;
+      line-height: 1.55 !important;
+      margin-top: 8px !important;
+    }
+
+    .swal2-bisa-popup .swal2-confirm,
+    .swal2-bisa-popup .swal2-cancel {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+      padding: 9px 22px !important;
+      box-shadow: none !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+
+    /* ===== Kreator View Modal Specific Styling ===== */
+    .kreator-modal-box {
+      max-width: 760px !important;
+      width: 95% !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      padding: 22px 26px 26px !important;
+      border-radius: 12px !important;
+      background: #ffffff !important;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2) !important;
+      position: relative !important;
+    }
+
+    .kreator-modal-box::-webkit-scrollbar {
+      width: 6px;
+    }
+    .kreator-modal-box::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .kreator-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1.5px dashed #cbd5e1;
+      margin-bottom: 18px;
+    }
+
+    .kreator-modal-header .modal-title {
+      font-size: 17px;
+      font-family: 'Outfit', sans-serif;
+      color: #334155;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kreator-modal-header .modal-title i {
+      font-style: italic;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .kreator-modal-header .modal-title span {
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .modal-close-boxed {
+      width: 26px;
+      height: 24px;
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #334155;
+      font-size: 13px;
+      font-style: italic;
+      font-weight: 700;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-boxed:hover {
+      background: #f1f5f9;
+      border-color: #64748b;
+      color: #0f172a;
+    }
+
+    .kreator-foto-center-section {
+      grid-column: span 12;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .kreator-foto-center-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .kreator-foto-center-card {
+      width: 140px;
+      height: 130px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .kreator-foto-center-card img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 6px;
+      display: block;
+    }
+
+    .kreator-grid-layout {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .kreator-grid-layout .col-12 {
+      grid-column: span 12;
+    }
+
+    .kreator-grid-layout .col-6 {
+      grid-column: span 6;
+    }
+
+    .kreator-grid-layout .col-4 {
+      grid-column: span 4;
+    }
+
+    @media (max-width: 640px) {
+      .kreator-grid-layout .col-4,
+      .kreator-grid-layout .col-6 {
+        grid-column: span 12;
+      }
+    }
+
+    .kreator-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+
+    .kreator-field-group label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1e293b;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .kreator-field-input-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .kreator-field-input {
+      width: 100%;
+      height: 38px;
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 0 12px;
+      font-size: 12.5px;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+      box-sizing: border-box;
+      outline: none;
+      cursor: default;
+      transition: border-color 0.15s ease;
+    }
+
+    .kreator-field-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .kreator-field-input.has-chevron {
+      padding-right: 28px;
+    }
+
+    .kreator-input-chevron {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: #94a3b8;
+      pointer-events: none;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .kreator-modal-footer-single {
+      grid-column: span 12;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .btn-keluar-outline {
+      border: 1.5px solid #29A3D8 !important;
+      color: #29A3D8 !important;
+      background: #ffffff !important;
+      padding: 8px 36px !important;
+      border-radius: 6px !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      font-family: 'Outfit', sans-serif !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      box-shadow: 0 1px 2px rgba(41, 163, 216, 0.08) !important;
+    }
+
+    .btn-keluar-outline:hover {
+      background: #29A3D8 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(41, 163, 216, 0.25) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    .btn-keluar-outline:active {
+      transform: translateY(0) !important;
+    }
+
+    /* ===== Table Styling for Keikutsertaan Campaign ===== */
+    .kreator-campaign-table-container {
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+    }
+
+    .kreator-campaign-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      text-align: left;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .kreator-campaign-table thead th {
+      background: #f8fafc;
+      border-bottom: 1.5px solid #cbd5e1;
+      color: #1e293b;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 12.5px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .kreator-campaign-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      font-size: 12.5px;
+      vertical-align: middle;
+    }
+
+    .kreator-campaign-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .kreator-campaign-table tbody tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* ===== Multi Category Pill Badge Styling (Sesuai Data Kreator) ===== */
+    .kreator-cat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.2;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+    .kreator-cat-pill:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    }
+
+    /* ===== Search Bar Styling (Sama Persis dengan Campaign & Data Kreator) ===== */
+    .dashboard-body .campaign-search.campaign-search-bar {
+      display: inline-flex !important;
+      align-items: center !important;
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 8px !important;
+      padding: 0 10px !important;
+      height: 38px !important;
+      width: 280px !important;
+      transition: all 0.2s ease-in-out !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+      position: relative !important;
+      cursor: text !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:hover {
+      border-color: #94a3b8 !important;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within {
+      width: 320px !important;
+      border-color: #29A3D8 !important;
+      box-shadow: 0 0 0 3px rgba(41, 163, 216, 0.16), 0 2px 4px rgba(41, 163, 216, 0.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__icon {
+      width: 16px !important;
+      height: 16px !important;
+      min-width: 16px !important;
+      min-height: 16px !important;
+      max-width: 16px !important;
+      max-height: 16px !important;
+      color: #64748b !important;
+      stroke: #64748b !important;
+      stroke-width: 2.2 !important;
+      fill: none !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 8px 0 2px !important;
+      box-sizing: content-box !important;
+      transition: all 0.2s ease !important;
+      pointer-events: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within .campaign-search-bar__icon {
+      color: #29A3D8 !important;
+      stroke: #29A3D8 !important;
+      transform: scale(1.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input {
+      flex: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #1e293b !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input::placeholder {
+      color: #94a3b8 !important;
+      font-weight: 400 !important;
+      font-size: 13px !important;
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear {
+      width: 17px !important;
+      height: 17px !important;
+      border: none !important;
+      background: #e2e8f0 !important;
+      border-radius: 50% !important;
+      color: #475569 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin-left: 6px !important;
+      flex-shrink: 0 !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear:hover {
+      background: #cbd5e1 !important;
+      color: #0f172a !important;
+      transform: scale(1.1) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear svg {
+      width: 9px !important;
+      height: 9px !important;
+      min-width: 9px !important;
+      min-height: 9px !important;
+      stroke-width: 2.8 !important;
+      stroke: currentColor !important;
+      fill: none !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar hirezy-topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Tracking Kreator</h1>
+      </div>
+
+      <!-- ================= 1. Metric Summary Cards (Sama Persis Format Data Kreator) ================= -->
+      <div class="milestone-metric-grid-new tracking-metric-grid">
+
+        <!-- Card 1: Aktif Konten & Live -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Aktif Konten & Live">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Aktif Konten &amp; Live</span>
+            <strong class="metric-value" id="metricAktifKontenLive">0</strong>
+          </div>
+        </article>
+
+        <!-- Card 2: Aktif Live -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Aktif Live">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polygon points="23 7 16 12 23 17 23 7"></polygon>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Aktif Live</span>
+            <strong class="metric-value" id="metricAktifLive">0</strong>
+          </div>
+        </article>
+
+        <!-- Card 3: Aktif Konten -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Aktif Konten">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Aktif Konten</span>
+            <strong class="metric-value" id="metricAktifKonten">0</strong>
+          </div>
+        </article>
+
+        <!-- Card 4: Tidak Aktif -->
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Tidak Aktif">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <line x1="18" y1="8" x2="22" y2="12"></line>
+              <line x1="22" y1="8" x2="18" y2="12"></line>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Tidak Aktif</span>
+            <strong class="metric-value" id="metricTidakAktif">0</strong>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- ================= 2. Panel Table Section ================= -->
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterCampaign" class="small-action-button" type="button" aria-label="Filter Data">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown Filter Popover -->
+              <div id="filterCampaignDropdown" class="filter-popover">
+                <form id="filterCampaignForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">Kategori Produk</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterKategoriSelect">
+                        <option value="" disabled selected hidden>Pilih Kategori</option>
+                        <option value="">Semua Kategori</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="beauty">Beauty &amp; Care</option>
+                        <option value="food">Food &amp; Beverage</option>
+                        <option value="lifestyle">Lifestyle</option>
+                        <option value="electronic">Elektronik</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Aktivitas</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterAktivitasSelect">
+                        <option value="" disabled selected hidden>Pilih Aktivitas</option>
+                        <option value="">Semua Aktivitas</option>
+                        <option value="Aktif Konten & Live">Aktif Konten &amp; Live</option>
+                        <option value="Aktif Live">Aktif Live</option>
+                        <option value="Aktif Konten">Aktif Konten</option>
+                        <option value="Tidak Aktif">Tidak Aktif</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Leads</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterLeadsSelect">
+                        <option value="" disabled selected hidden>Pilih Leads</option>
+                        <option value="">Semua Leads</option>
+                        <option value="member">Member</option>
+                        <option value="member_mahasiswa">Member &amp; Mahasiswa</option>
+                        <option value="smartc">SmartC</option>
+                        <option value="markom">Markom</option>
+                        <option value="bootcamp">Bootcamp</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+                    <button type="reset" class="btn-reset" id="btnResetFilter"
+                      style="background-color: #f44336; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px;">Reset</button>
+                    <button type="submit" class="btn-simpan"
+                      style="background-color: #2264c6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px; margin: 0;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Real-time Search Input -->
+            <div class="campaign-search campaign-search-bar" id="campaignSearchBar">
+              <svg class="campaign-search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="searchKreatorInput" class="campaign-search-bar__input" placeholder="Cari UID, Username, Nama, Kategori, Level, Keaktifan..." autocomplete="off" />
+              <button type="button" id="clearSearchKreatorBtn" class="campaign-search-bar__clear" title="Hapus pencarian" aria-label="Hapus pencarian" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="campaign-toolbar__right">
+            <!-- Read-only monitoring view: no add button -->
+          </div>
+        </div>
+
+        <!-- Empty State Container -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Tracking Kreator</div>
+          <div class="app-empty-state__subtitle">Data kreator yang tersimpan akan otomatis muncul pada tabel monitoring ini.</div>
+        </div>
+
+        <!-- Table Container (Tanpa Kolom Status, Aksi Hanya Lihat) -->
+        <div class="table-wrap campaign-table" id="tableContainerWrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>UID</th>
+                <th>Username</th>
+                <th>Nama Kreator</th>
+                <th>Kategori</th>
+                <th>Level Kreator</th>
+                <th>Keaktifan</th>
+                <th class="text-center col-sticky-action" style="text-align: center; width: 100px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="trackingTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+  </div>
+
+  <!-- ================= Modal PopUp Lihat Tracking Kreator ================= -->
+  <div id="kreatorViewModal" class="modal-overlay">
+    <div class="modal-box kreator-modal-box">
+      <div class="kreator-modal-header">
+        <h2 class="modal-title"><i>Lihat</i> <span>Tracking Kreator</span></h2>
+        <button id="closeKreatorViewModalTop" class="modal-close-boxed" type="button" aria-label="Tutup popup">x</button>
+      </div>
+
+      <div class="kreator-grid-layout">
+        <!-- Foto Centered -->
+        <div class="kreator-foto-center-section">
+          <span class="kreator-foto-center-label">Foto</span>
+          <div class="kreator-foto-center-card">
+            <img id="viewKreatorFotoImg" src="../../media/avatar.png" alt="Foto Kreator" />
+          </div>
+        </div>
+
+        <!-- Row 1: UID (Span 12) -->
+        <div class="kreator-field-group col-12">
+          <label>UID</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorUidInput" class="kreator-field-input has-chevron" placeholder="UID" readonly />
+            <span class="kreator-input-chevron">&#709;</span>
+          </div>
+        </div>
+
+        <!-- Row 2: Username, Nama Kreator, Nomor Whatsapp (Span 4 each) -->
+        <div class="kreator-field-group col-4">
+          <label>Username</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorUsernameInput" class="kreator-field-input has-chevron" placeholder="Username" readonly />
+            <span class="kreator-input-chevron">&#709;</span>
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Nama Kreator</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorNamaInput" class="kreator-field-input" placeholder="Nama" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Nomor Whatsapp</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorWaInput" class="kreator-field-input" placeholder="0858-1238-4548" readonly />
+          </div>
+        </div>
+
+        <!-- Row 3: Alamat, Email, Leads Kreator (Span 4 each) -->
+        <div class="kreator-field-group col-4">
+          <label>Alamat</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorAlamatInput" class="kreator-field-input" placeholder="alamat lengkap" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Email</label>
+          <div class="kreator-field-input-wrap">
+            <input type="email" id="viewKreatorEmailInput" class="kreator-field-input" placeholder="contoh@gmail.com" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Leads Kreator</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorLeadsInput" class="kreator-field-input" placeholder="leads kreator" readonly />
+          </div>
+        </div>
+
+        <!-- Row 4: Kategori Produk & PIC Card (Span 12 - Sesuai Data Kreator) -->
+        <div class="col-12" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin: 4px 0 6px 0;">
+          <div style="font-weight: 600; font-size: 13px; color: #1e293b; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+            <span style="display: flex; align-items: center; gap: 6px;"><i class="bx bx-category" style="color: #29A3D8; font-size: 16px;"></i> Kategori Produk &amp; PIC</span>
+            <span style="font-size: 11px; font-weight: 500; color: #64748b;">Maksimal 3 Kategori (Kategori 1 Wajib, 2 &amp; 3 Opsional)</span>
+          </div>
+
+          <div id="viewKreatorCategoriesDynamicWrap" style="display: flex; flex-direction: column; gap: 10px;">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Row 5: Spesifik & Status (Span 6 each) -->
+        <div class="kreator-field-group col-6">
+          <label>Spesifik</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorKatSpesifikInput" class="kreator-field-input" placeholder="spesifik" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-6">
+          <label>Status</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorStatusInput" class="kreator-field-input has-chevron" placeholder="Status" readonly />
+            <span class="kreator-input-chevron">&#709;</span>
+          </div>
+        </div>
+
+        <!-- Row 6: Kontrak Awal & Kontrak Akhir (Span 6 each) -->
+        <div class="kreator-field-group col-6">
+          <label>Kontrak Awal</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorKontrakAwalInput" class="kreator-field-input has-chevron" placeholder="dd/mm/yyyy" readonly />
+            <span class="kreator-input-chevron">&#709;</span>
+          </div>
+        </div>
+        <div class="kreator-field-group col-6">
+          <label>Kontrak Akhir</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorKontrakAkhirInput" class="kreator-field-input" placeholder="dd/mm/yyyy" readonly />
+          </div>
+        </div>
+
+        <!-- Section: Keikutsertaan Campaign (Table sesuai update gambar) -->
+        <div class="kreator-field-group col-12" style="margin-top: 4px; margin-bottom: 6px;">
+          <label style="font-size: 13.5px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif;">Keikutsertaan Campaign</label>
+          <div class="kreator-campaign-table-container">
+            <table class="kreator-campaign-table">
+              <thead>
+                <tr>
+                  <th style="width: 25%;">Tanggal</th>
+                  <th style="width: 22%;">ID Campaign</th>
+                  <th style="width: 25%;">Brand/Seller</th>
+                  <th style="width: 28%;">Keterangan</th>
+                </tr>
+              </thead>
+              <tbody id="viewKreatorCampaignTableBody">
+                <!-- Dynamically Populated from Campaign Data -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Row 7: Level Kreator, Target GMV, Progres GMV (Span 4 each) -->
+        <div class="kreator-field-group col-4">
+          <label>Level Kreator</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorLevelInput" class="kreator-field-input" placeholder="Level" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Target GMV</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorTargetGmvInput" class="kreator-field-input" placeholder="Tarhet" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Progres GMV</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorProgresGmvInput" class="kreator-field-input" placeholder="Progres" readonly />
+          </div>
+        </div>
+
+        <!-- Row 8: GMV Berjalan, Siaran Live, Video (Span 4 each) -->
+        <div class="kreator-field-group col-4">
+          <label>GMV Berjalan</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorGmvBerjalanInput" class="kreator-field-input" placeholder="GMV Berjalan" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Siaran Live</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorSiaranLiveInput" class="kreator-field-input" placeholder="Siaran Live" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Video</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorVideoInput" class="kreator-field-input" placeholder="Video" readonly />
+          </div>
+        </div>
+
+        <!-- Row 9: GMV Berjalan, Keaktifan (Span 6 each) -->
+        <div class="kreator-field-group col-6">
+          <label>GMV Berjalan</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorAdsHandlingInput" class="kreator-field-input" placeholder="Pilih Ads Handling" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-6">
+          <label>Keaktifan</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="viewKreatorKeaktifanInput" class="kreator-field-input" placeholder="Pilih Ads Operating" readonly />
+          </div>
+        </div>
+
+        <!-- Footer: Keluar Button -->
+        <div class="kreator-modal-footer-single">
+          <button type="button" class="btn-keluar-outline" id="btnKeluarViewModal">
+            Keluar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../staffkol_layout.js"></script>
+  <script src="../../sidebar_engine.js?v=999"></script>
+  <script src="../spvkol_layout.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const KREATOR_STORAGE_KEYS = [
+        "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13",
+        "bisa_kreator_list_v12",
+        "bisa_kreator_list_v11",
+        "bisa_kreator_list_v10",
+        "bisa_kreator_list_v9",
+        "bisa_kreator_list_v8",
+        "bisa_kreator_list"
+      ];
+
+      const DEFAULT_KREATOR = [
+        {
+          id: 1,
+          uid: "UID-0001",
+          username: "@aura.beauty",
+          nama: "Aura Cantika",
+          alamat: "Jl. R.E. Martadinata No. 88, Tasikmalaya",
+          nomorWa: "081234567890",
+          kategori: "Fashion Muslim",
+          kategori1: "Fashion Muslim",
+          pic1: "Setiawan",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Hijab Pashmina & Segi Empat",
+          spesifik: "Hijab Pashmina & Segi Empat",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "auracantika@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 100.000.000",
+          gmvBerjalan: "Rp 150.000.000",
+          progresGmv: "150%",
+          siaranLive: "48 Jam",
+          video: "18 Video",
+          aktivitas: "Aktif Konten & Live"
+        },
+        {
+          id: 2,
+          uid: "UID-0002",
+          username: "@clarissa.style",
+          nama: "Clarissa Putri",
+          alamat: "Jl. Anggrek No. 88, Surabaya",
+          nomorWa: "081377889900",
+          kategori: "Beauty & Care",
+          kategori1: "Beauty & Care",
+          pic1: "Amanda",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Skincare, Makeup",
+          spesifik: "Skincare, Makeup",
+          masaKontrak: "01/03/2026 - 30/09/2026",
+          kontrakAwal: "2026-03-01",
+          kontrakAkhir: "2026-09-30",
+          status: "Tenggang",
+          leads: "SmartC",
+          email: "clarissa@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "SEMI TOP",
+          targetGmv: "Rp 50.000.000",
+          gmvBerjalan: "Rp 35.000.000",
+          progresGmv: "70%",
+          siaranLive: "32 Jam",
+          video: "12 Video",
+          aktivitas: "Aktif Live"
+        }
+      ];
+
+      // Helper to get distinct modern color styles for each category
+      function getKreatorCatPillStyle(catName) {
+        if (!catName || catName === "-") return { bg: "#f1f5f9", color: "#64748b", border: "#e2e8f0", dot: "#94a3b8" };
+        const lower = String(catName).toLowerCase();
+        if (lower.includes("fashion") || lower.includes("muslim") || lower.includes("hijab") || lower.includes("pakaian") || lower.includes("outfit")) {
+          return { bg: "#e0f2fe", color: "#0369a1", border: "#bae6fd", dot: "#0284c7" };
+        }
+        if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin") || lower.includes("kosmetik") || lower.includes("makeup") || lower.includes("cantik")) {
+          return { bg: "#fce7f3", color: "#be185d", border: "#fbcfe8", dot: "#db2777" };
+        }
+        if (lower.includes("food") || lower.includes("beverage") || lower.includes("makan") || lower.includes("minum") || lower.includes("kuliner") || lower.includes("snack") || lower.includes("f&b")) {
+          return { bg: "#fef3c7", color: "#b45309", border: "#fde68a", dot: "#f59e0b" };
+        }
+        if (lower.includes("baby") || lower.includes("mom") || lower.includes("anak") || lower.includes("ibu") || lower.includes("kids")) {
+          return { bg: "#ede9fe", color: "#6d28d9", border: "#ddd6fe", dot: "#8b5cf6" };
+        }
+        if (lower.includes("elektronik") || lower.includes("electronic") || lower.includes("gadget") || lower.includes("tech") || lower.includes("hp")) {
+          return { bg: "#dcfce7", color: "#15803d", border: "#bbf7d0", dot: "#22c55e" };
+        }
+        if (lower.includes("home") || lower.includes("living") || lower.includes("rumah") || lower.includes("dekor")) {
+          return { bg: "#ffedd5", color: "#c2410c", border: "#fed7aa", dot: "#f97316" };
+        }
+        if (lower.includes("health") || lower.includes("sehat") || lower.includes("kesehatan") || lower.includes("herbal") || lower.includes("medis")) {
+          return { bg: "#ccfbf1", color: "#0f766e", border: "#99f6e4", dot: "#14b8a6" };
+        }
+        if (lower.includes("sport") || lower.includes("olahraga") || lower.includes("gym") || lower.includes("fitness")) {
+          return { bg: "#e0e7ff", color: "#4338ca", border: "#c7d2fe", dot: "#6366f1" };
+        }
+        if (lower.includes("otomotif") || lower.includes("motor") || lower.includes("mobil")) {
+          return { bg: "#f1f5f9", color: "#334155", border: "#cbd5e1", dot: "#64748b" };
+        }
+
+        // Deterministic pastel palette for other custom categories
+        const fallbacks = [
+          { bg: "#f0fdf4", color: "#166534", border: "#bbf7d0", dot: "#22c55e" },
+          { bg: "#fdf4ff", color: "#86198f", border: "#f5d0fe", dot: "#a21caf" },
+          { bg: "#ecfeff", color: "#155e75", border: "#a5f3fc", dot: "#06b6d4" },
+          { bg: "#fff7ed", color: "#9a3412", border: "#ffedd5", dot: "#ea580c" },
+          { bg: "#f8fafc", color: "#475569", border: "#e2e8f0", dot: "#64748b" }
+        ];
+        let hash = 0;
+        for (let i = 0; i < catName.length; i++) hash = (hash * 31 + catName.charCodeAt(i)) % fallbacks.length;
+        return fallbacks[Math.abs(hash)];
+      }
+
+      function getKreatorDb() {
+        for (const k of KREATOR_STORAGE_KEYS) {
+          try {
+            const saved = localStorage.getItem(k);
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
+        }
+        return DEFAULT_KREATOR;
+      }
+
+      let kreatorDb = getKreatorDb();
+
+      // ================= Campaign Database & Creator Experience Sync =================
+      const CAMPAIGN_STORAGE_KEYS = [
+        "bisa_campaign_list_v14", "bisa_campaign_list_v13",
+        "bisa_campaign_list_v12",
+        "bisa_campaign_list_v11",
+        "bisa_campaign_list_v10",
+        "bisa_campaign_list_v9",
+        "bisa_campaign_list_v8",
+        "bisa_campaign_list_v7",
+        "bisa_campaign_list_v6",
+        "bisa_campaign_list_v5",
+        "bisa_campaign_list_v4",
+        "bisa_campaign_list_v3",
+        "bisa_campaign_list_v2",
+        "bisa_campaign_list"
+      ];
+
+            const DEFAULT_CAMPAIGNS_FALLBACK = [
+        {
+          id: "CMP-001",
+          idCampaign: "CMP-001",
+          brand: "Bisa Hijab Official",
+          kategori: "Fashion Muslim",
+          tanggal: "01/09/2026 - 30/09/2026",
+          tanggalMulai: "01/09/2026",
+          tanggalSelesai: "30/09/2026",
+          statusCampaign: "Running",
+          kreator: "Aura Cantika",
+          kreatorDetails: [
+            { id: 1, name: "Aura Cantika", username: "@aura.beauty", category: "Fashion Muslim" }
+          ],
+          riwayatAktifitas: [
+            {
+              id: "h_001",
+              campaignId: "CMP-001",
+              namaKreator: "Clarissa Putri",
+              username: "@clarissa.style",
+              keterangan: "Dikeluarkan dari campaign karena pergantian fokus kategori ke Beauty",
+              tanggal: "22/09/2026"
+            }
+          ]
+        },
+        {
+          id: "CMP-002",
+          idCampaign: "CMP-002",
+          brand: "Bisa Glow Skincare",
+          kategori: "Beauty & Care",
+          tanggal: "01/09/2026 - 30/09/2026",
+          tanggalMulai: "01/09/2026",
+          tanggalSelesai: "30/09/2026",
+          statusCampaign: "Running",
+          kreator: "Clarissa Putri",
+          kreatorDetails: [
+            { id: 2, name: "Clarissa Putri", username: "@clarissa.style", category: "Beauty & Care" }
+          ],
+          riwayatAktifitas: []
+        }
+      ];
+
+      function getCampaignDatabase() {
+        for (const key of CAMPAIGN_STORAGE_KEYS) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
+        }
+        return DEFAULT_CAMPAIGNS_FALLBACK;
+      }
+
+      function getCreatorCampaignHistory(item) {
+        if (!item) return [];
+        const campaigns = getCampaignDatabase();
+        const cId = String(item.id || item.uid || '').toLowerCase().trim();
+        const cUid = String(item.uid || '').toLowerCase().trim();
+        const cName = String(item.nama || item.name || '').toLowerCase().trim();
+        const cUser = String(item.username || '').replace(/^@/, '').toLowerCase().trim();
+
+        const historyList = [];
+        const seenCampKeys = new Set();
+
+        campaigns.forEach(camp => {
+          const campId = camp.idCampaign || camp.id || "CMP-001";
+          const brandName = camp.brand || "-";
+          const tgl = camp.tanggal || (camp.tanggalMulai ? `${camp.tanggalMulai} - ${camp.tanggalSelesai || ''}` : "-");
+          const statusCamp = (camp.statusCampaign || "Running").trim();
+
+          // 1. Cek apakah kreator aktif / berpartisipasi dalam campaign ini
+          let isParticipating = false;
+          if (Array.isArray(camp.kreatorDetails) && camp.kreatorDetails.length > 0) {
+            isParticipating = camp.kreatorDetails.some(kd => {
+              const kdId = String(kd.id || kd.uid || '').toLowerCase().trim();
+              const kdName = String(kd.name || kd.nama || '').toLowerCase().trim();
+              const kdUser = String(kd.username || '').replace(/^@/, '').toLowerCase().trim();
+              return (cId && kdId === cId) || (cUid && kdId === cUid) || (cName && kdName === cName) || (cUser && kdUser === cUser);
+            });
+          }
+          if (!isParticipating && camp.kreator && typeof camp.kreator === 'string') {
+            const names = camp.kreator.split(',').map(s => s.toLowerCase().trim());
+            if (cName && names.includes(cName)) isParticipating = true;
+          }
+
+          if (isParticipating) {
+            let ketText = "Sedang Berjalan";
+            let ketType = "running";
+            const stLower = statusCamp.toLowerCase();
+            if (stLower === "selesai" || stLower === "completed" || stLower === "finished") {
+              ketText = "Campaign Selesai";
+              ketType = "selesai";
+            } else if (stLower === "planning" || stLower === "draft") {
+              ketText = "Planning";
+              ketType = "planning";
+            } else if (stLower === "pending") {
+              ketText = "Pending";
+              ketType = "pending";
+            } else {
+              ketText = statusCamp;
+            }
+
+            historyList.push({
+              tanggal: tgl,
+              idCampaign: campId,
+              brand: brandName,
+              keterangan: ketText,
+              type: ketType,
+              isEjected: false
+            });
+            seenCampKeys.add(campId + "_" + (cId || cName));
+          }
+
+          // 2. Cek apakah kreator memiliki riwayat dikeluarkan dari campaign ini
+          if (Array.isArray(camp.riwayatAktifitas) && camp.riwayatAktifitas.length > 0) {
+            camp.riwayatAktifitas.forEach(r => {
+              const rName = String(r.namaKreator || r.nama || '').toLowerCase().trim();
+              const rUser = String(r.username || '').replace(/^@/, '').toLowerCase().trim();
+              const rId = String(r.kreatorId || r.id || '').toLowerCase().trim();
+              const isMatch = (cName && rName === cName) || (cUser && rUser === cUser) || (cId && rId === cId) || (cUid && rId === cUid);
+              if (isMatch) {
+                const rTgl = r.tanggal || tgl;
+                const rKet = r.keterangan ? r.keterangan : "Dikeluarkan dari campaign";
+                historyList.push({
+                  tanggal: rTgl,
+                  idCampaign: r.campaignId || campId,
+                  brand: brandName,
+                  keterangan: rKet,
+                  type: "dikeluarkan",
+                  isEjected: true
+                });
+              }
+            });
+          }
+        });
+
+        return historyList;
+      }
+
+      const trackingTableBody = document.getElementById("trackingTableBody");
+      const searchKreatorInput = document.getElementById("searchKreatorInput");
+      const clearSearchKreatorBtn = document.getElementById("clearSearchKreatorBtn");
+      const filterCampaignBtn = document.getElementById("btnFilterCampaign");
+      const filterCampaignDropdown = document.getElementById("filterCampaignDropdown");
+      const filterCampaignForm = document.getElementById("filterCampaignForm");
+      const btnResetFilter = document.getElementById("btnResetFilter");
+      const modalView = document.getElementById("kreatorViewModal");
+
+      let currentFilterKategori = "";
+      let currentFilterAktivitas = "";
+      let currentFilterLeads = "";
+
+      function getCreatorActivityStatus(item) {
+        if (!item) return "Tidak Aktif";
+        if (item.status === "Berhenti") return "Tidak Aktif";
+        if (item.aktivitas) return item.aktivitas;
+        const perf = getCreatorPerformance(item);
+        if (perf) {
+          const liveNum = Number(perf.live_broadcasts) || (perf.live_gmv && perf.live_gmv !== "Rp 0" ? 1 : 0);
+          const videoNum = Number(perf.videos) || (perf.video_gmv && perf.video_gmv !== "Rp 0" ? 1 : 0);
+          if (liveNum > 0 && videoNum > 0) return "Aktif Konten & Live";
+          if (liveNum > 0) return "Aktif Live";
+          if (videoNum > 0) return "Aktif Konten";
+          return "Tidak Aktif";
+        }
+        if (item.status === "Bind" || item.status === "Aktif") {
+          return "Aktif Konten & Live";
+        }
+        return "Tidak Aktif";
+      }
+
+      function updateTrackingMetrics() {
+        let countAktifKontenLive = 0;
+        let countAktifLive = 0;
+        let countAktifKonten = 0;
+        let countTidakAktif = 0;
+
+        kreatorDb = getKreatorDb();
+
+        kreatorDb.forEach(k => {
+          const akt = getCreatorActivityStatus(k).toLowerCase().trim();
+          if (akt === "aktif konten & live" || (akt.includes("konten") && akt.includes("live"))) {
+            countAktifKontenLive++;
+          } else if (akt === "aktif live" || akt.includes("live")) {
+            countAktifLive++;
+          } else if (akt === "aktif konten" || akt.includes("konten")) {
+            countAktifKonten++;
+          } else {
+            countTidakAktif++;
+          }
+        });
+
+        const elAKL = document.getElementById("metricAktifKontenLive");
+        const elAL = document.getElementById("metricAktifLive");
+        const elAK = document.getElementById("metricAktifKonten");
+        const elTA = document.getElementById("metricTidakAktif");
+
+        if (elAKL) elAKL.textContent = countAktifKontenLive;
+        if (elAL) elAL.textContent = countAktifLive;
+        if (elAK) elAK.textContent = countAktifKonten;
+        if (elTA) elTA.textContent = countTidakAktif;
+      }
+
+      function renderTrackingTable(query = "") {
+        if (!trackingTableBody) return;
+        kreatorDb = getKreatorDb();
+        trackingTableBody.innerHTML = "";
+        updateTrackingMetrics();
+
+        const q = (query || "").trim().toLowerCase();
+        const filtered = kreatorDb.filter(k => {
+          const aktStatus = getCreatorActivityStatus(k);
+          if (q) {
+            const allKats = [k.kategori, k.kategori1, k.kategori2, k.kategori3].filter(Boolean).join(" ").toLowerCase();
+            const matchQ = (k.uid && k.uid.toLowerCase().includes(q)) ||
+              (k.username && k.username.toLowerCase().includes(q)) ||
+              (k.nama && k.nama.toLowerCase().includes(q)) ||
+              allKats.includes(q) ||
+              (k.kategoriSpesifik && k.kategoriSpesifik.toLowerCase().includes(q)) ||
+              (k.spesifik && k.spesifik.toLowerCase().includes(q)) ||
+              aktStatus.toLowerCase().includes(q);
+            if (!matchQ) return false;
+          }
+          if (currentFilterKategori) {
+            const allKats = [k.kategori, k.kategori1, k.kategori2, k.kategori3].filter(Boolean).join(" ").toLowerCase();
+            if (!allKats.includes(currentFilterKategori)) return false;
+          }
+          if (currentFilterAktivitas) {
+            const akt = aktStatus.toLowerCase();
+            if (!akt.includes(currentFilterAktivitas)) return false;
+          }
+          if (currentFilterLeads) {
+            const ld = (k.leads || "").toLowerCase();
+            if (!ld.includes(currentFilterLeads)) return false;
+          }
+          return true;
+        });
+
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        if (kreatorDb.length === 0) {
+          if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+          if (emptyTableState) emptyTableState.style.setProperty("display", "flex", "important");
+          return;
+        } else {
+          if (tableWrapper) tableWrapper.style.removeProperty("display");
+          if (emptyTableState) emptyTableState.style.setProperty("display", "none", "important");
+        }
+
+        if (filtered.length === 0) {
+          trackingTableBody.innerHTML = `
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data Tracking Kreator yang sesuai dengan pencarian atau filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach((item, index) => {
+          const row = document.createElement("tr");
+          const fotoUrl = (item.foto && item.foto !== "../../media/logo.png") ? item.foto : "../../media/avatar.png";
+
+          // Extract multiple categories & PICs
+          const categories = [];
+          if (item.kategori1 && item.kategori1 !== "-") categories.push({ name: item.kategori1, pic: item.pic1 });
+          if (item.kategori2 && item.kategori2 !== "-") categories.push({ name: item.kategori2, pic: item.pic2 });
+          if (item.kategori3 && item.kategori3 !== "-") categories.push({ name: item.kategori3, pic: item.pic3 });
+
+          if (categories.length === 0 && item.kategori && item.kategori !== "-") {
+            const splitCats = item.kategori.split(",").map(s => s.trim()).filter(Boolean);
+            splitCats.forEach(c => {
+              if (c && c !== "-") categories.push({ name: c, pic: "" });
+            });
+          }
+
+          let kategoriHtml = "-";
+          if (categories.length > 0) {
+            kategoriHtml = `
+              <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center;">
+                ${categories.map((c) => {
+                  const style = getKreatorCatPillStyle(c.name);
+                  const picTitle = c.pic ? `PIC: ${c.pic}` : '';
+                  return `
+                    <span class="kreator-cat-pill" style="background: ${style.bg}; color: ${style.color}; border: 1px solid ${style.border};" title="${picTitle}">
+                      ${c.name}
+                    </span>
+                  `;
+                }).join('')}
+              </div>
+            `;
+          }
+
+          const perf = getCreatorPerformance(item);
+          const levelInfo = getCreatorLevelFromMaster(item, perf);
+          const levelName = levelInfo.nama || item.level || "New Growth";
+          const aktStatus = getCreatorActivityStatus(item);
+
+          const levelHtml = `<span style="color: #334155; font-weight: 500;">${levelName}</span>`;
+
+          const keaktifanHtml = `<span style="color: #334155; font-weight: 500;">${aktStatus}</span>`;
+
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td style="font-weight: 600; color: #1e293b;">${item.uid || "-"}</td>
+            <td>
+              <div class="kreator-user-cell" style="display: flex; align-items: center; gap: 10px;">
+                <img src="${fotoUrl}" 
+                     alt="${item.username || 'Foto'}" 
+                     class="kreator-table-avatar" 
+                     data-photo-preview="1"
+                     data-photo-kind="kreator"
+                     data-preview-src="${fotoUrl}"
+                     data-photo-src="${fotoUrl}"
+                     data-photo-title="Lihat Foto Kreator - ${item.username || item.nama || ''}"
+                     data-photo-meta="Foto profil ${item.nama || item.username || 'Kreator'}"
+                     data-photo-address="${item.alamat || 'Bisa Media MCN, Tasikmalaya'}"
+                     data-photo-note="${item.kategori ? ('Kategori: ' + item.kategori + (item.kategoriSpesifik ? ' - ' + item.kategoriSpesifik : '')) : '-'}"
+                     style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0; background: #f8fafc; cursor: pointer; transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;" 
+                     onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)';"
+                     onmouseout="this.style.transform='scale(1)';this.style.boxShadow='none';"
+                     title="Klik untuk lihat foto"
+                     onerror="this.onerror=null; this.src='../../media/avatar.png';" />
+                <span class="kreator-table-username" style="font-weight: 500; color: #1e293b;">${item.username || "-"}</span>
+              </div>
+            </td>
+            <td>${item.nama || item.name || "-"}</td>
+            <td>${kategoriHtml}</td>
+            <td>${levelHtml}</td>
+            <td>${keaktifanHtml}</td>
+            <td class="tdActions text-center col-sticky-action" style="text-align: center;">
+              <button type="button" class="btn-view btn-act-view" data-id="${item.id}" aria-label="Lihat" title="Lihat Tracking Kreator">
+                <i class="bx bx-show"></i>
+              </button>
+            </td>
+          `;
+          trackingTableBody.appendChild(row);
+        });
+      }
+
+      // Fungsi untuk mengambil Data Master Leveling Kreator
+      function getLevelingMaster() {
+        const LEVELING_KEYS = [
+          "bisa_leveling_kreator_list_v6",
+          "bisa_leveling_kreator_list_v5",
+          "bisa_leveling_kreator_list_v4",
+          "bisa_leveling_kreator_list_v3",
+          "bisa_leveling_kreator_list_v2",
+          "bisa_leveling_kreator_list"
+        ];
+        for (const k of LEVELING_KEYS) {
+          try {
+            const saved = localStorage.getItem(k);
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
+        }
+        return [
+          { id: 1, nama: "Top Kreator", gmv: "Rp. 210.000.000" },
+          { id: 2, nama: "Semi Top Creator", gmv: "Rp. 50.000.000" },
+          { id: 3, nama: "New Growth", gmv: "Rp. 5.000.000" },
+          { id: 4, nama: "Incubate", gmv: "Rp. 0" }
+        ];
+      }
+
+      function getCreatorLevelFromMaster(item, perf) {
+        if (!perf || !perf.gmv) {
+          return { nama: item.level || "New Growth", gmv: item.targetGmv || "Rp 0" };
+        }
+
+        const masterList = getLevelingMaster();
+        if (!masterList || masterList.length === 0) {
+          return { nama: item.level || "-", gmv: item.targetGmv || "-" };
+        }
+
+        const gmvNum = parseRupiahNum(perf.gmv);
+        for (const m of masterList) {
+          const mGmv = parseRupiahNum(m.gmv);
+          if (gmvNum >= mGmv) {
+            return { nama: m.nama, gmv: m.gmv };
+          }
+        }
+        const lastTier = masterList[masterList.length - 1];
+        return { nama: lastTier.nama, gmv: lastTier.gmv || "Rp 0" };
+      }
+
+      // Dataset Performa Kreator
+      function getPerformaDb() {
+        const PERFORMA_KEYS = [
+          "bisa_performa_kreator_list_v6",
+          "bisa_performa_kreator_list_v5",
+          "bisa_performa_kreator_list_v4",
+          "bisa_performa_kreator_list_v3",
+          "bisa_performa_kreator_list_v33",
+          "bisa_performa_kreator_list"
+        ];
+        for (const k of PERFORMA_KEYS) {
+          try {
+            const saved = localStorage.getItem(k);
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+              }
+            }
+          } catch (e) {}
+        }
+        return [
+          {
+            id: 1,
+            uid: "UID-0001",
+            username: "@aura.beauty",
+            gmv: "Rp 150.000.000",
+            live_gmv: "Rp 105.000.000",
+            video_gmv: "Rp 45.000.000",
+            live_broadcasts: "48",
+            videos: "18",
+            partner_gmv: "Rp 37.500.000",
+            direct_gmv: "Rp 112.500.000",
+            followers: "185.000"
+          },
+          {
+            id: 2,
+            uid: "UID-0002",
+            username: "@clarissa.style",
+            gmv: "Rp 35.000.000",
+            live_gmv: "Rp 25.000.000",
+            video_gmv: "Rp 10.000.000",
+            live_broadcasts: "32",
+            videos: "12",
+            partner_gmv: "Rp 21.000.000",
+            direct_gmv: "Rp 14.000.000",
+            followers: "94.500"
+          },
+          {
+            id: 3,
+            uid: "UID-0003",
+            username: "@bima.fashion",
+            gmv: "Rp 45.200.000",
+            live_gmv: "Rp 32.000.000",
+            video_gmv: "Rp 13.200.000",
+            live_broadcasts: "10",
+            videos: "24",
+            partner_gmv: "Rp 20.000.000",
+            direct_gmv: "Rp 25.200.000",
+            followers: "125.400"
+          },
+          {
+            id: 2,
+            uid: "UID-0002",
+            username: "@clarissa.style",
+            gmv: "Rp 8.500.000",
+            live_gmv: "Rp 5.000.000",
+            video_gmv: "Rp 3.500.000",
+            live_broadcasts: "4",
+            videos: "6",
+            partner_gmv: "Rp 3.000.000",
+            direct_gmv: "Rp 5.500.000",
+            followers: "45.000"
+          }
+        ];
+      }
+
+      function getCreatorPerformance(item) {
+        if (!item) return null;
+        const performaList = getPerformaDb();
+        if (!performaList || performaList.length === 0) return null;
+
+        if (item.username) {
+          const cleanUser = item.username.toLowerCase().replace(/[@\s]/g, "");
+          const found = performaList.find(p => p.username && p.username.toLowerCase().replace(/[@\s]/g, "") === cleanUser);
+          if (found) return found;
+        }
+
+        if (item.uid) {
+          const cleanUid = item.uid.toLowerCase().replace(/[-\s]/g, "");
+          const found = performaList.find(p => p.uid && p.uid.toLowerCase().replace(/[-\s]/g, "") === cleanUid);
+          if (found) return found;
+        }
+
+        return null;
+      }
+
+      function parseRupiahNum(str) {
+        if (!str) return 0;
+        const num = String(str).replace(/[^\d]/g, "");
+        return parseFloat(num) || 0;
+      }
+
+      function calculateProgressGmv(gmvBerjalanStr, targetGmvStr) {
+        const gmvVal = parseRupiahNum(gmvBerjalanStr);
+        const targetVal = parseRupiahNum(targetGmvStr);
+        if (targetVal <= 0) return gmvVal > 0 ? "100%" : "0%";
+        const percent = Math.min(Math.round((gmvVal / targetVal) * 100), 100);
+        return percent + "%";
+      }
+
+      function getPicForCategory(cat) {
+        if (!cat) return "Setiawan";
+        const lower = String(cat).toLowerCase();
+        if (lower.includes("fashion") || lower.includes("muslim")) return "Setiawan";
+        if (lower.includes("beauty") || lower.includes("care") || lower.includes("skin")) return "Amanda";
+        if (lower.includes("food") || lower.includes("beverage") || lower.includes("kuliner") || lower.includes("snack")) return "Dimas";
+        if (lower.includes("mom") || lower.includes("baby") || lower.includes("anak")) return "Clarissa";
+        if (lower.includes("electronic") || lower.includes("elektronik") || lower.includes("tech")) return "Dimas";
+        return "Setiawan";
+      }
+
+      function openViewModal(item) {
+        if (!item) return;
+        const perf = getCreatorPerformance(item);
+        const levelInfo = getCreatorLevelFromMaster(item, perf);
+
+        const gmvBerjalan = (perf && perf.gmv) ? perf.gmv : (item.gmvBerjalan || "Rp 0");
+        const targetGmv = (perf && perf.gmv && levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : (item.targetGmv || "Rp 0");
+        const progresGmv = (gmvBerjalan !== "-" && targetGmv !== "-" && targetGmv !== "Rp 0") ? calculateProgressGmv(gmvBerjalan, targetGmv) : (item.progresGmv || "0%");
+        
+        let siaranLive = (perf && perf.live_broadcasts) ? (perf.live_broadcasts + " Jam") : (item.siaranLive || "0 Jam");
+        if (perf) {
+          siaranLive = perf.live_broadcasts ? (perf.live_broadcasts + " Jam") : (perf.live_gmv ? ("Live " + perf.live_gmv) : siaranLive);
+        }
+
+        let videoCount = (perf && perf.videos) ? (perf.videos + " Video") : (item.video || "0 Video");
+        if (perf) {
+          videoCount = perf.videos ? (perf.videos + " Video") : (perf.video_gmv ? ("Video " + perf.video_gmv) : videoCount);
+        }
+
+        let adsPartnerGmv = (perf && perf.partner_gmv) ? perf.partner_gmv : (item.gmvPartner || "Rp 0");
+        const keaktifanStatus = getCreatorActivityStatus(item);
+
+        document.getElementById("viewKreatorUidInput").value = item.uid || "";
+        document.getElementById("viewKreatorUsernameInput").value = item.username || "";
+        document.getElementById("viewKreatorNamaInput").value = item.nama || item.name || "";
+        document.getElementById("viewKreatorWaInput").value = item.nomorWa || "";
+        document.getElementById("viewKreatorAlamatInput").value = item.alamat || "";
+        document.getElementById("viewKreatorEmailInput").value = item.email || "";
+        document.getElementById("viewKreatorLeadsInput").value = item.leads || "Member";
+        
+        // Dynamically build and populate category and PIC slots in modal (Identik dengan Data Kreator)
+        const catWrap = document.getElementById("viewKreatorCategoriesDynamicWrap");
+        if (catWrap) {
+          const catSlots = [];
+          if (item.kategori1 && item.kategori1.trim() && item.kategori1 !== "-" && item.kategori1 !== "Kategori Produk") {
+            catSlots.push({ name: item.kategori1.trim(), pic: item.pic1 || getPicForCategory(item.kategori1) });
+          }
+          if (item.kategori2 && item.kategori2.trim() && item.kategori2 !== "-" && item.kategori2 !== "Kategori Produk") {
+            catSlots.push({ name: item.kategori2.trim(), pic: item.pic2 || getPicForCategory(item.kategori2) });
+          }
+          if (item.kategori3 && item.kategori3.trim() && item.kategori3 !== "-" && item.kategori3 !== "Kategori Produk") {
+            catSlots.push({ name: item.kategori3.trim(), pic: item.pic3 || getPicForCategory(item.kategori3) });
+          }
+
+          if (catSlots.length === 0) {
+            const rawKat = item.kategori || "-";
+            if (rawKat !== "-" && rawKat !== "Kategori Produk" && rawKat.includes(",")) {
+              const splitCats = rawKat.split(",").map(s => s.trim()).filter(c => c && c !== "-" && c !== "Kategori Produk");
+              splitCats.forEach((c, idx) => {
+                catSlots.push({ name: c, pic: idx === 0 ? (item.pic1 || item.pic || getPicForCategory(c)) : getPicForCategory(c) });
+              });
+            } else if (rawKat && rawKat !== "-" && rawKat !== "Kategori Produk") {
+              catSlots.push({ name: rawKat, pic: item.pic1 || item.pic || getPicForCategory(rawKat) });
+            }
+          }
+
+          if (catSlots.length === 0) {
+            catSlots.push({ name: "Fashion Muslim", pic: item.pic1 || item.pic || "Setiawan" });
+          }
+
+          catWrap.innerHTML = catSlots.map((slot, index) => {
+            const slotNum = index + 1;
+            const isFirst = index === 0;
+            const badgeHtml = isFirst
+              ? `<span class="status-badge status-badge--success" style="padding: 1px 6px; font-size: 9.5px; background-color: #dcfce7; color: #15803d; border: 1px solid #86efac; border-radius: 4px; font-weight: 600;">Wajib</span>`
+              : `<span style="font-size: 10.5px; color: #94a3b8; font-weight: 500;">Opsional</span>`;
+            const borderStyle = isFirst
+              ? `border: 1.5px solid #93c5fd; box-shadow: 0 1px 2px rgba(0,0,0,0.02);`
+              : `border: 1px solid #e2e8f0;`;
+            const requiredStar = isFirst ? `<span style="color: #ef4444;">*</span>` : ``;
+
+            return `
+              <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; align-items: flex-end; background: #ffffff; ${borderStyle} border-radius: 8px; padding: 10px 12px;">
+                <div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <label class="form-label" style="font-size: 12px; font-weight: 600; margin: 0; color: #1e293b;">Kategori ${slotNum} ${requiredStar}</label>
+                    ${badgeHtml}
+                  </div>
+                  <input type="text" class="kreator-field-input" value="${slot.name || '-'}" readonly style="background-color: #f8fafc; cursor: default; font-size: 13px; height: 38px; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; color: #1e293b; box-sizing: border-box;" />
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #1e293b; display: block;">PIC Kategori ${slotNum}</label>
+                  <input type="text" class="kreator-field-input" value="${slot.pic || getPicForCategory(slot.name)}" readonly placeholder="PIC otomatis terisi" style="background-color: #f1f5f9; cursor: default; font-size: 13px; font-weight: 500; height: 38px; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0 12px; color: #1e293b; box-sizing: border-box;" />
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+
+        const elKatSpesifik = document.getElementById("viewKreatorKatSpesifikInput");
+        if (elKatSpesifik) {
+          elKatSpesifik.value = item.kategoriSpesifik || item.spesifik || item.kategori || "-";
+        }
+
+        document.getElementById("viewKreatorKontrakAwalInput").value = item.kontrakAwal || "-";
+        document.getElementById("viewKreatorKontrakAkhirInput").value = item.kontrakAkhir || "-";
+        document.getElementById("viewKreatorStatusInput").value = item.status || "Bind";
+        
+        // Populate Keikutsertaan Campaign Table
+        const campTbody = document.getElementById("viewKreatorCampaignTableBody");
+        if (campTbody) {
+          campTbody.innerHTML = "";
+          const historyList = getCreatorCampaignHistory(item);
+
+          if (historyList.length === 0) {
+            campTbody.innerHTML = `
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 22px 14px; color: #94a3b8; font-style: italic; background: #ffffff;">
+                  Belum ada data keikutsertaan campaign
+                </td>
+              </tr>
+            `;
+          } else {
+            historyList.forEach(hist => {
+              const tr = document.createElement("tr");
+
+              let ketBadgeHtml = "";
+              if (hist.isEjected || hist.type === "dikeluarkan") {
+                const alasanSafe = (hist.keterangan || "Tidak ada keterangan tambahan.").replace(/"/g, "&quot;");
+                const campSafe = ((hist.idCampaign || "") + " - " + (hist.brand || "")).replace(/"/g, "&quot;");
+                ketBadgeHtml = `
+                  <div style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span style="display: inline-flex; align-items: center; gap: 4px; color: #dc2626; font-weight: 600; font-size: 11.5px; background: #fef2f2; border: 1px solid #fecaca; padding: 2.5px 8px; border-radius: 4px;">
+                      <i class="bx bx-user-x" style="font-size: 13px;"></i> Dikeluarkan
+                    </span>
+                    <button type="button" class="btn-view-alasan-ejected" data-alasan="${alasanSafe}" data-camp="${campSafe}" title="Lihat Keterangan Dikeluarkan" style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid #fecaca; background: #ffffff; color: #dc2626; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 1px 2px rgba(220,38,38,0.06);">
+                      <i class="bx bx-show" style="font-size: 13px;"></i>
+                    </button>
+                  </div>
+                `;
+              } else if (hist.type === "selesai" || hist.keterangan.toLowerCase().includes("selesai")) {
+                ketBadgeHtml = `
+                  <span style="display: inline-flex; align-items: center; gap: 5px; color: #16a34a; font-weight: 600; font-size: 12px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 3px 9px; border-radius: 4px;">
+                    <i class="bx bx-check-circle" style="font-size: 14px;"></i> Campaign Selesai
+                  </span>
+                `;
+              } else if (hist.type === "running" || hist.keterangan.toLowerCase().includes("berjalan")) {
+                ketBadgeHtml = `
+                  <span style="display: inline-flex; align-items: center; gap: 5px; color: #0284c7; font-weight: 600; font-size: 12px; background: #f0f9ff; border: 1px solid #bae6fd; padding: 3px 9px; border-radius: 4px;">
+                    <i class="bx bx-time-five" style="font-size: 13px;"></i> Sedang Berjalan
+                  </span>
+                `;
+              } else {
+                ketBadgeHtml = `
+                  <span style="display: inline-flex; align-items: center; gap: 5px; color: #d97706; font-weight: 600; font-size: 12px; background: #fffbeb; border: 1px solid #fde68a; padding: 3px 9px; border-radius: 4px;">
+                    <i class="bx bx-calendar" style="font-size: 13px;"></i> ${hist.keterangan}
+                  </span>
+                `;
+              }
+
+              tr.innerHTML = `
+                <td style="font-weight: 500; color: #334155;">${hist.tanggal || "-"}</td>
+                <td style="font-weight: 600; color: #1e293b;">${hist.idCampaign || "-"}</td>
+                <td style="font-weight: 500; color: #334155;">${hist.brand || "-"}</td>
+                <td>${ketBadgeHtml}</td>
+              `;
+              campTbody.appendChild(tr);
+            });
+          }
+        }
+
+        document.getElementById("viewKreatorLevelInput").value = levelInfo.nama || item.level || "Semi Top Creator";
+        document.getElementById("viewKreatorTargetGmvInput").value = targetGmv;
+        document.getElementById("viewKreatorProgresGmvInput").value = progresGmv;
+        document.getElementById("viewKreatorGmvBerjalanInput").value = gmvBerjalan;
+        document.getElementById("viewKreatorSiaranLiveInput").value = siaranLive;
+        document.getElementById("viewKreatorVideoInput").value = videoCount;
+        document.getElementById("viewKreatorAdsHandlingInput").value = adsPartnerGmv;
+        document.getElementById("viewKreatorKeaktifanInput").value = keaktifanStatus;
+
+        const fotoUrl = (item.foto && item.foto !== "../../media/logo.png") ? item.foto : "../../media/avatar.png";
+        const imgEl = document.getElementById("viewKreatorFotoImg");
+        if (imgEl) imgEl.src = fotoUrl;
+
+        if (modalView) modalView.classList.add("is-active");
+      }
+
+      // Event delegation for table action clicks and reason popups
+      document.addEventListener("click", function (e) {
+        const btnAlasan = e.target.closest(".btn-view-alasan-ejected");
+        if (btnAlasan) {
+          e.preventDefault();
+          e.stopPropagation();
+          const alasan = btnAlasan.getAttribute("data-alasan") || "Tidak ada keterangan tambahan.";
+          const camp = btnAlasan.getAttribute("data-camp") || "Campaign";
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              title: 'Keterangan Dikeluarkan',
+              html: `
+                <div style="text-align: left; font-size: 13px; color: #334155; line-height: 1.6;">
+                  <div style="margin-bottom: 8px; font-weight: 600; color: #1e293b;">
+                    Campaign: <span style="font-weight: 400; color: #64748b;">${camp}</span>
+                  </div>
+                  <div style="padding: 12px 14px; background: #fef2f2; border: 1.5px solid #fecaca; border-radius: 8px; color: #991b1b; font-weight: 500;">
+                    ${alasan}
+                  </div>
+                </div>
+              `,
+              icon: 'info',
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Tutup',
+              customClass: {
+                popup: 'swal2-bisa-popup'
+              }
+            });
+          } else {
+            alert(`Keterangan Dikeluarkan (${camp}):\n\n${alasan}`);
+          }
+          return;
+        }
+      });
+
+      // Event delegation for table action clicks
+      if (trackingTableBody) {
+        trackingTableBody.addEventListener("click", function (e) {
+          const avatarBtn = e.target.closest(".kreator-table-avatar");
+          if (avatarBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const src = avatarBtn.getAttribute("data-photo-src") || avatarBtn.src;
+            const title = avatarBtn.getAttribute("data-photo-title") || "Lihat Foto Kreator";
+            const meta = avatarBtn.getAttribute("data-photo-meta") || "Preview foto kreator";
+            const address = avatarBtn.getAttribute("data-photo-address") || "Bisa Media MCN, Tasikmalaya";
+            const note = avatarBtn.getAttribute("data-photo-note") || "-";
+            if (typeof window.openPhotoModal === "function") {
+              window.openPhotoModal(src, title, meta, address, note);
+            }
+            return;
+          }
+
+          const btnView = e.target.closest(".btn-act-view");
+          if (btnView) {
+            e.preventDefault();
+            e.stopPropagation();
+            const id = btnView.getAttribute("data-id");
+            kreatorDb = getKreatorDb();
+            const item = kreatorDb.find(k => String(k.id) === String(id) || String(k.uid) === String(id));
+            if (item) {
+              openViewModal(item);
+            }
+            return;
+          }
+        });
+      }
+
+      // Search Events
+      if (searchKreatorInput) {
+        searchKreatorInput.addEventListener("input", function () {
+          const val = this.value;
+          if (clearSearchKreatorBtn) {
+            clearSearchKreatorBtn.style.display = val.length > 0 ? "inline-flex" : "none";
+          }
+          renderTrackingTable(val);
+        });
+      }
+
+      if (clearSearchKreatorBtn) {
+        clearSearchKreatorBtn.addEventListener("click", function () {
+          if (searchKreatorInput) {
+            searchKreatorInput.value = "";
+            this.style.display = "none";
+            searchKreatorInput.focus();
+            renderTrackingTable("");
+          }
+        });
+      }
+
+      function populateTrackingKategoriFilter() {
+        const katSelect = document.getElementById("filterKategoriSelect");
+        if (!katSelect) return;
+        const currentVal = katSelect.value;
+        let catList = [];
+        try {
+          const saved = localStorage.getItem("bisa_kategori_kreator_list_v5");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              catList = parsed.map(c => (typeof c === "string" ? c : (c.nama || c.kategori || c.namaKategori))).filter(Boolean);
+            }
+          }
+        } catch (e) {}
+        if (catList.length === 0) {
+          catList = ["Fashion Muslim", "Beauty & Care", "Food & Beverage", "Mom & Baby", "Electronics", "Lifestyle", "Home & Living"];
+        }
+        catList = Array.from(new Set(catList));
+
+        katSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Kategori</option><option value="">Semua Kategori</option>';
+        catList.forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat.toLowerCase();
+          opt.textContent = cat;
+          if (currentVal && cat.toLowerCase() === currentVal.toLowerCase()) {
+            opt.selected = true;
+          }
+          katSelect.appendChild(opt);
+        });
+      }
+
+      function populateTrackingLeadsFilter() {
+        const leadsSelect = document.getElementById("filterLeadsSelect");
+        if (!leadsSelect) return;
+        const currentVal = leadsSelect.value;
+        let leadsList = [];
+        try {
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              leadsList = parsed.map(l => (typeof l === "string" ? l : (l.status || l.nama || l.namaLeads))).filter(Boolean);
+            }
+          }
+        } catch (e) {}
+        if (leadsList.length === 0) {
+          leadsList = ["Member", "Member & Mahasiswa", "SmartC", "Markom", "Bootcamp"];
+        }
+        leadsList = Array.from(new Set(leadsList));
+
+        leadsSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Leads</option><option value="">Semua Leads</option>';
+        leadsList.forEach(lead => {
+          const opt = document.createElement("option");
+          opt.value = lead.toLowerCase();
+          opt.textContent = lead;
+          if (currentVal && lead.toLowerCase() === currentVal.toLowerCase()) {
+            opt.selected = true;
+          }
+          leadsSelect.appendChild(opt);
+        });
+      }
+
+      // Filter Events
+      if (filterCampaignBtn && filterCampaignDropdown) {
+        filterCampaignBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          populateTrackingKategoriFilter();
+          populateTrackingLeadsFilter();
+          filterCampaignDropdown.classList.toggle("is-active");
+        });
+
+        document.addEventListener("click", function (e) {
+          if (!filterCampaignDropdown.contains(e.target) && !filterCampaignBtn.contains(e.target)) {
+            filterCampaignDropdown.classList.remove("is-active");
+          }
+        });
+      }
+
+      if (filterCampaignForm) {
+        filterCampaignForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const katSelect = document.getElementById("filterKategoriSelect");
+          const aktSelect = document.getElementById("filterAktivitasSelect");
+          const leadsSelect = document.getElementById("filterLeadsSelect");
+
+          currentFilterKategori = katSelect ? katSelect.value.toLowerCase().trim() : "";
+          currentFilterAktivitas = aktSelect ? aktSelect.value.toLowerCase().trim() : "";
+          currentFilterLeads = leadsSelect ? leadsSelect.value.toLowerCase().trim() : "";
+
+          if (filterCampaignDropdown) filterCampaignDropdown.classList.remove("is-active");
+          renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener("click", function () {
+          currentFilterKategori = "";
+          currentFilterAktivitas = "";
+          currentFilterLeads = "";
+          if (filterCampaignDropdown) filterCampaignDropdown.classList.remove("is-active");
+          setTimeout(() => {
+            renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+          }, 50);
+        });
+      }
+
+      // Close modal handlers
+      const btnCloseTop = document.getElementById("closeKreatorViewModalTop");
+      const btnCloseBtm = document.getElementById("btnKeluarViewModal");
+
+      if (btnCloseTop) {
+        btnCloseTop.addEventListener("click", function () {
+          if (modalView) modalView.classList.remove("is-active");
+        });
+      }
+      if (btnCloseBtm) {
+        btnCloseBtm.addEventListener("click", function () {
+          if (modalView) modalView.classList.remove("is-active");
+        });
+      }
+      if (modalView) {
+        modalView.addEventListener("click", function (e) {
+          if (e.target === modalView) {
+            modalView.classList.remove("is-active");
+          }
+        });
+      }
+
+      // Real-time synchronization when creator data is added or modified in Data Kreator
+      window.addEventListener("storage", function (e) {
+        if (KREATOR_STORAGE_KEYS.includes(e.key)) {
+          kreatorDb = getKreatorDb();
+          renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+        }
+      });
+      window.addEventListener("focus", function () {
+        kreatorDb = getKreatorDb();
+        renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+      });
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") {
+          kreatorDb = getKreatorDb();
+          renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+        }
+      });
+
+      // Initial Render
+      renderTrackingTable();
+    });
+  </script>
+</body>
+
+</html>

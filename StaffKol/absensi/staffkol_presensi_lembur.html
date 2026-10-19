@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -14,6 +14,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet" />
   <style>
+    .col-sticky-action { position: sticky !important; right: 0; z-index: 10; background-color: #ffffff; box-shadow: -2px 0 5px rgba(0,0,0,0.03); border-left: 1px solid rgba(0,0,0,0.03) !important; }
+    th.col-sticky-action { background-color: #f8fafc !important; z-index: 11; }
+    tr:hover td.col-sticky-action { background-color: #f8fafc !important; }
+    /* Toolbar Green Excel Button matching screenshot */
+    .btn-excel-green,
+    .small-action-button.btn-excel-green {
+      background: #f0fdf4 !important;
+      border: 1px solid #86efac !important;
+      color: #15803d !important;
+      position: relative;
+      cursor: pointer;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 8px !important;
+    }
+    .btn-excel-green:hover,
+    .small-action-button.btn-excel-green:hover {
+      background: #dcfce7 !important;
+      border-color: #4ade80 !important;
+      box-shadow: 0 2px 6px rgba(34, 197, 94, 0.2) !important;
+    }
     .status-badge {
       display: inline-block;
       padding: 4px 10px;
@@ -38,21 +62,30 @@
       border: 1px solid rgba(255, 82, 82, 0.3);
     }
 
-    /* Actions style from staffkol_rrk.html btn-view */
+    /* Actions style for eye/view icon */
     .btn-view {
-      background: none;
-      border: none;
+      background: rgba(41, 163, 216, 0.08);
+      border: 1px solid rgba(41, 163, 216, 0.2);
       cursor: pointer;
-      padding: 6px;
-      border-radius: 4px;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.15s ease;
+      transition: all 0.15s ease;
       color: #29A3D8;
     }
     .btn-view:hover {
-      background-color: rgba(41, 163, 216, 0.08);
+      background-color: #29A3D8;
+      color: #ffffff;
+      border-color: #29A3D8;
+      box-shadow: 0 2px 6px rgba(41, 163, 216, 0.25);
+    }
+    .btn-view i {
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
     }
 
     /* Align the Aksi header text and its cell contents to center */
@@ -186,10 +219,74 @@
         <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
-        <header class="topbar hirezy-topbar"></header>
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Staff KOL</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
 
     <main class="dashboard-content">
-      
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Absensi Lembur</h1>
+      </div>
+
       <!-- Hidden Rata-rata Durasi to prevent JS errors -->
       <span id="ovLemburLong" style="display: none;">0</span>
 
@@ -228,15 +325,15 @@
 
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left" style="gap: 8px; display: flex; align-items: center;">
-            <button id="btnExportLembur" class="small-action-button" type="button" aria-label="Export Excel" title="Export Excel">
-              <!-- Excel / Spreadsheet SVG -->
-              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="3" width="16" height="18" rx="1.5" fill="#1f72b6" stroke="#1f72b6" />
-                <line x1="12" y1="7" x2="17" y2="7" stroke="#fff" stroke-width="1.2" />
-                <line x1="12" y1="11" x2="17" y2="11" stroke="#fff" stroke-width="1.2" />
-                <line x1="12" y1="15" x2="17" y2="15" stroke="#fff" stroke-width="1.2" />
-                <line x1="12" y1="7" x2="12" y2="17" stroke="#fff" stroke-width="1.2" />
-                <path d="M6 9l3 6M9 9l-3 6" stroke="#fff" stroke-width="1.8" />
+            <button id="btnExportLembur" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.csv)" style="background: #f0fdf4 !important; border: 1px solid #86efac !important; color: #15803d !important; width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+              <!-- Excel / Spreadsheet SVG Green -->
+              <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
             <div class="filter-dropdown-wrapper">
@@ -294,34 +391,48 @@
                 <th>Nama Karyawan</th>
                 <th>Tanggal</th>
                 <th>Check In</th>
+                <th>Photo Check In</th>
                 <th>Check Out</th>
+                <th>Photo Check Out</th>
+                <th>Jenis</th>
+                <th>Type</th>
                 <th>Total Waktu</th>
-                <th>Aksi</th>
+                <th class="col-sticky-action text-center" style="text-align: center;">Aksi</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>1</td>
                 <td>Setiawan</td>
-                <td>2026-05-21</td>
+                <td>2026-10-08</td>
                 <td>18:00</td>
+                <td><button class="btn btn-sm btn-outline-primary" type="button" data-photo-preview="1" data-photo-kind="check-in" data-preview-src="../../media/avatar.png" data-photo-address="Bisa Media MCN" data-photo-note="-" style="padding: 4px 10px; font-size: 11px; font-family: 'Outfit'; font-weight: 500; border-radius: 4px; border: 1px solid rgba(34, 100, 198, 0.4); color: #2264c6; background: rgba(34, 100, 198, 0.04); cursor: pointer;">Lihat Foto</button></td>
                 <td>20:00</td>
+                <td><button class="btn btn-sm btn-outline-primary" type="button" data-photo-preview="1" data-photo-kind="check-out" data-preview-src="../../media/avatar.png" data-photo-address="Bisa Media MCN" data-photo-note="-" style="padding: 4px 10px; font-size: 11px; font-family: 'Outfit'; font-weight: 500; border-radius: 4px; border: 1px solid rgba(34, 100, 198, 0.4); color: #2264c6; background: rgba(34, 100, 198, 0.04); cursor: pointer;">Lihat Foto</button></td>
+                <td>Pengajuan</td>
+                <td>WFH</td>
                 <td>2 Jam</td>
-                <td class="tdActions">
-                  <div class="dropdown bm-action-dropdown">
-                    <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
-                      data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi">
-                      <i class="bx bx-dots-vertical-rounded"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu">
-                      <li>
-                        <button class="dropdown-item" type="button" data-action="view" title="Lihat">
-                          <span class="bm-menu-iconify"><i class="bx bx-show"></i></span>
-                          <span>Lihat</span>
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+                <td class="tdActions text-center col-sticky-action">
+                  <button class="btn-view" type="button" data-action="view" aria-label="Lihat" title="Lihat">
+                    <i class="bx bx-show"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Setiawan</td>
+                <td>2026-10-07</td>
+                <td>19:00</td>
+                <td><button class="btn btn-sm btn-outline-primary" type="button" data-photo-preview="1" data-photo-kind="check-in" data-preview-src="../../media/avatar.png" data-photo-address="Bisa Media MCN" data-photo-note="-" style="padding: 4px 10px; font-size: 11px; font-family: 'Outfit'; font-weight: 500; border-radius: 4px; border: 1px solid rgba(34, 100, 198, 0.4); color: #2264c6; background: rgba(34, 100, 198, 0.04); cursor: pointer;">Lihat Foto</button></td>
+                <td>22:00</td>
+                <td><button class="btn btn-sm btn-outline-primary" type="button" data-photo-preview="1" data-photo-kind="check-out" data-preview-src="../../media/avatar.png" data-photo-address="Bisa Media MCN" data-photo-note="-" style="padding: 4px 10px; font-size: 11px; font-family: 'Outfit'; font-weight: 500; border-radius: 4px; border: 1px solid rgba(34, 100, 198, 0.4); color: #2264c6; background: rgba(34, 100, 198, 0.04); cursor: pointer;">Lihat Foto</button></td>
+                <td>Intruksi</td>
+                <td>WFO</td>
+                <td>3 Jam</td>
+                <td class="tdActions text-center col-sticky-action">
+                  <button class="btn-view" type="button" data-action="view" aria-label="Lihat" title="Lihat">
+                    <i class="bx bx-show"></i>
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -329,7 +440,7 @@
         </div>
       </section>
     </main>
-    <footer class="dashboard-footer"> 2026 Bisa Media</footer>
+    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
   </div>
 
 
@@ -398,6 +509,54 @@
       const btnApplyFilter = document.getElementById('applyStatusFilterBtn');
       const btnResetFilter = document.getElementById('resetFilterBtn');
 
+      function parseDurationToMinutes(str) {
+        if (!str || str === '-') return 0;
+        let totalMinutes = 0;
+        const jamMatch = str.match(/(\d+)\s*jam/i);
+        if (jamMatch) {
+          totalMinutes += parseInt(jamMatch[1]) * 60;
+        }
+        const menitMatch = str.match(/(\d+)\s*menit/i);
+        if (menitMatch) {
+          totalMinutes += parseInt(menitMatch[1]);
+        }
+        return totalMinutes;
+      }
+      
+      function formatMinutesToDuration(totalMinutes) {
+        if (totalMinutes === 0) return '0 Jam';
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        let res = [];
+        if (hours > 0) res.push(hours + ' Jam');
+        if (minutes > 0) res.push(minutes + ' Menit');
+        return res.join(' ');
+      }
+
+      function updateLemburMetrics() {
+        const table = document.getElementById('tblLemburV2');
+        if (!table) return;
+        const rows = table.querySelectorAll('tbody tr');
+        let totalCount = 0;
+        let totalMinutes = 0;
+        
+        rows.forEach(tr => {
+          if (tr.style.display !== 'none') {
+            const tds = tr.querySelectorAll('td');
+            if (tds.length > 9) {
+              totalCount++;
+              const durationStr = tds[9].textContent.trim();
+              totalMinutes += parseDurationToMinutes(durationStr);
+            }
+          }
+        });
+        
+        const elTotal = document.getElementById('ovLemburTotal');
+        const elHours = document.getElementById('ovLemburHours');
+        if (elTotal) elTotal.textContent = totalCount;
+        if (elHours) elHours.textContent = formatMinutesToDuration(totalMinutes);
+      }
+
       function filterLemburTable() {
         const valIn = selIn ? selIn.value : 'Semua';
         const valOut = selOut ? selOut.value : 'Semua';
@@ -409,7 +568,7 @@
           const tds = tr.querySelectorAll('td');
           if (tds.length < 6) continue;
           const checkIn = tds[3].textContent.trim();
-          const checkOut = tds[4].textContent.trim();
+          const checkOut = tds[5].textContent.trim();
           
           let matchIn = true;
           if (valIn === 'Sudah Check In') {
@@ -440,6 +599,7 @@
             tdFirst.textContent = String(n++);
           }
         }
+        updateLemburMetrics();
       }
 
       function resetLemburTableFilter() {
@@ -500,6 +660,7 @@
           exportTableToCSV('tblLemburV2', 'data_absensi_lembur.csv');
         });
       }
+      updateLemburMetrics();
     });
   </script>
   <script src="../staffkol_layout.js"></script>

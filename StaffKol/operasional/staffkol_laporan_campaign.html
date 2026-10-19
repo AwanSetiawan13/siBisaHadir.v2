@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Campaign | Staff KOL - Bisa Media</title>
+  <link rel="stylesheet" href="../../style.css" />
+  <!-- Boxicons for action icons -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
+    rel="stylesheet" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    .col-sticky-action {
+      position: sticky !important;
+      right: 0;
+      z-index: 10;
+      background-color: #ffffff;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.03);
+      border-left: 1px solid #e2e8f0 !important;
+    }
+
+    th.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .status-badge--success {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+
+    .status-badge--warning {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+
+    .status-badge--danger {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+
+    /* ===== Search Bar Styling (Sama Persis dengan Data Kreator) ===== */
+    .dashboard-body .campaign-search.campaign-search-bar {
+      display: inline-flex !important;
+      align-items: center !important;
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 8px !important;
+      padding: 0 10px !important;
+      height: 38px !important;
+      width: 320px !important;
+      transition: all 0.2s ease-in-out !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+      position: relative !important;
+      cursor: text !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:hover {
+      border-color: #94a3b8 !important;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within {
+      width: 360px !important;
+      border-color: #29A3D8 !important;
+      box-shadow: 0 0 0 3px rgba(41, 163, 216, 0.16), 0 2px 4px rgba(41, 163, 216, 0.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__icon {
+      width: 16px !important;
+      height: 16px !important;
+      min-width: 16px !important;
+      min-height: 16px !important;
+      max-width: 16px !important;
+      max-height: 16px !important;
+      color: #64748b !important;
+      stroke: #64748b !important;
+      stroke-width: 2.2 !important;
+      fill: none !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 8px 0 2px !important;
+      box-sizing: content-box !important;
+      transition: all 0.2s ease !important;
+      pointer-events: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within .campaign-search-bar__icon {
+      color: #29A3D8 !important;
+      stroke: #29A3D8 !important;
+      transform: scale(1.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input {
+      flex: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #1e293b !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input::placeholder {
+      color: #94a3b8 !important;
+      font-weight: 400 !important;
+      font-size: 13px !important;
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear {
+      width: 17px !important;
+      height: 17px !important;
+      border: none !important;
+      background: #e2e8f0 !important;
+      border-radius: 50% !important;
+      color: #475569 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin-left: 6px !important;
+      flex-shrink: 0 !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear:hover {
+      background: #cbd5e1 !important;
+      color: #0f172a !important;
+      transform: scale(1.1) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear svg {
+      width: 9px !important;
+      height: 9px !important;
+      min-width: 9px !important;
+      min-height: 9px !important;
+      stroke-width: 2.8 !important;
+      stroke: currentColor !important;
+      fill: none !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Action View Button (Icon Mata Standar Bisa Media) */
+    .btn-view {
+      background: rgba(41, 163, 216, 0.08);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      color: #29A3D8;
+    }
+
+    .btn-view:hover {
+      background-color: #29A3D8;
+      color: #ffffff;
+      border-color: #29A3D8;
+      box-shadow: 0 2px 6px rgba(41, 163, 216, 0.25);
+    }
+
+    .btn-view i {
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* Modal Detail View */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+      padding: 20px;
+    }
+
+    .modal-overlay.is-active {
+      display: flex;
+    }
+
+    .report-modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 820px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16);
+      display: flex;
+      flex-direction: column;
+      font-family: 'Outfit', sans-serif;
+      padding: 24px;
+    }
+
+    .report-stat-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .report-detail-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .report-detail-val {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1e293b;
+      word-break: break-word;
+    }
+
+    .live-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #ef4444;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 2px 7px;
+      border-radius: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulseLive 1.4s infinite;
+    }
+
+    @keyframes pulseLive {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .table-wrap th,
+    .table-wrap td {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      .report-detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <!-- Dynamic Sidebar Hook -->
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna"
+            aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Staff KOL</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Laporan Campaign</h1>
+      </div>
+
+
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterReport" class="small-action-button" type="button" aria-label="Filter">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <!-- Dropdown Content Popover -->
+              <div id="filterReportDropdown" class="filter-popover">
+                <form id="filterReportForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">Kreator</label>
+                    <div class="select-wrapper">
+                      <select id="filterKreatorSelect" class="form-select">
+                        <option value="">Semua Kreator</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Rentang GMV</label>
+                    <div class="select-wrapper">
+                      <select id="filterGmvSelect" class="form-select">
+                        <option value="">Semua GMV</option>
+                        <option value="high">> Rp 30.000.000</option>
+                        <option value="medium">Rp 15.000.000 - Rp 30.000.000</option>
+                        <option value="low">< Rp 15.000.000</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+                    <button type="reset" id="btnResetFilter" class="btn-reset"
+                      style="background-color: #f44336; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px;">Reset</button>
+                    <button type="submit" class="btn-simpan"
+                      style="background-color: #2264c6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px; margin: 0;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Real-time Search Input (Sama dengan Data Kreator) -->
+            <div class="campaign-search campaign-search-bar" id="campaignSearchBar">
+              <svg class="campaign-search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="searchReportInput" class="campaign-search-bar__input" placeholder="Cari Kreator, ID LIVE, Judul LIVE..." autocomplete="off" />
+              <button type="button" id="clearSearchReportBtn" class="campaign-search-bar__clear" title="Hapus pencarian" aria-label="Hapus pencarian" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="campaign-toolbar__right"></div>
+        </div>
+
+        <div class="table-wrap campaign-table" id="tableContainerWrapper" style="overflow-x: auto;">
+          <table id="tblStaffLaporanCampaign">
+            <thead>
+              <tr>
+                <th style="width: 50px;">ID</th>
+                <th>Kreator</th>
+                <th>ID LIVE</th>
+                <th>LIVE</th>
+                <th>Waktu mulai</th>
+                <th>GMV dari kreator</th>
+                <th>GMV Langsung</th>
+                <th>Produk yang terjual dari kreator</th>
+                <th>Penonton</th>
+                <th>GPM Sesi</th>
+                <th>Rasio ketuk-tayang</th>
+                <th>Pesanan SKU dari kreator</th>
+                <th>Pembeli</th>
+                <th>Durasi</th>
+                <th>Tayangan</th>
+                <th>Komentar</th>
+                <th>Dibagikan</th>
+                <th>Suka</th>
+                <th>Harga rata-rata</th>
+                <th class="text-center col-sticky-action" style="text-align: center; width: 70px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody">
+              <!-- Dynamically Populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+  </div>
+
+  <!-- Modal Detail Laporan Campaign (Sesi LIVE) -->
+  <div id="modalDetailReport" class="modal-overlay">
+    <div class="report-modal-box">
+      <!-- Modal Header -->
+      <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px;">
+        <h2 class="modal-title" style="margin: 0; font-size: 19px; font-weight: 700; color: #0f172a; font-family: 'Outfit', sans-serif;">
+          Lihat <span style="font-weight: 900; font-style: italic; color: #29A3D8;">LAPORAN CAMPAIGN</span>
+        </h2>
+        <button class="modal-close-boxed" id="closeDetailModalBtn" type="button" aria-label="Tutup popup"
+          style="background: #f1f5f9; border: none; font-size: 20px; line-height: 1; width: 32px; height: 32px; border-radius: 8px; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease;"
+          onmouseover="this.style.background='#e2e8f0';this.style.color='#0f172a';"
+          onmouseout="this.style.background='#f1f5f9';this.style.color='#64748b';">&times;</button>
+      </div>
+      <div class="modal-divider" style="height: 1px; background: #e2e8f0; margin-bottom: 18px;"></div>
+
+      <div class="report-modal-body" style="display: flex; flex-direction: column; gap: 18px; padding: 0;">
+        <!-- Live Header Summary Card -->
+        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <h3 id="modalLiveTitle" style="margin: 0; font-size: 16.5px; font-weight: 700; color: #0f172a; line-height: 1.35;">-</h3>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #64748b; flex-shrink: 0;">
+              <i class="bx bx-calendar" style="color: #29A3D8; font-size: 15px;"></i>
+              <span>Mulai: <strong id="modalWaktuMulai" style="color: #0f172a;">-</strong></span>
+            </div>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span style="font-size: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 3px 8px; color: #64748b;">
+                ID LIVE: <strong id="modalLiveId" style="color: #0f172a;">-</strong>
+              </span>
+              <span style="font-size: 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 3px 8px; color: #64748b;">
+                <i class="bx bx-user" style="color: #29A3D8; margin-right: 3px;"></i>Kreator: <strong id="modalKreatorNama" style="color: #0f172a;">-</strong>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Standar Form Grid (Sesuai Fitur-Fitur Lain) -->
+        <div class="modal-form-grid" style="margin-top: 4px;">
+          <!-- Section 1: Ringkasan Pendapatan (GMV) -->
+          <div class="form-group span-6" style="margin-bottom: -4px;">
+            <span style="font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+              <span>Ringkasan Pendapatan (GMV)</span>
+              <span style="flex: 1; height: 1px; background: #e2e8f0;"></span>
+            </span>
+          </div>
+
+          <div class="form-group span-3">
+            <label class="form-label">GMV dari Kreator</label>
+            <input type="text" id="modalGmvKreator" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-weight: 600; color: #15803d;" />
+          </div>
+          <div class="form-group span-3">
+            <label class="form-label">GMV Langsung</label>
+            <input type="text" id="modalGmvLangsung" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-weight: 600; color: #0284c7;" />
+          </div>
+
+          <div class="form-group span-3">
+            <label class="form-label">GPM Sesi</label>
+            <input type="text" id="modalGpmSesi" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-weight: 600; color: #d97706;" />
+          </div>
+          <div class="form-group span-3">
+            <label class="form-label">Harga Rata-Rata</label>
+            <input type="text" id="modalHargaRataRata" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-weight: 600;" />
+          </div>
+
+          <!-- Section 2: Metrik Penjualan & Konversi -->
+          <div class="form-group span-6" style="margin-top: 6px; margin-bottom: -4px;">
+            <span style="font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+              <span>Metrik Penjualan & Konversi</span>
+              <span style="flex: 1; height: 1px; background: #e2e8f0;"></span>
+            </span>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label">Produk Terjual</label>
+            <input type="text" id="modalProdukTerjual" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Pesanan SKU</label>
+            <input type="text" id="modalPesananSku" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Pembeli</label>
+            <input type="text" id="modalPembeli" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+
+          <div class="form-group span-3">
+            <label class="form-label">Rasio Ketuk-Tayang (CTR)</label>
+            <input type="text" id="modalCtr" class="form-input" readonly style="background-color: #f8fafc; cursor: default; font-weight: 600; color: #7c3aed;" />
+          </div>
+          <div class="form-group span-3">
+            <label class="form-label">Durasi LIVE</label>
+            <input type="text" id="modalDurasi" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+
+          <!-- Section 3: Traffic & Interaksi Audiens -->
+          <div class="form-group span-6" style="margin-top: 6px; margin-bottom: -4px;">
+            <span style="font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+              <span>Traffic & Interaksi Audiens</span>
+              <span style="flex: 1; height: 1px; background: #e2e8f0;"></span>
+            </span>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label">Penonton</label>
+            <input type="text" id="modalPenonton" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Tayangan</label>
+            <input type="text" id="modalTayangan" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+          <div class="form-group span-2">
+            <label class="form-label">Komentar</label>
+            <input type="text" id="modalKomentar" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+
+          <div class="form-group span-3">
+            <label class="form-label">Dibagikan</label>
+            <input type="text" id="modalDibagikan" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+          <div class="form-group span-3">
+            <label class="form-label">Suka</label>
+            <input type="text" id="modalSuka" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" style="padding-top: 14px; margin-top: 18px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+        <button type="button" id="btnDismissDetailModal" class="btn-cancel"
+          style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;"
+          onmouseover="this.style.background='#29A3D8';this.style.color='#fff';"
+          onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../script.js"></script>
+  <script src="../staffkol_layout.js"></script>
+  <script src="../../sidebar_engine.js?v=999"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // Seed data report campaign live TikTok Shop
+      const REPORT_LIVE_DATA = [
+        {
+          id: 1,
+          kreatorNama: "Aura Cantika",
+          kreatorUser: "@aura.beauty",
+          kreatorFoto: "../../media/avatar.png",
+          idLive: "74291823901928312",
+          liveTitle: "MEGA RAMADHAN HIJAB SPECIAL DISKON 50%",
+          waktuMulai: "14/10/2026 19:30",
+          gmvKreator: 48750000,
+          gmvLangsung: 42100000,
+          produkTerjual: 865,
+          penonton: 28400,
+          gpmSesi: 1716549,
+          rasioKetukTayang: 14.8,
+          pesananSku: 920,
+          pembeli: 785,
+          durasi: "03:15:20",
+          tayangan: 94200,
+          komentar: 4520,
+          dibagikan: 1840,
+          suka: 65400,
+          hargaRataRata: 56358
+        },
+        {
+          id: 2,
+          kreatorNama: "Clarissa Putri",
+          kreatorUser: "@clarissa.style",
+          kreatorFoto: "../../media/avatar.png",
+          idLive: "74288129301924151",
+          liveTitle: "GLOWING MALAM BERSAMA BISA GLOW SKINCARE",
+          waktuMulai: "13/10/2026 20:00",
+          gmvKreator: 36420000,
+          gmvLangsung: 31800000,
+          produkTerjual: 485,
+          penonton: 19800,
+          gpmSesi: 1839393,
+          rasioKetukTayang: 16.2,
+          pesananSku: 520,
+          pembeli: 440,
+          durasi: "02:40:12",
+          tayangan: 62500,
+          komentar: 2980,
+          dibagikan: 920,
+          suka: 48200,
+          hargaRataRata: 75092
+        },
+        {
+          id: 3,
+          kreatorNama: "Nabila Syakieb",
+          kreatorUser: "@nabila.hijab",
+          kreatorFoto: "../../media/avatar.png",
+          idLive: "74276192837192019",
+          liveTitle: "FLASH SALE HIJAB BERGO INSTAN SERBA 25RB",
+          waktuMulai: "12/10/2026 14:00",
+          gmvKreator: 25300000,
+          gmvLangsung: 21650000,
+          produkTerjual: 680,
+          penonton: 15600,
+          gpmSesi: 1621794,
+          rasioKetukTayang: 13.5,
+          pesananSku: 710,
+          pembeli: 590,
+          durasi: "02:10:45",
+          tayangan: 48900,
+          komentar: 1850,
+          dibagikan: 670,
+          suka: 33100,
+          hargaRataRata: 37205
+        },
+        {
+          id: 4,
+          kreatorNama: "Riva Pratama",
+          kreatorUser: "@riva.official",
+          kreatorFoto: "../../media/avatar.png",
+          idLive: "74265412984719283",
+          liveTitle: "PASHMINA SILK & OUTFIT KULIAH CASUAL",
+          waktuMulai: "11/10/2026 16:30",
+          gmvKreator: 19850000,
+          gmvLangsung: 17400000,
+          produkTerjual: 390,
+          penonton: 12300,
+          gpmSesi: 1613821,
+          rasioKetukTayang: 11.9,
+          pesananSku: 415,
+          pembeli: 365,
+          durasi: "01:55:00",
+          tayangan: 39400,
+          komentar: 1420,
+          dibagikan: 510,
+          suka: 24800,
+          hargaRataRata: 50897
+        },
+        {
+          id: 5,
+          kreatorNama: "Chef Arnoldi",
+          kreatorUser: "@arnoldi.food",
+          kreatorFoto: "../../media/avatar.png",
+          idLive: "74251298471928374",
+          liveTitle: "MUKBANG SNACK SEHAT & PROMO BUNDLE 10.10",
+          waktuMulai: "10/10/2026 19:00",
+          gmvKreator: 16200000,
+          gmvLangsung: 14100000,
+          produkTerjual: 520,
+          penonton: 14200,
+          gpmSesi: 1140845,
+          rasioKetukTayang: 10.4,
+          pesananSku: 545,
+          pembeli: 480,
+          durasi: "02:25:30",
+          tayangan: 44800,
+          komentar: 2150,
+          dibagikan: 890,
+          suka: 31200,
+          hargaRataRata: 31153
+        },
+        {
+          id: 6,
+          kreatorNama: "Mama Gigi",
+          kreatorUser: "@gigikids.daily",
+          kreatorFoto: "../../media/avatar.png",
+          idLive: "74249817293817294",
+          liveTitle: "LAUNCHING BAJU ORGANIK BAYI & BALITA",
+          waktuMulai: "09/10/2026 10:00",
+          gmvKreator: 28900000,
+          gmvLangsung: 26350000,
+          produkTerjual: 410,
+          penonton: 16800,
+          gpmSesi: 1720238,
+          rasioKetukTayang: 15.1,
+          pesananSku: 435,
+          pembeli: 385,
+          durasi: "02:30:15",
+          tayangan: 51200,
+          komentar: 2640,
+          dibagikan: 1050,
+          suka: 39500,
+          hargaRataRata: 70487
+        }
+      ];
+
+      function formatRupiah(num) {
+        if (isNaN(num)) return "Rp 0";
+        return "Rp " + Math.round(num).toLocaleString('id-ID');
+      }
+
+      function formatNumber(num) {
+        if (isNaN(num)) return "0";
+        return Math.round(num).toLocaleString('id-ID');
+      }
+
+      const tbody = document.getElementById("reportTableBody");
+      const searchInput = document.getElementById("searchReportInput");
+      const clearSearchBtn = document.getElementById("clearSearchReportBtn");
+      const filterKreatorSelect = document.getElementById("filterKreatorSelect");
+      const filterGmvSelect = document.getElementById("filterGmvSelect");
+
+      // Populate filter dropdowns
+      if (filterKreatorSelect) {
+        const uniqueKreators = Array.from(new Set(REPORT_LIVE_DATA.map(d => d.kreatorNama)));
+        uniqueKreators.forEach(k => {
+          const opt = document.createElement("option");
+          opt.value = k;
+          opt.textContent = k;
+          filterKreatorSelect.appendChild(opt);
+        });
+      }
+
+      // Update Metric Values (Label tetap dikosongkan)
+      function updateMetrics(list) {
+        const totalGmv = list.reduce((acc, curr) => acc + curr.gmvKreator, 0);
+        const totalProduk = list.reduce((acc, curr) => acc + curr.produkTerjual, 0);
+        const totalPenonton = list.reduce((acc, curr) => acc + curr.penonton, 0);
+
+        const el1 = document.getElementById("metricLaporan1");
+        const el2 = document.getElementById("metricLaporan2");
+        const el3 = document.getElementById("metricLaporan3");
+
+        if (el1) el1.textContent = formatRupiah(totalGmv);
+        if (el2) el2.textContent = formatNumber(totalProduk);
+        if (el3) el3.textContent = formatNumber(totalPenonton);
+      }
+
+      function renderTable() {
+        if (!tbody) return;
+        const q = (searchInput?.value || "").toLowerCase().trim();
+        const selKreator = (filterKreatorSelect?.value || "").toLowerCase().trim();
+        const selGmv = filterGmvSelect?.value || "";
+
+        const filtered = REPORT_LIVE_DATA.filter(item => {
+          // Search query match
+          const matchQuery = !q ||
+            item.kreatorNama.toLowerCase().includes(q) ||
+            item.kreatorUser.toLowerCase().includes(q) ||
+            item.idLive.toLowerCase().includes(q) ||
+            item.liveTitle.toLowerCase().includes(q);
+
+          // Kreator filter match
+          const matchKreator = !selKreator || item.kreatorNama.toLowerCase() === selKreator;
+
+          // GMV filter match
+          let matchGmv = true;
+          if (selGmv === "high") matchGmv = item.gmvKreator > 30000000;
+          else if (selGmv === "medium") matchGmv = item.gmvKreator >= 15000000 && item.gmvKreator <= 30000000;
+          else if (selGmv === "low") matchGmv = item.gmvKreator < 15000000;
+
+          return matchQuery && matchKreator && matchGmv;
+        });
+
+        updateMetrics(filtered);
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="20" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ada data laporan campaign yang sesuai dengan pencarian atau filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(item => {
+          return `
+            <tr>
+              <td style="font-weight: 600; color: #64748b;">${item.id}</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 9px;">
+                  <img src="${item.kreatorFoto}" alt="${item.kreatorNama}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0;" />
+                  <div>
+                    <strong style="color: #0f172a; display: block; font-size: 13px;">${item.kreatorNama}</strong>
+                    <span style="font-size: 11.5px; color: #64748b;">${item.kreatorUser}</span>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-family: monospace; font-size: 12px; font-weight: 600; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">${item.idLive}</span></td>
+              <td><span style="font-weight: 600; color: #1e293b; max-width: 200px; display: inline-block; overflow: hidden; text-overflow: ellipsis; vertical-align: middle;" title="${item.liveTitle}">${item.liveTitle}</span></td>
+              <td style="color: #64748b; font-size: 12.5px;">${item.waktuMulai}</td>
+              <td style="font-weight: 700; color: #16a34a;">${formatRupiah(item.gmvKreator)}</td>
+              <td style="font-weight: 600; color: #0284c7;">${formatRupiah(item.gmvLangsung)}</td>
+              <td style="text-align: right; font-weight: 600;">${formatNumber(item.produkTerjual)}</td>
+              <td style="text-align: right;">${formatNumber(item.penonton)}</td>
+              <td style="font-weight: 600; color: #d97706;">${formatRupiah(item.gpmSesi)}</td>
+              <td style="text-align: right; font-weight: 600; color: #9333ea;">${item.rasioKetukTayang}%</td>
+              <td style="text-align: right;">${formatNumber(item.pesananSku)}</td>
+              <td style="text-align: right;">${formatNumber(item.pembeli)}</td>
+              <td style="color: #64748b;"><i class="bx bx-time-five" style="vertical-align: middle; margin-right: 3px;"></i>${item.durasi}</td>
+              <td style="text-align: right;">${formatNumber(item.tayangan)}</td>
+              <td style="text-align: right;">${formatNumber(item.komentar)}</td>
+              <td style="text-align: right;">${formatNumber(item.dibagikan)}</td>
+              <td style="text-align: right;">${formatNumber(item.suka)}</td>
+              <td style="font-weight: 600;">${formatRupiah(item.hargaRataRata)}</td>
+              <td class="text-center col-sticky-action">
+                <button type="button" class="btn-view" data-id="${item.id}" title="Lihat Detail Sesi">
+                  <i class="bx bx-show"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        // Attach action button listeners
+        tbody.querySelectorAll(".btn-view").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const id = parseInt(btn.getAttribute("data-id"), 10);
+            openDetailModal(id);
+          });
+        });
+      }
+
+      function setFieldValue(id, val) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if ('value' in el) el.value = val;
+        el.textContent = val;
+      }
+
+      function openDetailModal(id) {
+        const item = REPORT_LIVE_DATA.find(d => d.id === id);
+        if (!item) return;
+
+        setFieldValue("modalLiveTitle", item.liveTitle);
+        setFieldValue("modalLiveId", item.idLive);
+        setFieldValue("modalWaktuMulai", item.waktuMulai);
+        setFieldValue("modalKreatorNama", `${item.kreatorNama} (${item.kreatorUser})`);
+        setFieldValue("modalGmvKreator", formatRupiah(item.gmvKreator));
+        setFieldValue("modalGmvLangsung", formatRupiah(item.gmvLangsung));
+        setFieldValue("modalProdukTerjual", `${formatNumber(item.produkTerjual)} pcs`);
+        setFieldValue("modalPenonton", `${formatNumber(item.penonton)} views`);
+        setFieldValue("modalGpmSesi", formatRupiah(item.gpmSesi));
+        setFieldValue("modalCtr", `${item.rasioKetukTayang}%`);
+        setFieldValue("modalPesananSku", `${formatNumber(item.pesananSku)} pesanan`);
+        setFieldValue("modalPembeli", `${formatNumber(item.pembeli)} pembeli`);
+        setFieldValue("modalDurasi", item.durasi);
+        setFieldValue("modalTayangan", `${formatNumber(item.tayangan)} tayangan`);
+        setFieldValue("modalHargaRataRata", formatRupiah(item.hargaRataRata));
+        setFieldValue("modalKomentar", formatNumber(item.komentar));
+        setFieldValue("modalDibagikan", formatNumber(item.dibagikan));
+        setFieldValue("modalSuka", formatNumber(item.suka));
+
+        const modal = document.getElementById("modalDetailReport");
+        if (modal) modal.classList.add("is-active");
+      }
+
+      function closeDetailModal() {
+        const modal = document.getElementById("modalDetailReport");
+        if (modal) modal.classList.remove("is-active");
+      }
+
+      document.getElementById("closeDetailModalBtn")?.addEventListener("click", closeDetailModal);
+      document.getElementById("btnDismissDetailModal")?.addEventListener("click", closeDetailModal);
+      document.getElementById("modalDetailReport")?.addEventListener("click", (e) => {
+        if (e.target.id === "modalDetailReport") closeDetailModal();
+      });
+
+      // Filter events
+      const btnFilterReport = document.getElementById("btnFilterReport");
+      const filterReportDropdown = document.getElementById("filterReportDropdown");
+      const filterReportForm = document.getElementById("filterReportForm");
+
+      if (btnFilterReport && filterReportDropdown) {
+        btnFilterReport.addEventListener("click", (e) => {
+          e.stopPropagation();
+          filterReportDropdown.classList.toggle("is-open");
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!filterReportDropdown.contains(e.target) && e.target !== btnFilterReport) {
+            filterReportDropdown.classList.remove("is-open");
+          }
+        });
+      }
+
+      if (filterReportForm) {
+        filterReportForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          if (filterReportDropdown) filterReportDropdown.classList.remove("is-open");
+          renderTable();
+        });
+
+        document.getElementById("btnResetFilter")?.addEventListener("click", () => {
+          filterReportForm.reset();
+          if (filterReportDropdown) filterReportDropdown.classList.remove("is-open");
+          setTimeout(renderTable, 50);
+        });
+      }
+
+      // Search events
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          const val = e.target.value.trim();
+          if (clearSearchBtn) {
+            clearSearchBtn.style.display = val.length > 0 ? "inline-flex" : "none";
+          }
+          renderTable();
+        });
+      }
+
+      if (clearSearchBtn && searchInput) {
+        clearSearchBtn.addEventListener("click", () => {
+          searchInput.value = "";
+          clearSearchBtn.style.display = "none";
+          renderTable();
+          searchInput.focus();
+        });
+      }
+
+      // Initial Render
+      renderTable();
+    })();
+  </script>
+</body>
+
+</html>

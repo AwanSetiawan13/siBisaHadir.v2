@@ -14,6 +14,34 @@
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
+    /* Actions style for eye/view icon */
+    .btn-view {
+      background: rgba(41, 163, 216, 0.08);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      color: #29A3D8;
+    }
+    .btn-view:hover {
+      background-color: #29A3D8;
+      color: #ffffff;
+      border-color: #29A3D8;
+      box-shadow: 0 2px 6px rgba(41, 163, 216, 0.25);
+    }
+    .btn-view i {
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .col-sticky-action { position: sticky !important; right: 0; z-index: 10; background-color: #ffffff; box-shadow: -2px 0 5px rgba(0,0,0,0.03); border-left: 1px solid #e2e8f0 !important; }
+    th.col-sticky-action { background-color: #f8fafc !important; }
+    tr:hover td.col-sticky-action { background-color: #f8fafc !important; }
     .status-badge {
       display: inline-block;
       padding: 4px 10px;
@@ -698,7 +726,7 @@
                 <circle cx="11" cy="11" r="7"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="text" id="searchKreatorInput" class="campaign-search-bar__input" placeholder="Cari Kreator, Username, Kategori..." autocomplete="off" />
+              <input type="text" id="searchKreatorInput" class="campaign-search-bar__input" placeholder="Cari UID, Username, Nama, Kategori, Level, Keaktifan..." autocomplete="off" />
               <button type="button" id="clearSearchKreatorBtn" class="campaign-search-bar__clear" title="Hapus pencarian" aria-label="Hapus pencarian" style="display: none;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -741,9 +769,10 @@
                 <th>UID</th>
                 <th>Username</th>
                 <th>Nama Kreator</th>
-                <th>Kategori Produk</th>
-                <th>Masa Kontrak</th>
-                <th class="text-center" style="text-align: center; width: 100px;">Aksi</th>
+                <th>Kategori</th>
+                <th>Level Kreator</th>
+                <th>Keaktifan</th>
+                <th class="text-center col-sticky-action" style="text-align: center; width: 100px;">Aksi</th>
               </tr>
             </thead>
             <tbody id="trackingTableBody"></tbody>
@@ -1368,7 +1397,7 @@
         if (filtered.length === 0) {
           trackingTableBody.innerHTML = `
             <tr>
-              <td colspan="7" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+              <td colspan="8" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
                 Tidak ditemukan data Tracking Kreator yang sesuai dengan pencarian atau filter.
               </td>
             </tr>
@@ -1410,6 +1439,15 @@
             `;
           }
 
+          const perf = getCreatorPerformance(item);
+          const levelInfo = getCreatorLevelFromMaster(item, perf);
+          const levelName = levelInfo.nama || item.level || "New Growth";
+          const aktStatus = getCreatorActivityStatus(item);
+
+          const levelHtml = `<span style="color: #334155; font-weight: 500;">${levelName}</span>`;
+
+          const keaktifanHtml = `<span style="color: #334155; font-weight: 500;">${aktStatus}</span>`;
+
           row.innerHTML = `
             <td>${index + 1}</td>
             <td style="font-weight: 600; color: #1e293b;">${item.uid || "-"}</td>
@@ -1436,11 +1474,11 @@
             </td>
             <td>${item.nama || item.name || "-"}</td>
             <td>${kategoriHtml}</td>
-            <td>${item.masaKontrak || "-"}</td>
-            <td class="tdActions text-center" style="text-align: center;">
-              <button type="button" class="btn-action-view btn-act-view" data-id="${item.id}" title="Lihat Tracking Kreator">
-                <i class="bx bx-show" style="font-size: 15px;"></i>
-                <span>Lihat</span>
+            <td>${levelHtml}</td>
+            <td>${keaktifanHtml}</td>
+            <td class="tdActions text-center col-sticky-action" style="text-align: center;">
+              <button type="button" class="btn-view btn-act-view" data-id="${item.id}" aria-label="Lihat" title="Lihat Tracking Kreator">
+                <i class="bx bx-show"></i>
               </button>
             </td>
           `;
