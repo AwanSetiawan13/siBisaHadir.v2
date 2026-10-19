@@ -5,10 +5,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | Staff KOL - Bisa Media</title>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../style.css" />
   <link rel="icon" type="image/png" href="../media/logo.png" />
-      <style>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
     /* Styling for Kehadiran Hari Ini Widget (Bigger font sizes) */
     .db-attendance-stats {
       display: grid;
@@ -28,14 +28,14 @@
       margin-bottom: 4px;
     }
     .db-att-label {
-      font-size: 15px;
+      font-size: 15px; /* enlarged from 13px */
       font-weight: 600;
       color: #333;
     }
     .db-att-count {
       color: #8c8c8c;
       font-weight: 600;
-      font-size: 13.5px;
+      font-size: 13.5px; /* enlarged from 11px */
     }
     .db-att-bar {
       height: 5px;
@@ -52,9 +52,57 @@
         <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
-            <header class="topbar hirezy-topbar"></header>
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <i data-lucide="search" class="topbar-search-icon" style="width: 20px; height: 20px;"></i>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <i data-lucide="bell" class="topbar-action-icon" style="width: 20px; height: 20px;"></i>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+            <img src="../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Supervisi KOL</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <i data-lucide="home" class="user-menu-dropdown__icon" style="width: 19px; height: 19px;"></i>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <i data-lucide="log-out" class="user-menu-dropdown__icon" style="width: 19px; height: 19px;"></i>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
 
     <main class="dashboard-content">
+
       <!-- ===== Welcome Banner ===== -->
       <div class="db-welcome-img-container">
         <img class="db-welcome-img" src="../media/work_can_be_fun.png" alt="Work Can Be Fun" />
@@ -68,112 +116,41 @@
           <div class="db-metrics-grid">
             <div class="db-metric-card">
               <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
-                  <circle cx="8.5" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"></path>
-                </svg>
+                <i data-lucide="users" style="width: 28px; height: 28px; stroke: #fff;"></i>
               </div>
               <div class="db-metric-info">
                 <span class="db-metric-label">Tim KOL</span>
-                <strong class="db-metric-value">0</strong>
+                <strong class="db-metric-value" id="metricTimKol">0</strong>
               </div>
             </div>
 
             <div class="db-metric-card">
               <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"></path>
-                </svg>
+                <i data-lucide="user-check" style="width: 28px; height: 28px; stroke: #fff;"></i>
               </div>
               <div class="db-metric-info">
-                <span class="db-metric-label">Karyawan</span>
-                <strong class="db-metric-value">0</strong>
+                <span class="db-metric-label">Total Kreator</span>
+                <strong class="db-metric-value" id="metricTotalKreator">2</strong>
               </div>
             </div>
 
             <div class="db-metric-card">
               <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path>
-                  <circle cx="8.5" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"></path>
-                </svg>
+                <i data-lucide="megaphone" style="width: 28px; height: 28px; stroke: #fff;"></i>
               </div>
               <div class="db-metric-info">
-                <span class="db-metric-label">Kreator</span>
-                <strong class="db-metric-value">0</strong>
+                <span class="db-metric-label">Total Campaign</span>
+                <strong class="db-metric-value" id="metricTotalCampaign">2</strong>
               </div>
             </div>
 
             <div class="db-metric-card">
               <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 19V5"></path>
-                  <path d="M4 19h16"></path>
-                  <path d="M7 15l4-4 3 2 5-6"></path>
-                </svg>
+                <i data-lucide="tag" style="width: 28px; height: 28px; stroke: #fff;"></i>
               </div>
               <div class="db-metric-info">
-                <span class="db-metric-label">Campaign</span>
-                <strong class="db-metric-value">0</strong>
-              </div>
-            </div>
-
-            <div class="db-metric-card">
-              <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                  <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"></path>
-                </svg>
-              </div>
-              <div class="db-metric-info">
-                <span class="db-metric-label">Project</span>
-                <strong class="db-metric-value">0</strong>
-              </div>
-            </div>
-
-            <div class="db-metric-card">
-              <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-              </div>
-              <div class="db-metric-info">
-                <span class="db-metric-label">Laporan</span>
-                <strong class="db-metric-value">0</strong>
-              </div>
-            </div>
-
-            <div class="db-metric-card">
-              <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path>
-                </svg>
-              </div>
-              <div class="db-metric-info">
-                <span class="db-metric-label">Pengaduan</span>
-                <strong class="db-metric-value">0</strong>
-              </div>
-            </div>
-
-            <div class="db-metric-card">
-              <div class="db-metric-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <circle cx="12" cy="12" r="6"></circle>
-                  <circle cx="12" cy="12" r="2"></circle>
-                </svg>
-              </div>
-              <div class="db-metric-info">
-                <span class="db-metric-label">Target & Capaian</span>
-                <strong class="db-metric-value">0</strong>
+                <span class="db-metric-label">Total Brand</span>
+                <strong class="db-metric-value" id="metricTotalBrand">2</strong>
               </div>
             </div>
           </div>
@@ -185,70 +162,73 @@
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
                   <span class="db-att-label">Hadir</span>
-                  <span class="db-att-count" id="attHadir">10/10</span>
+                  <span class="db-att-count" id="attHadir">0/26</span>
                 </div>
                 <div class="db-att-bar"></div>
               </div>
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
                   <span class="db-att-label">Terlambat</span>
-                  <span class="db-att-count" id="attTerlambat">10</span>
+                  <span class="db-att-count" id="attTerlambat">0</span>
+                </div>
+              </div>
+                            <div class="db-att-stat">
+                <div class="db-att-stat-label-wrap">
+                  <span class="db-att-label">Izin</span>
+                  <span class="db-att-count" id="attIzin">0</span>
                 </div>
               </div>
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
-                  <span class="db-att-label">Izin / Cuti</span>
-                  <span class="db-att-count" id="attIzin">10</span>
-                </div>
-              </div>
-              <div class="db-att-stat">
-                <div class="db-att-stat-label-wrap">
-                  <span class="db-att-label">Tidak Hadir</span>
-                  <span class="db-att-count" id="attTidak">10</span>
+                  <span class="db-att-label">Cuti</span>
+                  <span class="db-att-count" id="attCuti">0</span>
                 </div>
               </div>
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
                   <span class="db-att-label">Lembur</span>
-                  <span class="db-att-count" id="attLembur">10</span>
+                  <span class="db-att-count" id="attLembur">2</span>
+                </div>
+              </div>
+              <div class="db-att-stat">
+                <div class="db-att-stat-label-wrap">
+                  <span class="db-att-label">Tidak Hadir</span>
+                  <span class="db-att-count" id="attTidak">0</span>
                 </div>
               </div>
             </div>
             <hr class="db-att-divider" />
             <div class="db-attendance-table-wrap">
-              <table class="db-attendance-table" data-empty-title="Belum ada data kehadiran">
+              <table class="db-attendance-table">
                 <thead>
                   <tr>
                     <th>#</th>
                     <th>Nama</th>
-                    <th>Sub Perusahaan</th>
-                    <th>Divisi</th>
+                    <th>Tanggal</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
                     <th>Status</th>
-                    <th>Jam Masuk</th>
-                    <th>Jam Keluar</th>
+                    <th>Total Waktu</th>
                   </tr>
                 </thead>
                 <tbody id="attendanceBody">
-                  <tr class="app-empty-table-row db-empty-row">
-                    <td colspan="7">
-                      <div class="app-empty-table-box">
-                        <svg viewBox="0 0 24 24">
-                          <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
-                          <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
-                          <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
-                          <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
-                          <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
-                          <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
-                          <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
-                          <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
-                          <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
-                          <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
-                          <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
-                        </svg>
-                        <div class="app-empty-table-title">Belum ada data kehadiran</div>
-                        <div class="app-empty-table-subtitle">Belum ada data yang tercatat saat ini.</div>
-                      </div>
-                    </td>
+                  <tr>
+                    <td>1</td>
+                    <td style="font-weight: 600; color: #1e293b;">Setiawan</td>
+                    <td>2026-10-08</td>
+                    <td>08:00</td>
+                    <td>17:00</td>
+                    <td><span class="status-badge status-badge--success" style="background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3); padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">Tepat Waktu</span></td>
+                    <td>9 Jam</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td style="font-weight: 600; color: #1e293b;">Setiawan</td>
+                    <td>2026-10-07</td>
+                    <td>08:01</td>
+                    <td>17:00</td>
+                    <td><span class="status-badge status-badge--danger" style="background-color: rgba(255, 82, 82, 0.1); color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.3); padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">Terlambat</span></td>
+                    <td>8 Jam 59 Menit</td>
                   </tr>
                 </tbody>
               </table>
@@ -262,9 +242,13 @@
             <!-- Calendar Sheet -->
             <div class="db-calendar-card">
               <div class="db-calendar-header">
-                <button class="db-cal-nav" id="calPrev" type="button" aria-label="Bulan sebelumnya">◀</button>
+                <button class="db-cal-nav" id="calPrev" type="button" aria-label="Bulan sebelumnya">
+                  <i data-lucide="chevron-left" style="width: 14px; height: 14px; stroke-width: 2.5;"></i>
+                </button>
                 <span class="db-cal-month" id="calMonthLabel">AGUSTUS</span>
-                <button class="db-cal-nav" id="calNext" type="button" aria-label="Bulan berikutnya">▶</button>
+                <button class="db-cal-nav" id="calNext" type="button" aria-label="Bulan berikutnya">
+                  <i data-lucide="chevron-right" style="width: 14px; height: 14px; stroke-width: 2.5;"></i>
+                </button>
               </div>
               <table class="db-calendar-table" id="calendarTable">
                 <thead>
@@ -307,12 +291,7 @@
           <h2>TOP Kreator</h2>
           <div class="db-topk-controls">
             <span class="db-topk-count" style="display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid var(--blue-200); border-radius: 6px; padding: 2px 6px; background: rgba(57,173,217,.05);">
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
-                style="display:inline-block;vertical-align:middle;stroke:var(--blue-500);fill:none;stroke-width:2;">
-                <circle cx="12" cy="12" r="8.5"></circle>
-                <circle cx="12" cy="9" r="2.3"></circle>
-                <path d="M7.8 17c.8-2.2 2.2-3.3 4.2-3.3s3.4 1.1 4.2 3.3"></path>
-              </svg>
+              <i data-lucide="users" style="width: 15px; height: 15px; color: var(--blue-500); flex-shrink: 0;"></i>
               <select id="topKreatorLimitSelect" style="border: none; background: transparent; font-weight: 700; color: var(--blue-700); cursor: pointer; outline: none; font-size: 13px; font-family: 'Outfit'; padding: 0;">
                 <option value="5">5</option>
                 <option value="10">10</option>
@@ -348,25 +327,37 @@
         </div>
       </section>
 
-      <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+      <footer class="dashboard-footer">� 2026 Bisa Media</footer>
     </main>
   </div>
 
-  
-  <!-- Modal PopUp Foto Profil Kreator -->
+    <!-- Modal PopUp Foto Profil Kreator -->
   <div id="creatorAvatarModal" class="modal-overlay" style="z-index: 99999;">
-    <div class="modal-box" style="width: 360px; max-width: 90%; text-align: center; padding: 24px; border-radius: 14px; background: #fff; box-shadow: 0 20px 45px rgba(0,0,0,0.2);">
-      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed #cbd5e1;">
-        <h2 id="creatorAvatarModalTitle" class="modal-title" style="font-size: 16px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif;">Foto Profil Kreator</h2>
-        <button class="modal-close" type="button" aria-label="Tutup" onclick="document.getElementById('creatorAvatarModal').classList.remove('is-active')" style="background: transparent; border: none; font-size: 22px; cursor: pointer; color: #94a3b8;">&times;</button>
+    <div class="modal-box"
+      style="width: 440px; max-width: 90%; text-align: left; padding: 0; border-radius: 8px; background: #fff; box-shadow: 0 20px 45px rgba(0,0,0,0.2); overflow: hidden;">
+
+      <!-- Header -->
+      <div class="modal-header"
+        style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid #e2e8f0;">
+        <h2 id="creatorAvatarModalTitle" class="modal-title"
+          style="font-size: 16px; font-weight: 600; color: #0f172a; font-family: 'Outfit', sans-serif; margin: 0;">Lihat Foto Kreator</h2>
+        <button type="button" onclick="document.getElementById('creatorAvatarModal').classList.remove('is-active')"
+          style="background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; font-family: 'Inter', sans-serif;">Tutup</button>
       </div>
-      <div style="display: flex; justify-content: center; align-items: center; margin: 20px 0;">
-        <img id="creatorAvatarModalImg" src="" alt="Profile" style="width: 170px; height: 170px; border-radius: 50%; object-fit: cover; border: 4px solid #bae6fd; box-shadow: 0 10px 25px rgba(0,0,0,0.12);" />
+
+      <!-- Body -->
+      <div style="padding: 24px;">
+        <div
+          style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 40px 20px; display: flex; justify-content: center; align-items: center; background: #fff; margin-bottom: 16px;">
+          <img id="creatorAvatarModalImg" src="" alt="Profile"
+            style="width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 6px solid #111827;" />
+        </div>
+        <div style="text-align: center;">
+          <span id="creatorAvatarModalName"
+            style="font-size: 14px; font-weight: 500; color: #64748b; font-family: 'Inter', sans-serif;">Foto profil</span>
+        </div>
       </div>
-      <div id="creatorAvatarModalName" style="font-size: 16px; font-weight: 700; color: #0284c7; font-family: 'Outfit', sans-serif; margin-top: 4px;">-</div>
-      <div style="margin-top: 20px;">
-        <button type="button" class="btn-cancel-modal" onclick="document.getElementById('creatorAvatarModal').classList.remove('is-active')" style="background: #29A3D8; color: #fff; border: none; border-radius: 8px; padding: 9px 24px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; font-family: 'Outfit', sans-serif; transition: all 0.15s ease;">Tutup</button>
-      </div>
+
     </div>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -434,37 +425,6 @@
       renderCalendar();
     })();
 
-    window.openCreatorAvatarPopup = function (name, imgSrc) {
-      if (typeof Swal !== "undefined") {
-        Swal.fire({
-          title: "<strong>" + name + "</strong>",
-          html: "<div style='font-size: 13.5px; color: #64748b; margin-top: 4px; font-family: \"Outfit\", sans-serif;'>Foto Profil TOP Kreator</div>",
-          imageUrl: imgSrc,
-          imageWidth: 200,
-          imageHeight: 200,
-          imageAlt: name,
-          showCloseButton: true,
-          confirmButtonText: 'Tutup',
-          confirmButtonColor: '#29A3D8',
-          customClass: {
-            popup: 'swal2-bisa-popup',
-            image: 'swal2-creator-avatar-preview'
-          }
-        });
-      } else {
-        const modal = document.getElementById("creatorAvatarModal");
-        const modalImg = document.getElementById("creatorAvatarModalImg");
-        const modalName = document.getElementById("creatorAvatarModalName");
-        const modalTitle = document.getElementById("creatorAvatarModalTitle");
-        if (modal && modalImg && modalName) {
-          modalImg.src = imgSrc;
-          modalName.textContent = name;
-          if (modalTitle) modalTitle.textContent = "Foto Profil " + name;
-          modal.classList.add("is-active");
-        }
-      }
-    };
-
     /* ===== TOP Kreator Chart (Canvas) & Table Dynamic Rendering ===== */
     (function () {
       const canvas = document.getElementById("topKreatorChart");
@@ -500,23 +460,11 @@
         ]
       };
 
-            const creatorAvatars = {
-        "kreator.top": "../media/avatar.png",
-        "kreator.super": "../media/creator-bima.svg",
-        "kreator.kece": "../media/creator-alya.svg",
-        "kreator.hits": "../media/creator-caca.svg",
-        "kreator.cantik": "../media/creator-alya.svg",
-        "kreator.ganteng": "../media/creator-bima.svg",
-        "kreator.style": "../media/creator-caca.svg",
-        "kreator.vlog": "../media/avatar.png",
-        "kreator.game": "../media/creator-bima.svg",
-        "kreator.baru": "../media/creator-alya.svg"
-      };
-
       const tableBody = document.getElementById("topKreatorBody");
       const periodSelect = document.getElementById("topKreatorPeriodSelect");
       const limitSelect = document.getElementById("topKreatorLimitSelect");
 
+      // Specific trend data for each creator
       const creatorTrends = {
         "kreator.top": {
           "Bulan": [45, 50, 58, 62, 55, 68, 75, 80, 78, 85, 90, 95],
@@ -560,14 +508,42 @@
         }
       };
 
-      let selectedCreator = null;
+            let selectedCreator = null;
+
+      const creatorAvatars = {
+        "kreator.top": "../media/avatar.png",
+        "kreator.super": "../media/creator-bima.svg",
+        "kreator.kece": "../media/creator-alya.svg",
+        "kreator.hits": "../media/creator-caca.svg",
+        "kreator.cantik": "../media/creator-alya.svg",
+        "kreator.ganteng": "../media/creator-bima.svg",
+        "kreator.style": "../media/creator-caca.svg",
+        "kreator.vlog": "../media/avatar.png",
+        "kreator.game": "../media/creator-bima.svg",
+        "kreator.baru": "../media/creator-alya.svg"
+      };
+
+      window.openCreatorAvatarPopup = function (name, imgSrc) {
+        const modal = document.getElementById("creatorAvatarModal");
+        const modalImg = document.getElementById("creatorAvatarModalImg");
+        const modalName = document.getElementById("creatorAvatarModalName");
+        const modalTitle = document.getElementById("creatorAvatarModalTitle");
+        if (modal && modalImg && modalName) {
+          modalImg.src = imgSrc || "../media/avatar.png";
+          modalName.textContent = "Foto profil " + name;
+          if (modalTitle) modalTitle.textContent = "@" + name;
+          modal.classList.add("is-active");
+        }
+      };
 
       function renderTopKreator() {
         const period = periodSelect ? periodSelect.value : "Bulan";
         const limit = limitSelect ? parseInt(limitSelect.value) : 5;
         
+        // Slice the dataset
         const list = (datasets[period] || datasets["Bulan"]).slice(0, limit);
 
+        // Ensure selectedCreator is valid and belongs to current period list
         if (list.length > 0) {
           const names = list.map(item => item.name);
           if (!selectedCreator || !names.includes(selectedCreator)) {
@@ -575,6 +551,7 @@
           }
         }
 
+        // 1. Render Table
         if (tableBody) {
           tableBody.innerHTML = "";
           list.forEach((item, index) => {
@@ -588,11 +565,8 @@
             }
 
             const avatarSrc = creatorAvatars[item.name] || "../media/avatar.png";
-
             row.innerHTML = `
-
               <td>${index + 1}.</td>
-
               <td><span class="db-topk-avatar" style="cursor: pointer;" title="Klik untuk memperbesar foto profil" onclick="event.stopPropagation(); window.openCreatorAvatarPopup('${item.name}', '${avatarSrc}');"><img src="${avatarSrc}" alt="${item.name}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; display: block;" onerror="this.src='../media/avatar.png'"></span></td>
               <td style="text-align: left; font-weight: 600; color: ${isSelected ? 'var(--blue-700)' : '#4c4c4c'}">${item.name}</td>
               <td style="color: #2e7d32; font-weight: 600;">${item.gmvLabel}</td>
@@ -618,6 +592,7 @@
           });
         }
 
+        // Default fallback trend values
         const defaultTrendData = {
           "Bulan": {
             labels: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"],
@@ -629,6 +604,7 @@
           }
         };
 
+        // 2. Fetch Trend Data for selected creator
         const trend = (creatorTrends[selectedCreator] && creatorTrends[selectedCreator][period])
           ? {
               labels: period === "Bulan" 
@@ -641,18 +617,21 @@
         const values = trend.values;
         const labels = trend.labels;
 
+        // 3. Render Chart (Canvas)
         ctx.clearRect(0, 0, W, H);
         const maxVal = Math.max(...values, 10);
-        const padL = 40, padR = 20, padT = 35, padB = 30;
+        const padL = 40, padR = 20, padT = 35, padB = 30; // padT is 35 to make room for Title
         const chartW = W - padL - padR;
         const chartH = H - padT - padB;
         const N = values.length;
 
+        /* Title text indicating which creator is selected */
         ctx.fillStyle = "#29A3D8";
         ctx.font = "bold 12px sans-serif";
         ctx.textAlign = "left";
         ctx.fillText("Trend GMV - " + selectedCreator, padL, padT - 12);
 
+        /* Grid lines */
         ctx.strokeStyle = "#e0e0e0";
         ctx.lineWidth = 0.5;
         for (let i = 0; i <= 5; i++) {
@@ -663,6 +642,7 @@
           ctx.stroke();
         }
 
+        /* Y-axis labels */
         ctx.fillStyle = "#999";
         ctx.font = "10px sans-serif";
         ctx.textAlign = "right";
@@ -672,12 +652,14 @@
           ctx.fillText(val, padL - 6, y + 3);
         }
 
+        /* X-axis labels */
         ctx.textAlign = "center";
         for (let i = 0; i < N; i++) {
           const x = padL + (chartW / (N - 1 || 1)) * i;
           ctx.fillText(labels[i], x, H - 8);
         }
 
+        /* Line */
         ctx.strokeStyle = "#3166b3";
         ctx.lineWidth = 2;
         ctx.lineJoin = "round";
@@ -690,6 +672,7 @@
         }
         ctx.stroke();
 
+        /* Dots */
         ctx.fillStyle = "#3166b3";
         for (let i = 0; i < N; i++) {
           const x = padL + (chartW / (N - 1 || 1)) * i;
@@ -707,11 +690,109 @@
         renderTopKreator();
       });
 
+      // Initial render
       renderTopKreator();
     })();
+
+    // Initialize Lucide icons on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    });
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+      window.lucide.createIcons();
+    }
+
+    function updateTopMetrics() {
+      // 1. Total Kreator
+      let countKreator = 2;
+      const kreatorKeys = [
+        "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19",
+        "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16",
+        "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13",
+        "bisa_kreator_list_v12", "bisa_kreator_list_v11", "bisa_kreator_list_v10",
+        "bisa_kreator_list_v9", "bisa_kreator_list_v8", "bisa_kreator_list"
+      ];
+      for (const key of kreatorKeys) {
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          try {
+            const arr = JSON.parse(saved);
+            if (Array.isArray(arr) && arr.length >= 0) {
+              countKreator = arr.length;
+              break;
+            }
+          } catch (e) {}
+        }
+      }
+
+      // 2. Total Campaign
+      let countCampaign = 2;
+      const campaignKeys = [
+        "bisa_campaign_list_v14", "bisa_campaign_list_v13", "bisa_campaign_list_v12",
+        "bisa_campaign_list_v11", "bisa_campaign_list_v10", "bisa_campaign_list_v9",
+        "bisa_campaign_list_v8", "bisa_campaign_list_v7", "bisa_campaign_list_v6",
+        "bisa_campaign_list_v5", "bisa_campaign_list_v4", "bisa_campaign_list_v3",
+        "bisa_campaign_list_v2", "bisa_campaign_list_v1", "bisa_campaign_list"
+      ];
+      for (const key of campaignKeys) {
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          try {
+            const arr = JSON.parse(saved);
+            if (Array.isArray(arr) && arr.length >= 0) {
+              countCampaign = arr.length;
+              break;
+            }
+          } catch (e) {}
+        }
+      }
+
+      // 3. Total Brand
+      let countBrand = 2;
+      const brandKeys = [
+        "bisa_brand_list_v12", "bisa_brand_list_v11", "bisa_brand_list_v10",
+        "bisa_brand_list_v9", "bisa_brand_list_v8", "bisa_brand_list_v7",
+        "bisa_brand_list_v6", "bisa_brand_list_v5", "bisa_brand_list_v4",
+        "bisa_brand_list_v3", "bisa_brand_list_v2", "bisa_brand_list"
+      ];
+      for (const key of brandKeys) {
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          try {
+            const arr = JSON.parse(saved);
+            if (Array.isArray(arr) && arr.length >= 0) {
+              countBrand = arr.length;
+              break;
+            }
+          } catch (e) {}
+        }
+      }
+
+      const elTimKol = document.getElementById("metricTimKol");
+      if (elTimKol) elTimKol.textContent = "0";
+
+      const elKreator = document.getElementById("metricTotalKreator");
+      if (elKreator) elKreator.textContent = countKreator;
+
+      const elCampaign = document.getElementById("metricTotalCampaign");
+      if (elCampaign) elCampaign.textContent = countCampaign;
+
+      const elBrand = document.getElementById("metricTotalBrand");
+      if (elBrand) elBrand.textContent = countBrand;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateTopMetrics();
+    });
+    window.addEventListener("storage", updateTopMetrics);
+    window.addEventListener("focus", updateTopMetrics);
+    window.addEventListener("pageshow", updateTopMetrics);
+    updateTopMetrics();
   </script>
   <script src="staffkol_layout.js"></script>
-  <script src="../sidebar_engine.js?v=4"></script>
+  <script src="../sidebar_engine.js?v=999"></script>
 </body>
 
 </html>

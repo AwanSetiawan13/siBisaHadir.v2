@@ -9504,7 +9504,18 @@
       row.appendChild(cell);
     }
 
-    let isSpv = window.location.pathname.toLowerCase().includes("spvkol"); const isDots = Boolean(isSpv || config?.dotsMenu || ['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(row.closest('table')?.id));
+    let isSpv = window.location.pathname.toLowerCase().includes("spvkol");
+    const isAttendance = ['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(row.closest('table')?.id);
+    if (isAttendance) {
+      cell.className = 'tdActions text-center col-sticky-action';
+      cell.innerHTML = `
+        <button class="btn-view" type="button" data-action="view" aria-label="Lihat" title="Lihat">
+          <i class="bx bx-show"></i>
+        </button>
+      `.trim();
+      return;
+    }
+    const isDots = Boolean(isSpv || config?.dotsMenu || ['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(row.closest('table')?.id));
     if (isDots || isSpv) {
       cell.className = 'tdActions text-center col-sticky-action';
       cell.innerHTML = `

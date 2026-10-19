@@ -13,7 +13,7 @@
         <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
-        <header class="topbar hirezy-topbar"></header>
+        <header class="topbar"></header>
 
     <main class="dashboard-content">
       
@@ -209,12 +209,17 @@
       const btnNext = document.getElementById("calNext");
       const selectedDateLabel = document.getElementById("selectedDateLabel");
 
+      // Initial dummy schedule database
+      const todayDay = now.getDate();
       const scheduleDb = {
+        [String(todayDay)]: [
+          { id: 1, title: "Meeting", desc: "Diskusi dengan Brand A terkait dengan Keberjalannya Campaign A", time: "09.00 - 11.00", status: "pending" }
+        ],
         "12": [
-          { id: 1, title: "Meeting", desc: "Bersama Bisa Hijab Official", time: "09.00 - 12.00", status: "pending" }
+          { id: 2, title: "Meeting", desc: "Bersama Bisa Hijab Official", time: "09.00 - 12.00", status: "pending" }
         ]
       };
-      let schedIdCounter = 2;
+      let schedIdCounter = 3;
 
       function formatDateLabel(year, month, day) {
         const d = new Date(year, month, day);
@@ -297,19 +302,19 @@
           
           let badgeBg = "#ffcc00";
           let badgeColor = "#111";
-          if (item.title.includes("Meeting")) {
+          if (item.title.includes("Meeting") || (item.desc && item.desc.includes("Meeting"))) {
             badgeBg = "#ffcc00";
             badgeColor = "#111";
-          } else if (item.title.includes("Visit")) {
+          } else if (item.title.includes("Visit") || (item.desc && item.desc.includes("Visit"))) {
             badgeBg = "#2196f3";
             badgeColor = "#fff";
-          } else if (item.title.includes("HR")) {
+          } else if (item.title.includes("HR") || (item.desc && item.desc.includes("HR"))) {
             badgeBg = "#9c27b0";
             badgeColor = "#fff";
-          } else if (item.title.includes("Deadline")) {
+          } else if (item.title.includes("Deadline") || (item.desc && item.desc.includes("Deadline"))) {
             badgeBg = "#f44336";
             badgeColor = "#fff";
-          } else if (item.title.includes("Tanggal Merah")) {
+          } else if (item.title.includes("Tanggal Merah") || (item.desc && item.desc.includes("Tanggal Merah"))) {
             badgeBg = "#ff5252";
             badgeColor = "#fff";
           } else {
@@ -317,8 +322,19 @@
             badgeColor = "#fff";
           }
 
-          const displayTitle = item.title.replace(/^\[.*?\]\s*/, "");
-          const typeLabel = item.title.match(/^\[(.*?)\]/) ? item.title.match(/^\[(.*?)\]/)[1] : "Kegiatan";
+          let displayTitle = item.title.replace(/^\[.*?\]\s*/, "");
+          let typeLabel = "Kegiatan";
+          if (item.title.match(/^\[(.*?)\]/)) {
+            typeLabel = item.title.match(/^\[(.*?)\]/)[1];
+          } else if (item.title === "Meeting") {
+            displayTitle = item.desc || item.title;
+            typeLabel = "Meeting";
+          } else if (item.desc === "Meeting") {
+            displayTitle = item.title;
+            typeLabel = "Meeting";
+          } else {
+            typeLabel = item.desc || "Kegiatan";
+          }
 
           const div = document.createElement("div");
           div.className = "db-activity-item";

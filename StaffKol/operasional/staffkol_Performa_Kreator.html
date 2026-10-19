@@ -4,12 +4,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Performa Kreator | Bisa Media</title>
+  <title>Performa Kreator | Staff KOL - Bisa Media</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link rel="stylesheet" href="../../style.css" />
   <!-- Boxicons for action icons -->
-  <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
+    rel="stylesheet" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
   <style>
+    /* Actions style for eye/view icon */
+    .btn-view {
+      background: rgba(41, 163, 216, 0.08);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      color: #29A3D8;
+    }
+    .btn-view:hover {
+      background-color: #29A3D8;
+      color: #ffffff;
+      border-color: #29A3D8;
+      box-shadow: 0 2px 6px rgba(41, 163, 216, 0.25);
+    }
+    .btn-view i {
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
+    }
+    /* ===== SweetAlert2 Custom Styling for Bisa Media ===== */
+    .swal2-bisa-popup {
+      font-family: 'Outfit', sans-serif !important;
+      border-radius: 14px !important;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16) !important;
+      padding: 26px 22px !important;
+    }
+
+    .swal2-bisa-popup .swal2-title {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 19px !important;
+      font-weight: 700 !important;
+      color: #1e293b !important;
+      margin-top: 12px !important;
+    }
+
+    .swal2-bisa-popup .swal2-html-container {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      color: #64748b !important;
+      line-height: 1.55 !important;
+      margin-top: 8px !important;
+    }
+
+    .swal2-bisa-popup .swal2-confirm,
+    .swal2-bisa-popup .swal2-cancel {
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+      padding: 9px 22px !important;
+      box-shadow: none !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+
     /* Toolbar Green Excel Button */
     .btn-excel-green {
       background: #f0fdf4 !important;
@@ -18,63 +87,463 @@
       position: relative;
       cursor: pointer;
     }
+
     .btn-excel-green:hover {
       background: #dcfce7 !important;
       border-color: #4ade80 !important;
+    }
+
+    /* Sembunyikan Tombol / Icon Edit di Sisi Kanan Aksi */
+    .tdActions button.btn-outline-primary,
+    .tdActions .btn-outline-primary,
+    .tdActions button[title*="Edit"],
+    .tdActions button[aria-label*="Edit"],
+    .tdActions [data-action="edit"],
+    .tdActions .bx-edit-alt,
+    .tdActions button:has(.bx-edit-alt) {
+      display: none !important;
+    }
+
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+
+    .toolbar-active-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .btn-filter-active,
+    .btn-calendar-active {
+      background: #e0f2fe !important;
+      border-color: #38bdf8 !important;
+      color: #0284c7 !important;
+    }
+
+    /* ===== Search Bar Styling ===== */
+    .dashboard-body .campaign-search.campaign-search-bar {
+      display: inline-flex !important;
+      align-items: center !important;
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 8px !important;
+      padding: 0 10px !important;
+      height: 38px !important;
+      width: 280px !important;
+      transition: all 0.2s ease-in-out !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+      position: relative !important;
+      cursor: text !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:hover {
+      border-color: #94a3b8 !important;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within {
+      width: 320px !important;
+      border-color: #29A3D8 !important;
+      box-shadow: 0 0 0 3px rgba(41, 163, 216, 0.16), 0 2px 4px rgba(41, 163, 216, 0.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__icon {
+      width: 16px !important;
+      height: 16px !important;
+      min-width: 16px !important;
+      min-height: 16px !important;
+      max-width: 16px !important;
+      max-height: 16px !important;
+      color: #64748b !important;
+      stroke: #64748b !important;
+      stroke-width: 2.2 !important;
+      fill: none !important;
+      flex-shrink: 0 !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 8px 0 2px !important;
+      box-sizing: content-box !important;
+      transition: all 0.2s ease !important;
+      pointer-events: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar:focus-within .campaign-search-bar__icon {
+      color: #29A3D8 !important;
+      stroke: #29A3D8 !important;
+      transform: scale(1.08) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input {
+      flex: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      outline: none !important;
+      background: transparent !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #1e293b !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__input::placeholder {
+      color: #94a3b8 !important;
+      font-weight: 400 !important;
+      font-size: 13px !important;
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear {
+      width: 17px !important;
+      height: 17px !important;
+      border: none !important;
+      background: #e2e8f0 !important;
+      border-radius: 50% !important;
+      color: #475569 !important;
+      cursor: pointer !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+      margin-left: 6px !important;
+      flex-shrink: 0 !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear:hover {
+      background: #cbd5e1 !important;
+      color: #0f172a !important;
+      transform: scale(1.1) !important;
+    }
+
+    .dashboard-body .campaign-search.campaign-search-bar .campaign-search-bar__clear svg {
+      width: 9px !important;
+      height: 9px !important;
+      min-width: 9px !important;
+      min-height: 9px !important;
+      stroke-width: 2.8 !important;
+      stroke: currentColor !important;
+      fill: none !important;
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Sticky Aksi Column on the Right (Fixed seperti dashboard staff bagian campaign) */
+    .campaign-table th.col-sticky-action,
+    .campaign-table td.col-sticky-action {
+      position: sticky;
+      right: 0;
+      z-index: 10;
+      box-shadow: -5px 0 12px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .campaign-table th.col-sticky-action {
+      background: #f8fafc !important;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .campaign-table td.col-sticky-action {
+      background: #ffffff !important;
+      border-right: 1px solid #e2e8f0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .campaign-table tr:hover td.col-sticky-action {
+      background: #f8fafc !important;
+    }
+
+    /* Action Buttons (Lihat Saja untuk SPV Performa Kreator) */
+    .action-btn-group {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-action-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0;
+    }
+
+    .btn-action-view {
+      color: #0284c7;
+      border-color: #bae6fd;
+      background: #f0f9ff;
+    }
+
+    .btn-action-view:hover {
+      background: #0284c7;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-action-sm svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    /* Checkbox Pin/Fix Column Header Button */
+    .th-pin-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .pin-check-btn {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .pin-check-btn input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .pin-check-indicator {
+      width: 17px;
+      height: 17px;
+      border-radius: 4px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-indicator svg {
+      width: 11px;
+      height: 11px;
+      stroke: #ffffff;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-btn:hover .pin-check-indicator {
+      border-color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked+.pin-check-indicator {
+      background: #0284c7;
+      border-color: #0284c7;
+      box-shadow: 0 1px 4px rgba(2, 132, 199, 0.35);
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked+.pin-check-indicator svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Fixed/Pinned Left Columns */
+    .campaign-table th:first-child,
+    .campaign-table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 11;
+      background: #f8fafc;
+      text-align: center;
+      min-width: 44px;
+      max-width: 48px;
+    }
+
+    .campaign-table td:first-child {
+      background: #ffffff;
+    }
+
+    .campaign-table tr:hover td:first-child {
+      background: #f8fafc;
+    }
+
+    .campaign-table th.col-pinned-sticky {
+      position: sticky;
+      z-index: 10;
+      background: #f8fafc !important;
+    }
+
+    .campaign-table td.col-pinned-sticky {
+      position: sticky;
+      z-index: 9;
+      background: #ffffff !important;
+    }
+
+    .campaign-table tr:hover td.col-pinned-sticky {
+      background: #f8fafc !important;
+    }
+
+    .campaign-table th.col-pinned-last,
+    .campaign-table td.col-pinned-last {
+      box-shadow: 5px 0 12px rgba(0, 0, 0, 0.06) !important;
+      border-right: 1px solid #cbd5e1 !important;
     }
   </style>
 </head>
 
 <body class="dashboard-body">
-                  <aside id="app-sidebar"></aside>
+  <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
-        <header class="topbar hirezy-topbar"></header>
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna"
+            aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Setiawan</span>
+                <span class="user-menu-dropdown__role">SPV KOL</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
 
     <main class="dashboard-content">
-      
+      <div class="dashboard-heading">
+        <h1 id="pageHeading">Performa Kreator</h1>
+      </div>
+
       <section id="tablePanel" class="panel campaign-panel">
         <div class="campaign-panel__line"></div>
 
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
             <!-- Green Excel Button with tooltip -->
-            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.csv)">
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button"
+              aria-label="Export Excel" title="Export ke Excel (.csv)">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
-                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37"
+                  stroke-width="1.2" />
                 <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
                 <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
                 <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
                 <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
-                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
             </button>
 
+            <!-- Blue Filter Button -->
             <div class="filter-dropdown-wrapper">
-              <button id="btnFilterPerforma" class="small-action-button" type="button" aria-label="Filter" title="Filter Status">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+              <button id="btnFilterPerforma" class="small-action-button" type="button" aria-label="Filter"
+                title="Filter Status" style="border-color: #29A3D8; color: #29A3D8;">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#29A3D8" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
                   <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
                 </svg>
+                <span id="filterActiveBadge" class="toolbar-active-badge" style="display: none;">1</span>
               </button>
-              
+
               <!-- Popover Content -->
               <div id="filterPerformaDropdown" class="filter-popover" style="width: 250px;">
                 <div class="filter-popover-form">
                   <div class="form-group" style="margin-bottom: 12px; text-align: left;">
-                    <label class="form-label" style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Username Kreator</label>
+                    <label class="form-label"
+                      style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Username
+                      Kreator</label>
                     <div class="select-wrapper">
-                      <select id="filterUsername" class="form-select" style="font-size: 12px; padding: 6px 10px; height: auto;">
+                      <select id="filterUsername" class="form-select"
+                        style="font-size: 12px; padding: 6px 10px; height: auto;">
                         <option value="Semua">Semua</option>
-                        <option value="kreator.kece">kreator.kece</option>
-                        <option value="kreator.super">kreator.super</option>
-                        <option value="kreator.top">kreator.top</option>
                       </select>
                     </div>
                   </div>
                   <div class="form-group" style="margin-bottom: 16px; text-align: left;">
-                    <label class="form-label" style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Estimasi Komisi</label>
+                    <label class="form-label"
+                      style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b; text-align: left;">Estimasi
+                      Komisi</label>
                     <div class="select-wrapper">
-                      <select id="filterKomisi" class="form-select" style="font-size: 12px; padding: 6px 10px; height: auto;">
+                      <select id="filterKomisi" class="form-select"
+                        style="font-size: 12px; padding: 6px 10px; height: auto;">
                         <option value="Semua">Semua</option>
                         <option value="Ada Komisi">Ada Komisi</option>
                         <option value="Tidak Ada">Tidak Ada / Rp 0</option>
@@ -82,61 +551,175 @@
                     </div>
                   </div>
                   <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                    <button id="resetFilterBtn" type="button" style="background: #f44336; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit';">Reset</button>
-                    <button id="applyStatusFilterBtn" type="button" style="background: #2264c6; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit';">Terapkan</button>
+                    <button id="resetFilterBtn" type="button"
+                      style="background: #f44336; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit'; flex: 1;">Reset</button>
+                    <button id="applyStatusFilterBtn" type="button"
+                      style="background: #2264c6; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit'; flex: 1;">Terapkan</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <label class="campaign-search">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="10" cy="10" r="5"></circle>
-                <path d="M14 14l5 5"></path>
+            <!-- Blue Calendar Filter Button -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnCalendarPerforma" class="small-action-button" type="button" aria-label="Pilih tanggal"
+                title="Filter rentang tanggal" style="border-color: #29A3D8; color: #29A3D8;">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="#29A3D8" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span id="calendarActiveBadge" class="toolbar-active-badge" style="display: none;">1</span>
+              </button>
+
+              <!-- Popover Date Filter (Rentang Tanggal) -->
+              <div id="calendarPerformaDropdown" class="filter-popover" style="width: 270px;">
+                <div class="filter-popover-form">
+                  <div class="form-group" style="margin-bottom: 12px; text-align: left;">
+                    <label class="form-label"
+                      style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b;">Dari
+                      Tanggal</label>
+                    <input type="date" id="filterStartDate" class="form-input"
+                      style="font-size: 12px; padding: 6px 10px; height: 36px;" />
+                  </div>
+                  <div class="form-group" style="margin-bottom: 16px; text-align: left;">
+                    <label class="form-label"
+                      style="font-weight: 600; font-size: 12px; margin-bottom: 6px; display: block; color: #2b2b2b;">Sampai
+                      Tanggal</label>
+                    <input type="date" id="filterEndDate" class="form-input"
+                      style="font-size: 12px; padding: 6px 10px; height: 36px;" />
+                  </div>
+                  <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <button id="resetDateFilterBtn" type="button"
+                      style="background: #f44336; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit'; flex: 1;">Reset</button>
+                    <button id="applyDateFilterBtn" type="button"
+                      style="background: #2264c6; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; cursor: pointer; font-family: 'Outfit'; flex: 1;">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Real-time Search Input -->
+            <div class="campaign-search campaign-search-bar" id="campaignSearchBar">
+              <svg class="campaign-search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input type="search" placeholder="Cari...." />
-            </label>
+              <input type="text" id="searchPerformaInput" class="campaign-search-bar__input"
+                placeholder="Cari Brand, Sampel, Kreator, Type..." autocomplete="off" />
+              <button type="button" id="clearSearchPerformaBtn" class="campaign-search-bar__clear"
+                title="Hapus pencarian" aria-label="Hapus pencarian" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <div class="campaign-toolbar__right">
-            <button id="btnTambahPerforma" class="btn-tambah" style="margin-right: 14px;" type="button">
-              + Tambah
-            </button>
+          <div class="campaign-toolbar__right"></div>
+        </div>
+
+        <!-- Empty State Container (Sesuai Referensi Pengguna) -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8" />
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff" />
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff" />
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff" />
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff" />
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff" />
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff" />
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff" />
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff" />
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff" />
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff" />
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Performa Kreator</div>
+          <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan data performa baru.
           </div>
         </div>
 
-        <div class="table-wrap campaign-table">
-          <table>
+        <div class="table-wrap campaign-table" id="tableContainerWrapper">
+          <table data-ceo-custom-crud="1">
             <thead>
               <tr>
                 <th>#</th>
-                <th>Tanggal</th>
-                <th>UID</th>
-                <th>User Name</th>
-                <th>GMV Afiliasi</th>
-                <th>Pesanan dari Afiliasi</th>
-                <th>GMV Live Afiliasi</th>
-                <th>GMV Video Afiliasi</th>
-                <th>Pesanan dari Live Afiliasi</th>
-                <th>Pesanan dari Video Afiliasi</th>
-                <th>CTR Live</th>
+                <th class="th-pinnable" data-col="tanggal">
+                  <div class="th-pin-wrapper">
+                    <span>Tanggal</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Tanggal agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="tanggal" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="uid">
+                  <div class="th-pin-wrapper">
+                    <span>UID</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom UID agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="uid" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="username">
+                  <div class="th-pin-wrapper">
+                    <span>Nama pengguna kreator</span>
+                    <label class="pin-check-btn"
+                      title="Kunci / Pin kolom Nama pengguna kreator agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="username" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th>Jumlah pengikut kreator</th>
+                <th>GMV dari kreator</th>
+                <th>Pesanan dari kreator</th>
+                <th>GMV dari LIVE kreator</th>
+                <th>GMV dari video afiliasi</th>
+                <th>Pesanan dari LIVE kreator</th>
+                <th>Pesanan dari video kreator</th>
+                <th>CTR LIVE</th>
                 <th>Rasio Klik Video</th>
                 <th>GMV Langsung</th>
-                <th>GMV Langsung dari Live</th>
+                <th>GMV langsung dari LIVE</th>
                 <th>GMV langsung dari video</th>
-                <th>Pesanan Langsung</th>
+                <th>Pesanan langsung</th>
                 <th>Produk terjual</th>
-                <th>Pesanan langsung dari Live</th>
-                <th>Produk terjual dari Live</th>
-                <th>Pesanan Langsung dari Video</th>
-                <th>Produk terjual dari video</th>
-                <th>Total Produk terjual</th>
-                <th>Est Komisi</th>
-                <th>Dasar Komisi</th>
-                <th>Tayangan Live</th>
+                <th>Pesanan langsung dari LIVE</th>
+                <th>Produk yang terjual dari LIVE kreator</th>
+                <th>Pesanan langsung dari Video</th>
+                <th>produk yang terjual dari video kreator</th>
+                <th>Produk yang terjual dari kreator</th>
+                <th>Est. Komisi</th>
+                <th>Dasar komisi</th>
+                <th>Tayangan LIVE</th>
                 <th>Tayangan</th>
-                <th>Siaran Live</th>
+                <th>Siaran LIVE</th>
                 <th>Video</th>
+                <th>GMV dari kreator mitra afiliasi</th>
+                <th>Pesanan dari kreator mitra afiliasi</th>
+                <th class="text-center col-sticky-action" style="width: 80px;">Aksi</th>
               </tr>
             </thead>
             <tbody id="performaTableBody"></tbody>
@@ -146,38 +729,23 @@
 
       <!-- Form Panel for Tambah Performa Kreator -->
       <section id="formPanel" class="panel campaign-panel" style="display: none; position: relative;">
-        <button type="button" id="btnCancelTambahPerforma" style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; line-height: 1; color: #a5a5aa; cursor: pointer; transition: color 0.15s; z-index: 10;" onmouseover="this.style.color='#ff5252'" onmouseout="this.style.color='#a5a5aa'">&times;</button>
+        <button type="button" id="btnCancelTambahPerforma"
+          style="position: absolute; top: 12px; right: 16px; background: none; border: none; font-size: 24px; line-height: 1; color: #a5a5aa; cursor: pointer; transition: color 0.15s; z-index: 10;"
+          onmouseover="this.style.color='#ff5252'" onmouseout="this.style.color='#a5a5aa'">&times;</button>
         <div class="campaign-panel__line"></div>
 
         <div class="performa-form-container">
           <form id="performaForm">
-            <!-- Row 1: Tanggal and Format -->
-            <div class="form-row-top">
-              <div class="form-group" style="width: 180px;">
-                <label class="form-label">Tanggal</label>
-                <input type="text" class="form-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')"
-                  onblur="(this.type='text')" required />
-              </div>
-              <div class="form-group" style="width: 180px;">
-                <label class="form-label">Format</label>
-                <div class="select-wrapper">
-                  <select id="performaFormatSelect" class="form-select" required>
-                    <option value="Excel" selected>Excel</option>
-                    <option value="Paste_Data">Paste Data</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Row 2: Input Data and Preview -->
-            <div class="form-row-mid">
+            <!-- Row: Input Data and Preview -->
+            <div class="form-row-mid" style="margin-top: 6px;">
               <div class="form-group" style="flex: 0 0 250px;">
                 <label class="form-label">Input Data</label>
                 <div class="file-upload-box" id="fileUploadContainer">
                   <span class="btn-choose-file">Choose File</span>
-                  <input type="file" id="performaFileInput" style="display: none;" accept=".xls,.xlsx" required />
+                  <input type="file" id="performaFileInput" style="display: none;" accept=".xlsx,.xls" required />
                 </div>
-                <textarea class="form-input" id="performaPasteInput" rows="4" placeholder="Tempel data di sini..." style="display: none; width: 100%; height: 80px; resize: none; padding: 8px; border: 1px solid #c5c5c8; border-radius: 6px;"></textarea>
+                <textarea class="form-input" id="performaPasteInput" rows="4" placeholder="Tempel data di sini..."
+                  style="display: none; width: 100%; height: 80px; resize: none; padding: 8px; border: 1px solid #c5c5c8; border-radius: 6px;"></textarea>
               </div>
 
               <div class="form-group" style="flex: 1;">
@@ -189,7 +757,7 @@
             </div>
 
             <!-- Submit Button Row -->
-            <div style="display: flex; justify-content: flex-end;">
+            <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
               <button class="btn-submit-modal" type="submit">Submit</button>
             </div>
           </form>
@@ -205,62 +773,247 @@
     <div class="modal-box" style="max-width: 680px;">
       <div class="modal-header">
         <h2 class="modal-title">Detail <span style="font-weight: 700;">Performa Kreator</span></h2>
-        <button class="modal-close" type="button" aria-label="Tutup popup" onclick="document.getElementById('performaViewModal').classList.remove('is-active')">&times;</button>
+        <button class="modal-close" type="button" aria-label="Tutup popup"
+          onclick="document.getElementById('performaViewModal').classList.remove('is-active')">&times;</button>
       </div>
       <div class="modal-divider"></div>
-      <div class="modal-form-grid" style="grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 4px 0;">
+      <div class="modal-form-grid"
+        style="grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 4px 0; max-height: 480px; overflow-y: auto;">
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">Tanggal</label>
-          <div id="viewPerformaTanggal" style="font-size: 13.5px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Tanggal</label>
+          <div id="viewPerformaTanggal"
+            style="font-size: 13px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">UID</label>
-          <div id="viewPerformaUid" style="font-size: 13.5px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">UID</label>
+          <div id="viewPerformaUid"
+            style="font-size: 13px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">Username</label>
-          <div id="viewPerformaUsername" style="font-size: 13.5px; font-weight: 700; color: #0284c7; background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Nama pengguna
+            kreator</label>
+          <div id="viewPerformaUsername"
+            style="font-size: 13px; font-weight: 700; color: #0284c7; background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV Afiliasi</label>
-          <div id="viewPerformaGmv" style="font-size: 13.5px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Jumlah pengikut
+            kreator</label>
+          <div id="viewPerformaFollowers"
+            style="font-size: 13px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan Afiliasi</label>
-          <div id="viewPerformaPesanan" style="font-size: 13.5px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV dari
+            kreator</label>
+          <div id="viewPerformaGmv"
+            style="font-size: 13px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">Est Komisi</label>
-          <div id="viewPerformaKomisi" style="font-size: 13.5px; font-weight: 700; color: #00c853; background: rgba(0, 200, 83, 0.08); border: 1px solid rgba(0, 200, 83, 0.25); border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan dari
+            kreator</label>
+          <div id="viewPerformaPesanan"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV Live Afiliasi</label>
-          <div id="viewPerformaLiveGmv" style="font-size: 13.5px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV dari LIVE
+            kreator</label>
+          <div id="viewPerformaLiveGmv"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV Video Afiliasi</label>
-          <div id="viewPerformaVideoGmv" style="font-size: 13.5px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV dari video
+            afiliasi</label>
+          <div id="viewPerformaVideoGmv"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">CTR Live</label>
-          <div id="viewPerformaCtrLive" style="font-size: 13.5px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan dari LIVE
+            kreator</label>
+          <div id="viewPerformaLiveOrders"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">Rasio Klik Video</label>
-          <div id="viewPerformaCtrVideo" style="font-size: 13.5px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan dari video
+            kreator</label>
+          <div id="viewPerformaVideoOrders"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Produk Terjual</label>
-          <div id="viewPerformaTotalSold" style="font-size: 13.5px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">CTR LIVE</label>
+          <div id="viewPerformaCtrLive"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
         <div class="form-group">
-          <label class="form-label" style="font-size: 11.5px; color: #64748b; font-weight: 600; text-transform: uppercase;">Dasar Komisi</label>
-          <div id="viewPerformaDasar" style="font-size: 13.5px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">-</div>
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Rasio Klik
+            Video</label>
+          <div id="viewPerformaCtrVideo"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV Langsung</label>
+          <div id="viewPerformaDirectGmv"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV langsung dari
+            LIVE</label>
+          <div id="viewPerformaDirectLive"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV langsung dari
+            video</label>
+          <div id="viewPerformaDirectVideo"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan
+            langsung</label>
+          <div id="viewPerformaDirectOrders"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Produk terjual</label>
+          <div id="viewPerformaSold"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan langsung dari
+            LIVE</label>
+          <div id="viewPerformaDirectLiveOrders"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Produk yang terjual
+            dari LIVE kreator</label>
+          <div id="viewPerformaLiveSold"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan langsung dari
+            Video</label>
+          <div id="viewPerformaDirectVideoOrders"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">produk yang terjual
+            dari video kreator</label>
+          <div id="viewPerformaVideoSold"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Produk yang terjual
+            dari kreator</label>
+          <div id="viewPerformaKreatorSold"
+            style="font-size: 13px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Est. Komisi</label>
+          <div id="viewPerformaKomisi"
+            style="font-size: 13px; font-weight: 700; color: #00c853; background: rgba(0, 200, 83, 0.08); border: 1px solid rgba(0, 200, 83, 0.25); border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Dasar komisi</label>
+          <div id="viewPerformaDasar"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Tayangan LIVE</label>
+          <div id="viewPerformaLiveViews"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Tayangan</label>
+          <div id="viewPerformaViews"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Siaran LIVE</label>
+          <div id="viewPerformaLiveBroadcasts"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Video</label>
+          <div id="viewPerformaVideos"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">GMV dari kreator mitra
+            afiliasi</label>
+          <div id="viewPerformaPartnerGmv"
+            style="font-size: 13px; font-weight: 600; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label"
+            style="font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase;">Pesanan dari kreator
+            mitra afiliasi</label>
+          <div id="viewPerformaPartnerOrders"
+            style="font-size: 13px; font-weight: 500; color: #1e293b; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 10px;">
+            -</div>
         </div>
       </div>
       <div class="modal-divider" style="margin-top: 18px;"></div>
       <div style="display: flex; justify-content: flex-end;">
-        <button type="button" class="btn-cancel-modal" onclick="document.getElementById('performaViewModal').classList.remove('is-active')" style="padding: 8px 24px; border: 1px solid #cbd5e1; background: #f1f5f9; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Tutup</button>
+        <button type="button" class="btn-cancel-modal"
+          onclick="document.getElementById('performaViewModal').classList.remove('is-active')"
+          style="padding: 8px 24px; border: 1px solid #cbd5e1; background: #f1f5f9; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Tutup</button>
       </div>
     </div>
   </div>
@@ -270,10 +1023,12 @@
     <div class="modal-box" style="max-width: 620px;">
       <div class="modal-header">
         <h2 class="modal-title">Edit <span style="font-weight: 700;">Performa Kreator</span></h2>
-        <button class="modal-close" type="button" aria-label="Tutup popup" onclick="document.getElementById('performaEditModal').classList.remove('is-active')">&times;</button>
+        <button class="modal-close" type="button" aria-label="Tutup popup"
+          onclick="document.getElementById('performaEditModal').classList.remove('is-active')">&times;</button>
       </div>
       <div class="modal-divider"></div>
-      <form id="formEditPerforma" class="modal-form-grid" style="grid-template-columns: repeat(2, 1fr); gap: 14px 18px;">
+      <form id="formEditPerforma" class="modal-form-grid"
+        style="grid-template-columns: repeat(2, 1fr); gap: 14px 18px;">
         <input type="hidden" id="editPerformaId" />
         <div class="form-group">
           <label class="form-label">Tanggal</label>
@@ -307,9 +1062,14 @@
           <label class="form-label">Dasar Komisi</label>
           <input type="text" id="editPerformaDasar" class="form-input" required />
         </div>
-        <div class="span-2" style="grid-column: span 2; display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
-          <button type="button" class="btn-cancel-modal" onclick="document.getElementById('performaEditModal').classList.remove('is-active')" style="padding: 8px 20px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Batal</button>
-          <button type="submit" class="btn-submit-modal" style="padding: 8px 24px; background: #2264c6; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Simpan Perubahan</button>
+        <div class="span-2"
+          style="grid-column: span 2; display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn-cancel-modal"
+            onclick="document.getElementById('performaEditModal').classList.remove('is-active')"
+            style="padding: 8px 20px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Batal</button>
+          <button type="submit" class="btn-submit-modal"
+            style="padding: 8px 24px; background: #2264c6; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Simpan
+            Perubahan</button>
         </div>
       </form>
     </div>
@@ -318,65 +1078,111 @@
   <!-- Modal PopUp Hapus Performa Kreator -->
   <div id="performaDeleteModal" class="modal-overlay">
     <div class="modal-box" style="max-width: 440px; text-align: center; padding: 28px 24px;">
-      <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+      <div
+        style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
         <i class="bx bx-trash" style="font-size: 28px;"></i>
       </div>
       <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Hapus Performa</h3>
       <p style="font-size: 13.5px; color: #64748b; line-height: 1.5; margin-bottom: 24px;">
-        Apakah Anda yakin ingin menghapus data performa kreator <strong id="deletePerformaUsernameText" style="color: #1e293b;">-</strong>? Tindakan ini tidak dapat dibatalkan.
+        Apakah Anda yakin ingin menghapus data performa kreator <strong id="deletePerformaUsernameText"
+          style="color: #1e293b;">-</strong>? Tindakan ini tidak dapat dibatalkan.
       </p>
       <div style="display: flex; gap: 10px; justify-content: center;">
-        <button type="button" class="btn-cancel-modal" onclick="document.getElementById('performaDeleteModal').classList.remove('is-active')" style="flex: 1; padding: 10px 16px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Batal</button>
-        <button type="button" id="confirmDeletePerformaBtn" style="flex: 1; padding: 10px 16px; border: none; background: #ef4444; color: #fff; border-radius: 6px; font-weight: 600; cursor: pointer;">Hapus</button>
+        <button type="button" class="btn-cancel-modal"
+          onclick="document.getElementById('performaDeleteModal').classList.remove('is-active')"
+          style="flex: 1; padding: 10px 16px; border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 6px; font-weight: 600; cursor: pointer;">Batal</button>
+        <button type="button" id="confirmDeletePerformaBtn"
+          style="flex: 1; padding: 10px 16px; border: none; background: #ef4444; color: #fff; border-radius: 6px; font-weight: 600; cursor: pointer;">Hapus</button>
       </div>
     </div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../../script.js"></script>
+  <script src="../staffkol_layout.js"></script>
+  <script src="../../sidebar_engine.js?v=999"></script>
   <script>
-    (function() {
-      const PERFORMA_STORAGE_KEY = "bisa_performa_kreator_list_v4";
+    (function () {
+      const PERFORMA_STORAGE_KEY = "bisa_performa_kreator_list_v7";
       try {
         localStorage.removeItem("bisa_performa_kreator_list");
         localStorage.removeItem("bisa_performa_kreator_list_v2");
         localStorage.removeItem("bisa_performa_kreator_list_v3");
-        if (!localStorage.getItem("bisa_performa_reset_v4")) {
+        localStorage.removeItem("bisa_performa_kreator_list_v4");
+        localStorage.removeItem("bisa_performa_kreator_list_v5");
+        localStorage.removeItem("bisa_performa_kreator_list_v6");
+        if (!localStorage.getItem("bisa_performa_reset_v7")) {
           localStorage.removeItem(PERFORMA_STORAGE_KEY);
-          localStorage.setItem("bisa_performa_reset_v4", "true");
+          localStorage.setItem("bisa_performa_reset_v7", "true");
         }
-      } catch (e) {}
+      } catch (e) { }
 
       const DEFAULT_PERFORMA = [
         {
           id: 1,
           tanggal: "18/05/2026",
-          uid: "UID-78192039",
-          username: "@bima.fashion",
-          gmv: "Rp 45.200.000",
-          pesanan: "1.250",
-          live_gmv: "Rp 32.000.000",
-          video_gmv: "Rp 13.200.000",
-          live_orders: "890",
-          video_orders: "360",
-          ctr_live: "4.8%",
-          ctr_video: "3.2%",
-          direct_gmv: "Rp 28.500.000",
-          direct_live: "Rp 20.000.000",
-          direct_video: "Rp 8.500.000",
-          direct_orders: "780",
-          sold: "1.420",
-          direct_live_sold: "980",
-          direct_live_prod: "15",
-          direct_video_sold: "440",
-          direct_video_prod: "8",
-          total_sold: "1.420",
-          komisi: "Rp 4.520.000",
+          uid: "UID-0001",
+          username: "@aura.beauty",
+          followers: "185.000",
+          gmv: "Rp 150.000.000",
+          pesanan: "3.450",
+          live_gmv: "Rp 105.000.000",
+          video_gmv: "Rp 45.000.000",
+          live_orders: "2.400",
+          video_orders: "1.050",
+          ctr_live: "5.8%",
+          ctr_video: "4.2%",
+          direct_gmv: "Rp 112.500.000",
+          direct_live: "Rp 80.000.000",
+          direct_video: "Rp 32.500.000",
+          direct_orders: "2.580",
+          sold: "4.820",
+          direct_live_orders: "1.840",
+          live_sold: "3.280",
+          direct_video_orders: "740",
+          video_sold: "1.540",
+          kreator_sold: "4.820",
+          komisi: "Rp 15.000.000",
           dasar: "10%",
-          live_views: "24.500",
-          views: "68.200",
-          live_broadcasts: "6",
-          videos: "12"
+          live_views: "64.500",
+          views: "180.200",
+          live_broadcasts: "48",
+          videos: "18",
+          partner_gmv: "Rp 37.500.000",
+          partner_orders: "870"
+        },
+        {
+          id: 2,
+          tanggal: "17/05/2026",
+          uid: "UID-0002",
+          username: "@clarissa.style",
+          followers: "94.500",
+          gmv: "Rp 35.000.000",
+          pesanan: "940",
+          live_gmv: "Rp 25.000.000",
+          video_gmv: "Rp 10.000.000",
+          live_orders: "670",
+          video_orders: "270",
+          ctr_live: "4.2%",
+          ctr_video: "3.0%",
+          direct_gmv: "Rp 21.000.000",
+          direct_live: "Rp 15.000.000",
+          direct_video: "Rp 6.000.000",
+          direct_orders: "580",
+          sold: "1.050",
+          direct_live_orders: "410",
+          live_sold: "720",
+          direct_video_orders: "170",
+          video_sold: "330",
+          kreator_sold: "1.050",
+          komisi: "Rp 3.500.000",
+          dasar: "10%",
+          live_views: "28.900",
+          views: "72.400",
+          live_broadcasts: "32",
+          videos: "12",
+          partner_gmv: "Rp 21.000.000",
+          partner_orders: "350"
         }
       ];
 
@@ -408,10 +1214,22 @@
       const tableBody = document.getElementById("performaTableBody");
       const btnFilter = document.getElementById("btnFilterPerforma");
       const filterDropdown = document.getElementById("filterPerformaDropdown");
+      const filterActiveBadge = document.getElementById("filterActiveBadge");
       const selUser = document.getElementById("filterUsername");
       const selKomisi = document.getElementById("filterKomisi");
       const btnApplyFilter = document.getElementById("applyStatusFilterBtn");
       const btnResetFilter = document.getElementById("resetFilterBtn");
+
+      const btnCalendar = document.getElementById("btnCalendarPerforma");
+      const calendarDropdown = document.getElementById("calendarPerformaDropdown");
+      const calendarActiveBadge = document.getElementById("calendarActiveBadge");
+      const filterStartDate = document.getElementById("filterStartDate");
+      const filterEndDate = document.getElementById("filterEndDate");
+      const btnApplyDateFilter = document.getElementById("applyDateFilterBtn");
+      const btnResetDateFilter = document.getElementById("resetDateFilterBtn");
+
+      const searchInput = document.getElementById("searchPerformaInput");
+      const clearSearchBtn = document.getElementById("clearSearchPerformaBtn");
 
       const modalLihatPerforma = document.getElementById("performaViewModal");
       const modalEditPerforma = document.getElementById("performaEditModal");
@@ -419,6 +1237,26 @@
       const formEditPerforma = document.getElementById("formEditPerforma");
       const btnConfirmDeletePerforma = document.getElementById("confirmDeletePerformaBtn");
       let pendingDeletePerformaId = null;
+
+      let activeStartDate = null;
+      let activeEndDate = null;
+
+      function parseDMY(str) {
+        if (!str || typeof str !== "string") return null;
+        const parts = str.trim().split(/[\/\-\.]/);
+        if (parts.length === 3) {
+          if (parts[0].length === 4) {
+            // YYYY-MM-DD
+            return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+          }
+          // DD/MM/YYYY
+          const d = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const y = parseInt(parts[2], 10);
+          return new Date(y, m, d);
+        }
+        return new Date(str);
+      }
 
       function updateUserFilterOptions() {
         if (!selUser) return;
@@ -438,10 +1276,64 @@
         if (!tableBody) return;
         tableBody.innerHTML = "";
         updateUserFilterOptions();
-        
+
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        if (typeof window.bmToggleEmptyState === 'function') {
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, performaDb.length === 0);
+        } else {
+          if (performaDb.length === 0) {
+            if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+            if (emptyTableState) {
+              emptyTableState.classList.remove("is-hidden");
+              emptyTableState.classList.add("is-visible");
+              emptyTableState.style.setProperty("display", "flex", "important");
+            }
+          } else {
+            if (tableWrapper) {
+              tableWrapper.style.removeProperty("display");
+              if (tableWrapper.style.display === "none") tableWrapper.style.display = "";
+            }
+            if (emptyTableState) {
+              emptyTableState.classList.add("is-hidden");
+              emptyTableState.classList.remove("is-visible");
+              emptyTableState.style.setProperty("display", "none", "important");
+            }
+          }
+        }
+
+        if (performaDb.length === 0) {
+          return;
+        }
+
         const valUser = selUser ? selUser.value : "Semua";
         const valKomisi = selKomisi ? selKomisi.value : "Semua";
-        
+        const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
+
+        // Update Filter Badge
+        let filterCount = 0;
+        if (valUser !== "Semua") filterCount++;
+        if (valKomisi !== "Semua") filterCount++;
+        if (filterActiveBadge) {
+          filterActiveBadge.style.display = filterCount > 0 ? "flex" : "none";
+          filterActiveBadge.textContent = filterCount;
+        }
+        if (btnFilter) {
+          if (filterCount > 0) btnFilter.classList.add("btn-filter-active");
+          else btnFilter.classList.remove("btn-filter-active");
+        }
+
+        // Update Calendar Badge
+        let hasDateFilter = activeStartDate || activeEndDate;
+        if (calendarActiveBadge) {
+          calendarActiveBadge.style.display = hasDateFilter ? "flex" : "none";
+        }
+        if (btnCalendar) {
+          if (hasDateFilter) btnCalendar.classList.add("btn-calendar-active");
+          else btnCalendar.classList.remove("btn-calendar-active");
+        }
+
         const filtered = performaDb.filter(item => {
           const matchUser = (valUser === "Semua" || item.username === valUser);
           let matchKomisi = true;
@@ -450,27 +1342,42 @@
           } else if (valKomisi === "Tidak Ada") {
             matchKomisi = (item.komisi === "Rp 0" || item.komisi === "");
           }
-          return matchUser && matchKomisi;
+          let matchSearch = true;
+          if (searchQuery) {
+            matchSearch = (item.username && item.username.toLowerCase().includes(searchQuery)) ||
+              (item.uid && item.uid.toLowerCase().includes(searchQuery)) ||
+              (item.tanggal && item.tanggal.toLowerCase().includes(searchQuery));
+          }
+          let matchDate = true;
+          if (activeStartDate || activeEndDate) {
+            const itemDate = parseDMY(item.tanggal);
+            if (itemDate) {
+              if (activeStartDate && itemDate < activeStartDate) matchDate = false;
+              if (activeEndDate && itemDate > activeEndDate) matchDate = false;
+            }
+          }
+          return matchUser && matchKomisi && matchSearch && matchDate;
         });
-        
+
         if (filtered.length === 0) {
           tableBody.innerHTML = `
             <tr>
-              <td colspan="30" style="text-align: left; padding: 28px 24px; color: #a1a1a5; font-size: 14px;">
-                <div style="position: sticky; left: 24px; display: inline-block;">Tidak ada data performa kreator</div>
+              <td colspan="32" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data performa kreator yang sesuai dengan pencarian atau filter.
               </td>
             </tr>
           `;
           return;
         }
-        
+
         filtered.forEach((item, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${index + 1}</td>
             <td>${item.tanggal || "-"}</td>
             <td>${item.uid || "-"}</td>
-            <td style="font-weight: 600;">${item.username || "-"}</td>
+            <td style="font-weight: 600; color: #0284c7;">${item.username || "-"}</td>
+            <td>${item.followers || "-"}</td>
             <td>${item.gmv || "-"}</td>
             <td>${item.pesanan || "-"}</td>
             <td>${item.live_gmv || "-"}</td>
@@ -484,20 +1391,123 @@
             <td>${item.direct_video || "-"}</td>
             <td>${item.direct_orders || "-"}</td>
             <td>${item.sold || "-"}</td>
-            <td>${item.direct_live_sold || "-"}</td>
-            <td>${item.direct_live_prod || "-"}</td>
-            <td>${item.direct_video_sold || "-"}</td>
-            <td>${item.direct_video_prod || "-"}</td>
-            <td>${item.total_sold || "-"}</td>
+            <td>${item.direct_live_orders || "-"}</td>
+            <td>${item.live_sold || "-"}</td>
+            <td>${item.direct_video_orders || "-"}</td>
+            <td>${item.video_sold || "-"}</td>
+            <td>${item.kreator_sold || "-"}</td>
             <td style="font-weight: 600; color: #00c853;">${item.komisi || "-"}</td>
             <td>${item.dasar || "-"}</td>
             <td>${item.live_views || "-"}</td>
             <td>${item.views || "-"}</td>
             <td>${item.live_broadcasts || "-"}</td>
             <td>${item.videos || "-"}</td>
+            <td>${item.partner_gmv || "-"}</td>
+            <td>${item.partner_orders || "-"}</td>
+            <td class="tdActions text-center col-sticky-action">
+              <button class="btn-view btn-act-view" type="button" data-id="${item.id}" aria-label="Lihat" title="Lihat">
+                <i class="bx bx-show"></i>
+              </button>
+            </td>
           `;
           tableBody.appendChild(row);
         });
+
+        updatePinnedColumns();
+      }
+
+      // PINNED / FIXED COLUMNS CONTROLLER
+      const PIN_STORAGE_KEY = "bisa_performa_pinned_cols_v1";
+
+      function getSavedPinnedCols() {
+        try {
+          const saved = localStorage.getItem(PIN_STORAGE_KEY);
+          return saved ? JSON.parse(saved) : {};
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function savePinnedCols(map) {
+        try {
+          localStorage.setItem(PIN_STORAGE_KEY, JSON.stringify(map));
+        } catch (e) { }
+      }
+
+      function updatePinnedColumns() {
+        const table = document.querySelector(".campaign-table table");
+        if (!table) return;
+
+        const colConfig = [
+          { key: "tanggal", colIdx: 1 },
+          { key: "uid", colIdx: 2 },
+          { key: "username", colIdx: 3 }
+        ];
+
+        // Column 0 (#) width
+        const thFirst = table.querySelector("thead tr th:first-child");
+        let currentLeft = thFirst ? thFirst.getBoundingClientRect().width : 46;
+
+        colConfig.forEach(cfg => {
+          const chk = document.querySelector(`.chk-pin-col[data-col="${cfg.key}"]`);
+          const isPinned = chk ? chk.checked : false;
+
+          const th = table.querySelector(`thead tr th:nth-child(${cfg.colIdx + 1})`);
+          const tds = table.querySelectorAll(`tbody tr td:nth-child(${cfg.colIdx + 1})`);
+
+          if (isPinned) {
+            const width = th ? th.getBoundingClientRect().width : 110;
+            if (th) {
+              th.classList.add("col-pinned-sticky");
+              th.style.left = currentLeft + "px";
+            }
+            tds.forEach(td => {
+              td.classList.add("col-pinned-sticky");
+              td.style.left = currentLeft + "px";
+            });
+            currentLeft += width;
+          } else {
+            if (th) {
+              th.classList.remove("col-pinned-sticky");
+              th.style.left = "";
+            }
+            tds.forEach(td => {
+              td.classList.remove("col-pinned-sticky");
+              td.style.left = "";
+            });
+          }
+        });
+
+        // Manage .col-pinned-last for divider shadow
+        table.querySelectorAll(".col-pinned-last").forEach(el => el.classList.remove("col-pinned-last"));
+        const pinnedThs = table.querySelectorAll("thead tr th.col-pinned-sticky");
+        if (pinnedThs.length > 0) {
+          pinnedThs[pinnedThs.length - 1].classList.add("col-pinned-last");
+          table.querySelectorAll("tbody tr").forEach(r => {
+            const pinnedTds = r.querySelectorAll("td.col-pinned-sticky");
+            if (pinnedTds.length > 0) {
+              pinnedTds[pinnedTds.length - 1].classList.add("col-pinned-last");
+            }
+          });
+        }
+      }
+
+      function initPinnedColsEvents() {
+        const saved = getSavedPinnedCols();
+        document.querySelectorAll(".chk-pin-col").forEach(chk => {
+          const col = chk.getAttribute("data-col");
+          if (saved && saved[col]) {
+            chk.checked = true;
+          }
+          chk.addEventListener("change", () => {
+            const currentSaved = getSavedPinnedCols();
+            currentSaved[col] = chk.checked;
+            savePinnedCols(currentSaved);
+            updatePinnedColumns();
+          });
+        });
+
+        window.addEventListener("resize", updatePinnedColumns);
       }
 
       // Event delegation for table action buttons
@@ -511,32 +1521,42 @@
             e.preventDefault();
             e.stopPropagation();
             const id = btnView.getAttribute("data-id");
-            const item = performaDb.find(p => p.id === id);
+            const item = performaDb.find(p => String(p.id) === String(id));
             if (item) {
-              const elTanggal = document.getElementById("viewPerformaTanggal");
-              const elUid = document.getElementById("viewPerformaUid");
-              const elUser = document.getElementById("viewPerformaUsername");
-              const elGmv = document.getElementById("viewPerformaGmv");
-              const elPesanan = document.getElementById("viewPerformaPesanan");
-              const elKomisi = document.getElementById("viewPerformaKomisi");
-              const elLiveGmv = document.getElementById("viewPerformaLiveGmv");
-              const elVideoGmv = document.getElementById("viewPerformaVideoGmv");
-              const elCtrLive = document.getElementById("viewPerformaCtrLive");
-              const elCtrVideo = document.getElementById("viewPerformaCtrVideo");
-              const elTotalSold = document.getElementById("viewPerformaTotalSold");
-              const elDasar = document.getElementById("viewPerformaDasar");
-              if (elTanggal) elTanggal.textContent = item.tanggal || "-";
-              if (elUid) elUid.textContent = item.uid || "-";
-              if (elUser) elUser.textContent = item.username || "-";
-              if (elGmv) elGmv.textContent = item.gmv || "-";
-              if (elPesanan) elPesanan.textContent = item.pesanan || "-";
-              if (elKomisi) elKomisi.textContent = item.komisi || "-";
-              if (elLiveGmv) elLiveGmv.textContent = item.live_gmv || "-";
-              if (elVideoGmv) elVideoGmv.textContent = item.video_gmv || "-";
-              if (elCtrLive) elCtrLive.textContent = item.ctr_live || "-";
-              if (elCtrVideo) elCtrVideo.textContent = item.ctr_video || "-";
-              if (elTotalSold) elTotalSold.textContent = item.total_sold || "-";
-              if (elDasar) elDasar.textContent = item.dasar || "-";
+              const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val || "-";
+              };
+              setText("viewPerformaTanggal", item.tanggal);
+              setText("viewPerformaUid", item.uid);
+              setText("viewPerformaUsername", item.username);
+              setText("viewPerformaFollowers", item.followers);
+              setText("viewPerformaGmv", item.gmv);
+              setText("viewPerformaPesanan", item.pesanan);
+              setText("viewPerformaLiveGmv", item.live_gmv);
+              setText("viewPerformaVideoGmv", item.video_gmv);
+              setText("viewPerformaLiveOrders", item.live_orders);
+              setText("viewPerformaVideoOrders", item.video_orders);
+              setText("viewPerformaCtrLive", item.ctr_live);
+              setText("viewPerformaCtrVideo", item.ctr_video);
+              setText("viewPerformaDirectGmv", item.direct_gmv);
+              setText("viewPerformaDirectLive", item.direct_live);
+              setText("viewPerformaDirectVideo", item.direct_video);
+              setText("viewPerformaDirectOrders", item.direct_orders);
+              setText("viewPerformaSold", item.sold);
+              setText("viewPerformaDirectLiveOrders", item.direct_live_orders);
+              setText("viewPerformaLiveSold", item.live_sold);
+              setText("viewPerformaDirectVideoOrders", item.direct_video_orders);
+              setText("viewPerformaVideoSold", item.video_sold);
+              setText("viewPerformaKreatorSold", item.kreator_sold);
+              setText("viewPerformaKomisi", item.komisi);
+              setText("viewPerformaDasar", item.dasar);
+              setText("viewPerformaLiveViews", item.live_views);
+              setText("viewPerformaViews", item.views);
+              setText("viewPerformaLiveBroadcasts", item.live_broadcasts);
+              setText("viewPerformaVideos", item.videos);
+              setText("viewPerformaPartnerGmv", item.partner_gmv);
+              setText("viewPerformaPartnerOrders", item.partner_orders);
               if (modalLihatPerforma) modalLihatPerforma.classList.add("is-active");
             }
             return;
@@ -577,10 +1597,43 @@
             const id = btnDel.getAttribute("data-id");
             const item = performaDb.find(p => p.id === id);
             if (item) {
-              pendingDeletePerformaId = item.id;
-              const elText = document.getElementById("deletePerformaUsernameText");
-              if (elText) elText.textContent = `${item.username} (${item.tanggal})`;
-              if (modalHapusPerforma) modalHapusPerforma.classList.add("is-active");
+              if (typeof Swal !== "undefined") {
+                Swal.fire({
+                  title: 'Hapus Data Performa?',
+                  html: `Apakah Anda yakin ingin menghapus data performa untuk <strong>${item.username || ''}</strong> (${item.tanggal || ''})?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#ef4444',
+                  cancelButtonColor: '#94a3b8',
+                  confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+                  cancelButtonText: 'Batal',
+                  reverseButtons: true,
+                  focusCancel: true,
+                  customClass: { popup: 'swal2-bisa-popup' }
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    performaDb = performaDb.filter(p => p.id !== item.id);
+                    savePerformaDb();
+                    renderPerformaTable();
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Berhasil Dihapus!',
+                      html: `Data performa <strong>${item.username || ''}</strong> berhasil dihapus.`,
+                      confirmButtonColor: '#29A3D8',
+                      confirmButtonText: 'Selesai',
+                      timer: 2000,
+                      timerProgressBar: true,
+                      customClass: { popup: 'swal2-bisa-popup' }
+                    });
+                    if (typeof showToast === "function") showToast("Data performa berhasil dihapus", "success");
+                  }
+                });
+              } else {
+                pendingDeletePerformaId = item.id;
+                const elText = document.getElementById("deletePerformaUsernameText");
+                if (elText) elText.textContent = `${item.username} (${item.tanggal})`;
+                if (modalHapusPerforma) modalHapusPerforma.classList.add("is-active");
+              }
             }
             return;
           }
@@ -604,7 +1657,20 @@
             savePerformaDb();
             renderPerformaTable();
             if (modalEditPerforma) modalEditPerforma.classList.remove("is-active");
-            if (typeof showToast === "function") showToast("Data performa berhasil diperbarui");
+
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Diperbarui!',
+                html: `Data performa <strong>${performaDb[idx].username}</strong> berhasil diperbarui.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+            if (typeof showToast === "function") showToast("Data performa berhasil diperbarui", "success");
           }
         });
       }
@@ -623,16 +1689,53 @@
       }
 
       window.renderPerformaTable = renderPerformaTable;
-      window.addPerformaItem = function(item) {
+      window.addPerformaItem = function (item) {
         performaDb.unshift(item);
         savePerformaDb();
         renderPerformaTable();
       };
 
+      // Dropdown 3 dots handler
+      document.addEventListener("click", function (e) {
+        const dotsBtn = e.target.closest('[data-bm-dots="true"]');
+        if (dotsBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const dropdown = dotsBtn.closest(".bm-action-dropdown");
+          const menu = dropdown ? dropdown.querySelector(".bm-table-action-menu") : null;
+          const isOpen = menu && menu.classList.contains("show");
+
+          // Close all open menus first
+          document.querySelectorAll(".bm-action-dropdown .bm-table-action-menu.show").forEach(m => {
+            m.classList.remove("show");
+            const p = m.closest(".col-sticky-action");
+            if (p) p.classList.remove("is-open");
+          });
+
+          if (!isOpen && menu) {
+            menu.classList.add("show");
+            const tdParent = dropdown.closest(".col-sticky-action");
+            if (tdParent) tdParent.classList.add("is-open");
+          }
+          return;
+        }
+
+        // Click outside closes dropdowns
+        if (!e.target.closest(".bm-action-dropdown")) {
+          document.querySelectorAll(".bm-action-dropdown .bm-table-action-menu.show").forEach(m => {
+            m.classList.remove("show");
+            const p = m.closest(".col-sticky-action");
+            if (p) p.classList.remove("is-open");
+          });
+        }
+      });
+
+      // Filter Dropdown Handler
       if (btnFilter && filterDropdown) {
         btnFilter.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
+          if (calendarDropdown) calendarDropdown.classList.remove("is-active");
           filterDropdown.classList.toggle("is-active");
         });
 
@@ -659,13 +1762,297 @@
         });
       }
 
+      // Calendar Dropdown Handler
+      if (btnCalendar && calendarDropdown) {
+        btnCalendar.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (filterDropdown) filterDropdown.classList.remove("is-active");
+          calendarDropdown.classList.toggle("is-active");
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!calendarDropdown.contains(e.target) && e.target !== btnCalendar) {
+            calendarDropdown.classList.remove("is-active");
+          }
+        });
+      }
+
+      if (btnApplyDateFilter) {
+        btnApplyDateFilter.addEventListener("click", () => {
+          const sVal = filterStartDate ? filterStartDate.value : "";
+          const eVal = filterEndDate ? filterEndDate.value : "";
+          activeStartDate = sVal ? new Date(sVal + "T00:00:00") : null;
+          activeEndDate = eVal ? new Date(eVal + "T23:59:59") : null;
+          renderPerformaTable();
+          if (calendarDropdown) calendarDropdown.classList.remove("is-active");
+        });
+      }
+
+      if (btnResetDateFilter) {
+        btnResetDateFilter.addEventListener("click", () => {
+          if (filterStartDate) filterStartDate.value = "";
+          if (filterEndDate) filterEndDate.value = "";
+          activeStartDate = null;
+          activeEndDate = null;
+          renderPerformaTable();
+          if (calendarDropdown) calendarDropdown.classList.remove("is-active");
+        });
+      }
+
+      // Search Real-time Handler
+      if (searchInput) {
+        searchInput.addEventListener("input", function () {
+          const val = this.value;
+          if (clearSearchBtn) {
+            clearSearchBtn.style.display = val.length > 0 ? "inline-flex" : "none";
+          }
+          renderPerformaTable();
+        });
+      }
+
+      if (clearSearchBtn) {
+        clearSearchBtn.addEventListener("click", function () {
+          if (searchInput) {
+            searchInput.value = "";
+            this.style.display = "none";
+            searchInput.focus();
+            renderPerformaTable();
+          }
+        });
+      }
+
+      // Tambah Performa Form & Panel Toggle Handlers
+      const btnTambahPerforma = document.getElementById("btnTambahPerforma");
+      const btnCancelTambahPerforma = document.getElementById("btnCancelTambahPerforma");
+      const tablePanel = document.getElementById("tablePanel");
+      const formPanel = document.getElementById("formPanel");
+      const performaForm = document.getElementById("performaForm");
+      const performaFormatSelect = document.getElementById("performaFormatSelect");
+      const fileUploadContainer = document.getElementById("fileUploadContainer");
+      const performaFileInput = document.getElementById("performaFileInput");
+      const performaPasteInput = document.getElementById("performaPasteInput");
+      const previewBox = document.getElementById("previewBox");
+
+      if (btnTambahPerforma && tablePanel && formPanel) {
+        btnTambahPerforma.addEventListener("click", () => {
+          tablePanel.style.display = "none";
+          formPanel.style.display = "block";
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      if (btnCancelTambahPerforma && tablePanel && formPanel) {
+        btnCancelTambahPerforma.addEventListener("click", () => {
+          formPanel.style.display = "none";
+          tablePanel.style.display = "block";
+        });
+      }
+
+      if (performaFormatSelect) {
+        performaFormatSelect.addEventListener("change", function () {
+          if (this.value === "Paste_Data") {
+            if (fileUploadContainer) fileUploadContainer.style.display = "none";
+            if (performaPasteInput) performaPasteInput.style.display = "block";
+            if (performaFileInput) performaFileInput.removeAttribute("required");
+            if (performaPasteInput) performaPasteInput.setAttribute("required", "required");
+          } else {
+            if (fileUploadContainer) fileUploadContainer.style.display = "flex";
+            if (performaPasteInput) performaPasteInput.style.display = "none";
+            if (performaFileInput) performaFileInput.setAttribute("required", "required");
+            if (performaPasteInput) performaPasteInput.removeAttribute("required");
+          }
+        });
+      }
+
+      if (fileUploadContainer && performaFileInput) {
+        fileUploadContainer.addEventListener("click", () => {
+          performaFileInput.click();
+        });
+        performaFileInput.addEventListener("change", function () {
+          if (this.files && this.files[0]) {
+            const fileName = this.files[0].name;
+            const chooseBtn = fileUploadContainer.querySelector(".btn-choose-file");
+            if (chooseBtn) chooseBtn.textContent = fileName;
+            if (previewBox) {
+              previewBox.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0284c7; font-weight: 600;">
+                  <i class="bx bxs-file-doc" style="font-size: 20px;"></i>
+                  <span>${fileName} (${(this.files[0].size / 1024).toFixed(1)} KB)</span>
+                </div>
+              `;
+            }
+          }
+        });
+      }
+
+      if (performaForm) {
+        performaForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          const today = new Date();
+          const dd = String(today.getDate()).padStart(2, '0');
+          const mm = String(today.getMonth() + 1).padStart(2, '0');
+          const yyyy = today.getFullYear();
+          const defaultDate = `${dd}/${mm}/${yyyy}`;
+
+          const newItem = {
+            id: Date.now(),
+            tanggal: defaultDate,
+            uid: `UID-00${Math.floor(10 + Math.random() * 90)}`,
+            username: "@kreator.baru",
+            followers: "50.000",
+            gmv: "Rp 25.000.000",
+            pesanan: "500",
+            live_gmv: "Rp 15.000.000",
+            video_gmv: "Rp 10.000.000",
+            live_orders: "300",
+            video_orders: "200",
+            ctr_live: "4.5%",
+            ctr_video: "3.2%",
+            direct_gmv: "Rp 18.000.000",
+            direct_live: "Rp 10.000.000",
+            direct_video: "Rp 8.000.000",
+            direct_orders: "350",
+            sold: "650",
+            direct_live_orders: "200",
+            live_sold: "400",
+            direct_video_orders: "150",
+            video_sold: "250",
+            kreator_sold: "650",
+            komisi: "Rp 2.500.000",
+            dasar: "10%",
+            live_views: "15.000",
+            views: "35.000",
+            live_broadcasts: "12",
+            videos: "8",
+            partner_gmv: "Rp 7.000.000",
+            partner_orders: "150"
+          };
+
+          performaDb.unshift(newItem);
+          savePerformaDb();
+          renderPerformaTable();
+
+          if (formPanel) formPanel.style.display = "none";
+          if (tablePanel) tablePanel.style.display = "block";
+          performaForm.reset();
+          if (previewBox) previewBox.innerHTML = "";
+          const chooseBtn = fileUploadContainer?.querySelector(".btn-choose-file");
+          if (chooseBtn) chooseBtn.textContent = "Choose File";
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil Ditambahkan!',
+              html: `Data performa kreator berhasil ditambahkan ke dalam sistem.`,
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Selesai',
+              timer: 2200,
+              timerProgressBar: true,
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+          }
+        });
+      }
+
+      // Toolbar: Excel Export (CSV)
+      const btnExportExcel = document.getElementById("btnExportExcel");
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener("click", () => {
+          if (!performaDb || performaDb.length === 0) {
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: 'info',
+                title: 'Data Kosong',
+                text: 'Tidak ada data performa kreator untuk diekspor.',
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+            return;
+          }
+
+          const headers = [
+            "No", "Tanggal", "UID", "Username", "Followers", "GMV Afiliasi",
+            "Pesanan Afiliasi", "Live GMV", "Video GMV", "Live Orders", "Video Orders",
+            "CTR Live", "CTR Video", "Direct GMV", "Direct Live", "Direct Video",
+            "Direct Orders", "Sold", "Direct Live Orders", "Live Sold", "Direct Video Orders",
+            "Video Sold", "Kreator Sold", "Est Komisi", "Dasar Komisi", "Tayangan Live",
+            "Tayangan", "Siaran Live", "Video", "Partner GMV", "Partner Orders"
+          ];
+
+          const rows = performaDb.map((item, idx) => [
+            idx + 1,
+            `"${(item.tanggal || '').replace(/"/g, '""')}"`,
+            `"${(item.uid || '').replace(/"/g, '""')}"`,
+            `"${(item.username || '').replace(/"/g, '""')}"`,
+            `"${(item.followers || '').replace(/"/g, '""')}"`,
+            `"${(item.gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.pesanan || '').replace(/"/g, '""')}"`,
+            `"${(item.live_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.video_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.live_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.video_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.ctr_live || '').replace(/"/g, '""')}"`,
+            `"${(item.ctr_video || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_live || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_video || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.sold || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_live_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.live_sold || '').replace(/"/g, '""')}"`,
+            `"${(item.direct_video_orders || '').replace(/"/g, '""')}"`,
+            `"${(item.video_sold || '').replace(/"/g, '""')}"`,
+            `"${(item.kreator_sold || '').replace(/"/g, '""')}"`,
+            `"${(item.komisi || '').replace(/"/g, '""')}"`,
+            `"${(item.dasar || '').replace(/"/g, '""')}"`,
+            `"${(item.live_views || '').replace(/"/g, '""')}"`,
+            `"${(item.views || '').replace(/"/g, '""')}"`,
+            `"${(item.live_broadcasts || '').replace(/"/g, '""')}"`,
+            `"${(item.videos || '').replace(/"/g, '""')}"`,
+            `"${(item.partner_gmv || '').replace(/"/g, '""')}"`,
+            `"${(item.partner_orders || '').replace(/"/g, '""')}"`
+          ]);
+
+          const csvContent = "\\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\\r\\n");
+          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.setAttribute("href", url);
+          const todayStr = new Date().toISOString().split("T")[0];
+          link.setAttribute("download", `data_performa_kreator_${todayStr}.csv`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              icon: 'success',
+              title: 'Export Berhasil!',
+              text: 'Data performa kreator berhasil diekspor ke Excel (.csv).',
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Selesai',
+              timer: 2000,
+              timerProgressBar: true,
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+          }
+        });
+      }
+
+      initPinnedColsEvents();
       renderPerformaTable();
+
+      // Pastikan icon/tombol edit di kolom Aksi bersih tanpa jejak
+      const cleanEditBtns = () => {
+        document.querySelectorAll('.tdActions button.btn-outline-primary, .tdActions .btn-outline-primary, .tdActions button:has(.bx-edit-alt), .tdActions button[title*="Edit"], .tdActions button[aria-label*="Edit"]').forEach(el => el.remove());
+      };
+      cleanEditBtns();
+      setInterval(cleanEditBtns, 400);
     })();
   </script>
-  <script src="../staffkol_layout.js"></script>
-  <script src="../../sidebar_engine.js?v=4"></script>
 </body>
 
 </html>
-
-

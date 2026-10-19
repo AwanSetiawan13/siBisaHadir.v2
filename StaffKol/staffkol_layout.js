@@ -38,20 +38,24 @@
   const titles = {
     'staffkol_dashboard.html': 'Dashboard',
     'staffkol_kalender.html': 'Kalender',
-    'staffkol_kehadiran.html': 'Kehadiran',
+    'staffkol_kehadiran.html': 'Absensi',
     'staffkol_presensi_istirahat.html': 'Presensi Istirahat',
     'staffkol_presensi_lembur.html': 'Presensi Lembur',
     'staffkol_folder.html': 'My Folders',
     'staffkol_evaluasi_kinerja.html': 'Evaluasi Kinerja',
-    'staffkol_rencana_karier.html': 'Rencana Karier',
     'staffkol_target_capaian.html': 'Target & Capaian Kerja',
-    'staffkol_upgrade_skill.html': 'Rencana Karier',
+    'staffkol_upgrade_skill.html': 'Upgrade Skill',
     'staffkol_campaign.html': 'Campaign',
     'staffkol_dashboard_campaign.html': 'Dashboard Campaign',
-    'staffkol_kreator.html': 'Kreator',
+    'staffkol_laporan_campaign.html': 'Laporan Campaign',
+    'staffkol_kreator.html': 'Data Kreator',
+    'staffkol_tracking_kreator.html': 'Tracking Kreator',
     'staffkol_operasional.html': 'Operasional',
     'staffkol_Performa_Kreator.html': 'Performa Kreator',
     'staffkol_tracking_sampel.html': 'Tracking Sampel',
+    'staffkol_dashboard_brand.html': 'Dashboard Brands',
+    'staffkol_produk_brand.html': 'Produk & Brands',
+    'staffkol_data_brand.html': 'Data Brands',
     'staffkol_laporan.html': 'Laporan',
     'staffkol_Milestone.html': 'Milestone',
     'staffkol_pengaduan.html': 'Pengaduan',
@@ -98,10 +102,10 @@
         <span>Kalender</span>
       </a>
 
-      <!-- 1. Kehadiran -->
+      <!-- 1. Absensi -->
       <section class="nav-group ${isGroupActive(['staffkol_kehadiran.html', 'staffkol_presensi_istirahat.html', 'staffkol_presensi_lembur.html'])}">
         <button class="nav-group__toggle" type="button">
-          <span>Kehadiran</span>
+          <span>Absensi</span>
           <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 9l5 5 5-5"></path>
           </svg>
@@ -113,7 +117,7 @@
               <path d="M9 11l3 3L22 4"></path>
               <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
             </svg>
-            <span>Kehadiran</span>
+            <span>Absensi</span>
           </a>
 
           <a class="nav-item ${isActive('staffkol_presensi_istirahat.html')}" href="${resolveLink('absensi', 'staffkol_presensi_istirahat.html')}">
@@ -134,7 +138,7 @@
       </section>
 
       <!-- 2. Operasional -->
-      <section class="nav-group ${isGroupActive(['staffkol_dashboard_campaign.html', 'staffkol_campaign.html', 'staffkol_tracking_sampel.html', 'staffkol_kreator.html', 'staffkol_Performa_Kreator.html', 'staffkol_operasional.html'])}">
+      <section class="nav-group ${isGroupActive(['staffkol_campaign.html', 'staffkol_laporan_campaign.html', 'staffkol_kreator.html', 'staffkol_tracking_kreator.html', 'staffkol_dashboard_campaign.html', 'staffkol_tracking_sampel.html', 'staffkol_Performa_Kreator.html', 'staffkol_operasional.html'])}">
         <button class="nav-group__toggle" type="button">
           <span>Operasional</span>
           <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
@@ -161,13 +165,15 @@
             <span>Campaign</span>
           </a>
 
-          <a class="nav-item ${isActive('staffkol_tracking_sampel.html')}" href="${resolveLink('operasional', 'staffkol_tracking_sampel.html')}">
-            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="10" cy="10" r="5"></circle>
-              <path d="M14 14l6 6"></path>
-              <path d="M8 10h4M10 8v4"></path>
+          <a class="nav-item ${isActive('staffkol_laporan_campaign.html')}" href="${resolveLink('operasional', 'staffkol_laporan_campaign.html')}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
-            <span>Tracking Sampel</span>
+            <span>Laporan Campaign</span>
           </a>
 
           <a class="nav-item ${isActive('staffkol_kreator.html')}" href="${resolveLink('operasional', 'staffkol_kreator.html')}">
@@ -177,16 +183,25 @@
               <circle cx="17" cy="9" r="2"></circle>
               <path d="M15.5 14.5c2.7-.3 4.4 1.2 5 4"></path>
             </svg>
-            <span>Kreator</span>
+            <span>Data Kreator</span>
           </a>
 
-          <a class="nav-item ${isActive('staffkol_operasional.html')}" href="${resolveLink('operasional', 'staffkol_operasional.html')}">
+          <a class="nav-item ${isActive('staffkol_tracking_kreator.html')}" href="${resolveLink('operasional', 'staffkol_tracking_kreator.html')}">
             <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="7" r="4"></circle>
               <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"></path>
               <polyline points="16 3 20 7 16 11"></polyline>
             </svg>
             <span>Tracking Kreator</span>
+          </a>
+
+          <a class="nav-item ${isActive('staffkol_tracking_sampel.html')}" href="${resolveLink('operasional', 'staffkol_tracking_sampel.html')}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10" cy="10" r="5"></circle>
+              <path d="M14 14l6 6"></path>
+              <path d="M8 10h4M10 8v4"></path>
+            </svg>
+            <span>Tracking Sampel</span>
           </a>
 
           <a class="nav-item ${isActive('staffkol_Performa_Kreator.html')}" href="${resolveLink('operasional', 'staffkol_Performa_Kreator.html')}">
@@ -196,6 +211,45 @@
               <path d="M7 15l4-4 3 2 5-6"></path>
             </svg>
             <span>Performa Kreator</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- 2b. Brands -->
+      <section class="nav-group ${isGroupActive(['staffkol_dashboard_brand.html', 'staffkol_produk_brand.html', 'staffkol_data_brand.html'])}">
+        <button class="nav-group__toggle" type="button">
+          <span>Brands</span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 9l5 5 5-5"></path>
+          </svg>
+        </button>
+
+        <div class="nav-group__items">
+          <a class="nav-item ${isActive('staffkol_dashboard_brand.html')}" href="${resolveLink('brand', 'staffkol_dashboard_brand.html')}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3.5 10.5L12 3l8.5 7.5"></path>
+              <path d="M5.5 9.5V21h13V9.5"></path>
+              <path d="M9.5 21v-6h5v6"></path>
+            </svg>
+            <span>Dashboard Brands</span>
+          </a>
+
+          <a class="nav-item ${isActive('staffkol_produk_brand.html')}" href="${resolveLink('brand', 'staffkol_produk_brand.html')}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <span>Produk & Brands</span>
+          </a>
+
+          <a class="nav-item ${isActive('staffkol_data_brand.html')}" href="${resolveLink('brand', 'staffkol_data_brand.html')}">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
+              <path d="M2 12h20"></path>
+            </svg>
+            <span>Data Brands</span>
           </a>
         </div>
       </section>
@@ -283,7 +337,7 @@
       </section>
 
       <!-- 5. Kinerja -->
-      <section class="nav-group ${isGroupActive(['staffkol_evaluasi_kinerja.html', 'staffkol_target_capaian.html', 'staffkol_upgrade_skill.html', 'staffkol_rencana_karier.html'])}">
+      <section class="nav-group ${isGroupActive(['staffkol_evaluasi_kinerja.html', 'staffkol_target_capaian.html', 'staffkol_upgrade_skill.html'])}">
         <button class="nav-group__toggle" type="button">
           <span>Kinerja</span>
           <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
@@ -312,14 +366,14 @@
             <span>Target & Capaian Kerja</span>
           </a>
 
-          <a class="nav-item ${isActive('staffkol_upgrade_skill.html') || isActive('staffkol_rencana_karier.html')}" href="${resolveLink('kinerja', 'staffkol_upgrade_skill.html')}">
+          <a class="nav-item ${isActive('staffkol_upgrade_skill.html')}" href="${resolveLink('kinerja', 'staffkol_upgrade_skill.html')}">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
               <circle cx="8.5" cy="7" r="4"></circle>
               <line x1="18" y1="8" x2="23" y2="8"></line>
               <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
             </svg>
-            <span>Rencana Karier</span>
+            <span>Upgrade Skill</span>
           </a>
         </div>
       </section>
@@ -338,6 +392,18 @@
       </div>
 
       <div class="topbar__actions hirezy-topbar-right">
+        <!-- Search Input or Calendar Button -->
+        ${(currentFileName === 'staffkol_dashboard_brand.html' || currentFileName === 'staffkol_dashboard_campaign.html') ? `
+        <button id="btnCalendarTop" type="button" aria-label="Pilih tanggal" title="Pilih Tanggal" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 16px; border-radius: 8px; color: #64748b; font-size: 13px; font-weight: 500; cursor: pointer; height: 38px; outline: none; transition: all 0.2s;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.background='#f1f5f9';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#f8fafc';" onclick="(document.getElementById('calendarBrandModal') || document.getElementById('calendarCampaignModal'))?.classList.add('is-active')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span id="txtCalendarTop">Oktober</span>
+        </button>
+        ` : `
         <!-- Search Input -->
         <div class="hirezy-search-box">
           <svg class="hirezy-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -346,6 +412,7 @@
           </svg>
           <input id="menuSearch" class="hirezy-search-input" type="search" placeholder="Search candidate, vacancy, etc" />
         </div>
+        `}
 
         <!-- Chat / Message Icon -->
         <button class="hirezy-icon-btn" type="button" aria-label="Pesan / Chat" title="Pesan">
@@ -371,7 +438,7 @@
             </div>
             <div class="hirezy-user-text">
               <span class="hirezy-user-name">Andrew Sebastian</span>
-              <span class="hirezy-user-role">Lead HR</span>
+              <span class="hirezy-user-role">Staff KOL</span>
             </div>
             <svg class="hirezy-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>

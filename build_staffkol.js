@@ -16,10 +16,11 @@ function getFullSidebar(prefix, activePage) {
 
   const isDashCampaign = activePage === 'staffkol_dashboard_campaign.html' ? ' nav-item--active' : '';
   const isCampaign = activePage === 'staffkol_campaign.html' ? ' nav-item--active' : '';
+  const isLaporanCampaign = activePage === 'staffkol_laporan_campaign.html' ? ' nav-item--active' : '';
   const isTrackingSampel = activePage === 'staffkol_tracking_sampel.html' ? ' nav-item--active' : '';
   const isKreator = activePage === 'staffkol_kreator.html' ? ' nav-item--active' : '';
   const isPerformaKreator = activePage === 'staffkol_Performa_Kreator.html' ? ' nav-item--active' : '';
-  const isOprasionalGroup = (isDashCampaign || isCampaign || isTrackingSampel || isKreator || isPerformaKreator) ? '' : ' is-collapsed';
+  const isOprasionalGroup = (isDashCampaign || isCampaign || isLaporanCampaign || isTrackingSampel || isKreator || isPerformaKreator) ? '' : ' is-collapsed';
 
   const isFolder = activePage === 'staffkol_folder.html' ? ' nav-item--active' : '';
   const isDokumenGroup = isFolder ? '' : ' is-collapsed';
@@ -34,7 +35,7 @@ function getFullSidebar(prefix, activePage) {
 
   const isEvaluasi = activePage === 'staffkol_evaluasi_kinerja.html' ? ' nav-item--active' : '';
   const isTarget = activePage === 'staffkol_target_capaian.html' ? ' nav-item--active' : '';
-  const isUpgrade = (activePage === 'staffkol_upgrade_skill.html' || activePage === 'staffkol_rencana_karier.html') ? ' nav-item--active' : '';
+  const isUpgrade = activePage === 'staffkol_upgrade_skill.html' ? ' nav-item--active' : '';
   const isKinerjaGroup = (isEvaluasi || isTarget || isUpgrade) ? '' : ' is-collapsed';
 
   return `  <aside id="sidebar" class="sidebar kol-sidebar">
@@ -128,6 +129,17 @@ function getFullSidebar(prefix, activePage) {
               <path d="M18 9.5c1 .6 1.5 1.4 1.5 2.5S19 13.9 18 14.5"></path>
             </svg>
             <span>Campaign</span>
+          </a>
+
+          <a class="nav-item${isLaporanCampaign}" href="${prefix}operasional/staffkol_laporan_campaign.html">
+            <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Laporan Campaign</span>
           </a>
 
           <a class="nav-item${isTrackingSampel}" href="${prefix}operasional/staffkol_tracking_sampel.html">
@@ -285,7 +297,7 @@ function getFullSidebar(prefix, activePage) {
               <line x1="18" y1="8" x2="23" y2="8"></line>
               <line x1="20.5" y1="5.5" x2="20.5" y2="10.5"></line>
             </svg>
-            <span>Rencana Karier</span>
+            <span>Upgrade Skill</span>
           </a>
         </div>
       </section>

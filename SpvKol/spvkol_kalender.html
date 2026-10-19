@@ -216,7 +216,7 @@
       const todayDay = now.getDate();
       const scheduleDb = {
         [String(todayDay)]: [
-          { id: 1, title: "<i>Diskusi dengan Brand A terkait dengan Keberjalannya Campaign A</i>", desc: "Meeting", time: "09.00 - 11.00", status: "pending" }
+          { id: 1, title: "Meeting", desc: "Diskusi dengan Brand A terkait dengan Keberjalannya Campaign A", time: "09.00 - 11.00", status: "pending" }
         ],
         "12": [
           { id: 2, title: "Meeting", desc: "Bersama Bisa Hijab Official", time: "09.00 - 12.00", status: "pending" }
@@ -328,8 +328,19 @@
           }
 
           // Strip type prefix if present
-          const displayTitle = item.title.replace(/^\[.*?\]\s*/, "");
-          const typeLabel = item.title.match(/^\[(.*?)\]/) ? item.title.match(/^\[(.*?)\]/)[1] : (item.desc || "Kegiatan");
+          let displayTitle = item.title.replace(/^\[.*?\]\s*/, "");
+          let typeLabel = "Kegiatan";
+          if (item.title.match(/^\[(.*?)\]/)) {
+            typeLabel = item.title.match(/^\[(.*?)\]/)[1];
+          } else if (item.title === "Meeting") {
+            displayTitle = item.desc || item.title;
+            typeLabel = "Meeting";
+          } else if (item.desc === "Meeting") {
+            displayTitle = item.title;
+            typeLabel = "Meeting";
+          } else {
+            typeLabel = item.desc || "Kegiatan";
+          }
 
           const div = document.createElement("div");
           div.className = "db-activity-item";

@@ -57,13 +57,8 @@ function getSpvSidebar(prefix, mediaPrefix, logoutHref, activePage) {
   return `  <aside id="sidebar" class="sidebar kol-sidebar">
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <div class="sidebar-brand__logo-wrap">
-          <img class="brand-logo brand-logo--sidebar" src="${mediaPrefix}logo.png" alt="Logo Bisa Media" />
-        </div>
-        <div class="sidebar-brand__text">
-          <span class="brand-name brand-name--dark">Bisa Media</span>
-          <span class="sidebar-brand__badge">MCN Management</span>
-        </div>
+        <img class="brand-logo brand-logo--sidebar" src="${mediaPrefix}logo.png" style="width:38px;height:38px;object-fit:contain;" alt="Logo Bisa Media" />
+        <span class="brand-name brand-name--dark">Bisa Media</span>
       </div>
     </div>
 

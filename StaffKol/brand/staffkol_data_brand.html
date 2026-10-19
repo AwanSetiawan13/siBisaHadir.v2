@@ -1,0 +1,2350 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Brands | Staff KOL - Bisa Media</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="../../style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- Boxicons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" />
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    .brand-card .bm-action-dropdown {
+      position: relative;
+      display: inline-block;
+      margin-top: 8px;
+    }
+    .brand-card .bm-table-action-menu {
+      position: absolute !important;
+      top: calc(100% + 4px) !important;
+      left: 0 !important;
+      right: auto !important;
+      z-index: 9999 !important;
+      min-width: 145px;
+      background: #ffffff !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      border-radius: 8px !important;
+    }
+    .brand-card__logo-box {
+      width: 90px !important;
+      height: 90px !important;
+      border: 1px solid #e2e2e5 !important;
+      border-radius: 8px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+      background: #ffffff !important;
+      padding: 8px !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+    }
+    .brand-card__logo-box img {
+      max-width: 100% !important;
+      max-height: 100% !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+      display: block !important;
+    }
+    .brand-logo-upload-box {
+      padding: 10px !important;
+      box-sizing: border-box !important;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .brand-logo-upload-box.has-image:hover {
+      border-color: #29A3D8 !important;
+      box-shadow: 0 4px 12px rgba(41, 163, 216, 0.15) !important;
+    }
+    .brand-logo-preview img {
+      max-width: 100% !important;
+      max-height: 100% !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+      display: block !important;
+    }
+    .brand-logo-change-badge {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.22);
+      border: 1.5px solid #ffffff;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 5;
+      pointer-events: none;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0.2px;
+    }
+    .brand-logo-upload-box:hover .brand-logo-change-badge {
+      background: #29A3D8;
+      border-color: #ffffff;
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 5px 14px rgba(41, 163, 216, 0.4);
+    }
+    .brand-logo-hint {
+      font-size: 11.5px;
+      color: #64748b;
+      display: none;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: color 0.15s ease;
+      user-select: none;
+      margin-top: 2px;
+    }
+    .brand-logo-hint:hover {
+      color: #29A3D8;
+    }
+    #brandViewModal .modal-box {
+      background: #ffffff !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+      border-radius: 8px !important;
+      max-height: 90vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+    }
+    #brandViewModal .modal-form-grid-brand {
+      overflow-y: auto !important;
+      padding-right: 4px;
+    }
+    /* Brand View Modal Sampel Component */
+    .view-sampel-box {
+      grid-column: span 12;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      padding: 14px 16px;
+      margin: 4px 0;
+    }
+    .view-sampel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .view-sampel-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .view-sampel-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      background: #e0f2fe;
+      color: #0284c7;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .view-sampel-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 216px; /* Consistent height for 3 cards so modal doesn't jump */
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .view-sampel-list.is-changing {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    .view-sampel-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      height: 64px;
+      box-sizing: border-box;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      animation: sampelCardFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    }
+    @keyframes sampelCardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .view-sampel-card:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+      transform: translateY(-1.5px);
+    }
+    .view-sampel-card-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .view-sampel-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid #e2e8f0;
+      background: #f1f5f9;
+      flex-shrink: 0;
+    }
+    .view-sampel-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+    .view-sampel-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .view-sampel-pid {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11.5px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .view-sampel-pid-tag {
+      background: #f1f5f9;
+      color: #475569;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 11px;
+      margin-left: 4px;
+    }
+    /* Pagination Styles */
+    .view-sampel-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #e2e8f0;
+    }
+    .view-sampel-page-info {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .view-sampel-page-buttons {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .view-sampel-page-btn {
+      min-width: 28px;
+      height: 28px;
+      padding: 0 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: 'Outfit', sans-serif;
+    }
+    .view-sampel-page-btn:hover:not(:disabled):not(.active) {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #0f172a;
+    }
+    .view-sampel-page-btn.active {
+      background: #29A3D8 !important;
+      border-color: #29A3D8 !important;
+      color: #ffffff !important;
+      cursor: default;
+    }
+    .view-sampel-page-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Brand Modal Container & Scroll */
+    .brand-modal-box {
+      max-height: 92vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+    }
+    #brandForm {
+      overflow-y: auto !important;
+      max-height: calc(92vh - 130px) !important;
+      padding-right: 6px;
+    }
+
+    /* Sampel Section & Card Styling matching Image 2 */
+    .brand-sampel-section {
+      grid-column: span 12;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+    .brand-sampel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      background: #ffffff;
+      padding: 8px 0 10px 0;
+      border-bottom: 1.5px solid #f1f5f9;
+    }
+    .brand-sampel-title {
+      font-size: 16px;
+      color: #17171a;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+    }
+    .btn-tambah-sampel {
+      font-size: 13px;
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .btn-tambah-sampel:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+    .brand-sampel-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Individual Sample Card Item */
+    .sampel-card-item {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      position: relative;
+      box-sizing: border-box;
+      width: 100%;
+    }
+    .sampel-card-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .sampel-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      font-family: 'Outfit', sans-serif;
+    }
+    .btn-hapus-sampel-card {
+      background: #dc2626;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 5px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .btn-hapus-sampel-card:hover {
+      background: #b91c1c;
+      transform: translateY(-1px);
+    }
+
+    /* Grid layout inside card */
+    .sampel-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px 16px;
+    }
+    .sampel-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sampel-field-label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #1f2937;
+      font-family: 'Outfit', sans-serif;
+    }
+    .sampel-field-input {
+      width: 100%;
+      height: 38px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 13px;
+      color: #1f2937;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .sampel-field-input:focus {
+      border-color: #29A3D8;
+      box-shadow: 0 0 0 2px rgba(41, 163, 216, 0.15);
+    }
+    .sampel-field-input::placeholder {
+      color: #9ca3af;
+    }
+
+    /* Foto Sampel Box in Card */
+    .sampel-foto-box {
+      width: 100%;
+      height: 38px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px 0 8px;
+      background: #ffffff;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .sampel-foto-box:hover {
+      border-color: #29A3D8;
+    }
+    .btn-choose-file-styled {
+      background: #ffffff;
+      border: 1.5px solid #38bdf8;
+      color: #0284c7;
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-choose-file-styled:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+    }
+    /* Thumbnail with Eye Overlay on Hover */
+    .sampel-foto-thumb-wrap {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1.5px solid #0284c7;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #f8fafc;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .sampel-foto-thumb-wrap:hover {
+      transform: scale(1.12);
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+      border-color: #0369a1;
+    }
+    .sampel-foto-thumb-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.2s ease;
+    }
+    .sampel-foto-thumb-wrap:hover img {
+      filter: brightness(0.8);
+    }
+    .sampel-foto-thumb-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      opacity: 0.35;
+      transition: opacity 0.2s ease, background 0.2s ease;
+      pointer-events: none;
+    }
+    .sampel-foto-thumb-wrap:hover .sampel-foto-thumb-overlay {
+      opacity: 1;
+      background: rgba(15, 23, 42, 0.55);
+    }
+    .sampel-foto-thumb-overlay i {
+      font-size: 15px;
+      color: #ffffff;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.6));
+      transition: transform 0.2s ease;
+    }
+    .sampel-foto-thumb-wrap:hover .sampel-foto-thumb-overlay i {
+      transform: scale(1.15);
+    }
+    .sampel-foto-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-action-icon-styled {
+      width: 26px;
+      height: 26px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: #ffffff;
+      padding: 0;
+      transition: all 0.15s;
+    }
+    .btn-action-view {
+      border: 1px solid #38bdf8;
+      color: #0284c7;
+    }
+    .btn-action-view:hover {
+      background: #e0f2fe;
+    }
+    .btn-action-del {
+      border: 1px solid #f87171;
+      color: #dc2626;
+    }
+    .btn-action-del:hover {
+      background: #fee2e2;
+    }
+
+    /* Date input styling for Sampel Periode */
+    input[type="date"].sampel-field-input {
+      position: relative;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+    }
+    input[type="date"].sampel-field-input::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.65;
+      font-size: 16px;
+      transition: opacity 0.15s;
+    }
+    input[type="date"].sampel-field-input::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+
+    /* Varian Table Styling inside Sample Card */
+    .sampel-varian-table-wrap {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .sampel-varian-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      font-family: 'Outfit', sans-serif;
+    }
+    .sampel-varian-table thead th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 9px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .sampel-varian-table tbody td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      background: #ffffff;
+    }
+    .sampel-varian-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .sampel-varian-table tbody tr:hover td {
+      background: #f8fafc;
+    }
+    .sampel-table-input {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 12.5px;
+      color: #1f2937;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .sampel-table-input:focus {
+      border-color: #29A3D8;
+      box-shadow: 0 0 0 2px rgba(41, 163, 216, 0.12);
+    }
+    .sampel-table-input::placeholder {
+      color: #9ca3af;
+    }
+    .btn-tambah-varian-row {
+      background: #f0f9ff;
+      border: 1.5px solid #38bdf8;
+      color: #0284c7;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'Outfit', sans-serif;
+      transition: all 0.15s;
+    }
+    .btn-tambah-varian-row:hover {
+      background: #e0f2fe;
+      border-color: #0284c7;
+    }
+    .btn-del-varian-row {
+      width: 30px;
+      height: 30px;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #ef4444;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      padding: 0;
+      font-size: 15px;
+    }
+    .btn-del-varian-row:hover {
+      background: #fee2e2;
+      border-color: #f87171;
+    }
+    .sampel-varian-empty-row td {
+      text-align: center;
+      padding: 18px 12px;
+      color: #94a3b8;
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    /* Lightbox Modal for Sampel Photo Preview */
+    #sampelPhotoPreviewModal {
+      z-index: 10005 !important;
+    }
+    #sampelPhotoPreviewModal .modal-box {
+      max-width: 460px;
+      width: 90%;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+    .preview-modal-img-wrap {
+      width: 100%;
+      max-height: 340px;
+      min-height: 200px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+    .preview-modal-img-wrap img {
+      max-width: 100%;
+      max-height: 340px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+  
+    /* Sticky Aksi Column */
+    .campaign-table th.col-sticky-action,
+    .campaign-table td.col-sticky-action,
+    table th.col-sticky-action,
+    table td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10 !important;
+      background-color: #fff !important;
+      border-left: 1px solid #cbd5e1 !important;
+      padding-left: 20px !important;
+      padding-right: 20px !important;
+    }
+    .campaign-table th.col-sticky-action,
+    table th.col-sticky-action {
+      background-color: #f8fafc !important;
+      z-index: 11 !important;
+    }
+</style>
+</head>
+
+<body class="dashboard-body">
+        <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar hirezy-topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1>Brand</h1>
+      </div>
+
+      <!-- Metric Summary Cards outside Panel -->
+      <div class="milestone-metric-grid-new"
+        style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 29px; margin-bottom: 26px;">
+
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Brand Aktif">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Aktif</span>
+            <strong class="metric-value">1</strong>
+          </div>
+        </article>
+
+        <article class="metric-card">
+          <div class="metric-icon-box" title="Selesai Kerja Sama">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div>
+            <span class="metric-label">Selesai Kerja Sama</span>
+            <strong class="metric-value">0</strong>
+          </div>
+        </article>
+
+      </div>
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <button class="small-action-button" type="button" aria-label="Filter">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+              </svg>
+            </button>
+
+            <label class="campaign-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="10" cy="10" r="5"></circle>
+                <path d="M14 14l5 5"></path>
+              </svg>
+              <input type="search" placeholder="Cari...." />
+            </label>
+          </div>
+
+          <div class="campaign-toolbar__right">
+            <button class="btn-tambah" style="margin-right: 6px;" type="button">
+              + Tambah
+            </button>
+          </div>
+        </div>
+
+        <div class="brand-grid" id="brandGrid"></div>
+      </section>
+
+    </main>
+
+    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+  </div>
+
+  <!-- ===== MODAL POPUP TAMBAH / EDIT BRAND ===== -->
+  <div id="brandModal" class="modal-overlay">
+    <div class="modal-box brand-modal-box">
+      <div class="modal-header">
+        <h2 class="modal-title" id="brandModalTitle" style="font-weight: 500; font-size: 16px; color: #17171a;">Tambah <strong
+            style="font-weight: 700;">Brand</strong></h2>
+        <button id="closeBrandModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <form id="brandForm" class="modal-form-grid-brand">
+        <input type="hidden" id="brandEditId" value="" />
+        <input type="hidden" id="brandLogoData" value="" />
+        <!-- Logo Brand -->
+        <div class="form-group-full"
+          style="grid-column: span 12; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 8px;">
+          <label class="form-label" style="font-weight: 600; font-size: 14px;">Logo Brand</label>
+          <div class="brand-logo-upload-box" id="brandLogoUploadBox" title="Klik untuk memilih / mengganti logo brand">
+            <input type="file" id="brandLogoInput" accept="image/*" style="display: none;" />
+            <div class="brand-logo-preview" id="brandLogoPreview">
+              <span class="choose-file-btn">Choose File</span>
+            </div>
+          </div>
+          <span class="brand-logo-hint" id="brandLogoHint" title="Klik untuk memilih file baru">
+            <i class="bx bx-camera" style="font-size: 14px; color: #29A3D8;"></i> Klik kotak logo untuk ganti logo
+          </span>
+        </div>
+
+        <!-- Shop Code & Nama Brand -->
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Shop Code</label>
+          <input type="text" id="brandShopCode" class="form-input" placeholder="Tambah ID Brand" required />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Nama Brand</label>
+          <input type="text" id="brandNama" class="form-input" placeholder="Tambah Nama Brand" required />
+        </div>
+
+        <!-- Kategori & Telepon -->
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Kategori</label>
+          <select id="brandKategoriSelect" class="form-input" style="cursor: pointer;" required>
+            <option value="" disabled selected hidden>Pilih Kategori Produk</option>
+          </select>
+          <input type="hidden" name="kategori_produk" id="kategoriProdukVal" value="" />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Telepon</label>
+          <input type="text" id="brandTelepon" class="form-input" placeholder="Tambah Nomor Telepon" required />
+        </div>
+
+        <!-- Kontrak awal & Kontrak Akhir -->
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Kontrak awal</label>
+          <input type="date" id="brandKontrakAwal" class="form-input" required />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Kontrak Akhir</label>
+          <input type="date" id="brandKontrakAkhir" class="form-input" required />
+        </div>
+
+        <!-- Sampel Section -->
+        <div class="brand-sampel-section" style="grid-column: span 12;">
+          <div class="brand-sampel-header">
+            <span class="brand-sampel-title" style="font-weight: 600;">Sampel</span>
+            <button type="button" class="btn-tambah-sampel" id="btnAddSampel">Tambah</button>
+          </div>
+
+          <div class="brand-sampel-list" id="brandSampelList">
+            <!-- Dynamic rows will go here -->
+          </div>
+        </div>
+
+        <!-- ID ads account & Nama ads account -->
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">ID ads account</label>
+          <input type="text" id="brandAdsId" class="form-input" placeholder="Tambah ID Ads Account" />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Nama ads account</label>
+          <input type="text" id="brandAdsName" class="form-input" placeholder="Tambah Nama Ads Account" />
+        </div>
+
+        <!-- Email & Password -->
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Email</label>
+          <input type="email" id="brandEmail" class="form-input" placeholder="Tambah Email" required />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600;">Password</label>
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" id="brandPassword" class="form-input" placeholder="Tambah Password" required
+              style="padding-right: 40px; width: 100%;" />
+            <button type="button" class="password-toggle-btn" id="toggleBrandPassword"
+              style="position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: #9e9ea3;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alamat -->
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: 600;">Alamat</label>
+          <input type="text" id="brandAlamat" class="form-input" placeholder="Tambah Alamat Lengkap" />
+        </div>
+        <!-- Footer with standard full-width dashed line and blue outline button -->
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ababaf; width: 100%; grid-column: span 12;">
+          <button type="submit" id="brandSubmitBtn" style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;" onmouseover="this.style.background='#29A3D8';this.style.color='#fff';" onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL POPUP LIHAT DETAIL BRAND ===== -->
+  <div id="brandViewModal" class="modal-overlay">
+    <div class="modal-box modal-box--medium" style="max-width: 680px; width: 95%;">
+      <div class="modal-header">
+        <h2 class="modal-title" style="font-weight: 500; font-size: 16px; color: #17171a;">Detail <strong style="font-weight: 700;">Brand</strong></h2>
+        <button id="closeBrandViewModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <div class="modal-form-grid-brand" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; padding-top: 8px;">
+        <!-- Logo Preview -->
+        <div style="grid-column: span 12; display: flex; flex-direction: column; align-items: center; gap: 6px; margin-bottom: 6px;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Logo Brand</label>
+          <div style="width: 80px; height: 80px; border-radius: 8px; border: 1px solid #e2e8f0; background: #ffffff; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6px; box-sizing: border-box;">
+            <img id="viewBrandLogoImg" src="" alt="Logo Brand" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: none;" />
+            <span id="viewBrandLogoPlaceholder" style="color: #94a3b8; font-size: 12px;"><i class="bx bx-image" style="font-size: 32px;"></i></span>
+          </div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Shop Code</label>
+          <input type="text" id="viewBrandShopCode" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Nama Brand</label>
+          <input type="text" id="viewBrandNama" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Kategori</label>
+          <input type="text" id="viewBrandKategori" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Telepon</label>
+          <input type="text" id="viewBrandTelepon" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Kontrak Awal</label>
+          <input type="text" id="viewBrandKontrakAwal" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Kontrak Akhir</label>
+          <input type="text" id="viewBrandKontrakAkhir" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <!-- Sampel list in view modal with enhanced UI & Pagination -->
+        <div class="view-sampel-box">
+          <div class="view-sampel-header">
+            <div class="view-sampel-title">
+              <i class="bx bx-package" style="font-size: 18px; color: #29A3D8;"></i>
+              <span>Daftar Sampel</span>
+              <span class="view-sampel-badge" id="viewSampelTotalBadge">0 Sampel</span>
+            </div>
+            <span id="viewSampelCountText" style="font-size: 12px; color: #64748b;">Halaman 1</span>
+          </div>
+
+          <!-- Dynamic Cards Container -->
+          <div class="view-sampel-list" id="viewBrandSampelContainer">
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="view-sampel-pagination" id="viewSampelPagination" style="display: none;">
+            <span class="view-sampel-page-info" id="viewSampelPageInfo">Menampilkan 1-3 dari 5 sampel</span>
+            <div class="view-sampel-page-buttons" id="viewSampelPageButtons">
+              <!-- Buttons dynamically generated -->
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">ID Ads Account</label>
+          <input type="text" id="viewBrandAdsId" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Nama Ads Account</label>
+          <input type="text" id="viewBrandAdsName" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Email</label>
+          <input type="text" id="viewBrandEmail" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: 600; font-size: 13px;">Alamat</label>
+          <input type="text" id="viewBrandAlamat" class="form-input" readonly style="background-color: #f8fafc; cursor: default;" />
+        </div>
+      </div>
+
+      <!-- Footer with standard full-width dashed line and blue outline Tutup button -->
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ababaf; width: 100%;">
+        <button type="button" class="btn-cancel-modal" id="btnTutupViewBrand" onclick="document.getElementById('brandViewModal').classList.remove('is-active')" style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;" onmouseover="this.style.background='#29A3D8';this.style.color='#fff';" onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL POPUP HAPUS BRAND ===== -->
+  <div id="brandDeleteModal" class="modal-overlay">
+    <div class="modal-box delete-modal-box">
+      <h3 class="delete-modal-title">Hapus</h3>
+      <div class="delete-modal-icon-box">
+        <i class="bx bx-trash"></i>
+      </div>
+      <p class="delete-modal-desc">
+        Apakah Anda yakin ingin menghapus "<span id="deleteBrandNamaText">-</span>"?
+      </p>
+      <div class="delete-modal-actions">
+        <button type="button" class="btn-delete-cancel" onclick="document.getElementById('brandDeleteModal').classList.remove('is-active')">Batal</button>
+        <button type="button" class="btn-delete-confirm" id="confirmDeleteBrandBtn">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL POPUP PREVIEW FOTO SAMPEL (LIGHTBOX) ===== -->
+  <div id="sampelPhotoPreviewModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between;">
+        <h3 style="font-size: 15px; font-weight: 700; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 8px;">
+          <i class="bx bx-image" style="color: #29A3D8; font-size: 20px;"></i>
+          <span id="sampelPhotoPreviewTitle">Preview Foto Sampel</span>
+        </h3>
+        <button type="button" class="modal-close" onclick="document.getElementById('sampelPhotoPreviewModal').classList.remove('is-active')" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b;">&times;</button>
+      </div>
+      <div class="modal-divider" style="margin: 10px 0;"></div>
+      <div class="preview-modal-img-wrap">
+        <img id="sampelPhotoPreviewImg" src="" alt="Foto Sampel" />
+      </div>
+      <p id="sampelPhotoPreviewMeta" style="font-size: 12.5px; color: #64748b; margin: 6px 0 14px 0; text-align: center;"></p>
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="button" onclick="document.getElementById('sampelPhotoPreviewModal').classList.remove('is-active')" style="background: #29A3D8; color: #ffffff; border: none; border-radius: 6px; padding: 7px 22px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif;">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="../../script.js"></script>
+  <script>
+    (function () {
+      const modal = document.getElementById("brandModal");
+      const modalView = document.getElementById("brandViewModal");
+      const modalDelete = document.getElementById("brandDeleteModal");
+
+      const btnTambah = document.querySelector(".btn-tambah");
+      const btnClose = document.getElementById("closeBrandModal");
+      const form = document.getElementById("brandForm");
+
+      const logoInput = document.getElementById("brandLogoInput");
+      const logoPreview = document.getElementById("brandLogoPreview");
+      const logoUploadBox = document.getElementById("brandLogoUploadBox");
+
+      const btnAddSampel = document.getElementById("btnAddSampel");
+      const sampelList = document.getElementById("brandSampelList");
+
+      const togglePasswordBtn = document.getElementById("toggleBrandPassword");
+      const passwordInput = document.getElementById("brandPassword");
+      const confirmDeleteBtn = document.getElementById("confirmDeleteBrandBtn");
+
+      let pendingDeleteBrandId = null;
+
+      // Password Toggle
+      togglePasswordBtn && togglePasswordBtn.addEventListener("click", () => {
+        const isPassword = passwordInput.type === "password";
+        passwordInput.type = isPassword ? "text" : "password";
+      });
+
+      // Brand Logo Helpers (preview & badge penanda ganti logo)
+      function showBrandLogoWithBadge(src) {
+        logoUploadBox.classList.add("has-image");
+        logoPreview.innerHTML = `
+          <img src="${src}" alt="Logo Brand Preview" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 4px;" />
+          <div class="brand-logo-change-badge" title="Klik untuk mengganti logo">
+            <i class="bx bx-camera" style="font-size: 13px;"></i>
+            <span>Ganti Logo</span>
+          </div>
+        `;
+        const hint = document.getElementById("brandLogoHint");
+        if (hint) hint.style.display = "inline-flex";
+      }
+
+      function clearBrandLogoPreview() {
+        logoUploadBox.classList.remove("has-image");
+        logoPreview.innerHTML = `<span class="choose-file-btn">Choose File</span>`;
+        const hint = document.getElementById("brandLogoHint");
+        if (hint) hint.style.display = "none";
+      }
+
+      // Brand Logo Preview Trigger
+      logoUploadBox.addEventListener("click", () => {
+        logoInput.click();
+      });
+
+      document.getElementById("brandLogoHint")?.addEventListener("click", () => {
+        logoInput.click();
+      });
+
+      logoInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (evt) {
+            showBrandLogoWithBadge(evt.target.result);
+            const hiddenData = document.getElementById("brandLogoData");
+            if (hiddenData) hiddenData.value = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Show / Hide Modal
+      btnTambah && btnTambah.addEventListener("click", () => {
+        resetBrandForm();
+        modal.classList.add("is-active");
+      });
+
+      btnClose && btnClose.addEventListener("click", () => {
+        modal.classList.remove("is-active");
+      });
+
+      // Dynamic Sampel Cards matching Image 2
+      let sampelIndex = 0;
+
+      function createSampelRow(dataOrName = "", pidVal = "", varian1Val = "", varian2Val = "", fotoSrc = "") {
+        let sampleData = {};
+        if (typeof dataOrName === "object" && dataOrName !== null) {
+          sampleData = { ...dataOrName };
+        } else {
+          // Backward compatibility if called with multiple parameters
+          if (typeof varian1Val === "string" && (varian1Val.startsWith("data:image") || varian1Val.startsWith("http") || varian1Val.includes("/") || varian1Val.includes(".svg") || varian1Val.includes(".png") || varian1Val.includes(".jpg"))) {
+            fotoSrc = varian1Val;
+            varian1Val = "";
+            varian2Val = "";
+          }
+          sampleData = {
+            nama: dataOrName || "",
+            pid: pidVal || "",
+            varian1: varian1Val || "",
+            varian2: varian2Val || "",
+            foto: fotoSrc || "",
+            type: "",
+            link: "",
+            stok: "",
+            komisi: "",
+            periode: "",
+            publish: "Aktif",
+            varian1List: [],
+            varian2List: []
+          };
+        }
+
+        // Initialize legacy variant lists
+        let v1List = [];
+        if (Array.isArray(sampleData.varian1List) && sampleData.varian1List.length > 0) {
+          v1List = [...sampleData.varian1List];
+        } else if (sampleData.varian1 && typeof sampleData.varian1 === "string") {
+          v1List = sampleData.varian1.split(",").map(s => s.trim()).filter(Boolean);
+        }
+
+        let v2List = [];
+        if (Array.isArray(sampleData.varian2List) && sampleData.varian2List.length > 0) {
+          v2List = [...sampleData.varian2List];
+        } else if (sampleData.varian2 && typeof sampleData.varian2 === "string") {
+          v2List = sampleData.varian2.split(",").map(s => s.trim()).filter(Boolean);
+        }
+
+        // Initialize variant table rows
+        let variantRows = [];
+        if (Array.isArray(sampleData.variants) && sampleData.variants.length > 0) {
+          variantRows = sampleData.variants.map(v => ({
+            varian1: v.varian1 || "",
+            varian2: v.varian2 || "",
+            stok: v.stok !== undefined ? v.stok : ""
+          }));
+        } else {
+          // Construct rows from legacy v1List / v2List / sampleData.stok
+          if (v1List.length > 0 && v2List.length > 0) {
+            const defaultPerStock = Math.max(1, Math.floor((Number(sampleData.stok) || 10) / (v1List.length * v2List.length)));
+            v1List.forEach(item1 => {
+              v2List.forEach(item2 => {
+                variantRows.push({
+                  varian1: item1,
+                  varian2: item2,
+                  stok: defaultPerStock
+                });
+              });
+            });
+          } else if (v1List.length > 0) {
+            const defaultPerStock = Math.max(1, Math.floor((Number(sampleData.stok) || 10) / v1List.length));
+            v1List.forEach(item1 => {
+              variantRows.push({
+                varian1: item1,
+                varian2: "All Size",
+                stok: defaultPerStock
+              });
+            });
+          } else if (v2List.length > 0) {
+            const defaultPerStock = Math.max(1, Math.floor((Number(sampleData.stok) || 10) / v2List.length));
+            v2List.forEach(item2 => {
+              variantRows.push({
+                varian1: "Standar",
+                varian2: item2,
+                stok: defaultPerStock
+              });
+            });
+          } else {
+            variantRows = [
+              { varian1: "", varian2: "", stok: "" }
+            ];
+          }
+        }
+
+        function normalizeMonthName(p) {
+          if (!p) return "";
+          const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+          const clean = String(p).trim();
+          const found = months.find(m => m.toLowerCase() === clean.toLowerCase());
+          if (found) return found;
+          // If date format like YYYY-MM-DD or DD/MM/YYYY
+          if (clean.includes("-") || clean.includes("/")) {
+            const parts = clean.split(/[-/]/);
+            if (parts.length === 3) {
+              let monthNum = 0;
+              if (parts[0].length === 4) monthNum = parseInt(parts[1], 10);
+              else monthNum = parseInt(parts[1], 10);
+              if (monthNum >= 1 && monthNum <= 12) return months[monthNum - 1];
+            }
+          }
+          return clean;
+        }
+
+        const rowId = `sampel-card-${sampelIndex++}`;
+        const card = document.createElement("div");
+        card.className = "sampel-card-item";
+        card.id = rowId;
+
+        const currentFoto = sampleData.foto || "";
+        const currentType = sampleData.type || "";
+        const currentPublish = sampleData.publish || "Aktif";
+        const currentPeriode = normalizeMonthName(sampleData.periode || "");
+
+        card.innerHTML = `
+          <div class="sampel-card-topbar">
+            <span class="sampel-card-title">Tambah Produk</span>
+            <button type="button" class="btn-hapus-sampel-card" data-target="${rowId}">Hapus</button>
+          </div>
+
+          <div class="sampel-card-grid">
+            <!-- Row 1: Nama Produk, PID Sempel, Foto Sampel -->
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">Nama Produk</label>
+              <input type="text" class="sampel-field-input sampel-nama-input" placeholder="Nama Produk" value="${sampleData.nama ? sampleData.nama.replace(/"/g, '&quot;') : ''}" />
+            </div>
+
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">PID Sempel</label>
+              <input type="text" class="sampel-field-input sampel-pid-input" placeholder="XXX" value="${sampleData.pid ? sampleData.pid.replace(/"/g, '&quot;') : ''}" />
+            </div>
+
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">Foto Sampel</label>
+              <input type="hidden" class="sampel-foto-data" value="${currentFoto}" />
+              <input type="file" accept="image/*" class="sampel-file-input" style="display: none;" />
+              <div class="sampel-foto-box" id="fotoBox-${rowId}">
+                <button type="button" class="btn-choose-file-styled">Choose File</button>
+                <div class="sampel-foto-actions" id="fotoActions-${rowId}" style="display: ${currentFoto ? 'flex' : 'none'}; align-items: center; gap: 6px;">
+                  <div class="sampel-foto-thumb-wrap" id="fotoThumbWrap-${rowId}" title="Klik untuk melihat foto">
+                    <img id="fotoThumb-${rowId}" 
+                         src="${currentFoto || ''}" 
+                         alt="Foto Sampel" />
+                    <div class="sampel-foto-thumb-overlay">
+                      <i class="bx bx-show"></i>
+                    </div>
+                  </div>
+                  <button type="button" class="btn-action-icon-styled btn-action-del btn-sampel-del" title="Hapus Foto">
+                    <i class="bx bx-trash" style="font-size: 15px;"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2: Type, Link Produk, Total Stok -->
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">Type</label>
+              <select class="sampel-field-input sampel-type-input" style="cursor: pointer;">
+                <option value="" ${!currentType ? 'selected' : ''} disabled hidden>Campaign / Umum</option>
+                <option value="Campaign" ${currentType === 'Campaign' ? 'selected' : ''}>Campaign</option>
+                <option value="Umum" ${currentType === 'Umum' ? 'selected' : ''}>Umum</option>
+              </select>
+            </div>
+
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">Link Produk</label>
+              <input type="text" class="sampel-field-input sampel-link-input" placeholder="Link..." value="${sampleData.link ? sampleData.link.replace(/"/g, '&quot;') : ''}" />
+            </div>
+
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">Total Stok</label>
+              <input type="text" class="sampel-field-input sampel-stok-input" placeholder="0" value="0" readonly disabled style="background: #f1f5f9 !important; color: #475569 !important; cursor: not-allowed !important; border-color: #cbd5e1 !important; font-weight: 700 !important;" />
+            </div>
+
+            <!-- Row 3: komisi %, Periode, Publish -->
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">komisi %</label>
+              <input type="text" class="sampel-field-input sampel-komisi-input" placeholder="xxx %" value="${sampleData.komisi ? sampleData.komisi.replace(/"/g, '&quot;') : ''}" />
+            </div>
+
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">Periode</label>
+              <select class="sampel-field-input sampel-periode-input" style="cursor: pointer; width: 100%; font-family: 'Outfit', sans-serif;">
+                <option value="" ${!currentPeriode ? 'selected' : ''} disabled hidden>Pilih Bulan</option>
+                <option value="Januari" ${currentPeriode === 'Januari' ? 'selected' : ''}>Januari</option>
+                <option value="Februari" ${currentPeriode === 'Februari' ? 'selected' : ''}>Februari</option>
+                <option value="Maret" ${currentPeriode === 'Maret' ? 'selected' : ''}>Maret</option>
+                <option value="April" ${currentPeriode === 'April' ? 'selected' : ''}>April</option>
+                <option value="Mei" ${currentPeriode === 'Mei' ? 'selected' : ''}>Mei</option>
+                <option value="Juni" ${currentPeriode === 'Juni' ? 'selected' : ''}>Juni</option>
+                <option value="Juli" ${currentPeriode === 'Juli' ? 'selected' : ''}>Juli</option>
+                <option value="Agustus" ${currentPeriode === 'Agustus' ? 'selected' : ''}>Agustus</option>
+                <option value="September" ${currentPeriode === 'September' ? 'selected' : ''}>September</option>
+                <option value="Oktober" ${currentPeriode === 'Oktober' ? 'selected' : ''}>Oktober</option>
+                <option value="November" ${currentPeriode === 'November' ? 'selected' : ''}>November</option>
+                <option value="Desember" ${currentPeriode === 'Desember' ? 'selected' : ''}>Desember</option>
+              </select>
+            </div>
+
+            <div class="sampel-field-group">
+              <label class="sampel-field-label">Publish</label>
+              <select class="sampel-field-input sampel-publish-input" style="cursor: pointer;">
+                <option value="Aktif" ${currentPublish === 'Aktif' ? 'selected' : ''}>Aktif</option>
+                <option value="Non Aktif" ${currentPublish === 'Non Aktif' ? 'selected' : ''}>Non Aktif</option>
+              </select>
+            </div>
+
+            <!-- Row 4: Tabel Varian (3 Kolom: Varian 1, Varian 2, Stok & Aksi) -->
+            <div class="sampel-field-group" style="grid-column: span 3; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <label class="sampel-field-label" style="font-size: 13px; font-weight: 700; color: #1e293b; margin: 0;">Tabel Varian & Stok</label>
+                  <span style="font-size: 11.5px; color: #64748b; font-weight: 500;">(Varian 1 & 2 Opsional, Stok Ready)</span>
+                </div>
+                <button type="button" class="btn-tambah-varian-row" title="Tambah baris varian baru">
+                  <i class="bx bx-plus" style="font-size: 15px;"></i>
+                  <span>Tambah Varian</span>
+                </button>
+              </div>
+
+              <div class="sampel-varian-table-wrap">
+                <table class="sampel-varian-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 35%;">Varian 1 (Opsional)</th>
+                      <th style="width: 35%;">Varian 2 (Opsional)</th>
+                      <th style="width: 20%;">Stok</th>
+                      <th style="width: 10%; text-align: center;" class="col-sticky-action text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody class="sampel-varian-tbody">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Logic for Variant Table
+        const tbody = card.querySelector(".sampel-varian-tbody");
+        const btnAddVar = card.querySelector(".btn-tambah-varian-row");
+
+        function updateTotalStokFromVariants() {
+          const total = variantRows.reduce((sum, r) => sum + (parseInt(r.stok, 10) || 0), 0);
+          const mainStokInp = card.querySelector(".sampel-stok-input");
+          if (mainStokInp) {
+            mainStokInp.value = total;
+          }
+        }
+
+        function renderVariantTable() {
+          if (variantRows.length === 0) {
+            tbody.innerHTML = `
+              <tr class="sampel-varian-empty-row">
+                <td colspan="4">Belum ada data varian. Klik tombol "+ Tambah Varian" untuk menambahkan.</td>
+              </tr>
+            `;
+            updateTotalStokFromVariants();
+            return;
+          }
+
+          tbody.innerHTML = variantRows.map((r, idx) => `
+            <tr class="varian-row-item" data-idx="${idx}">
+              <td>
+                <input type="text" class="sampel-table-input var-v1-input" placeholder="Varian 1 (Opsional)" value="${(r.varian1 || '').replace(/"/g, '&quot;')}" />
+              </td>
+              <td>
+                <input type="text" class="sampel-table-input var-v2-input" placeholder="Varian 2 (Opsional)" value="${(r.varian2 || '').replace(/"/g, '&quot;')}" />
+              </td>
+              <td>
+                <input type="number" min="0" class="sampel-table-input var-stok-input" placeholder="0" value="${r.stok !== undefined ? String(r.stok).replace(/"/g, '&quot;') : ''}" />
+              </td>
+              <td style="text-align: center;">
+                <button type="button" class="btn-del-varian-row" data-idx="${idx}" title="Hapus varian ini">
+                  <i class="bx bx-trash" style="font-size: 15px;"></i>
+                </button>
+              </td>
+            </tr>
+          `).join("");
+
+          // Attach change listeners to sync state
+          tbody.querySelectorAll(".varian-row-item").forEach(tr => {
+            const idx = parseInt(tr.getAttribute("data-idx"), 10);
+            const inpV1 = tr.querySelector(".var-v1-input");
+            const inpV2 = tr.querySelector(".var-v2-input");
+            const inpStok = tr.querySelector(".var-stok-input");
+
+            if (inpV1) {
+              inpV1.addEventListener("input", () => {
+                if (variantRows[idx]) variantRows[idx].varian1 = inpV1.value;
+              });
+            }
+            if (inpV2) {
+              inpV2.addEventListener("input", () => {
+                if (variantRows[idx]) variantRows[idx].varian2 = inpV2.value;
+              });
+            }
+            if (inpStok) {
+              inpStok.addEventListener("input", () => {
+                if (variantRows[idx]) variantRows[idx].stok = inpStok.value;
+                updateTotalStokFromVariants();
+              });
+              inpStok.addEventListener("change", () => {
+                if (variantRows[idx]) variantRows[idx].stok = inpStok.value;
+                updateTotalStokFromVariants();
+              });
+              inpStok.addEventListener("keyup", () => {
+                if (variantRows[idx]) variantRows[idx].stok = inpStok.value;
+                updateTotalStokFromVariants();
+              });
+            }
+          });
+
+          // Delete buttons
+          tbody.querySelectorAll(".btn-del-varian-row").forEach(btn => {
+            btn.onclick = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const idx = parseInt(btn.getAttribute("data-idx"), 10);
+              variantRows.splice(idx, 1);
+              if (variantRows.length === 0) {
+                variantRows.push({ varian1: "", varian2: "", stok: "" });
+              }
+              renderVariantTable();
+              updateTotalStokFromVariants();
+            };
+          });
+
+          updateTotalStokFromVariants();
+        }
+
+        if (btnAddVar) {
+          btnAddVar.addEventListener("click", (e) => {
+            e.preventDefault();
+            const lastRow = variantRows.length > 0 ? variantRows[variantRows.length - 1] : null;
+            const defaultColor = lastRow ? (lastRow.varian1 || "") : "";
+            variantRows.push({ varian1: defaultColor, varian2: "", stok: "" });
+            renderVariantTable();
+            updateTotalStokFromVariants();
+            // Focus on the new row's varian 2 input
+            const newRows = tbody.querySelectorAll(".varian-row-item");
+            if (newRows.length > 0) {
+              const lastTr = newRows[newRows.length - 1];
+              const targetFocus = defaultColor ? lastTr.querySelector(".var-v2-input") : lastTr.querySelector(".var-v1-input");
+              if (targetFocus) targetFocus.focus();
+            }
+          });
+        }
+
+        renderVariantTable();
+        updateTotalStokFromVariants();
+
+        // Expose variants for form submission serialization
+        card._getVariants = () => {
+          return variantRows.map(r => ({
+            varian1: (r.varian1 || "").trim(),
+            varian2: (r.varian2 || "").trim(),
+            stok: r.stok !== undefined && r.stok !== "" ? String(r.stok).trim() : "0"
+          })).filter(r => r.varian1 || r.varian2 || (r.stok && r.stok !== "0"));
+        };
+        card._getV1List = () => Array.from(new Set(card._getVariants().map(v => v.varian1).filter(Boolean)));
+        card._getV2List = () => Array.from(new Set(card._getVariants().map(v => v.varian2).filter(Boolean)));
+
+        // Foto Sampel Actions
+        const fileInp = card.querySelector(".sampel-file-input");
+        const chooseBtn = card.querySelector(".btn-choose-file-styled");
+        const hiddenFoto = card.querySelector(".sampel-foto-data");
+        const fotoActions = card.querySelector(`#fotoActions-${rowId}`);
+        const fotoThumbWrap = card.querySelector(`#fotoThumbWrap-${rowId}`);
+        const fotoThumb = card.querySelector(`#fotoThumb-${rowId}`);
+        const delBtn = card.querySelector(".btn-sampel-del");
+
+        chooseBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          fileInp.click();
+        });
+
+        fileInp.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+              hiddenFoto.value = evt.target.result;
+              if (fotoThumb) {
+                fotoThumb.src = evt.target.result;
+              }
+              if (fotoThumbWrap) {
+                fotoThumbWrap.style.display = "inline-flex";
+              }
+              if (fotoActions) fotoActions.style.display = "flex";
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        if (delBtn) {
+          delBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            hiddenFoto.value = "";
+            fileInp.value = "";
+            if (fotoThumb) {
+              fotoThumb.src = "";
+            }
+            if (fotoThumbWrap) {
+              fotoThumbWrap.style.display = "none";
+            }
+            if (fotoActions) fotoActions.style.display = "none";
+          });
+        }
+
+        if (fotoThumbWrap) {
+          fotoThumbWrap.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const src = hiddenFoto.value;
+            if (!src) return;
+            const nameVal = card.querySelector(".sampel-nama-input")?.value.trim() || "Foto Sampel";
+            const pidVal = card.querySelector(".sampel-pid-input")?.value.trim() || "";
+            const sPid = pidVal ? `PID: ${pidVal}` : "";
+
+            const pModal = document.getElementById("sampelPhotoPreviewModal");
+            const pImg = document.getElementById("sampelPhotoPreviewImg");
+            const pTitle = document.getElementById("sampelPhotoPreviewTitle");
+            const pMeta = document.getElementById("sampelPhotoPreviewMeta");
+
+            if (pImg) pImg.src = src;
+            if (pTitle) pTitle.textContent = nameVal;
+            if (pMeta) pMeta.textContent = sPid;
+            if (pModal) pModal.classList.add("is-active");
+          });
+        }
+
+        // Hapus card button
+        card.querySelector(".btn-hapus-sampel-card").addEventListener("click", () => {
+          card.remove();
+        });
+
+        sampelList.appendChild(card);
+      }
+
+      btnAddSampel && btnAddSampel.addEventListener("click", () => {
+        createSampelRow();
+      });
+
+      // Kategori Produk Dynamic Data from Master Pendukung (LocalStorage)
+      function populateBrandCategories(selectedVal = "") {
+        const selectEl = document.getElementById("brandKategoriSelect");
+        const hiddenInput = document.getElementById("kategoriProdukVal");
+        if (!selectEl) return;
+
+        selectEl.innerHTML = '<option value="" disabled selected hidden>Pilih Kategori Produk</option>';
+
+        let categories = [];
+        try {
+          const saved = localStorage.getItem("spv_kategori_produk_v1");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              categories = parsed.map(k => (typeof k === "string" ? k : (k.kategori || k.namaKategori))).filter(Boolean);
+            }
+          }
+        } catch (e) {}
+
+        if (categories.length === 0) {
+          categories = ["Fashion Muslim", "Beauty & Care", "Food & Beverage", "Mom & Baby"];
+        }
+
+        // Deduplicate categories
+        categories = Array.from(new Set(categories));
+
+        if (selectedVal && !categories.includes(selectedVal)) {
+          categories.unshift(selectedVal);
+        }
+
+        categories.forEach(cat => {
+          const opt = document.createElement("option");
+          opt.value = cat;
+          opt.textContent = cat;
+          if (selectedVal && cat.toLowerCase() === selectedVal.toLowerCase()) {
+            opt.selected = true;
+          }
+          selectEl.appendChild(opt);
+        });
+
+        if (selectedVal) {
+          selectEl.value = selectedVal;
+          if (hiddenInput) hiddenInput.value = selectedVal;
+        } else {
+          selectEl.selectedIndex = 0;
+          if (hiddenInput) hiddenInput.value = "";
+        }
+
+        selectEl.onchange = function () {
+          if (hiddenInput) hiddenInput.value = selectEl.value;
+        };
+      }
+
+      function resetCategoryDropdown() {
+        populateBrandCategories("");
+      }
+      window.resetCategoryDropdown = resetCategoryDropdown;
+
+      // Brand Data & LocalStorage Persistence (v11 - Multi-Category Brand & Sampel Lengkap)
+      const BRAND_STORAGE_KEY = "bisa_brand_list_v12";
+            const DEFAULT_BRAND = [
+        {
+          id: 1,
+          logo: "../../media/logo.png",
+          shopCode: "SC-HIJAB-001",
+          nama: "Bisa Hijab Official",
+          kategori: "Fashion Muslim",
+          telepon: "081234567890",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          sampel: [
+            {
+              nama: "Pashmina Ceruty Baby Doll",
+              pid: "PID 001",
+              type: "Campaign",
+              link: "https://tiktok.com/@bisahijab/pashmina",
+              stok: "150",
+              komisi: "15%",
+              periode: "2026-01-01",
+              publish: "Aktif",
+              variants: [
+                { varian1: "Hitam", varian2: "Standar", stok: 35 },
+                { varian1: "Hitam", varian2: "Jumbo", stok: 25 },
+                { varian1: "Navy", varian2: "Standar", stok: 30 },
+                { varian1: "Navy", varian2: "Jumbo", stok: 20 },
+                { varian1: "Mocca", varian2: "Standar", stok: 40 }
+              ],
+              varian1List: ["Hitam", "Navy", "Mocca"],
+              varian2List: ["Standar", "Jumbo"],
+              varian1: "Hitam, Navy, Mocca",
+              varian2: "Standar, Jumbo",
+              foto: "../../media/hijab-pashmina.svg"
+            },
+            {
+              nama: "Segi Empat Paris Premium",
+              pid: "PID 002",
+              type: "Umum",
+              link: "https://tiktok.com/@bisahijab/paris",
+              stok: "200",
+              komisi: "10%",
+              periode: "2026-01-15",
+              publish: "Aktif",
+              variants: [
+                { varian1: "Navy", varian2: "115x115 cm", stok: 70 },
+                { varian1: "Denim", varian2: "115x115 cm", stok: 65 },
+                { varian1: "Army", varian2: "115x115 cm", stok: 65 }
+              ],
+              varian1List: ["Navy", "Denim", "Army"],
+              varian2List: ["115x115 cm"],
+              varian1: "Navy, Denim, Army",
+              varian2: "115x115 cm",
+              foto: "../../media/hijab-segiempat.svg"
+            },
+            {
+              nama: "Bergo Maryam Diamond Crepe",
+              pid: "PID 003",
+              type: "Campaign",
+              link: "https://tiktok.com/@bisahijab/bergo",
+              stok: "120",
+              komisi: "12%",
+              periode: "2026-02-01",
+              publish: "Aktif",
+              variants: [
+                { varian1: "Mocca", varian2: "Size M", stok: 30 },
+                { varian1: "Mocca", varian2: "Size L", stok: 30 },
+                { varian1: "Coksu", varian2: "Size M", stok: 30 },
+                { varian1: "Hitam", varian2: "Size L", stok: 30 }
+              ],
+              varian1List: ["Mocca", "Coksu", "Hitam"],
+              varian2List: ["Size M", "Size L"],
+              varian1: "Mocca, Coksu, Hitam",
+              varian2: "Size M, Size L",
+              foto: "../../media/hijab-bergo.svg"
+            }
+          ],
+          adsId: "UID-718294019284",
+          adsName: "BisaMedia_TikTok_Ads_Hijab",
+          email: "bisahijab@gmail.com",
+          password: "password123",
+          alamat: "Jl. Cisalak No. 47A, Sukamanah, Kec. Cipedes, Tasikmalaya, Jawa Barat 46131",
+          deskripsi: "Brand fashion muslimah dan produsen hijab premium berkualitas tinggi dengan berbagai varian pashmina, segi empat, bergo, dan hijab instan.",
+          pic: "Setiawan"
+        },
+        {
+          id: 2,
+          logo: "../../media/logo.png",
+          shopCode: "SC-GLOW-002",
+          nama: "Bisa Glow Skincare",
+          kategori: "Beauty & Care",
+          telepon: "081298765432",
+          kontrakAwal: "2026-02-01",
+          kontrakAkhir: "2026-12-31",
+          sampel: [
+            {
+              nama: "Serum Pencerah Vitamin C 30ml",
+              pid: "PID 010",
+              type: "Campaign",
+              link: "https://tiktok.com/@bisaglow/serum",
+              stok: "85",
+              komisi: "20%",
+              periode: "2026-02-01",
+              publish: "Aktif",
+              variants: [
+                { varian1: "30ml", varian2: "Regular", stok: 50 },
+                { varian1: "50ml", varian2: "Extra Glowing", stok: 35 }
+              ],
+              varian1List: ["30ml", "50ml"],
+              varian2List: ["Regular", "Extra Glowing"],
+              varian1: "30ml, 50ml",
+              varian2: "Regular, Extra Glowing",
+              foto: "../../media/logo.png"
+            },
+            {
+              nama: "Moisturizer Gel Ceramide 50g",
+              pid: "PID 011",
+              type: "Campaign",
+              link: "https://tiktok.com/@bisaglow/moisturizer",
+              stok: "90",
+              komisi: "18%",
+              periode: "2026-02-10",
+              publish: "Aktif",
+              variants: [
+                { varian1: "50g", varian2: "Gentle Barrier", stok: 50 },
+                { varian1: "100g", varian2: "Gentle Barrier", stok: 40 }
+              ],
+              varian1List: ["50g", "100g"],
+              varian2List: ["Gentle Barrier"],
+              varian1: "50g, 100g",
+              varian2: "Gentle Barrier",
+              foto: "../../media/logo.png"
+            }
+          ],
+          adsId: "UID-882019482710",
+          adsName: "BisaGlow_Beauty_TikTok",
+          email: "bisaglow@gmail.com",
+          password: "password123",
+          alamat: "Ruko Asia Plaza Blok B-12, Tasikmalaya, Jawa Barat",
+          deskripsi: "Brand perawatan kulit dan kosmetik terpercaya yang fokus pada produk pencerah dan perlindungan skin barrier alami.",
+          pic: "Amanda"
+        }
+      ];
+      let brandDb = DEFAULT_BRAND;
+
+      try {
+        ['bisa_brand_list', 'bisa_brand_list_v2', 'bisa_brand_list_v3', 'bisa_brand_list_v4', 'bisa_brand_list_v5', 'bisa_brand_list_v6', 'bisa_brand_list_v7', 'bisa_brand_list_v8', 'bisa_brand_list_v9', 'bisa_brand_list_v10', 'bisa_brand_list_v11'].forEach(k => {
+          try { localStorage.removeItem(k); } catch(e){}
+        });
+
+        if (!localStorage.getItem("bisa_brand_reset_v12")) {
+          try {
+            localStorage.removeItem(BRAND_STORAGE_KEY);
+            localStorage.setItem("bisa_brand_reset_v12", "true");
+          } catch(e){}
+        }
+
+        const saved = localStorage.getItem(BRAND_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            brandDb = parsed;
+          } else if (Array.isArray(parsed) && parsed.length === 0) {
+            brandDb = DEFAULT_BRAND;
+          }
+        } else {
+          localStorage.setItem(BRAND_STORAGE_KEY, JSON.stringify(DEFAULT_BRAND));
+        }
+      } catch (err) {
+        brandDb = DEFAULT_BRAND;
+      }
+
+      function saveBrandDb() {
+        try {
+          const jsonStr = JSON.stringify(brandDb);
+          localStorage.setItem(BRAND_STORAGE_KEY, jsonStr);
+          localStorage.setItem("bisa_brand_list_v9", jsonStr);
+          localStorage.setItem("bisa_brand_list", jsonStr);
+        } catch (err) {
+          console.error("Error saving brandDb:", err);
+        }
+      }
+
+      // Render Brand Cards
+      function renderBrandGrid(query = "") {
+        const brandGrid = document.getElementById("brandGrid");
+        if (!brandGrid) return;
+        brandGrid.innerHTML = "";
+
+        const activeMetric = document.querySelector(".milestone-metric-grid-new .metric-card:first-of-type .metric-value");
+        if (activeMetric) activeMetric.textContent = brandDb.length;
+
+        const q = query.toLowerCase().trim();
+        const filtered = brandDb.filter(b => {
+          if (!q) return true;
+          return (b.nama && b.nama.toLowerCase().includes(q)) || (b.kategori && b.kategori.toLowerCase().includes(q));
+        });
+        if (brandDb.length === 0) {
+          brandGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; width: 100%;">
+              <div class="app-empty-state is-visible" style="display: flex;">
+                <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+                  <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+                  <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+                  <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+                  <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+                  <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+                  <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+                  <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+                  <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+                  <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+                  <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+                  <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+                </svg>
+                <div class="app-empty-state__title">Belum ada data Brand</div>
+                <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan brand baru.</div>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
+        if (filtered.length === 0) {
+          brandGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #94a3b8; font-style: italic;">
+              Tidak ditemukan data brand yang sesuai dengan pencarian atau filter.
+            </div>
+          `;
+          return;
+        }
+
+        filtered.forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "brand-card";
+
+          let logoHtml = item.logo ? `<img src="${item.logo}" alt="${item.nama}" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block;" />` : `
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+              </svg>
+            `;
+
+          card.innerHTML = `
+            <div class="brand-card__logo-box">
+              ${logoHtml}
+            </div>
+            <div class="brand-card__info" style="flex: 1; min-width: 0;">
+              <h3 class="brand-card__name" style="word-break: break-word;">${item.nama || "-"}</h3>
+              <span class="brand-card__category" style="word-break: break-word;">${item.kategori || "Kategori"}</span>
+              
+              <div class="dropdown bm-action-dropdown" style="margin-top: 8px; position: relative;">
+                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                  data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi"
+                  style="background: #f1f5f9; border: 1px solid #e2e8f0; width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #475569;">
+                  <i class="bx bx-dots-vertical-rounded" style="font-size: 18px;"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu">
+                  <li>
+                    <button class="dropdown-item btn-act-view" type="button" data-id="${item.id}" title="Lihat">
+                      <span class="bm-menu-iconify"><i class="bx bx-show"></i></span>
+                      <span>Lihat</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button class="dropdown-item btn-act-edit" type="button" data-id="${item.id}" title="Edit">
+                      <span class="bm-menu-iconify"><i class="bx bx-edit-alt"></i></span>
+                      <span>Edit</span>
+                    </button>
+                  </li>
+                  <li>
+                    <button class="dropdown-item text-danger btn-act-delete" type="button" data-id="${item.id}" title="Hapus">
+                      <span class="bm-menu-iconify" style="background: #e02424 !important;"><i class="bx bx-trash"></i></span>
+                      <span>Hapus</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          `;
+          brandGrid.appendChild(card);
+        });
+      }
+
+      // Event delegation
+      const brandGridEl = document.getElementById("brandGrid");
+      if (brandGridEl) {
+        brandGridEl.addEventListener("click", (e) => {
+          const dotsBtn = e.target.closest('[data-bm-dots="true"]');
+          if (dotsBtn) {
+            e.preventDefault(); e.stopPropagation();
+            const menu = dotsBtn.closest('.bm-action-dropdown')?.querySelector('.bm-table-action-menu');
+            if (menu) {
+              const isOpen = menu.classList.contains('show');
+              document.querySelectorAll('.bm-table-action-menu.show').forEach(m => m.classList.remove('show'));
+              if (!isOpen) menu.classList.add('show');
+            }
+            return;
+          }
+
+          const btnView = e.target.closest(".btn-act-view");
+          const btnEdit = e.target.closest(".btn-act-edit");
+          const btnDel = e.target.closest(".btn-act-delete");
+
+          if (btnView) {
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.bm-table-action-menu.show').forEach(m => m.classList.remove('show'));
+            const item = brandDb.find(b => String(b.id) === String(btnView.getAttribute("data-id")));
+            if (item) openViewBrand(item);
+          } else if (btnEdit) {
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.bm-table-action-menu.show').forEach(m => m.classList.remove('show'));
+            const item = brandDb.find(b => String(b.id) === String(btnEdit.getAttribute("data-id")));
+            if (item) openEditBrand(item);
+          } else if (btnDel) {
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.bm-table-action-menu.show').forEach(m => m.classList.remove('show'));
+            const item = brandDb.find(b => String(b.id) === String(btnDel.getAttribute("data-id")));
+            if (item) {
+              pendingDeleteBrandId = item.id;
+              const delText = document.getElementById("deleteBrandNamaText");
+              if (delText) delText.textContent = item.nama || "Brand";
+              if (modalDelete) modalDelete.classList.add("is-active");
+            }
+          }
+        });
+      }
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest('.bm-action-dropdown')) {
+          document.querySelectorAll('.bm-table-action-menu.show').forEach(m => m.classList.remove('show'));
+        }
+      });
+
+      function openViewBrand(item) {
+        const logoImg = document.getElementById("viewBrandLogoImg");
+        const logoPh = document.getElementById("viewBrandLogoPlaceholder");
+        if (item.logo) {
+          if (logoImg) { logoImg.src = item.logo; logoImg.style.display = "block"; }
+          if (logoPh) logoPh.style.display = "none";
+        } else {
+          if (logoImg) { logoImg.src = ""; logoImg.style.display = "none"; }
+          if (logoPh) logoPh.style.display = "block";
+        }
+        document.getElementById("viewBrandShopCode").value = item.shopCode || "-";
+        document.getElementById("viewBrandNama").value = item.nama || "-";
+        document.getElementById("viewBrandKategori").value = item.kategori || "-";
+        document.getElementById("viewBrandTelepon").value = item.telepon || "-";
+        document.getElementById("viewBrandKontrakAwal").value = item.kontrakAwal || "-";
+        document.getElementById("viewBrandKontrakAkhir").value = item.kontrakAkhir || "-";
+        document.getElementById("viewBrandAdsId").value = item.adsId || "-";
+        document.getElementById("viewBrandAdsName").value = item.adsName || "-";
+        document.getElementById("viewBrandEmail").value = item.email || "-";
+        document.getElementById("viewBrandAlamat").value = item.alamat || "-";
+        
+        // State pagination sampel modal
+        let currentSampelList = Array.isArray(item.sampel) ? item.sampel : [];
+        let currentSampelPage = 1;
+        const SAMPEL_PAGE_SIZE = 3;
+
+        function renderModalSampelPage(page = 1, isInitial = false) {
+          currentSampelPage = page;
+          const container = document.getElementById("viewBrandSampelContainer");
+          const totalBadge = document.getElementById("viewSampelTotalBadge");
+          const countText = document.getElementById("viewSampelCountText");
+          const paginEl = document.getElementById("viewSampelPagination");
+          const pageInfo = document.getElementById("viewSampelPageInfo");
+          const pageBtns = document.getElementById("viewSampelPageButtons");
+
+          if (!container) return;
+
+          const total = currentSampelList.length;
+          if (totalBadge) totalBadge.textContent = `${total} Sampel`;
+
+          if (total === 0) {
+            container.innerHTML = `
+              <div style="text-align: center; padding: 24px 12px; color: #94a3b8; font-size: 12.5px; background: #fff; border-radius: 8px; border: 1px dashed #cbd5e1;">
+                <i class="bx bx-package" style="font-size: 28px; color: #cbd5e1; display: block; margin-bottom: 4px;"></i>
+                Belum ada data sampel untuk brand ini
+              </div>`;
+            if (paginEl) paginEl.style.display = "none";
+            if (countText) countText.textContent = "";
+            return;
+          }
+
+          const totalPages = Math.ceil(total / SAMPEL_PAGE_SIZE);
+          if (currentSampelPage > totalPages) currentSampelPage = totalPages;
+          if (currentSampelPage < 1) currentSampelPage = 1;
+
+          const startIdx = (currentSampelPage - 1) * SAMPEL_PAGE_SIZE;
+          const endIdx = Math.min(startIdx + SAMPEL_PAGE_SIZE, total);
+          const pageItems = currentSampelList.slice(startIdx, endIdx);
+
+          function updateContent() {
+            if (countText) countText.textContent = `Halaman ${currentSampelPage} dari ${totalPages}`;
+
+            container.innerHTML = pageItems.map((s, idx) => {
+              const fotoSrc = s.foto || "../../media/logo.png";
+              const v1Display = Array.isArray(s.varian1List) && s.varian1List.length > 0 ? s.varian1List.join(", ") : (s.varian1 || "");
+              const v2Display = Array.isArray(s.varian2List) && s.varian2List.length > 0 ? s.varian2List.join(", ") : (s.varian2 || "");
+
+              let variantDisplayHtml = "";
+              if (Array.isArray(s.variants) && s.variants.length > 0) {
+                variantDisplayHtml = `
+                  <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px;">
+                    ${s.variants.map(v => `
+                      <span style="font-size: 11px; padding: 2px 7px; background: #f0f9ff; border: 1px solid #bae6fd; color: #0284c7; border-radius: 4px; font-weight: 500;">
+                        ${v.varian1 || '-'}${v.varian2 ? ` (${v.varian2})` : ''}: <strong style="color: #0f172a;">${v.stok !== undefined ? v.stok : 0}</strong>
+                      </span>
+                    `).join("")}
+                  </div>
+                `;
+              } else if (v1Display || v2Display) {
+                variantDisplayHtml = `
+                  ${v1Display ? `<div style="margin-top: 4px; font-size: 11.5px; color: #64748b;"><strong>Varian 1:</strong> <span style="color: #334155;">${v1Display}</span></div>` : ''}
+                  ${v2Display ? `<div style="margin-top: 2px; font-size: 11.5px; color: #64748b;"><strong>Varian 2:</strong> <span style="color: #334155;">${v2Display}</span></div>` : ''}
+                `;
+              }
+
+              return `
+                <div class="view-sampel-card" style="animation-delay: ${idx * 0.04}s; height: auto; min-height: 64px; padding: 10px 12px;">
+                  <div class="view-sampel-card-left" style="align-items: flex-start; width: 100%;">
+                    <img src="${fotoSrc}" alt="${s.nama || 'Sampel'}" class="view-sampel-img" onerror="this.onerror=null; this.src='../../media/logo.png';" style="width: 48px; height: 48px; border-radius: 6px; object-fit: cover; margin-top: 2px;" />
+                    <div class="view-sampel-info" style="flex: 1; min-width: 0;">
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <span class="view-sampel-name" title="${s.nama || '-'}">${s.nama || '-'}</span>
+                        ${s.publish ? `<span style="font-size: 11px; padding: 1px 8px; border-radius: 999px; font-weight: 600; background: ${s.publish === 'Aktif' ? '#dcfce7; color: #16a34a;' : '#f1f5f9; color: #64748b;'}">${s.publish}</span>` : ''}
+                      </div>
+                      <div class="view-sampel-pid" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 4px;">
+                        <span>PID: <span class="view-sampel-pid-tag">${s.pid || '-'}</span></span>
+                        ${s.type ? `<span>Type: <span class="view-sampel-pid-tag" style="background:#e0f2fe;color:#0284c7;">${s.type}</span></span>` : ''}
+                        ${s.stok ? `<span>Stok: <span class="view-sampel-pid-tag">${s.stok}</span></span>` : ''}
+                        ${s.komisi ? `<span>Komisi: <span class="view-sampel-pid-tag" style="background:#fef3c7;color:#d97706;">${String(s.komisi).trim().endsWith('%') ? String(s.komisi).trim() : `${String(s.komisi).trim()}%`}</span></span>` : ''}
+                        ${s.periode ? `<span>Periode: <span class="view-sampel-pid-tag">${s.periode}</span></span>` : ''}
+                      </div>
+                      ${variantDisplayHtml}
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join("");
+
+            container.classList.remove("is-changing");
+
+            // Render Pagination
+            if (totalPages > 1 && paginEl) {
+              paginEl.style.display = "flex";
+              if (pageInfo) pageInfo.textContent = `Menampilkan ${startIdx + 1}-${endIdx} dari ${total} sampel`;
+
+              if (pageBtns) {
+                let btnsHtml = `
+                  <button type="button" class="view-sampel-page-btn" ${currentSampelPage === 1 ? 'disabled' : ''} data-page="${currentSampelPage - 1}" title="Sebelumnya">
+                    <i class="bx bx-chevron-left" style="font-size: 16px;"></i>
+                  </button>
+                `;
+
+                for (let p = 1; p <= totalPages; p++) {
+                  btnsHtml += `
+                    <button type="button" class="view-sampel-page-btn ${p === currentSampelPage ? 'active' : ''}" data-page="${p}">
+                      ${p}
+                    </button>
+                  `;
+                }
+
+                btnsHtml += `
+                  <button type="button" class="view-sampel-page-btn" ${currentSampelPage === totalPages ? 'disabled' : ''} data-page="${currentSampelPage + 1}" title="Berikutnya">
+                    <i class="bx bx-chevron-right" style="font-size: 16px;"></i>
+                  </button>
+                `;
+                pageBtns.innerHTML = btnsHtml;
+
+                pageBtns.querySelectorAll(".view-sampel-page-btn").forEach(b => {
+                  b.onclick = (e) => {
+                    e.preventDefault();
+                    if (b.disabled) return;
+                    const targetPage = parseInt(b.getAttribute("data-page"), 10);
+                    if (!isNaN(targetPage) && targetPage !== currentSampelPage) {
+                      renderModalSampelPage(targetPage, false);
+                    }
+                  };
+                });
+              }
+            } else if (paginEl) {
+              paginEl.style.display = "none";
+            }
+          }
+
+          if (isInitial) {
+            updateContent();
+          } else {
+            container.classList.add("is-changing");
+            setTimeout(updateContent, 120);
+          }
+        }
+
+        renderModalSampelPage(1, true);
+
+        if (modalView) modalView.classList.add("is-active");
+      }
+
+      function openEditBrand(item) {
+        resetBrandForm();
+        const modalTitle = document.getElementById("brandModalTitle");
+        const submitBtn = document.getElementById("brandSubmitBtn");
+        const editIdInput = document.getElementById("brandEditId");
+        const logoDataInput = document.getElementById("brandLogoData");
+
+        if (modalTitle) modalTitle.innerHTML = 'Edit <strong style="font-weight: 700;">Brand</strong>';
+        if (submitBtn) submitBtn.textContent = 'Simpan Perubahan';
+        if (editIdInput) editIdInput.value = item.id;
+
+        document.getElementById("brandShopCode").value = item.shopCode || "";
+        document.getElementById("brandNama").value = item.nama || "";
+        populateBrandCategories(item.kategori || "");
+        document.getElementById("brandTelepon").value = item.telepon || "";
+        document.getElementById("brandKontrakAwal").value = item.kontrakAwal || "";
+        document.getElementById("brandKontrakAkhir").value = item.kontrakAkhir || "";
+        document.getElementById("brandAdsId").value = item.adsId || "";
+        document.getElementById("brandAdsName").value = item.adsName || "";
+        document.getElementById("brandEmail").value = item.email || "";
+        document.getElementById("brandPassword").value = item.password || "password123";
+        document.getElementById("brandAlamat").value = item.alamat || "";
+
+        if (item.logo) {
+          showBrandLogoWithBadge(item.logo);
+          if (logoDataInput) logoDataInput.value = item.logo;
+        } else {
+          clearBrandLogoPreview();
+        }
+
+        sampelList.innerHTML = "";
+        if (Array.isArray(item.sampel) && item.sampel.length > 0) {
+          item.sampel.forEach(s => createSampelRow(s));
+        } else {
+          createSampelRow();
+        }
+        modal.classList.add("is-active");
+      }
+
+      if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener("click", () => {
+          if (pendingDeleteBrandId) {
+            brandDb = brandDb.filter(b => String(b.id) !== String(pendingDeleteBrandId));
+            saveBrandDb();
+            renderBrandGrid();
+            pendingDeleteBrandId = null;
+            if (modalDelete) modalDelete.classList.remove("is-active");
+            showToast("Brand berhasil dihapus");
+          }
+        });
+      }
+
+      [modal, modalView, modalDelete].forEach(m => {
+        if (m) m.addEventListener("click", (e) => { if (e.target === m) m.classList.remove("is-active"); });
+      });
+
+      document.getElementById("closeBrandViewModal")?.addEventListener("click", () => modalView.classList.remove("is-active"));
+
+      document.querySelector(".campaign-search input")?.addEventListener("input", (e) => renderBrandGrid(e.target.value));
+
+      function showToast(msg) {
+        const toast = document.getElementById("toast");
+        if (toast) {
+          toast.textContent = msg;
+          toast.classList.add("toast--show");
+          setTimeout(() => toast.classList.remove("toast--show"), 3000);
+        }
+      }
+
+      function resetBrandForm() {
+        populateBrandCategories("");
+        form.reset();
+        const editIdInput = document.getElementById("brandEditId");
+        const logoDataInput = document.getElementById("brandLogoData");
+        const modalTitle = document.getElementById("brandModalTitle");
+        const submitBtn = document.getElementById("brandSubmitBtn");
+
+        if (editIdInput) editIdInput.value = "";
+        if (logoDataInput) logoDataInput.value = "";
+        if (modalTitle) modalTitle.innerHTML = 'Tambah <strong style="font-weight: 700;">Brand</strong>';
+        if (submitBtn) submitBtn.textContent = 'Simpan';
+
+        clearBrandLogoPreview();
+        logoInput.value = "";
+        sampelList.innerHTML = "";
+        passwordInput.type = "password";
+        createSampelRow();
+        if (typeof resetCategoryDropdown === "function") resetCategoryDropdown();
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const editId = document.getElementById("brandEditId")?.value.trim();
+        const isEditing = editId && editId !== "";
+        const brandData = {
+          shopCode: document.getElementById("brandShopCode").value.trim(),
+          nama: document.getElementById("brandNama").value.trim(),
+          kategori: document.getElementById("kategoriProdukVal")?.value.trim() || document.getElementById("brandKategoriSelect")?.value.trim() || "",
+          telepon: document.getElementById("brandTelepon").value.trim(),
+          kontrakAwal: document.getElementById("brandKontrakAwal").value,
+          kontrakAkhir: document.getElementById("brandKontrakAkhir").value,
+          adsId: document.getElementById("brandAdsId").value.trim(),
+          adsName: document.getElementById("brandAdsName").value.trim(),
+          email: document.getElementById("brandEmail").value.trim(),
+          password: document.getElementById("brandPassword").value,
+          alamat: document.getElementById("brandAlamat").value.trim(),
+          logo: document.getElementById("brandLogoData").value || (logoPreview.querySelector("img")?.src || null),
+          sampel: Array.from(sampelList.querySelectorAll(".sampel-card-item")).map(card => {
+            const variants = typeof card._getVariants === "function" ? card._getVariants() : [];
+            const v1List = typeof card._getV1List === "function" ? card._getV1List() : [];
+            const v2List = typeof card._getV2List === "function" ? card._getV2List() : [];
+            const nama = card.querySelector(".sampel-nama-input")?.value.trim() || "";
+            const pid = card.querySelector(".sampel-pid-input")?.value.trim() || "";
+            const foto = card.querySelector(".sampel-foto-data")?.value || "";
+            const type = card.querySelector(".sampel-type-input")?.value.trim() || "";
+            const link = card.querySelector(".sampel-link-input")?.value.trim() || "";
+            let stok = card.querySelector(".sampel-stok-input")?.value.trim() || "";
+            let komisi = card.querySelector(".sampel-komisi-input")?.value.trim() || "";
+            if (komisi && !komisi.endsWith("%")) {
+              komisi = komisi + "%";
+            }
+            const periode = card.querySelector(".sampel-periode-input")?.value.trim() || "";
+            const publish = card.querySelector(".sampel-publish-input")?.value.trim() || "Aktif";
+
+            const totalVariantStock = variants.reduce((sum, v) => sum + (parseInt(v.stok, 10) || 0), 0);
+            if (!stok && totalVariantStock > 0) {
+              stok = String(totalVariantStock);
+            }
+
+            return {
+              nama,
+              pid,
+              foto,
+              type,
+              link,
+              stok,
+              komisi,
+              periode,
+              publish,
+              variants,
+              varian1List: v1List,
+              varian2List: v2List,
+              varian1: v1List.join(", "),
+              varian2: v2List.join(", ")
+            };
+          }).filter(s => s.nama || s.pid || s.foto || s.type || s.link || s.stok || s.komisi || s.periode || (s.variants && s.variants.length > 0) || (s.varian1List && s.varian1List.length > 0))
+        };
+
+        if (isEditing) {
+          const idx = brandDb.findIndex(b => String(b.id) === String(editId));
+          if (idx !== -1) {
+            brandDb[idx] = { ...brandDb[idx], ...brandData };
+            saveBrandDb();
+            renderBrandGrid();
+            modal.classList.remove("is-active");
+            resetBrandForm();
+            showToast("Brand berhasil diperbarui");
+          }
+        } else {
+          brandDb.unshift({ ...brandData, id: 'b_' + Date.now() });
+          saveBrandDb();
+          renderBrandGrid();
+          modal.classList.remove("is-active");
+          resetBrandForm();
+          showToast("Brand berhasil ditambahkan");
+        }
+      });
+
+      renderBrandGrid();
+    })();
+  </script>
+  <script src="../staffkol_layout.js"></script>
+  <script src="../../sidebar_engine.js?v=4"></script>
+</body>
+</html>
+
+

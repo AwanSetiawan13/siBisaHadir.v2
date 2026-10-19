@@ -102,7 +102,7 @@
       { 
         type: 'group', label: 'Absensi', icon: 'clock', id: 'm-spv-absensi',
         children: [
-          { label: 'Kehadiran', link: 'SpvKol/absensi/spvkol_kehadiran.html' },
+          { label: 'Absensi', link: 'SpvKol/absensi/spvkol_kehadiran.html' },
           { label: 'Presensi Istirahat', link: 'SpvKol/absensi/spvkol_presensi_istirahat.html' },
           { label: 'Presensi Lembur', link: 'SpvKol/absensi/spvkol_presensi_lembur.html' }
         ]
@@ -170,9 +170,9 @@
 
       { type: 'heading', label: 'Operasional Staff' },
       { 
-        type: 'group', label: 'Kehadiran', icon: 'clock', id: 'm-staff-kehadiran',
+        type: 'group', label: 'Absensi', icon: 'clock', id: 'm-staff-absensi',
         children: [
-          { label: 'Kehadiran', link: 'StaffKol/absensi/staffkol_kehadiran.html' },
+          { label: 'Absensi', link: 'StaffKol/absensi/staffkol_kehadiran.html' },
           { label: 'Presensi Istirahat', link: 'StaffKol/absensi/staffkol_presensi_istirahat.html' },
           { label: 'Presensi Lembur', link: 'StaffKol/absensi/staffkol_presensi_lembur.html' }
         ]
@@ -182,10 +182,19 @@
         children: [
           { label: 'Dashboard Campaign', link: 'StaffKol/operasional/staffkol_dashboard_campaign.html' },
           { label: 'Campaign', link: 'StaffKol/operasional/staffkol_campaign.html' },
+          { label: 'Laporan Campaign', link: 'StaffKol/operasional/staffkol_laporan_campaign.html' },
+          { label: 'Data Kreator', link: 'StaffKol/operasional/staffkol_kreator.html' },
+          { label: 'Tracking Kreator', link: 'StaffKol/operasional/staffkol_tracking_kreator.html' },
           { label: 'Tracking Sampel', link: 'StaffKol/operasional/staffkol_tracking_sampel.html' },
-          { label: 'Kreator', link: 'StaffKol/operasional/staffkol_kreator.html' },
-          { label: 'Tracking Kreator', link: 'StaffKol/operasional/staffkol_operasional.html' },
           { label: 'Performa Kreator', link: 'StaffKol/operasional/staffkol_Performa_Kreator.html' }
+        ]
+      },
+      { 
+        type: 'group', label: 'Brands', icon: 'brand', id: 'm-staff-brands',
+        children: [
+          { label: 'Dashboard Brands', link: 'StaffKol/brand/staffkol_dashboard_brand.html' },
+          { label: 'Produk & Brands', link: 'StaffKol/brand/staffkol_produk_brand.html' },
+          { label: 'Data Brands', link: 'StaffKol/brand/staffkol_data_brand.html' }
         ]
       },
 
@@ -212,8 +221,7 @@
         children: [
           { label: 'Evaluasi Kinerja', link: 'StaffKol/kinerja/staffkol_evaluasi_kinerja.html' },
           { label: 'Target & Capaian Kerja', link: 'StaffKol/kinerja/staffkol_target_capaian.html' },
-          { label: 'Upgrade Skill', link: 'StaffKol/kinerja/staffkol_upgrade_skill.html' },
-          { label: 'Rencana Karier', link: 'StaffKol/kinerja/staffkol_rencana_karier.html' }
+          { label: 'Upgrade Skill', link: 'StaffKol/kinerja/staffkol_upgrade_skill.html' }
         ]
       }
     ]
@@ -477,9 +485,8 @@
       .sidebar-brand-header:hover {
         background-color: #f8fafc;
       }
-      .sidebar-brand-header:hover .brand-logo-frame {
-        transform: scale(1.05) rotate(-1deg);
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.22);
+      .sidebar-brand-header:hover .brand-logo-img {
+        transform: scale(1.06);
       }
 
       /* Layout Sidebar Shell */
@@ -585,35 +592,14 @@
       }
     </style>
     <div id="app-sidebar-inner" style="height:100vh;max-height:100vh;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;">
-      <!-- Logo Brand (Aesthetic, Larger & Prominent) -->
+      <!-- Logo Brand (Clean Logo, No Blue Box, No MCN Platform Subtitle) -->
       <a href="${homeLink}" class="sidebar-brand-header" style="padding:18px 16px 14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f5f9;text-decoration:none;flex-shrink:0;">
-        <div class="brand-logo-frame" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1.5px solid #bae6fd;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(2, 132, 199, 0.12);flex-shrink:0;transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
-          <img src="${rootPrefix}media/logo.png" style="width:30px;height:30px;object-fit:contain;" alt="Logo Bisa Media" onerror="this.style.display='none'" />
-        </div>
-        <div style="display:flex;flex-direction:column;justify-content:center;">
-          <span style="font-size:20.5px;font-weight:800;color:#0f172a;letter-spacing:-0.7px;font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;line-height:1.15;">Bisa Media</span>
-          <span style="font-size:9.5px;font-weight:700;color:#0284c7;letter-spacing:1.1px;text-transform:uppercase;margin-top:2px;">MCN Platform</span>
-        </div>
+        <img src="${rootPrefix}media/logo.png" class="brand-logo-img" style="width:38px;height:38px;object-fit:contain;flex-shrink:0;display:block;transition:transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);" alt="Logo Bisa Media" onerror="this.style.display='none'" />
+        <span style="font-size:24.5px;font-weight:800;color:#0f172a;letter-spacing:-0.7px;font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;line-height:1.15;white-space:nowrap;">Bisa Media</span>
       </a>
       <!-- Scrollable Navigation Menu (Direct flex child: takes available height) -->
       <div id="app-sidebar-box" style="overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0;padding:6px 10px;scrollbar-width:thin;">
         <ul style="margin:0;padding:0;list-style:none;">${menuHtml}</ul>
-      </div>
-      <!-- Sidebar Footer (Logout Fixed Directly Above SPV KOL Profile) -->
-      <div id="sidebar-footer-fixed" style="padding:10px 12px 12px 12px;border-top:1px solid #f1f5f9;background:#fafafa;display:flex;flex-direction:column;gap:8px;flex-shrink:0;overflow:visible;z-index:10;position:relative;">
-        <!-- 1. Tombol Logout (Fixed tepat di atas profil SPV KOL) -->
-        <a href="${rootPrefix}login.html" class="sidebar-logout-btn" title="Logout" id="sidebar-logout-link" style="display:flex !important;align-items:center !important;justify-content:flex-start !important;gap:9px !important;width:100% !important;padding:8px 12px !important;border-radius:9px !important;border:1px solid #fee2e2 !important;background:#fff5f5 !important;color:#ef4444 !important;text-decoration:none !important;font-size:12.5px !important;font-weight:600 !important;cursor:pointer !important;box-sizing:border-box !important;visibility:visible !important;opacity:1 !important;transition:all 0.2s ease !important;"
-           onmouseover="this.style.background='#fee2e2';this.style.borderColor='#fca5a5';this.style.color='#dc2626'"
-           onmouseout="this.style.background='#fff5f5';this.style.borderColor='#fee2e2';this.style.color='#ef4444'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0;display:block !important;visibility:visible !important;width:16px !important;height:16px !important;" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-          <span style="color:#ef4444 !important;font-size:12.5px !important;font-weight:600 !important;">Logout</span>
-        </a>
-
-
       </div>
     </div>
   `;
@@ -1135,6 +1121,8 @@
       'spvkol_target_capaian.html': 'Target & Capaian',
       'spvkol_campaign.html': 'Campaign',
       'spvkol_dashboard_campaign.html': 'Dashboard Campaign',
+      'staffkol_dashboard_campaign.html': 'Dashboard Campaign',
+      'staffkol_laporan_campaign.html': 'Laporan Campaign',
       'spvkol_operasional.html': 'Operasional',
       'spvkol_tracking_sampel.html': 'Tracking Sampel',
       'spvkol_Performa_Kreator.html': 'Performa Kreator',
@@ -1169,8 +1157,8 @@
 
       <div class="topbar__actions hirezy-topbar-right">
         <!-- Search Input or Calendar -->
-        ${currentFile === 'spvkol_dashboard_campaign.html' ? `
-        <button id="btnCalendarTop" type="button" aria-label="Pilih tanggal" title="Pilih Tanggal" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 16px; border-radius: 8px; color: #64748b; font-size: 13px; font-weight: 500; cursor: pointer; height: 38px; outline: none; transition: all 0.2s;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.background='#f1f5f9';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#f8fafc';" onclick="document.getElementById('calendarCampaignModal')?.classList.add('is-active')">
+        ${(currentFile === 'spvkol_dashboard_campaign.html' || currentFile === 'staffkol_dashboard_campaign.html' || currentFile === 'spvkol_dashboard_brand.html' || currentFile === 'staffkol_dashboard_brand.html') ? `
+        <button id="btnCalendarTop" type="button" aria-label="Pilih tanggal" title="Pilih Tanggal" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 16px; border-radius: 8px; color: #64748b; font-size: 13px; font-weight: 500; cursor: pointer; height: 38px; outline: none; transition: all 0.2s;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.background='#f1f5f9';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#f8fafc';" onclick="(document.getElementById('calendarBrandModal') || document.getElementById('calendarCampaignModal'))?.classList.add('is-active')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="4" width="18" height="18" rx="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
