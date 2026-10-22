@@ -5,11 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | Bisa Media</title>
-  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="icon" type="image/png" href="../media/logo.png" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* Styling for Kehadiran Hari Ini Widget (Bigger font sizes) */
+    /* Styling for Kehadiran Bulan Ini Widget (Bigger font sizes) */
     .db-attendance-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -46,6 +46,12 @@
       margin-top: 4px;
     }
   </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../vendor/exceljs.min.js"></script>
+  <script src="../assets/js/excel_engine.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -126,38 +132,38 @@
 
             <div class="db-metric-card">
               <div class="db-metric-icon">
-                <i data-lucide="user-check" style="width: 28px; height: 28px; stroke: #fff;"></i>
+                <i data-lucide="clipboard-list" style="width: 28px; height: 28px; stroke: #fff;"></i>
               </div>
               <div class="db-metric-info">
-                <span class="db-metric-label">Total Kreator</span>
-                <strong class="db-metric-value" id="metricTotalKreator">2</strong>
+                <span class="db-metric-label">Total RRK</span>
+                <strong class="db-metric-value" id="metricTotalRrk">0</strong>
               </div>
             </div>
 
             <div class="db-metric-card">
               <div class="db-metric-icon">
-                <i data-lucide="megaphone" style="width: 28px; height: 28px; stroke: #fff;"></i>
+                <i data-lucide="milestone" style="width: 28px; height: 28px; stroke: #fff;"></i>
               </div>
               <div class="db-metric-info">
-                <span class="db-metric-label">Total Campaign</span>
-                <strong class="db-metric-value" id="metricTotalCampaign">2</strong>
+                <span class="db-metric-label">Total Milestone</span>
+                <strong class="db-metric-value" id="metricTotalMilestone">0</strong>
               </div>
             </div>
 
             <div class="db-metric-card">
               <div class="db-metric-icon">
-                <i data-lucide="tag" style="width: 28px; height: 28px; stroke: #fff;"></i>
+                <i data-lucide="list-checks" style="width: 28px; height: 28px; stroke: #fff;"></i>
               </div>
               <div class="db-metric-info">
-                <span class="db-metric-label">Total Brand</span>
-                <strong class="db-metric-value" id="metricTotalBrand">2</strong>
+                <span class="db-metric-label">Total Tugas</span>
+                <strong class="db-metric-value" id="metricTotalTugas">0</strong>
               </div>
             </div>
           </div>
 
-          <!-- Kehadiran Hari Ini Card -->
-          <div class="db-attendance-card">
-            <h2 class="db-att-title">Kehadiran Hari Ini</h2>
+            <!-- Kehadiran Bulan Ini Card -->
+            <div class="db-attendance-card">
+              <h2 class="db-att-title">Kehadiran Bulan Ini</h2>
             <div class="db-attendance-stats">
               <div class="db-att-stat">
                 <div class="db-att-stat-label-wrap">
@@ -361,7 +367,7 @@
     </div>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="../script.js"></script>
+  <script src="../assets/js/app.js"></script>
   <script>
     /* ===== Dashboard Calendar ===== */
     (function () {
@@ -704,83 +710,161 @@
       window.lucide.createIcons();
     }
 
+    function readStoredArray(key) {
+      try {
+        const saved = localStorage.getItem(key);
+        if (!saved) return [];
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function readMetricCount(keys, fallback) {
+      for (const key of keys) {
+        const raw = localStorage.getItem(key);
+        if (raw === null) continue;
+        try {
+          const arr = JSON.parse(raw);
+          if (Array.isArray(arr)) return arr.length;
+        } catch (e) {}
+      }
+      return fallback;
+    }
+
+    function escapeDashboardHtml(value) {
+      return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function toIsoLocalDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function getCurrentMonthPrefix() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function getDashboardAttendanceRows() {
+      const monthPrefix = getCurrentMonthPrefix();
+      let rows = readStoredArray("bmAttendanceDemoRowsV1");
+      if (!rows.length) {
+        const today = toIsoLocalDate(new Date());
+        rows = [
+          { name: "Setiawan", date: today, status: "Hadir", in: "08:00", out: "17:00" },
+          { name: "Raka Wijaya", date: today, status: "Terlambat", in: "08:18", out: "17:03" }
+        ];
+      }
+      return rows.filter((row) => String(row && row.date || "").slice(0, 7) === monthPrefix);
+    }
+
+    function getDashboardAttendanceStatus(row) {
+      const raw = String(row && row.status || "").toLowerCase();
+      if (raw.includes("terlambat")) return "Terlambat";
+      if (raw.includes("cuti")) return "Cuti";
+      if (raw.includes("izin")) return "Izin";
+      if (raw.includes("sakit")) return "Sakit";
+      if (raw.includes("tidak") || raw.includes("alpha")) return "Tidak Hadir";
+      if (String(row && row.in || "").trim()) return "Tepat Waktu";
+      return "Belum Presensi";
+    }
+
+    function countLemburBulanIni() {
+      const monthPrefix = getCurrentMonthPrefix();
+      const raw = localStorage.getItem("bisa_lembur_demo_rows_v1");
+      if (raw === null) return 2;
+      return readStoredArray("bisa_lembur_demo_rows_v1")
+        .filter((row) => String(row && row.date || "").slice(0, 7) === monthPrefix).length;
+    }
+
+    function formatAttendanceDuration(start, end) {
+      const toMinutes = (value) => {
+        const match = String(value || "").match(/^(\d{1,2}):(\d{2})/);
+        return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+      };
+      const startMinutes = toMinutes(start);
+      const endMinutes = toMinutes(end);
+      if (startMinutes === null || endMinutes === null || endMinutes < startMinutes) return "-";
+      const total = endMinutes - startMinutes;
+      const hours = Math.floor(total / 60);
+      const minutes = total % 60;
+      return minutes ? `${hours} Jam ${minutes} Menit` : `${hours} Jam`;
+    }
+
+    function renderMonthlyAttendance() {
+      const tbody = document.getElementById("attendanceBody");
+      const rows = getDashboardAttendanceRows();
+      const employeeCount = readStoredArray("ceoEmployeesV2").length || 26;
+      const counts = { hadir: 0, terlambat: 0, izin: 0, cuti: 0, tidak: 0 };
+
+      rows.forEach((row) => {
+        const status = getDashboardAttendanceStatus(row);
+        if (status === "Terlambat") counts.terlambat += 1;
+        else if (status === "Cuti") counts.cuti += 1;
+        else if (status === "Izin" || status === "Sakit") counts.izin += 1;
+        else if (status === "Tidak Hadir") counts.tidak += 1;
+        else if (status === "Tepat Waktu") counts.hadir += 1;
+      });
+      counts.tidak += Math.max(employeeCount - (counts.hadir + counts.terlambat + counts.izin + counts.cuti + counts.tidak), 0);
+
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+      setText("attHadir", `${counts.hadir}/${employeeCount}`);
+      setText("attTerlambat", counts.terlambat);
+      setText("attIzin", counts.izin);
+      setText("attCuti", counts.cuti);
+      setText("attLembur", countLemburBulanIni());
+      setText("attTidak", counts.tidak);
+
+      if (!tbody) return;
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#8c8c8c;padding:18px 0;">Belum ada data kehadiran bulan ini</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map((row, index) => {
+        const status = getDashboardAttendanceStatus(row);
+        const badgeStyle = status === "Terlambat"
+          ? "background-color: rgba(255, 82, 82, 0.1); color: #ff5252; border: 1px solid rgba(255, 82, 82, 0.3);"
+          : "background-color: rgba(0, 230, 118, 0.1); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3);";
+        return `<tr>
+              <td>${index + 1}</td>
+              <td style="font-weight: 600; color: #1e293b;">${escapeDashboardHtml(row.name || "-")}</td>
+              <td>${escapeDashboardHtml(row.date || "-")}</td>
+              <td>${escapeDashboardHtml(row.in || "-")}</td>
+              <td>${escapeDashboardHtml(row.out || "-")}</td>
+              <td><span class="status-badge" style="${badgeStyle} padding: 4px 10px; font-size: 11px; font-weight: 600; border-radius: 4px; display: inline-block;">${escapeDashboardHtml(status)}</span></td>
+              <td>${formatAttendanceDuration(row.in, row.out)}</td>
+            </tr>`;
+      }).join("");
+    }
+
     function updateTopMetrics() {
-      // 1. Total Kreator
-      let countKreator = 2;
-      const kreatorKeys = [
-        "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19",
-        "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16",
-        "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13",
-        "bisa_kreator_list_v12", "bisa_kreator_list_v11", "bisa_kreator_list_v10",
-        "bisa_kreator_list_v9", "bisa_kreator_list_v8", "bisa_kreator_list"
-      ];
-      for (const key of kreatorKeys) {
-        const saved = localStorage.getItem(key);
-        if (saved) {
-          try {
-            const arr = JSON.parse(saved);
-            if (Array.isArray(arr) && arr.length >= 0) {
-              countKreator = arr.length;
-              break;
-            }
-          } catch (e) {}
-        }
-      }
+      const countRrk = readMetricCount(["bisa_rrk_data_v2"], 1);
+      const countMilestone = readMetricCount(["bisa_milestone_data_v1"], 3);
+      const countTugas = readMetricCount(["bisa_tugas_data_v1"], 3);
 
-      // 2. Total Campaign
-      let countCampaign = 2;
-      const campaignKeys = [
-        "bisa_campaign_list_v14", "bisa_campaign_list_v13", "bisa_campaign_list_v12",
-        "bisa_campaign_list_v11", "bisa_campaign_list_v10", "bisa_campaign_list_v9",
-        "bisa_campaign_list_v8", "bisa_campaign_list_v7", "bisa_campaign_list_v6",
-        "bisa_campaign_list_v5", "bisa_campaign_list_v4", "bisa_campaign_list_v3",
-        "bisa_campaign_list_v2", "bisa_campaign_list_v1", "bisa_campaign_list"
-      ];
-      for (const key of campaignKeys) {
-        const saved = localStorage.getItem(key);
-        if (saved) {
-          try {
-            const arr = JSON.parse(saved);
-            if (Array.isArray(arr) && arr.length >= 0) {
-              countCampaign = arr.length;
-              break;
-            }
-          } catch (e) {}
-        }
-      }
+      const setMetric = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      };
+      setMetric("metricTimKol", "0");
+      setMetric("metricTotalRrk", countRrk);
+      setMetric("metricTotalMilestone", countMilestone);
+      setMetric("metricTotalTugas", countTugas);
 
-      // 3. Total Brand
-      let countBrand = 2;
-      const brandKeys = [
-        "bisa_brand_list_v12", "bisa_brand_list_v11", "bisa_brand_list_v10",
-        "bisa_brand_list_v9", "bisa_brand_list_v8", "bisa_brand_list_v7",
-        "bisa_brand_list_v6", "bisa_brand_list_v5", "bisa_brand_list_v4",
-        "bisa_brand_list_v3", "bisa_brand_list_v2", "bisa_brand_list"
-      ];
-      for (const key of brandKeys) {
-        const saved = localStorage.getItem(key);
-        if (saved) {
-          try {
-            const arr = JSON.parse(saved);
-            if (Array.isArray(arr) && arr.length >= 0) {
-              countBrand = arr.length;
-              break;
-            }
-          } catch (e) {}
-        }
-      }
-
-      const elTimKol = document.getElementById("metricTimKol");
-      if (elTimKol) elTimKol.textContent = "0";
-
-      const elKreator = document.getElementById("metricTotalKreator");
-      if (elKreator) elKreator.textContent = countKreator;
-
-      const elCampaign = document.getElementById("metricTotalCampaign");
-      if (elCampaign) elCampaign.textContent = countCampaign;
-
-      const elBrand = document.getElementById("metricTotalBrand");
-      if (elBrand) elBrand.textContent = countBrand;
+      renderMonthlyAttendance();
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -791,7 +875,7 @@
     window.addEventListener("pageshow", updateTopMetrics);
     updateTopMetrics();
   </script>
-  <script src="../sidebar_engine.js?v=999"></script>
+  <script src="../assets/js/layout.js?v=999"></script>
 </body>
 
 </html>

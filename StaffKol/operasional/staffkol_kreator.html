@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Kreator | Staff KOL - Bisa Media</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
   <!-- Boxicons for action icons -->
   <link
     href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
@@ -509,6 +509,12 @@
       padding: 6px 12px !important;
     }
   </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -646,6 +652,18 @@
 
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
+            <!-- Green Excel Button with tooltip -->
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+              <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
             <div class="filter-dropdown-wrapper">
               <button id="btnFilterCampaign" class="small-action-button" type="button" aria-label="Filter">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1146,7 +1164,7 @@
     <button type="button" class="toast-notification__close" id="toastCloseBtn" aria-label="Tutup notifikasi">&times;</button>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="../../script.js"></script>
+  <script src="../../assets/js/app.js"></script>
   <script>
     (function () {
       // ===== Toast Notification Function =====
@@ -2181,14 +2199,9 @@
       let currentFilterKategori = "";
       let currentFilterLeads = "";
 
-      function renderKreatorTable(query = "") {
-        if (!kreatorTableBody) return;
-        syncKreatorStatuses();
-        kreatorTableBody.innerHTML = "";
-        updateKreatorMetrics();
-
-        const q = (query || "").trim().toLowerCase();
-        const filtered = kreatorDb.filter(k => {
+      function getFilteredKreators(query = "") {
+        const q = (query !== undefined && query !== null ? query : (searchKreatorInput ? searchKreatorInput.value : "")).trim().toLowerCase();
+        return kreatorDb.filter(k => {
           if (q) {
             const matchQ = (k.uid && k.uid.toLowerCase().includes(q)) ||
               (k.username && k.username.toLowerCase().includes(q)) ||
@@ -2223,6 +2236,15 @@
           }
           return true;
         });
+      }
+
+      function renderKreatorTable(query = "") {
+        if (!kreatorTableBody) return;
+        syncKreatorStatuses();
+        kreatorTableBody.innerHTML = "";
+        updateKreatorMetrics();
+
+        const filtered = getFilteredKreators(query);
 
         const tableWrapper = document.getElementById("tableContainerWrapper");
         const emptyTableState = document.getElementById("emptyTableState");
@@ -2977,6 +2999,92 @@
         });
       }
 
+      // Toolbar: Excel Export (CSV)
+      const btnExportExcel = document.getElementById("btnExportExcel");
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener("click", () => {
+          const exportRows = getFilteredKreators();
+          if (!exportRows || exportRows.length === 0) {
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: 'info',
+                title: 'Data Kosong',
+                text: 'Tidak ada data kreator untuk diekspor.',
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            } else if (typeof showToast === "function") {
+              showToast("Tidak ada data untuk diekspor", "warning");
+            } else {
+              alert("Tidak ada data untuk diekspor");
+            }
+            return;
+          }
+
+          const headers = [
+            "No", "UID", "Username", "Nama Kreator", "Kategori Produk",
+            "PIC Kategori", "Kategori Spesifik", "Masa Kontrak", "Status Kontrak",
+            "Leads", "Nomor WhatsApp", "Email", "Alamat"
+          ];
+
+          const rows = exportRows.map((item, idx) => {
+            const cats = [item.kategori1, item.kategori2, item.kategori3].filter(c => c && c !== "-");
+            const catStr = cats.length > 0 ? cats.join(", ") : (item.kategori || "-");
+            const pics = [item.pic1, item.pic2, item.pic3].filter(p => p && p !== "-");
+            const picStr = pics.length > 0 ? pics.join(", ") : "-";
+            const spesifik = item.kategoriSpesifik || item.spesifik || "-";
+            const masaKontrak = item.masaKontrak || (item.kontrakAwal && item.kontrakAkhir ? `${item.kontrakAwal} - ${item.kontrakAkhir}` : "-");
+
+            return [
+              idx + 1,
+              item.uid || '-',
+              item.username || '-',
+              item.nama || '-',
+              catStr,
+              picStr,
+              spesifik,
+              masaKontrak,
+              item.status || 'Bind',
+              item.leads || '-',
+              item.nomorWa || '-',
+              item.email || '-',
+              item.alamat || '-'
+            ];
+          });
+
+          const todayStr = new Date().toISOString().slice(0, 10);
+          if (typeof exportBisaExcel === 'function') {
+            exportBisaExcel({
+              title: "DATA KREATOR",
+              filename: `data_kreator_${todayStr}.xlsx`,
+              sheetName: "Data Kreator",
+              headers: headers,
+              rows: rows
+            });
+            showToast("Data kreator berhasil diekspor ke Excel (.xlsx)", "success");
+          } else {
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","))].join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          if (typeof window.downloadBlobSafely === 'function') {
+            window.downloadBlobSafely(blob, `data_kreator_${todayStr}.csv`);
+          } else {
+            const reader = new FileReader();
+            reader.onloadend = function() {
+              const link = document.createElement("a");
+              link.href = reader.result;
+              link.download = `data_kreator_${todayStr}.csv`;
+              document.body.appendChild(link);
+              link.click();
+              setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1500);
+            };
+            reader.readAsDataURL(blob);
+          }
+            showToast("Data kreator berhasil diekspor", "success");
+          }
+        });
+      }
+
       populateKreatorCategories();
       populateKreatorLeads();
       renderKreatorTable();
@@ -2989,8 +3097,7 @@
       setInterval(cleanEditBtns, 400);
     })();
   </script>
-  <script src="../staffkol_layout.js"></script>
-  <script src="../../sidebar_engine.js?v=999"></script>
+  <script src="../../assets/js/layout.js?v=999"></script>
 </body>
 
 </html>

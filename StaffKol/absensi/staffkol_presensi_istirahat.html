@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Presensi Istirahat - Bisa Media</title>
   <link rel="icon" type="image/png" href="../../media/logo.png" />
-  <link rel="stylesheet" href="../../style.css" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
   <!-- Boxicons for action icons -->
   <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -213,6 +213,12 @@
       line-height: 1 !important;
     }
   </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -327,7 +333,7 @@
 
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left" style="gap: 8px; display: flex; align-items: center;">
-            <button id="btnExportIstirahat" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.csv)" style="background: #f0fdf4 !important; border: 1px solid #86efac !important; color: #15803d !important; width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
+            <button id="btnExportIstirahat" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)" style="background: #f0fdf4 !important; border: 1px solid #86efac !important; color: #15803d !important; width: 36px; height: 36px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">
               <!-- Excel / Spreadsheet SVG Green -->
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
@@ -434,48 +440,71 @@
 
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="../../script.js"></script>
+  <script src="../../assets/js/app.js"></script>
   <script>
     function exportTableToCSV(tableId, filename) {
       const table = document.getElementById(tableId);
       if (!table) return;
 
-      const rows = Array.from(table.querySelectorAll('tr'));
-      const csvData = [];
+      const theadRow = table.querySelector('thead tr');
+      let headers = [];
+      let keepIndexes = [];
+      if (theadRow) {
+        Array.from(theadRow.querySelectorAll('th, td')).forEach((cell, index) => {
+          const label = cell.textContent.trim().replace(/\s+/g, ' ');
+          const isAction = cell.classList.contains('tdActions') || label.toLowerCase() === 'aksi';
+          const isPhoto = /^photo\b/i.test(label);
+          if (!isAction && !isPhoto) {
+            headers.push(label);
+            keepIndexes.push(index);
+          }
+        });
+      }
 
-      rows.forEach(row => {
-        const cells = Array.from(row.querySelectorAll('th, td'));
-        const rowData = cells.map((cell, index) => {
-          if (index === cells.length - 1 && cell.textContent.trim().toLowerCase() === 'aksi') {
-            return null;
+      const rows = [];
+      const trs = Array.from(table.querySelectorAll('tbody tr')).filter(tr => tr.style.display !== 'none');
+      trs.forEach((tr, idx) => {
+        const allCells = Array.from(tr.querySelectorAll('td'));
+        const cells = keepIndexes.length > 0
+          ? keepIndexes.map(i => allCells[i]).filter(Boolean)
+          : allCells.filter(cell => !cell.classList.contains('tdActions') && cell.getAttribute('data-action') !== 'true');
+        if (cells.length > 0) {
+          const rowData = cells.map(cell => cell.textContent.trim().replace(/\s+/g, ' '));
+          if (rowData.length > 0 && /^\d+$/.test(rowData[0])) {
+            rowData[0] = idx + 1;
           }
-          if (cell.classList.contains('tdActions')) {
-            return null;
-          }
-          let text = cell.textContent.trim();
-          text = text.replace(/"/g, '""');
-          if (text.includes(',') || text.includes('\n') || text.includes('"')) {
-            text = `"${text}"`;
-          }
-          return text;
-        }).filter(val => val !== null);
-
-        if (rowData.length > 0) {
-          csvData.push(rowData);
+          rows.push(rowData);
         }
       });
 
-      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csvData.map(row => row.join(",")).join("\n");
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", filename);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const cleanFilename = (filename || `data_istirahat_${todayStr}`).replace(/\.csv$/i, '') + '.xlsx';
+      const pageTitle = (document.querySelector('h1')?.textContent || 'DATA PRESENSI ISTIRAHAT').trim();
 
-      if (typeof showToast === 'function') {
-        showToast("File Excel berhasil diunduh");
+      if (typeof exportBisaExcel === 'function') {
+        exportBisaExcel({
+          title: pageTitle,
+          filename: cleanFilename,
+          sheetName: "Istirahat",
+          headers: headers,
+          rows: rows
+        });
+        if (typeof showToast === 'function') {
+          showToast("File Excel (.xlsx) berhasil diunduh");
+        }
+      } else {
+        const allData = [headers, ...rows];
+        const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + allData.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", (filename || `data_istirahat_${todayStr}.csv`));
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        if (typeof showToast === 'function') {
+          showToast("File berhasil diunduh");
+        }
       }
     }
 
@@ -615,8 +644,7 @@
       updateIstirahatMetrics();
     });
   </script>
-  <script src="../staffkol_layout.js"></script>
-  <script src="../../sidebar_engine.js?v=4"></script>
+  <script src="../../assets/js/layout.js?v=4"></script>
 </body>
 
 </html>

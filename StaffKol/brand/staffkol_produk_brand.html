@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Produk & Brands | Staff KOL - Bisa Media</title>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="../../style.css" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
   <!-- Boxicons for action icons -->
   <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
@@ -713,6 +713,12 @@
       word-break: break-word;
     }
   </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -733,7 +739,7 @@
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
             <!-- Export Excel Button (Green Excel Icon) -->
-            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.csv)">
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
                 <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
@@ -966,7 +972,7 @@
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <h2 class="modal-title" style="font-size: 16px; margin: 0;"><span id="modalExcelOriTitle" style="font-weight: 700; color: #1e293b;">Template_Import_Produk_Brand.xlsx</span></h2>
-              <span style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pratinjau Langsung • Tanpa Unduh</span>
+              <span style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pratinjau Langsung â€¢ Tanpa Unduh</span>
             </div>
             <div style="font-size: 11.5px; color: #64748b;" id="modalExcelOriSubtitle">Menampilkan lembar kerja asli</div>
           </div>
@@ -1280,8 +1286,7 @@
   </div>
 
   <!-- Sidebar & System Script -->
-  <script src="../staffkol_layout.js"></script>
-  <script src="../../sidebar_engine.js?v=999"></script>
+  <script src="../../assets/js/layout.js?v=999"></script>
 
   <script>
     (function () {
@@ -1872,80 +1877,6 @@
         });
       }
 
-      // ================= EXPORT EXCEL (.CSV) =================
-      const btnExport = document.getElementById("btnExportExcel");
-      if (btnExport) {
-        btnExport.addEventListener("click", () => {
-          if (produkBrandDb.length === 0) {
-            alert("Tidak ada data untuk diekspor!");
-            return;
-          }
-
-          const headers = [
-            "No", "Tanggal", "Nama pengguna kreator", "Jumlah pengikut kreator", "ID Produk",
-            "Info produk", "Kode Toko", "ID Toko", "Nama toko", "GMV dari kreator",
-            "GMV dari LIVE kreator", "GMV dari video afiliasi", "Pesanan dari kreator",
-            "Pesanan dari LIVE kreator", "Pesanan dari video kreator", "GMV Langsung",
-            "GMV langsung dari LIVE", "GMV langsung dari video", "GMV langsung dari kartu produk",
-            "Produk yang terjual dari kreator", "Pesanan langsung", "Pesanan langsung dari LIVE",
-            "Pesanan langsung dari Video", "Pesanan dari kartu produk", "Produk yang terjual dari LIVE kreator",
-            "produk yang terjual dari video kreator", "Produk terjual dari kartu produk",
-            "GMV pengembalian dana langsung", "Barang yang dikembalikan dananya", "CTR",
-            "CTOR (pesanan SKU)", "GMV dari kreator mitra afiliasi", "Pesanan dari kreator mitra afiliasi"
-          ];
-
-          let csvContent = "\uFEFF" + headers.join(",") + "\n";
-          produkBrandDb.forEach((r, idx) => {
-            const row = [
-              idx + 1,
-              `"${r.tanggal || ""}"`,
-              `"${r.nama_kreator || ""}"`,
-              `"${r.pengikut || ""}"`,
-              `"${r.id_produk || ""}"`,
-              `"${r.info_produk || ""}"`,
-              `"${r.kode_toko || ""}"`,
-              `"${r.id_toko || ""}"`,
-              `"${r.nama_toko || ""}"`,
-              `"${r.gmv_kreator || ""}"`,
-              `"${r.gmv_live_kreator || ""}"`,
-              `"${r.gmv_video_afiliasi || ""}"`,
-              `"${r.pesanan_kreator || ""}"`,
-              `"${r.pesanan_live_kreator || ""}"`,
-              `"${r.pesanan_video_kreator || ""}"`,
-              `"${r.gmv_langsung || ""}"`,
-              `"${r.gmv_langsung_live || ""}"`,
-              `"${r.gmv_langsung_video || ""}"`,
-              `"${r.gmv_langsung_kartu || ""}"`,
-              `"${r.terjual_kreator || ""}"`,
-              `"${r.pesanan_langsung || ""}"`,
-              `"${r.pesanan_langsung_live || ""}"`,
-              `"${r.pesanan_langsung_video || ""}"`,
-              `"${r.pesanan_kartu || ""}"`,
-              `"${r.terjual_live_kreator || ""}"`,
-              `"${r.terjual_video_kreator || ""}"`,
-              `"${r.terjual_kartu || ""}"`,
-              `"${r.gmv_refund_langsung || ""}"`,
-              `"${r.barang_refund || ""}"`,
-              `"${r.ctr || ""}"`,
-              `"${r.ctor || ""}"`,
-              `"${r.gmv_mitra || ""}"`,
-              `"${r.pesanan_mitra || ""}"`
-            ];
-            csvContent += row.join(",") + "\n";
-          });
-
-          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.setAttribute("href", url);
-          link.setAttribute("download", `Produk_Brands_${new Date().toISOString().slice(0, 10)}.csv`);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          showToast("Data berhasil diekspor ke file Excel/CSV");
-        });
-      }
-
       // ================= FORM PANEL (+ TAMBAH) =================
       let parsedImportRows = [];
       let currentExcelFileName = "Template_Import_Produk_Brand.xlsx";
@@ -2234,8 +2165,8 @@
 
         if (titleEl) titleEl.textContent = excelViewerState.fileName;
         if (subtitleEl) {
-          const sheetLabel = excelViewerState.activeSheet ? `Lembar: "${excelViewerState.activeSheet}" • ` : "";
-          subtitleEl.textContent = `${sheetLabel}${totalRows} baris data • Dokumen Asli Terbaca Online Tanpa Unduh`;
+          const sheetLabel = excelViewerState.activeSheet ? `Lembar: "${excelViewerState.activeSheet}" â€¢ ` : "";
+          subtitleEl.textContent = `${sheetLabel}${totalRows} baris data â€¢ Dokumen Asli Terbaca Online Tanpa Unduh`;
         }
 
         const contentEl = document.getElementById("modalExcelOriContent");
@@ -2503,8 +2434,8 @@
 
               parseExcelRowsToDb(rawRows);
               const sizeKB = (file.size / 1024).toFixed(1) + " KB";
-              renderPreviewCard(file.name, `${sizeKB} • File Excel Asli Terverifikasi`);
-              initExcelViewerWithData(file.name, `${sizeKB} • ${workbook.SheetNames.length} Sheet`, allSheets);
+              renderPreviewCard(file.name, `${sizeKB} â€¢ File Excel Asli Terverifikasi`);
+              initExcelViewerWithData(file.name, `${sizeKB} â€¢ ${workbook.SheetNames.length} Sheet`, allSheets);
               resetSubmitButtonState(true);
               showToast(`File '${file.name}' siap! Klik 'Lihat' pada preview untuk membuka viewer penuh.`);
             } catch (err) {
@@ -2783,6 +2714,87 @@
           if (modalHapus) modalHapus.classList.remove("is-active");
           pendingDeleteId = null;
           showToast("Data Produk & Brand berhasil dihapus.");
+        });
+      }
+
+      // Toolbar: Export Excel
+      const btnExportExcel = document.getElementById("btnExportExcel");
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener("click", () => {
+          if (!produkBrandDb || produkBrandDb.length === 0) {
+            showToast("Tidak ada data Produk & Brand untuk diekspor");
+            return;
+          }
+          const headers = [
+            "No", "Tanggal", "Nama Pengguna Kreator", "Jumlah Pengikut", "ID Produk", "Info Produk",
+            "Kode Toko", "ID Toko", "Nama Toko", "GMV Dari Kreator", "GMV Dari LIVE",
+            "GMV Video Afiliasi", "Pesanan Dari Kreator", "Pesanan LIVE", "Pesanan Video",
+            "GMV Langsung", "GMV Langsung LIVE", "GMV Langsung Video", "GMV Langsung Kartu Produk",
+            "Produk Terjual Dari Kreator", "Pesanan Langsung", "Pesanan Langsung LIVE", "Pesanan Langsung Video",
+            "Pesanan Langsung Kartu Produk", "Produk Terjual LIVE", "Produk Terjual Video",
+            "Produk Terjual Kartu Produk", "GMV Refund Langsung", "Barang Refund Pesanan Langsung",
+            "CTR", "CTOR", "GMV Mitra", "Pesanan Mitra"
+          ];
+          const q = (searchInput ? searchInput.value : "").toLowerCase().trim();
+          const selToko = filterNamaToko ? filterNamaToko.value : "Semua";
+          const selKreator = filterKreator ? filterKreator.value : "Semua";
+          const exportList = produkBrandDb.filter(item => {
+            const matchToko = selToko === "Semua" || item.nama_toko === selToko;
+            const matchKreator = selKreator === "Semua" || item.nama_kreator === selKreator;
+            const matchQuery = !q || Object.values(item).join(" ").toLowerCase().includes(q);
+            return matchToko && matchKreator && matchQuery;
+          });
+          if (exportList.length === 0) {
+            showToast("Tidak ada data yang sesuai filter untuk diekspor");
+            return;
+          }
+          const rows = exportList.map((item, idx) => [
+            idx + 1,
+            item.tanggal || '-',
+            item.nama_kreator || '-',
+            item.pengikut || '-',
+            item.id_produk || '-',
+            item.info_produk || '-',
+            item.kode_toko || '-',
+            item.id_toko || '-',
+            item.nama_toko || '-',
+            item.gmv_kreator || '-',
+            item.gmv_live_kreator || '-',
+            item.gmv_video_afiliasi || '-',
+            item.pesanan_kreator || '-',
+            item.pesanan_live_kreator || '-',
+            item.pesanan_video_kreator || '-',
+            item.gmv_langsung || '-',
+            item.gmv_langsung_live || '-',
+            item.gmv_langsung_video || '-',
+            item.gmv_langsung_kartu || '-',
+            item.terjual_kreator || '-',
+            item.pesanan_langsung || '-',
+            item.pesanan_langsung_live || '-',
+            item.pesanan_langsung_video || '-',
+            item.pesanan_kartu || '-',
+            item.terjual_live_kreator || '-',
+            item.terjual_video_kreator || '-',
+            item.terjual_kartu || '-',
+            item.gmv_refund_langsung || '-',
+            item.barang_refund || '-',
+            item.ctr || '-',
+            item.ctor || '-',
+            item.gmv_mitra || '-',
+            item.pesanan_mitra || '-'
+          ]);
+
+          const todayStr = new Date().toISOString().split("T")[0];
+          if (typeof exportBisaExcel === 'function') {
+            exportBisaExcel({
+              title: "DATA PRODUK & BRAND",
+              filename: `data_produk_brand_${todayStr}.xlsx`,
+              sheetName: "Produk Brand",
+              headers: headers,
+              rows: rows
+            });
+            showToast("Data Produk & Brand berhasil diekspor ke Excel (.xlsx)");
+          }
         });
       }
 
