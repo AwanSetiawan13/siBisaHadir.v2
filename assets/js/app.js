@@ -3609,7 +3609,10 @@
         </button>
         <div class="bm-ms__menu shadow-sm">
           <div class="p-2 border-bottom">
-            <input type="text" class="form-control form-control-sm bm-ms__search" placeholder="Cari karyawan..." />
+            <div class="bm-ms__search-wrap">
+              <i class="bx bx-search" aria-hidden="true"></i>
+              <input type="text" class="form-control form-control-sm bm-ms__search" placeholder="Cari karyawan..." />
+            </div>
           </div>
           <div class="bm-ms__list p-2"></div>
         </div>
@@ -14919,40 +14922,6 @@
     return itemId;
   }
 
-  function ensureNavigationUi() {
-    if (document.getElementById('bmDrivePathbar')) return;
-
-    var tools = document.querySelector('.bm-folder-card-page .bm-table-tools');
-    if (!tools) return;
-
-    var pathbar = document.createElement('div');
-    pathbar.className = 'card-body bm-folder-pathbar py-2';
-    pathbar.id = 'bmDrivePathbar';
-    pathbar.innerHTML = [
-      '<div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">',
-      '  <nav class="bm-folder-breadcrumb" aria-label="Breadcrumb folder" id="bmFolderBreadcrumb"></nav>',
-      '  <button class="btn btn-sm btn-outline-secondary" type="button" id="bmFolderBackBtn" hidden><i class="bx bx-arrow-back me-1"></i>Kembali</button>',
-      '</div>'
-    ].join('');
-    tools.insertAdjacentElement('afterend', pathbar);
-
-    var card = document.querySelector('.bm-folder-card-page');
-    if (card && !document.getElementById('bmFolderEmptyState')) {
-      var empty = document.createElement('div');
-      empty.className = 'card-body bm-folder-empty-state text-center';
-      empty.id = 'bmFolderEmptyState';
-      empty.hidden = true;
-      empty.innerHTML = [
-        '<div class="py-4">',
-        '  <span class="bm-folder-empty-icon"><iconify-icon icon="solar:folder-open-bold"></iconify-icon></span>',
-        '  <div class="fw-semibold mt-2">Folder ini masih kosong</div>',
-        '  <small class="text-muted">Tambahkan file, link Docs/Sheet, atau buat folder baru di lokasi ini.</small>',
-        '</div>'
-      ].join('');
-      card.appendChild(empty);
-    }
-  }
-
   function getBreadcrumbPath(folderId) {
     var path = [];
     var current = folderId || '';
@@ -14970,8 +14939,6 @@
   }
 
   function updatePathbar() {
-    ensureNavigationUi();
-
     var breadcrumb = document.getElementById('bmFolderBreadcrumb');
     var backBtn = document.getElementById('bmFolderBackBtn');
     if (!breadcrumb) return;
@@ -15354,7 +15321,6 @@
 
   function init() {
     if (!hasFolderPage()) return;
-    ensureNavigationUi();
     normalizeExistingItems('');
     bindOpenEvents();
     bindUploadInputs();
