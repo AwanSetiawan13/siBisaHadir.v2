@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -941,7 +941,7 @@
         <div class="kreator-field-group col-4">
           <label>Target GMV</label>
           <div class="kreator-field-input-wrap">
-            <input type="text" id="viewKreatorTargetGmvInput" class="kreator-field-input" placeholder="Tarhet" readonly />
+            <input type="text" id="viewKreatorTargetGmvInput" class="kreator-field-input" placeholder="Target GMV" readonly />
           </div>
         </div>
         <div class="kreator-field-group col-4">
@@ -1667,6 +1667,20 @@
         return parseFloat(num) || 0;
       }
 
+      function formatRupiah(num) {
+        return "Rp " + Number(num).toLocaleString('id-ID');
+      }
+
+      // Rumus Target GMV: Menyesuaikan secara dinamis dari GMV Berjalan saat ini + 20% (GMV Berjalan * 1.20)
+      function calculateTargetGmv(gmvBerjalanStr, fallbackTarget) {
+        const gmvVal = parseRupiahNum(gmvBerjalanStr);
+        if (gmvVal > 0) {
+          const targetNum = Math.round(gmvVal * 1.20);
+          return formatRupiah(targetNum);
+        }
+        return fallbackTarget || "Rp 0";
+      }
+
       function calculateProgressGmv(gmvBerjalanStr, targetGmvStr) {
         const gmvVal = parseRupiahNum(gmvBerjalanStr);
         const targetVal = parseRupiahNum(targetGmvStr);
@@ -1693,7 +1707,8 @@
         const levelInfo = getCreatorLevelFromMaster(item, perf);
 
         const gmvBerjalan = (perf && perf.gmv) ? perf.gmv : (item.gmvBerjalan || "Rp 0");
-        const targetGmv = (perf && perf.gmv && levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : (item.targetGmv || "Rp 0");
+        const defaultTargetFallback = (levelInfo && levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : (item.targetGmv || "Rp 0");
+        const targetGmv = calculateTargetGmv(gmvBerjalan, defaultTargetFallback);
         const progresGmv = (gmvBerjalan !== "-" && targetGmv !== "-" && targetGmv !== "Rp 0") ? calculateProgressGmv(gmvBerjalan, targetGmv) : (item.progresGmv || "0%");
         
         let siaranLive = (perf && perf.live_broadcasts) ? (perf.live_broadcasts + " Jam") : (item.siaranLive || "0 Jam");
@@ -2313,9 +2328,9 @@
             const levelInfo = (typeof getCreatorLevelFromMaster === "function") ? getCreatorLevelFromMaster(item, perf) : {};
             const levelName = levelInfo.nama || item.level || "New Growth";
             const aktStatus = (typeof getCreatorActivityStatus === "function") ? getCreatorActivityStatus(item) : (item.aktivitas || "Aktif");
-            const targetGmv = perf.targetGmv || item.targetGmv || levelInfo.gmv || "Rp 0";
-            const progresGmv = perf.progresGmv || item.progresGmv || "0%";
             const gmvBerjalan = perf.gmv || item.gmvBerjalan || "Rp 0";
+            const targetGmv = calculateTargetGmv(gmvBerjalan, levelInfo.gmv || item.targetGmv || "Rp 0");
+            const progresGmv = (gmvBerjalan !== "-" && targetGmv !== "-" && targetGmv !== "Rp 0") ? calculateProgressGmv(gmvBerjalan, targetGmv) : (item.progresGmv || "0%");
             const siaranLive = perf.liveCount != null ? String(perf.liveCount) : (item.siaranLive || "0");
             const videoCount = perf.videoCount != null ? String(perf.videoCount) : (item.videoFyp || "0");
             const masaKontrak = item.masaKontrak || (item.kontrakAwal && item.kontrakAkhir ? (item.kontrakAwal + " - " + item.kontrakAkhir) : "-");
