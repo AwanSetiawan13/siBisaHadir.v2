@@ -508,6 +508,40 @@
       vertical-align: middle !important;
       padding: 6px 12px !important;
     }
+
+    /* ===== Import Excel Button & Dropzone Styling ===== */
+    .btn-import-excel {
+      background: #ffffff;
+      color: #107c41;
+      border: 1.5px solid #107c41;
+      border-radius: 4px;
+      padding: 0 14px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 32px;
+      font-family: 'Outfit', sans-serif;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .btn-import-excel:hover {
+      background: #f0fdf4;
+      border-color: #0e6b37;
+      color: #0e6b37;
+      box-shadow: 0 2px 6px rgba(16, 124, 65, 0.18);
+      transform: translateY(-1px);
+    }
+    .btn-import-excel:active {
+      transform: translateY(1px);
+    }
+    .kreator-dropzone-dragover {
+      border-color: #2563eb !important;
+      background: #eff6ff !important;
+    }
   </style>
 
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
@@ -738,7 +772,14 @@
             </div>
           </div>
 
-          <div class="campaign-toolbar__right"></div>
+          <div class="campaign-toolbar__right" style="display: flex; align-items: center; gap: 8px;">
+            <button id="btnImportKreator" class="btn-import-excel" type="button" title="Import Data Kreator dari Excel (.xlsx / .xls / .csv)">
+              <i class="bx bx-upload" style="font-size: 16px;"></i> Import Excel
+            </button>
+            <button class="btn-tambah" style="margin-right: 6px;" type="button">
+              + Tambah
+            </button>
+          </div>
         </div>
 
         <!-- Empty State Container (Sesuai Referensi Pengguna) -->
@@ -1150,7 +1191,95 @@
     </div>
   </div>
 
-    <!-- Floating Toast Notification -->
+    <!-- Modal Import Data Kreator -->
+  <div id="kreatorImportModal" class="modal-overlay">
+    <div class="modal-box kreator-modal-box" style="max-width: 680px !important;">
+      <div class="kreator-modal-header">
+        <h2 class="modal-title" style="font-family: 'Outfit', sans-serif; font-size: 18px; margin: 0; color: #1e293b;">
+          <span style="font-weight: 400; font-style: italic;">Import</span> <span style="font-weight: 700;">Data Kreator</span>
+        </h2>
+        <button id="closeImportKreatorModal" class="modal-close-boxed" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider" style="margin: 12px 0 16px 0; border: 0; border-top: 1px solid #e2e8f0;"></div>
+
+      <div class="import-modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Drag & Drop Zone -->
+        <div id="kreatorDropzone" style="border: 2px dashed #cbd5e1; border-radius: 12px; padding: 26px 20px; text-align: center; background: #fafbfc; cursor: pointer; transition: all 0.2s ease; position: relative;">
+          <input type="file" id="kreatorFileInput" accept=".xlsx, .xls, .csv" style="display: none;" />
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 10px;">
+            <i class="bx bx-cloud-upload"></i>
+          </div>
+          <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; margin-bottom: 4px; font-family: 'Outfit', sans-serif;">
+            Tarik & Lepaskan file Excel di sini, atau <span style="color: #2563eb; text-decoration: underline;">Pilih File</span>
+          </div>
+          <div style="font-size: 12px; color: #64748b;">Mendukung file .xlsx, .xls, dan .csv (Maksimal 10MB)</div>
+        </div>
+
+        <!-- Selected File Banner (Hidden until file selected) -->
+        <div id="kreatorFileInfoContainer" style="display: none; background: #ffffff; border: 1.5px solid #93c5fd; border-radius: 10px; padding: 12px 16px; align-items: center; justify-content: space-between; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px; overflow: hidden;">
+            <div style="width: 38px; height: 38px; border-radius: 8px; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+              <i class="bx bx-file"></i>
+            </div>
+            <div style="overflow: hidden;">
+              <div id="kreatorFileName" style="font-weight: 700; font-size: 13.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Outfit', sans-serif;">data_kreator.xlsx</div>
+              <div id="kreatorFileSize" style="font-size: 11.5px; color: #64748b; margin-top: 1px;">0 KB</div>
+            </div>
+          </div>
+          <button type="button" id="btnRemoveKreatorFile" style="background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-family: 'Outfit', sans-serif;">
+            <i class="bx bx-trash"></i> Hapus
+          </button>
+        </div>
+
+        <!-- Preview Container (Hidden until file parsed) -->
+        <div id="kreatorPreviewContainer" style="display: none; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 700; font-size: 13px; color: #334155; display: flex; align-items: center; gap: 6px;">
+              <i class="bx bx-list-check" style="color: #107c41; font-size: 18px;"></i>
+              <span>Preview Data Terbaca</span>
+              <span id="kreatorPreviewCountBadge" style="background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; border: 1px solid #bbf7d0;">0 Data</span>
+            </div>
+            <span style="font-size: 11px; color: #94a3b8;">*Menampilkan hingga 5 baris pertama</span>
+          </div>
+
+          <div style="max-height: 210px; overflow: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Outfit', sans-serif;">
+              <thead>
+                <tr style="background: #f8fafc; border-bottom: 1.5px solid #e2e8f0; text-align: left; color: #475569; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <th style="padding: 10px 12px; white-space: nowrap;">#</th>
+                  <th style="padding: 10px 12px; white-space: nowrap;">UID</th>
+                  <th style="padding: 10px 12px; white-space: nowrap;">USERNAME</th>
+                  <th style="padding: 10px 12px; white-space: nowrap;">NAMA KREATOR</th>
+                  <th style="padding: 10px 12px; white-space: nowrap;">KATEGORI PRODUK</th>
+                  <th style="padding: 10px 12px; white-space: nowrap;">SPESIFIK</th>
+                  <th style="padding: 10px 12px; white-space: nowrap;">MASA KONTRAK</th>
+                  <th style="padding: 10px 12px; white-space: nowrap;">STATUS</th>
+                </tr>
+              </thead>
+              <tbody id="kreatorPreviewTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-divider" style="margin: 18px 0 14px 0; border: 0; border-top: 1px solid #e2e8f0;"></div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center;">
+        <button type="button" id="btnCancelImportKreator" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; font-family: 'Outfit', sans-serif;">
+          Batal
+        </button>
+        <button type="button" id="btnSubmitImportKreator" disabled style="background: #94a3b8; color: #ffffff; border: none; border-radius: 6px; padding: 8px 22px; font-size: 13px; font-weight: 700; cursor: not-allowed; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 6px; font-family: 'Outfit', sans-serif;">
+          <i class="bx bx-check-circle" style="font-size: 16px;"></i> Import Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Toast Notification -->
   <div id="toastNotification" class="toast-notification">
     <div class="toast-notification__icon-wrap">
       <svg id="toastIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
@@ -1940,7 +2069,9 @@
       function syncKreatorStatuses() {
         let changed = false;
         kreatorDb.forEach(k => {
-          if (window.editingKreatorId && k.id === window.editingKreatorId && k.status === "Berhenti") return; // Prevent overwriting
+          if (k.statusExplicit) return; // Lindungi status hasil import atau eksplisit
+          if (window.editingKreatorId && k.id === window.editingKreatorId && k.status === "Berhenti") return;
+          if (k.status === "Berhenti") return;
           const computed = calculateKreatorStatus(k);
           if (k.status !== computed) {
             k.status = computed;
@@ -2866,11 +2997,703 @@
         renderKreatorTable();
       };
 
-      window.addKreatorItem = function (item) {
-        kreatorDb.unshift(item);
-        saveKreatorDb();
-        renderKreatorTable();
-      };
+
+      // ==========================================
+      // ===== FITUR IMPORT DATA KREATOR (.XLSX/.CSV) =====
+      // ==========================================
+      const btnImportKreator = document.getElementById("btnImportKreator");
+      const kreatorImportModal = document.getElementById("kreatorImportModal");
+      const closeImportKreatorModal = document.getElementById("closeImportKreatorModal");
+      const btnCancelImportKreator = document.getElementById("btnCancelImportKreator");
+      const btnDownloadTemplateKreator = document.getElementById("btnDownloadTemplateKreator");
+      const kreatorDropzone = document.getElementById("kreatorDropzone");
+      const kreatorFileInput = document.getElementById("kreatorFileInput");
+      const kreatorFileInfoContainer = document.getElementById("kreatorFileInfoContainer");
+      const kreatorFileName = document.getElementById("kreatorFileName");
+      const kreatorFileSize = document.getElementById("kreatorFileSize");
+      const btnRemoveKreatorFile = document.getElementById("btnRemoveKreatorFile");
+      const kreatorPreviewContainer = document.getElementById("kreatorPreviewContainer");
+      const kreatorPreviewCountBadge = document.getElementById("kreatorPreviewCountBadge");
+      const kreatorPreviewTableBody = document.getElementById("kreatorPreviewTableBody");
+      const btnSubmitImportKreator = document.getElementById("btnSubmitImportKreator");
+
+      let parsedImportData = [];
+
+      function resetImportModalState() {
+        parsedImportData = [];
+        if (kreatorFileInput) kreatorFileInput.value = "";
+        if (kreatorFileInfoContainer) {
+          kreatorFileInfoContainer.style.display = "none";
+        }
+        if (kreatorDropzone) {
+          kreatorDropzone.style.display = "block";
+          kreatorDropzone.classList.remove("kreator-dropzone-dragover");
+        }
+        if (kreatorPreviewContainer) {
+          kreatorPreviewContainer.style.display = "none";
+        }
+        if (kreatorPreviewTableBody) {
+          kreatorPreviewTableBody.innerHTML = "";
+        }
+        if (btnSubmitImportKreator) {
+          btnSubmitImportKreator.disabled = true;
+          btnSubmitImportKreator.style.background = "#94a3b8";
+          btnSubmitImportKreator.style.cursor = "not-allowed";
+        }
+      }
+
+      function openImportModal() {
+        resetImportModalState();
+        if (kreatorImportModal) kreatorImportModal.classList.add("is-active");
+      }
+
+      function closeImportModal() {
+        if (kreatorImportModal) kreatorImportModal.classList.remove("is-active");
+        resetImportModalState();
+      }
+
+      if (btnImportKreator) btnImportKreator.addEventListener("click", openImportModal);
+      if (closeImportKreatorModal) closeImportKreatorModal.addEventListener("click", closeImportModal);
+      if (btnCancelImportKreator) btnCancelImportKreator.addEventListener("click", closeImportModal);
+      if (kreatorImportModal) {
+        kreatorImportModal.addEventListener("click", function (e) {
+          if (e.target === kreatorImportModal) closeImportModal();
+        });
+      }
+
+      // 1. Download Template Excel (.xlsx)
+      function downloadKreatorImportTemplate() {
+        if (typeof ExcelJS !== "undefined" && ExcelJS.Workbook) {
+          const workbook = new ExcelJS.Workbook();
+          workbook.creator = "Bisa Media Group";
+          const sheet = workbook.addWorksheet("Template Data Kreator");
+
+          const headers = [
+            "UID", "Username", "Nama Kreator", "Nomor WhatsApp", "Email", "Alamat",
+            "Leads", "Kategori 1", "PIC 1", "Kategori 2", "PIC 2", "Kategori 3", "PIC 3",
+            "Kategori Spesifik", "Kontrak Awal", "Kontrak Akhir", "Status"
+          ];
+
+          const sampleRow1 = [
+            "UID-0003", "@citra.kirana", "Citra Kirana", "081234567890", "citra@gmail.com", "Jl. Asia Afrika No. 10, Bandung",
+            "Member", "Fashion Muslim", "Setiawan", "Beauty & Care", "Amanda", "", "",
+            "Gamis Modern & Hijab Syari", "2026-03-01", "2026-12-31", "Bind"
+          ];
+          const sampleRow2 = [
+            "UID-0004", "@dimas.foodie", "Dimas Setiawan", "081987654321", "dimas@gmail.com", "Jl. Malioboro No. 20, Yogyakarta",
+            "SmartC", "Food & Beverage", "Dimas", "", "", "", "",
+            "Kuliner Nusantara & Snacks", "2026-01-15", "2026-07-15", "Bind"
+          ];
+
+          sheet.addRow(headers);
+          sheet.addRow(sampleRow1);
+          sheet.addRow(sampleRow2);
+
+          const headerRow = sheet.getRow(1);
+          headerRow.font = { name: "Outfit", size: 11, bold: true, color: { argb: "FFFFFFFF" } };
+          headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF107C41" } };
+          headerRow.alignment = { vertical: "middle", horizontal: "center" };
+          headerRow.height = 28;
+
+          const colWidths = [14, 18, 22, 18, 24, 30, 16, 20, 16, 20, 16, 20, 16, 26, 16, 16, 14];
+          colWidths.forEach((w, i) => { sheet.getColumn(i + 1).width = w; });
+
+          [2, 3].forEach(rIdx => {
+            const row = sheet.getRow(rIdx);
+            row.font = { name: "Outfit", size: 10 };
+            row.alignment = { vertical: "middle" };
+            row.height = 20;
+          });
+
+          workbook.xlsx.writeBuffer().then(buffer => {
+            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "Template_Import_Data_Kreator.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+            showToast("Template Excel berhasil diunduh!", "success");
+          }).catch(err => {
+            console.error("Gagal export template:", err);
+            downloadCsvTemplateFallback();
+          });
+        } else {
+          downloadCsvTemplateFallback();
+        }
+      }
+
+      function downloadCsvTemplateFallback() {
+        const headers = [
+          "UID", "Username", "Nama Kreator", "Nomor WhatsApp", "Email", "Alamat",
+          "Leads", "Kategori 1", "PIC 1", "Kategori 2", "PIC 2", "Kategori 3", "PIC 3",
+          "Kategori Spesifik", "Kontrak Awal", "Kontrak Akhir", "Status"
+        ];
+        const row1 = [
+          "UID-0003", "@citra.kirana", "Citra Kirana", "081234567890", "citra@gmail.com", "Jl. Asia Afrika No. 10, Bandung",
+          "Member", "Fashion Muslim", "Setiawan", "Beauty & Care", "Amanda", "", "",
+          "Gamis Modern & Hijab Syari", "2026-03-01", "2026-12-31", "Bind"
+        ];
+        const csvContent = "\uFEFF" + [headers.join(","), row1.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")].join("\n");
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Template_Import_Data_Kreator.csv";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1500);
+        showToast("Template CSV berhasil diunduh!", "success");
+      }
+
+      if (btnDownloadTemplateKreator) {
+        btnDownloadTemplateKreator.addEventListener("click", downloadKreatorImportTemplate);
+      }
+
+      // 2. Drag & Drop and File Selection
+      if (kreatorDropzone) {
+        kreatorDropzone.addEventListener("click", () => {
+          if (kreatorFileInput) kreatorFileInput.click();
+        });
+        kreatorDropzone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          kreatorDropzone.classList.add("kreator-dropzone-dragover");
+        });
+        kreatorDropzone.addEventListener("dragleave", () => {
+          kreatorDropzone.classList.remove("kreator-dropzone-dragover");
+        });
+        kreatorDropzone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          kreatorDropzone.classList.remove("kreator-dropzone-dragover");
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            handleSelectedImportFile(e.dataTransfer.files[0]);
+          }
+        });
+      }
+
+      if (kreatorFileInput) {
+        kreatorFileInput.addEventListener("change", (e) => {
+          if (e.target.files && e.target.files.length > 0) {
+            handleSelectedImportFile(e.target.files[0]);
+          }
+        });
+      }
+
+      if (btnRemoveKreatorFile) {
+        btnRemoveKreatorFile.addEventListener("click", resetImportModalState);
+      }
+
+      async function handleSelectedImportFile(file) {
+        if (!file) return;
+        const validExtensions = [".xlsx", ".xls", ".csv"];
+        const lowerName = file.name.toLowerCase();
+        const isValid = validExtensions.some(ext => lowerName.endsWith(ext));
+        if (!isValid) {
+          Swal.fire({
+            icon: "error",
+            title: "Format File Tidak Didukung",
+            text: "Mohon unggah file dengan format .xlsx, .xls, atau .csv.",
+            customClass: { popup: "swal2-bisa-popup" }
+          });
+          return;
+        }
+
+        // Show file info
+        if (kreatorFileName) kreatorFileName.textContent = file.name;
+        if (kreatorFileSize) {
+          const kb = (file.size / 1024).toFixed(1);
+          kreatorFileSize.textContent = `${kb} KB`;
+        }
+        if (kreatorDropzone) kreatorDropzone.style.display = "none";
+        if (kreatorFileInfoContainer) kreatorFileInfoContainer.style.display = "flex";
+
+        try {
+          if (typeof Swal !== "undefined") {
+            Swal.fire({
+              title: "Membaca file...",
+              text: "Mohon tunggu sebentar",
+              allowOutsideClick: false,
+              didOpen: () => { Swal.showLoading(); }
+            });
+          }
+
+          const parsedRows = await parseKreatorExcelFile(file);
+          if (typeof Swal !== "undefined" && Swal.isVisible()) Swal.close();
+
+          if (!parsedRows || parsedRows.length === 0) {
+            Swal.fire({
+              icon: "warning",
+              title: "Data Tidak Ditemukan",
+              text: "File tidak memiliki baris data yang valid atau format kolom tidak sesuai.",
+              customClass: { popup: "swal2-bisa-popup" }
+            });
+            resetImportModalState();
+            return;
+          }
+
+          parsedImportData = parsedRows;
+          renderImportPreviewTable(parsedRows);
+
+          // Enable submit button
+          if (btnSubmitImportKreator) {
+            btnSubmitImportKreator.disabled = false;
+            btnSubmitImportKreator.style.background = "#2563eb";
+            btnSubmitImportKreator.style.cursor = "pointer";
+          }
+        } catch (err) {
+          if (typeof Swal !== "undefined" && Swal.isVisible()) Swal.close();
+          console.error("Error parsing file:", err);
+          Swal.fire({
+            icon: "error",
+            title: "Data Tidak Sesuai",
+            html: err.message || "File yang diunggah tidak sesuai dengan format Data Kreator.",
+            confirmButtonColor: "#2563eb",
+            confirmButtonText: "Mengerti",
+            customClass: { popup: "swal2-bisa-popup" }
+          });
+          resetImportModalState();
+        }
+      }
+
+      function renderImportPreviewTable(rows) {
+        if (!kreatorPreviewContainer || !kreatorPreviewTableBody) return;
+        kreatorPreviewContainer.style.display = "flex";
+        if (kreatorPreviewCountBadge) {
+          kreatorPreviewCountBadge.textContent = `${rows.length} Data Terdeteksi`;
+        }
+
+        const previewSlice = rows.slice(0, 5);
+        kreatorPreviewTableBody.innerHTML = previewSlice.map((r, i) => {
+          let badgeClass = "status-badge--success";
+          const st = (r.status || "Bind").toLowerCase();
+          if (st === "tenggang") badgeClass = "status-badge--warning";
+          else if (st === "berhenti") badgeClass = "status-badge--danger";
+
+          const catName = r.kategori1 || r.kategori || "-";
+          const catStyle = typeof getKreatorCatPillStyle === "function" 
+            ? getKreatorCatPillStyle(catName) 
+            : { bg: "#e0f2fe", color: "#0369a1", border: "#bae6fd" };
+
+          const fotoUrl = r.foto || "../../media/avatar.png";
+          const rawSpec = r.spesifik || r.kategoriSpesifik || "-";
+          const spesifikDisplay = (rawSpec && rawSpec !== "-") ? rawSpec : "-";
+          const masaDisplay = r.masaKontrak || "-";
+
+          return `
+            <tr style="border-bottom: 1px solid #f1f5f9; background: #ffffff;">
+              <td style="padding: 10px 12px; color: #64748b; font-weight: 500;">${i + 1}</td>
+              <td style="padding: 10px 12px; font-weight: 600; color: #1e293b;">${r.uid || "-"}</td>
+              <td style="padding: 10px 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <img src="${fotoUrl}" alt="Avatar" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; background: #f8fafc;" onerror="this.src='../../media/avatar.png';" />
+                  <span style="font-weight: 500; color: #1e293b;">${r.username || "-"}</span>
+                </div>
+              </td>
+              <td style="padding: 10px 12px; font-weight: 600; color: #334155;">${r.nama || "-"}</td>
+              <td style="padding: 10px 12px;">
+                <span class="kreator-cat-pill" style="background: ${catStyle.bg}; color: ${catStyle.color}; border: 1px solid ${catStyle.border}; font-size: 11px; padding: 2px 8px; border-radius: 6px;">
+                  ${catName}
+                </span>
+              </td>
+              <td style="padding: 10px 12px; color: #334155; font-weight: 500;">${spesifikDisplay}</td>
+              <td style="padding: 10px 12px; color: #475569; font-weight: 500; white-space: nowrap;">${masaDisplay}</td>
+              <td style="padding: 10px 12px;">
+                <span class="status-badge ${badgeClass}" style="font-size: 11px; padding: 3px 8px;">${r.status || "Bind"}</span>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      async function parseKreatorExcelFile(file) {
+        const isCsv = file.name.toLowerCase().endsWith(".csv");
+        if (isCsv) {
+          const text = await file.text();
+          return parseCsvToKreatorRows(text);
+        }
+
+        if (typeof ExcelJS !== "undefined" && ExcelJS.Workbook) {
+          const buffer = await file.arrayBuffer();
+          const workbook = new ExcelJS.Workbook();
+          await workbook.xlsx.load(buffer);
+          const worksheet = workbook.worksheets[0];
+          if (!worksheet) throw new Error("File Excel tidak memiliki sheet yang aktif.");
+
+          const rows = [];
+          worksheet.eachRow({ includeEmpty: false }, (row) => {
+            const values = [];
+            row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+              let val = cell.value;
+              if (val && typeof val === "object") {
+                if (val instanceof Date) {
+                  val = val.toISOString().slice(0, 10);
+                } else if (val.text) {
+                  val = val.text;
+                } else if (val.result !== undefined) {
+                  val = val.result;
+                }
+              }
+              if (typeof val === "number" && val > 25000 && val < 60000) {
+                const d = new Date(Math.round((val - 25569) * 86400 * 1000));
+                val = d.toISOString().slice(0, 10);
+              }
+              values[colNumber - 1] = val != null ? String(val).trim() : "";
+            });
+            rows.push(values);
+          });
+
+          if (rows.length < 2) throw new Error("File Excel hanya memiliki baris header atau kosong.");
+          return mapHeaderAndRowsToKreator(rows[0], rows.slice(1));
+        } else {
+          throw new Error("Library ExcelJS belum siap. Silakan muat ulang halaman.");
+        }
+      }
+
+      function parseCsvToKreatorRows(csvText) {
+        const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+        if (lines.length < 2) throw new Error("File CSV tidak memiliki baris data.");
+
+        function parseCsvLine(line) {
+          const result = [];
+          let insideQuote = false;
+          let entry = "";
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+              if (insideQuote && line[i + 1] === '"') {
+                entry += '"';
+                i++;
+              } else {
+                insideQuote = !insideQuote;
+              }
+            } else if (char === "," && !insideQuote) {
+              result.push(entry.trim());
+              entry = "";
+            } else {
+              entry += char;
+            }
+          }
+          result.push(entry.trim());
+          return result;
+        }
+
+        const rawHeaders = parseCsvLine(lines[0]);
+        const rawRows = lines.slice(1).map(parseCsvLine);
+        return mapHeaderAndRowsToKreator(rawHeaders, rawRows);
+      }
+
+      function mapHeaderAndRowsToKreator(rawHeaders, rawRows) {
+        if (!rawHeaders || rawHeaders.length === 0) {
+          throw new Error("File tidak memiliki baris judul (header) yang valid.");
+        }
+
+        const colMap = {};
+        rawHeaders.forEach((h, idx) => {
+          const clean = String(h || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+          // UID
+          if (clean.includes("uid") || clean.includes("idkreator") || clean.includes("kodekreator") || clean === "id") {
+            colMap.uid = idx;
+          }
+          // USERNAME
+          else if (clean.includes("username") || clean === "user" || clean.includes("akuntiktok") || clean.includes("akun") || clean.includes("tiktok") || clean === "ig" || clean.includes("instagram") || clean.includes("sosmed")) {
+            colMap.username = idx;
+          }
+          // NAMA KREATOR
+          else if (clean.includes("namakreator") || clean === "nama" || clean.includes("namalengkap") || clean === "kreator" || clean === "creator" || clean.includes("talent")) {
+            colMap.nama = idx;
+          }
+          // KATEGORI PRODUK
+          else if (clean.includes("kategoriproduk") || clean === "kategori" || clean === "kategori1" || clean.includes("kategoriutama") || clean === "category" || clean === "jenisproduk" || clean === "produk") {
+            colMap.kategori = idx;
+          }
+          // SPESIFIK
+          else if (clean.includes("spesifik") || clean.includes("subkategori") || clean.includes("niche") || clean.includes("spesifikasi") || clean.includes("detail")) {
+            colMap.spesifik = idx;
+          }
+          // MASA KONTRAK
+          else if (clean.includes("masakontrak") || clean.includes("periodekontrak") || clean.includes("periode") || clean.includes("durasikontrak") || clean.includes("durasi") || clean.includes("masaberlaku") || clean === "kontrak" || clean.includes("tglkontrak")) {
+            colMap.masaKontrak = idx;
+          }
+          else if (clean.includes("kontrakawal") || clean.includes("tglmulai") || clean.includes("awal") || clean.includes("startdate")) {
+            colMap.kontrakAwal = idx;
+          }
+          else if (clean.includes("kontrakakhir") || clean.includes("tglberakhir") || clean.includes("akhir") || clean.includes("enddate")) {
+            colMap.kontrakAkhir = idx;
+          }
+          // STATUS
+          else if (clean.includes("status") || clean.includes("kondisi") || clean.includes("keterangan")) {
+            colMap.status = idx;
+          }
+          // PIC
+          else if (clean.includes("pic") || clean.includes("penanggungjawab")) {
+            colMap.pic = idx;
+          }
+          // LEADS
+          else if (clean.includes("lead") || clean.includes("sumber") || clean.includes("asal")) {
+            colMap.leads = idx;
+          }
+          // WHATSAPP
+          else if (clean.includes("whatsapp") || clean.includes("nomorwa") || clean.includes("wa") || clean.includes("telepon") || clean.includes("nohp") || clean.includes("phone")) {
+            colMap.nomorWa = idx;
+          }
+          // EMAIL
+          else if (clean.includes("email") || clean.includes("surel") || clean.includes("mail")) {
+            colMap.email = idx;
+          }
+          // ALAMAT
+          else if (clean.includes("alamat") || clean.includes("domisili") || clean.includes("kota") || clean.includes("address")) {
+            colMap.alamat = idx;
+          }
+        });
+
+        // VALIDASI KOLOM UTAMA DATA KREATOR:
+        // Wajib memiliki minimal UID, Username, Nama Kreator, dan Kategori Produk
+        const hasUid = colMap.uid !== undefined;
+        const hasUsername = colMap.username !== undefined;
+        const hasNama = colMap.nama !== undefined;
+        const hasKategori = colMap.kategori !== undefined;
+
+        if (!hasUid || !hasUsername || !hasNama || !hasKategori) {
+          const missing = [];
+          if (!hasUid) missing.push("UID");
+          if (!hasUsername) missing.push("Username");
+          if (!hasNama) missing.push("Nama Kreator");
+          if (!hasKategori) missing.push("Kategori Produk");
+
+          throw new Error(`Format file tidak sesuai dengan Data Kreator.<br><small style="color: #64748b; font-size: 12.5px; display: inline-block; margin-top: 6px;">Kolom wajib yang tidak ditemukan: <b style="color: #ef4444;">${missing.join(", ")}</b>.<br>Pastikan file memiliki kolom sesuai Data Kreator: <b>UID, Username, Nama Kreator, Kategori Produk, Spesifik, Masa Kontrak, Status</b>.</small>`);
+        }
+
+        const masterInfo = typeof getMasterCategoriesAndPics === "function" ? getMasterCategoriesAndPics() : { categoryToPicMap: {} };
+        const catToPic = masterInfo.categoryToPicMap || {};
+
+        let currentMaxId = kreatorDb.reduce((max, k) => Math.max(max, Number(k.id) || 0), 0);
+        const parsedItems = [];
+
+        rawRows.forEach((r) => {
+          if (!r || r.every(cell => !cell || String(cell).trim() === "")) return;
+
+          currentMaxId++;
+          const rawUid = colMap.uid !== undefined ? String(r[colMap.uid] || "").trim() : "";
+          const rawUsername = colMap.username !== undefined ? String(r[colMap.username] || "").trim() : "";
+          const rawNama = colMap.nama !== undefined ? String(r[colMap.nama] || "").trim() : "";
+
+          if (!rawUid || !rawUsername || !rawNama) return;
+
+          const formattedUsername = rawUsername.startsWith("@") ? rawUsername : "@" + rawUsername;
+          const uid = rawUid;
+          const nama = rawNama;
+
+          // 1. KATEGORI PRODUK
+          let kat1 = "Fashion Muslim";
+          let kat2 = "";
+          let kat3 = "";
+          if (colMap.kategori !== undefined) {
+            const rawKat = String(r[colMap.kategori] || "").trim();
+            if (rawKat.includes(",")) {
+              const kParts = rawKat.split(",").map(p => p.trim());
+              kat1 = kParts[0] || "Fashion Muslim";
+              kat2 = kParts[1] || "";
+              kat3 = kParts[2] || "";
+            } else if (rawKat) {
+              kat1 = rawKat;
+            }
+          }
+
+          // 2. PIC
+          let pic1 = "";
+          let pic2 = "";
+          let pic3 = "";
+          if (colMap.pic !== undefined) {
+            const rawPic = String(r[colMap.pic] || "").trim();
+            if (rawPic.includes(",")) {
+              const pParts = rawPic.split(",").map(p => p.trim());
+              pic1 = pParts[0] || "";
+              pic2 = pParts[1] || "";
+              pic3 = pParts[2] || "";
+            } else if (rawPic && rawPic !== "-") {
+              pic1 = rawPic;
+            }
+          }
+          if (!pic1 && kat1 && catToPic[kat1.toLowerCase()]) pic1 = catToPic[kat1.toLowerCase()];
+          if (!pic2 && kat2 && catToPic[kat2.toLowerCase()]) pic2 = catToPic[kat2.toLowerCase()];
+          if (!pic3 && kat3 && catToPic[kat3.toLowerCase()]) pic3 = catToPic[kat3.toLowerCase()];
+
+          // 3. SPESIFIK
+          const rawSpec = colMap.spesifik !== undefined ? String(r[colMap.spesifik] || "").trim() : "";
+          const spesifik = (rawSpec && rawSpec !== "-") ? rawSpec : "-";
+
+          // 4. MASA KONTRAK
+          let rawMasa = colMap.masaKontrak !== undefined ? String(r[colMap.masaKontrak] || "").trim() : "";
+          let kAwal = colMap.kontrakAwal !== undefined ? String(r[colMap.kontrakAwal] || "").trim() : "";
+          let kAkhir = colMap.kontrakAkhir !== undefined ? String(r[colMap.kontrakAkhir] || "").trim() : "";
+
+          function toDMY(p) {
+            if (!p) return "";
+            p = p.trim();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(p)) {
+              const [y, m, d] = p.split("-");
+              return `${d}/${m}/${y}`;
+            }
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(p)) {
+              const [d, m, y] = p.split("/");
+              return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+            }
+            return p;
+          }
+
+          function toYMD(p) {
+            if (!p) return "";
+            p = p.trim();
+            if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return p;
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(p)) {
+              const [d, m, y] = p.split("/");
+              return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+            }
+            return p;
+          }
+
+          let displayMasaKontrak = "-";
+          if (rawMasa && rawMasa !== "-") {
+            let str = rawMasa.replace(/\s+(s\/d|s\.d\.|sampai|sd|to)\s+/gi, " - ");
+            if (str.includes("-")) {
+              const parts = str.split("-").map(p => p.trim());
+              displayMasaKontrak = `${toDMY(parts[0])} - ${toDMY(parts[1])}`;
+              if (!kAwal) kAwal = toYMD(parts[0]);
+              if (!kAkhir) kAkhir = toYMD(parts[1]);
+            } else {
+              displayMasaKontrak = str;
+            }
+          } else if (kAwal && kAkhir) {
+            displayMasaKontrak = `${toDMY(kAwal)} - ${toDMY(kAkhir)}`;
+            kAwal = toYMD(kAwal);
+            kAkhir = toYMD(kAkhir);
+          }
+
+          // 5. STATUS
+          let rawStatus = colMap.status !== undefined ? String(r[colMap.status] || "").trim() : "";
+          let finalStatus = "Bind";
+          if (rawStatus && rawStatus !== "-") {
+            const sLower = rawStatus.toLowerCase();
+            if (sLower.includes("berhenti") || sLower.includes("stop") || sLower.includes("nonaktif") || sLower.includes("keluar") || sLower.includes("selesai")) {
+              finalStatus = "Berhenti";
+            } else if (sLower.includes("tenggang") || sLower.includes("warning") || sLower.includes("pending") || sLower.includes("masa tenggang")) {
+              finalStatus = "Tenggang";
+            } else {
+              finalStatus = "Bind";
+            }
+          } else {
+            if (typeof calculateKreatorStatus === "function") {
+              finalStatus = calculateKreatorStatus({ kontrakAwal: kAwal, kontrakAkhir: kAkhir, masaKontrak: displayMasaKontrak });
+            } else {
+              finalStatus = "Bind";
+            }
+          }
+
+          const item = {
+            id: currentMaxId,
+            uid: uid,
+            username: formattedUsername,
+            nama: nama,
+            nomorWa: colMap.nomorWa !== undefined ? (String(r[colMap.nomorWa] || "").trim() || "-") : "-",
+            email: colMap.email !== undefined ? (String(r[colMap.email] || "").trim() || "-") : "-",
+            alamat: colMap.alamat !== undefined ? (String(r[colMap.alamat] || "").trim() || "-") : "-",
+            leads: colMap.leads !== undefined ? (String(r[colMap.leads] || "").trim() || "Member") : "Member",
+            kategori: kat1,
+            kategori1: kat1,
+            kategoriProduk: kat1,
+            pic1: pic1 || "-",
+            kategori2: kat2,
+            pic2: pic2,
+            kategori3: kat3,
+            pic3: pic3,
+            kategoriSpesifik: spesifik,
+            spesifik: spesifik,
+            kontrakAwal: kAwal || "",
+            kontrakAkhir: kAkhir || "",
+            masaKontrak: displayMasaKontrak,
+            status: finalStatus,
+            statusExplicit: true,
+            password: "password123",
+            foto: "../../media/avatar.png",
+            level: "NORMAL",
+            targetGmv: "Rp 50.000.000",
+            gmvBerjalan: "Rp 0",
+            progresGmv: "0%",
+            siaranLive: "0 Jam",
+            video: "0 Video",
+            aktivitas: "Belum Ada Aktivitas"
+          };
+
+          parsedItems.push(item);
+        });
+
+        if (parsedItems.length === 0) {
+          throw new Error("Data di dalam file tidak sesuai dengan format Data Kreator atau kolom wajib (UID, Username, Nama) kosong.");
+        }
+
+        return parsedItems;
+      }
+
+      // 3. Submit Import Action
+      if (btnSubmitImportKreator) {
+        btnSubmitImportKreator.addEventListener("click", function () {
+          if (!parsedImportData || parsedImportData.length === 0) {
+            Swal.fire({
+              icon: "error",
+              title: "Data Tidak Sesuai",
+              text: "Pilih file Excel yang sesuai dengan format Data Kreator terlebih dahulu.",
+              confirmButtonColor: "#2563eb",
+              confirmButtonText: "Mengerti",
+              customClass: { popup: "swal2-bisa-popup" }
+            });
+            return;
+          }
+
+          let addedCount = 0;
+          let updatedCount = 0;
+
+          parsedImportData.forEach(newItem => {
+            const existingIdx = kreatorDb.findIndex(k => 
+              (k.uid && newItem.uid && String(k.uid).trim().toLowerCase() === String(newItem.uid).trim().toLowerCase()) ||
+              (k.username && newItem.username && String(k.username).trim().toLowerCase() === String(newItem.username).trim().toLowerCase())
+            );
+
+            if (existingIdx !== -1) {
+              kreatorDb[existingIdx] = {
+                ...kreatorDb[existingIdx],
+                ...newItem,
+                id: kreatorDb[existingIdx].id
+              };
+              updatedCount++;
+            } else {
+              kreatorDb.unshift(newItem);
+              addedCount++;
+            }
+          });
+
+          saveKreatorDb();
+          renderKreatorTable();
+          closeImportModal();
+
+          const messages = [];
+          if (addedCount > 0) messages.push(`${addedCount} data kreator baru berhasil ditambahkan`);
+          if (updatedCount > 0) messages.push(`${updatedCount} data kreator diperbarui`);
+          if (messages.length === 0) messages.push(`${parsedImportData.length} data kreator diproses`);
+
+          Swal.fire({
+            icon: "success",
+            title: "Import Data Berhasil!",
+            text: messages.join(", ") + ".",
+            timer: 2800,
+            showConfirmButton: false,
+            customClass: { popup: "swal2-bisa-popup" }
+          });
+
+          showToast(`Berhasil mengimpor ${parsedImportData.length} data kreator!`, "success");
+        });
+      }
 
       const tambahBtn = document.querySelector(".btn-tambah");
       if (tambahBtn) {
