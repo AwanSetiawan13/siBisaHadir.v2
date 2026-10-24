@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -1623,6 +1623,7 @@
       // Render Table Data
       function renderTable() {
         if (!tbody) return;
+        document.querySelectorAll("[id^='pb-menu-']").forEach(m => m.remove());
         tbody.innerHTML = "";
         updateFilterOptions();
 
@@ -1723,26 +1724,26 @@
             <td>${row.pesanan_mitra || "-"}</td>
             <td class="col-sticky-action tdActions text-center">
               <div class="dropdown bm-action-dropdown">
-                                <button class="hide-arrow custom-dots-btn" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi"
+                <button class="hide-arrow custom-dots-btn" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi"
                   style="background-color: transparent !important; outline: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 0; color: #64748b; transition: all 0.15s ease;"
                   onclick="window.toggleProdukBrandActionMenu(this, event)">
                   <i class="bx bx-dots-vertical-rounded"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu">
                   <li>
-                    <button class="dropdown-item btn-act-view" type="button" data-id="${row.id}" title="Lihat">
+                    <button class="dropdown-item btn-act-view" type="button" data-id="${row.id}" onclick="window.openViewProdukBrandById('${row.id}', event)" title="Lihat">
                       <span class="bm-menu-iconify"><i class="bx bx-show"></i></span>
                       <span class="bm-menu-text">Lihat</span>
                     </button>
                   </li>
                   <li>
-                    <button class="dropdown-item btn-act-edit" type="button" data-id="${row.id}" title="Edit">
+                    <button class="dropdown-item btn-act-edit" type="button" data-id="${row.id}" onclick="window.openEditProdukBrandById('${row.id}', event)" title="Edit">
                       <span class="bm-menu-iconify"><i class="bx bx-edit-alt"></i></span>
                       <span class="bm-menu-text">Edit</span>
                     </button>
                   </li>
                   <li>
-                    <button class="dropdown-item text-danger btn-act-delete" type="button" data-id="${row.id}" title="Hapus">
+                    <button class="dropdown-item text-danger btn-act-delete" type="button" data-id="${row.id}" onclick="window.openDeleteProdukBrandById('${row.id}', event)" title="Hapus">
                       <span class="bm-menu-iconify bm-menu-iconify--danger"><i class="bx bx-trash"></i></span>
                       <span class="bm-menu-text">Hapus</span>
                     </button>
@@ -2516,6 +2517,7 @@
       window.closeAllProdukBrandActionMenus = function () {
         document.querySelectorAll(".bm-table-action-menu.show").forEach(m => {
           m.classList.remove("show");
+          m.style.display = "none";
           m.style.position = "";
           m.style.top = "";
           m.style.left = "";
@@ -2527,17 +2529,29 @@
           e.preventDefault();
           e.stopPropagation();
         }
-        const dropdown = btn.closest(".bm-action-dropdown");
-        const menu = dropdown ? dropdown.querySelector(".bm-table-action-menu") : null;
+        
+        let menuId = btn.dataset.menuId;
+        let menu;
+        if (menuId) {
+          menu = document.getElementById(menuId);
+        } else {
+          const dropdown = btn.closest(".bm-action-dropdown");
+          menu = dropdown ? dropdown.querySelector(".bm-table-action-menu") : null;
+          if (menu) {
+            menuId = "pb-menu-" + Math.random().toString(36).substr(2, 9);
+            menu.id = menuId;
+            btn.dataset.menuId = menuId;
+            document.body.appendChild(menu);
+          }
+        }
         if (!menu) return;
 
         const isOpen = menu.classList.contains("show");
         window.closeAllProdukBrandActionMenus();
-                if (!isOpen) {
-          document.body.appendChild(menu);
-          menu.dataset.originalParentId = btn.getAttribute('data-btn-id') || (btn.setAttribute('data-btn-id', 'btn-' + Date.now()), btn.getAttribute('data-btn-id'));
-          dropdown.setAttribute('data-target-menu', menu.dataset.originalParentId);
+
+        if (!isOpen) {
           menu.classList.add("show");
+          menu.style.display = "block";
 
           const rect = btn.getBoundingClientRect();
           const menuWidth = menu.offsetWidth || 140;
@@ -2566,7 +2580,7 @@
       };
 
       document.addEventListener("click", function (e) {
-        if (!e.target.closest(".bm-action-dropdown")) {
+        if (!e.target.closest(".bm-action-dropdown") && !e.target.closest(".bm-table-action-menu")) {
           window.closeAllProdukBrandActionMenus();
         }
       });
@@ -2575,101 +2589,125 @@
         window.closeAllProdukBrandActionMenus();
       }, true);
 
-      if (tbody) {
-        tbody.addEventListener("click", function (e) {
-          const btnView = e.target.closest(".btn-act-view");
-          const btnEdit = e.target.closest(".btn-act-edit");
-          const btnDel = e.target.closest(".btn-act-delete");
+      // Global functions for direct invocation & robust click handling
+      window.openViewProdukBrandById = function (id, e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        window.closeAllProdukBrandActionMenus();
+        const item = produkBrandDb.find(d => String(d.id) === String(id));
+        if (item && modalLihat) {
+          document.getElementById("viewTanggal").textContent = item.tanggal || "-";
+          document.getElementById("viewNamaKreator").textContent = item.nama_kreator || "-";
+          document.getElementById("viewPengikut").textContent = item.pengikut || "-";
+          document.getElementById("viewIdProduk").textContent = item.id_produk || "-";
+          document.getElementById("viewInfoProduk").textContent = item.info_produk || "-";
+          document.getElementById("viewKodeToko").textContent = item.kode_toko || "-";
+          document.getElementById("viewIdToko").textContent = item.id_toko || "-";
+          document.getElementById("viewNamaToko").textContent = item.nama_toko || "-";
+          document.getElementById("viewGmvKreator").textContent = item.gmv_kreator || "-";
+          document.getElementById("viewGmvLiveKreator").textContent = item.gmv_live_kreator || "-";
+          document.getElementById("viewGmvVideoAfiliasi").textContent = item.gmv_video_afiliasi || "-";
+          document.getElementById("viewPesananKreator").textContent = item.pesanan_kreator || "-";
+          document.getElementById("viewPesananLiveKreator").textContent = item.pesanan_live_kreator || "-";
+          document.getElementById("viewPesananVideoKreator").textContent = item.pesanan_video_kreator || "-";
+          document.getElementById("viewGmvLangsung").textContent = item.gmv_langsung || "-";
+          document.getElementById("viewGmvLangsungLive").textContent = item.gmv_langsung_live || "-";
+          document.getElementById("viewGmvLangsungVideo").textContent = item.gmv_langsung_video || "-";
+          document.getElementById("viewGmvLangsungKartu").textContent = item.gmv_langsung_kartu || "-";
+          document.getElementById("viewTerjualKreator").textContent = item.terjual_kreator || "-";
+          document.getElementById("viewPesananLangsung").textContent = item.pesanan_langsung || "-";
+          document.getElementById("viewPesananLangsungLive").textContent = item.pesanan_langsung_live || "-";
+          document.getElementById("viewPesananLangsungVideo").textContent = item.pesanan_langsung_video || "-";
+          document.getElementById("viewPesananKartu").textContent = item.pesanan_kartu || "-";
+          document.getElementById("viewTerjualLiveKreator").textContent = item.terjual_live_kreator || "-";
+          document.getElementById("viewTerjualVideoKreator").textContent = item.terjual_video_kreator || "-";
+          document.getElementById("viewTerjualKartu").textContent = item.terjual_kartu || "-";
+          document.getElementById("viewGmvRefundLangsung").textContent = item.gmv_refund_langsung || "-";
+          document.getElementById("viewBarangRefund").textContent = item.barang_refund || "-";
+          document.getElementById("viewCtr").textContent = item.ctr || "-";
+          document.getElementById("viewCtor").textContent = item.ctor || "-";
+          document.getElementById("viewGmvMitra").textContent = item.gmv_mitra || "-";
+          document.getElementById("viewPesananMitra").textContent = item.pesanan_mitra || "-";
+          modalLihat.classList.add("is-active");
+        }
+      };
 
-          if (btnView || btnEdit || btnDel) {
-            window.closeAllProdukBrandActionMenus();
+      window.openEditProdukBrandById = function (id, e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        window.closeAllProdukBrandActionMenus();
+        const item = produkBrandDb.find(d => String(d.id) === String(id));
+        if (item && modalEdit) {
+          document.getElementById("editRowId").value = item.id;
+          document.getElementById("editTanggal").value = item.tanggal || "";
+          document.getElementById("editNamaKreator").value = item.nama_kreator || "";
+          document.getElementById("editPengikut").value = item.pengikut || "";
+          document.getElementById("editIdProduk").value = item.id_produk || "";
+          document.getElementById("editInfoProduk").value = item.info_produk || "";
+          document.getElementById("editNamaToko").value = item.nama_toko || "";
+          document.getElementById("editGmvKreator").value = item.gmv_kreator || "";
+          document.getElementById("editPesananKreator").value = item.pesanan_kreator || "";
+          document.getElementById("editGmvLangsung").value = item.gmv_langsung || "";
+          document.getElementById("editTerjualKreator").value = item.terjual_kreator || "";
+          document.getElementById("editCtr").value = item.ctr || "";
+          document.getElementById("editCtor").value = item.ctor || "";
+          modalEdit.classList.add("is-active");
+        }
+      };
+
+      window.openDeleteProdukBrandById = function (id, e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        window.closeAllProdukBrandActionMenus();
+        const item = produkBrandDb.find(d => String(d.id) === String(id));
+        if (item && modalHapus) {
+          pendingDeleteId = item.id;
+          if (deleteTargetText) {
+            deleteTargetText.textContent = `${item.nama_kreator} - ${item.info_produk} (${item.tanggal})`;
           }
+          modalHapus.classList.add("is-active");
+        }
+      };
 
-          // 1. LIHAT MODAL (32 FIELD DISPLAY)
-          if (btnView) {
-            e.stopPropagation();
-            const id = btnView.getAttribute("data-id");
-            const item = produkBrandDb.find(d => String(d.id) === String(id));
-            if (item && modalLihat) {
-              document.getElementById("viewTanggal").textContent = item.tanggal || "-";
-              document.getElementById("viewNamaKreator").textContent = item.nama_kreator || "-";
-              document.getElementById("viewPengikut").textContent = item.pengikut || "-";
-              document.getElementById("viewIdProduk").textContent = item.id_produk || "-";
-              document.getElementById("viewInfoProduk").textContent = item.info_produk || "-";
-              document.getElementById("viewKodeToko").textContent = item.kode_toko || "-";
-              document.getElementById("viewIdToko").textContent = item.id_toko || "-";
-              document.getElementById("viewNamaToko").textContent = item.nama_toko || "-";
-              document.getElementById("viewGmvKreator").textContent = item.gmv_kreator || "-";
-              document.getElementById("viewGmvLiveKreator").textContent = item.gmv_live_kreator || "-";
-              document.getElementById("viewGmvVideoAfiliasi").textContent = item.gmv_video_afiliasi || "-";
-              document.getElementById("viewPesananKreator").textContent = item.pesanan_kreator || "-";
-              document.getElementById("viewPesananLiveKreator").textContent = item.pesanan_live_kreator || "-";
-              document.getElementById("viewPesananVideoKreator").textContent = item.pesanan_video_kreator || "-";
-              document.getElementById("viewGmvLangsung").textContent = item.gmv_langsung || "-";
-              document.getElementById("viewGmvLangsungLive").textContent = item.gmv_langsung_live || "-";
-              document.getElementById("viewGmvLangsungVideo").textContent = item.gmv_langsung_video || "-";
-              document.getElementById("viewGmvLangsungKartu").textContent = item.gmv_langsung_kartu || "-";
-              document.getElementById("viewTerjualKreator").textContent = item.terjual_kreator || "-";
-              document.getElementById("viewPesananLangsung").textContent = item.pesanan_langsung || "-";
-              document.getElementById("viewPesananLangsungLive").textContent = item.pesanan_langsung_live || "-";
-              document.getElementById("viewPesananLangsungVideo").textContent = item.pesanan_langsung_video || "-";
-              document.getElementById("viewPesananKartu").textContent = item.pesanan_kartu || "-";
-              document.getElementById("viewTerjualLiveKreator").textContent = item.terjual_live_kreator || "-";
-              document.getElementById("viewTerjualVideoKreator").textContent = item.terjual_video_kreator || "-";
-              document.getElementById("viewTerjualKartu").textContent = item.terjual_kartu || "-";
-              document.getElementById("viewGmvRefundLangsung").textContent = item.gmv_refund_langsung || "-";
-              document.getElementById("viewBarangRefund").textContent = item.barang_refund || "-";
-              document.getElementById("viewCtr").textContent = item.ctr || "-";
-              document.getElementById("viewCtor").textContent = item.ctor || "-";
-              document.getElementById("viewGmvMitra").textContent = item.gmv_mitra || "-";
-              document.getElementById("viewPesananMitra").textContent = item.pesanan_mitra || "-";
+      // Event delegation fallback
+      document.addEventListener("click", function (e) {
+        const btnView = e.target.closest(".btn-act-view");
+        const btnEdit = e.target.closest(".btn-act-edit");
+        const btnDel  = e.target.closest(".btn-act-delete");
 
-              modalLihat.classList.add("is-active");
+        if (btnView) {
+          const id = btnView.getAttribute("data-id");
+          window.openViewProdukBrandById(id, e);
+          return;
+        }
+        if (btnEdit) {
+          const id = btnEdit.getAttribute("data-id");
+          window.openEditProdukBrandById(id, e);
+          return;
+        }
+        if (btnDel) {
+          const id = btnDel.getAttribute("data-id");
+          window.openDeleteProdukBrandById(id, e);
+          return;
+        }
+      });
+
+      // Close modal on click outside (backdrop)
+      [modalLihat, modalEdit, modalHapus].forEach(m => {
+        if (m) {
+          m.addEventListener("click", function (e) {
+            if (e.target === m) {
+              m.classList.remove("is-active");
             }
-            return;
-          }
-
-          // 2. EDIT MODAL
-          if (btnEdit) {
-            e.stopPropagation();
-            const id = btnEdit.getAttribute("data-id");
-            const item = produkBrandDb.find(d => String(d.id) === String(id));
-            if (item && modalEdit) {
-              document.getElementById("editRowId").value = item.id;
-              document.getElementById("editTanggal").value = item.tanggal || "";
-              document.getElementById("editNamaKreator").value = item.nama_kreator || "";
-              document.getElementById("editPengikut").value = item.pengikut || "";
-              document.getElementById("editIdProduk").value = item.id_produk || "";
-              document.getElementById("editInfoProduk").value = item.info_produk || "";
-              document.getElementById("editNamaToko").value = item.nama_toko || "";
-              document.getElementById("editGmvKreator").value = item.gmv_kreator || "";
-              document.getElementById("editPesananKreator").value = item.pesanan_kreator || "";
-              document.getElementById("editGmvLangsung").value = item.gmv_langsung || "";
-              document.getElementById("editTerjualKreator").value = item.terjual_kreator || "";
-              document.getElementById("editCtr").value = item.ctr || "";
-              document.getElementById("editCtor").value = item.ctor || "";
-
-              modalEdit.classList.add("is-active");
-            }
-            return;
-          }
-
-          // 3. HAPUS MODAL
-          if (btnDel) {
-            e.stopPropagation();
-            const id = btnDel.getAttribute("data-id");
-            const item = produkBrandDb.find(d => String(d.id) === String(id));
-            if (item && modalHapus) {
-              pendingDeleteId = item.id;
-              if (deleteTargetText) {
-                deleteTargetText.textContent = `${item.nama_kreator} - ${item.info_produk} (${item.tanggal})`;
-              }
-              modalHapus.classList.add("is-active");
-            }
-            return;
-          }
-        });
-      }
+          });
+        }
+      });
 
       // Handle Edit Form Submission
       if (formEdit) {
