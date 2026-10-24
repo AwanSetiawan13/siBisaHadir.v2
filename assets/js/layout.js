@@ -137,7 +137,8 @@
         children: [
           { label: 'Dashboard Brands', link: 'SpvKol/brand/spvkol_dashboard_brand.html' },
           { label: 'Produk & Brands', link: 'SpvKol/brand/spvkol_produk_brand.html' },
-          { label: 'Data Brands', link: 'SpvKol/brand/spvkol_data_brand.html' }
+          { label: 'Data Brands', link: 'SpvKol/brand/spvkol_data_brand.html' },
+          { label: 'Laporan Brand', link: 'SpvKol/brand/spvkol_laporan_brand.html' }
         ]
       },
 
@@ -208,7 +209,8 @@
         children: [
           { label: 'Dashboard Brands', link: 'StaffKol/brand/staffkol_dashboard_brand.html' },
           { label: 'Produk & Brands', link: 'StaffKol/brand/staffkol_produk_brand.html' },
-          { label: 'Data Brands', link: 'StaffKol/brand/staffkol_data_brand.html' }
+          { label: 'Data Brands', link: 'StaffKol/brand/staffkol_data_brand.html' },
+          { label: 'Laporan Brand', link: 'StaffKol/brand/staffkol_laporan_brand.html' }
         ]
       },
 
@@ -325,9 +327,19 @@
     } else if (m.type === 'group') {
       let subHtml = '';
       let isGroupActive = false;
+      // Deteksi folder grup — jika semua child berada di folder yang sama, deteksi per folder
+      const groupFolder = m.children.length > 0
+        ? m.children[0].link.split('/').slice(0, -1).join('/').toLowerCase()
+        : '';
+      const currentPathLower = normalizedPath.toLowerCase();
       m.children.forEach(sub => {
         const fullSubLink = rootPrefix + sub.link;
-        const isSubActive = currentFile.toLowerCase() === sub.link.split('/').pop().toLowerCase();
+        const subFileName = sub.link.split('/').pop().toLowerCase();
+        // Cocokkan nama file ATAU full path mengandung link sub-item
+        const subLinkLower = sub.link.toLowerCase();
+        const isSubActive = currentFile.toLowerCase() === subFileName
+          || currentPathLower.endsWith('/' + subLinkLower)
+          || currentPathLower.includes('/' + subLinkLower);
         if (isSubActive) isGroupActive = true;
         subHtml += `
           <li style="list-style:none;margin:1px 0;padding:0;">
@@ -337,6 +349,11 @@
             </a>
           </li>`;
       });
+
+      // Jika grup punya folder, aktifkan juga berdasarkan path folder (untuk halaman di subfolder yang sama)
+      if (!isGroupActive && groupFolder) {
+        isGroupActive = currentPathLower.includes('/' + groupFolder + '/');
+      }
 
       menuHtml += `
         <li style="list-style:none;margin-top:4px;padding:0;">
@@ -394,10 +411,10 @@
         margin: 0;
         padding: 0;
         list-style: none;
-        transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s ease;
+        transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s ease;
       }
       .sidebar-submenu.is-expanded {
-        max-height: 500px;
+        max-height: 2000px;
         opacity: 1;
         margin: 2px 0 4px 0;
       }
@@ -1152,6 +1169,7 @@
       'spvkol_dashboard_brand.html': 'Dashboard Brands',
       'spvkol_data_brand.html': 'Data Brands',
       'spvkol_produk_brand.html': 'Produk & Brands',
+      'spvkol_laporan_brand.html': 'Laporan Brand',
       'spvkol_Ads_Account.html': 'Ads Account',
       'spvkol_Kategori_Produk.html': 'Kategori Produk',
       'spvkol_Leads_Kreator.html': 'Leads Kreator',
@@ -1370,6 +1388,7 @@
       'staffkol_dashboard_brand.html': 'Dashboard Brands',
       'staffkol_produk_brand.html': 'Produk & Brands',
       'staffkol_data_brand.html': 'Data Brands',
+      'staffkol_laporan_brand.html': 'Laporan Brand',
       'staffkol_laporan.html': 'Laporan',
       'staffkol_Milestone.html': 'Milestone',
       'staffkol_pengaduan.html': 'Pengaduan',

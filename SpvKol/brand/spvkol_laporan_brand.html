@@ -1,0 +1,1418 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Brand | Bisa Media</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    .dashboard-content {
+      padding: 24px;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+
+    .dashboard-heading {
+      margin-bottom: 20px;
+    }
+
+    .dashboard-heading h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+      margin: 0;
+    }
+
+    .campaign-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+      position: relative;
+      overflow: visible;
+      margin-bottom: 24px;
+    }
+
+    .campaign-panel__line {
+      height: 4px;
+      background: #1c64f2;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      width: 100%;
+    }
+
+    .campaign-toolbar {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .campaign-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .small-action-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 16px;
+    }
+
+    .small-action-button:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+
+    .btn-excel-green,
+    .small-action-button.btn-excel-green {
+      background: #f0fdf4 !important;
+      border: 1px solid #86efac !important;
+      color: #15803d !important;
+    }
+
+    .btn-excel-green:hover,
+    .small-action-button.btn-excel-green:hover {
+      background: #dcfce7 !important;
+      border-color: #4ade80 !important;
+      box-shadow: 0 2px 6px rgba(34, 197, 94, 0.15) !important;
+    }
+
+    .small-action-button svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+
+    .filter-popover {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      z-index: 50;
+      min-width: 260px;
+    }
+
+    .filter-popover.is-open {
+      display: block;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    .campaign-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .campaign-table thead th {
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+      user-select: none;
+    }
+
+    .campaign-table tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      border-right: 1px solid #f8fafc;
+      color: #334155;
+    }
+
+    .campaign-table tbody tr:hover td {
+      background: #f8fafc;
+    }
+
+    .campaign-table th:first-child,
+    .campaign-table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 11;
+      background: #f8fafc;
+      text-align: center;
+      min-width: 44px;
+      max-width: 48px;
+    }
+
+    .campaign-table td:first-child {
+      background: #ffffff;
+    }
+
+    .campaign-table tr:hover td:first-child {
+      background: #f8fafc;
+    }
+
+    .form-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .form-select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 12.5px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      background: #ffffff;
+      transition: all 0.15s ease;
+    }
+
+    .form-select:focus {
+      border-color: #1c64f2;
+      box-shadow: 0 0 0 3px rgba(28, 100, 242, 0.12);
+    }
+
+    /* Checkbox Pin/Fix Column Header Button */
+    .th-pin-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .pin-check-btn {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .pin-check-btn input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .pin-check-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-indicator svg {
+      width: 11px;
+      height: 11px;
+      stroke: #ffffff;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-btn:hover .pin-check-indicator {
+      border-color: #1c64f2;
+      background: #eff6ff;
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked + .pin-check-indicator {
+      background: #1c64f2;
+      border-color: #1c64f2;
+      box-shadow: 0 1px 4px rgba(28, 100, 242, 0.35);
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked + .pin-check-indicator svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Fixed/Pinned Columns */
+    .campaign-table th.col-pinned-sticky {
+      position: sticky;
+      z-index: 10;
+      background: #f8fafc !important;
+    }
+
+    .campaign-table td.col-pinned-sticky {
+      position: sticky;
+      z-index: 9;
+      background: #ffffff !important;
+    }
+
+    .campaign-table tr:hover td.col-pinned-sticky {
+      background: #f8fafc !important;
+    }
+
+    .campaign-table th.col-pinned-last,
+    .campaign-table td.col-pinned-last {
+      box-shadow: 5px 0 12px rgba(0, 0, 0, 0.06) !important;
+      border-right: 1px solid #cbd5e1 !important;
+    }
+
+    /* Sticky Aksi Column on the Right */
+    .campaign-table th.col-sticky-action,
+    .campaign-table td.col-sticky-action {
+      position: sticky;
+      right: 0;
+      z-index: 10;
+      box-shadow: -5px 0 12px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .campaign-table th.col-sticky-action {
+      background: #f8fafc !important;
+    }
+
+    .campaign-table td.col-sticky-action {
+      background: #ffffff !important;
+    }
+
+    .campaign-table tr:hover td.col-sticky-action {
+      background: #f8fafc !important;
+    }
+
+    /* View action button */
+    .btn-view {
+      background: rgba(41, 163, 216, 0.08);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      color: #29A3D8;
+    }
+
+    .btn-view:hover {
+      background-color: #29A3D8;
+      color: #ffffff;
+      border-color: #29A3D8;
+      box-shadow: 0 2px 6px rgba(41, 163, 216, 0.25);
+    }
+
+    .btn-view svg {
+      width: 17px;
+      height: 17px;
+      pointer-events: none;
+    }
+
+    /* ===== Tracking Kreator Style Modal (Laporan Brand View) ===== */
+    .kreator-modal-box {
+      max-width: 780px !important;
+      width: 96% !important;
+      max-height: 90vh !important;
+      overflow-y: auto !important;
+      padding: 22px 26px 26px !important;
+      border-radius: 12px !important;
+      background: #ffffff !important;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2) !important;
+      position: relative !important;
+    }
+    .kreator-modal-box::-webkit-scrollbar { width: 6px; }
+    .kreator-modal-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+    .kreator-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1.5px dashed #cbd5e1;
+      margin-bottom: 18px;
+    }
+    .kreator-modal-header .modal-title {
+      font-size: 17px;
+      font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+      color: #334155;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .kreator-modal-header .modal-title i { font-style: italic; font-weight: 500; color: #475569; }
+    .kreator-modal-header .modal-title span { font-weight: 700; color: #0f172a; }
+
+    .modal-close-boxed {
+      width: 26px; height: 24px;
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      cursor: pointer;
+      color: #334155;
+      font-size: 13px; font-style: normal; font-weight: 700; line-height: 1;
+      transition: all 0.15s ease;
+    }
+    .modal-close-boxed:hover { background: #f1f5f9; border-color: #64748b; color: #0f172a; }
+
+    .kreator-grid-layout {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .kreator-grid-layout .col-12 { grid-column: span 12; }
+    .kreator-grid-layout .col-6  { grid-column: span 6; }
+    .kreator-grid-layout .col-4  { grid-column: span 4; }
+    @media (max-width: 640px) {
+      .kreator-grid-layout .col-4,
+      .kreator-grid-layout .col-6 { grid-column: span 12; }
+    }
+
+    .kreator-field-group {
+      display: flex; flex-direction: column; gap: 5px; position: relative;
+    }
+    .kreator-field-group label {
+      font-size: 12.5px; font-weight: 700; color: #1e293b;
+      font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+    }
+    .kreator-field-input-wrap { position: relative; width: 100%; }
+    .kreator-field-input {
+      width: 100%; height: 38px;
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 0 12px;
+      font-size: 12.5px;
+      color: #334155;
+      font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+      box-sizing: border-box;
+      outline: none;
+      cursor: default;
+    }
+    .kreator-field-input.has-chevron { padding-right: 28px; }
+    .kreator-input-chevron {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      font-size: 10px; color: #94a3b8; pointer-events: none;
+    }
+
+    .lb-section-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .lb-section-card__title {
+      font-size: 13px; font-weight: 700; color: #1e293b;
+      margin-bottom: 12px;
+      font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+    }
+    .lb-section-inner-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px 14px;
+    }
+    @media (max-width: 640px) {
+      .lb-section-inner-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .kreator-modal-footer-single {
+      grid-column: span 12;
+      display: flex; justify-content: flex-end; align-items: center;
+      margin-top: 14px; padding-top: 10px;
+    }
+    .btn-keluar-outline {
+      border: 1.5px solid #1c64f2 !important;
+      color: #1c64f2 !important;
+      background: #ffffff !important;
+      padding: 8px 36px !important;
+      border-radius: 6px !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      cursor: pointer !important;
+      font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .btn-keluar-outline:hover {
+      background: #1c64f2 !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(28, 100, 242, 0.25) !important;
+      transform: translateY(-1px) !important;
+    }
+    .btn-keluar-outline:active { transform: translateY(0) !important; }
+  </style>
+
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar hirezy-topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1>Laporan Brand</h1>
+      </div>
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line"></div>
+
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+              <svg viewBox="0 0 24 24">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterLaporanBrand" class="small-action-button" type="button" aria-label="Filter" title="Filter Brand & Kreator">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <div id="filterLaporanBrandDropdown" class="filter-popover" style="width: 280px;">
+                <div class="form-group" style="margin-bottom: 12px;">
+                  <label class="form-label" style="display:block; margin-bottom:6px; font-size:11.5px; font-weight:700;">Pilih Brand</label>
+                  <select id="filterBrand" class="form-select" style="width:100%; font-size:12px; padding:6px 10px;">
+                    <option value="Semua">Semua Brand</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label class="form-label" style="display:block; margin-bottom:6px; font-size:11.5px; font-weight:700;">Pilih Kreator</label>
+                  <select id="filterKreator" class="form-select" style="width:100%; font-size:12px; padding:6px 10px;">
+                    <option value="Semua">Semua Kreator</option>
+                  </select>
+                </div>
+                <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                  <button id="resetFilterLaporanBrand" type="button" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">Reset</button>
+                  <button id="applyFilterLaporanBrand" type="button" style="background: #1c64f2; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">Terapkan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="campaign-toolbar__right"></div>
+        </div>
+
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Laporan Brand</div>
+          <div class="app-empty-state__subtitle">Data laporan diambil dari menu Produk &amp; Brands.</div>
+        </div>
+
+        <div class="table-wrap campaign-table" id="tableContainerWrapper">
+          <table id="tableLaporanBrand">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th class="th-pinnable" data-col="nama_kreator">
+                  <div class="th-pin-wrapper">
+                    <span>Kreator</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Kreator agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="nama_kreator" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="info_produk">
+                  <div class="th-pin-wrapper">
+                    <span>Produk</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Produk agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="info_produk" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="id_produk">
+                  <div class="th-pin-wrapper">
+                    <span>ID Produk</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom ID Produk agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="id_produk" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th>GMV</th>
+                <th>GMV Live</th>
+                <th>GMV Video</th>
+                <th>Pesanan</th>
+                <th>Pesanan Live</th>
+                <th>Pesanan Video</th>
+                <th>Produk Terjual</th>
+                <th>GMV Langsung</th>
+                <th>Refund</th>
+                <th>Qty Refund</th>
+                <th>CTR</th>
+                <th>CTOR</th>
+                <th class="col-sticky-action" style="text-align: center; width: 100px;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyLaporanBrand"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+  </div>
+
+  <div id="toastNotification" style="position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: #ffffff; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 99999; box-shadow: 0 10px 20px rgba(0,0,0,0.15); display: none; align-items: center; gap: 8px; transform: translateY(10px); transition: all 0.2s ease;">
+    <span id="toastMessage">Operasi berhasil</span>
+  </div>
+
+  <!-- ================= Modal Detail Laporan Brand (Tracking Kreator Style) ================= -->
+  <div id="laporanBrandViewModal" class="modal-overlay">
+    <div class="modal-box kreator-modal-box">
+      <!-- Header -->
+      <div class="kreator-modal-header">
+        <h2 class="modal-title"><i>Lihat</i> <span>Detail Laporan Brand</span></h2>
+        <button id="closeLaporanBrandViewModal" class="modal-close-boxed" type="button" aria-label="Tutup popup">✕</button>
+      </div>
+
+      <div class="kreator-grid-layout">
+
+        <!-- ── Baris 1: Tanggal, Kreator, Pengikut ── -->
+        <div class="kreator-field-group col-4">
+          <label>Tanggal</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewTanggal" class="kreator-field-input has-chevron" placeholder="dd/mm/yyyy" readonly />
+            <span class="kreator-input-chevron">&#709;</span>
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Kreator</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewKreator" class="kreator-field-input has-chevron" placeholder="Username / Nama" readonly />
+            <span class="kreator-input-chevron">&#709;</span>
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Pengikut</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewPengikut" class="kreator-field-input" placeholder="0K" readonly />
+          </div>
+        </div>
+
+        <!-- ── Baris 2: Brand, Kode Toko, ID Toko ── -->
+        <div class="kreator-field-group col-4">
+          <label>Brand / Toko</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewBrand" class="kreator-field-input" placeholder="Nama Brand" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>Kode Toko</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewKodeToko" class="kreator-field-input" placeholder="TK-XX" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>ID Toko</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewIdToko" class="kreator-field-input" placeholder="SC-XXX-001" readonly />
+          </div>
+        </div>
+
+        <!-- ── Baris 3: Produk (span 8), ID Produk (span 4) ── -->
+        <div class="kreator-field-group" style="grid-column: span 8;">
+          <label>Nama Produk</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewProduk" class="kreator-field-input" placeholder="Nama produk" readonly />
+          </div>
+        </div>
+        <div class="kreator-field-group col-4">
+          <label>ID Produk</label>
+          <div class="kreator-field-input-wrap">
+            <input type="text" id="lbViewIdProduk" class="kreator-field-input has-chevron" placeholder="PID XXX" readonly />
+            <span class="kreator-input-chevron">&#709;</span>
+          </div>
+        </div>
+
+        <!-- ── Section Card: Data GMV ── -->
+        <div class="col-12">
+          <div class="lb-section-card">
+            <div class="lb-section-card__title">&#128200; Data GMV Kreator</div>
+            <div class="lb-section-inner-grid">
+              <div class="kreator-field-group">
+                <label>GMV Kreator</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewGmv" class="kreator-field-input" placeholder="Rp 0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>GMV Live</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewGmvLive" class="kreator-field-input" placeholder="Rp 0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>GMV Video Afiliasi</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewGmvVideo" class="kreator-field-input" placeholder="Rp 0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>GMV Langsung</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewGmvLangsung" class="kreator-field-input" placeholder="Rp 0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>Refund</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewRefund" class="kreator-field-input" placeholder="Rp 0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>Qty Refund</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewQtyRefund" class="kreator-field-input" placeholder="0" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section Card: Data Pesanan & Terjual ── -->
+        <div class="col-12">
+          <div class="lb-section-card">
+            <div class="lb-section-card__title">&#128230; Data Pesanan &amp; Produk Terjual</div>
+            <div class="lb-section-inner-grid">
+              <div class="kreator-field-group">
+                <label>Pesanan Kreator</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewPesanan" class="kreator-field-input" placeholder="0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>Pesanan Live</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewPesananLive" class="kreator-field-input" placeholder="0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>Pesanan Video</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewPesananVideo" class="kreator-field-input" placeholder="0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>Produk Terjual</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewTerjual" class="kreator-field-input" placeholder="0" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>CTR</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewCtr" class="kreator-field-input" placeholder="0%" readonly />
+                </div>
+              </div>
+              <div class="kreator-field-group">
+                <label>CTOR</label>
+                <div class="kreator-field-input-wrap">
+                  <input type="text" id="lbViewCtor" class="kreator-field-input" placeholder="0%" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Footer: Keluar Button ── -->
+        <div class="kreator-modal-footer-single">
+          <button type="button" class="btn-keluar-outline" id="closeLaporanBrandViewModalBottom">Keluar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/layout.js?v=1002"></script>
+
+  <script>
+    (function () {
+      const REPORT_STORAGE_KEY = "bisa_produk_brand_list_v4";
+      const BRAND_STORAGE_KEY = "bisa_brand_list_v12";
+      const KREATOR_STORAGE_KEY = "bisa_kreator_list_v21";
+
+      const DEFAULT_DATA = [
+        {
+          id: 1,
+          tanggal: "18/05/2026",
+          nama_kreator: "@aura.beauty",
+          pengikut: "185K",
+          id_produk: "PID 001",
+          info_produk: "Pashmina Ceruty Baby Doll",
+          kode_toko: "TK-01",
+          id_toko: "SC-HIJAB-001",
+          nama_toko: "Bisa Hijab Official",
+          gmv_kreator: "Rp 24.500.000",
+          gmv_live_kreator: "Rp 17.500.000",
+          gmv_video_afiliasi: "Rp 7.000.000",
+          pesanan_kreator: "350",
+          pesanan_live_kreator: "250",
+          pesanan_video_kreator: "100",
+          gmv_langsung: "Rp 12.000.000",
+          gmv_langsung_live: "Rp 8.000.000",
+          gmv_langsung_video: "Rp 4.000.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "490",
+          pesanan_langsung: "180",
+          pesanan_langsung_live: "130",
+          pesanan_langsung_video: "50",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "320",
+          terjual_video_kreator: "170",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "5.4%",
+          ctor: "4.1%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 2,
+          tanggal: "18/05/2026",
+          nama_kreator: "@aura.beauty",
+          pengikut: "185K",
+          id_produk: "PID 002",
+          info_produk: "Segi Empat Paris Premium",
+          kode_toko: "TK-01",
+          id_toko: "SC-HIJAB-001",
+          nama_toko: "Bisa Hijab Official",
+          gmv_kreator: "Rp 18.200.000",
+          gmv_live_kreator: "Rp 12.200.000",
+          gmv_video_afiliasi: "Rp 6.000.000",
+          pesanan_kreator: "260",
+          pesanan_live_kreator: "180",
+          pesanan_video_kreator: "80",
+          gmv_langsung: "Rp 7.500.000",
+          gmv_langsung_live: "Rp 5.000.000",
+          gmv_langsung_video: "Rp 2.500.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "310",
+          pesanan_langsung: "120",
+          pesanan_langsung_live: "80",
+          pesanan_langsung_video: "40",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "190",
+          terjual_video_kreator: "120",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "4.8%",
+          ctor: "3.2%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 3,
+          tanggal: "17/05/2026",
+          nama_kreator: "@clarissa.style",
+          pengikut: "94.5K",
+          id_produk: "PID 010",
+          info_produk: "Serum Pencerah Vitamin C 30ml",
+          kode_toko: "TK-02",
+          id_toko: "SC-GLOW-002",
+          nama_toko: "Bisa Glow Skincare",
+          gmv_kreator: "Rp 21.000.000",
+          gmv_live_kreator: "Rp 15.000.000",
+          gmv_video_afiliasi: "Rp 6.000.000",
+          pesanan_kreator: "280",
+          pesanan_live_kreator: "200",
+          pesanan_video_kreator: "80",
+          gmv_langsung: "Rp 9.200.000",
+          gmv_langsung_live: "Rp 6.000.000",
+          gmv_langsung_video: "Rp 3.200.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "340",
+          pesanan_langsung: "130",
+          pesanan_langsung_live: "85",
+          pesanan_langsung_video: "45",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "210",
+          terjual_video_kreator: "130",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "5.1%",
+          ctor: "3.8%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 4,
+          tanggal: "17/05/2026",
+          nama_kreator: "@clarissa.style",
+          pengikut: "94.5K",
+          id_produk: "PID 011",
+          info_produk: "Moisturizer Gel Ceramide 50g",
+          kode_toko: "TK-02",
+          id_toko: "SC-GLOW-002",
+          nama_toko: "Bisa Glow Skincare",
+          gmv_kreator: "Rp 14.000.000",
+          gmv_live_kreator: "Rp 10.000.000",
+          gmv_video_afiliasi: "Rp 4.000.000",
+          pesanan_kreator: "190",
+          pesanan_live_kreator: "135",
+          pesanan_video_kreator: "55",
+          gmv_langsung: "Rp 5.400.000",
+          gmv_langsung_live: "Rp 3.200.000",
+          gmv_langsung_video: "Rp 2.200.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "220",
+          pesanan_langsung: "80",
+          pesanan_langsung_live: "50",
+          pesanan_langsung_video: "30",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "130",
+          terjual_video_kreator: "90",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "4.2%",
+          ctor: "3.0%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 5,
+          tanggal: "16/05/2026",
+          nama_kreator: "@bima.fashion",
+          pengikut: "125.4K",
+          id_produk: "PID 003",
+          info_produk: "Bergo Maryam Diamond Crepe",
+          kode_toko: "TK-01",
+          id_toko: "SC-HIJAB-001",
+          nama_toko: "Bisa Hijab Official",
+          gmv_kreator: "Rp 16.800.000",
+          gmv_live_kreator: "Rp 7.800.000",
+          gmv_video_afiliasi: "Rp 9.000.000",
+          pesanan_kreator: "230",
+          pesanan_live_kreator: "110",
+          pesanan_video_kreator: "120",
+          gmv_langsung: "Rp 6.800.000",
+          gmv_langsung_live: "Rp 3.500.000",
+          gmv_langsung_video: "Rp 3.300.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "270",
+          pesanan_langsung: "95",
+          pesanan_langsung_live: "50",
+          pesanan_langsung_video: "45",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "140",
+          terjual_video_kreator: "130",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "4.6%",
+          ctor: "3.4%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        },
+        {
+          id: 6,
+          tanggal: "16/05/2026",
+          nama_kreator: "@bima.fashion",
+          pengikut: "125.4K",
+          id_produk: "PID 020",
+          info_produk: "Kemeja Pria Slim Fit Cotton",
+          kode_toko: "TK-03",
+          id_toko: "SC-FASH-003",
+          nama_toko: "Bisa Fashion Official",
+          gmv_kreator: "Rp 28.400.000",
+          gmv_live_kreator: "Rp 10.400.000",
+          gmv_video_afiliasi: "Rp 18.000.000",
+          pesanan_kreator: "320",
+          pesanan_live_kreator: "120",
+          pesanan_video_kreator: "200",
+          gmv_langsung: "Rp 11.200.000",
+          gmv_langsung_live: "Rp 4.500.000",
+          gmv_langsung_video: "Rp 6.700.000",
+          gmv_langsung_kartu: "Rp 0",
+          terjual_kreator: "380",
+          pesanan_langsung: "140",
+          pesanan_langsung_live: "60",
+          pesanan_langsung_video: "80",
+          pesanan_kartu: "0",
+          terjual_live_kreator: "160",
+          terjual_video_kreator: "220",
+          terjual_kartu: "0",
+          gmv_refund_langsung: "Rp 0",
+          barang_refund: "0",
+          ctr: "4.9%",
+          ctor: "3.7%",
+          gmv_mitra: "Rp 0",
+          pesanan_mitra: "0"
+        }
+      ];
+
+      function readStorageArray(key) {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function loadReportData() {
+        try {
+          const raw = localStorage.getItem(REPORT_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+          localStorage.setItem(REPORT_STORAGE_KEY, JSON.stringify(DEFAULT_DATA));
+        } catch (e) {
+          console.warn("Could not load Laporan Brand data:", e);
+        }
+        return JSON.parse(JSON.stringify(DEFAULT_DATA));
+      }
+
+      const reportDb = loadReportData();
+
+      const tbody = document.getElementById("tbodyLaporanBrand");
+      const filterBrand = document.getElementById("filterBrand");
+      const filterKreator = document.getElementById("filterKreator");
+      const btnFilter = document.getElementById("btnFilterLaporanBrand");
+      const filterDropdown = document.getElementById("filterLaporanBrandDropdown");
+      const applyFilterBtn = document.getElementById("applyFilterLaporanBrand");
+      const resetFilterBtn = document.getElementById("resetFilterLaporanBrand");
+      const btnExportExcel = document.getElementById("btnExportExcel");
+      const viewModal = document.getElementById("laporanBrandViewModal");
+
+      // ================= COLUMN PIN / FREEZE FUNCTIONALITY =================
+      const PINNED_STORAGE_KEY = "bisa_laporan_brand_pinned_cols";
+      const DEFAULT_PINNED_COLS = { nama_kreator: true, info_produk: true, id_produk: true };
+
+      function getSavedPinnedCols() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(PINNED_STORAGE_KEY));
+          return saved && typeof saved === "object" ? saved : { ...DEFAULT_PINNED_COLS };
+        } catch (e) {
+          return { ...DEFAULT_PINNED_COLS };
+        }
+      }
+
+      function savePinnedCols(obj) {
+        localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(obj));
+      }
+
+      function updatePinnedColumns() {
+        const table = document.getElementById("tableLaporanBrand");
+        if (!table) return;
+
+        const firstCol = table.querySelector("th:first-child");
+        let currentLeft = firstCol ? firstCol.offsetWidth : 48;
+
+        const pinnableThs = Array.from(table.querySelectorAll("th.th-pinnable"));
+        let lastPinnedTh = null;
+
+        pinnableThs.forEach((th) => {
+          const colName = th.getAttribute("data-col");
+          const chk = th.querySelector(".chk-pin-col");
+          const isPinned = chk && chk.checked;
+          const bodyTds = table.querySelectorAll(`tbody td[data-col="${colName}"]`);
+
+          if (isPinned) {
+            th.classList.add("col-pinned-sticky");
+            th.classList.remove("col-pinned-last");
+            th.style.left = currentLeft + "px";
+
+            bodyTds.forEach((td) => {
+              td.classList.add("col-pinned-sticky");
+              td.classList.remove("col-pinned-last");
+              td.style.left = currentLeft + "px";
+            });
+
+            currentLeft += th.offsetWidth;
+            lastPinnedTh = { th, bodyTds };
+          } else {
+            th.classList.remove("col-pinned-sticky", "col-pinned-last");
+            th.style.left = "";
+            bodyTds.forEach((td) => {
+              td.classList.remove("col-pinned-sticky", "col-pinned-last");
+              td.style.left = "";
+            });
+          }
+        });
+
+        if (lastPinnedTh) {
+          lastPinnedTh.th.classList.add("col-pinned-last");
+          lastPinnedTh.bodyTds.forEach((td) => td.classList.add("col-pinned-last"));
+        }
+      }
+
+      function initPinnedColumns() {
+        const saved = getSavedPinnedCols();
+        document.querySelectorAll(".chk-pin-col").forEach((chk) => {
+          const col = chk.getAttribute("data-col");
+          if (saved && saved[col]) chk.checked = true;
+          chk.addEventListener("change", () => {
+            const cur = getSavedPinnedCols();
+            cur[col] = chk.checked;
+            savePinnedCols(cur);
+            updatePinnedColumns();
+          });
+        });
+        window.addEventListener("resize", updatePinnedColumns);
+      }
+
+      // ================= DETAIL MODAL =================
+      const DETAIL_FIELD_MAP = {
+        lbViewTanggal: "tanggal",
+        lbViewBrand: "nama_toko",
+        lbViewKodeToko: "kode_toko",
+        lbViewIdToko: "id_toko",
+        lbViewKreator: "nama_kreator",
+        lbViewPengikut: "pengikut",
+        lbViewProduk: "info_produk",
+        lbViewIdProduk: "id_produk",
+        lbViewGmv: "gmv_kreator",
+        lbViewGmvLive: "gmv_live_kreator",
+        lbViewGmvVideo: "gmv_video_afiliasi",
+        lbViewPesanan: "pesanan_kreator",
+        lbViewPesananLive: "pesanan_live_kreator",
+        lbViewPesananVideo: "pesanan_video_kreator",
+        lbViewTerjual: "terjual_kreator",
+        lbViewGmvLangsung: "gmv_langsung",
+        lbViewRefund: "gmv_refund_langsung",
+        lbViewQtyRefund: "barang_refund",
+        lbViewCtr: "ctr",
+        lbViewCtor: "ctor"
+      };
+
+      function openDetailModal(item) {
+        if (!item) return;
+        Object.keys(DETAIL_FIELD_MAP).forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const value = item[DETAIL_FIELD_MAP[id]];
+          el.value = (value === undefined || value === null || value === "") ? "-" : value;
+        });
+        if (viewModal) viewModal.classList.add("is-active");
+      }
+
+      function closeDetailModal() {
+        if (viewModal) viewModal.classList.remove("is-active");
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById("toastNotification");
+        const toastMsg = document.getElementById("toastMessage");
+        if (!toast || !toastMsg) return;
+        toastMsg.textContent = message;
+        toast.style.display = "flex";
+        setTimeout(() => { toast.style.transform = "translateY(0)"; }, 10);
+        setTimeout(() => {
+          toast.style.transform = "translateY(10px)";
+          setTimeout(() => { toast.style.display = "none"; }, 200);
+        }, 3000);
+      }
+
+      function getBrandOptions() {
+        const names = readStorageArray(BRAND_STORAGE_KEY)
+          .map((brand) => String(brand?.nama || "").trim())
+          .filter(Boolean);
+        reportDb.forEach((item) => {
+          const name = String(item?.nama_toko || "").trim();
+          if (name) names.push(name);
+        });
+        return Array.from(new Set(names));
+      }
+
+      function getKreatorOptions() {
+        const names = readStorageArray(KREATOR_STORAGE_KEY)
+          .map((kreator) => String(kreator?.username || kreator?.nama || "").trim())
+          .filter(Boolean);
+        reportDb.forEach((item) => {
+          const name = String(item?.nama_kreator || "").trim();
+          if (name) names.push(name);
+        });
+        return Array.from(new Set(names));
+      }
+
+      function fillSelect(select, allLabel, options) {
+        if (!select) return;
+        const current = select.value || "Semua";
+        select.innerHTML = "";
+        const allOption = document.createElement("option");
+        allOption.value = "Semua";
+        allOption.textContent = allLabel;
+        select.appendChild(allOption);
+        options.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          if (name === current) option.selected = true;
+          select.appendChild(option);
+        });
+        select.value = options.includes(current) ? current : "Semua";
+      }
+
+      function updateFilterOptions() {
+        fillSelect(filterBrand, "Semua Brand", getBrandOptions());
+        fillSelect(filterKreator, "Semua Kreator", getKreatorOptions());
+      }
+
+      function getFilteredData() {
+        const selectedBrand = filterBrand ? filterBrand.value : "Semua";
+        const selectedKreator = filterKreator ? filterKreator.value : "Semua";
+        const brandRow = readStorageArray(BRAND_STORAGE_KEY)
+          .find((brand) => String(brand?.nama || "").trim() === selectedBrand);
+        const brandCode = brandRow ? String(brandRow.shopCode || "").trim() : "";
+
+        return reportDb.filter((item) => {
+          const matchBrand = selectedBrand === "Semua"
+            || item.nama_toko === selectedBrand
+            || (brandCode && item.id_toko === brandCode);
+          const matchKreator = selectedKreator === "Semua" || item.nama_kreator === selectedKreator;
+          return matchBrand && matchKreator;
+        });
+      }
+
+      function renderTable() {
+        if (!tbody) return;
+        updateFilterOptions();
+
+        const filtered = getFilteredData();
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        if (typeof window.bmToggleEmptyState === "function") {
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, reportDb.length === 0);
+        } else if (reportDb.length === 0) {
+          if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+          if (emptyTableState) {
+            emptyTableState.classList.add("is-visible");
+            emptyTableState.style.setProperty("display", "flex", "important");
+          }
+        }
+
+        tbody.innerHTML = "";
+
+        if (reportDb.length === 0) return;
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="17" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data Laporan Brand yang sesuai dengan filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        filtered.forEach((item, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td data-col="nama_kreator" style="font-weight: 700; color: #0284c7;">${item.nama_kreator || "-"}</td>
+            <td data-col="info_produk">${item.info_produk || "-"}</td>
+            <td data-col="id_produk" style="font-weight: 600;">${item.id_produk || "-"}</td>
+            <td style="font-weight: 700; color: #1c64f2;">${item.gmv_kreator || "-"}</td>
+            <td>${item.gmv_live_kreator || "-"}</td>
+            <td>${item.gmv_video_afiliasi || "-"}</td>
+            <td>${item.pesanan_kreator || "-"}</td>
+            <td>${item.pesanan_live_kreator || "-"}</td>
+            <td>${item.pesanan_video_kreator || "-"}</td>
+            <td>${item.terjual_kreator || "-"}</td>
+            <td>${item.gmv_langsung || "-"}</td>
+            <td style="color: #ef4444; font-weight: 600;">${item.gmv_refund_langsung || "-"}</td>
+            <td style="color: #ef4444;">${item.barang_refund || "-"}</td>
+            <td>${item.ctr || "-"}</td>
+            <td>${item.ctor || "-"}</td>
+            <td class="col-sticky-action" style="text-align: center;">
+              <button type="button" class="btn-view btn-act-view" data-id="${item.id}" title="Lihat detail Laporan Brand" aria-label="Lihat">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        updatePinnedColumns();
+      }
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener("click", (event) => {
+          event.stopPropagation();
+          filterDropdown.classList.toggle("is-open");
+        });
+
+        document.addEventListener("click", (event) => {
+          if (!filterDropdown.contains(event.target) && !btnFilter.contains(event.target)) {
+            filterDropdown.classList.remove("is-open");
+          }
+        });
+      }
+
+      if (applyFilterBtn) {
+        applyFilterBtn.addEventListener("click", () => {
+          if (filterDropdown) filterDropdown.classList.remove("is-open");
+          renderTable();
+        });
+      }
+
+      if (resetFilterBtn) {
+        resetFilterBtn.addEventListener("click", () => {
+          if (filterBrand) filterBrand.value = "Semua";
+          if (filterKreator) filterKreator.value = "Semua";
+          if (filterDropdown) filterDropdown.classList.remove("is-open");
+          renderTable();
+        });
+      }
+
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener("click", () => {
+          const exportList = getFilteredData();
+          if (exportList.length === 0) {
+            showToast("Tidak ada data Laporan Brand untuk diekspor");
+            return;
+          }
+
+          const headers = [
+            "No", "Kreator", "Produk", "ID Produk", "GMV", "GMV Live", "GMV Video",
+            "Pesanan", "Pesanan Live", "Pesanan Video", "Produk Terjual", "GMV Langsung",
+            "Refund", "Qty Refund", "CTR", "CTOR"
+          ];
+
+          const rows = exportList.map((item, index) => [
+            index + 1,
+            item.nama_kreator || "-",
+            item.info_produk || "-",
+            item.id_produk || "-",
+            item.gmv_kreator || "-",
+            item.gmv_live_kreator || "-",
+            item.gmv_video_afiliasi || "-",
+            item.pesanan_kreator || "-",
+            item.pesanan_live_kreator || "-",
+            item.pesanan_video_kreator || "-",
+            item.terjual_kreator || "-",
+            item.gmv_langsung || "-",
+            item.gmv_refund_langsung || "-",
+            item.barang_refund || "-",
+            item.ctr || "-",
+            item.ctor || "-"
+          ]);
+
+          const todayStr = new Date().toISOString().split("T")[0];
+          if (typeof exportBisaExcel === "function") {
+            exportBisaExcel({
+              title: "LAPORAN BRAND",
+              filename: `laporan_brand_${todayStr}.xlsx`,
+              sheetName: "Laporan Brand",
+              headers: headers,
+              rows: rows
+            });
+            showToast("Data Laporan Brand berhasil diekspor ke Excel (.xlsx)");
+          }
+        });
+      }
+
+      if (tbody) {
+        tbody.addEventListener("click", (event) => {
+          const btn = event.target.closest(".btn-act-view");
+          if (!btn) return;
+          const id = btn.getAttribute("data-id");
+          const item = reportDb.find((row) => String(row.id) === String(id));
+          openDetailModal(item);
+        });
+      }
+
+      if (viewModal) {
+        viewModal.addEventListener("click", (event) => {
+          if (event.target === viewModal) closeDetailModal();
+        });
+      }
+
+      ["closeLaporanBrandViewModal", "closeLaporanBrandViewModalBottom"].forEach((btnId) => {
+        const btn = document.getElementById(btnId);
+        if (btn) btn.addEventListener("click", closeDetailModal);
+      });
+
+      initPinnedColumns();
+      renderTable();
+    })();
+  </script>
+</body>
+
+</html>
+
+

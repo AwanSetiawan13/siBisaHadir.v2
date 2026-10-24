@@ -967,7 +967,7 @@
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <h2 class="modal-title" style="font-size: 16px; margin: 0;"><span id="modalExcelOriTitle" style="font-weight: 700; color: #1e293b;">Template_Import_Produk_Brand.xlsx</span></h2>
-              <span style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pratinjau Langsung â€¢ Tanpa Unduh</span>
+              <span style="background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;">Pratinjau Langsung Ã¢â‚¬Â¢ Tanpa Unduh</span>
             </div>
             <div style="font-size: 11.5px; color: #64748b;" id="modalExcelOriSubtitle">Menampilkan lembar kerja asli</div>
           </div>
@@ -1281,7 +1281,7 @@
   </div>
 
   <!-- Sidebar & System Script -->
-  <script src="../../assets/js/layout.js?v=999"></script>
+  <script src="../../assets/js/layout.js?v=1002"></script>
 
   <script>
     (function () {
@@ -2160,8 +2160,8 @@
 
         if (titleEl) titleEl.textContent = excelViewerState.fileName;
         if (subtitleEl) {
-          const sheetLabel = excelViewerState.activeSheet ? `Lembar: "${excelViewerState.activeSheet}" â€¢ ` : "";
-          subtitleEl.textContent = `${sheetLabel}${totalRows} baris data â€¢ Dokumen Asli Terbaca Online Tanpa Unduh`;
+          const sheetLabel = excelViewerState.activeSheet ? `Lembar: "${excelViewerState.activeSheet}" Ã¢â‚¬Â¢ ` : "";
+          subtitleEl.textContent = `${sheetLabel}${totalRows} baris data Ã¢â‚¬Â¢ Dokumen Asli Terbaca Online Tanpa Unduh`;
         }
 
         const contentEl = document.getElementById("modalExcelOriContent");
@@ -2429,8 +2429,8 @@
 
               parseExcelRowsToDb(rawRows);
               const sizeKB = (file.size / 1024).toFixed(1) + " KB";
-              renderPreviewCard(file.name, `${sizeKB} â€¢ File Excel Asli Terverifikasi`);
-              initExcelViewerWithData(file.name, `${sizeKB} â€¢ ${workbook.SheetNames.length} Sheet`, allSheets);
+              renderPreviewCard(file.name, `${sizeKB} Ã¢â‚¬Â¢ File Excel Asli Terverifikasi`);
+              initExcelViewerWithData(file.name, `${sizeKB} Ã¢â‚¬Â¢ ${workbook.SheetNames.length} Sheet`, allSheets);
               resetSubmitButtonState(true);
               showToast(`File '${file.name}' siap! Klik 'Lihat' pada preview untuk membuka viewer penuh.`);
             } catch (err) {
@@ -2575,101 +2575,100 @@
         window.closeAllProdukBrandActionMenus();
       }, true);
 
-      if (tbody) {
-        tbody.addEventListener("click", function (e) {
-          const btnView = e.target.closest(".btn-act-view");
-          const btnEdit = e.target.closest(".btn-act-edit");
-          const btnDel = e.target.closest(".btn-act-delete");
+      // ⚠️ Event listener dipasang di document (bukan tbody) karena dropdown menu
+      // dipindahkan ke document.body via document.body.appendChild(menu).
+      // Jika listener ada di tbody, klik pada item dropdown yang sudah pindah ke body tidak tertangkap.
+      document.addEventListener("click", function (e) {
+        const btnView = e.target.closest(".btn-act-view");
+        const btnEdit = e.target.closest(".btn-act-edit");
+        const btnDel  = e.target.closest(".btn-act-delete");
 
-          if (btnView || btnEdit || btnDel) {
-            window.closeAllProdukBrandActionMenus();
+        if (!btnView && !btnEdit && !btnDel) return;
+
+        window.closeAllProdukBrandActionMenus();
+
+        // 1. LIHAT MODAL
+        if (btnView) {
+          e.stopPropagation();
+          const id = btnView.getAttribute("data-id");
+          const item = produkBrandDb.find(d => String(d.id) === String(id));
+          if (item && modalLihat) {
+            document.getElementById("viewTanggal").textContent = item.tanggal || "-";
+            document.getElementById("viewNamaKreator").textContent = item.nama_kreator || "-";
+            document.getElementById("viewPengikut").textContent = item.pengikut || "-";
+            document.getElementById("viewIdProduk").textContent = item.id_produk || "-";
+            document.getElementById("viewInfoProduk").textContent = item.info_produk || "-";
+            document.getElementById("viewKodeToko").textContent = item.kode_toko || "-";
+            document.getElementById("viewIdToko").textContent = item.id_toko || "-";
+            document.getElementById("viewNamaToko").textContent = item.nama_toko || "-";
+            document.getElementById("viewGmvKreator").textContent = item.gmv_kreator || "-";
+            document.getElementById("viewGmvLiveKreator").textContent = item.gmv_live_kreator || "-";
+            document.getElementById("viewGmvVideoAfiliasi").textContent = item.gmv_video_afiliasi || "-";
+            document.getElementById("viewPesananKreator").textContent = item.pesanan_kreator || "-";
+            document.getElementById("viewPesananLiveKreator").textContent = item.pesanan_live_kreator || "-";
+            document.getElementById("viewPesananVideoKreator").textContent = item.pesanan_video_kreator || "-";
+            document.getElementById("viewGmvLangsung").textContent = item.gmv_langsung || "-";
+            document.getElementById("viewGmvLangsungLive").textContent = item.gmv_langsung_live || "-";
+            document.getElementById("viewGmvLangsungVideo").textContent = item.gmv_langsung_video || "-";
+            document.getElementById("viewGmvLangsungKartu").textContent = item.gmv_langsung_kartu || "-";
+            document.getElementById("viewTerjualKreator").textContent = item.terjual_kreator || "-";
+            document.getElementById("viewPesananLangsung").textContent = item.pesanan_langsung || "-";
+            document.getElementById("viewPesananLangsungLive").textContent = item.pesanan_langsung_live || "-";
+            document.getElementById("viewPesananLangsungVideo").textContent = item.pesanan_langsung_video || "-";
+            document.getElementById("viewPesananKartu").textContent = item.pesanan_kartu || "-";
+            document.getElementById("viewTerjualLiveKreator").textContent = item.terjual_live_kreator || "-";
+            document.getElementById("viewTerjualVideoKreator").textContent = item.terjual_video_kreator || "-";
+            document.getElementById("viewTerjualKartu").textContent = item.terjual_kartu || "-";
+            document.getElementById("viewGmvRefundLangsung").textContent = item.gmv_refund_langsung || "-";
+            document.getElementById("viewBarangRefund").textContent = item.barang_refund || "-";
+            document.getElementById("viewCtr").textContent = item.ctr || "-";
+            document.getElementById("viewCtor").textContent = item.ctor || "-";
+            document.getElementById("viewGmvMitra").textContent = item.gmv_mitra || "-";
+            document.getElementById("viewPesananMitra").textContent = item.pesanan_mitra || "-";
+            modalLihat.classList.add("is-active");
           }
+          return;
+        }
 
-          // 1. LIHAT MODAL (32 FIELD DISPLAY)
-          if (btnView) {
-            e.stopPropagation();
-            const id = btnView.getAttribute("data-id");
-            const item = produkBrandDb.find(d => String(d.id) === String(id));
-            if (item && modalLihat) {
-              document.getElementById("viewTanggal").textContent = item.tanggal || "-";
-              document.getElementById("viewNamaKreator").textContent = item.nama_kreator || "-";
-              document.getElementById("viewPengikut").textContent = item.pengikut || "-";
-              document.getElementById("viewIdProduk").textContent = item.id_produk || "-";
-              document.getElementById("viewInfoProduk").textContent = item.info_produk || "-";
-              document.getElementById("viewKodeToko").textContent = item.kode_toko || "-";
-              document.getElementById("viewIdToko").textContent = item.id_toko || "-";
-              document.getElementById("viewNamaToko").textContent = item.nama_toko || "-";
-              document.getElementById("viewGmvKreator").textContent = item.gmv_kreator || "-";
-              document.getElementById("viewGmvLiveKreator").textContent = item.gmv_live_kreator || "-";
-              document.getElementById("viewGmvVideoAfiliasi").textContent = item.gmv_video_afiliasi || "-";
-              document.getElementById("viewPesananKreator").textContent = item.pesanan_kreator || "-";
-              document.getElementById("viewPesananLiveKreator").textContent = item.pesanan_live_kreator || "-";
-              document.getElementById("viewPesananVideoKreator").textContent = item.pesanan_video_kreator || "-";
-              document.getElementById("viewGmvLangsung").textContent = item.gmv_langsung || "-";
-              document.getElementById("viewGmvLangsungLive").textContent = item.gmv_langsung_live || "-";
-              document.getElementById("viewGmvLangsungVideo").textContent = item.gmv_langsung_video || "-";
-              document.getElementById("viewGmvLangsungKartu").textContent = item.gmv_langsung_kartu || "-";
-              document.getElementById("viewTerjualKreator").textContent = item.terjual_kreator || "-";
-              document.getElementById("viewPesananLangsung").textContent = item.pesanan_langsung || "-";
-              document.getElementById("viewPesananLangsungLive").textContent = item.pesanan_langsung_live || "-";
-              document.getElementById("viewPesananLangsungVideo").textContent = item.pesanan_langsung_video || "-";
-              document.getElementById("viewPesananKartu").textContent = item.pesanan_kartu || "-";
-              document.getElementById("viewTerjualLiveKreator").textContent = item.terjual_live_kreator || "-";
-              document.getElementById("viewTerjualVideoKreator").textContent = item.terjual_video_kreator || "-";
-              document.getElementById("viewTerjualKartu").textContent = item.terjual_kartu || "-";
-              document.getElementById("viewGmvRefundLangsung").textContent = item.gmv_refund_langsung || "-";
-              document.getElementById("viewBarangRefund").textContent = item.barang_refund || "-";
-              document.getElementById("viewCtr").textContent = item.ctr || "-";
-              document.getElementById("viewCtor").textContent = item.ctor || "-";
-              document.getElementById("viewGmvMitra").textContent = item.gmv_mitra || "-";
-              document.getElementById("viewPesananMitra").textContent = item.pesanan_mitra || "-";
+        // 2. EDIT MODAL
+        if (btnEdit) {
+          e.stopPropagation();
+          const id = btnEdit.getAttribute("data-id");
+          const item = produkBrandDb.find(d => String(d.id) === String(id));
+          if (item && modalEdit) {
+            document.getElementById("editRowId").value = item.id;
+            document.getElementById("editTanggal").value = item.tanggal || "";
+            document.getElementById("editNamaKreator").value = item.nama_kreator || "";
+            document.getElementById("editPengikut").value = item.pengikut || "";
+            document.getElementById("editIdProduk").value = item.id_produk || "";
+            document.getElementById("editInfoProduk").value = item.info_produk || "";
+            document.getElementById("editNamaToko").value = item.nama_toko || "";
+            document.getElementById("editGmvKreator").value = item.gmv_kreator || "";
+            document.getElementById("editPesananKreator").value = item.pesanan_kreator || "";
+            document.getElementById("editGmvLangsung").value = item.gmv_langsung || "";
+            document.getElementById("editTerjualKreator").value = item.terjual_kreator || "";
+            document.getElementById("editCtr").value = item.ctr || "";
+            document.getElementById("editCtor").value = item.ctor || "";
+            modalEdit.classList.add("is-active");
+          }
+          return;
+        }
 
-              modalLihat.classList.add("is-active");
+        // 3. HAPUS MODAL
+        if (btnDel) {
+          e.stopPropagation();
+          const id = btnDel.getAttribute("data-id");
+          const item = produkBrandDb.find(d => String(d.id) === String(id));
+          if (item && modalHapus) {
+            pendingDeleteId = item.id;
+            if (deleteTargetText) {
+              deleteTargetText.textContent = `${item.nama_kreator} - ${item.info_produk} (${item.tanggal})`;
             }
-            return;
+            modalHapus.classList.add("is-active");
           }
-
-          // 2. EDIT MODAL
-          if (btnEdit) {
-            e.stopPropagation();
-            const id = btnEdit.getAttribute("data-id");
-            const item = produkBrandDb.find(d => String(d.id) === String(id));
-            if (item && modalEdit) {
-              document.getElementById("editRowId").value = item.id;
-              document.getElementById("editTanggal").value = item.tanggal || "";
-              document.getElementById("editNamaKreator").value = item.nama_kreator || "";
-              document.getElementById("editPengikut").value = item.pengikut || "";
-              document.getElementById("editIdProduk").value = item.id_produk || "";
-              document.getElementById("editInfoProduk").value = item.info_produk || "";
-              document.getElementById("editNamaToko").value = item.nama_toko || "";
-              document.getElementById("editGmvKreator").value = item.gmv_kreator || "";
-              document.getElementById("editPesananKreator").value = item.pesanan_kreator || "";
-              document.getElementById("editGmvLangsung").value = item.gmv_langsung || "";
-              document.getElementById("editTerjualKreator").value = item.terjual_kreator || "";
-              document.getElementById("editCtr").value = item.ctr || "";
-              document.getElementById("editCtor").value = item.ctor || "";
-
-              modalEdit.classList.add("is-active");
-            }
-            return;
-          }
-
-          // 3. HAPUS MODAL
-          if (btnDel) {
-            e.stopPropagation();
-            const id = btnDel.getAttribute("data-id");
-            const item = produkBrandDb.find(d => String(d.id) === String(id));
-            if (item && modalHapus) {
-              pendingDeleteId = item.id;
-              if (deleteTargetText) {
-                deleteTargetText.textContent = `${item.nama_kreator} - ${item.info_produk} (${item.tanggal})`;
-              }
-              modalHapus.classList.add("is-active");
-            }
-            return;
-          }
-        });
-      }
+          return;
+        }
+      });
 
       // Handle Edit Form Submission
       if (formEdit) {
@@ -2802,6 +2801,8 @@
 </body>
 
 </html>
+
+
 
 
 
