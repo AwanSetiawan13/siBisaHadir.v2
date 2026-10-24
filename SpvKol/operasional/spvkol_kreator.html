@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -497,6 +497,44 @@
       border-color: #2563eb !important;
       background: #eff6ff !important;
     }
+
+    .table-checkbox, .bulk-check-all {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #2563eb;
+      border-radius: 4px;
+      margin: 0;
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    .btn-bulk-delete {
+      background: #fee2e2;
+      color: #ef4444;
+      border: 1.5px solid #fca5a5;
+      border-radius: 4px;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 32px;
+      font-family: 'Outfit', sans-serif;
+      box-shadow: 0 1px 2px rgba(239, 68, 68, 0.1);
+      white-space: nowrap;
+    }
+
+    .btn-bulk-delete:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #dc2626;
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2);
+    }
   </style>
 
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
@@ -725,6 +763,11 @@
                 </svg>
               </button>
             </div>
+
+            <!-- Bulk Delete Button (Muncul jika ada baris dipilih) -->
+            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
+              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+            </button>
           </div>
 
           <div class="campaign-toolbar__right" style="display: flex; align-items: center; gap: 8px;">
@@ -760,6 +803,9 @@
           <table>
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center; vertical-align: middle;">
+                  <input type="checkbox" id="checkAllRows" class="bulk-check-all" title="Pilih Semua" />
+                </th>
                 <th>#</th>
                 <th>UID</th>
                 <th>Username</th>
@@ -2364,9 +2410,15 @@
         if (filtered.length === 0) {
           kreatorTableBody.innerHTML = `
             <tr>
-              <td colspan="9" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">Tidak ditemukan data kreator yang sesuai dengan pencarian atau filter.</td>
+              <td colspan="10" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">Tidak ditemukan data kreator yang sesuai dengan pencarian atau filter.</td>
             </tr>
           `;
+          const checkAll = document.getElementById("checkAllRows");
+          if (checkAll) {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+          }
+          if (typeof updateBulkActionsState === "function") updateBulkActionsState();
           return;
         }
 
@@ -2463,6 +2515,9 @@
           const spesifikText = (rawSpec && rawSpec !== "-") ? rawSpec : "-";
 
           row.innerHTML = `
+            <td style="text-align: center; vertical-align: middle;">
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+            </td>
             <td>${index + 1}</td>
             <td style="font-weight: 600;">${item.uid || "-"}</td>
             <td>
@@ -2523,6 +2578,13 @@
 
           kreatorTableBody.appendChild(row);
         });
+
+        const checkAll = document.getElementById("checkAllRows");
+        if (checkAll) {
+          checkAll.checked = false;
+          checkAll.indeterminate = false;
+        }
+        if (typeof updateBulkActionsState === "function") updateBulkActionsState();
       }
 
       const modalLihatKreator = document.getElementById("kreatorViewModal");
@@ -3792,9 +3854,111 @@
         });
       }
 
+      // ================= BULK CHECKBOX & DELETE DATA KREATOR =================
+      function updateBulkActionsState() {
+        const rowCheckboxes = Array.from(document.querySelectorAll(".row-select-checkbox"));
+        const checkedBoxes = rowCheckboxes.filter(cb => cb.checked);
+        const checkAll = document.getElementById("checkAllRows");
+        const btnBulkDelete = document.getElementById("btnBulkDelete");
+        const bulkCountSpan = document.querySelector(".bulk-count");
+
+        if (checkAll) {
+          if (rowCheckboxes.length > 0 && checkedBoxes.length === rowCheckboxes.length) {
+            checkAll.checked = true;
+            checkAll.indeterminate = false;
+          } else if (checkedBoxes.length > 0) {
+            checkAll.checked = false;
+            checkAll.indeterminate = true;
+          } else {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+          }
+        }
+
+        if (bulkCountSpan) {
+          bulkCountSpan.textContent = checkedBoxes.length;
+        }
+
+        if (btnBulkDelete) {
+          btnBulkDelete.style.display = checkedBoxes.length > 0 ? "inline-flex" : "none";
+        }
+      }
+
+      const checkAllRowsEl = document.getElementById("checkAllRows");
+      if (checkAllRowsEl) {
+        checkAllRowsEl.addEventListener("change", function () {
+          const isChecked = this.checked;
+          const rowCheckboxes = document.querySelectorAll(".row-select-checkbox");
+          rowCheckboxes.forEach(cb => { cb.checked = isChecked; });
+          updateBulkActionsState();
+        });
+      }
+
+      if (kreatorTableBody) {
+        kreatorTableBody.addEventListener("change", function (e) {
+          if (e.target && e.target.classList.contains("row-select-checkbox")) {
+            updateBulkActionsState();
+          }
+        });
+      }
+
+      function handleBulkDeleteKreator() {
+        const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+        if (checkedBoxes.length === 0) return;
+        const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
+
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            title: 'Hapus Data Terpilih?',
+            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.size} data kreator</strong> yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              kreatorDb = kreatorDb.filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
+              saveKreatorDb();
+              renderKreatorTable(searchKreatorInput ? searchKreatorInput.value : "");
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Dihapus',
+                text: `${selectedIds.size} data kreator berhasil dihapus.`,
+                timer: 1800,
+                showConfirmButton: false,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
+        } else {
+          if (confirm(`Hapus ${selectedIds.size} data kreator?`)) {
+            kreatorDb = kreatorDb.filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
+            saveKreatorDb();
+            renderKreatorTable(searchKreatorInput ? searchKreatorInput.value : "");
+          }
+        }
+      }
+
+      const btnBulkDeleteEl = document.getElementById("btnBulkDelete");
+      if (btnBulkDeleteEl) {
+        btnBulkDeleteEl.addEventListener("click", handleBulkDeleteKreator);
+      }
+
       // Toolbar: Excel Export (.xlsx)
       function handleExportKreator() {
-        const exportRows = getFilteredKreators();
+        const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+        let exportRows = getFilteredKreators();
+
+        const isPartialExport = checkedBoxes.length > 0;
+        if (isPartialExport) {
+          const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
+          exportRows = exportRows.filter(item => selectedIds.has(String(item.id)) || selectedIds.has(String(item.uid)));
+        }
+
         if (!exportRows || exportRows.length === 0) {
           if (typeof Swal !== "undefined") {
             Swal.fire({
@@ -3847,8 +4011,8 @@
         const todayStr = new Date().toISOString().slice(0, 10);
         if (typeof exportBisaExcel === 'function') {
           exportBisaExcel({
-            title: "DATA KREATOR",
-            filename: `data_kreator_${todayStr}.xlsx`,
+            title: isPartialExport ? `DATA KREATOR (${exportRows.length} DATA PILIHAN)` : "DATA KREATOR",
+            filename: isPartialExport ? `data_kreator_pilihan_${todayStr}.xlsx` : `data_kreator_${todayStr}.xlsx`,
             sheetName: "Data Kreator",
             headers: headers,
             rows: rows
@@ -3857,7 +4021,9 @@
             Swal.fire({
               icon: 'success',
               title: 'Berhasil Diekspor',
-              text: 'Data kreator berhasil diunduh dalam format Excel (.xlsx) dengan tabel rapi.',
+              text: isPartialExport
+                ? `${exportRows.length} data kreator pilihan berhasil diunduh dalam format Excel (.xlsx).`
+                : 'Data kreator berhasil diunduh dalam format Excel (.xlsx) dengan tabel rapi.',
               timer: 2000,
               showConfirmButton: false,
               customClass: { popup: 'swal2-bisa-popup' }
@@ -3869,14 +4035,15 @@
           // Fallback jika library belum siap
           const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","))].join("\n");
           const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const fname = isPartialExport ? `data_kreator_pilihan_${todayStr}.csv` : `data_kreator_${todayStr}.csv`;
           if (typeof window.downloadBlobSafely === 'function') {
-            window.downloadBlobSafely(blob, `data_kreator_${todayStr}.csv`);
+            window.downloadBlobSafely(blob, fname);
           } else {
             const reader = new FileReader();
             reader.onloadend = function() {
               const link = document.createElement("a");
               link.href = reader.result;
-              link.download = `data_kreator_${todayStr}.csv`;
+              link.download = fname;
               document.body.appendChild(link);
               link.click();
               setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1500);

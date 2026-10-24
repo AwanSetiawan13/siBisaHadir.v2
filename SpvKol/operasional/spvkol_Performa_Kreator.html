@@ -40,6 +40,45 @@
       line-height: 1;
       pointer-events: none;
     }
+        /* ===== Bulk Selection & Checkbox Styling ===== */
+    .table-checkbox {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .bulk-check-all {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .btn-bulk-delete {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-bulk-delete:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #b91c1c;
+      transform: translateY(-1px);
+    }
+
     /* ===== SweetAlert2 Custom Styling for Bisa Media ===== */
     .swal2-bisa-popup {
       font-family: 'Outfit', sans-serif !important;
@@ -506,6 +545,10 @@
                   stroke-linejoin="round" />
               </svg>
             </button>
+            <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
+            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
+              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+            </button>
 
             <!-- Blue Filter Button -->
             <div class="filter-dropdown-wrapper">
@@ -647,7 +690,10 @@
           <table data-ceo-custom-crud="1">
             <thead>
               <tr>
-                <th>#</th>
+                <th style="width: 40px; text-align: center; vertical-align: middle;">
+                  <input type="checkbox" id="checkAllRows" class="bulk-check-all" title="Pilih Semua" />
+                </th>
+                <th style="width: 50px;">#</th>
                 <th class="th-pinnable" data-col="tanggal">
                   <div class="th-pin-wrapper">
                     <span>Tanggal</span>
@@ -1360,7 +1406,7 @@
         if (filtered.length === 0) {
           tableBody.innerHTML = `
             <tr>
-              <td colspan="32" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+              <td colspan="33" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
                 Tidak ditemukan data performa kreator yang sesuai dengan pencarian atau filter.
               </td>
             </tr>
@@ -1371,6 +1417,9 @@
         filtered.forEach((item, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
+            <td style="text-align: center; vertical-align: middle;">
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+            </td>
             <td>${index + 1}</td>
             <td>${item.tanggal || "-"}</td>
             <td>${item.uid || "-"}</td>
@@ -1437,14 +1486,16 @@
         if (!table) return;
 
         const colConfig = [
-          { key: "tanggal", colIdx: 1 },
-          { key: "uid", colIdx: 2 },
-          { key: "username", colIdx: 3 }
+          { key: "tanggal", colIdx: 2 },
+          { key: "uid", colIdx: 3 },
+          { key: "username", colIdx: 4 }
         ];
 
-        // Column 0 (#) width
-        const thFirst = table.querySelector("thead tr th:first-child");
-        let currentLeft = thFirst ? thFirst.getBoundingClientRect().width : 46;
+        // Column 0 (checkbox) and Column 1 (#) width
+        const thCol0 = table.querySelector("thead tr th:nth-child(1)");
+        const thCol1 = table.querySelector("thead tr th:nth-child(2)");
+        let currentLeft = (thCol0 ? thCol0.getBoundingClientRect().width : 40) +
+                          (thCol1 ? thCol1.getBoundingClientRect().width : 46);
 
         colConfig.forEach(cfg => {
           const chk = document.querySelector(`.chk-pin-col[data-col="${cfg.key}"]`);
@@ -1506,6 +1557,93 @@
         });
 
         window.addEventListener("resize", updatePinnedColumns);
+
+      // Bulk Actions & Checkbox Handling
+      const checkAllRows = document.getElementById("checkAllRows");
+      const btnBulkDelete = document.getElementById("btnBulkDelete");
+
+      function getSelectedRowIds() {
+        const checked = document.querySelectorAll(".row-select-checkbox:checked");
+        return Array.from(checked).map(cb => cb.dataset.id);
+      }
+
+      function updateBulkActionsState() {
+        const allCheckboxes = document.querySelectorAll(".row-select-checkbox");
+        const checkedCheckboxes = document.querySelectorAll(".row-select-checkbox:checked");
+        const count = checkedCheckboxes.length;
+
+        if (checkAllRows) {
+          checkAllRows.checked = allCheckboxes.length > 0 && checkedCheckboxes.length === allCheckboxes.length;
+          checkAllRows.indeterminate = count > 0 && count < allCheckboxes.length;
+        }
+
+        if (btnBulkDelete) {
+          if (count > 0) {
+            btnBulkDelete.style.display = "inline-flex";
+            const countSpan = btnBulkDelete.querySelector(".bulk-count");
+            if (countSpan) countSpan.textContent = count;
+          } else {
+            btnBulkDelete.style.display = "none";
+          }
+        }
+      }
+
+      if (checkAllRows) {
+        checkAllRows.addEventListener("change", function () {
+          const checkboxes = document.querySelectorAll(".row-select-checkbox");
+          checkboxes.forEach(cb => {
+            cb.checked = checkAllRows.checked;
+          });
+          updateBulkActionsState();
+        });
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener("change", function (e) {
+          if (e.target && e.target.classList.contains("row-select-checkbox")) {
+            updateBulkActionsState();
+          }
+        });
+      }
+
+      if (btnBulkDelete) {
+        btnBulkDelete.addEventListener("click", function () {
+          const selectedIds = getSelectedRowIds();
+          if (!selectedIds.length) return;
+
+          Swal.fire({
+            title: `Hapus ${selectedIds.length} Data Terpilih?`,
+            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.length}</strong> data performa yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              performaDb = performaDb.filter(t => !selectedIds.includes(String(t.id)));
+              savePerformaDb();
+              populateUserFilter();
+              renderTable();
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Dihapus!',
+                text: `${selectedIds.length} data performa kreator berhasil dihapus.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
+        });
+      }
+
       }
 
       // Event delegation for table action buttons

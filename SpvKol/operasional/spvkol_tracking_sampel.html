@@ -19,6 +19,45 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
+        /* ===== Bulk Selection & Checkbox Styling ===== */
+    .table-checkbox {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .bulk-check-all {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .btn-bulk-delete {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-bulk-delete:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #b91c1c;
+      transform: translateY(-1px);
+    }
+
     /* ===== Status Badge Styling (Identik dengan Data Kreator) ===== */
     .status-badge {
       display: inline-block;
@@ -745,6 +784,10 @@
                 <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
+            <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
+            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
+              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+            </button>
 
             <!-- 2. Filter Dropdown & Popover -->
             <div class="filter-dropdown-wrapper">
@@ -864,6 +907,9 @@
           <table>
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center; vertical-align: middle;">
+                  <input type="checkbox" id="checkAllRows" class="bulk-check-all" title="Pilih Semua" />
+                </th>
                 <th style="width: 50px;">#</th>
                 <th>Nama Brand</th>
                 <th>Nama Sampel</th>
@@ -1753,6 +1799,12 @@
         if (!tableBody) return;
         tableBody.innerHTML = "";
 
+        if (checkAllRows) {
+          checkAllRows.checked = false;
+          checkAllRows.indeterminate = false;
+        }
+        updateBulkActionsState();
+
         const filtered = getFilteredData();
         const totalItems = filtered.length;
         const isEmpty = totalItems === 0;
@@ -1810,6 +1862,9 @@
           const tr = document.createElement("tr");
 
           tr.innerHTML = `
+            <td style="text-align: center; vertical-align: middle;">
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+            </td>
             <td>${globalIndex}</td>
             <td style="font-weight: 600;">${item.brand || "-"}</td>
             <td>${item.sampel || "-"}</td>
@@ -2373,6 +2428,93 @@
           });
         }
       };
+
+      // Bulk Actions & Checkbox Handling
+      const checkAllRows = document.getElementById("checkAllRows");
+      const btnBulkDelete = document.getElementById("btnBulkDelete");
+
+      function getSelectedRowIds() {
+        const checked = document.querySelectorAll(".row-select-checkbox:checked");
+        return Array.from(checked).map(cb => cb.dataset.id);
+      }
+
+      function updateBulkActionsState() {
+        const allCheckboxes = document.querySelectorAll(".row-select-checkbox");
+        const checkedCheckboxes = document.querySelectorAll(".row-select-checkbox:checked");
+        const count = checkedCheckboxes.length;
+
+        if (checkAllRows) {
+          checkAllRows.checked = allCheckboxes.length > 0 && checkedCheckboxes.length === allCheckboxes.length;
+          checkAllRows.indeterminate = count > 0 && count < allCheckboxes.length;
+        }
+
+        if (btnBulkDelete) {
+          if (count > 0) {
+            btnBulkDelete.style.display = "inline-flex";
+            const countSpan = btnBulkDelete.querySelector(".bulk-count");
+            if (countSpan) countSpan.textContent = count;
+          } else {
+            btnBulkDelete.style.display = "none";
+          }
+        }
+      }
+
+      if (checkAllRows) {
+        checkAllRows.addEventListener("change", function () {
+          const checkboxes = document.querySelectorAll(".row-select-checkbox");
+          checkboxes.forEach(cb => {
+            cb.checked = checkAllRows.checked;
+          });
+          updateBulkActionsState();
+        });
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener("change", function (e) {
+          if (e.target && e.target.classList.contains("row-select-checkbox")) {
+            updateBulkActionsState();
+          }
+        });
+      }
+
+      if (btnBulkDelete) {
+        btnBulkDelete.addEventListener("click", function () {
+          const selectedIds = getSelectedRowIds();
+          if (!selectedIds.length) return;
+
+          Swal.fire({
+            title: `Hapus ${selectedIds.length} Data Terpilih?`,
+            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.length}</strong> data sampel yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              trackingData = trackingData.filter(t => !selectedIds.includes(String(t.id)));
+              saveTrackingData();
+              populateBrandFilterOptions();
+              renderTable();
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Dihapus!',
+                text: `${selectedIds.length} data tracking sampel berhasil dihapus.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
+        });
+      }
+
 
       // Document click to close menu
       document.addEventListener("click", function (e) {

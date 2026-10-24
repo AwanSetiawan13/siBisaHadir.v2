@@ -55,6 +55,45 @@
       display: none !important;
     }
 
+        /* ===== Bulk Selection & Checkbox Styling ===== */
+    .table-checkbox {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .bulk-check-all {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .btn-bulk-delete {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-bulk-delete:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #b91c1c;
+      transform: translateY(-1px);
+    }
+
     /* Toolbar & Custom Select Extensions */
     .btn-excel-green {
       background: #f0fdf4 !important;
@@ -1397,6 +1436,10 @@
                 <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
+            <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
+            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
+              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+            </button>
 
             <!-- Filter Dropdown & Popover -->
             <div class="filter-dropdown-wrapper">
@@ -1533,6 +1576,9 @@
           <table id="tblStaffCampaign" data-ceo-custom-crud="1">
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center; vertical-align: middle;">
+                  <input type="checkbox" id="checkAllRows" class="bulk-check-all" title="Pilih Semua" />
+                </th>
                 <th style="width: 50px;">#</th>
                 <th>Brand/Seller</th>
                 <th>Kategori</th>
@@ -6168,6 +6214,12 @@
       function renderCampaignTable() {
         if (!campaignTableBody) return;
         campaignTableBody.innerHTML = "";
+
+        if (checkAllRows) {
+          checkAllRows.checked = false;
+          checkAllRows.indeterminate = false;
+        }
+        updateBulkActionsState();
         updateCampaignOverview();
 
         const tableWrapper = document.getElementById("tableContainerWrapper");
@@ -6246,6 +6298,9 @@
         filtered.forEach((item, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
+            <td style="text-align: center; vertical-align: middle;">
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+            </td>
             <td>${index + 1}</td>
             <td style="font-weight: 600;">${item.brand || "-"}</td>
             <td>${item.kategori || "-"}</td>
@@ -6731,6 +6786,92 @@
             }
             return;
           }
+        });
+      }
+
+      
+      // Bulk Actions & Checkbox Handling
+      const checkAllRows = document.getElementById("checkAllRows");
+      const btnBulkDelete = document.getElementById("btnBulkDelete");
+
+      function getSelectedRowIds() {
+        const checked = document.querySelectorAll(".row-select-checkbox:checked");
+        return Array.from(checked).map(cb => cb.dataset.id);
+      }
+
+      function updateBulkActionsState() {
+        const allCheckboxes = document.querySelectorAll(".row-select-checkbox");
+        const checkedCheckboxes = document.querySelectorAll(".row-select-checkbox:checked");
+        const count = checkedCheckboxes.length;
+
+        if (checkAllRows) {
+          checkAllRows.checked = allCheckboxes.length > 0 && checkedCheckboxes.length === allCheckboxes.length;
+          checkAllRows.indeterminate = count > 0 && count < allCheckboxes.length;
+        }
+
+        if (btnBulkDelete) {
+          if (count > 0) {
+            btnBulkDelete.style.display = "inline-flex";
+            const countSpan = btnBulkDelete.querySelector(".bulk-count");
+            if (countSpan) countSpan.textContent = count;
+          } else {
+            btnBulkDelete.style.display = "none";
+          }
+        }
+      }
+
+      if (checkAllRows) {
+        checkAllRows.addEventListener("change", function () {
+          const checkboxes = document.querySelectorAll(".row-select-checkbox");
+          checkboxes.forEach(cb => {
+            cb.checked = checkAllRows.checked;
+          });
+          updateBulkActionsState();
+        });
+      }
+
+      if (campaignTableBody) {
+        campaignTableBody.addEventListener("change", function (e) {
+          if (e.target && e.target.classList.contains("row-select-checkbox")) {
+            updateBulkActionsState();
+          }
+        });
+      }
+
+      if (btnBulkDelete) {
+        btnBulkDelete.addEventListener("click", function () {
+          const selectedIds = getSelectedRowIds();
+          if (!selectedIds.length) return;
+
+          Swal.fire({
+            title: `Hapus ${selectedIds.length} Campaign Terpilih?`,
+            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.length}</strong> campaign yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              campaignDb = campaignDb.filter(t => !selectedIds.includes(String(t.id)));
+              saveCampaignDb();
+              renderCampaignTable();
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Dihapus!',
+                text: `${selectedIds.length} campaign berhasil dihapus.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
         });
       }
 
