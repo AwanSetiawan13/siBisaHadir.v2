@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tracking Kreator | Bisa Media</title>
-  <link rel="stylesheet" href="../../style.css" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
   <!-- Boxicons for action icons -->
   <link
     href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
@@ -568,6 +568,10 @@
       margin: 0 !important;
     }
   </style>
+  <script src="../../assets/js/avatar_data.js"></script>
+  <script src="../../vendor/html2canvas.min.js"></script>
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -656,6 +660,17 @@
 
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
+            <!-- Green Excel Button with tooltip -->
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+              <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
             <div class="filter-dropdown-wrapper">
               <button id="btnFilterCampaign" class="small-action-button" type="button" aria-label="Filter Data">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -782,15 +797,17 @@
 
     </main>
 
-    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+    <footer class="dashboard-footer">Â© 2026 Bisa Media</footer>
   </div>
 
   <!-- ================= Modal PopUp Lihat Tracking Kreator ================= -->
   <div id="kreatorViewModal" class="modal-overlay">
     <div class="modal-box kreator-modal-box">
-      <div class="kreator-modal-header">
+      <div class="kreator-modal-header" style="display: flex; align-items: center; justify-content: space-between;">
         <h2 class="modal-title"><i>Lihat</i> <span>Tracking Kreator</span></h2>
-        <button id="closeKreatorViewModalTop" class="modal-close-boxed" type="button" aria-label="Tutup popup">x</button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="closeKreatorViewModalTop" class="modal-close-boxed" type="button" aria-label="Tutup popup">x</button>
+        </div>
       </div>
 
       <div class="kreator-grid-layout">
@@ -969,7 +986,11 @@
         </div>
 
         <!-- Footer: Keluar Button -->
-        <div class="kreator-modal-footer-single">
+        <div class="kreator-modal-footer-single" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+          <button type="button" id="btnDownloadSingleKreatorBtm" class="btn-png-download-btm" style="background: #2563eb; color: #ffffff; border: 1px solid #1d4ed8; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(37,99,235,0.25);">
+            <i class="bx bxs-file-png" style="font-size: 17px;"></i>
+            <span>Download Detail (PNG)</span>
+          </button>
           <button type="button" class="btn-keluar-outline" id="btnKeluarViewModal">
             Keluar
           </button>
@@ -979,11 +1000,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="../../sidebar_engine.js?v=999"></script>
-  <script src="../spvkol_layout.js"></script>
+  <script src="../../assets/js/layout.js?v=999"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    (function () {
+      function initTrackingPage() {
       const KREATOR_STORAGE_KEYS = [
         "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13",
         "bisa_kreator_list_v12",
@@ -1347,14 +1368,12 @@
         if (elTA) elTA.textContent = countTidakAktif;
       }
 
-      function renderTrackingTable(query = "") {
-        if (!trackingTableBody) return;
+      function getFilteredTrackingKreators(query = "") {
+        window.getFilteredTrackingKreators = getFilteredTrackingKreators;
         kreatorDb = getKreatorDb();
-        trackingTableBody.innerHTML = "";
-        updateTrackingMetrics();
-
-        const q = (query || "").trim().toLowerCase();
-        const filtered = kreatorDb.filter(k => {
+        const searchInput = document.getElementById("searchCampaignInput");
+        const q = (query !== undefined && query !== null ? query : (searchInput ? searchInput.value : "")).trim().toLowerCase();
+        return kreatorDb.filter(k => {
           const aktStatus = getCreatorActivityStatus(k);
           if (q) {
             const allKats = [k.kategori, k.kategori1, k.kategori2, k.kategori3].filter(Boolean).join(" ").toLowerCase();
@@ -1367,20 +1386,29 @@
               aktStatus.toLowerCase().includes(q);
             if (!matchQ) return false;
           }
-          if (currentFilterKategori) {
+          if (typeof currentFilterKategori !== "undefined" && currentFilterKategori) {
             const allKats = [k.kategori, k.kategori1, k.kategori2, k.kategori3].filter(Boolean).join(" ").toLowerCase();
             if (!allKats.includes(currentFilterKategori)) return false;
           }
-          if (currentFilterAktivitas) {
+          if (typeof currentFilterAktivitas !== "undefined" && currentFilterAktivitas) {
             const akt = aktStatus.toLowerCase();
             if (!akt.includes(currentFilterAktivitas)) return false;
           }
-          if (currentFilterLeads) {
+          if (typeof currentFilterLeads !== "undefined" && currentFilterLeads) {
             const ld = (k.leads || "").toLowerCase();
             if (!ld.includes(currentFilterLeads)) return false;
           }
           return true;
         });
+      }
+
+      function renderTrackingTable(query = "") {
+        if (!trackingTableBody) return;
+        kreatorDb = getKreatorDb();
+        trackingTableBody.innerHTML = "";
+        updateTrackingMetrics();
+
+        const filtered = getFilteredTrackingKreators(query);
 
         const tableWrapper = document.getElementById("tableContainerWrapper");
         const emptyTableState = document.getElementById("emptyTableState");
@@ -1659,6 +1687,7 @@
       }
 
       function openViewModal(item) {
+        window.currentViewingKreator = item;
         if (!item) return;
         const perf = getCreatorPerformance(item);
         const levelInfo = getCreatorLevelFromMaster(item, perf);
@@ -2072,9 +2101,313 @@
         }
       });
 
+      // ================= DOWNLOAD PNG GAMBAR KARTU DETAIL KREATOR =================
+      async function downloadKreatorModalAsPng() {
+        const modalGrid = document.querySelector('#kreatorViewModal .kreator-grid-layout');
+        if (!modalGrid) {
+          if (typeof showToast === 'function') showToast('Area detail kreator tidak ditemukan', 'warning');
+          return;
+        }
+
+        const c = window.currentViewingKreator || {};
+        const cleanUser = String(c.username || c.nama || 'kreator').replace(/[^a-zA-Z0-9_-]/g, '');
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const filename = `detail_tracking_${cleanUser}_${todayStr}.png`;
+
+        // Simpan src asli semua gambar agar bisa dipulihkan setelah capture
+        const imageEls = Array.from(modalGrid.querySelectorAll('img'));
+        const originalSrcs = imageEls.map(img => img.getAttribute('src'));
+
+        // Ubah gambar menjadi Data URL agar canvas tidak tainted (CORS-safe)
+        const imageToDataUrl = async (src) => {
+          if (!src || src.startsWith('data:')) return src;
+          try {
+            const res = await fetch(src, { mode: 'cors', credentials: 'omit' });
+            if (!res.ok) throw new Error('fetch failed');
+            const blob = await res.blob();
+            return await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+          } catch (e) {
+            return await new Promise((resolve) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                try {
+                  const cv = document.createElement('canvas');
+                  cv.width = img.naturalWidth;
+                  cv.height = img.naturalHeight;
+                  cv.getContext('2d').drawImage(img, 0, 0);
+                  resolve(cv.toDataURL('image/png'));
+                } catch (err) {
+                  resolve(null);
+                }
+              };
+              img.onerror = () => resolve(null);
+              img.src = src;
+            });
+          }
+        };
+
+        // Sembunyikan tombol footer selama proses capture agar murni kartu formulir yang tersimpan
+        const footerEl = modalGrid.querySelector('.kreator-modal-footer-single');
+        const prevFooterDisplay = footerEl ? footerEl.style.display : '';
+        if (footerEl) footerEl.style.display = 'none';
+
+        const prevBg = modalGrid.style.backgroundColor;
+        const prevPad = modalGrid.style.padding;
+        const prevRadius = modalGrid.style.borderRadius;
+        modalGrid.style.backgroundColor = '#ffffff';
+        modalGrid.style.padding = '20px 20px 30px 20px';
+        modalGrid.style.borderRadius = '12px';
+
+        let loadingSwal = false;
+        if (typeof Swal !== 'undefined' && Swal.fire) {
+          loadingSwal = true;
+          Swal.fire({
+            title: 'Memproses Gambar...',
+            text: `Menyiapkan kartu detail ${c.nama || cleanUser} dalam format PNG...`,
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+          });
+        }
+
+        try {
+          await new Promise(r => setTimeout(r, 120));
+
+          if (typeof html2canvas === 'undefined') {
+            await new Promise((resolve) => {
+              const s = document.createElement('script');
+              s.src = '../../vendor/html2canvas.min.js';
+              s.onload = resolve;
+              s.onerror = resolve;
+              document.head.appendChild(s);
+            });
+          }
+
+          // Pastikan semua gambar memakai Data URL sebelum capture
+          await Promise.all(imageEls.map(async (img) => {
+            const dataUrl = await imageToDataUrl(img.src);
+            if (dataUrl) {
+              img.src = dataUrl;
+            } else {
+              img.src = window.BISA_DEFAULT_AVATAR_DATA_URL || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+            }
+          }));
+
+          const canvas = await html2canvas(modalGrid, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: '#ffffff',
+            logging: false,
+            onclone: (clonedDoc) => {
+              // Sync input values within the same modal grid only
+              const clonedGrid = clonedDoc.querySelector('#kreatorViewModal .kreator-grid-layout');
+              if (!clonedGrid) return;
+              const origInputs = modalGrid.querySelectorAll('input, select, textarea');
+              const cloneInputs = clonedGrid.querySelectorAll('input, select, textarea');
+              origInputs.forEach((orig, idx) => {
+                const clone = cloneInputs[idx];
+                if (clone) {
+                  clone.value = orig.value;
+                  clone.setAttribute('value', orig.value);
+                }
+              });
+
+              // Biarkan gambar memakai sumber aslinya agar identik dengan detail kreator
+            }
+          });
+
+          const triggerDownload = (href) => {
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = href;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => {
+              if (link.parentNode) link.parentNode.removeChild(link);
+              if (href.startsWith('blob:')) URL.revokeObjectURL(href);
+            }, 1500);
+          };
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              triggerDownload(URL.createObjectURL(blob));
+            } else {
+              triggerDownload(canvas.toDataURL('image/png'));
+            }
+
+            if (loadingSwal && typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Diunduh!',
+                text: `Gambar detail tracking kreator berhasil diunduh (${filename})`,
+                timer: 2200,
+                showConfirmButton: false,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          }, 'image/png');
+
+        } catch (err) {
+          console.error('PNG Capture error:', err);
+          if (loadingSwal && typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal Membuat Gambar',
+              text: err.message || 'Terjadi kesalahan saat memproses gambar.',
+              confirmButtonColor: '#29A3D8'
+            });
+          }
+        } finally {
+          if (footerEl) footerEl.style.display = prevFooterDisplay;
+          modalGrid.style.backgroundColor = prevBg;
+          modalGrid.style.padding = prevPad;
+          modalGrid.style.borderRadius = prevRadius;
+          imageEls.forEach((img, idx) => {
+            if (originalSrcs[idx]) img.setAttribute('src', originalSrcs[idx]);
+          });
+        }
+      }
+      window.downloadKreatorModalAsPng = downloadKreatorModalAsPng;
+
+  
+
+      // ================= EXPORT EXCEL TABEL TRACKING KREATOR =================
+      async function handleExportTrackingKreator() {
+        try {
+          const exportRows = (typeof getFilteredTrackingKreators === "function")
+            ? getFilteredTrackingKreators()
+            : ((typeof getKreatorDb === "function") ? getKreatorDb() : []);
+
+          if (!exportRows || exportRows.length === 0) {
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: 'info',
+                title: 'Data Kosong',
+                text: 'Tidak ada data tracking kreator untuk diekspor.',
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Tutup',
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            } else {
+              alert("Tidak ada data tracking kreator untuk diekspor");
+            }
+            return;
+          }
+
+          const headers = [
+            "No", "UID", "Username", "Nama Kreator", "Kategori Produk",
+            "Level Kreator", "Keaktifan", "Target GMV", "Progres GMV",
+            "GMV Berjalan", "Siaran Live", "Video FYP", "Masa Kontrak", "Status Kontrak", "Leads"
+          ];
+
+          const rows = exportRows.map((item, idx) => {
+            const cats = [item.kategori1, item.kategori2, item.kategori3].filter(c => c && c !== "-");
+            const catStr = cats.length > 0 ? cats.join(", ") : (item.kategori || "-");
+            const perf = (typeof getCreatorPerformance === "function") ? getCreatorPerformance(item) : {};
+            const levelInfo = (typeof getCreatorLevelFromMaster === "function") ? getCreatorLevelFromMaster(item, perf) : {};
+            const levelName = levelInfo.nama || item.level || "New Growth";
+            const aktStatus = (typeof getCreatorActivityStatus === "function") ? getCreatorActivityStatus(item) : (item.aktivitas || "Aktif");
+            const targetGmv = perf.targetGmv || item.targetGmv || levelInfo.gmv || "Rp 0";
+            const progresGmv = perf.progresGmv || item.progresGmv || "0%";
+            const gmvBerjalan = perf.gmv || item.gmvBerjalan || "Rp 0";
+            const siaranLive = perf.liveCount != null ? String(perf.liveCount) : (item.siaranLive || "0");
+            const videoCount = perf.videoCount != null ? String(perf.videoCount) : (item.videoFyp || "0");
+            const masaKontrak = item.masaKontrak || (item.kontrakAwal && item.kontrakAkhir ? (item.kontrakAwal + " - " + item.kontrakAkhir) : "-");
+
+            return [
+              idx + 1,
+              item.uid || '-',
+              item.username || '-',
+              item.nama || item.name || '-',
+              catStr,
+              levelName,
+              aktStatus,
+              targetGmv,
+              progresGmv,
+              gmvBerjalan,
+              siaranLive,
+              videoCount,
+              masaKontrak,
+              item.status || 'Bind',
+              item.leads || '-'
+            ];
+          });
+
+          const todayStr = new Date().toISOString().slice(0, 10);
+          const exportFn = (typeof exportBisaExcel === 'function') ? exportBisaExcel : window.exportBisaExcel;
+
+          if (typeof exportFn === 'function') {
+            await exportFn({
+              title: "TRACKING KREATOR",
+              filename: "tracking_kreator_" + todayStr + ".xlsx",
+              sheetName: "Tracking Kreator",
+              headers: headers,
+              rows: rows
+            });
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Diekspor!',
+                text: 'Data tracking kreator berhasil diekspor ke Excel (.xlsx)',
+                timer: 2000,
+                showConfirmButton: false,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          } else {
+            // Immediate fallback to CSV
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(","))].join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            if (typeof window.downloadBlobSafely === 'function') {
+              window.downloadBlobSafely(blob, "tracking_kreator_" + todayStr + ".csv");
+            } else {
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(blob);
+              link.download = "tracking_kreator_" + todayStr + ".csv";
+              document.body.appendChild(link);
+              link.click();
+              setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1500);
+            }
+          }
+        } catch (err) {
+          console.error("Export Tracking Kreator Error:", err);
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Gagal Export',
+              text: err.message || 'Terjadi kesalahan saat mengekspor data.',
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+          } else {
+            alert("Gagal export: " + err.message);
+          }
+        }
+      }
+      window.handleExportTrackingKreator = handleExportTrackingKreator;
+      window.triggerExportTrackingExcel = handleExportTrackingKreator;
+
+      const btnExp = document.getElementById('btnExportExcel');
+      if (btnExp) btnExp.addEventListener('click', handleExportTrackingKreator);
+
+      const btnDlBtm = document.getElementById('btnDownloadSingleKreatorBtm');
+      if (btnDlBtm) btnDlBtm.addEventListener('click', downloadKreatorModalAsPng);
+
       // Initial Render
       renderTrackingTable();
-    });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTrackingPage);
+      } else {
+        initTrackingPage();
+      }
+    })();
   </script>
 </body>
 

@@ -8,7 +8,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel="stylesheet" href="../../style.css" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
   <!-- Boxicons for action icons -->
   <link
     href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
@@ -404,6 +404,12 @@
       border-right: 1px solid #cbd5e1 !important;
     }
   </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -488,7 +494,7 @@
           <div class="campaign-toolbar__left">
             <!-- Green Excel Button with tooltip -->
             <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button"
-              aria-label="Export Excel" title="Export ke Excel (.csv)">
+              aria-label="Export Excel" title="Export ke Excel (.xlsx)">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37"
                   stroke-width="1.2" />
@@ -1091,8 +1097,8 @@
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="../../script.js"></script>
-  <script src="../../sidebar_engine.js?v=999"></script>
+  <script src="../../assets/js/app.js"></script>
+  <script src="../../assets/js/layout.js?v=999"></script>
   <script>
     (function () {
       const PERFORMA_STORAGE_KEY = "bisa_performa_kreator_list_v7";
@@ -1965,6 +1971,37 @@
             return;
           }
 
+          let exportList = performaDb;
+          const valUser = selUser ? selUser.value : "Semua";
+          const valKomisi = selKomisi ? selKomisi.value : "Semua";
+          const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+          if (valUser !== "Semua" || valKomisi !== "Semua" || query || activeStartDate || activeEndDate) {
+            exportList = performaDb.filter(item => {
+              const matchUser = (valUser === "Semua" || item.username === valUser);
+              let matchKomisi = true;
+              if (valKomisi === "Ada Komisi") {
+                matchKomisi = (item.komisi !== "Rp 0" && item.komisi !== "");
+              } else if (valKomisi === "Tidak Ada") {
+                matchKomisi = (item.komisi === "Rp 0" || item.komisi === "");
+              }
+              let matchSearch = true;
+              if (query) {
+                matchSearch = (item.username && item.username.toLowerCase().includes(query)) ||
+                  (item.uid && item.uid.toLowerCase().includes(query)) ||
+                  (item.tanggal && item.tanggal.toLowerCase().includes(query));
+              }
+              let matchDate = true;
+              if (activeStartDate || activeEndDate) {
+                const itemDate = parseDMY(item.tanggal);
+                if (itemDate) {
+                  if (activeStartDate && itemDate < activeStartDate) matchDate = false;
+                  if (activeEndDate && itemDate > activeEndDate) matchDate = false;
+                }
+              }
+              return matchUser && matchKomisi && matchSearch && matchDate;
+            });
+          }
+
           const headers = [
             "No", "Tanggal", "UID", "Username", "Followers", "GMV Afiliasi",
             "Pesanan Afiliasi", "Live GMV", "Video GMV", "Live Orders", "Video Orders",
@@ -1974,62 +2011,71 @@
             "Tayangan", "Siaran Live", "Video", "Partner GMV", "Partner Orders"
           ];
 
-          const rows = performaDb.map((item, idx) => [
+          const rows = exportList.map((item, idx) => [
             idx + 1,
-            `"${(item.tanggal || '').replace(/"/g, '""')}"`,
-            `"${(item.uid || '').replace(/"/g, '""')}"`,
-            `"${(item.username || '').replace(/"/g, '""')}"`,
-            `"${(item.followers || '').replace(/"/g, '""')}"`,
-            `"${(item.gmv || '').replace(/"/g, '""')}"`,
-            `"${(item.pesanan || '').replace(/"/g, '""')}"`,
-            `"${(item.live_gmv || '').replace(/"/g, '""')}"`,
-            `"${(item.video_gmv || '').replace(/"/g, '""')}"`,
-            `"${(item.live_orders || '').replace(/"/g, '""')}"`,
-            `"${(item.video_orders || '').replace(/"/g, '""')}"`,
-            `"${(item.ctr_live || '').replace(/"/g, '""')}"`,
-            `"${(item.ctr_video || '').replace(/"/g, '""')}"`,
-            `"${(item.direct_gmv || '').replace(/"/g, '""')}"`,
-            `"${(item.direct_live || '').replace(/"/g, '""')}"`,
-            `"${(item.direct_video || '').replace(/"/g, '""')}"`,
-            `"${(item.direct_orders || '').replace(/"/g, '""')}"`,
-            `"${(item.sold || '').replace(/"/g, '""')}"`,
-            `"${(item.direct_live_orders || '').replace(/"/g, '""')}"`,
-            `"${(item.live_sold || '').replace(/"/g, '""')}"`,
-            `"${(item.direct_video_orders || '').replace(/"/g, '""')}"`,
-            `"${(item.video_sold || '').replace(/"/g, '""')}"`,
-            `"${(item.kreator_sold || '').replace(/"/g, '""')}"`,
-            `"${(item.komisi || '').replace(/"/g, '""')}"`,
-            `"${(item.dasar || '').replace(/"/g, '""')}"`,
-            `"${(item.live_views || '').replace(/"/g, '""')}"`,
-            `"${(item.views || '').replace(/"/g, '""')}"`,
-            `"${(item.live_broadcasts || '').replace(/"/g, '""')}"`,
-            `"${(item.videos || '').replace(/"/g, '""')}"`,
-            `"${(item.partner_gmv || '').replace(/"/g, '""')}"`,
-            `"${(item.partner_orders || '').replace(/"/g, '""')}"`
+            item.tanggal || '-',
+            item.uid || '-',
+            item.username || '-',
+            item.followers || '-',
+            item.gmv || '-',
+            item.pesanan || '-',
+            item.live_gmv || '-',
+            item.video_gmv || '-',
+            item.live_orders || '-',
+            item.video_orders || '-',
+            item.ctr_live || '-',
+            item.ctr_video || '-',
+            item.direct_gmv || '-',
+            item.direct_live || '-',
+            item.direct_video || '-',
+            item.direct_orders || '-',
+            item.sold || '-',
+            item.direct_live_orders || '-',
+            item.live_sold || '-',
+            item.direct_video_orders || '-',
+            item.video_sold || '-',
+            item.kreator_sold || '-',
+            item.komisi || '-',
+            item.dasar || '-',
+            item.live_views || '-',
+            item.views || '-',
+            item.live_broadcasts || '-',
+            item.videos || '-',
+            item.partner_gmv || '-',
+            item.partner_orders || '-'
           ]);
 
-          const csvContent = "\\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\\r\\n");
-          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.setAttribute("href", url);
           const todayStr = new Date().toISOString().split("T")[0];
-          link.setAttribute("download", `data_performa_kreator_${todayStr}.csv`);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-
-          if (typeof Swal !== "undefined") {
-            Swal.fire({
-              icon: 'success',
-              title: 'Export Berhasil!',
-              text: 'Data performa kreator berhasil diekspor ke Excel (.csv).',
-              confirmButtonColor: '#29A3D8',
-              confirmButtonText: 'Selesai',
-              timer: 2000,
-              timerProgressBar: true,
-              customClass: { popup: 'swal2-bisa-popup' }
+          if (typeof exportBisaExcel === 'function') {
+            exportBisaExcel({
+              title: "PERFORMA KREATOR",
+              filename: `performa_kreator_${todayStr}.xlsx`,
+              sheetName: "Performa Kreator",
+              headers: headers,
+              rows: rows
             });
+            if (typeof Swal !== "undefined") {
+              Swal.fire({
+                icon: 'success',
+                title: 'Export Berhasil!',
+                text: 'Data performa kreator berhasil diekspor ke Excel (.xlsx) dengan tabel rapi.',
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          } else {
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","))].join("\r\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `data_performa_kreator_${todayStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
           }
         });
       }

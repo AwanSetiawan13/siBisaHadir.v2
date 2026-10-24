@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tracking Sampel | Staff KOL - Bisa Media</title>
   <link rel="icon" type="image/png" href="../../media/logo.png" />
-  <link rel="stylesheet" href="../../style.css" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
   <!-- Boxicons for action icons -->
   <link
     href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
@@ -713,6 +713,12 @@
       font-size: 13px !important;
     }
   </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
 </head>
 
 <body class="dashboard-body">
@@ -729,7 +735,7 @@
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <!-- 1. Green Excel Button with tooltip -->
-            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.csv)">
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
                 <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
@@ -1349,9 +1355,7 @@
       <span id="toastMsg" style="font-size: 13.5px; font-weight: 600; color: #1e293b;">Data berhasil diperbarui</span>
     </div>
   </div>
-
-  <script src="../../sidebar_engine.js?v=999"></script>
-  <script src="../staffkol_layout.js"></script>
+  <script src="../../assets/js/layout.js?v=999"></script>
 
   <script>
     (function () {
@@ -2697,36 +2701,47 @@
           }
 
           const headers = [
-            "No", "ID Tracking", "Nama Brand", "Nama Sampel", "PID", "Type",
+            "No", "ID Tracking", "Nama Brand", "Nama Sampel", "PID", "Type", "Type Sampel",
             "Username Kreator", "Varian", "Status Sampel", "Keterangan", "Tanggal"
           ];
 
           const rows = exportRows.map((item, idx) => [
             idx + 1,
-            `"${(item.id || '').replace(/"/g, '""')}"`,
-            `"${(item.brand || '').replace(/"/g, '""')}"`,
-            `"${(item.sampel || '').replace(/"/g, '""')}"`,
-            `"${(item.pid || '').replace(/"/g, '""')}"`,
-            `"${(item.type || '').replace(/"/g, '""')}"`,
-            `"${(item.kreator || '').replace(/"/g, '""')}"`,
-            `"${(item.varian || '').replace(/"/g, '""')}"`,
-            `"${(item.statusSampel || '').replace(/"/g, '""')}"`,
-            `"${(item.keterangan || '').replace(/"/g, '""')}"`,
-            `"${(item.tanggal || '').replace(/"/g, '""')}"`
+            item.id || '-',
+            item.brand || '-',
+            item.sampel || '-',
+            item.pid || '-',
+            item.type || '-',
+            item.typeSampel || '-',
+            item.kreator || '-',
+            item.varian || '-',
+            item.statusSampel || '-',
+            item.keterangan || '-',
+            item.tanggal || '-'
           ]);
 
-          const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\r\n");
-          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.setAttribute("href", url);
           const todayStr = new Date().toISOString().split("T")[0];
-          link.setAttribute("download", `data_tracking_sampel_${todayStr}.csv`);
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-
-          showToast("Data Tracking Sampel berhasil diexport ke Excel", "success");
+          if (typeof exportBisaExcel === 'function') {
+            exportBisaExcel({
+              title: "TRACKING SAMPEL",
+              filename: `data_tracking_sampel_${todayStr}.xlsx`,
+              sheetName: "Tracking Sampel",
+              headers: headers,
+              rows: rows
+            });
+            showToast("Data Tracking Sampel berhasil diexport ke Excel (.xlsx)", "success");
+          } else {
+            const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","))].join("\r\n");
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `data_tracking_sampel_${todayStr}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Data Tracking Sampel berhasil diexport ke Excel", "success");
+          }
         });
       }
 

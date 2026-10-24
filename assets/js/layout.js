@@ -1,4 +1,4 @@
-// sidebar_engine.js - Full & Faithful Company Edition (State, Hierarchy & Responsive Standard)
+// layout.js - Unified Layout Engine (Sidebar, Navbar & State per Role)
 (function () {
   'use strict';
 
@@ -23,6 +23,20 @@
   }
   const rootPrefix = depth > 0 ? '../'.repeat(depth) : '';
   const currentFile = normalizedPath.split('/').pop() || 'BM_dashboard.html';
+
+  // Preload Bisa Excel Engine agar seluruh fitur export otomatis menghasilkan Excel rapi bertabel & berwarna
+  (function preloadExcelEngine() {
+    if (!window.ExcelJS && !document.querySelector('script[src*="exceljs"]')) {
+      const excelJsScript = document.createElement('script');
+      excelJsScript.src = rootPrefix + 'vendor/exceljs.min.js';
+      document.head.appendChild(excelJsScript);
+    }
+    if (!window.exportBisaExcel && !document.querySelector('script[src*="excel_engine"]')) {
+      const excelScript = document.createElement('script');
+      excelScript.src = rootPrefix + 'assets/js/excel_engine.js';
+      document.head.appendChild(excelScript);
+    }
+  })();
 
   // 2. Deteksi Role Pengguna berdasarkan path halaman
   let role = 'admin';
@@ -837,10 +851,12 @@
       }, 150);
     }
 
-    // 5b. SPV KOL Unified Navbar Upgrade (Mirrors StaffKol Hirezy Topbar)
+    // 5b. Role-based Unified Navbar (SPV KOL & Staff KOL)
     if (role === 'spv_kol') {
       renderSpvKolNavbar();
       initSpvTablePagination();
+    } else if (role === 'staff_kol') {
+      renderStaffKolNavbar();
     }
 
     // 5c. Render Dedicated Consistent Footer Template
@@ -1329,6 +1345,141 @@
         </div>
       </div>
     `;
+  }
+
+  // Helper: Render Staff KOL Unified Topbar
+  function renderStaffKolNavbar() {
+    const staffTitles = {
+      'staffkol_dashboard.html': 'Dashboard',
+      'staffkol_kalender.html': 'Kalender',
+      'staffkol_kehadiran.html': 'Absensi',
+      'staffkol_presensi_istirahat.html': 'Presensi Istirahat',
+      'staffkol_presensi_lembur.html': 'Presensi Lembur',
+      'staffkol_folder.html': 'My Folders',
+      'staffkol_evaluasi_kinerja.html': 'Evaluasi Kinerja',
+      'staffkol_target_capaian.html': 'Target & Capaian Kerja',
+      'staffkol_upgrade_skill.html': 'Upgrade Skill',
+      'staffkol_campaign.html': 'Campaign',
+      'staffkol_dashboard_campaign.html': 'Dashboard Campaign',
+      'staffkol_laporan_campaign.html': 'Laporan Campaign',
+      'staffkol_kreator.html': 'Data Kreator',
+      'staffkol_tracking_kreator.html': 'Tracking Kreator',
+      'staffkol_operasional.html': 'Operasional',
+      'staffkol_Performa_Kreator.html': 'Performa Kreator',
+      'staffkol_tracking_sampel.html': 'Tracking Sampel',
+      'staffkol_dashboard_brand.html': 'Dashboard Brands',
+      'staffkol_produk_brand.html': 'Produk & Brands',
+      'staffkol_data_brand.html': 'Data Brands',
+      'staffkol_laporan.html': 'Laporan',
+      'staffkol_Milestone.html': 'Milestone',
+      'staffkol_pengaduan.html': 'Pengaduan',
+      'staffkol_project.html': 'Project',
+      'staffkol_rrk.html': 'RRK',
+      'staffkol_tugas.html': 'Tugas'
+    };
+
+    const staffPageTitle = staffTitles[currentFile] || (document.title ? document.title.split('|')[0].trim() : 'Dashboard');
+
+    let topbarEl = document.querySelector('header.topbar');
+    if (!topbarEl) return;
+
+    topbarEl.className = 'topbar hirezy-topbar';
+    topbarEl.innerHTML = `
+      <div class="topbar__left hirezy-topbar-left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <h2 class="hirezy-page-title">${staffPageTitle}</h2>
+      </div>
+
+      <div class="topbar__actions hirezy-topbar-right">
+        <!-- Search Input or Calendar Button -->
+        ${(currentFile === 'staffkol_dashboard_brand.html' || currentFile === 'staffkol_dashboard_campaign.html') ? `
+        <button id="btnCalendarTop" type="button" aria-label="Pilih tanggal" title="Pilih Tanggal" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 6px 16px; border-radius: 8px; color: #64748b; font-size: 13px; font-weight: 500; cursor: pointer; height: 38px; outline: none; transition: all 0.2s;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.background='#f1f5f9';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#f8fafc';" onclick="(document.getElementById('calendarBrandModal') || document.getElementById('calendarCampaignModal'))?.classList.add('is-active')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span id="txtCalendarTop">Oktober</span>
+        </button>
+        ` : `
+        <!-- Search Input -->
+        <div class="hirezy-search-box">
+          <svg class="hirezy-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="menuSearch" class="hirezy-search-input" type="search" placeholder="Search candidate, vacancy, etc" />
+        </div>
+        `}
+
+        <!-- Chat / Message Icon -->
+        <button class="hirezy-icon-btn" type="button" aria-label="Pesan / Chat" title="Pesan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
+        </button>
+
+        <!-- Notification Bell Icon with Red Dot Badge -->
+        <button class="hirezy-icon-btn" type="button" aria-label="Notifikasi" title="Notifikasi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="hirezy-notif-dot"></span>
+        </button>
+
+        <!-- User Profile Pill & Dropdown -->
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+            <div class="hirezy-avatar-box">
+              <img src="${rootPrefix}media/avatar.png" alt="Andrew Sebastian" class="hirezy-avatar-img" data-ceo-avatar="" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80'" />
+            </div>
+            <div class="hirezy-user-text">
+              <span class="hirezy-user-name">Andrew Sebastian</span>
+              <span class="hirezy-user-role">Staff KOL</span>
+            </div>
+            <svg class="hirezy-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="${rootPrefix}media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Andrew Sebastian</span>
+                <span class="user-menu-dropdown__role">Staff KOL &bull; PT. Bisa Media</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="${rootPrefix}BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="${rootPrefix}login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>`;
   }
 
   // 6. Smooth Feature Transition Handler (Navigasi Antar-Fitur Sangat Halus & Responsif)
