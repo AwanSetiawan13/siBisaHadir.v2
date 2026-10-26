@@ -1,389 +1,3 @@
-/**
- * Bisa Media Unified Sidebar Engine
- * Renders Pixel-Perfect SaaS Navigation dynamically based on user_role (Admin, SPV KOL, Staff KOL)
- */
-(function () {
-  'use strict';
-  // Obsolete sidebar disabled: sidebar is exclusively rendered by assets/js/layout.js
-  return;
-
-  function getProjectRootPrefix() {
-    const pathname = window.location.pathname.replace(/\\/g, '/');
-    const parts = pathname.split('/').filter(Boolean);
-    const idx = parts.findIndex(p => ['bm', 'spvkol', 'staffkol'].includes(p.toLowerCase()));
-    if (idx === -1) return '';
-    const depth = parts.length - 1 - idx;
-    return '../'.repeat(depth);
-  }
-
-  function getUserRole() {
-    let role = (localStorage.getItem('user_role') || '').toLowerCase().trim();
-    if (!['admin', 'spv_kol', 'staff_kol'].includes(role)) {
-      const p = window.location.pathname.toLowerCase();
-      if (p.includes('/bm/')) role = 'admin';
-      else if (p.includes('/staffkol/')) role = 'staff_kol';
-      else role = 'spv_kol';
-      localStorage.setItem('user_role', role);
-    }
-    return role;
-  }
-
-  const ROLE_NAMES = {
-    admin: 'Admin',
-    spv_kol: 'SPV KOL',
-    staff_kol: 'Staff KOL'
-  };
-
-  const ROLE_MENUS = {
-    admin: [
-      { section: 'UTAMA' },
-      { title: 'Beranda', icon: 'bx bx-home-circle', href: 'BM/BM_dashboard.html' },
-      { title: 'Kalender', icon: 'bx bx-calendar', href: 'BM/BM_kalender.html' },
-      { title: 'Panduan', icon: 'bx bx-book-content', href: 'BM/BM_panduan.html' },
-      { section: 'MANAJEMEN & OPERASIONAL' },
-      {
-        title: 'Data Karyawan',
-        icon: 'bx bx-user',
-        children: [
-          { title: 'Karyawan', href: 'BM/data_karyawan/BM_karyawan.html' },
-          { title: 'Kontrak Karyawan', href: 'BM/data_karyawan/BM_Kontrak.html' },
-          { title: 'Kegiatan Karyawan', href: 'BM/data_karyawan/BM_kegiatan_karyawan.html' }
-        ]
-      },
-      {
-        title: 'Tugas & Pekerjaan',
-        icon: 'bx bx-list-check',
-        children: [
-          { title: 'Instruksi Tugas', href: 'BM/tugas_pekerjaan/BM_instruksi_tugas.html' },
-          { title: 'RRK', href: 'BM/tugas_pekerjaan/BM_rrk.html' },
-          { title: 'Report Pengerjaan', href: 'BM/tugas_pekerjaan/BM_report_pengerjaan.html' }
-        ]
-      },
-      {
-        title: 'Absensi & Penilaian',
-        icon: 'bx bx-calendar-check',
-        children: [
-          { title: 'Kehadiran', href: 'BM/absensi/BM_kehadiran.html' },
-          { title: 'Presensi Istirahat', href: 'BM/absensi/BM_presensi_istirahat.html' },
-          { title: 'Presensi Lembur', href: 'BM/absensi/BM_presensi_lembur.html' },
-          { title: 'Skenario Jam Kerja', href: 'BM/absensi/BM_skenario_jam_kerja.html' },
-          { title: 'Penilaian Karyawan', href: 'BM/penilaian/BM_penilaian_karyawan.html' }
-        ]
-      },
-      {
-        title: 'Kelola Perusahaan',
-        icon: 'bx bx-buildings',
-        children: [
-          { title: 'Profil Perusahaan', href: 'BM/perusahaan/BM_profil_perusahaan.html' },
-          { title: 'Sub Perusahaan', href: 'BM/perusahaan/BM_subperusahaan.html' },
-          { title: 'Divisi', href: 'BM/perusahaan/BM_divisi.html' },
-          { title: 'Jabatan', href: 'BM/perusahaan/BM_jabatan.html' },
-          { title: 'Struktur', href: 'BM/perusahaan/BM_struktur_perusahaan.html' }
-        ]
-      }
-    ],
-
-    spv_kol: [
-      { section: 'UTAMA' },
-      { title: 'Beranda / Dashboard KOL', icon: 'bx bx-home-circle', href: 'SpvKol/spvkol_dashboard.html' },
-      { title: 'Kalender', icon: 'bx bx-calendar', href: 'SpvKol/spvkol_kalender.html' },
-      { title: 'Panduan', icon: 'bx bx-book-content', href: 'BM/BM_panduan.html' },
-      { section: 'OPERASIONAL KOL' },
-      {
-        title: 'Operasional KOL',
-        icon: 'bx bx-pie-chart-alt-2',
-        children: [
-          { title: 'Approval Sampel', href: 'SpvKol/operasional/spvkol_tracking_sampel.html' },
-          { title: 'Monitoring Campaign', href: 'SpvKol/operasional/spvkol_dashboard_campaign.html' },
-          { title: 'Campaign', href: 'SpvKol/operasional/spvkol_campaign.html' },
-          { title: 'Performa Kreator', href: 'SpvKol/operasional/spvkol_Performa_Kreator.html' }
-        ]
-      },
-      {
-        title: 'Manajemen Tim',
-        icon: 'bx bx-group',
-        children: [
-          { title: 'Data Staff KOL / Kreator', href: 'SpvKol/operasional/spvkol_kreator.html' },
-          { title: 'Penugasan / RRK', href: 'SpvKol/perancangan_kerja/spvkol_rrk.html' },
-          { title: 'Tugas', href: 'SpvKol/perancangan_kerja/spvkol_tugas.html' },
-          { title: 'Evaluasi Kinerja', href: 'SpvKol/kinerja/spvkol_evaluasi_kinerja.html' }
-        ]
-      },
-      {
-        title: 'Presensi & Jadwal Kerja',
-        icon: 'bx bx-calendar-check',
-        children: [
-          { title: 'Kehadiran', href: 'SpvKol/absensi/spvkol_kehadiran.html' },
-          { title: 'Presensi Istirahat', href: 'SpvKol/absensi/spvkol_presensi_istirahat.html' },
-          { title: 'Presensi Lembur', href: 'SpvKol/absensi/spvkol_presensi_lembur.html' }
-        ]
-      },
-      { section: 'DATA & DOKUMEN' },
-      {
-        title: 'Data Master',
-        icon: 'bx bx-data',
-        children: [
-          { title: 'Brand', href: 'SpvKol/data_master/spvkol_Brand.html' },
-          { title: 'Kategori Produk', href: 'SpvKol/data_master/master_pendukung/spvkol_Kategori_Produk.html' },
-          { title: 'Leads Kreator', href: 'SpvKol/data_master/master_pendukung/spvkol_Leads_Kreator.html' },
-          { title: 'Leveling Kreator', href: 'SpvKol/data_master/master_pendukung/spvkol_Leveling_Kreator.html' },
-          { title: 'Ads Account', href: 'SpvKol/data_master/master_pendukung/spvkol_Ads_Account.html' }
-        ]
-      },
-      {
-        title: 'Dokumen Kolaborasi',
-        icon: 'bx bx-folder',
-        children: [
-          { title: 'Folder', href: 'SpvKol/dokumen_kolaborasi/spvkol_folder.html' }
-        ]
-      }
-    ],
-
-    staff_kol: [
-      { section: 'UTAMA' },
-      { title: 'Beranda', icon: 'bx bx-home-circle', href: 'StaffKol/staffkol_dashboard.html' },
-      { title: 'Kalender', icon: 'bx bx-calendar', href: 'StaffKol/staffkol_kalender.html' },
-      { title: 'Panduan', icon: 'bx bx-book-content', href: 'BM/BM_panduan.html' },
-      { section: 'OPERASIONAL & TUGAS' },
-      {
-        title: 'Operasional',
-        icon: 'bx bx-package',
-        children: [
-          { title: 'Tracking Sampel', href: 'StaffKol/operasional/staffkol_tracking_sampel.html' },
-          { title: 'Data Kreator', href: 'StaffKol/operasional/staffkol_kreator.html' },
-          { title: 'Laporan Campaign', href: 'StaffKol/operasional/staffkol_dashboard_campaign.html' }
-        ]
-      },
-      {
-        title: 'Tugas Harian',
-        icon: 'bx bx-list-check',
-        children: [
-          { title: 'Instruksi Tugas', href: 'StaffKol/perancangan_kerja/staffkol_tugas.html' },
-          { title: 'Report Pengerjaan', href: 'StaffKol/perancangan_kerja/staffkol_laporan.html' }
-        ]
-      },
-      {
-        title: 'Presensi Saya',
-        icon: 'bx bx-calendar-check',
-        children: [
-          { title: 'Presensi Kehadiran', href: 'StaffKol/absensi/staffkol_kehadiran.html' },
-          { title: 'Presensi Istirahat', href: 'StaffKol/absensi/staffkol_presensi_istirahat.html' },
-          { title: 'Presensi Lembur', href: 'StaffKol/absensi/staffkol_presensi_lembur.html' }
-        ]
-      },
-      { section: 'DOKUMEN' },
-      {
-        title: 'Dokumen Kolaborasi',
-        icon: 'bx bx-folder',
-        children: [
-          { title: 'Folder', href: 'StaffKol/dokumen_kolaborasi/staffkol_folder.html' }
-        ]
-      }
-    ]
-  };
-
-  function isUrlActive(targetRelativePath) {
-    const currentFilename = window.location.pathname.split('/').pop().toLowerCase();
-    const targetFilename = targetRelativePath.split('/').pop().toLowerCase();
-    return currentFilename === targetFilename;
-  }
-
-  function renderSidebar() {
-    const sidebarEl = document.getElementById('sidebar') ||
-                      document.getElementById('layout-menu') ||
-                      document.querySelector('.kol-sidebar') ||
-                      document.querySelector('.layout-menu');
-    if (!sidebarEl) return;
-
-    const rootPrefix = getProjectRootPrefix();
-    const role = getUserRole();
-    const menuItems = ROLE_MENUS[role] || ROLE_MENUS.spv_kol;
-    const roleLabel = ROLE_NAMES[role] || 'SPV KOL';
-
-    /**
-     * Legacy sidebar code removed - sidebar is now centrally managed by assets/js/layout.js
-     */
-    sidebarEl.className = 'sidebar bm-unified-sidebar';
-
-    let navHtml = '';
-
-    menuItems.forEach((item) => {
-      if (item.section) {
-        navHtml += `<div class="bm-sidebar-section-header">${item.section}</div>`;
-        return;
-      }
-
-      if (item.children && Array.isArray(item.children)) {
-        const hasActive = item.children.some(ch => isUrlActive(ch.href));
-        const savedKey = `bm_nav_group_${role}_${item.title}`;
-        let isCollapsed = true;
-
-        if (hasActive) {
-          isCollapsed = false;
-        } else {
-          const savedState = localStorage.getItem(savedKey);
-          if (savedState === 'open') isCollapsed = false;
-        }
-
-        let childrenHtml = '';
-        item.children.forEach(child => {
-          const activeClass = isUrlActive(child.href) ? ' active' : '';
-          const targetHref = `${rootPrefix}${child.href}`;
-          childrenHtml += `
-            <a href="${targetHref}" class="bm-nav-subitem${activeClass}">
-              <i class="bx bxs-circle bm-sub-bullet"></i>
-              <span>${child.title}</span>
-            </a>
-          `;
-        });
-
-        navHtml += `
-          <div class="bm-nav-group ${isCollapsed ? 'is-collapsed' : ''}" data-group-key="${savedKey}">
-            <button type="button" class="bm-nav-group-toggle ${hasActive ? 'has-active' : ''}">
-              <div class="bm-nav-group-left">
-                <i class="bm-nav-icon ${item.icon}"></i>
-                <span class="bm-nav-text">${item.title}</span>
-              </div>
-              <i class="bx bx-chevron-down bm-nav-chevron"></i>
-            </button>
-            <div class="bm-nav-submenu">
-              ${childrenHtml}
-            </div>
-          </div>
-        `;
-      } else {
-        const activeClass = isUrlActive(item.href) ? ' active' : '';
-        const targetHref = `${rootPrefix}${item.href}`;
-        navHtml += `
-          <a href="${targetHref}" class="bm-nav-item${activeClass}">
-            <i class="bm-nav-icon ${item.icon}"></i>
-            <span class="bm-nav-text">${item.title}</span>
-          </a>
-        `;
-      }
-    });
-
-    const brandHomeHref = role === 'admin' ? `${rootPrefix}BM/BM_dashboard.html` :
-                          role === 'staff_kol' ? `${rootPrefix}StaffKol/staffkol_dashboard.html` :
-                          `${rootPrefix}SpvKol/spvkol_dashboard.html`;
-
-    sidebarEl.innerHTML = `
-      <div class="bm-sidebar-header">
-        <a href="${brandHomeHref}" class="bm-brand-link">
-          <div class="bm-brand-logo-wrap">
-            <img src="${rootPrefix}media/logo.png" alt="Logo Bisa Media" class="bm-brand-logo-img" />
-          </div>
-          <span class="bm-brand-title">bisa media</span>
-        </a>
-      </div>
-
-      <nav class="bm-sidebar-nav" aria-label="Menu Utama">
-        ${navHtml}
-      </nav>
-
-      <div class="bm-sidebar-footer">
-        <div class="bm-user-card">
-          <img src="${rootPrefix}media/avatar.png" alt="Rayi" class="bm-user-avatar" />
-          <div class="bm-user-info">
-            <span class="bm-user-name">Rayi</span>
-            <button type="button" class="bm-role-badge-btn" id="bmRoleBadgeBtn" title="Klik untuk berganti Role">
-              <span>${roleLabel}</span>
-              <i class="bx bx-chevron-up" style="font-size: 13px;"></i>
-            </button>
-          </div>
-          <a href="${rootPrefix}index.html" class="bm-logout-btn" id="bmSidebarLogoutBtn" title="Logout" aria-label="Logout">
-            <i class="bx bx-power-off"></i>
-          </a>
-
-          <!-- Role Selector Popup -->
-          <div class="bm-role-picker-popup" id="bmRolePickerPopup">
-            <button type="button" class="bm-role-opt ${role === 'admin' ? 'is-selected' : ''}" data-role="admin">
-              <span>Admin</span>
-              ${role === 'admin' ? '<i class="bx bx-check"></i>' : ''}
-            </button>
-            <button type="button" class="bm-role-opt ${role === 'spv_kol' ? 'is-selected' : ''}" data-role="spv_kol">
-              <span>SPV KOL</span>
-              ${role === 'spv_kol' ? '<i class="bx bx-check"></i>' : ''}
-            </button>
-            <button type="button" class="bm-role-opt ${role === 'staff_kol' ? 'is-selected' : ''}" data-role="staff_kol">
-              <span>Staff KOL</span>
-              ${role === 'staff_kol' ? '<i class="bx bx-check"></i>' : ''}
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Bind Accordion Events
-    sidebarEl.querySelectorAll('.bm-nav-group-toggle').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const group = btn.closest('.bm-nav-group');
-        if (!group) return;
-        const key = group.getAttribute('data-group-key');
-        group.classList.toggle('is-collapsed');
-        const isNowCollapsed = group.classList.contains('is-collapsed');
-        if (key) {
-          localStorage.setItem(key, isNowCollapsed ? 'collapsed' : 'open');
-        }
-      });
-    });
-
-    // Bind Role Switcher Popup
-    const roleBadgeBtn = document.getElementById('bmRoleBadgeBtn');
-    const rolePopup = document.getElementById('bmRolePickerPopup');
-    if (roleBadgeBtn && rolePopup) {
-      roleBadgeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        rolePopup.classList.toggle('is-open');
-      });
-
-      rolePopup.querySelectorAll('.bm-role-opt').forEach(opt => {
-        opt.addEventListener('click', (e) => {
-          e.preventDefault();
-          const targetRole = opt.getAttribute('data-role');
-          if (targetRole) {
-            localStorage.setItem('user_role', targetRole);
-            rolePopup.classList.remove('is-open');
-            // Redirect to target role's dashboard
-            const nextHome = targetRole === 'admin' ? `${rootPrefix}BM/BM_dashboard.html` :
-                             targetRole === 'staff_kol' ? `${rootPrefix}StaffKol/staffkol_dashboard.html` :
-                             `${rootPrefix}SpvKol/spvkol_dashboard.html`;
-            window.location.href = nextHome;
-          }
-        });
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.bm-user-card')) {
-          rolePopup.classList.remove('is-open');
-        }
-      });
-    }
-
-    // Bind Sidebar Toggle button (hamburger)
-    const sidebarToggle = document.getElementById('sidebarToggle') || document.querySelector('.layout-menu-toggle');
-    if (sidebarToggle) {
-      sidebarToggle.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.body.classList.toggle('sidebar-collapsed');
-        document.body.classList.toggle('sidebar-open');
-      });
-    }
-  }
-
-  // Auto initialize on DOM ready or immediate
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderSidebar);
-  } else {
-    renderSidebar();
-  }
-
-  // Expose global render function if needed
-  window.bmRenderSidebar = renderSidebar;
-})();
-
 /* Owner custom JS (Sneat)
  *
  * Fitur:
@@ -582,7 +196,7 @@
     const text = String(message || '').replace(/\s+/g, ' ').trim();
     if (!text) return '';
 
-    const quoted = text.match(/["Ã¢â‚¬Å“Ã¢â‚¬Â]([^"Ã¢â‚¬Å“Ã¢â‚¬Â]+)["Ã¢â‚¬Å“Ã¢â‚¬Â]/);
+    const quoted = text.match(/["ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â]([^"ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â]+)["ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â]/);
     if (quoted && quoted[1]) return normalizeFeatureTitle(quoted[1]);
 
     return normalizeFeatureTitle(
@@ -6731,7 +6345,7 @@
       const end = String(ev.end || '').trim();
       const type = String(ev.type || '').trim();
       const time = start || end ? `${start || '--:--'}${end ? ` - ${end}` : ''}` : 'Jadwal fleksibel';
-      return type ? `${time} Ã¢â‚¬Â¢ ${type}` : time;
+      return type ? `${time} ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ${type}` : time;
     };
 
     setText('dashTotalEmployees', totalEmp);
@@ -6752,7 +6366,7 @@
     const nextEl = document.getElementById('dashNextEvent');
     const heroEvent = nextEvents[0] || null;
     if (nextEl) {
-      nextEl.textContent = heroEvent ? `${heroEvent.date || '-'} Ã¢â‚¬Â¢ ${formatEventTime(heroEvent)} Ã¢â‚¬Â¢ ${heroEvent.title || 'Jadwal'}` : '-';
+      nextEl.textContent = heroEvent ? `${heroEvent.date || '-'} ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ${formatEventTime(heroEvent)} ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ${heroEvent.title || 'Jadwal'}` : '-';
     }
 
     const heroTitleEl = document.getElementById('dashHeroNextTitle');
@@ -6760,7 +6374,7 @@
     const heroTypeEl = document.getElementById('dashHeroNextType');
     const heroNoteEl = document.getElementById('dashHeroNextNote');
     if (heroTitleEl) heroTitleEl.textContent = heroEvent?.title || 'Belum ada jadwal';
-    if (heroMetaEl) heroMetaEl.textContent = heroEvent ? `${heroEvent.date || '-'} Ã¢â‚¬Â¢ ${formatEventTime(heroEvent)}` : '-';
+    if (heroMetaEl) heroMetaEl.textContent = heroEvent ? `${heroEvent.date || '-'} ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ${formatEventTime(heroEvent)}` : '-';
     if (heroTypeEl) heroTypeEl.textContent = heroEvent?.type || '-';
     if (heroNoteEl) heroNoteEl.textContent = heroEvent?.note || 'Belum ada catatan';
 
@@ -7378,7 +6992,7 @@
     }
 
     function maskPassword(value) {
-      return String(value || '').trim() ? 'Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢' : '-';
+      return String(value || '').trim() ? 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢' : '-';
     }
 
     function ensureFilePreviewControl(inputId, linkId) {
@@ -7820,7 +7434,7 @@
       });
       fillSelectOptions(jabEl, filtered.map((row) => ({
         value: row.id,
-        label: `${bmOptionLabel(row, 'Jabatan')} Ã¢â‚¬â€ ${bmEmployeeNamesForJabatan(row.id).join(', ') || 'Belum ada karyawan'}`,
+        label: `${bmOptionLabel(row, 'Jabatan')} ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ${bmEmployeeNamesForJabatan(row.id).join(', ') || 'Belum ada karyawan'}`,
       })), 'Pilih jabatan');
       if (initial.jabatan_id && filtered.some((row) => String(row.id) === initial.jabatan_id)) jabEl.value = initial.jabatan_id;
       else if (filtered[0]) jabEl.value = filtered[0].id;
@@ -7863,7 +7477,7 @@
       <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
           <h5 class="mb-0">Pilih Akses ${escapeHtml(featureTitle)}</h5>
-          <small class="text-muted">Pilih bertahap: Sub Perusahaan Ã¢â€ â€™ Divisi Ã¢â€ â€™ Jabatan.</small>
+          <small class="text-muted">Pilih bertahap: Sub Perusahaan ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Divisi ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Jabatan.</small>
         </div>
         <button class="btn btn-sm btn-outline-secondary d-none" type="button" data-bm-gate-reset>Ganti Pilihan</button>
       </div>
@@ -8130,7 +7744,7 @@
               <div class="row g-3">
                 <div class="col-12">
                   <div class="alert alert-info mb-0">
-                    RRK dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan Ã¢â€ â€™ Divisi Ã¢â€ â€™ Jabatan.
+                    RRK dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Divisi ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Jabatan.
                   </div>
                 </div>
                 <div class="col-12"><label class="form-label">Rancangan Rencana Kerja</label><textarea id="bmRrkRancangan" class="form-control" rows="4" placeholder="Isi rancangan rencana kerja"></textarea></div>
@@ -8284,7 +7898,7 @@
               <div class="row g-3">
                 <div class="col-12">
                   <div class="alert alert-info mb-0">
-                    Report dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan Ã¢â€ â€™ Divisi Ã¢â€ â€™ Jabatan.
+                    Report dibuat untuk jabatan yang sudah dipilih dari alur Sub Perusahaan ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Divisi ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Jabatan.
                   </div>
                 </div>
                 <div class="col-md-4"><label class="form-label">Tanggal</label><input id="bmReportTanggal" class="form-control" type="date" /></div>
@@ -9759,7 +9373,7 @@
         type: 'photo',
         photoSrc: isImagePath(rawSrc) ? rawSrc : fallbackPhotoSrc(),
         photoTitle: `${header} - ${employeeName}`,
-        photoMeta: `${employeeName}${dateText ? ' Ã‚Â· ' + dateText : ''} Ã‚Â· ${kind}`,
+        photoMeta: `${employeeName}${dateText ? ' ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· ' + dateText : ''} ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· ${kind}`,
         photoAddress: address,
         photoNote: note,
         excludeFromTable: false,
@@ -11758,8 +11372,8 @@
   function cleanGoogleTitle(title, link) {
     let clean = decodeHtmlEntity(String(title || ''))
       .replace(/\s+/g, ' ')
-      .replace(/\s[-Ã¢â‚¬â€œ|]\sGoogle\s+(Docs|Sheets|Drive).*$/i, '')
-      .replace(/\s[-Ã¢â‚¬â€œ|]\sGoogle.*$/i, '')
+      .replace(/\s[-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ|]\sGoogle\s+(Docs|Sheets|Drive).*$/i, '')
+      .replace(/\s[-ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ|]\sGoogle.*$/i, '')
       .trim();
 
     const blockedTitles = [
@@ -15150,7 +14764,7 @@
         '<div class="bm-upload-file-popup-head">',
         '<div>',
         '<h5>' + name + '</h5>',
-        '<small>PDF Preview Ã¢â‚¬Â¢ ' + size + ' Ã¢â‚¬Â¢ ' + escapeHtml(todayText) + '</small>',
+        '<small>PDF Preview ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ' + size + ' ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ' + escapeHtml(todayText) + '</small>',
         '</div>',
         '</div>',
         '<iframe class="bm-upload-file-frame" src="' + src + '" title="' + name + '"></iframe>',
@@ -15164,7 +14778,7 @@
         '<div class="bm-upload-file-popup-head">',
         '<div>',
         '<h5>' + name + '</h5>',
-        '<small>Image Preview Ã¢â‚¬Â¢ ' + size + ' Ã¢â‚¬Â¢ ' + escapeHtml(todayText) + '</small>',
+        '<small>Image Preview ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ' + size + ' ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ' + escapeHtml(todayText) + '</small>',
         '</div>',
         '</div>',
         '<div class="bm-upload-file-image-wrap"><img src="' + src + '" alt="' + name + '" /></div>',
@@ -15180,7 +14794,7 @@
       '<div class="bm-upload-file-popup-head">',
       '<div>',
       '<h5>' + name + '</h5>',
-      '<small>' + escapeHtml(label) + ' Ã¢â‚¬Â¢ ' + size + ' Ã¢â‚¬Â¢ ' + escapeHtml(todayText) + '</small>',
+      '<small>' + escapeHtml(label) + ' ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ' + size + ' ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢ ' + escapeHtml(todayText) + '</small>',
       '</div>',
       '</div>',
       '<div class="bm-upload-file-placeholder">',
@@ -16452,19 +16066,19 @@
 
   function iconFallback(icon) {
     var value = String(icon || '').toLowerCase();
-    if (value.indexOf('folder') >= 0) return 'Ã°Å¸â€œÂ';
-    if (value.indexOf('excel') >= 0 || value.indexOf('sheet') >= 0 || value.indexOf('spreadsheet') >= 0) return 'Ã¢â€“Â¦';
+    if (value.indexOf('folder') >= 0) return 'ÃƒÆ’Ã‚Â°Ãƒâ€¦Ã‚Â¸ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒâ€šÃ‚Â';
+    if (value.indexOf('excel') >= 0 || value.indexOf('sheet') >= 0 || value.indexOf('spreadsheet') >= 0) return 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“Ãƒâ€šÃ‚Â¦';
     if (value.indexOf('word') >= 0) return 'W';
     if (value.indexOf('pdf') >= 0) return 'PDF';
-    if (value.indexOf('image') >= 0 || value.indexOf('gallery') >= 0) return 'Ã¢â€“Â§';
+    if (value.indexOf('image') >= 0 || value.indexOf('gallery') >= 0) return 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“Ãƒâ€šÃ‚Â§';
     if (value.indexOf('google') >= 0 || value.indexOf('drive') >= 0) return 'G';
-    if (value.indexOf('share') >= 0) return 'Ã¢â€ â€”';
-    if (value.indexOf('star') >= 0) return 'Ã¢Ëœâ€¦';
-    if (value.indexOf('delete') >= 0) return 'Ãƒâ€”';
-    if (value.indexOf('edit') >= 0 || value.indexOf('rename') >= 0) return 'Ã¢Å“Å½';
-    if (value.indexOf('copy') >= 0) return 'Ã¢Â§â€°';
-    if (value.indexOf('dots') >= 0) return 'Ã¢â€¹Â®';
-    return 'Ã¢â‚¬Â¢';
+    if (value.indexOf('share') >= 0) return 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
+    if (value.indexOf('star') >= 0) return 'ÃƒÆ’Ã‚Â¢Ãƒâ€¹Ã…â€œÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦';
+    if (value.indexOf('delete') >= 0) return 'ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â';
+    if (value.indexOf('edit') >= 0 || value.indexOf('rename') >= 0) return 'ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“Ãƒâ€¦Ã‚Â½';
+    if (value.indexOf('copy') >= 0) return 'ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚Â§ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°';
+    if (value.indexOf('dots') >= 0) return 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹Ãƒâ€šÃ‚Â®';
+    return 'ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¢';
   }
 
   function applyIconFallbacks(scope) {
@@ -17396,16 +17010,24 @@
 
       if ((userVal === 'admin@bisamedia.com' || userVal === 'admin') && (passVal === 'admin123' || passVal === '123456')) {
         localStorage.setItem('user_role', 'admin');
+        localStorage.setItem('user_name', 'Rayi (Admin)');
+        localStorage.setItem('user_display_role', 'Admin');
+        localStorage.setItem('user_avatar', 'media/avatar.png');
         window.location.href = 'BM/BM_dashboard.html';
       } else if ((userVal === 'spv@bisamedia.com' || userVal === 'spv') && (passVal === 'spv123' || passVal === '123456')) {
         localStorage.setItem('user_role', 'spv_kol');
+        localStorage.setItem('user_name', 'Rayi');
+        localStorage.setItem('user_display_role', 'SPV KOL');
+        localStorage.setItem('user_avatar', 'media/avatar.png');
         window.location.href = 'SpvKol/spvkol_dashboard.html';
       } else if ((userVal === 'staff@bisamedia.com' || userVal === 'staff') && (passVal === 'staff123' || passVal === '123456')) {
         localStorage.setItem('user_role', 'staff_kol');
+        localStorage.setItem('user_name', 'Rayi (Staff)');
+        localStorage.setItem('user_display_role', 'Staff KOL');
+        localStorage.setItem('user_avatar', 'media/avatar.png');
         window.location.href = 'StaffKol/staffkol_dashboard.html';
       } else {
         showLoginError();
-        alert('Username atau password salah!\n\nAkun Login:\n- Admin: admin / admin123\n- SPV KOL: spv / spv123\n- Staff KOL: staff / staff123');
       }
     });
   }

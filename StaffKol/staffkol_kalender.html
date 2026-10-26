@@ -65,11 +65,14 @@
         <!-- Right Column: Jadwal Card -->
         <div class="db-schedule-card">
           <div class="db-sched-header">
-            <div class="db-sched-title-wrap">
-              <h2 class="db-sched-title">Jadwal</h2>
-              <span class="db-sched-date" id="selectedDateLabel">Kamis, 01 - 05 - 2020</span>
-            </div>
-          </div>
+        <div class="db-sched-title-wrap">
+          <h2 class="db-sched-title">Jadwal</h2>
+          <span class="db-sched-date" id="selectedDateLabel">Kamis, 01 - 05 - 2020</span>
+        </div>
+        <button type="button" id="openAddSchedModalBtn" class="btn-tambah">
+          <i class="bx bx-plus"></i> Tambah Jadwal
+        </button>
+      </div>
 
           <div class="db-sched-list" id="scheduleListContainer">
             <div class="db-sched-item" id="sched-item-1">
@@ -226,6 +229,33 @@
         ]
       };
       let schedIdCounter = 3;
+
+      const SCHEDULE_STORAGE_KEY = "bisa_kalender_schedule_v1";
+      function saveSchedules() {
+        try {
+          localStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(scheduleDb));
+        } catch (e) {}
+      }
+      function loadSchedules() {
+        try {
+          const raw = localStorage.getItem(SCHEDULE_STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return;
+          Object.keys(scheduleDb).forEach(key => delete scheduleDb[key]);
+          let maxId = 0;
+          Object.entries(parsed).forEach(([key, list]) => {
+            if (!Array.isArray(list)) return;
+            scheduleDb[key] = list;
+            list.forEach(item => {
+              const id = Number(item && item.id);
+              if (Number.isFinite(id) && id > maxId) maxId = id;
+            });
+          });
+          schedIdCounter = maxId + 1;
+        } catch (e) {}
+      }
+      loadSchedules();
 
       function formatDateLabel(year, month, day) {
         const d = new Date(year, month, day);
@@ -417,6 +447,7 @@
         const item = list.find(x => x.id === id);
         if (item) {
           item.status = "done";
+          saveSchedules();
           updateScheduleList(activeDay);
           showToast("Jadwal diselesaikan!");
         }
@@ -428,6 +459,7 @@
         const item = list.find(x => x.id === id);
         if (item) {
           item.status = "cancelled";
+          saveSchedules();
           updateScheduleList(activeDay);
           showToast("Jadwal dibatalkan!");
         }
@@ -439,6 +471,7 @@
         const index = list.findIndex(x => x.id === id);
         if (index > -1) {
           list.splice(index, 1);
+          saveSchedules();
           updateScheduleList(activeDay);
           showToast("Jadwal dihapus!");
         }
@@ -630,6 +663,7 @@
             time: timeStr,
             status: "pending"
           });
+          saveSchedules();
 
           hideModal();
 

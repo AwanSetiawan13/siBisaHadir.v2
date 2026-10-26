@@ -576,6 +576,7 @@
             <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
             <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
               <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
             </button>
             <div class="filter-dropdown-wrapper">
               <button id="btnFilterReport" class="small-action-button" type="button" aria-label="Filter">
@@ -1581,6 +1582,7 @@
         });
 
         window.addEventListener("resize", updatePinnedColumns);
+      }
 
       // Bulk Actions & Checkbox Handling
       const checkAllRows = document.getElementById("checkAllRows");
@@ -1627,6 +1629,16 @@
           if (e.target && e.target.classList.contains("row-select-checkbox")) {
             updateBulkActionsState();
           }
+        });
+      }
+
+      const btnBulkCancel = document.getElementById("btnBulkCancel");
+      if (btnBulkCancel) {
+        btnBulkCancel.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
         });
       }
 
@@ -1762,8 +1774,6 @@
             });
           }
         });
-      }
-
       }
 
       // Initial Setup

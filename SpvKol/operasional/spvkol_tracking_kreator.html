@@ -791,6 +791,7 @@
             <!-- Bulk Delete Button (Muncul jika ada baris dipilih) -->
             <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
               <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
             </button>
           </div>
 
@@ -1362,6 +1363,27 @@
       let currentFilterKategori = "";
       let currentFilterAktivitas = "";
       let currentFilterLeads = "";
+      let currentTrackingFiltered = [];
+
+      const TRACKING_HIDDEN_KEY = "bisa_tracking_kreator_hidden_v1";
+      function getHiddenTrackingIds() {
+        try {
+          const raw = localStorage.getItem(TRACKING_HIDDEN_KEY);
+          const parsed = raw ? JSON.parse(raw) : [];
+          return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+        } catch (e) {
+          return new Set();
+        }
+      }
+      function saveHiddenTrackingIds(ids) {
+        try {
+          localStorage.setItem(TRACKING_HIDDEN_KEY, JSON.stringify(Array.from(ids)));
+        } catch (e) {}
+      }
+      function isTrackingHidden(item, hiddenIds = getHiddenTrackingIds()) {
+        if (!item) return false;
+        return hiddenIds.has(String(item.id)) || hiddenIds.has(String(item.uid));
+      }
 
       function getCreatorActivityStatus(item) {
         if (!item) return "Tidak Aktif";
@@ -1389,8 +1411,9 @@
         let countTidakAktif = 0;
 
         kreatorDb = getKreatorDb();
+        const hiddenIds = getHiddenTrackingIds();
 
-        kreatorDb.forEach(k => {
+        kreatorDb.filter(k => !isTrackingHidden(k, hiddenIds)).forEach(k => {
           const akt = getCreatorActivityStatus(k).toLowerCase().trim();
           if (akt === "aktif konten & live" || (akt.includes("konten") && akt.includes("live"))) {
             countAktifKontenLive++;
@@ -1417,9 +1440,11 @@
       function getFilteredTrackingKreators(query = "") {
         window.getFilteredTrackingKreators = getFilteredTrackingKreators;
         kreatorDb = getKreatorDb();
-        const searchInput = document.getElementById("searchCampaignInput");
+        const searchInput = document.getElementById("searchKreatorInput");
         const q = (query !== undefined && query !== null ? query : (searchInput ? searchInput.value : "")).trim().toLowerCase();
+        const hiddenIds = getHiddenTrackingIds();
         return kreatorDb.filter(k => {
+          if (isTrackingHidden(k, hiddenIds)) return false;
           const aktStatus = getCreatorActivityStatus(k);
           if (q) {
             const allKats = [k.kategori, k.kategori1, k.kategori2, k.kategori3].filter(Boolean).join(" ").toLowerCase();
@@ -1455,11 +1480,12 @@
         updateTrackingMetrics();
 
         const filtered = getFilteredTrackingKreators(query);
+        currentTrackingFiltered = filtered;
 
         const tableWrapper = document.getElementById("tableContainerWrapper");
         const emptyTableState = document.getElementById("emptyTableState");
 
-        if (kreatorDb.length === 0) {
+        if (kreatorDb.filter(k => !isTrackingHidden(k)).length === 0) {
           if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
           if (emptyTableState) emptyTableState.style.setProperty("display", "flex", "important");
           return;
@@ -1530,7 +1556,7 @@
 
           row.innerHTML = `
             <td style="text-align: center; vertical-align: middle;">
-              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id || item.uid || ''}" data-index="${index}" value="${item.id || item.uid || ''}" />
             </td>
             <td>${index + 1}</td>
             <td style="font-weight: 600; color: #1e293b;">${item.uid || "-"}</td>
@@ -1629,6 +1655,7 @@
       // Dataset Performa Kreator
       function getPerformaDb() {
         const PERFORMA_KEYS = [
+          "bisa_performa_kreator_list_v7",
           "bisa_performa_kreator_list_v6",
           "bisa_performa_kreator_list_v5",
           "bisa_performa_kreator_list_v4",
@@ -2038,7 +2065,7 @@
         const currentVal = katSelect.value;
         let catList = [];
         try {
-          const saved = localStorage.getItem("bisa_kategori_kreator_list_v5");
+          const saved = localStorage.getItem("spv_kategori_produk_v1") || localStorage.getItem("bisa_kategori_produk_list_v5") || localStorage.getItem("bisa_kategori_kreator_list_v5");
           if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -2069,7 +2096,7 @@
         const currentVal = leadsSelect.value;
         let leadsList = [];
         try {
-          const saved = localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v7") || localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
           if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -2421,15 +2448,14 @@
             customClass: { popup: 'swal2-bisa-popup' }
           }).then((result) => {
             if (result.isConfirmed) {
-              kreatorDb = getKreatorDb().filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
-              try {
-                localStorage.setItem(KREATOR_STORAGE_KEYS[0], JSON.stringify(kreatorDb));
-              } catch(e) {}
+              const hiddenIds = getHiddenTrackingIds();
+              selectedIds.forEach(id => hiddenIds.add(String(id)));
+              saveHiddenTrackingIds(hiddenIds);
               renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
               Swal.fire({
                 icon: 'success',
                 title: 'Berhasil Dihapus',
-                text: `${selectedIds.size} data tracking kreator berhasil dihapus.`,
+                text: `${selectedIds.size} data tracking kreator berhasil dihapus. Data master kreator tetap aman.`,
                 timer: 1800,
                 showConfirmButton: false,
                 customClass: { popup: 'swal2-bisa-popup' }
@@ -2437,14 +2463,23 @@
             }
           });
         } else {
-          if (confirm(`Hapus ${selectedIds.size} data tracking kreator?`)) {
-            kreatorDb = getKreatorDb().filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
-            try {
-              localStorage.setItem(KREATOR_STORAGE_KEYS[0], JSON.stringify(kreatorDb));
-            } catch(e) {}
+          if (confirm(`Hapus ${selectedIds.size} data tracking kreator? Data master kreator tidak akan dihapus.`)) {
+            const hiddenIds = getHiddenTrackingIds();
+            selectedIds.forEach(id => hiddenIds.add(String(id)));
+            saveHiddenTrackingIds(hiddenIds);
             renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
           }
         }
+      }
+
+      const btnBulkCancelEl = document.getElementById("btnBulkCancel");
+      if (btnBulkCancelEl) {
+        btnBulkCancelEl.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
       }
 
       const btnBulkDeleteEl = document.getElementById("btnBulkDelete");
@@ -2456,14 +2491,13 @@
       async function handleExportTrackingKreator() {
         try {
           const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
-          let exportRows = (typeof getFilteredTrackingKreators === "function")
-            ? getFilteredTrackingKreators()
-            : ((typeof getKreatorDb === "function") ? getKreatorDb() : []);
-
+          let exportRows = Array.isArray(currentTrackingFiltered) ? currentTrackingFiltered.slice() : [];
           const isPartialExport = checkedBoxes.length > 0;
           if (isPartialExport) {
-            const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
-            exportRows = exportRows.filter(item => selectedIds.has(String(item.id)) || selectedIds.has(String(item.uid)));
+            const selectedIndexes = checkedBoxes
+              .map(cb => Number(cb.dataset.index))
+              .filter(idx => Number.isInteger(idx) && idx >= 0);
+            exportRows = selectedIndexes.map(idx => exportRows[idx]).filter(Boolean);
           }
 
           if (!exportRows || exportRows.length === 0) {

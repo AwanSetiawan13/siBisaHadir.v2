@@ -412,24 +412,59 @@
       transform: scale(1);
     }
 
-    /* Fixed/Pinned Left Columns */
-    .campaign-table th:first-child,
-    .campaign-table td:first-child {
+    /* Fixed/Pinned Left Columns: Checkbox & # (Nomor Urut) */
+    .campaign-table th:nth-child(1),
+    .campaign-table td:nth-child(1) {
       position: sticky;
       left: 0;
-      z-index: 11;
+      z-index: 13;
       background: #f8fafc;
       text-align: center;
-      min-width: 44px;
-      max-width: 48px;
+      width: 42px;
+      min-width: 42px;
+      max-width: 42px;
+      box-sizing: border-box;
     }
 
-    .campaign-table td:first-child {
+    .campaign-table td:nth-child(1) {
       background: #ffffff;
+      z-index: 12;
     }
 
-    .campaign-table tr:hover td:first-child {
+    .campaign-table tr:hover td:nth-child(1) {
       background: #f8fafc;
+    }
+
+    /* Fixed Kolom Angka / Nomor Urut (#) */
+    .campaign-table th:nth-child(2),
+    .campaign-table td:nth-child(2) {
+      position: sticky;
+      left: 42px;
+      z-index: 12;
+      background: #f8fafc;
+      text-align: center;
+      width: 48px;
+      min-width: 48px;
+      max-width: 48px;
+      box-sizing: border-box;
+    }
+
+    .campaign-table td:nth-child(2) {
+      background: #ffffff;
+      color: #64748b;
+      z-index: 11;
+    }
+
+    .campaign-table tr:hover td:nth-child(2) {
+      background: #f8fafc;
+    }
+
+    .campaign-table td[colspan] {
+      position: static !important;
+      left: auto !important;
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: none !important;
     }
 
     .campaign-table th.col-pinned-sticky {
@@ -559,6 +594,7 @@
             <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
             <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
               <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
             </button>
 
             <!-- Blue Filter Button -->
@@ -670,7 +706,11 @@
             </div>
           </div>
 
-          <div class="campaign-toolbar__right"></div>
+          <div class="campaign-toolbar__right">
+            <button id="btnTambahPerforma" class="btn-tambah" style="margin-right: 14px;" type="button">
+              + Tambah
+            </button>
+          </div>
         </div>
 
         <!-- Empty State Container (Sesuai Referensi Pengguna) -->
@@ -1238,6 +1278,7 @@
       ];
 
       let performaDb = DEFAULT_PERFORMA;
+      let currentFilteredPerforma = [];
       try {
         const saved = localStorage.getItem(PERFORMA_STORAGE_KEY);
         if (saved) {
@@ -1323,6 +1364,36 @@
         });
       }
 
+      function getFilteredPerformaData() {
+        const valUser = selUser ? selUser.value : "Semua";
+        const valKomisi = selKomisi ? selKomisi.value : "Semua";
+        const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
+        return performaDb.filter(item => {
+          const matchUser = (valUser === "Semua" || item.username === valUser);
+          let matchKomisi = true;
+          if (valKomisi === "Ada Komisi") {
+            matchKomisi = (item.komisi !== "Rp 0" && item.komisi !== "");
+          } else if (valKomisi === "Tidak Ada") {
+            matchKomisi = (item.komisi === "Rp 0" || item.komisi === "");
+          }
+          let matchSearch = true;
+          if (searchQuery) {
+            matchSearch = (item.username && item.username.toLowerCase().includes(searchQuery)) ||
+              (item.uid && item.uid.toLowerCase().includes(searchQuery)) ||
+              (item.tanggal && item.tanggal.toLowerCase().includes(searchQuery));
+          }
+          let matchDate = true;
+          if (activeStartDate || activeEndDate) {
+            const itemDate = parseDMY(item.tanggal);
+            if (itemDate) {
+              if (activeStartDate && itemDate < activeStartDate) matchDate = false;
+              if (activeEndDate && itemDate > activeEndDate) matchDate = false;
+            }
+          }
+          return matchUser && matchKomisi && matchSearch && matchDate;
+        });
+      }
+
       function renderPerformaTable() {
         if (!tableBody) return;
         tableBody.innerHTML = "";
@@ -1385,30 +1456,8 @@
           else btnCalendar.classList.remove("btn-calendar-active");
         }
 
-        const filtered = performaDb.filter(item => {
-          const matchUser = (valUser === "Semua" || item.username === valUser);
-          let matchKomisi = true;
-          if (valKomisi === "Ada Komisi") {
-            matchKomisi = (item.komisi !== "Rp 0" && item.komisi !== "");
-          } else if (valKomisi === "Tidak Ada") {
-            matchKomisi = (item.komisi === "Rp 0" || item.komisi === "");
-          }
-          let matchSearch = true;
-          if (searchQuery) {
-            matchSearch = (item.username && item.username.toLowerCase().includes(searchQuery)) ||
-              (item.uid && item.uid.toLowerCase().includes(searchQuery)) ||
-              (item.tanggal && item.tanggal.toLowerCase().includes(searchQuery));
-          }
-          let matchDate = true;
-          if (activeStartDate || activeEndDate) {
-            const itemDate = parseDMY(item.tanggal);
-            if (itemDate) {
-              if (activeStartDate && itemDate < activeStartDate) matchDate = false;
-              if (activeEndDate && itemDate > activeEndDate) matchDate = false;
-            }
-          }
-          return matchUser && matchKomisi && matchSearch && matchDate;
-        });
+        const filtered = getFilteredPerformaData();
+        currentFilteredPerforma = filtered;
 
         if (filtered.length === 0) {
           tableBody.innerHTML = `
@@ -1425,7 +1474,7 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td style="text-align: center; vertical-align: middle;">
-              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id || item.uid || ''}" data-index="${index}" value="${item.id || item.uid || ''}" />
             </td>
             <td>${index + 1}</td>
             <td>${item.tanggal || "-"}</td>
@@ -1498,11 +1547,20 @@
           { key: "username", colIdx: 4 }
         ];
 
-        // Column 0 (checkbox) and Column 1 (#) width
+        // Ensure Col 0 (checkbox) and Col 1 (#) are properly aligned & fixed
         const thCol0 = table.querySelector("thead tr th:nth-child(1)");
         const thCol1 = table.querySelector("thead tr th:nth-child(2)");
-        let currentLeft = (thCol0 ? thCol0.getBoundingClientRect().width : 40) +
-                          (thCol1 ? thCol1.getBoundingClientRect().width : 46);
+        const col0Width = thCol0 ? Math.round(thCol0.getBoundingClientRect().width) : 42;
+        const col1Width = thCol1 ? Math.round(thCol1.getBoundingClientRect().width) : 48;
+
+        if (thCol1) {
+          thCol1.style.left = col0Width + "px";
+        }
+        table.querySelectorAll("tbody tr td:nth-child(2)").forEach(td => {
+          td.style.left = col0Width + "px";
+        });
+
+        let currentLeft = col0Width + col1Width;
 
         colConfig.forEach(cfg => {
           const chk = document.querySelector(`.chk-pin-col[data-col="${cfg.key}"]`);
@@ -1544,6 +1602,12 @@
             if (pinnedTds.length > 0) {
               pinnedTds[pinnedTds.length - 1].classList.add("col-pinned-last");
             }
+          });
+        } else {
+          // If no custom columns are pinned, the # column acts as the last fixed column with shadow divider
+          if (thCol1) thCol1.classList.add("col-pinned-last");
+          table.querySelectorAll("tbody tr td:nth-child(2)").forEach(td => {
+            td.classList.add("col-pinned-last");
           });
         }
       }
@@ -1613,6 +1677,16 @@
         });
       }
 
+      const btnBulkCancel = document.getElementById("btnBulkCancel");
+      if (btnBulkCancel) {
+        btnBulkCancel.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
+      }
+
       if (btnBulkDelete) {
         btnBulkDelete.addEventListener("click", function () {
           const selectedIds = getSelectedRowIds();
@@ -1635,7 +1709,7 @@
               performaDb = performaDb.filter(t => !selectedIds.includes(String(t.id)));
               savePerformaDb();
               populateUserFilter();
-              renderTable();
+              renderPerformaTable();
               Swal.fire({
                 icon: 'success',
                 title: 'Berhasil Dihapus!',
@@ -2102,6 +2176,8 @@
       const btnExportExcel = document.getElementById("btnExportExcel");
       if (btnExportExcel) {
         btnExportExcel.addEventListener("click", () => {
+          const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+          const isPartialExport = checkedBoxes.length > 0;
           if (!performaDb || performaDb.length === 0) {
             if (typeof Swal !== "undefined") {
               Swal.fire({
@@ -2116,35 +2192,13 @@
             return;
           }
 
-          let exportList = performaDb;
-          const valUser = selUser ? selUser.value : "Semua";
-          const valKomisi = selKomisi ? selKomisi.value : "Semua";
-          const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
-          if (valUser !== "Semua" || valKomisi !== "Semua" || query || activeStartDate || activeEndDate) {
-            exportList = performaDb.filter(item => {
-              const matchUser = (valUser === "Semua" || item.username === valUser);
-              let matchKomisi = true;
-              if (valKomisi === "Ada Komisi") {
-                matchKomisi = (item.komisi !== "Rp 0" && item.komisi !== "");
-              } else if (valKomisi === "Tidak Ada") {
-                matchKomisi = (item.komisi === "Rp 0" || item.komisi === "");
-              }
-              let matchSearch = true;
-              if (query) {
-                matchSearch = (item.username && item.username.toLowerCase().includes(query)) ||
-                  (item.uid && item.uid.toLowerCase().includes(query)) ||
-                  (item.tanggal && item.tanggal.toLowerCase().includes(query));
-              }
-              let matchDate = true;
-              if (activeStartDate || activeEndDate) {
-                const itemDate = parseDMY(item.tanggal);
-                if (itemDate) {
-                  if (activeStartDate && itemDate < activeStartDate) matchDate = false;
-                  if (activeEndDate && itemDate > activeEndDate) matchDate = false;
-                }
-              }
-              return matchUser && matchKomisi && matchSearch && matchDate;
-            });
+          let exportList = Array.isArray(currentFilteredPerforma) ? currentFilteredPerforma.slice() : [];
+
+          if (isPartialExport) {
+            const selectedIndexes = checkedBoxes
+              .map(cb => Number(cb.dataset.index))
+              .filter(idx => Number.isInteger(idx) && idx >= 0);
+            exportList = selectedIndexes.map(idx => exportList[idx]).filter(Boolean);
           }
 
           const headers = [
@@ -2193,8 +2247,8 @@
           const todayStr = new Date().toISOString().split("T")[0];
           if (typeof exportBisaExcel === 'function') {
             exportBisaExcel({
-              title: "PERFORMA KREATOR",
-              filename: `performa_kreator_${todayStr}.xlsx`,
+              title: isPartialExport ? `PERFORMA KREATOR (${exportList.length} DATA PILIHAN)` : "PERFORMA KREATOR",
+              filename: isPartialExport ? `performa_kreator_pilihan_${todayStr}.xlsx` : `performa_kreator_${todayStr}.xlsx`,
               sheetName: "Performa Kreator",
               headers: headers,
               rows: rows
@@ -2203,7 +2257,9 @@
               Swal.fire({
                 icon: 'success',
                 title: 'Export Berhasil!',
-                text: 'Data performa kreator berhasil diekspor ke Excel (.xlsx) dengan tabel rapi.',
+                text: isPartialExport
+                  ? `${exportList.length} data performa kreator pilihan berhasil diekspor ke Excel (.xlsx) dengan tabel rapi.`
+                  : 'Data performa kreator berhasil diekspor ke Excel (.xlsx) dengan tabel rapi.',
                 confirmButtonColor: '#29A3D8',
                 confirmButtonText: 'Selesai',
                 timer: 2000,
@@ -2217,7 +2273,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", `data_performa_kreator_${todayStr}.csv`);
+            link.setAttribute("download", isPartialExport ? `data_performa_kreator_pilihan_${todayStr}.csv` : `data_performa_kreator_${todayStr}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

@@ -767,6 +767,7 @@
             <!-- Bulk Delete Button (Muncul jika ada baris dipilih) -->
             <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
               <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
             </button>
           </div>
 
@@ -1142,10 +1143,7 @@
             style="background-color: #f8fafc; cursor: default;" />
         </div>
         <div class="form-group col-6">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <label class="form-label" style="margin: 0;">Status</label>
-              <button type="button" id="btnStatusBerhenti" onclick="promptBerhenti()" style="display: none; padding: 2px 8px; font-size: 11px; font-weight: 600; cursor: pointer; color: #ef4444; background: #fee2e2; border: 1px solid #fecaca; border-radius: 4px;">Berhenti</button>
-            </div>
+          <label class="form-label">Status</label>
           <input type="text" id="viewKreatorStatusInput" class="form-input" readonly
             style="background-color: #f8fafc; cursor: default;" />
         </div>
@@ -1597,6 +1595,7 @@
 
         // Check if creator is currently active/running in any campaign under this category
         const CAMPAIGN_STORAGE_KEYS = [
+          "bisa_campaign_list_v14",
           "bisa_campaign_list_v13",
           "bisa_campaign_list_v12",
           "bisa_campaign_list_v11",
@@ -1812,7 +1811,7 @@
 
         let leadsList = [];
         try {
-          const saved = localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v7") || localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
           if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -2200,7 +2199,7 @@
 
         // Also check if creator is assigned to any campaigns with another category
         try {
-          const campSaved = localStorage.getItem("bisa_campaign_list_v1");
+          const campSaved = localStorage.getItem("bisa_campaign_list_v14") || localStorage.getItem("bisa_campaign_list_v13") || localStorage.getItem("bisa_campaign_list_v12") || localStorage.getItem("bisa_campaign_list_v11") || localStorage.getItem("bisa_campaign_list_v1");
           if (campSaved) {
             const campList = JSON.parse(campSaved);
             if (Array.isArray(campList)) {
@@ -2661,7 +2660,7 @@
               }
 
               try {
-                const campSaved = localStorage.getItem("bisa_campaign_list_v1");
+                const campSaved = localStorage.getItem("bisa_campaign_list_v14") || localStorage.getItem("bisa_campaign_list_v13") || localStorage.getItem("bisa_campaign_list_v12") || localStorage.getItem("bisa_campaign_list_v11") || localStorage.getItem("bisa_campaign_list_v1");
                 if (campSaved) {
                   const campList = JSON.parse(campSaved);
                   if (Array.isArray(campList)) {
@@ -3941,6 +3940,16 @@
             renderKreatorTable(searchKreatorInput ? searchKreatorInput.value : "");
           }
         }
+      }
+
+      const btnBulkCancelEl = document.getElementById("btnBulkCancel");
+      if (btnBulkCancelEl) {
+        btnBulkCancelEl.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
       }
 
       const btnBulkDeleteEl = document.getElementById("btnBulkDelete");

@@ -787,6 +787,7 @@
             <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
             <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
               <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
             </button>
 
             <!-- 2. Filter Dropdown & Popover -->
@@ -1531,10 +1532,20 @@
       // Auto-sync samples added to creators in campaigns into tracking data
       function syncFromCampaignDatabase() {
         try {
-          const campRaw = localStorage.getItem("bisa_campaign_list_v14") || getItem("bisa_campaign_list_v13") || localStorage.getItem("bisa_campaign_list_v12") || localStorage.getItem("bisa_campaign_list_v11");
-          if (!campRaw) return;
-          const campaigns = JSON.parse(campRaw);
-          if (!Array.isArray(campaigns)) return;
+          let campaigns = [];
+          const campaignKeys = ["bisa_campaign_list_v14", "bisa_campaign_list_v13", "bisa_campaign_list_v12", "bisa_campaign_list_v11"];
+          for (const key of campaignKeys) {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            try {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                campaigns = parsed;
+                break;
+              }
+            } catch (err) {}
+          }
+          if (campaigns.length === 0) return;
 
           let hasChanges = false;
           const now = new Date();
@@ -2477,6 +2488,16 @@
         });
       }
 
+      const btnBulkCancel = document.getElementById("btnBulkCancel");
+      if (btnBulkCancel) {
+        btnBulkCancel.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
+      }
+
       if (btnBulkDelete) {
         btnBulkDelete.addEventListener("click", function () {
           const selectedIds = getSelectedRowIds();
@@ -2825,7 +2846,13 @@
       const btnExportExcel = document.getElementById("btnExportExcel");
       if (btnExportExcel) {
         btnExportExcel.addEventListener("click", () => {
-          const exportRows = getFilteredData();
+          const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+          const isPartialExport = checkedBoxes.length > 0;
+          let exportRows = getFilteredData();
+          if (isPartialExport) {
+            const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
+            exportRows = exportRows.filter(item => selectedIds.has(String(item.id)));
+          }
           if (!exportRows || exportRows.length === 0) {
             if (typeof Swal !== "undefined") {
               Swal.fire({
@@ -2865,24 +2892,34 @@
           const todayStr = new Date().toISOString().split("T")[0];
           if (typeof exportBisaExcel === 'function') {
             exportBisaExcel({
-              title: "TRACKING SAMPEL",
-              filename: `data_tracking_sampel_${todayStr}.xlsx`,
+              title: isPartialExport ? `TRACKING SAMPEL (${exportRows.length} DATA PILIHAN)` : "TRACKING SAMPEL",
+              filename: isPartialExport ? `data_tracking_sampel_pilihan_${todayStr}.xlsx` : `data_tracking_sampel_${todayStr}.xlsx`,
               sheetName: "Tracking Sampel",
               headers: headers,
               rows: rows
             });
-            showToast("Data Tracking Sampel berhasil diexport ke Excel (.xlsx)", "success");
+            showToast(
+              isPartialExport
+                ? `${exportRows.length} data tracking sampel pilihan berhasil diexport ke Excel (.xlsx)`
+                : "Data Tracking Sampel berhasil diexport ke Excel (.xlsx)",
+              "success"
+            );
           } else {
             const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","))].join("\r\n");
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", `data_tracking_sampel_${todayStr}.csv`);
+            link.setAttribute("download", isPartialExport ? `data_tracking_sampel_pilihan_${todayStr}.csv` : `data_tracking_sampel_${todayStr}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast("Data Tracking Sampel berhasil diexport ke Excel", "success");
+            showToast(
+              isPartialExport
+                ? `${exportRows.length} data tracking sampel pilihan berhasil diexport`
+                : "Data Tracking Sampel berhasil diexport ke Excel",
+              "success"
+            );
           }
         });
       }

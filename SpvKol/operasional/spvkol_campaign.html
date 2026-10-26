@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -1428,6 +1428,7 @@
             <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
             <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
               <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
             </button>
 
             <!-- Filter Dropdown & Popover -->
@@ -2572,6 +2573,24 @@
     </div>
   </div>
 
+  <!-- Modal Riwayat Campaign -->
+  <div id="campaignHistoryModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 980px; width: 94%; padding: 24px 28px; border-radius: 12px; background: #fff;">
+      <div class="modal-header">
+        <h2 class="modal-title">Riwayat <span style="font-weight: 900; font-style: italic;">CAMPAIGN</span></h2>
+        <button class="modal-close" type="button" id="closeCampaignHistoryModal" aria-label="Tutup popup">&times;</button>
+      </div>
+      <div class="modal-divider"></div>
+      <div style="display: grid; grid-template-columns: 1.4fr 1.3fr 1fr 1.3fr; gap: 16px; padding: 0 0 12px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
+        <div>Nama Kreator</div>
+        <div>Nama Sampel</div>
+        <div>Status Sampel</div>
+        <div>Keterangan</div>
+      </div>
+      <div id="campaignHistoryRowsContainer" style="display: flex; flex-direction: column; gap: 14px; max-height: 55vh; overflow-y: auto; padding-right: 4px;"></div>
+    </div>
+  </div>
+
   <!-- Modal PopUp Keluarkan Kreator (Wajib Keterangan) -->
   <div id="modalKeluarkanKreator" class="modal-overlay">
     <div class="modal-box modal-box--small" style="max-width: 460px; width: 92%; padding: 24px 28px; border-radius: 12px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.18);">
@@ -3424,7 +3443,12 @@
           for (const key of keysToTry) {
             const saved = localStorage.getItem(key);
             if (saved) {
-              const parsed = JSON.parse(saved);
+              let parsed;
+              try {
+                parsed = JSON.parse(saved);
+              } catch (err) {
+                continue;
+              }
               if (Array.isArray(parsed) && parsed.length > 0) {
                 const mapped = parsed.map(k => {
                   const rawCategories = [];
@@ -4015,7 +4039,12 @@
           for (const key of kreatorStorageKeys) {
             const saved = localStorage.getItem(key);
             if (saved) {
-              let list = JSON.parse(saved);
+              let list;
+              try {
+                list = JSON.parse(saved);
+              } catch (err) {
+                continue;
+              }
               if (Array.isArray(list) && list.length > 0) {
                 let updated = false;
                 list.forEach(item => {
@@ -4082,10 +4111,23 @@
               matched.categories = existingCats;
               matched.category = existingCats[0] || newCategory;
 
-              let listToSave = [];
-              const savedV13 = localStorage.getItem("bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13") || localStorage.getItem("bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13", "bisa_kreator_list_v12");
-              if (savedV13) {
-                try { listToSave = JSON.parse(savedV13); } catch (e) {}
+              let listToSave = null;
+              const kreatorKeys = [
+                "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18",
+                "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14",
+                "bisa_kreator_list_v13", "bisa_kreator_list_v12", "bisa_kreator_list_v11", "bisa_kreator_list_v10",
+                "bisa_kreator_list_v9", "bisa_kreator_list_v8", "bisa_kreator_list_v7", "bisa_kreator_list"
+              ];
+              for (const key of kreatorKeys) {
+                const raw = localStorage.getItem(key);
+                if (!raw) continue;
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    listToSave = parsed;
+                    break;
+                  }
+                } catch (e) {}
               }
               if (!Array.isArray(listToSave) || listToSave.length === 0) {
                 listToSave = allCurrent.map(k => {
@@ -4166,7 +4208,7 @@
                   });
                 }
               }
-              localStorage.setItem("bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13", JSON.stringify(listToSave));
+              localStorage.setItem("bisa_kreator_list_v21", JSON.stringify(listToSave));
             }
           }
 
@@ -4268,7 +4310,12 @@
           for (const key of kreatorStorageKeys) {
             const saved = localStorage.getItem(key);
             if (saved) {
-              let list = JSON.parse(saved);
+              let list;
+              try {
+                list = JSON.parse(saved);
+              } catch (err) {
+                continue;
+              }
               if (Array.isArray(list) && list.length > 0) {
                 let updated = false;
                 list.forEach(item => {
@@ -5437,7 +5484,12 @@
             for (const key of kreatorStorageKeys) {
               const savedKreators = localStorage.getItem(key);
               if (savedKreators) {
-                const parsedList = JSON.parse(savedKreators);
+                let parsedList;
+                try {
+                  parsedList = JSON.parse(savedKreators);
+                } catch (err) {
+                  continue;
+                }
                 if (Array.isArray(parsedList) && parsedList.length > 0) {
                   let updated = false;
                   parsedList.forEach(item => {
@@ -6843,6 +6895,16 @@
         });
       }
 
+      const btnBulkCancel = document.getElementById("btnBulkCancel");
+      if (btnBulkCancel) {
+        btnBulkCancel.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
+      }
+
       if (btnBulkDelete) {
         btnBulkDelete.addEventListener("click", function () {
           const selectedIds = getSelectedRowIds();
@@ -6893,15 +6955,33 @@
         });
       }
 
+      const campaignHistoryModalEl = document.getElementById("campaignHistoryModal");
+      const closeCampaignHistoryBtn = document.getElementById("closeCampaignHistoryModal");
+      if (closeCampaignHistoryBtn && campaignHistoryModalEl) {
+        closeCampaignHistoryBtn.addEventListener("click", () => campaignHistoryModalEl.classList.remove("is-active"));
+      }
+      if (campaignHistoryModalEl) {
+        campaignHistoryModalEl.addEventListener("click", (e) => {
+          if (e.target === campaignHistoryModalEl) campaignHistoryModalEl.classList.remove("is-active");
+        });
+      }
+
       function syncCampaignSamplesToTracking(campaign) {
         if (!campaign) return;
-        const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v11";
+        const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v13";
         let trackingList = [];
         try {
-          const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) trackingList = parsed;
+          const trackingKeys = [TRACKING_STORAGE_KEY, "bisa_tracking_sampel_list_v12", "bisa_tracking_sampel_list_v11"];
+          for (const key of trackingKeys) {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            try {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) {
+                trackingList = parsed;
+                break;
+              }
+            } catch (err) {}
           }
         } catch (e) {
           console.error("Error reading tracking data for sync:", e);
@@ -6962,7 +7042,7 @@
             if (existingIdx === -1) {
               let maxNum = 0;
               trackingList.forEach(t => {
-                if (t.id && t.id.startsWith("TRK-")) {
+                if (t.id && String(t.id).startsWith("TRK-")) {
                   const num = parseInt(t.id.replace("TRK-", ""), 10);
                   if (!isNaN(num) && num > maxNum) maxNum = num;
                 }
@@ -7298,6 +7378,8 @@
       const btnExportExcel = document.getElementById("btnExportExcel");
       if (btnExportExcel) {
         btnExportExcel.addEventListener("click", () => {
+          const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+          const isPartialExport = checkedBoxes.length > 0;
           if (!campaignDb || campaignDb.length === 0) {
             if (typeof Swal !== "undefined") {
               Swal.fire({
@@ -7358,6 +7440,11 @@
             });
           }
 
+          if (isPartialExport) {
+            const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
+            exportList = exportList.filter(item => selectedIds.has(String(item.id)));
+          }
+
           const headers = [
             "No", "ID Campaign", "Brand/Seller", "Kategori", "PIC", "Kreator",
             "Jenis Campaign", "Tanggal Mulai", "Tanggal Selesai", "Status Campaign",
@@ -7388,31 +7475,40 @@
           const todayStr = new Date().toISOString().slice(0, 10);
           if (typeof exportBisaExcel === 'function') {
             exportBisaExcel({
-              title: "DATA CAMPAIGN",
-              filename: `data_campaign_${todayStr}.xlsx`,
+              title: isPartialExport ? `DATA CAMPAIGN (${exportList.length} DATA PILIHAN)` : "DATA CAMPAIGN",
+              filename: isPartialExport ? `data_campaign_pilihan_${todayStr}.xlsx` : `data_campaign_${todayStr}.xlsx`,
               sheetName: "Campaign",
               headers: headers,
               rows: rows
             });
-            showToast("Data campaign berhasil diekspor ke Excel (.xlsx)", "success");
+            showToast(
+              isPartialExport
+                ? `${exportList.length} data campaign pilihan berhasil diekspor ke Excel (.xlsx)`
+                : "Data campaign berhasil diekspor ke Excel (.xlsx)",
+              "success"
+            );
           } else {
             const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))].join("\n");
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const csvName = isPartialExport ? `data_campaign_pilihan_${todayStr}.csv` : `data_campaign_${todayStr}.csv`;
           if (typeof window.downloadBlobSafely === 'function') {
-            window.downloadBlobSafely(blob, `data_campaign_${todayStr}.csv`);
+            window.downloadBlobSafely(blob, csvName);
           } else {
             const reader = new FileReader();
             reader.onloadend = function() {
               const link = document.createElement("a");
               link.href = reader.result;
-              link.download = `data_campaign_${todayStr}.csv`;
+              link.download = csvName;
               document.body.appendChild(link);
               link.click();
               setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1500);
             };
             reader.readAsDataURL(blob);
           }
-            showToast("Data berhasil diekspor", "success");
+            showToast(
+              isPartialExport ? `${exportList.length} data campaign pilihan berhasil diekspor` : "Data berhasil diekspor",
+              "success"
+            );
           }
         });
       }
