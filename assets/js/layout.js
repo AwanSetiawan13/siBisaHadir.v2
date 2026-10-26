@@ -109,7 +109,7 @@
     ],
     spv_kol: [
       { type: 'heading', label: 'Menu Utama' },
-      { type: 'item', label: 'Dashboard', icon: 'home', link: 'SpvKol/spvkol_dashboard.html' },
+      { type: 'item', label: 'Beranda SPVKOL', icon: 'home', link: 'SpvKol/spvkol_dashboard.html' },
       { type: 'item', label: 'Kalender', icon: 'calendar', link: 'SpvKol/spvkol_kalender.html' },
 
       { type: 'heading', label: 'Operasional KOL' },
@@ -383,13 +383,13 @@
   };
   const portalLabels = {
     admin: 'Beranda Admin',
-    spv_kol: 'Beranda SPV KOL',
+    spv_kol: 'Beranda SPVKOL',
     staff_kol: 'Beranda Staff KOL'
   };
 
   const currentUserName = localStorage.getItem('user_name') || roleDisplayNames[role] || 'Rayi';
-  const currentPortalLabel = portalLabels[role] || 'Beranda SPV KOL';
-  const currentRoleLabel = localStorage.getItem('user_display_role') || (role === 'staff_kol' ? 'Staff KOL' : role === 'admin' ? 'Admin' : 'SPV KOL');
+  const currentPortalLabel = portalLabels[role] || 'Beranda SPVKOL';
+  const currentRoleLabel = localStorage.getItem('user_display_role') || (role === 'staff_kol' ? 'Staff KOL' : role === 'admin' ? 'Admin' : 'SPVKOL');
   const rawAvatar = localStorage.getItem('user_avatar');
   const currentAvatar = (rawAvatar && !rawAvatar.includes('undefined'))
     ? (rawAvatar.startsWith('http') ? rawAvatar : rootPrefix + rawAvatar.replace(/^\/+/, ''))
@@ -1141,7 +1141,7 @@
     topbarEl.classList.add('hirezy-topbar');
 
     const spvTitles = {
-      'spvkol_dashboard.html': 'Dashboard',
+      'spvkol_dashboard.html': 'Beranda SPVKOL',
       'spvkol_kalender.html': 'Kalender',
       'spvkol_kehadiran.html': 'Kehadiran',
       'spvkol_presensi_istirahat.html': 'Presensi Istirahat',
