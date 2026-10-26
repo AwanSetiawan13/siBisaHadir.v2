@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -55,6 +55,44 @@
     }
     .btn-tambah-blue:hover {
       background-color: #1e87b7;
+    }
+
+    #karyawanOptions {
+      max-height: 320px;
+    }
+    .karyawan-dropdown-tools {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px 10px 8px;
+      margin-bottom: 4px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+    }
+    .karyawan-search-input,
+    .karyawan-divisi-select {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 12.5px;
+      border: 1px solid #c5c5c8;
+      border-radius: 5px;
+      font-family: inherit;
+      color: #333;
+      background: #fff;
+    }
+    .karyawan-search-input:focus,
+    .karyawan-divisi-select:focus {
+      outline: none;
+      border-color: #29A3D8;
+    }
+    .karyawan-empty-filter {
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: #94a3b8;
+      font-style: italic;
     }
   </style>
 
@@ -168,6 +206,18 @@
         </div>
 
         <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Karyawan</label>
+          <div class="dropdown-select-checkbox">
+            <div class="dropdown-select-trigger" onclick="toggleDropdownChecklist(this)">
+              <span class="dropdown-select-label">Pilih Karyawan</span>
+              <span class="dropdown-select-arrow">&#9662;</span>
+            </div>
+            <div class="dropdown-select-options" id="karyawanOptions"></div>
+            <input type="hidden" id="inputKaryawan" />
+          </div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
           <label class="form-label" style="font-weight: bold;">Lampiran</label>
           <input type="file" id="inputLampiran" class="form-input" style="padding: 4px;" />
         </div>
@@ -184,7 +234,7 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      /* ── LocalStorage Persistence & Default Demo Data ── */
+      /* Ã¢â€â‚¬Ã¢â€â‚¬ LocalStorage Persistence & Default Demo Data Ã¢â€â‚¬Ã¢â€â‚¬ */
       const PENGADUAN_STORAGE_KEY = "bisa_pengaduan_data_v1";
       const PENGADUAN_RESET_KEY = "bisa_pengaduan_reset_v1";
 
@@ -243,6 +293,183 @@
       const btnTambah = document.getElementById("btnTambahPengaduan");
       const btnClose = document.getElementById("closePengaduanModal");
       const btnBatal = document.getElementById("btnBatal");
+      const karyawanOptions = document.getElementById("karyawanOptions");
+      const inputKaryawan = document.getElementById("inputKaryawan");
+      const karyawanLabel = karyawanOptions
+        ? karyawanOptions.closest(".dropdown-select-checkbox").querySelector(".dropdown-select-label")
+        : null;
+
+      const FALLBACK_KARYAWAN = ["Supervisi KOL", "Riva", "Sri", "Ahmad", "Fauzi"];
+
+      function readStorageArray(key) {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function getDivisiNameMap() {
+        const map = {};
+        readStorageArray("ceoDivisiV2").forEach((div) => {
+          const id = String(div?.id || "").trim();
+          if (id) map[id] = String(div?.name || "").trim();
+        });
+        return map;
+      }
+
+      function getEmployeeOptions() {
+        const divisiMap = getDivisiNameMap();
+        const rows = [];
+        const seen = new Set();
+
+        readStorageArray("ceoEmployeesV2").forEach((emp) => {
+          const name = String(emp?.name || emp?.employee_no || emp?.id || "").trim();
+          if (!name || seen.has(name)) return;
+          seen.add(name);
+
+          const divisiIds = Array.isArray(emp?.divisi_ids)
+            ? emp.divisi_ids
+            : [emp?.divisi_id].filter(Boolean);
+          let divisiList = divisiIds
+            .map((id) => divisiMap[String(id)] || "")
+            .filter(Boolean);
+          if (!divisiList.length && emp?.divisi) {
+            divisiList = String(emp.divisi).split(",").map((s) => s.trim()).filter(Boolean);
+          }
+
+          rows.push({ name, divisiList: Array.from(new Set(divisiList)) });
+        });
+
+        if (rows.length) return rows;
+        return FALLBACK_KARYAWAN.map((name) => ({ name, divisiList: [] }));
+      }
+
+      function renderKaryawanOptions() {
+        if (!karyawanOptions) return;
+        karyawanOptions.innerHTML = "";
+
+        const tools = document.createElement("div");
+        tools.className = "karyawan-dropdown-tools";
+
+        const search = document.createElement("input");
+        search.type = "text";
+        search.className = "karyawan-search-input";
+        search.placeholder = "Cari karyawan...";
+        search.setAttribute("autocomplete", "off");
+
+        const divisiSelect = document.createElement("select");
+        divisiSelect.className = "karyawan-divisi-select";
+
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "Semua Divisi";
+        divisiSelect.appendChild(allOption);
+
+        const list = document.createElement("div");
+        list.className = "karyawan-option-list";
+
+        const employees = getEmployeeOptions();
+        const divisiNames = Array.from(new Set(employees.flatMap((emp) => emp.divisiList)))
+          .sort((a, b) => a.localeCompare(b));
+
+        divisiNames.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          divisiSelect.appendChild(option);
+        });
+
+        employees.forEach((emp) => {
+          const label = document.createElement("label");
+          label.className = "dropdown-option-item karyawan-option";
+          label.dataset.name = emp.name.toLowerCase();
+          label.dataset.divisi = emp.divisiList.length ? `|${emp.divisiList.join("|")}|` : "|";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "karyawan-checkbox";
+          checkbox.value = emp.name;
+
+          const text = document.createElement("span");
+          text.textContent = emp.name;
+
+          label.appendChild(checkbox);
+          label.appendChild(text);
+          list.appendChild(label);
+        });
+
+        const emptyFilter = document.createElement("div");
+        emptyFilter.className = "karyawan-empty-filter";
+        emptyFilter.textContent = "Karyawan tidak ditemukan.";
+        emptyFilter.style.display = "none";
+        list.appendChild(emptyFilter);
+
+        function applyFilter() {
+          const keyword = search.value.trim().toLowerCase();
+          const selectedDivisi = divisiSelect.value;
+          let visibleCount = 0;
+
+          list.querySelectorAll(".karyawan-option").forEach((option) => {
+            const matchName = !keyword || option.dataset.name.includes(keyword);
+            const matchDivisi = !selectedDivisi || option.dataset.divisi.includes(`|${selectedDivisi}|`);
+            const visible = matchName && matchDivisi;
+            option.style.display = visible ? "" : "none";
+            if (visible) visibleCount += 1;
+          });
+
+          emptyFilter.style.display = visibleCount ? "none" : "block";
+        }
+
+        search.addEventListener("input", applyFilter);
+        search.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") e.preventDefault();
+        });
+        divisiSelect.addEventListener("change", applyFilter);
+
+        tools.appendChild(search);
+        tools.appendChild(divisiSelect);
+        karyawanOptions.appendChild(tools);
+        karyawanOptions.appendChild(list);
+      }
+
+      function updateKaryawanLabel() {
+        if (!karyawanOptions) return;
+        const selected = Array.from(karyawanOptions.querySelectorAll(".karyawan-checkbox"))
+          .filter((cb) => cb.checked)
+          .map((cb) => cb.value);
+        if (karyawanLabel) {
+          karyawanLabel.textContent = selected.length ? selected.join(", ") : "Pilih Karyawan";
+        }
+        if (inputKaryawan) inputKaryawan.value = selected.join(", ");
+      }
+
+      function resetKaryawanDropdown() {
+        if (!karyawanOptions) return;
+        karyawanOptions.querySelectorAll(".karyawan-checkbox").forEach((cb) => {
+          cb.checked = false;
+        });
+
+        const search = karyawanOptions.querySelector(".karyawan-search-input");
+        if (search) search.value = "";
+        const divisiSelect = karyawanOptions.querySelector(".karyawan-divisi-select");
+        if (divisiSelect) divisiSelect.value = "";
+        karyawanOptions.querySelectorAll(".karyawan-option").forEach((option) => {
+          option.style.display = "";
+        });
+        const emptyFilter = karyawanOptions.querySelector(".karyawan-empty-filter");
+        if (emptyFilter) emptyFilter.style.display = "none";
+
+        updateKaryawanLabel();
+      }
+
+      renderKaryawanOptions();
+      if (karyawanOptions) {
+        karyawanOptions.addEventListener("change", (e) => {
+          if (e.target.classList.contains("karyawan-checkbox")) updateKaryawanLabel();
+        });
+      }
 
       function formatDate(dateStr) {
         if (!dateStr) return "-";
@@ -321,6 +548,7 @@
       function hideModal() {
         pengaduanModal.classList.remove("is-active");
         pengaduanForm.reset();
+        resetKaryawanDropdown();
       }
 
       btnTambah.addEventListener("click", showModal);
@@ -339,6 +567,9 @@
         const pengaduan = document.getElementById("inputPengaduan").value;
         const kategori = document.getElementById("inputKategori").value;
         const deskripsi = document.getElementById("inputDeskripsi").value;
+        const karyawan = Array.from(karyawanOptions.querySelectorAll(".karyawan-checkbox"))
+          .filter((cb) => cb.checked)
+          .map((cb) => cb.value);
         const tanggal = new Date().toISOString().split("T")[0];
         const status = "Belum Diproses";
 
@@ -349,7 +580,8 @@
           pengaduan,
           kategori,
           status,
-          deskripsi
+          deskripsi,
+          karyawan
         });
         savePengaduanData();
         if (window.ceoToast) {
@@ -366,9 +598,11 @@
       renderTable(pengaduanData);
     });
   </script>
-  <script src="../../assets/js/layout.js?v=4"></script>
+  <script src="../../assets/js/layout.js?v=1002"></script>
 </body>
 
 </html>
+
+
 
 

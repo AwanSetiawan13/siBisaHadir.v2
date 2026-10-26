@@ -567,6 +567,44 @@
       padding: 0 !important;
       margin: 0 !important;
     }
+
+    .table-checkbox, .bulk-check-all {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #2563eb;
+      border-radius: 4px;
+      margin: 0;
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    .btn-bulk-delete {
+      background: #fee2e2;
+      color: #ef4444;
+      border: 1.5px solid #fca5a5;
+      border-radius: 4px;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 38px;
+      font-family: 'Outfit', sans-serif;
+      box-shadow: 0 1px 2px rgba(239, 68, 68, 0.1);
+      white-space: nowrap;
+    }
+
+    .btn-bulk-delete:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #dc2626;
+      box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2);
+    }
   </style>
   <script src="../../assets/js/avatar_data.js"></script>
   <script src="../../vendor/html2canvas.min.js"></script>
@@ -749,6 +787,12 @@
                 </svg>
               </button>
             </div>
+
+            <!-- Bulk Delete Button (Muncul jika ada baris dipilih) -->
+            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
+              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
+            </button>
           </div>
 
           <div class="campaign-toolbar__right">
@@ -780,6 +824,9 @@
           <table>
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center; vertical-align: middle;">
+                  <input type="checkbox" id="checkAllRows" class="bulk-check-all" title="Pilih Semua" />
+                </th>
                 <th style="width: 50px;">#</th>
                 <th>UID</th>
                 <th>Username</th>
@@ -797,7 +844,7 @@
 
     </main>
 
-    <footer class="dashboard-footer">Â© 2026 Bisa Media</footer>
+    <footer class="dashboard-footer">Ã‚Â© 2026 Bisa Media</footer>
   </div>
 
   <!-- ================= Modal PopUp Lihat Tracking Kreator ================= -->
@@ -941,7 +988,7 @@
         <div class="kreator-field-group col-4">
           <label>Target GMV</label>
           <div class="kreator-field-input-wrap">
-            <input type="text" id="viewKreatorTargetGmvInput" class="kreator-field-input" placeholder="Tarhet" readonly />
+            <input type="text" id="viewKreatorTargetGmvInput" class="kreator-field-input" placeholder="Target GMV" readonly />
           </div>
         </div>
         <div class="kreator-field-group col-4">
@@ -1000,7 +1047,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="../../assets/js/layout.js?v=999"></script>
+  <script src="../../assets/js/layout.js?v=1002"></script>
 
   <script>
     (function () {
@@ -1316,6 +1363,27 @@
       let currentFilterKategori = "";
       let currentFilterAktivitas = "";
       let currentFilterLeads = "";
+      let currentTrackingFiltered = [];
+
+      const TRACKING_HIDDEN_KEY = "bisa_tracking_kreator_hidden_v1";
+      function getHiddenTrackingIds() {
+        try {
+          const raw = localStorage.getItem(TRACKING_HIDDEN_KEY);
+          const parsed = raw ? JSON.parse(raw) : [];
+          return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+        } catch (e) {
+          return new Set();
+        }
+      }
+      function saveHiddenTrackingIds(ids) {
+        try {
+          localStorage.setItem(TRACKING_HIDDEN_KEY, JSON.stringify(Array.from(ids)));
+        } catch (e) {}
+      }
+      function isTrackingHidden(item, hiddenIds = getHiddenTrackingIds()) {
+        if (!item) return false;
+        return hiddenIds.has(String(item.id)) || hiddenIds.has(String(item.uid));
+      }
 
       function getCreatorActivityStatus(item) {
         if (!item) return "Tidak Aktif";
@@ -1343,8 +1411,9 @@
         let countTidakAktif = 0;
 
         kreatorDb = getKreatorDb();
+        const hiddenIds = getHiddenTrackingIds();
 
-        kreatorDb.forEach(k => {
+        kreatorDb.filter(k => !isTrackingHidden(k, hiddenIds)).forEach(k => {
           const akt = getCreatorActivityStatus(k).toLowerCase().trim();
           if (akt === "aktif konten & live" || (akt.includes("konten") && akt.includes("live"))) {
             countAktifKontenLive++;
@@ -1371,9 +1440,11 @@
       function getFilteredTrackingKreators(query = "") {
         window.getFilteredTrackingKreators = getFilteredTrackingKreators;
         kreatorDb = getKreatorDb();
-        const searchInput = document.getElementById("searchCampaignInput");
+        const searchInput = document.getElementById("searchKreatorInput");
         const q = (query !== undefined && query !== null ? query : (searchInput ? searchInput.value : "")).trim().toLowerCase();
+        const hiddenIds = getHiddenTrackingIds();
         return kreatorDb.filter(k => {
+          if (isTrackingHidden(k, hiddenIds)) return false;
           const aktStatus = getCreatorActivityStatus(k);
           if (q) {
             const allKats = [k.kategori, k.kategori1, k.kategori2, k.kategori3].filter(Boolean).join(" ").toLowerCase();
@@ -1409,11 +1480,12 @@
         updateTrackingMetrics();
 
         const filtered = getFilteredTrackingKreators(query);
+        currentTrackingFiltered = filtered;
 
         const tableWrapper = document.getElementById("tableContainerWrapper");
         const emptyTableState = document.getElementById("emptyTableState");
 
-        if (kreatorDb.length === 0) {
+        if (kreatorDb.filter(k => !isTrackingHidden(k)).length === 0) {
           if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
           if (emptyTableState) emptyTableState.style.setProperty("display", "flex", "important");
           return;
@@ -1425,11 +1497,17 @@
         if (filtered.length === 0) {
           trackingTableBody.innerHTML = `
             <tr>
-              <td colspan="8" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+              <td colspan="9" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
                 Tidak ditemukan data Tracking Kreator yang sesuai dengan pencarian atau filter.
               </td>
             </tr>
           `;
+          const checkAll = document.getElementById("checkAllRows");
+          if (checkAll) {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+          }
+          if (typeof updateBulkActionsState === "function") updateBulkActionsState();
           return;
         }
 
@@ -1477,6 +1555,9 @@
           const keaktifanHtml = `<span style="color: #334155; font-weight: 500;">${aktStatus}</span>`;
 
           row.innerHTML = `
+            <td style="text-align: center; vertical-align: middle;">
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id || item.uid || ''}" data-index="${index}" value="${item.id || item.uid || ''}" />
+            </td>
             <td>${index + 1}</td>
             <td style="font-weight: 600; color: #1e293b;">${item.uid || "-"}</td>
             <td>
@@ -1512,6 +1593,13 @@
           `;
           trackingTableBody.appendChild(row);
         });
+
+        const checkAll = document.getElementById("checkAllRows");
+        if (checkAll) {
+          checkAll.checked = false;
+          checkAll.indeterminate = false;
+        }
+        if (typeof updateBulkActionsState === "function") updateBulkActionsState();
       }
 
       // Fungsi untuk mengambil Data Master Leveling Kreator
@@ -1567,6 +1655,7 @@
       // Dataset Performa Kreator
       function getPerformaDb() {
         const PERFORMA_KEYS = [
+          "bisa_performa_kreator_list_v7",
           "bisa_performa_kreator_list_v6",
           "bisa_performa_kreator_list_v5",
           "bisa_performa_kreator_list_v4",
@@ -1667,6 +1756,20 @@
         return parseFloat(num) || 0;
       }
 
+      function formatRupiah(num) {
+        return "Rp " + Number(num).toLocaleString('id-ID');
+      }
+
+      // Rumus Target GMV: Menyesuaikan secara dinamis dari GMV Berjalan saat ini + 20% (GMV Berjalan * 1.20)
+      function calculateTargetGmv(gmvBerjalanStr, fallbackTarget) {
+        const gmvVal = parseRupiahNum(gmvBerjalanStr);
+        if (gmvVal > 0) {
+          const targetNum = Math.round(gmvVal * 1.20);
+          return formatRupiah(targetNum);
+        }
+        return fallbackTarget || "Rp 0";
+      }
+
       function calculateProgressGmv(gmvBerjalanStr, targetGmvStr) {
         const gmvVal = parseRupiahNum(gmvBerjalanStr);
         const targetVal = parseRupiahNum(targetGmvStr);
@@ -1693,7 +1796,8 @@
         const levelInfo = getCreatorLevelFromMaster(item, perf);
 
         const gmvBerjalan = (perf && perf.gmv) ? perf.gmv : (item.gmvBerjalan || "Rp 0");
-        const targetGmv = (perf && perf.gmv && levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : (item.targetGmv || "Rp 0");
+        const defaultTargetFallback = (levelInfo && levelInfo.gmv && levelInfo.gmv !== "-") ? levelInfo.gmv : (item.targetGmv || "Rp 0");
+        const targetGmv = calculateTargetGmv(gmvBerjalan, defaultTargetFallback);
         const progresGmv = (gmvBerjalan !== "-" && targetGmv !== "-" && targetGmv !== "Rp 0") ? calculateProgressGmv(gmvBerjalan, targetGmv) : (item.progresGmv || "0%");
         
         let siaranLive = (perf && perf.live_broadcasts) ? (perf.live_broadcasts + " Jam") : (item.siaranLive || "0 Jam");
@@ -1961,7 +2065,7 @@
         const currentVal = katSelect.value;
         let catList = [];
         try {
-          const saved = localStorage.getItem("bisa_kategori_kreator_list_v5");
+          const saved = localStorage.getItem("spv_kategori_produk_v1") || localStorage.getItem("bisa_kategori_produk_list_v5") || localStorage.getItem("bisa_kategori_kreator_list_v5");
           if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -1992,7 +2096,7 @@
         const currentVal = leadsSelect.value;
         let leadsList = [];
         try {
-          const saved = localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
+          const saved = localStorage.getItem("bisa_leads_kreator_list_v7") || localStorage.getItem("bisa_leads_kreator_list_v6") || localStorage.getItem("bisa_leads_kreator_list_v5");
           if (saved) {
             const parsed = JSON.parse(saved);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -2277,12 +2381,124 @@
 
   
 
+      // ================= BULK CHECKBOX & DELETE TRACKING KREATOR =================
+      function updateBulkActionsState() {
+        const rowCheckboxes = Array.from(document.querySelectorAll(".row-select-checkbox"));
+        const checkedBoxes = rowCheckboxes.filter(cb => cb.checked);
+        const checkAll = document.getElementById("checkAllRows");
+        const btnBulkDelete = document.getElementById("btnBulkDelete");
+        const bulkCountSpan = document.querySelector(".bulk-count");
+
+        if (checkAll) {
+          if (rowCheckboxes.length > 0 && checkedBoxes.length === rowCheckboxes.length) {
+            checkAll.checked = true;
+            checkAll.indeterminate = false;
+          } else if (checkedBoxes.length > 0) {
+            checkAll.checked = false;
+            checkAll.indeterminate = true;
+          } else {
+            checkAll.checked = false;
+            checkAll.indeterminate = false;
+          }
+        }
+
+        if (bulkCountSpan) {
+          bulkCountSpan.textContent = checkedBoxes.length;
+        }
+
+        if (btnBulkDelete) {
+          btnBulkDelete.style.display = checkedBoxes.length > 0 ? "inline-flex" : "none";
+        }
+      }
+
+      const checkAllRowsEl = document.getElementById("checkAllRows");
+      if (checkAllRowsEl) {
+        checkAllRowsEl.addEventListener("change", function () {
+          const isChecked = this.checked;
+          const rowCheckboxes = document.querySelectorAll(".row-select-checkbox");
+          rowCheckboxes.forEach(cb => { cb.checked = isChecked; });
+          updateBulkActionsState();
+        });
+      }
+
+      if (trackingTableBody) {
+        trackingTableBody.addEventListener("change", function (e) {
+          if (e.target && e.target.classList.contains("row-select-checkbox")) {
+            updateBulkActionsState();
+          }
+        });
+      }
+
+      function handleBulkDeleteTracking() {
+        const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+        if (checkedBoxes.length === 0) return;
+        const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
+
+        if (typeof Swal !== "undefined") {
+          Swal.fire({
+            title: 'Hapus Data Terpilih?',
+            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.size} data tracking kreator</strong> yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const hiddenIds = getHiddenTrackingIds();
+              selectedIds.forEach(id => hiddenIds.add(String(id)));
+              saveHiddenTrackingIds(hiddenIds);
+              renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Dihapus',
+                text: `${selectedIds.size} data tracking kreator berhasil dihapus. Data master kreator tetap aman.`,
+                timer: 1800,
+                showConfirmButton: false,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
+        } else {
+          if (confirm(`Hapus ${selectedIds.size} data tracking kreator? Data master kreator tidak akan dihapus.`)) {
+            const hiddenIds = getHiddenTrackingIds();
+            selectedIds.forEach(id => hiddenIds.add(String(id)));
+            saveHiddenTrackingIds(hiddenIds);
+            renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
+          }
+        }
+      }
+
+      const btnBulkCancelEl = document.getElementById("btnBulkCancel");
+      if (btnBulkCancelEl) {
+        btnBulkCancelEl.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
+      }
+
+      const btnBulkDeleteEl = document.getElementById("btnBulkDelete");
+      if (btnBulkDeleteEl) {
+        btnBulkDeleteEl.addEventListener("click", handleBulkDeleteTracking);
+      }
+
       // ================= EXPORT EXCEL TABEL TRACKING KREATOR =================
       async function handleExportTrackingKreator() {
         try {
-          const exportRows = (typeof getFilteredTrackingKreators === "function")
-            ? getFilteredTrackingKreators()
-            : ((typeof getKreatorDb === "function") ? getKreatorDb() : []);
+          const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+          let exportRows = Array.isArray(currentTrackingFiltered) ? currentTrackingFiltered.slice() : [];
+          const isPartialExport = checkedBoxes.length > 0;
+          if (isPartialExport) {
+            const selectedIndexes = checkedBoxes
+              .map(cb => Number(cb.dataset.index))
+              .filter(idx => Number.isInteger(idx) && idx >= 0);
+            exportRows = selectedIndexes.map(idx => exportRows[idx]).filter(Boolean);
+          }
 
           if (!exportRows || exportRows.length === 0) {
             if (typeof Swal !== "undefined") {
@@ -2313,9 +2529,9 @@
             const levelInfo = (typeof getCreatorLevelFromMaster === "function") ? getCreatorLevelFromMaster(item, perf) : {};
             const levelName = levelInfo.nama || item.level || "New Growth";
             const aktStatus = (typeof getCreatorActivityStatus === "function") ? getCreatorActivityStatus(item) : (item.aktivitas || "Aktif");
-            const targetGmv = perf.targetGmv || item.targetGmv || levelInfo.gmv || "Rp 0";
-            const progresGmv = perf.progresGmv || item.progresGmv || "0%";
             const gmvBerjalan = perf.gmv || item.gmvBerjalan || "Rp 0";
+            const targetGmv = calculateTargetGmv(gmvBerjalan, levelInfo.gmv || item.targetGmv || "Rp 0");
+            const progresGmv = (gmvBerjalan !== "-" && targetGmv !== "-" && targetGmv !== "Rp 0") ? calculateProgressGmv(gmvBerjalan, targetGmv) : (item.progresGmv || "0%");
             const siaranLive = perf.liveCount != null ? String(perf.liveCount) : (item.siaranLive || "0");
             const videoCount = perf.videoCount != null ? String(perf.videoCount) : (item.videoFyp || "0");
             const masaKontrak = item.masaKontrak || (item.kontrakAwal && item.kontrakAkhir ? (item.kontrakAwal + " - " + item.kontrakAkhir) : "-");
@@ -2344,8 +2560,8 @@
 
           if (typeof exportFn === 'function') {
             await exportFn({
-              title: "TRACKING KREATOR",
-              filename: "tracking_kreator_" + todayStr + ".xlsx",
+              title: isPartialExport ? `TRACKING KREATOR (${exportRows.length} DATA PILIHAN)` : "TRACKING KREATOR",
+              filename: isPartialExport ? `tracking_kreator_pilihan_${todayStr}.xlsx` : `tracking_kreator_${todayStr}.xlsx`,
               sheetName: "Tracking Kreator",
               headers: headers,
               rows: rows
@@ -2354,7 +2570,9 @@
               Swal.fire({
                 icon: 'success',
                 title: 'Berhasil Diekspor!',
-                text: 'Data tracking kreator berhasil diekspor ke Excel (.xlsx)',
+                text: isPartialExport
+                  ? `${exportRows.length} data tracking kreator pilihan berhasil diekspor ke Excel (.xlsx)`
+                  : 'Data tracking kreator berhasil diekspor ke Excel (.xlsx)',
                 timer: 2000,
                 showConfirmButton: false,
                 customClass: { popup: 'swal2-bisa-popup' }
@@ -2364,12 +2582,13 @@
             // Immediate fallback to CSV
             const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(","))].join("\n");
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const fname = isPartialExport ? `tracking_kreator_pilihan_${todayStr}.csv` : `tracking_kreator_${todayStr}.csv`;
             if (typeof window.downloadBlobSafely === 'function') {
-              window.downloadBlobSafely(blob, "tracking_kreator_" + todayStr + ".csv");
+              window.downloadBlobSafely(blob, fname);
             } else {
               const link = document.createElement("a");
               link.href = URL.createObjectURL(blob);
-              link.download = "tracking_kreator_" + todayStr + ".csv";
+              link.download = fname;
               document.body.appendChild(link);
               link.click();
               setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1500);
@@ -2412,3 +2631,5 @@
 </body>
 
 </html>
+
+

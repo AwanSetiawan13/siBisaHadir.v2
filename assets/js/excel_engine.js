@@ -496,6 +496,23 @@
         to: { row: 4, column: totalCols }
       };
 
+      // ===== Force TEXT format pada kolom yang mengandung @ atau nilai khusus =====
+      // Kunci: gunakan column.style (bukan hanya numFmt) + set numFmt SETELAH semua style cell
+      const TEXT_HEADER_KEYWORDS = ['username', 'uid', 'handle', 'user', 'akun', 'no hp', 'nomor wa', 'whatsapp', 'no. wa', 'tiktok', 'instagram', 'sosmed'];
+      const callerTextCols = new Set((options.textColumnIndices || []).map(i => i + 1)); // 0-based → 1-based
+      const textColSet = new Set(); // kolom yang perlu dipaksa Text
+
+      headers.forEach((h, idx) => {
+        const colNum = idx + 1;
+        const hLower = String(h).toLowerCase().trim();
+        const isTextCol = callerTextCols.has(colNum) || TEXT_HEADER_KEYWORDS.some(kw => hLower.includes(kw));
+        if (isTextCol) {
+          // Gunakan .style (bukan hanya .numFmt) agar ExcelJS menulis format teks ke <col> XML
+          ws.getColumn(colNum).style = { numFmt: '@', font: { name: 'Calibri', size: 10 } };
+          textColSet.add(colNum);
+        }
+      });
+
       // Add Data Rows starting at Row 5
       rows.forEach((rowValues, rIdx) => {
         const rowNum = 5 + rIdx;
@@ -514,7 +531,10 @@
             cleanVal = cleanVal.trim().replace(/^"(.*)"$/, '$1').replace(/""/g, '"');
           }
 
-          cell.value = cleanVal != null ? cleanVal : '';
+          // Set value terlebih dahulu
+          cell.value = (cleanVal != null ? cleanVal : '');
+
+          // Style dasar
           cell.font = { name: 'Calibri', size: 10, color: { argb: 'FF1E293B' } };
           cell.border = {
             top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
@@ -532,8 +552,6 @@
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
           } else {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraBg } };
-
-            // Alignment detection
             if (colNum === 1 || valStr.length <= 4 || /^\d{4}-\d{2}-\d{2}/.test(valStr)) {
               cell.alignment = { vertical: 'middle', horizontal: 'center' };
             } else if (valStr.startsWith('Rp') || valStr.endsWith('%') || (/^[0-9.,]+$/.test(valStr) && valStr.length > 5)) {
@@ -542,8 +560,16 @@
               cell.alignment = { vertical: 'middle', horizontal: 'left' };
             }
           }
+
+          // ===== KUNCI FIX: set numFmt='@' SETELAH semua style lain =====
+          // Ini memastikan format Text tidak tertimpa oleh assignment fill/font/border di atas
+          if (textColSet.has(colNum)) {
+            cell.numFmt = '@';
+            cell.value = String(cleanVal != null ? cleanVal : ''); // pastikan tipe string
+          }
         });
       });
+
 
       // Auto-fit column widths
       headers.forEach((h, idx) => {

@@ -137,7 +137,8 @@
         children: [
           { label: 'Dashboard Brands', link: 'SpvKol/brand/spvkol_dashboard_brand.html' },
           { label: 'Produk & Brands', link: 'SpvKol/brand/spvkol_produk_brand.html' },
-          { label: 'Data Brands', link: 'SpvKol/brand/spvkol_data_brand.html' }
+          { label: 'Data Brands', link: 'SpvKol/brand/spvkol_data_brand.html' },
+          { label: 'Laporan Brand', link: 'SpvKol/brand/spvkol_laporan_brand.html' }
         ]
       },
 
@@ -208,7 +209,8 @@
         children: [
           { label: 'Dashboard Brands', link: 'StaffKol/brand/staffkol_dashboard_brand.html' },
           { label: 'Produk & Brands', link: 'StaffKol/brand/staffkol_produk_brand.html' },
-          { label: 'Data Brands', link: 'StaffKol/brand/staffkol_data_brand.html' }
+          { label: 'Data Brands', link: 'StaffKol/brand/staffkol_data_brand.html' },
+          { label: 'Laporan Brand', link: 'StaffKol/brand/staffkol_laporan_brand.html' }
         ]
       },
 
@@ -325,9 +327,19 @@
     } else if (m.type === 'group') {
       let subHtml = '';
       let isGroupActive = false;
+      // Deteksi folder grup — jika semua child berada di folder yang sama, deteksi per folder
+      const groupFolder = m.children.length > 0
+        ? m.children[0].link.split('/').slice(0, -1).join('/').toLowerCase()
+        : '';
+      const currentPathLower = normalizedPath.toLowerCase();
       m.children.forEach(sub => {
         const fullSubLink = rootPrefix + sub.link;
-        const isSubActive = currentFile.toLowerCase() === sub.link.split('/').pop().toLowerCase();
+        const subFileName = sub.link.split('/').pop().toLowerCase();
+        // Cocokkan nama file ATAU full path mengandung link sub-item
+        const subLinkLower = sub.link.toLowerCase();
+        const isSubActive = currentFile.toLowerCase() === subFileName
+          || currentPathLower.endsWith('/' + subLinkLower)
+          || currentPathLower.includes('/' + subLinkLower);
         if (isSubActive) isGroupActive = true;
         subHtml += `
           <li style="list-style:none;margin:1px 0;padding:0;">
@@ -337,6 +349,11 @@
             </a>
           </li>`;
       });
+
+      // Jika grup punya folder, aktifkan juga berdasarkan path folder (untuk halaman di subfolder yang sama)
+      if (!isGroupActive && groupFolder) {
+        isGroupActive = currentPathLower.includes('/' + groupFolder + '/');
+      }
 
       menuHtml += `
         <li style="list-style:none;margin-top:4px;padding:0;">
@@ -372,6 +389,7 @@
 
   const currentUserName = localStorage.getItem('user_name') || roleDisplayNames[role] || 'Rayi';
   const currentPortalLabel = portalLabels[role] || 'Beranda SPV KOL';
+  const currentRoleLabel = localStorage.getItem('user_display_role') || (role === 'staff_kol' ? 'Staff KOL' : role === 'admin' ? 'Admin' : 'SPV KOL');
   const rawAvatar = localStorage.getItem('user_avatar');
   const currentAvatar = (rawAvatar && !rawAvatar.includes('undefined'))
     ? (rawAvatar.startsWith('http') ? rawAvatar : rootPrefix + rawAvatar.replace(/^\/+/, ''))
@@ -394,10 +412,10 @@
         margin: 0;
         padding: 0;
         list-style: none;
-        transition: max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s ease;
+        transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s ease;
       }
       .sidebar-submenu.is-expanded {
-        max-height: 500px;
+        max-height: 2000px;
         opacity: 1;
         margin: 2px 0 4px 0;
       }
@@ -1128,8 +1146,6 @@
       'spvkol_kehadiran.html': 'Kehadiran',
       'spvkol_presensi_istirahat.html': 'Presensi Istirahat',
       'spvkol_presensi_lembur.html': 'Presensi Lembur',
-      'spvkol_skenario_jam_kerja.html': 'Skenario Jam Kerja',
-      'spvkol_karyawan.html': 'Data Karyawan',
       'spvkol_kreator.html': 'Data Kreator',
       'spvkol_tracking_kreator.html': 'Tracking Kreator',
       'spvkol_folder.html': 'My Folders',
@@ -1139,7 +1155,6 @@
       'spvkol_dashboard_campaign.html': 'Dashboard Campaign',
       'staffkol_dashboard_campaign.html': 'Dashboard Campaign',
       'staffkol_laporan_campaign.html': 'Laporan Campaign',
-      'spvkol_operasional.html': 'Operasional',
       'spvkol_tracking_sampel.html': 'Tracking Sampel',
       'spvkol_Performa_Kreator.html': 'Performa Kreator',
       'spvkol_rrk.html': 'RRK',
@@ -1152,6 +1167,7 @@
       'spvkol_dashboard_brand.html': 'Dashboard Brands',
       'spvkol_data_brand.html': 'Data Brands',
       'spvkol_produk_brand.html': 'Produk & Brands',
+      'spvkol_laporan_brand.html': 'Laporan Brand',
       'spvkol_Ads_Account.html': 'Ads Account',
       'spvkol_Kategori_Produk.html': 'Kategori Produk',
       'spvkol_Leads_Kreator.html': 'Leads Kreator',
@@ -1299,12 +1315,12 @@
         <div class="topbar-user-dropdown-wrap" style="position: relative;">
           <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false">
             <div class="hirezy-avatar-box">
-              <img src="${rootPrefix}media/avatar.png" alt="SPV KOL" class="hirezy-avatar-img" data-ceo-avatar=""
-                onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80'" />
+              <img src="${currentAvatar}" alt="${currentUserName}" class="hirezy-avatar-img" data-ceo-avatar=""
+                onerror="this.src='${rootPrefix}media/avatar.png'" />
             </div>
             <div class="hirezy-user-text">
-              <span class="hirezy-user-name">Setiawan</span>
-              <span class="hirezy-user-role">SPV KOL</span>
+              <span class="hirezy-user-name">${currentUserName}</span>
+              <span class="hirezy-user-role">${currentRoleLabel}</span>
             </div>
             <svg class="hirezy-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px; stroke: #64748b; flex-shrink: 0;">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -1313,10 +1329,10 @@
 
           <div id="userMenuDropdown" class="user-menu-dropdown">
             <div class="user-menu-dropdown__header">
-              <img src="${rootPrefix}media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <img src="${currentAvatar}" alt="${currentUserName}" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
               <div class="user-menu-dropdown__info">
-                <span class="user-menu-dropdown__name">Setiawan</span>
-                <span class="user-menu-dropdown__role">SPV KOL</span>
+                <span class="user-menu-dropdown__name">${currentUserName}</span>
+                <span class="user-menu-dropdown__role">${currentRoleLabel}</span>
               </div>
             </div>
             <div class="user-menu-dropdown__divider"></div>
@@ -1370,6 +1386,7 @@
       'staffkol_dashboard_brand.html': 'Dashboard Brands',
       'staffkol_produk_brand.html': 'Produk & Brands',
       'staffkol_data_brand.html': 'Data Brands',
+      'staffkol_laporan_brand.html': 'Laporan Brand',
       'staffkol_laporan.html': 'Laporan',
       'staffkol_Milestone.html': 'Milestone',
       'staffkol_pengaduan.html': 'Pengaduan',
@@ -1436,11 +1453,11 @@
         <div class="topbar-user-dropdown-wrap">
           <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
             <div class="hirezy-avatar-box">
-              <img src="${rootPrefix}media/avatar.png" alt="Andrew Sebastian" class="hirezy-avatar-img" data-ceo-avatar="" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80'" />
+              <img src="${currentAvatar}" alt="${currentUserName}" class="hirezy-avatar-img" data-ceo-avatar="" onerror="this.src='${rootPrefix}media/avatar.png'" />
             </div>
             <div class="hirezy-user-text">
-              <span class="hirezy-user-name">Andrew Sebastian</span>
-              <span class="hirezy-user-role">Staff KOL</span>
+              <span class="hirezy-user-name">${currentUserName}</span>
+              <span class="hirezy-user-role">${currentRoleLabel}</span>
             </div>
             <svg class="hirezy-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -1449,10 +1466,10 @@
 
           <div id="userMenuDropdown" class="user-menu-dropdown">
             <div class="user-menu-dropdown__header">
-              <img src="${rootPrefix}media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <img src="${currentAvatar}" alt="${currentUserName}" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
               <div class="user-menu-dropdown__info">
-                <span class="user-menu-dropdown__name">Andrew Sebastian</span>
-                <span class="user-menu-dropdown__role">Staff KOL &bull; PT. Bisa Media</span>
+                <span class="user-menu-dropdown__name">${currentUserName}</span>
+                <span class="user-menu-dropdown__role">${currentRoleLabel}</span>
               </div>
             </div>
             <div class="user-menu-dropdown__divider"></div>

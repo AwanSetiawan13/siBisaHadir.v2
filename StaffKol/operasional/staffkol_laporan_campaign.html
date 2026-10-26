@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -15,6 +15,56 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
+        /* ===== Bulk Selection & Checkbox Styling ===== */
+    .table-checkbox {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .bulk-check-all {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .btn-bulk-delete {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-bulk-delete:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #b91c1c;
+      transform: translateY(-1px);
+    }
+    .btn-excel-green {
+      background: #f0fdf4 !important;
+      border: 1px solid #86efac !important;
+      color: #16a34a !important;
+    }
+    .btn-excel-green:hover {
+      background: #dcfce7 !important;
+      border-color: #4ade80 !important;
+      color: #15803d !important;
+      transform: translateY(-1px);
+    }
+
     /* ===== SweetAlert2 Custom Styling for Bisa Media ===== */
     .swal2-bisa-popup {
       font-family: 'Outfit', sans-serif !important;
@@ -511,6 +561,23 @@
 
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
+            <!-- Green Excel Button with tooltip -->
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+              <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
+            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
+              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
+            </button>
             <div class="filter-dropdown-wrapper">
               <button id="btnFilterReport" class="small-action-button" type="button" aria-label="Filter">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -579,6 +646,9 @@
           <table id="tblStaffLaporanCampaign">
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center; vertical-align: middle;">
+                  <input type="checkbox" id="checkAllRows" class="bulk-check-all" title="Pilih Semua" />
+                </th>
                 <th class="th-pinnable" data-col="id" style="width: 70px;">
                   <div class="th-pin-wrapper">
                     <span>ID</span>
@@ -712,7 +782,7 @@
 
     </main>
 
-    <footer class="dashboard-footer">© 2026 Bisa Media</footer>
+    <footer class="dashboard-footer">Â© 2026 Bisa Media</footer>
   </div>
 
   <!-- Modal Detail Laporan Campaign (Sesi LIVE) -->
@@ -853,7 +923,7 @@
   </div>
 
   <script src="../../assets/js/app.js"></script>
-  <script src="../../assets/js/layout.js?v=999"></script>
+  <script src="../../assets/js/layout.js?v=1002"></script>
 
   <script>
     (function () {
@@ -1074,6 +1144,12 @@
 
       function renderTable() {
         if (!tbody) return;
+
+        if (checkAllRows) {
+          checkAllRows.checked = false;
+          checkAllRows.indeterminate = false;
+        }
+        updateBulkActionsState();
         const q = (searchInput?.value || "").toLowerCase().trim();
         const selKreator = (filterKreatorSelect?.value || "").toLowerCase().trim();
         const selGmv = filterGmvSelect?.value || "";
@@ -1104,7 +1180,7 @@
         if (filtered.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="20" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+              <td colspan="21" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
                 Tidak ada data laporan campaign yang sesuai dengan pencarian atau filter.
               </td>
             </tr>
@@ -1115,6 +1191,9 @@
         tbody.innerHTML = filtered.map(item => {
           return `
             <tr>
+              <td style="text-align: center; vertical-align: middle;">
+                <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+              </td>
               <td style="font-weight: 600; color: #64748b;">${item.id}</td>
               <td>
                 <div style="display: flex; align-items: center; gap: 9px;">
@@ -1260,10 +1339,10 @@
         });
       }
 
-      // ═══════════════════════════════════════════════════════════════════
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       // Tambah Laporan Campaign (Input Data & Preview Controller)
       // Mirip persis dengan fitur spvkol_Performa_Kreator.html
-      // ═══════════════════════════════════════════════════════════════════
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       const btnTambahReport = document.getElementById("btnTambahReport");
       const btnCancelTambahReport = document.getElementById("btnCancelTambahReport");
       const tablePanel = document.getElementById("tablePanel");
@@ -1408,9 +1487,9 @@
         });
       }
 
-      // ═══════════════════════════════════════════════════════════════════
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       // PINNED / FIXED COLUMNS CONTROLLER (Sesuai Konsep Performa Kreator)
-      // ═══════════════════════════════════════════════════════════════════
+      // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
       const PIN_STORAGE_KEY = "bisa_staffkol_laporan_pinned_cols_v1";
 
       function getSavedPinnedCols() {
@@ -1433,14 +1512,15 @@
         if (!table) return;
 
         const colConfig = [
-          { key: "id", colIdx: 0 },
-          { key: "kreator", colIdx: 1 },
-          { key: "idLive", colIdx: 2 },
-          { key: "live", colIdx: 3 },
-          { key: "waktuMulai", colIdx: 4 }
+          { key: "id", colIdx: 1 },
+          { key: "kreator", colIdx: 2 },
+          { key: "idLive", colIdx: 3 },
+          { key: "live", colIdx: 4 },
+          { key: "waktuMulai", colIdx: 5 }
         ];
 
-        let currentLeft = 0;
+        const thCol0 = table.querySelector("thead tr th:nth-child(1)");
+        let currentLeft = thCol0 ? thCol0.getBoundingClientRect().width : 40;
 
         colConfig.forEach(cfg => {
           const chk = document.querySelector(`.chk-pin-col[data-col="${cfg.key}"]`);
@@ -1504,6 +1584,198 @@
         window.addEventListener("resize", updatePinnedColumns);
       }
 
+      // Bulk Actions & Checkbox Handling
+      const checkAllRows = document.getElementById("checkAllRows");
+      const btnBulkDelete = document.getElementById("btnBulkDelete");
+
+      function getSelectedRowIds() {
+        const checked = document.querySelectorAll(".row-select-checkbox:checked");
+        return Array.from(checked).map(cb => cb.dataset.id);
+      }
+
+      function updateBulkActionsState() {
+        const allCheckboxes = document.querySelectorAll(".row-select-checkbox");
+        const checkedCheckboxes = document.querySelectorAll(".row-select-checkbox:checked");
+        const count = checkedCheckboxes.length;
+
+        if (checkAllRows) {
+          checkAllRows.checked = allCheckboxes.length > 0 && checkedCheckboxes.length === allCheckboxes.length;
+          checkAllRows.indeterminate = count > 0 && count < allCheckboxes.length;
+        }
+
+        if (btnBulkDelete) {
+          if (count > 0) {
+            btnBulkDelete.style.display = "inline-flex";
+            const countSpan = btnBulkDelete.querySelector(".bulk-count");
+            if (countSpan) countSpan.textContent = count;
+          } else {
+            btnBulkDelete.style.display = "none";
+          }
+        }
+      }
+
+      if (checkAllRows) {
+        checkAllRows.addEventListener("change", function () {
+          const checkboxes = document.querySelectorAll(".row-select-checkbox");
+          checkboxes.forEach(cb => {
+            cb.checked = checkAllRows.checked;
+          });
+          updateBulkActionsState();
+        });
+      }
+
+      if (tbody) {
+        tbody.addEventListener("change", function (e) {
+          if (e.target && e.target.classList.contains("row-select-checkbox")) {
+            updateBulkActionsState();
+          }
+        });
+      }
+
+      const btnBulkCancel = document.getElementById("btnBulkCancel");
+      if (btnBulkCancel) {
+        btnBulkCancel.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
+      }
+
+      if (btnBulkDelete) {
+        btnBulkDelete.addEventListener("click", function () {
+          const selectedIds = getSelectedRowIds();
+          if (!selectedIds.length) return;
+
+          Swal.fire({
+            title: `Hapus ${selectedIds.length} Laporan Terpilih?`,
+            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.length}</strong> data laporan campaign yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              reportDb = reportDb.filter(t => !selectedIds.includes(String(t.id)));
+              saveReportDb();
+              populateKreatorFilter();
+              renderTable();
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Dihapus!',
+                text: `${selectedIds.length} data laporan campaign berhasil dihapus.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
+        });
+      }
+
+      // Export Excel Handler
+      const btnExportExcel = document.getElementById("btnExportExcel");
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener("click", () => {
+          if (!reportDb || reportDb.length === 0) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Data Kosong',
+              text: 'Tidak ada data laporan campaign untuk diekspor.',
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Tutup',
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+            return;
+          }
+
+          const q = (searchInput?.value || "").toLowerCase().trim();
+          const selKreator = (filterKreatorSelect?.value || "").toLowerCase().trim();
+          const selGmv = filterGmvSelect?.value || "";
+
+          let exportList = reportDb.filter(item => {
+            const matchQuery = !q ||
+              (item.kreatorNama && item.kreatorNama.toLowerCase().includes(q)) ||
+              (item.kreatorUser && item.kreatorUser.toLowerCase().includes(q)) ||
+              (item.idLive && String(item.idLive).toLowerCase().includes(q)) ||
+              (item.liveTitle && item.liveTitle.toLowerCase().includes(q));
+            const matchKreator = !selKreator || (item.kreatorNama && item.kreatorNama.toLowerCase() === selKreator);
+            let matchGmv = true;
+            const gmvNum = Number(item.gmvKreator) || 0;
+            if (selGmv === "high") matchGmv = gmvNum > 30000000;
+            else if (selGmv === "medium") matchGmv = gmvNum >= 15000000 && gmvNum <= 30000000;
+            else if (selGmv === "low") matchGmv = gmvNum < 15000000;
+            return matchQuery && matchKreator && matchGmv;
+          });
+
+          const selectedIds = getSelectedRowIds();
+          if (selectedIds.length > 0) {
+            exportList = exportList.filter(item => selectedIds.includes(String(item.id)));
+          }
+
+          if (!exportList || exportList.length === 0) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Data Kosong',
+              text: 'Tidak ada data laporan terpilih untuk diekspor.',
+              confirmButtonColor: '#29A3D8',
+              confirmButtonText: 'Tutup',
+              customClass: { popup: 'swal2-bisa-popup' }
+            });
+            return;
+          }
+
+          const headers = [
+            "No", "ID", "Kreator", "Username", "ID LIVE", "Judul LIVE", "Waktu Mulai",
+            "GMV Kreator", "GMV Langsung", "Produk Terjual", "Penonton", "GPM Sesi",
+            "Rasio Ketuk-Tayang (%)", "Pesanan SKU", "Pembeli", "Durasi", "Tayangan",
+            "Komentar", "Dibagikan", "Suka", "Harga Rata-Rata"
+          ];
+
+          const rows = exportList.map((item, idx) => [
+            idx + 1,
+            item.id || '-',
+            item.kreatorNama || '-',
+            item.kreatorUser || '-',
+            item.idLive || '-',
+            item.liveTitle || '-',
+            item.waktuMulai || '-',
+            formatRupiah(item.gmvKreator),
+            formatRupiah(item.gmvLangsung),
+            formatNumber(item.produkTerjual),
+            formatNumber(item.penonton),
+            formatRupiah(item.gpmSesi),
+            item.rasioKetukTayang + '%',
+            formatNumber(item.pesananSku),
+            formatNumber(item.pembeli),
+            item.durasi || '-',
+            formatNumber(item.tayangan),
+            formatNumber(item.komentar),
+            formatNumber(item.dibagikan),
+            formatNumber(item.suka),
+            formatRupiah(item.hargaRataRata)
+          ]);
+
+          const todayStr = new Date().toISOString().split("T")[0];
+          if (typeof exportBisaExcel === 'function') {
+            exportBisaExcel({
+              title: "LAPORAN CAMPAIGN",
+              filename: `data_laporan_campaign_${todayStr}.xlsx`,
+              sheetName: "Laporan Campaign",
+              headers: headers,
+              rows: rows
+            });
+          }
+        });
+      }
+
       // Initial Setup
       initPinnedColsEvents();
       populateKreatorFilter();
@@ -1513,3 +1785,5 @@
 </body>
 
 </html>
+
+

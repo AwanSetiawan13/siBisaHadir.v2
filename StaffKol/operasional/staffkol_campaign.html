@@ -55,6 +55,45 @@
       display: none !important;
     }
 
+        /* ===== Bulk Selection & Checkbox Styling ===== */
+    .table-checkbox {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .bulk-check-all {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: #29A3D8;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+    .btn-bulk-delete {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fca5a5;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-bulk-delete:hover {
+      background: #fecaca;
+      border-color: #f87171;
+      color: #b91c1c;
+      transform: translateY(-1px);
+    }
+
     /* Toolbar & Custom Select Extensions */
     .btn-excel-green {
       background: #f0fdf4 !important;
@@ -310,7 +349,7 @@
     }
 
     .kreator-custom-checkbox.checked::after {
-      content: 'Ã¢Å“â€œ';
+      content: 'ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“';
       color: #fff;
       font-size: 11px;
       font-weight: bold;
@@ -1295,7 +1334,7 @@
         </select>
       </div>
 
-      <!-- Metric Summary Cards outside Panel Ã¢â‚¬â€ 6 berjejer -->
+      <!-- Metric Summary Cards outside Panel ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 6 berjejer -->
       <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px;">
 
         <article class="metric-card">
@@ -1396,6 +1435,11 @@
                 <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
                 <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
+            </button>
+            <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
+            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
+              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
+              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
             </button>
 
             <!-- Filter Dropdown & Popover -->
@@ -1533,6 +1577,9 @@
           <table id="tblStaffCampaign" data-ceo-custom-crud="1">
             <thead>
               <tr>
+                <th style="width: 40px; text-align: center; vertical-align: middle;">
+                  <input type="checkbox" id="checkAllRows" class="bulk-check-all" title="Pilih Semua" />
+                </th>
                 <th style="width: 50px;">#</th>
                 <th>Brand/Seller</th>
                 <th>Kategori</th>
@@ -1550,7 +1597,7 @@
 
     </main>
 
-    <footer class="dashboard-footer">Ã‚Â© 2026 Bisa Media</footer>
+    <footer class="dashboard-footer">Ãƒâ€šÃ‚Â© 2026 Bisa Media</footer>
   </div>
 
   <!-- Modal PopUp Tambah & Edit Campaign -->
@@ -2533,6 +2580,24 @@
     </div>
   </div>
 
+  <!-- Modal Riwayat Campaign -->
+  <div id="campaignHistoryModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 980px; width: 94%; padding: 24px 28px; border-radius: 12px; background: #fff;">
+      <div class="modal-header">
+        <h2 class="modal-title">Riwayat <span style="font-weight: 900; font-style: italic;">CAMPAIGN</span></h2>
+        <button class="modal-close" type="button" id="closeCampaignHistoryModal" aria-label="Tutup popup">&times;</button>
+      </div>
+      <div class="modal-divider"></div>
+      <div style="display: grid; grid-template-columns: 1.4fr 1.3fr 1fr 1.3fr; gap: 16px; padding: 0 0 12px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
+        <div>Nama Kreator</div>
+        <div>Nama Sampel</div>
+        <div>Status Sampel</div>
+        <div>Keterangan</div>
+      </div>
+      <div id="campaignHistoryRowsContainer" style="display: flex; flex-direction: column; gap: 14px; max-height: 55vh; overflow-y: auto; padding-right: 4px;"></div>
+    </div>
+  </div>
+
   <!-- Modal PopUp Keluarkan Kreator (Wajib Keterangan) -->
   <div id="modalKeluarkanKreator" class="modal-overlay">
     <div class="modal-box modal-box--small" style="max-width: 460px; width: 92%; padding: 24px 28px; border-radius: 12px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.18);">
@@ -2778,7 +2843,7 @@
             }
           });
 
-          // Clicking the Ã¢ÂÅ’ button deletes the item completely from the list
+          // Clicking the ÃƒÂ¢Ã‚ÂÃ…â€™ button deletes the item completely from the list
           xBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             const wasSelected = opt.classList.contains('prio-selected');
@@ -3323,7 +3388,7 @@
       function cleanCategoryOnly(cat) {
         if (!cat || cat === "-") return "-";
         let clean = String(cat).trim();
-        const parts = clean.split(/[\-\Ã¢â‚¬â€œ\Ã¢â‚¬â€\:\|]/);
+        const parts = clean.split(/[\-\ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“\ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â\:\|]/);
         if (parts.length > 0 && parts[0].trim()) {
           clean = parts[0].trim();
         }
@@ -3385,7 +3450,12 @@
           for (const key of keysToTry) {
             const saved = localStorage.getItem(key);
             if (saved) {
-              const parsed = JSON.parse(saved);
+              let parsed;
+              try {
+                parsed = JSON.parse(saved);
+              } catch (err) {
+                continue;
+              }
               if (Array.isArray(parsed) && parsed.length > 0) {
                 const mapped = parsed.map(k => {
                   const rawCategories = [];
@@ -3595,7 +3665,7 @@
         if (!cat || cat === "-") return "-";
         let clean = String(cat).trim();
         if (clean.includes(" - ")) clean = clean.split(" - ")[0].trim();
-        else if (clean.includes(" Ã¢â‚¬â€œ ")) clean = clean.split(" Ã¢â‚¬â€œ ")[0].trim();
+        else if (clean.includes(" ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ ")) clean = clean.split(" ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ ")[0].trim();
         else if (clean.includes(" : ")) clean = clean.split(" : ")[0].trim();
         else if (clean.includes(" | ")) clean = clean.split(" | ")[0].trim();
         return clean;
@@ -3976,7 +4046,12 @@
           for (const key of kreatorStorageKeys) {
             const saved = localStorage.getItem(key);
             if (saved) {
-              let list = JSON.parse(saved);
+              let list;
+              try {
+                list = JSON.parse(saved);
+              } catch (err) {
+                continue;
+              }
               if (Array.isArray(list) && list.length > 0) {
                 let updated = false;
                 list.forEach(item => {
@@ -4043,10 +4118,23 @@
               matched.categories = existingCats;
               matched.category = existingCats[0] || newCategory;
 
-              let listToSave = [];
-              const savedV13 = localStorage.getItem("bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13") || localStorage.getItem("bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13", "bisa_kreator_list_v12");
-              if (savedV13) {
-                try { listToSave = JSON.parse(savedV13); } catch (e) {}
+              let listToSave = null;
+              const kreatorKeys = [
+                "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18",
+                "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14",
+                "bisa_kreator_list_v13", "bisa_kreator_list_v12", "bisa_kreator_list_v11", "bisa_kreator_list_v10",
+                "bisa_kreator_list_v9", "bisa_kreator_list_v8", "bisa_kreator_list_v7", "bisa_kreator_list"
+              ];
+              for (const key of kreatorKeys) {
+                const raw = localStorage.getItem(key);
+                if (!raw) continue;
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (Array.isArray(parsed) && parsed.length > 0) {
+                    listToSave = parsed;
+                    break;
+                  }
+                } catch (e) {}
               }
               if (!Array.isArray(listToSave) || listToSave.length === 0) {
                 listToSave = allCurrent.map(k => {
@@ -4127,7 +4215,7 @@
                   });
                 }
               }
-              localStorage.setItem("bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19", "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16", "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13", JSON.stringify(listToSave));
+              localStorage.setItem("bisa_kreator_list_v21", JSON.stringify(listToSave));
             }
           }
 
@@ -4229,7 +4317,12 @@
           for (const key of kreatorStorageKeys) {
             const saved = localStorage.getItem(key);
             if (saved) {
-              let list = JSON.parse(saved);
+              let list;
+              try {
+                list = JSON.parse(saved);
+              } catch (err) {
+                continue;
+              }
               if (Array.isArray(list) && list.length > 0) {
                 let updated = false;
                 list.forEach(item => {
@@ -4311,7 +4404,7 @@
             rowDiv.innerHTML = `
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid ${isChecked ? '#29A3D8' : '#cbd5e1'}; background: ${isChecked ? '#29A3D8' : '#fff'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; font-size: 11px; font-weight: bold;">
-                  ${isChecked ? 'Ã¢Å“â€œ' : ''}
+                  ${isChecked ? 'ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“' : ''}
                 </div>
                 <span style="font-size: 13.5px; font-weight: ${isChecked ? '700' : '600'}; color: #1e293b; font-family: 'Outfit', sans-serif;">
                   ${slotItem.kategori || `Kategori ${slotItem.slot}`}
@@ -5398,7 +5491,12 @@
             for (const key of kreatorStorageKeys) {
               const savedKreators = localStorage.getItem(key);
               if (savedKreators) {
-                const parsedList = JSON.parse(savedKreators);
+                let parsedList;
+                try {
+                  parsedList = JSON.parse(savedKreators);
+                } catch (err) {
+                  continue;
+                }
                 if (Array.isArray(parsedList) && parsedList.length > 0) {
                   let updated = false;
                   parsedList.forEach(item => {
@@ -6168,6 +6266,12 @@
       function renderCampaignTable() {
         if (!campaignTableBody) return;
         campaignTableBody.innerHTML = "";
+
+        if (checkAllRows) {
+          checkAllRows.checked = false;
+          checkAllRows.indeterminate = false;
+        }
+        updateBulkActionsState();
         updateCampaignOverview();
 
         const tableWrapper = document.getElementById("tableContainerWrapper");
@@ -6246,6 +6350,9 @@
         filtered.forEach((item, index) => {
           const row = document.createElement("tr");
           row.innerHTML = `
+            <td style="text-align: center; vertical-align: middle;">
+              <input type="checkbox" class="row-select-checkbox table-checkbox" data-id="${item.id}" value="${item.id}" />
+            </td>
             <td>${index + 1}</td>
             <td style="font-weight: 600;">${item.brand || "-"}</td>
             <td>${item.kategori || "-"}</td>
@@ -6734,6 +6841,102 @@
         });
       }
 
+      
+      // Bulk Actions & Checkbox Handling
+      const checkAllRows = document.getElementById("checkAllRows");
+      const btnBulkDelete = document.getElementById("btnBulkDelete");
+
+      function getSelectedRowIds() {
+        const checked = document.querySelectorAll(".row-select-checkbox:checked");
+        return Array.from(checked).map(cb => cb.dataset.id);
+      }
+
+      function updateBulkActionsState() {
+        const allCheckboxes = document.querySelectorAll(".row-select-checkbox");
+        const checkedCheckboxes = document.querySelectorAll(".row-select-checkbox:checked");
+        const count = checkedCheckboxes.length;
+
+        if (checkAllRows) {
+          checkAllRows.checked = allCheckboxes.length > 0 && checkedCheckboxes.length === allCheckboxes.length;
+          checkAllRows.indeterminate = count > 0 && count < allCheckboxes.length;
+        }
+
+        if (btnBulkDelete) {
+          if (count > 0) {
+            btnBulkDelete.style.display = "inline-flex";
+            const countSpan = btnBulkDelete.querySelector(".bulk-count");
+            if (countSpan) countSpan.textContent = count;
+          } else {
+            btnBulkDelete.style.display = "none";
+          }
+        }
+      }
+
+      if (checkAllRows) {
+        checkAllRows.addEventListener("change", function () {
+          const checkboxes = document.querySelectorAll(".row-select-checkbox");
+          checkboxes.forEach(cb => {
+            cb.checked = checkAllRows.checked;
+          });
+          updateBulkActionsState();
+        });
+      }
+
+      if (campaignTableBody) {
+        campaignTableBody.addEventListener("change", function (e) {
+          if (e.target && e.target.classList.contains("row-select-checkbox")) {
+            updateBulkActionsState();
+          }
+        });
+      }
+
+      const btnBulkCancel = document.getElementById("btnBulkCancel");
+      if (btnBulkCancel) {
+        btnBulkCancel.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
+          updateBulkActionsState();
+        });
+      }
+
+      if (btnBulkDelete) {
+        btnBulkDelete.addEventListener("click", function () {
+          const selectedIds = getSelectedRowIds();
+          if (!selectedIds.length) return;
+
+          Swal.fire({
+            title: `Hapus ${selectedIds.length} Campaign Terpilih?`,
+            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.length}</strong> campaign yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusCancel: true,
+            customClass: { popup: 'swal2-bisa-popup' }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              campaignDb = campaignDb.filter(t => !selectedIds.includes(String(t.id)));
+              saveCampaignDb();
+              renderCampaignTable();
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil Dihapus!',
+                text: `${selectedIds.length} campaign berhasil dihapus.`,
+                confirmButtonColor: '#29A3D8',
+                confirmButtonText: 'Selesai',
+                timer: 2000,
+                timerProgressBar: true,
+                customClass: { popup: 'swal2-bisa-popup' }
+              });
+            }
+          });
+        });
+      }
+
       if (btnConfirmDelete) {
         btnConfirmDelete.addEventListener("click", () => {
           if (pendingDeleteCampaignId) {
@@ -6747,15 +6950,33 @@
         });
       }
 
+      const campaignHistoryModalEl = document.getElementById("campaignHistoryModal");
+      const closeCampaignHistoryBtn = document.getElementById("closeCampaignHistoryModal");
+      if (closeCampaignHistoryBtn && campaignHistoryModalEl) {
+        closeCampaignHistoryBtn.addEventListener("click", () => campaignHistoryModalEl.classList.remove("is-active"));
+      }
+      if (campaignHistoryModalEl) {
+        campaignHistoryModalEl.addEventListener("click", (e) => {
+          if (e.target === campaignHistoryModalEl) campaignHistoryModalEl.classList.remove("is-active");
+        });
+      }
+
       function syncCampaignSamplesToTracking(campaign) {
         if (!campaign) return;
-        const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v11";
+        const TRACKING_STORAGE_KEY = "bisa_tracking_sampel_list_v13";
         let trackingList = [];
         try {
-          const raw = localStorage.getItem(TRACKING_STORAGE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) trackingList = parsed;
+          const trackingKeys = [TRACKING_STORAGE_KEY, "bisa_tracking_sampel_list_v12", "bisa_tracking_sampel_list_v11"];
+          for (const key of trackingKeys) {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            try {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) {
+                trackingList = parsed;
+                break;
+              }
+            } catch (err) {}
           }
         } catch (e) {
           console.error("Error reading tracking data for sync:", e);
@@ -6816,7 +7037,7 @@
             if (existingIdx === -1) {
               let maxNum = 0;
               trackingList.forEach(t => {
-                if (t.id && t.id.startsWith("TRK-")) {
+                if (t.id && String(t.id).startsWith("TRK-")) {
                   const num = parseInt(t.id.replace("TRK-", ""), 10);
                   if (!isNaN(num) && num > maxNum) maxNum = num;
                 }
@@ -7152,6 +7373,8 @@
       const btnExportExcel = document.getElementById("btnExportExcel");
       if (btnExportExcel) {
         btnExportExcel.addEventListener("click", () => {
+          const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
+          const isPartialExport = checkedBoxes.length > 0;
           if (!campaignDb || campaignDb.length === 0) {
             if (typeof Swal !== "undefined") {
               Swal.fire({
@@ -7212,6 +7435,11 @@
             });
           }
 
+          if (isPartialExport) {
+            const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
+            exportList = exportList.filter(item => selectedIds.has(String(item.id)));
+          }
+
           const headers = [
             "No", "ID Campaign", "Brand/Seller", "Kategori", "PIC", "Kreator",
             "Jenis Campaign", "Tanggal Mulai", "Tanggal Selesai", "Status Campaign",
@@ -7242,31 +7470,40 @@
           const todayStr = new Date().toISOString().slice(0, 10);
           if (typeof exportBisaExcel === 'function') {
             exportBisaExcel({
-              title: "DATA CAMPAIGN",
-              filename: `data_campaign_${todayStr}.xlsx`,
+              title: isPartialExport ? `DATA CAMPAIGN (${exportList.length} DATA PILIHAN)` : "DATA CAMPAIGN",
+              filename: isPartialExport ? `data_campaign_pilihan_${todayStr}.xlsx` : `data_campaign_${todayStr}.xlsx`,
               sheetName: "Campaign",
               headers: headers,
               rows: rows
             });
-            showToast("Data campaign berhasil diekspor ke Excel (.xlsx)", "success");
+            showToast(
+              isPartialExport
+                ? `${exportList.length} data campaign pilihan berhasil diekspor ke Excel (.xlsx)`
+                : "Data campaign berhasil diekspor ke Excel (.xlsx)",
+              "success"
+            );
           } else {
             const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))].join("\n");
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const csvName = isPartialExport ? `data_campaign_pilihan_${todayStr}.csv` : `data_campaign_${todayStr}.csv`;
           if (typeof window.downloadBlobSafely === 'function') {
-            window.downloadBlobSafely(blob, `data_campaign_${todayStr}.csv`);
+            window.downloadBlobSafely(blob, csvName);
           } else {
             const reader = new FileReader();
             reader.onloadend = function() {
               const link = document.createElement("a");
               link.href = reader.result;
-              link.download = `data_campaign_${todayStr}.csv`;
+              link.download = csvName;
               document.body.appendChild(link);
               link.click();
               setTimeout(() => { if (link.parentNode) link.parentNode.removeChild(link); }, 1500);
             };
             reader.readAsDataURL(blob);
           }
-            showToast("Data berhasil diekspor", "success");
+            showToast(
+              isPartialExport ? `${exportList.length} data campaign pilihan berhasil diekspor` : "Data berhasil diekspor",
+              "success"
+            );
           }
         });
       }
@@ -7565,8 +7802,10 @@
       setInterval(cleanEditBtns, 400);
     })();
   </script>
-  <script src="../../assets/js/layout.js?v=999"></script>
+  <script src="../../assets/js/layout.js?v=1002"></script>
 </body>
 
 </html>
+
+
 
