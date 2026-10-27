@@ -699,7 +699,7 @@
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
             <!-- Green Excel Button with tooltip -->
-            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx). Centang baris untuk mengekspor sebagian data.">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
                 <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
@@ -788,11 +788,6 @@
               </button>
             </div>
 
-            <!-- Bulk Delete Button (Muncul jika ada baris dipilih) -->
-            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
-              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
-              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
-            </button>
           </div>
 
           <div class="campaign-toolbar__right">
@@ -1047,7 +1042,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="../../assets/js/layout.js?v=1002"></script>
+  <script src="../../assets/js/layout.js?v=1004"></script>
 
   <script>
     (function () {
@@ -2381,13 +2376,11 @@
 
   
 
-      // ================= BULK CHECKBOX & DELETE TRACKING KREATOR =================
+      // ================= BULK CHECKBOX UNTUK EXPORT TRACKING KREATOR =================
       function updateBulkActionsState() {
         const rowCheckboxes = Array.from(document.querySelectorAll(".row-select-checkbox"));
         const checkedBoxes = rowCheckboxes.filter(cb => cb.checked);
         const checkAll = document.getElementById("checkAllRows");
-        const btnBulkDelete = document.getElementById("btnBulkDelete");
-        const bulkCountSpan = document.querySelector(".bulk-count");
 
         if (checkAll) {
           if (rowCheckboxes.length > 0 && checkedBoxes.length === rowCheckboxes.length) {
@@ -2400,14 +2393,6 @@
             checkAll.checked = false;
             checkAll.indeterminate = false;
           }
-        }
-
-        if (bulkCountSpan) {
-          bulkCountSpan.textContent = checkedBoxes.length;
-        }
-
-        if (btnBulkDelete) {
-          btnBulkDelete.style.display = checkedBoxes.length > 0 ? "inline-flex" : "none";
         }
       }
 
@@ -2427,64 +2412,6 @@
             updateBulkActionsState();
           }
         });
-      }
-
-      function handleBulkDeleteTracking() {
-        const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
-        if (checkedBoxes.length === 0) return;
-        const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
-
-        if (typeof Swal !== "undefined") {
-          Swal.fire({
-            title: 'Hapus Data Terpilih?',
-            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.size} data tracking kreator</strong> yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: '<i class="bx bx-trash"></i> Ya, Hapus',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-            customClass: { popup: 'swal2-bisa-popup' }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              const hiddenIds = getHiddenTrackingIds();
-              selectedIds.forEach(id => hiddenIds.add(String(id)));
-              saveHiddenTrackingIds(hiddenIds);
-              renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
-              Swal.fire({
-                icon: 'success',
-                title: 'Berhasil Dihapus',
-                text: `${selectedIds.size} data tracking kreator berhasil dihapus. Data master kreator tetap aman.`,
-                timer: 1800,
-                showConfirmButton: false,
-                customClass: { popup: 'swal2-bisa-popup' }
-              });
-            }
-          });
-        } else {
-          if (confirm(`Hapus ${selectedIds.size} data tracking kreator? Data master kreator tidak akan dihapus.`)) {
-            const hiddenIds = getHiddenTrackingIds();
-            selectedIds.forEach(id => hiddenIds.add(String(id)));
-            saveHiddenTrackingIds(hiddenIds);
-            renderTrackingTable(searchKreatorInput ? searchKreatorInput.value : "");
-          }
-        }
-      }
-
-      const btnBulkCancelEl = document.getElementById("btnBulkCancel");
-      if (btnBulkCancelEl) {
-        btnBulkCancelEl.addEventListener("click", function (event) {
-          event.preventDefault();
-          event.stopPropagation();
-          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
-          updateBulkActionsState();
-        });
-      }
-
-      const btnBulkDeleteEl = document.getElementById("btnBulkDelete");
-      if (btnBulkDeleteEl) {
-        btnBulkDeleteEl.addEventListener("click", handleBulkDeleteTracking);
       }
 
       // ================= EXPORT EXCEL TABEL TRACKING KREATOR =================

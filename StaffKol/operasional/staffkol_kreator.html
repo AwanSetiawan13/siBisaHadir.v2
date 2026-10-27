@@ -782,7 +782,7 @@
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
             <!-- Green Excel Button with tooltip -->
-            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Kelola Data Excel (Import / Export)" title="Kelola Data Excel (Import / Export)">
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx). Centang baris untuk mengekspor sebagian data.">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
                 <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
@@ -866,17 +866,6 @@
               </button>
             </div>
 
-            <!-- Bulk Delete Button (Muncul jika ada baris dipilih) -->
-            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
-              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
-              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
-            </button>
-          </div>
-
-          <div class="campaign-toolbar__right" style="display: flex; align-items: center; gap: 8px;">
-            <button class="btn-tambah" style="margin-right: 6px;" type="button">
-              + Tambah
-            </button>
           </div>
         </div>
 
@@ -896,7 +885,7 @@
             <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
           </svg>
           <div class="app-empty-state__title">Belum ada data Kreator</div>
-          <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan kreator baru.</div>
+          <div class="app-empty-state__subtitle">Data kreator akan tampil di sini setelah tersedia.</div>
         </div>
 
         <div class="table-wrap campaign-table" id="tableContainerWrapper">
@@ -1289,7 +1278,7 @@
     </div>
   </div>
 
-      <!-- Modal Pilihan Aksi Excel (Import / Export) - Clean List Style -->
+      <!-- Modal Export Excel -->
   <div id="modalOpsiExcelKreator" class="modal-overlay">
     <div class="modal-box" style="max-width: 380px; border-radius: 14px; padding: 22px 22px 20px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);">
       <!-- Header -->
@@ -1299,8 +1288,8 @@
             <i class="bx bx-spreadsheet"></i>
           </div>
           <div>
-            <div style="font-size: 15px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif; line-height: 1.2;">Data Excel</div>
-            <div style="font-size: 12px; color: #94a3b8; font-family: 'Outfit', sans-serif;">Pilih tindakan</div>
+            <div style="font-size: 15px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif; line-height: 1.2;">Export Data</div>
+            <div style="font-size: 12px; color: #94a3b8; font-family: 'Outfit', sans-serif;">Unduh ke Excel</div>
           </div>
         </div>
         <button type="button" id="closeOpsiExcelModal" aria-label="Tutup" style="background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #64748b; cursor: pointer; transition: all 0.15s ease; line-height: 1; padding: 0;" onmouseover="this.style.background='#e2e8f0';this.style.color='#1e293b';" onmouseout="this.style.background='#f1f5f9';this.style.color='#64748b';">&times;</button>
@@ -1311,18 +1300,6 @@
 
       <!-- Action List -->
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <!-- Import -->
-        <button type="button" id="btnPilihImportExcel" class="excel-action-item excel-action-item--import">
-          <div class="excel-action-icon excel-action-icon--import">
-            <i class="bx bx-upload"></i>
-          </div>
-          <div style="flex: 1;">
-            <div style="font-size: 13.5px; font-weight: 700; color: #1e293b;">Import Data</div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Unggah file .xlsx atau .csv</div>
-          </div>
-          <i class="bx bx-chevron-right excel-action-arrow"></i>
-        </button>
-
         <!-- Export -->
         <button type="button" id="btnPilihExportExcel" class="excel-action-item excel-action-item--export">
           <div class="excel-action-icon excel-action-icon--export">
@@ -3956,14 +3933,6 @@
       }
 
 
-      const tambahBtn = document.querySelector(".btn-tambah");
-      if (tambahBtn) {
-        tambahBtn.addEventListener("click", function () {
-          resetKreatorForm();
-          if (kreatorModalEl) kreatorModalEl.classList.add("is-active");
-        });
-      }
-
       // Toolbar: Real-time Search with Clear Button (Sama dengan Campaign)
       const searchKreatorInput = document.getElementById("searchKreatorInput") || document.querySelector(".campaign-search input");
       const searchInput = searchKreatorInput;
@@ -4083,13 +4052,11 @@
         });
       }
 
-      // ================= BULK CHECKBOX & DELETE DATA KREATOR =================
+      // ================= BULK CHECKBOX UNTUK EXPORT DATA KREATOR =================
       function updateBulkActionsState() {
         const rowCheckboxes = Array.from(document.querySelectorAll(".row-select-checkbox"));
         const checkedBoxes = rowCheckboxes.filter(cb => cb.checked);
         const checkAll = document.getElementById("checkAllRows");
-        const btnBulkDelete = document.getElementById("btnBulkDelete");
-        const bulkCountSpan = document.querySelector(".bulk-count");
 
         if (checkAll) {
           if (rowCheckboxes.length > 0 && checkedBoxes.length === rowCheckboxes.length) {
@@ -4102,14 +4069,6 @@
             checkAll.checked = false;
             checkAll.indeterminate = false;
           }
-        }
-
-        if (bulkCountSpan) {
-          bulkCountSpan.textContent = checkedBoxes.length;
-        }
-
-        if (btnBulkDelete) {
-          btnBulkDelete.style.display = checkedBoxes.length > 0 ? "inline-flex" : "none";
         }
       }
 
@@ -4129,62 +4088,6 @@
             updateBulkActionsState();
           }
         });
-      }
-
-      function handleBulkDeleteKreator() {
-        const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
-        if (checkedBoxes.length === 0) return;
-        const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
-
-        if (typeof Swal !== "undefined") {
-          Swal.fire({
-            title: 'Hapus Data Terpilih?',
-            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.size} data kreator</strong> yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: '<i class="bx bx-trash"></i> Ya, Hapus',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-            customClass: { popup: 'swal2-bisa-popup' }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              kreatorDb = kreatorDb.filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
-              saveKreatorDb();
-              renderKreatorTable(searchKreatorInput ? searchKreatorInput.value : "");
-              Swal.fire({
-                icon: 'success',
-                title: 'Berhasil Dihapus',
-                text: `${selectedIds.size} data kreator berhasil dihapus.`,
-                timer: 1800,
-                showConfirmButton: false,
-                customClass: { popup: 'swal2-bisa-popup' }
-              });
-            }
-          });
-        } else {
-          if (confirm(`Hapus ${selectedIds.size} data kreator?`)) {
-            kreatorDb = kreatorDb.filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
-            saveKreatorDb();
-            renderKreatorTable(searchKreatorInput ? searchKreatorInput.value : "");
-          }
-        }
-      }
-
-      const btnBulkCancelEl = document.getElementById("btnBulkCancel");
-      if (btnBulkCancelEl) {
-        btnBulkCancelEl.addEventListener("click", function (event) {
-          event.preventDefault();
-          event.stopPropagation();
-          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
-          updateBulkActionsState();
-        });
-      }
-
-      const btnBulkDeleteEl = document.getElementById("btnBulkDelete");
-      if (btnBulkDeleteEl) {
-        btnBulkDeleteEl.addEventListener("click", handleBulkDeleteKreator);
       }
 
       // Toolbar: Excel Export (CSV / XLSX)
@@ -4302,7 +4205,7 @@
       }
       window.handleExportKreator = handleExportKreator;
 
-      // Helper: lepas semua pilihan checkbox & sembunyikan tombol hapus setelah export
+      // Helper: lepas semua pilihan checkbox setelah export
       function clearBulkSelection() {
         document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
         const checkAll = document.getElementById("checkAllRows");
@@ -4312,10 +4215,9 @@
 
       const btnExportExcel = document.getElementById("btnExportExcel");
 
-      // ===== MODAL PILIHAN EXCEL (IMPORT / EXPORT) =====
+      // ===== MODAL EXPORT EXCEL =====
       const modalOpsiExcel = document.getElementById("modalOpsiExcelKreator");
       const closeOpsiExcelModal = document.getElementById("closeOpsiExcelModal");
-      const btnPilihImportExcel = document.getElementById("btnPilihImportExcel");
       const btnPilihExportExcel = document.getElementById("btnPilihExportExcel");
       const exportChoiceSubtext = document.getElementById("exportChoiceSubtext");
       const exportChoiceBadge = document.getElementById("exportChoiceBadge");
@@ -4362,13 +4264,6 @@
         });
       }
 
-      if (btnPilihImportExcel) {
-        btnPilihImportExcel.addEventListener("click", function() {
-          closeOpsiExcelModalFunc();
-          openImportModal();
-        });
-      }
-
       if (btnPilihExportExcel) {
         btnPilihExportExcel.addEventListener("click", function() {
           closeOpsiExcelModalFunc();
@@ -4388,7 +4283,7 @@
       setInterval(cleanEditBtns, 400);
     })();
   </script>
-  <script src="../../assets/js/layout.js?v=1002"></script>
+  <script src="../../assets/js/layout.js?v=1004"></script>
 </body>
 
 </html>

@@ -1233,6 +1233,81 @@
       font-weight: 600 !important;
       margin: 0 !important;
     }
+
+    .variant-qty-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 1px;
+      height: 26px;
+      padding: 2px;
+      background: #ffffff;
+      border: 1px solid #dbe3ef;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .variant-qty-control:hover,
+    .variant-qty-control:focus-within {
+      border-color: #7dd3fc;
+      background: #f8fcff;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.08), 0 2px 6px rgba(15, 23, 42, 0.06);
+    }
+
+    .variant-qty-btn {
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    }
+
+    .variant-qty-btn svg {
+      width: 10px;
+      height: 10px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .variant-qty-btn:hover:not(:disabled) {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .variant-qty-btn:active:not(:disabled) {
+      transform: scale(0.88);
+    }
+
+    .variant-qty-btn:disabled {
+      color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .variant-qty-input {
+      width: 26px;
+      height: 20px;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0f172a;
+      caret-color: #0284c7;
+    }
+
+    .variant-qty-input:focus {
+      color: #0284c7;
+    }
   </style>
 
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
@@ -2581,13 +2656,28 @@
         <button class="modal-close" type="button" id="closeCampaignHistoryModal" aria-label="Tutup popup">&times;</button>
       </div>
       <div class="modal-divider"></div>
-      <div style="display: grid; grid-template-columns: 1.4fr 1.3fr 1fr 1.3fr; gap: 16px; padding: 0 0 12px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
-        <div>Nama Kreator</div>
-        <div>Nama Sampel</div>
-        <div>Status Sampel</div>
-        <div>Keterangan</div>
+      <div style="display: flex; gap: 24px; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px;">
+        <button type="button" class="campaign-history-tab" data-history-tab="changes" style="border: none; border-bottom: 2px solid #0284c7; background: transparent; color: #0284c7; font-size: 13px; font-weight: 700; padding: 9px 2px; cursor: pointer; font-family: 'Outfit', sans-serif;">Perubahan Campaign</button>
+        <button type="button" class="campaign-history-tab" data-history-tab="creators" style="border: none; border-bottom: 2px solid transparent; background: transparent; color: #64748b; font-size: 13px; font-weight: 600; padding: 9px 2px; cursor: pointer; font-family: 'Outfit', sans-serif;">Riwayat Kreator</button>
       </div>
-      <div id="campaignHistoryRowsContainer" style="display: flex; flex-direction: column; gap: 14px; max-height: 55vh; overflow-y: auto; padding-right: 4px;"></div>
+      <div id="campaignHistoryChangeWrap">
+        <div style="display: grid; grid-template-columns: 1.15fr 1fr 1.6fr 2.25fr; gap: 16px; padding: 0 0 12px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
+          <div>Tanggal Diubah</div>
+          <div>Diubah Oleh</div>
+          <div>Aksi</div>
+          <div>Detail Perubahan</div>
+        </div>
+        <div id="campaignChangeRowsContainer" style="display: flex; flex-direction: column; gap: 14px; max-height: 55vh; overflow-y: auto; padding-right: 4px;"></div>
+      </div>
+      <div id="campaignHistoryCreatorWrap" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1.4fr 1.3fr 1fr 1.3fr; gap: 16px; padding: 0 0 12px; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em;">
+          <div>Nama Kreator</div>
+          <div>Nama Sampel</div>
+          <div>Status Sampel</div>
+          <div>Keterangan</div>
+        </div>
+        <div id="campaignHistoryRowsContainer" style="display: flex; flex-direction: column; gap: 14px; max-height: 55vh; overflow-y: auto; padding-right: 4px;"></div>
+      </div>
     </div>
   </div>
 
@@ -2716,6 +2806,7 @@
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../../assets/js/app.js"></script>
+  <script src="../../assets/js/campaign_pic_shared.js"></script>
   <script>
     (function () {
       function initCustomDropdown(wrapId, inputId, triggerId, dropdownId, itemsContainerId, clearBtnId, hiddenInputId, defaultPlaceholder) {
@@ -3056,6 +3147,7 @@
 
       // --- NEW WORKFLOW: KREATOR & SAMPEL VARIANT + STOCK MANAGEMENT ---
       const SAMPLE_VARIANTS_KEY = "bisa_sampel_variants_v3";
+      const STOCK_ADJUSTMENTS_KEY = "bisa_sampel_stock_adjustments_v1";
       const DEFAULT_SAMPLE_VARIANTS = {
         "Pashmina Ceruty Baby Doll": [
           { nama: "Hitam (Standar)", stok: 5, status: "Ready" },
@@ -3120,12 +3212,18 @@
         ]
       };
 
+      function normalizeSampleQty(value) {
+        const qty = parseInt(value, 10);
+        return Number.isFinite(qty) && qty > 0 ? qty : 1;
+      }
+
       function parseSampleItem(item) {
         if (typeof item === "object" && item !== null) {
           return {
             nama: item.nama || item.sampleName || "Sampel",
             varian: item.varian || item.variant || "",
-            pid: item.pid || ""
+            pid: item.pid || "",
+            qty: normalizeSampleQty(item.qty)
           };
         }
         const str = String(item || "").trim();
@@ -3134,7 +3232,8 @@
           return {
             nama: parts[0].trim(),
             varian: parts.slice(1).join(" - ").trim(),
-            pid: ""
+            pid: "",
+            qty: 1
           };
         }
         const matchParen = str.match(/^(.*?)\s*\((.*?)\)$/);
@@ -3142,14 +3241,36 @@
           return {
             nama: matchParen[1].trim(),
             varian: matchParen[2].trim(),
-            pid: ""
+            pid: "",
+            qty: 1
           };
         }
-        return { nama: str, varian: "", pid: "" };
+        return { nama: str, varian: "", pid: "", qty: 1 };
       }
 
       function formatSampleItem(nama, varian) {
         return varian ? `${nama} - ${varian}` : nama;
+      }
+
+      function createSampleItem(nama, varian, qty, pid) {
+        return {
+          nama: nama || "Sampel",
+          varian: varian || "",
+          pid: pid || "",
+          qty: normalizeSampleQty(qty)
+        };
+      }
+
+      function sampleIdentity(nama, varian) {
+        return `${String(nama || "").trim().toLowerCase()}|${String(varian || "").trim().toLowerCase()}`;
+      }
+
+      function findSampleIndex(samples, nama, varian) {
+        const target = sampleIdentity(nama, varian);
+        return (Array.isArray(samples) ? samples : []).findIndex(item => {
+          const parsed = parseSampleItem(item);
+          return sampleIdentity(parsed.nama, parsed.varian) === target;
+        });
       }
 
       function getSampleVariantsData() {
@@ -3168,104 +3289,175 @@
         } catch (e) {}
       }
 
-      function getVariantsForSample(sampleName) {
-        const cleanName = (sampleName || "").trim();
-        const allData = getSampleVariantsData();
-        if (allData[cleanName] && Array.isArray(allData[cleanName]) && allData[cleanName].length > 0) {
-          return allData[cleanName];
+      function getStockAdjustmentsData() {
+        try {
+          const saved = localStorage.getItem(STOCK_ADJUSTMENTS_KEY);
+          if (!saved) return {};
+          const parsed = JSON.parse(saved);
+          return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+        } catch (e) {
+          return {};
         }
+      }
 
-        // Search in brand database
+      function saveStockAdjustmentsData(data) {
+        try {
+          localStorage.setItem(STOCK_ADJUSTMENTS_KEY, JSON.stringify(data || {}));
+        } catch (e) {}
+      }
+
+      function findCaseInsensitiveKey(obj, key) {
+        const target = String(key || "").trim().toLowerCase();
+        if (!target) return "";
+        return Object.keys(obj || {}).find(k => String(k).trim().toLowerCase() === target) || "";
+      }
+
+      function applyStockAdjustments(sampleName, variants) {
+        const adjustments = getStockAdjustmentsData();
+        const sampleKey = findCaseInsensitiveKey(adjustments, sampleName);
+        const sampleAdjustments = sampleKey ? adjustments[sampleKey] : {};
+        return (Array.isArray(variants) ? variants : []).map(v => {
+          const variantKey = findCaseInsensitiveKey(sampleAdjustments, v.nama);
+          const delta = variantKey ? (Number(sampleAdjustments[variantKey]) || 0) : 0;
+          const stock = Math.max(0, (Number(v.stok) || 0) + delta);
+          return {
+            ...v,
+            stok: stock,
+            status: stock > 0 ? "Ready" : "Habis"
+          };
+        });
+      }
+
+      function getBrandSampleVariants(sampleName) {
+        const cleanName = String(sampleName || "").trim();
+        if (!cleanName) return null;
+
+        const selectedBrandName = campaignBrandSelect ? campaignBrandSelect.value : "";
         const brands = getBrandDatabase();
-        for (const brand of brands) {
-          if (Array.isArray(brand.sampel)) {
-            const foundSample = brand.sampel.find(s => {
-              const sName = (typeof s === "string" ? s : (s.nama || s.pid || "")).trim();
-              return sName.toLowerCase() === cleanName.toLowerCase() || (s.pid && s.pid.toLowerCase() === cleanName.toLowerCase());
+        const orderedBrands = selectedBrandName
+          ? brands.slice().sort((a, b) => {
+              const aMatch = String(a.nama || "").toLowerCase() === selectedBrandName.toLowerCase();
+              const bMatch = String(b.nama || "").toLowerCase() === selectedBrandName.toLowerCase();
+              return aMatch === bMatch ? 0 : (aMatch ? -1 : 1);
+            })
+          : brands;
+
+        for (const brand of orderedBrands) {
+          if (!Array.isArray(brand.sampel)) continue;
+          const foundSample = brand.sampel.find(s => {
+            if (typeof s === "string") return s.trim().toLowerCase() === cleanName.toLowerCase();
+            const sampleNameText = String(s.nama || "").trim();
+            const samplePid = String(s.pid || "").trim();
+            return sampleNameText.toLowerCase() === cleanName.toLowerCase() ||
+              samplePid.toLowerCase() === cleanName.toLowerCase();
+          });
+
+          if (!foundSample || typeof foundSample !== "object") continue;
+
+          if (Array.isArray(foundSample.variants) && foundSample.variants.length > 0) {
+            return foundSample.variants.map(v => {
+              const nameParts = [];
+              if (v.varian1) nameParts.push(v.varian1);
+              if (v.varian2) nameParts.push(`(${v.varian2})`);
+              const varName = nameParts.length > 0 ? nameParts.join(" ") : (v.nama || "Standar");
+              const vStock = Math.max(0, Number(v.stok) || 0);
+              return {
+                nama: varName,
+                stok: vStock,
+                status: vStock > 0 ? "Ready" : "Habis"
+              };
             });
-
-            if (foundSample && typeof foundSample === "object") {
-              if (Array.isArray(foundSample.variants) && foundSample.variants.length > 0) {
-                const generatedVariants = foundSample.variants.map(v => {
-                  let nameParts = [];
-                  if (v.varian1) nameParts.push(v.varian1);
-                  if (v.varian2) nameParts.push(`(${v.varian2})`);
-                  const varName = nameParts.length > 0 ? nameParts.join(" ") : "Standar";
-                  const vStock = Number(v.stok) || 0;
-                  return {
-                    nama: varName,
-                    stok: vStock,
-                    status: vStock > 0 ? "Ready" : "Habis"
-                  };
-                });
-                if (generatedVariants.length > 0) {
-                  allData[cleanName] = generatedVariants;
-                  saveSampleVariantsData(allData);
-                  return generatedVariants;
-                }
-              }
-
-              let v1 = [];
-              let v2 = [];
-              if (Array.isArray(foundSample.varian1List) && foundSample.varian1List.length > 0) {
-                v1 = foundSample.varian1List;
-              } else if (foundSample.varian1 && typeof foundSample.varian1 === "string") {
-                v1 = foundSample.varian1.split(",").map(s => s.trim()).filter(Boolean);
-              }
-              if (Array.isArray(foundSample.varian2List) && foundSample.varian2List.length > 0) {
-                v2 = foundSample.varian2List;
-              } else if (foundSample.varian2 && typeof foundSample.varian2 === "string") {
-                v2 = foundSample.varian2.split(",").map(s => s.trim()).filter(Boolean);
-              }
-
-              const generatedVariants = [];
-              const rawStock = Number(foundSample.stok) || 10;
-
-              if (v1.length > 0 && v2.length > 0) {
-                const perStock = Math.max(1, Math.floor(rawStock / (v1.length * v2.length)));
-                v1.forEach(item1 => {
-                  v2.forEach(item2 => {
-                    generatedVariants.push({
-                      nama: `${item1} (${item2})`,
-                      stok: perStock,
-                      status: perStock > 0 ? "Ready" : "Habis"
-                    });
-                  });
-                });
-              } else if (v1.length > 0) {
-                const perStock = Math.max(1, Math.floor(rawStock / v1.length));
-                v1.forEach(item1 => {
-                  generatedVariants.push({
-                    nama: item1,
-                    stok: perStock,
-                    status: perStock > 0 ? "Ready" : "Habis"
-                  });
-                });
-              } else if (v2.length > 0) {
-                const perStock = Math.max(1, Math.floor(rawStock / v2.length));
-                v2.forEach(item2 => {
-                  generatedVariants.push({
-                    nama: item2,
-                    stok: perStock,
-                    status: perStock > 0 ? "Ready" : "Habis"
-                  });
-                });
-              }
-
-              if (generatedVariants.length > 0) {
-                allData[cleanName] = generatedVariants;
-                saveSampleVariantsData(allData);
-                return generatedVariants;
-              }
-            }
           }
+
+          let v1 = [];
+          let v2 = [];
+          if (Array.isArray(foundSample.varian1List) && foundSample.varian1List.length > 0) {
+            v1 = foundSample.varian1List;
+          } else if (foundSample.varian1 && typeof foundSample.varian1 === "string") {
+            v1 = foundSample.varian1.split(",").map(s => s.trim()).filter(Boolean);
+          }
+          if (Array.isArray(foundSample.varian2List) && foundSample.varian2List.length > 0) {
+            v2 = foundSample.varian2List;
+          } else if (foundSample.varian2 && typeof foundSample.varian2 === "string") {
+            v2 = foundSample.varian2.split(",").map(s => s.trim()).filter(Boolean);
+          }
+
+          const rawStockValue = foundSample.stok;
+          const hasExplicitStock = rawStockValue !== undefined && rawStockValue !== null && String(rawStockValue).trim() !== "";
+          const rawStock = hasExplicitStock ? Math.max(0, Number(rawStockValue) || 0) : 10;
+          const generatedVariants = [];
+
+          if (v1.length > 0 && v2.length > 0) {
+            const perStock = Math.floor(rawStock / (v1.length * v2.length));
+            v1.forEach(item1 => {
+              v2.forEach(item2 => {
+                generatedVariants.push({
+                  nama: `${item1} (${item2})`,
+                  stok: perStock,
+                  status: perStock > 0 ? "Ready" : "Habis"
+                });
+              });
+            });
+          } else if (v1.length > 0) {
+            const perStock = Math.floor(rawStock / v1.length);
+            v1.forEach(item1 => {
+              generatedVariants.push({
+                nama: item1,
+                stok: perStock,
+                status: perStock > 0 ? "Ready" : "Habis"
+              });
+            });
+          } else if (v2.length > 0) {
+            const perStock = Math.floor(rawStock / v2.length);
+            v2.forEach(item2 => {
+              generatedVariants.push({
+                nama: item2,
+                stok: perStock,
+                status: perStock > 0 ? "Ready" : "Habis"
+              });
+            });
+          } else if (hasExplicitStock) {
+            generatedVariants.push({
+              nama: "Standar",
+              stok: rawStock,
+              status: rawStock > 0 ? "Ready" : "Habis"
+            });
+          }
+
+          if (generatedVariants.length > 0) return generatedVariants;
+          return null;
         }
 
-        // Fallback variants if not found
+        return null;
+      }
+
+      function getBaseVariantsForSample(sampleName) {
+        const cleanName = String(sampleName || "").trim();
+        if (!cleanName) return [];
+
+        const brandVariants = getBrandSampleVariants(cleanName);
+        if (Array.isArray(brandVariants) && brandVariants.length > 0) {
+          return brandVariants;
+        }
+
+        const allData = getSampleVariantsData();
+        const exactKey = Object.prototype.hasOwnProperty.call(allData, cleanName) ? cleanName : findCaseInsensitiveKey(allData, cleanName);
+        if (exactKey && Array.isArray(allData[exactKey]) && allData[exactKey].length > 0) {
+          return allData[exactKey].map(v => ({
+            nama: v.nama || "Standar",
+            stok: Math.max(0, Number(v.stok) || 0),
+            status: (Number(v.stok) || 0) > 0 ? "Ready" : "Habis"
+          }));
+        }
+
         return [
           { nama: "Hitam", stok: 3, status: "Ready" },
           { nama: "Mocca", stok: 2, status: "Ready" }
         ];
+      }
+
+      function getVariantsForSample(sampleName) {
+        return applyStockAdjustments(sampleName, getBaseVariantsForSample(sampleName));
       }
 
       function getTotalStockForSample(sampleName) {
@@ -3279,29 +3471,33 @@
 
       function adjustVariantStock(sampleName, variantName, delta) {
         if (!sampleName) return;
-        const allData = getSampleVariantsData();
-        const cleanSamp = sampleName.trim();
-        if (!allData[cleanSamp]) {
-          allData[cleanSamp] = [
-            { nama: variantName || "Hitam", stok: Math.max(0, 3 + delta), status: (3 + delta) > 0 ? "Ready" : "Habis" }
-          ];
-        } else {
-          const cleanVar = (variantName || "").trim().toLowerCase();
-          const target = allData[cleanSamp].find(v => v.nama.toLowerCase() === cleanVar);
-          if (target) {
-            target.stok = Math.max(0, (Number(target.stok) || 0) + delta);
-            target.status = target.stok > 0 ? "Ready" : "Habis";
-          } else if (allData[cleanSamp].length > 0) {
-            allData[cleanSamp][0].stok = Math.max(0, (Number(allData[cleanSamp][0].stok) || 0) + delta);
-            allData[cleanSamp][0].status = allData[cleanSamp][0].stok > 0 ? "Ready" : "Habis";
-          }
+        const cleanName = String(sampleName).trim();
+        const baseVariants = getBaseVariantsForSample(cleanName);
+        const cleanVariant = String(variantName || "").trim().toLowerCase();
+        const target = baseVariants.find(v => String(v.nama || "").trim().toLowerCase() === cleanVariant) || baseVariants[0];
+        const targetName = target ? target.nama : (variantName || "Standar");
+
+        const allAdjustments = getStockAdjustmentsData();
+        const sampleKey = findCaseInsensitiveKey(allAdjustments, cleanName) || cleanName;
+        if (!allAdjustments[sampleKey] || typeof allAdjustments[sampleKey] !== "object") {
+          allAdjustments[sampleKey] = {};
         }
-        saveSampleVariantsData(allData);
+        const variantKey = findCaseInsensitiveKey(allAdjustments[sampleKey], targetName) || targetName;
+        const nextDelta = (Number(allAdjustments[sampleKey][variantKey]) || 0) + (Number(delta) || 0);
+        if (nextDelta === 0) {
+          delete allAdjustments[sampleKey][variantKey];
+        } else {
+          allAdjustments[sampleKey][variantKey] = nextDelta;
+        }
+        if (Object.keys(allAdjustments[sampleKey]).length === 0) {
+          delete allAdjustments[sampleKey];
+        }
+        saveStockAdjustmentsData(allAdjustments);
       }
 
       function adjustSampleStock(sampleItem, delta) {
         const parsed = parseSampleItem(sampleItem);
-        adjustVariantStock(parsed.nama, parsed.varian, delta);
+        adjustVariantStock(parsed.nama, parsed.varian, (Number(delta) || 0) * parsed.qty);
       }
 
       function updateKreatorCategoryHeader() {
@@ -4595,6 +4791,11 @@
             pop.classList.remove("is-open");
           }
         });
+        document.querySelectorAll(".sample-picker-popover").forEach(pop => {
+          if (pop.style.display !== "none" && !pop.contains(e.target)) {
+            pop.style.display = "none";
+          }
+        });
       });
 
       function renderKreatorTableRows(query = "") {
@@ -4982,10 +5183,11 @@
             const sampleRow = document.createElement("div");
             sampleRow.style.cssText = "display: flex; align-items: center; gap: 8px; width: 100%; min-width: 0;";
             sampleRow.innerHTML = `
-              <div class="sample-pill-btn" title="${parsed.nama}${parsed.varian ? ' - ' + parsed.varian : ''}" style="flex: 1; min-width: 0; height: 36px; min-height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: all 0.15s ease; box-sizing: border-box;">
+              <div class="sample-pill-btn" title="${parsed.nama}${parsed.varian ? ' - ' + parsed.varian : ''} (×${parsed.qty})" style="flex: 1; min-width: 0; height: 36px; min-height: 36px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: all 0.15s ease; box-sizing: border-box;">
                 <div style="display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; overflow: hidden; margin-right: 6px;">
                   <span style="font-size: 12px; color: #1e293b; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${parsed.nama}</span>
                   ${parsed.varian ? `<span style="font-size: 10.5px; font-weight: 600; color: #0284c7; background: #e0f2fe; border: 1px solid #bae6fd; padding: 1px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">${parsed.varian}</span>` : ''}
+                  <span style="font-size: 10.5px; font-weight: 700; color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 1px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0;">×${parsed.qty}</span>
                 </div>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                   <polyline points="6 9 12 15 18 9"></polyline>
@@ -5057,7 +5259,7 @@
           // 3. Floating Popover Element with Sample & Variant Picker Views
           const popover = document.createElement("div");
           popover.className = "sample-picker-popover";
-          popover.style.cssText = "display: none; position: absolute; left: 0; right: 44px; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; overflow: hidden;";
+          popover.style.cssText = "display: none; position: absolute; left: 0; min-width: 400px; max-width: 480px; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; overflow: hidden;";
           popover.innerHTML = `
             <!-- View 1: Daftar Sampel -->
             <div class="sample-view-main" style="display: block;">
@@ -5067,6 +5269,7 @@
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
                 <input type="text" class="sample-picker-search" placeholder="Cari Sampel" style="border: none; outline: none; font-size: 12px; width: 100%; font-family: 'Outfit', sans-serif; background: transparent;" />
+                <button type="button" class="btn-close-sample-popover" title="Tutup" aria-label="Tutup" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; line-height: 1; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0;">&times;</button>
               </div>
               <div class="sample-picker-list" style="max-height: 180px; overflow-y: auto; padding: 4px 0;"></div>
             </div>
@@ -5085,6 +5288,7 @@
                     <div class="variant-sample-title" style="font-size: 11px; color: #0284c7; font-weight: 500;">-</div>
                   </div>
                 </div>
+                <button type="button" class="btn-close-sample-popover" title="Tutup" aria-label="Tutup" style="background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; line-height: 1; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0;">&times;</button>
               </div>
 
               <!-- Search Bar for Variants -->
@@ -5118,6 +5322,7 @@
           const btnBackSamples = popover.querySelector(".btn-back-samples");
           const varSearchInp = popover.querySelector(".variant-picker-search");
           const varFilterPills = popover.querySelectorAll(".variant-filter-pill");
+          const closePopoverBtns = popover.querySelectorAll(".btn-close-sample-popover");
 
           let currentSampleForVariants = null;
           let currentVariantFilter = "all"; // "all" | "ready" | "habis"
@@ -5145,6 +5350,15 @@
               currentVariantFilter = pill.getAttribute("data-filter") || "all";
               updateVariantFilterPills();
               renderFilteredVariants();
+            });
+          });
+
+          closePopoverBtns.forEach(btn => {
+            btn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              popover.style.display = "none";
+              sampleViewVariants.style.display = "none";
+              sampleViewMain.style.display = "block";
             });
           });
 
@@ -5196,21 +5410,93 @@
             }
 
             filtered.forEach(v => {
-              const vStock = Number(v.stok) || 0;
-              const isReady = vStock > 0;
+              const vStock = Math.max(0, Number(v.stok) || 0);
+              const swapEntry = activeSwapIndex !== null ? parseSampleItem(assignedSamples[activeSwapIndex]) : null;
+              let existingQty = 0;
+
+              if (activeSwapIndex !== null) {
+                if (swapEntry && sampleIdentity(swapEntry.nama, swapEntry.varian) === sampleIdentity(currentSampleForVariants.nama, v.nama)) {
+                  existingQty += swapEntry.qty;
+                }
+                const duplicateIdx = findSampleIndex(assignedSamples, currentSampleForVariants.nama, v.nama);
+                if (duplicateIdx !== -1 && duplicateIdx !== activeSwapIndex) {
+                  existingQty += parseSampleItem(assignedSamples[duplicateIdx]).qty;
+                }
+              } else {
+                const existingIdx = findSampleIndex(assignedSamples, currentSampleForVariants.nama, v.nama);
+                if (existingIdx !== -1) existingQty = parseSampleItem(assignedSamples[existingIdx]).qty;
+              }
+
+              const maxQty = vStock + existingQty;
+              const isSelectable = maxQty > 0;
+              const qtyDefault = existingQty > 0 ? existingQty : 1;
+              const badgeText = vStock > 0 ? `Ready (${vStock})` : (existingQty > 0 ? `Dipakai (${existingQty})` : "Habis");
               const itemEl = document.createElement("div");
-              itemEl.style.cssText = `display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: ${isReady ? 'pointer' : 'not-allowed'}; opacity: ${isReady ? '1' : '0.55'}; transition: background 0.15s;`;
+              itemEl.style.cssText = `display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; cursor: ${isSelectable ? 'pointer' : 'not-allowed'}; opacity: ${isSelectable ? '1' : '0.55'}; transition: background 0.15s;`;
               itemEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 7px; height: 7px; border-radius: 50%; background: ${isReady ? '#22c55e' : '#cbd5e1'};"></span>
-                  <span style="font-size: 12.5px; color: #1e293b; font-weight: 500;">${v.nama}</span>
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+                  <span style="width: 7px; height: 7px; border-radius: 50%; background: ${isSelectable ? '#22c55e' : '#cbd5e1'}; flex-shrink: 0;"></span>
+                  <span title="${(v.nama || '').replace(/"/g, '&quot;')}" style="font-size: 12.5px; color: #1e293b; font-weight: 500; word-break: break-word; line-height: 1.35;">${v.nama}</span>
                 </div>
-                <span style="font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 10px; ${isReady ? 'background: #e0f2fe; color: #0284c7;' : 'background: #fee2e2; color: #ef4444;'}">
-                  ${isReady ? `Ready (${vStock})` : 'Habis'}
-                </span>
+                <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: auto;">
+                  ${isSelectable ? `
+                    <div class="variant-qty-control">
+                      <button type="button" class="variant-qty-btn" data-step="-1" title="Kurangi" aria-label="Kurangi jumlah">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="10" x2="15" y2="10" /></svg>
+                      </button>
+                      <input type="text" inputmode="numeric" class="variant-qty-input" value="${qtyDefault}" maxlength="4" aria-label="Jumlah sampel" />
+                      <button type="button" class="variant-qty-btn" data-step="1" title="Tambah" aria-label="Tambah jumlah">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="10" y1="5" x2="10" y2="15" /><line x1="5" y1="10" x2="15" y2="10" /></svg>
+                      </button>
+                    </div>
+                  ` : ''}
+                  <span style="font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; ${isSelectable ? 'background: #e0f2fe; color: #0284c7;' : 'background: #fee2e2; color: #ef4444;'}">
+                    ${badgeText}
+                  </span>
+                </div>
               `;
 
-              if (isReady) {
+              const qtyControl = itemEl.querySelector(".variant-qty-control");
+              const qtyInput = itemEl.querySelector(".variant-qty-input");
+              const qtyBtns = itemEl.querySelectorAll(".variant-qty-btn");
+
+              function getRowQty() {
+                const raw = qtyInput ? parseInt(String(qtyInput.value).replace(/[^0-9]/g, ""), 10) : qtyDefault;
+                return Math.min(maxQty, Math.max(1, Number.isFinite(raw) ? raw : 1));
+              }
+
+              function syncQtyInput() {
+                if (!qtyInput) return;
+                const q = getRowQty();
+                qtyInput.value = String(q);
+                qtyBtns.forEach(btn => {
+                  const step = Number(btn.getAttribute("data-step")) || 0;
+                  const disabled = (step < 0 && q <= 1) || (step > 0 && q >= maxQty);
+                  btn.disabled = disabled;
+                });
+              }
+
+              if (qtyControl) {
+                qtyControl.addEventListener("click", (e) => e.stopPropagation());
+              }
+              if (qtyInput) {
+                qtyInput.addEventListener("input", () => {
+                  qtyInput.value = qtyInput.value.replace(/[^0-9]/g, "").slice(0, 4);
+                });
+                qtyInput.addEventListener("blur", syncQtyInput);
+              }
+              qtyBtns.forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                  e.stopPropagation();
+                  const step = Number(btn.getAttribute("data-step")) || 0;
+                  const next = Math.min(maxQty, Math.max(1, getRowQty() + step));
+                  if (qtyInput) qtyInput.value = String(next);
+                  syncQtyInput();
+                });
+              });
+              syncQtyInput();
+
+              if (isSelectable) {
                 itemEl.addEventListener("mouseenter", () => {
                   itemEl.style.background = "#f0f9ff";
                 });
@@ -5221,7 +5507,7 @@
 
               itemEl.addEventListener("click", (e) => {
                 e.stopPropagation();
-                if (!isReady) {
+                if (!isSelectable) {
                   if (typeof Swal !== "undefined") {
                     Swal.fire({
                       icon: 'warning',
@@ -5233,20 +5519,35 @@
                   return;
                 }
 
-                const selectedSampleString = formatSampleItem(currentSampleForVariants.nama, v.nama);
+                const qty = getRowQty();
+                const newEntry = createSampleItem(currentSampleForVariants.nama, v.nama, qty, currentSampleForVariants.pid);
+                const samples = kreatorSampleMap[k.id];
+                if (!Array.isArray(samples)) return;
 
                 if (activeSwapIndex !== null) {
-                  const oldItem = kreatorSampleMap[k.id][activeSwapIndex];
-                  if (oldItem !== selectedSampleString) {
-                    adjustSampleStock(oldItem, +1);
-                    adjustVariantStock(currentSampleForVariants.nama, v.nama, -1);
-                    kreatorSampleMap[k.id][activeSwapIndex] = selectedSampleString;
+                  const oldItem = samples[activeSwapIndex];
+                  if (oldItem) adjustSampleStock(oldItem, +1);
+
+                  let targetIndex = findSampleIndex(samples, currentSampleForVariants.nama, v.nama);
+                  if (targetIndex !== -1 && targetIndex !== activeSwapIndex) {
+                    adjustSampleStock(samples[targetIndex], +1);
+                    samples.splice(targetIndex, 1);
+                    if (targetIndex < activeSwapIndex) activeSwapIndex -= 1;
+                    targetIndex = activeSwapIndex;
                   }
+
+                  const destIndex = targetIndex === -1 ? activeSwapIndex : targetIndex;
+                  samples[destIndex] = newEntry;
+                  adjustSampleStock(newEntry, -1);
                 } else {
-                  if (!kreatorSampleMap[k.id].includes(selectedSampleString)) {
-                    kreatorSampleMap[k.id].push(selectedSampleString);
-                    adjustVariantStock(currentSampleForVariants.nama, v.nama, -1);
+                  const existingIdx = findSampleIndex(samples, currentSampleForVariants.nama, v.nama);
+                  if (existingIdx !== -1) {
+                    adjustSampleStock(samples[existingIdx], +1);
+                    samples[existingIdx] = newEntry;
+                  } else {
+                    samples.push(newEntry);
                   }
+                  adjustSampleStock(newEntry, -1);
                 }
 
                 popover.style.display = "none";
@@ -5384,6 +5685,7 @@
             return {
               nama: parsed.nama,
               varian: parsed.varian || "",
+              qty: parsed.qty,
               pid: parsed.pid || currentCampaignPid || "PID 001",
               statusSampel: currentCampaignStatusSampel || (idx === 0 ? "Dipakai" : (idx === 1 ? "Dikirim" : (idx === 2 ? "Diterima" : "Rusak")))
             };
@@ -5448,6 +5750,24 @@
                   s && s.toLowerCase() !== String(k.name || '').toLowerCase()
                 );
                 camp.kreator = names.length > 0 ? names.join(', ') : '-';
+              }
+
+              if (window.BMCampaignShared) {
+                window.BMCampaignShared.recordCreatorRemoval(camp, k, keteranganVal);
+              }
+              if (editingCampaignSnapshot) {
+                if (Array.isArray(editingCampaignSnapshot.kreatorDetails)) {
+                  editingCampaignSnapshot.kreatorDetails = editingCampaignSnapshot.kreatorDetails.filter(kd =>
+                    String(kd.id) !== kIdStr &&
+                    String(kd.name || '').toLowerCase() !== String(k.name || '').toLowerCase()
+                  );
+                }
+                if (editingCampaignSnapshot.kreator && editingCampaignSnapshot.kreator !== "-") {
+                  const snapshotNames = editingCampaignSnapshot.kreator.split(',').map(s => s.trim()).filter(s =>
+                    s && s.toLowerCase() !== String(k.name || '').toLowerCase()
+                  );
+                  editingCampaignSnapshot.kreator = snapshotNames.length > 0 ? snapshotNames.join(', ') : '-';
+                }
               }
 
               saveCampaignDb();
@@ -5770,7 +6090,8 @@
           if (Array.isArray(parsed) && parsed.length > 0) {
             campaignDb = parsed.map(c => ({
               ...c,
-              kreator: String(c.kreator || "").replace(/@/g, "")
+              kreator: String(c.kreator || "").replace(/@/g, ""),
+              riwayatPerubahan: Array.isArray(c.riwayatPerubahan) ? c.riwayatPerubahan : []
             }));
           } else if (Array.isArray(parsed) && parsed.length === 0) {
             campaignDb = [];
@@ -5797,6 +6118,31 @@
       const campaignModalTitle = document.getElementById("campaignModalTitle");
       let pendingDeleteCampaignId = null;
       let editingCampaignId = null;
+      let editingCampaignSnapshot = null;
+      let campaignStockSnapshot = null;
+      let campaignStockSessionActive = false;
+
+      function beginCampaignStockSession() {
+        try {
+          campaignStockSnapshot = JSON.parse(JSON.stringify(getStockAdjustmentsData()));
+        } catch (e) {
+          campaignStockSnapshot = {};
+        }
+        campaignStockSessionActive = true;
+      }
+
+      function commitCampaignStockSession() {
+        campaignStockSnapshot = null;
+        campaignStockSessionActive = false;
+      }
+
+      function restoreCampaignStockSession() {
+        if (campaignStockSessionActive && campaignStockSnapshot) {
+          saveStockAdjustmentsData(campaignStockSnapshot);
+        }
+        campaignStockSnapshot = null;
+        campaignStockSessionActive = false;
+      }
 
       function setCustomDropdownValue(wrapId, inputId, itemsContainerId, clearBtnId, hiddenInputId, value) {
         const input = document.getElementById(inputId);
@@ -6130,26 +6476,40 @@
         });
       }
 
-      // Realtime brand listener from Data Brand updates
+      // Realtime brand & sample stock listener from Data Brand updates
+      function refreshBrandAndSampleData() {
+        populateBrandDropdowns();
+        if (campaignModal && campaignModal.classList.contains("is-active")) {
+          renderSelectedKreatorRows();
+        }
+      }
+
       window.addEventListener("storage", (e) => {
         if (e.key && e.key.includes("brand")) {
-          populateBrandDropdowns();
+          refreshBrandAndSampleData();
           if (campaignBrandSelect && campaignBrandSelect.value) {
             updatePidOptionsForBrand(campaignBrandSelect.value, document.getElementById("pidVal")?.value || "");
           }
         }
       });
       window.addEventListener("focus", () => {
-        populateBrandDropdowns();
+        refreshBrandAndSampleData();
       });
       window.addEventListener("pageshow", () => {
-        populateBrandDropdowns();
+        refreshBrandAndSampleData();
+      });
+      window.addEventListener("bisa-brand-updated", () => {
+        refreshBrandAndSampleData();
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) refreshBrandAndSampleData();
       });
 
       const openModalBtn = document.querySelector(".btn-tambah");
       if (openModalBtn) {
         openModalBtn.addEventListener("click", () => {
           resetCampaignForm();
+          beginCampaignStockSession();
           if (campaignModal) campaignModal.classList.add("is-active");
         });
       }
@@ -6157,7 +6517,9 @@
       const closeModalBtn = document.getElementById("closeModal");
       if (closeModalBtn && campaignModal) {
         closeModalBtn.addEventListener("click", () => {
+          restoreCampaignStockSession();
           campaignModal.classList.remove("is-active");
+          resetCampaignForm();
         });
       }
 
@@ -6393,6 +6755,173 @@
         });
       }
 
+      function escapeCampaignHistoryText(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function setCampaignHistoryTab(tab) {
+        const activeTab = tab === "creators" ? "creators" : "changes";
+        document.querySelectorAll("#campaignHistoryModal [data-history-tab]").forEach(btn => {
+          const isActive = btn.getAttribute("data-history-tab") === activeTab;
+          btn.style.borderBottomColor = isActive ? "#0284c7" : "transparent";
+          btn.style.color = isActive ? "#0284c7" : "#64748b";
+          btn.style.fontWeight = isActive ? "700" : "600";
+        });
+        const changeWrap = document.getElementById("campaignHistoryChangeWrap");
+        const creatorWrap = document.getElementById("campaignHistoryCreatorWrap");
+        if (changeWrap) changeWrap.style.display = activeTab === "changes" ? "block" : "none";
+        if (creatorWrap) creatorWrap.style.display = activeTab === "creators" ? "block" : "none";
+      }
+
+      function renderCampaignChangeHistory(item) {
+        const container = document.getElementById("campaignChangeRowsContainer");
+        if (!container) return;
+        const list = item && Array.isArray(item.riwayatPerubahan) ? item.riwayatPerubahan : [];
+        if (list.length === 0) {
+          container.innerHTML = `
+            <div style="padding: 28px 16px; text-align: center; color: #94a3b8; font-size: 13px; font-style: italic;">
+              Belum ada perubahan campaign yang tercatat.
+            </div>
+          `;
+          return;
+        }
+        container.innerHTML = list.map(entry => {
+          const changes = Array.isArray(entry.perubahan) ? entry.perubahan : [];
+          const ditambah = entry.kreator && Array.isArray(entry.kreator.ditambah) ? entry.kreator.ditambah : [];
+          const dikeluarkan = entry.kreator && Array.isArray(entry.kreator.dikeluarkan) ? entry.kreator.dikeluarkan : [];
+          const detailRows = [];
+          changes.forEach(change => {
+            detailRows.push(`
+              <div style="margin-bottom: 5px; line-height: 1.45;">
+                <span style="font-weight: 600; color: #334155;">${escapeCampaignHistoryText(change.label || change.field || "-")}</span>
+                <span style="color: #94a3b8;">: </span>
+                <span style="color: #64748b; text-decoration: line-through;">${escapeCampaignHistoryText(change.dari || "-")}</span>
+                <span style="color: #0284c7; font-weight: 600;"> &rarr; </span>
+                <span style="color: #0f172a; font-weight: 600;">${escapeCampaignHistoryText(change.ke || "-")}</span>
+              </div>
+            `);
+          });
+          if (ditambah.length > 0) {
+            detailRows.push(`<div style="margin-bottom: 5px; color: #15803d;"><strong>Kreator ditambah:</strong> ${escapeCampaignHistoryText(ditambah.join(", "))}</div>`);
+          }
+          if (dikeluarkan.length > 0) {
+            detailRows.push(`<div style="margin-bottom: 5px; color: #b91c1c;"><strong>Kreator dikeluarkan:</strong> ${escapeCampaignHistoryText(dikeluarkan.join(", "))}</div>`);
+          }
+          if (entry.catatan) {
+            detailRows.push(`<div style="margin-bottom: 5px; color: #64748b; font-style: italic;">Catatan: ${escapeCampaignHistoryText(entry.catatan)}</div>`);
+          }
+          const dateText = entry.tanggal || (window.BMCampaignShared ? window.BMCampaignShared.formatDateTime(entry.timestamp) : "-");
+          const roleText = entry.roleLabel || (window.BMCampaignShared ? window.BMCampaignShared.roleLabel(entry.role) : entry.role) || "-";
+          return `
+            <div style="display: grid; grid-template-columns: 1.15fr 1fr 1.6fr 2.25fr; gap: 16px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;">
+              <div style="font-size: 12.5px; color: #334155; font-weight: 600; line-height: 1.4;">${escapeCampaignHistoryText(dateText)}</div>
+              <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 13px; font-weight: 700; color: #1e293b;">${escapeCampaignHistoryText(entry.oleh || "-")}</span>
+                <span style="font-size: 11.5px; color: #64748b; margin-top: 2px;">${escapeCampaignHistoryText(roleText)}</span>
+              </div>
+              <div style="font-size: 13px; color: #334155; line-height: 1.45;">${escapeCampaignHistoryText(entry.ringkasan || "Mengubah campaign")}</div>
+              <div style="font-size: 12.5px; color: #475569;">${detailRows.join("") || "-"}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function renderCampaignCreatorHistory(item) {
+        const histContainer = document.getElementById("campaignHistoryRowsContainer");
+        if (!histContainer) return;
+        let historyList = [];
+        if (item && item.riwayatAktifitas && Array.isArray(item.riwayatAktifitas) && item.riwayatAktifitas.length > 0) {
+          historyList = item.riwayatAktifitas;
+        } else {
+          historyList = [
+            {
+              namaKreator: "Aura Cantika",
+              username: "@aura.beauty",
+              kategoriSpesifik: "Hijab Pashmina & Segi Empat",
+              keterangan: "Dikeluarkan karena tidak sesuai kriteria campaign",
+              samples: [
+                { nama: "Pashmina Ceruty Baby Doll", pid: "PID 001", statusSampel: "Dipakai" },
+                { nama: "Segi Empat Paris Premium", pid: "PID 002", statusSampel: "Dikirim" },
+                { nama: "Bergo Maryam Diamond Crepe", pid: "PID 003", statusSampel: "Diterima" }
+              ]
+            },
+            {
+              namaKreator: "Clarissa Putri",
+              username: "@clarissa.style",
+              kategoriSpesifik: "Hijab Bergo & Khimar",
+              keterangan: "Produk rusak saat pengiriman",
+              samples: [
+                { nama: "Hijab Instan Jersey Sport", pid: "PID 004", statusSampel: "Rusak" }
+              ]
+            }
+          ];
+        }
+
+        histContainer.innerHTML = historyList.map(h => {
+          const kName = h.namaKreator || "Nama Kreator";
+          const kUser = h.username ? (h.username.startsWith("@") ? h.username : "@" + h.username) : "@username";
+          const rawCat = h.kategoriSpesifik || h.category || "-";
+          const kCat = (rawCat && rawCat.trim() !== "" && rawCat !== "Kategori Spesifik") ? rawCat.trim() : "-";
+          const samples = Array.isArray(h.samples) && h.samples.length > 0 ? h.samples : [
+            { nama: h.namaSampel || "Nama Sampel", pid: h.pid || "IPD", statusSampel: h.statusSampel || "Dipakai" }
+          ];
+          const creatorKeterangan = h.keterangan || (samples[0] && (samples[0].keterangan || samples[0].alasan)) || "-";
+
+          return `
+            <div style="display: grid; grid-template-columns: 1.4fr 1.3fr 1fr 1.3fr; gap: 16px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;">
+              <div style="display: flex; align-items: flex-start; gap: 10px;">
+                <div style="display: flex; flex-direction: column;">
+                  <span style="font-size: 14px; font-weight: 700; color: #1e293b; line-height: 1.2;">${escapeCampaignHistoryText(kName)}</span>
+                  <div style="font-size: 11.5px; color: #64748b; margin-top: 3px;">
+                    <span>${escapeCampaignHistoryText(kUser)}</span> <span style="color: #cbd5e1; margin: 0 2px;">|</span> <span style="color: ${kCat !== '-' ? '#0076c6' : '#64748b'}; font-weight: ${kCat !== '-' ? '600' : '400'};">${escapeCampaignHistoryText(kCat)}</span>
+                  </div>
+                  ${h.tanggal ? `<div style="font-size: 10.5px; color: #94a3b8; margin-top: 4px;">${escapeCampaignHistoryText(h.tanggal)}</div>` : ""}
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                ${samples.map(s => {
+                  const parsed = parseSampleItem(typeof s === "object" && s !== null ? { ...s, nama: s.nama || s.namaSampel || "Nama Sampel" } : (s || "Nama Sampel"));
+                  return `
+                    <div style="display: flex; flex-direction: column;">
+                      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span style="font-size: 13.5px; color: #1e293b; font-weight: 500;">${escapeCampaignHistoryText(parsed.nama)}</span>
+                        ${parsed.varian ? `<span style="font-size: 11px; font-weight: 600; color: #0284c7; background: #e0f2fe; border: 1px solid #bae6fd; padding: 1px 7px; border-radius: 4px;">${escapeCampaignHistoryText(parsed.varian)}</span>` : ''}
+                        <span style="font-size: 10.5px; font-weight: 700; color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 1px 6px; border-radius: 4px;">×${parsed.qty}</span>
+                      </div>
+                      <span style="font-size: 11px; color: #0076c6; font-weight: 600; margin-top: 1px;">${escapeCampaignHistoryText(s.pid || "IPD")}</span>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                ${samples.map(s => `
+                  <div style="font-size: 13px; color: #334155; min-height: 28px; display: flex; align-items: flex-start;">
+                    <span>${escapeCampaignHistoryText(s.statusSampel || "Dipakai")}</span>
+                  </div>
+                `).join("")}
+              </div>
+              <div style="display: flex; align-items: flex-start; padding-top: 2px;">
+                <span style="font-size: 13px; color: #475569; line-height: 1.45;">${escapeCampaignHistoryText(creatorKeterangan)}</span>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      function openCampaignHistory(item) {
+        if (!item) return;
+        renderCampaignChangeHistory(item);
+        renderCampaignCreatorHistory(item);
+        setCampaignHistoryTab("changes");
+        const histModal = document.getElementById("campaignHistoryModal");
+        if (histModal) histModal.classList.add("is-active");
+      }
+
       // Event delegation for table action buttons
       if (campaignTableBody) {
         campaignTableBody.addEventListener("click", (e) => {
@@ -6406,97 +6935,7 @@
             e.stopPropagation();
             const id = btnHistory.getAttribute("data-id");
             const item = campaignDb.find(c => c.id === id);
-            if (item) {
-              const histModal = document.getElementById("campaignHistoryModal");
-              const histContainer = document.getElementById("campaignHistoryRowsContainer");
-              if (histContainer) {
-                let historyList = [];
-                if (item.riwayatAktifitas && Array.isArray(item.riwayatAktifitas) && item.riwayatAktifitas.length > 0) {
-                  historyList = item.riwayatAktifitas;
-                } else {
-                  // Standard initial mock history matching 4 columns
-                  historyList = [
-                    {
-                      namaKreator: "Aura Cantika",
-                      username: "@aura.beauty",
-                      kategoriSpesifik: "Hijab Pashmina & Segi Empat",
-                      keterangan: "Dikeluarkan karena tidak sesuai kriteria campaign",
-                      samples: [
-                        { nama: "Pashmina Ceruty Baby Doll", pid: "PID 001", statusSampel: "Dipakai" },
-                        { nama: "Segi Empat Paris Premium", pid: "PID 002", statusSampel: "Dikirim" },
-                        { nama: "Bergo Maryam Diamond Crepe", pid: "PID 003", statusSampel: "Diterima" }
-                      ]
-                    },
-                    {
-                      namaKreator: "Clarissa Putri",
-                      username: "@clarissa.style",
-                      kategoriSpesifik: "Hijab Bergo & Khimar",
-                      keterangan: "Produk rusak saat pengiriman",
-                      samples: [
-                        { nama: "Hijab Instan Jersey Sport", pid: "PID 004", statusSampel: "Rusak" }
-                      ]
-                    }
-                  ];
-                }
-
-                histContainer.innerHTML = historyList.map(h => {
-                  const kName = h.namaKreator || "Nama Kreator";
-                  const kUser = h.username ? (h.username.startsWith("@") ? h.username : "@" + h.username) : "@username";
-                  const rawCat = h.kategoriSpesifik || h.category || "-";
-                  const kCat = (rawCat && rawCat.trim() !== "" && rawCat !== "Kategori Spesifik") ? rawCat.trim() : "-";
-                  const samples = Array.isArray(h.samples) && h.samples.length > 0 ? h.samples : [
-                    { nama: h.namaSampel || "Nama Sampel", pid: h.pid || "IPD", statusSampel: h.statusSampel || "Dipakai" }
-                  ];
-                  const creatorKeterangan = h.keterangan || (samples[0] && (samples[0].keterangan || samples[0].alasan)) || "-";
-
-                  return `
-                    <div style="display: grid; grid-template-columns: 1.4fr 1.3fr 1fr 1.3fr; gap: 16px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;">
-                      <!-- Col 1: Nama Kreator -->
-                      <div style="display: flex; align-items: flex-start; gap: 10px;">
-                        <div style="display: flex; flex-direction: column;">
-                          <span style="font-size: 14px; font-weight: 700; color: #1e293b; line-height: 1.2;">${kName}</span>
-                          <div style="font-size: 11.5px; color: #64748b; margin-top: 3px;">
-                            <span>${kUser}</span> <span style="color: #cbd5e1; margin: 0 2px;">|</span> <span style="color: ${kCat !== '-' ? '#0076c6' : '#64748b'}; font-weight: ${kCat !== '-' ? '600' : '400'};">${kCat}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Col 2: Nama Sampel -->
-                      <div style="display: flex; flex-direction: column; gap: 12px;">
-                        ${samples.map(s => {
-                          const parsed = parseSampleItem(s.nama || s.namaSampel || "Nama Sampel");
-                          return `
-                            <div style="display: flex; flex-direction: column;">
-                              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                <span style="font-size: 13.5px; color: #1e293b; font-weight: 500;">${parsed.nama}</span>
-                                ${parsed.varian ? `<span style="font-size: 11px; font-weight: 600; color: #0284c7; background: #e0f2fe; border: 1px solid #bae6fd; padding: 1px 7px; border-radius: 4px;">${parsed.varian}</span>` : ''}
-                              </div>
-                              <span style="font-size: 11px; color: #0076c6; font-weight: 600; margin-top: 1px;">${s.pid || "IPD"}</span>
-                            </div>
-                          `;
-                        }).join("")}
-                      </div>
-
-                      <!-- Col 3: Status Sampel -->
-                      <div style="display: flex; flex-direction: column; gap: 12px;">
-                        ${samples.map(s => `
-                          <div style="font-size: 13px; color: #334155; min-height: 28px; display: flex; align-items: flex-start;">
-                            <span>${s.statusSampel || "Dipakai"}</span>
-                          </div>
-                        `).join("")}
-                      </div>
-
-                      <!-- Col 4: Keterangan (1 Keterangan untuk 1 Kreator) -->
-                      <div style="display: flex; align-items: flex-start; padding-top: 2px;">
-                        <span style="font-size: 13px; color: #475569; line-height: 1.45;">${creatorKeterangan}</span>
-                      </div>
-                    </div>
-                  `;
-                }).join("");
-              }
-
-              if (histModal) histModal.classList.add("is-active");
-            }
+            openCampaignHistory(item);
             return;
           }
 
@@ -6605,6 +7044,7 @@
                                 <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #1e293b; min-height: 22px;">
                                   <span style="font-weight: 500; color: #1e293b;">${parsed.nama}</span>
                                   ${parsed.varian ? `<span style="font-size: 11px; font-weight: 600; color: #0284c7; background: #e0f2fe; border: 1px solid #bae6fd; padding: 1px 7px; border-radius: 4px;">${parsed.varian}</span>` : ''}
+                                  <span style="font-size: 10.5px; font-weight: 700; color: #475569; background: #f1f5f9; border: 1px solid #e2e8f0; padding: 1px 6px; border-radius: 4px;">×${parsed.qty}</span>
                                 </div>
                               `;
                             }).join("")}
@@ -6682,6 +7122,8 @@
             const item = campaignDb.find(c => c.id === id);
             if (item) {
               editingCampaignId = item.id;
+              editingCampaignSnapshot = JSON.parse(JSON.stringify(item));
+              beginCampaignStockSession();
               if (campaignModalTitle) {
                 campaignModalTitle.innerHTML = 'Edit <span style="font-weight: 900; font-style: italic;">CAMPAIGN</span>';
               }
@@ -6964,6 +7406,10 @@
         campaignHistoryModalEl.addEventListener("click", (e) => {
           if (e.target === campaignHistoryModalEl) campaignHistoryModalEl.classList.remove("is-active");
         });
+        campaignHistoryModalEl.querySelectorAll("[data-history-tab]").forEach(btn => {
+          btn.addEventListener("click", () => setCampaignHistoryTab(btn.getAttribute("data-history-tab")));
+        });
+        setCampaignHistoryTab("changes");
       }
 
       function syncCampaignSamplesToTracking(campaign) {
@@ -7012,6 +7458,7 @@
             const parsed = parseSampleItem(s);
             const sampleName = parsed.nama || "Sampel Produk";
             const sampleVarian = parsed.varian || "Standar";
+            const sampleQty = parsed.qty;
             
             // Resolve sample PID from brand database if not in parsed
             let samplePid = parsed.pid;
@@ -7056,6 +7503,7 @@
                 type: "Campaign",
                 kreator: kHandle,
                 varian: sampleVarian,
+                qty: sampleQty,
                 keterangan: "Diambil",
                 statusSampel: "Request",
                 tanggal: todayStr,
@@ -7082,6 +7530,7 @@
               trackingList[existingIdx].brand = brandName;
               trackingList[existingIdx].pid = samplePid;
               trackingList[existingIdx].campaignId = campId;
+              trackingList[existingIdx].qty = sampleQty;
               hasNewOrUpdated = true;
             }
           });
@@ -7198,6 +7647,7 @@
 
       function resetCampaignForm() {
         editingCampaignId = null;
+        editingCampaignSnapshot = null;
         campaignForm.reset();
         populateBrandDropdowns();
 
@@ -7273,6 +7723,13 @@
           }
 
           const data = getCampaignFormData();
+          if (editingCampaignId) {
+            const existingCampaign = campaignDb.find(c => c.id === editingCampaignId);
+            if (existingCampaign) {
+              data.linkReport = existingCampaign.linkReport || "-";
+              data.statusSampel = existingCampaign.statusSampel || "-";
+            }
+          }
           const isRunning = (data.statusCampaign || "").toLowerCase().trim() === "running";
 
           const selectedKreatorNames = (data.kreatorDetails || [])
@@ -7302,6 +7759,9 @@
               campaignDb[idx].pic = data.pic;
               campaignDb[idx].kreator = kreatorVal;
               campaignDb[idx].kreatorDetails = data.kreatorDetails || [];
+              if (window.BMCampaignShared && editingCampaignSnapshot) {
+                window.BMCampaignShared.recordCampaignEdit(campaignDb[idx], editingCampaignSnapshot, data, { notify: false });
+              }
             }
             saveCampaignDb();
             syncCampaignSamplesToTracking(campaignDb[idx]);
@@ -7339,12 +7799,14 @@
               adsHandling: data.adsHandling,
               adsOperating: data.adsOperating,
               priority: data.priority,
-              linkReport: data.linkReport,
-              statusSampel: data.statusSampel,
+              linkReport: data.linkReport || "-",
+              statusSampel: data.statusSampel || "-",
               targetGmv: data.targetGmv,
               pic: data.pic,
               kreator: kreatorVal,
-              kreatorDetails: data.kreatorDetails || []
+              kreatorDetails: data.kreatorDetails || [],
+              riwayatPerubahan: [],
+              riwayatAktifitas: []
             };
 
             campaignDb.unshift(newCamp);
@@ -7369,6 +7831,7 @@
             showToast("Data berhasil ditambahkan", "success");
           }
 
+          commitCampaignStockSession();
           if (campaignModal) campaignModal.classList.remove("is-active");
           resetCampaignForm();
         });
@@ -7798,9 +8261,17 @@
         campaignDb.forEach(c => syncCampaignSamplesToTracking(c));
       }
       renderCampaignTable();
+
+      const requestedCampaignId = new URLSearchParams(window.location.search).get("campaign");
+      if (requestedCampaignId) {
+        const requestedCampaign = campaignDb.find(c => String(c.idCampaign || c.id) === requestedCampaignId || String(c.id) === requestedCampaignId);
+        if (requestedCampaign) {
+          setTimeout(() => openCampaignHistory(requestedCampaign), 120);
+        }
+      }
     })();
   </script>
-  <script src="../../assets/js/layout.js?v=1002"></script>
+  <script src="../../assets/js/layout.js?v=1004"></script>
 </body>
 
 </html>
