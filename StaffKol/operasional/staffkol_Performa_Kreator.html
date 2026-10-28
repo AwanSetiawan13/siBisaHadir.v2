@@ -579,7 +579,7 @@
           <div class="campaign-toolbar__left">
             <!-- Green Excel Button with tooltip -->
             <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button"
-              aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+              aria-label="Export Excel" title="Export ke Excel (.xlsx). Centang baris untuk mengekspor sebagian data.">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37"
                   stroke-width="1.2" />
@@ -591,12 +591,6 @@
                   stroke-linejoin="round" />
               </svg>
             </button>
-            <!-- Bulk Delete Button (muncul saat ada checkbox terpilih) -->
-            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
-              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
-              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
-            </button>
-
             <!-- Blue Filter Button -->
             <div class="filter-dropdown-wrapper">
               <button id="btnFilterPerforma" class="small-action-button" type="button" aria-label="Filter"
@@ -705,12 +699,6 @@
               </button>
             </div>
           </div>
-
-          <div class="campaign-toolbar__right">
-            <button id="btnTambahPerforma" class="btn-tambah" style="margin-right: 14px;" type="button">
-              + Tambah
-            </button>
-          </div>
         </div>
 
         <!-- Empty State Container (Sesuai Referensi Pengguna) -->
@@ -729,7 +717,7 @@
             <circle cx="15.2" cy="18" r="1.1" fill="#ffffff" />
           </svg>
           <div class="app-empty-state__title">Belum ada data Performa Kreator</div>
-          <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan data performa baru.
+          <div class="app-empty-state__subtitle">Data performa kreator akan tampil di sini setelah tersedia.
           </div>
         </div>
 
@@ -1191,7 +1179,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../../assets/js/app.js"></script>
-  <script src="../../assets/js/layout.js?v=1002"></script>
+  <script src="../../assets/js/layout.js?v=1004"></script>
   <script>
     (function () {
       const PERFORMA_STORAGE_KEY = "bisa_performa_kreator_list_v7";
@@ -1629,14 +1617,8 @@
 
         window.addEventListener("resize", updatePinnedColumns);
 
-      // Bulk Actions & Checkbox Handling
+      // Checkbox Handling (khusus export data terpilih)
       const checkAllRows = document.getElementById("checkAllRows");
-      const btnBulkDelete = document.getElementById("btnBulkDelete");
-
-      function getSelectedRowIds() {
-        const checked = document.querySelectorAll(".row-select-checkbox:checked");
-        return Array.from(checked).map(cb => cb.dataset.id);
-      }
 
       function updateBulkActionsState() {
         const allCheckboxes = document.querySelectorAll(".row-select-checkbox");
@@ -1646,16 +1628,6 @@
         if (checkAllRows) {
           checkAllRows.checked = allCheckboxes.length > 0 && checkedCheckboxes.length === allCheckboxes.length;
           checkAllRows.indeterminate = count > 0 && count < allCheckboxes.length;
-        }
-
-        if (btnBulkDelete) {
-          if (count > 0) {
-            btnBulkDelete.style.display = "inline-flex";
-            const countSpan = btnBulkDelete.querySelector(".bulk-count");
-            if (countSpan) countSpan.textContent = count;
-          } else {
-            btnBulkDelete.style.display = "none";
-          }
         }
       }
 
@@ -1674,54 +1646,6 @@
           if (e.target && e.target.classList.contains("row-select-checkbox")) {
             updateBulkActionsState();
           }
-        });
-      }
-
-      const btnBulkCancel = document.getElementById("btnBulkCancel");
-      if (btnBulkCancel) {
-        btnBulkCancel.addEventListener("click", function (event) {
-          event.preventDefault();
-          event.stopPropagation();
-          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
-          updateBulkActionsState();
-        });
-      }
-
-      if (btnBulkDelete) {
-        btnBulkDelete.addEventListener("click", function () {
-          const selectedIds = getSelectedRowIds();
-          if (!selectedIds.length) return;
-
-          Swal.fire({
-            title: `Hapus ${selectedIds.length} Data Terpilih?`,
-            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.length}</strong> data performa yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: '<i class="bx bx-trash" style="margin-right: 4px;"></i> Ya, Hapus',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-            focusCancel: true,
-            customClass: { popup: 'swal2-bisa-popup' }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              performaDb = performaDb.filter(t => !selectedIds.includes(String(t.id)));
-              savePerformaDb();
-              populateUserFilter();
-              renderPerformaTable();
-              Swal.fire({
-                icon: 'success',
-                title: 'Berhasil Dihapus!',
-                text: `${selectedIds.length} data performa kreator berhasil dihapus.`,
-                confirmButtonColor: '#29A3D8',
-                confirmButtonText: 'Selesai',
-                timer: 2000,
-                timerProgressBar: true,
-                customClass: { popup: 'swal2-bisa-popup' }
-              });
-            }
-          });
         });
       }
 
@@ -2040,7 +1964,6 @@
       }
 
       // Tambah Performa Form & Panel Toggle Handlers
-      const btnTambahPerforma = document.getElementById("btnTambahPerforma");
       const btnCancelTambahPerforma = document.getElementById("btnCancelTambahPerforma");
       const tablePanel = document.getElementById("tablePanel");
       const formPanel = document.getElementById("formPanel");
@@ -2050,14 +1973,6 @@
       const performaFileInput = document.getElementById("performaFileInput");
       const performaPasteInput = document.getElementById("performaPasteInput");
       const previewBox = document.getElementById("previewBox");
-
-      if (btnTambahPerforma && tablePanel && formPanel) {
-        btnTambahPerforma.addEventListener("click", () => {
-          tablePanel.style.display = "none";
-          formPanel.style.display = "block";
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      }
 
       if (btnCancelTambahPerforma && tablePanel && formPanel) {
         btnCancelTambahPerforma.addEventListener("click", () => {

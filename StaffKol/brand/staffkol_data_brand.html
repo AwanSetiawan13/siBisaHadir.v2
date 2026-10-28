@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Brands | Staff KOL - Bisa Media</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="../../assets/css/style.css" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
@@ -1883,12 +1884,43 @@
         brandDb = DEFAULT_BRAND;
       }
 
+      function getPicForBrandCategory(categoryName) {
+        const category = String(categoryName || "").trim().toLowerCase();
+        if (!category) return "";
+
+        try {
+          const saved = JSON.parse(localStorage.getItem("spv_kategori_produk_v1") || "[]");
+          if (Array.isArray(saved)) {
+            const match = saved.find(item => {
+              const name = String(typeof item === "string" ? item : (item.kategori || item.namaKategori || "")).trim().toLowerCase();
+              return name && (name === category || category.includes(name) || name.includes(category));
+            });
+            if (match && typeof match === "object" && match.pic) {
+              return String(match.pic).trim();
+            }
+          }
+        } catch (e) { }
+
+        const fallbackPics = {
+          "fashion muslim": "Setiawan",
+          "beauty & care": "Amanda",
+          "food & beverage": "Dimas",
+          "mom & baby": "Clarissa"
+        };
+        return fallbackPics[category] || "";
+      }
+
       function saveBrandDb() {
         try {
           const jsonStr = JSON.stringify(brandDb);
           localStorage.setItem(BRAND_STORAGE_KEY, jsonStr);
           localStorage.setItem("bisa_brand_list_v9", jsonStr);
           localStorage.setItem("bisa_brand_list", jsonStr);
+          localStorage.setItem("bisa_brand_sync_v1", JSON.stringify({
+            at: Date.now(),
+            source: "data_brand"
+          }));
+          window.dispatchEvent(new CustomEvent("bisa-brand-updated"));
         } catch (err) {
           console.error("Error saving brandDb:", err);
         }
@@ -2288,7 +2320,7 @@
             renderBrandGrid();
             pendingDeleteBrandId = null;
             if (modalDelete) modalDelete.classList.remove("is-active");
-            showToast("Brand berhasil dihapus");
+            showBrandSwal("success", "Brand berhasil dihapus");
           }
         });
       }
@@ -2348,6 +2380,22 @@
         }
       }
 
+      function showBrandSwal(icon, message) {
+        if (typeof Swal !== "undefined") {
+          return Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: icon,
+            title: message,
+            showConfirmButton: false,
+            timer: 2600,
+            timerProgressBar: true,
+            customClass: { popup: "swal2-bisa-popup" }
+          });
+        }
+        showToast(message);
+      }
+
       function resetBrandForm() {
         populateBrandCategories("");
         form.reset();
@@ -2373,10 +2421,12 @@
         e.preventDefault();
         const editId = document.getElementById("brandEditId")?.value.trim();
         const isEditing = editId && editId !== "";
+        const brandCategory = document.getElementById("kategoriProdukVal")?.value.trim() || document.getElementById("brandKategoriSelect")?.value.trim() || "";
         const brandData = {
           shopCode: document.getElementById("brandShopCode").value.trim(),
           nama: document.getElementById("brandNama").value.trim(),
-          kategori: document.getElementById("kategoriProdukVal")?.value.trim() || document.getElementById("brandKategoriSelect")?.value.trim() || "",
+          kategori: brandCategory,
+          pic: getPicForBrandCategory(brandCategory),
           telepon: document.getElementById("brandTelepon").value.trim(),
           kontrakAwal: document.getElementById("brandKontrakAwal").value,
           kontrakAkhir: document.getElementById("brandKontrakAkhir").value,
@@ -2435,7 +2485,7 @@
             renderBrandGrid();
             modal.classList.remove("is-active");
             resetBrandForm();
-            showToast("Brand berhasil diperbarui");
+            showBrandSwal("success", "Brand berhasil diperbarui");
           }
         } else {
           brandDb.unshift({ ...brandData, id: 'b_' + Date.now() });
@@ -2443,14 +2493,14 @@
           renderBrandGrid();
           modal.classList.remove("is-active");
           resetBrandForm();
-          showToast("Brand berhasil ditambahkan");
+          showBrandSwal("success", "Brand berhasil ditambahkan");
         }
       });
 
       renderBrandGrid();
     })();
   </script>
-  <script src="../../assets/js/layout.js?v=1002"></script>
+  <script src="../../assets/js/layout.js?v=1004"></script>
 </body>
 </html>
 

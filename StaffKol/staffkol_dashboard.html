@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -8,8 +8,158 @@
   <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="icon" type="image/png" href="../media/logo.png" />
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../vendor/three.min.js"></script>
+
+
   <style>
+    /* ===== Dynamic Welcome Banner ===== */
+    @import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Poppins:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&display=swap');
+
+    .db-welcome-banner {
+      position: relative;
+      width: 100%;
+      min-height: 200px;
+      background: linear-gradient(108deg, #1f9ad6 0%, #28a5de 38%, #49b6e7 78%, #5ec2ed 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      box-shadow: 0 8px 24px rgba(27, 138, 211, 0.25);
+      box-sizing: border-box;
+    }
+
+    /* Watermark logo folded-P di background */
+    .db-wb-watermark {
+      position: absolute;
+      left: 55%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(-4deg);
+      width: 280px;
+      height: 280px;
+      pointer-events: none;
+      opacity: 0.12;
+      filter: brightness(2) contrast(1.1);
+      z-index: 1;
+    }
+    .db-wb-watermark-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Kolom kiri: Logo + Tagline */
+    .db-wb-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px 20px 22px 26px;
+      min-width: 140px;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+    .db-wb-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .db-wb-logo-img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+    .db-wb-logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .db-wb-logo-title {
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .db-wb-tagline {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    .db-wb-hash {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1;
+      color: #ffffff;
+      opacity: 0.95;
+    }
+
+    /* Kolom tengah: Greeting + Nama + Role */
+    .db-wb-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 200px 20px 20px;
+      z-index: 2;
+    }
+    .db-wb-text-group {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-width: 100%;
+    }
+    .db-wb-greeting {
+      font-family: 'Alex Brush', 'Great Vibes', 'Dancing Script', cursive;
+      font-size: clamp(32px, 3.4vw, 48px);
+      font-weight: 400;
+      color: #ffffff;
+      line-height: 1.1;
+      margin-bottom: -6px;
+      transform: rotate(-3deg);
+      transform-origin: left bottom;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      margin-left: 2px;
+    }
+    .db-wb-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(48px, 5.4vw, 72px);
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      text-shadow: 0 4px 14px rgba(0, 30, 80, 0.4), 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+    .db-wb-role-wrap {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-top: 6px;
+    }
+    .db-wb-role {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(14px, 1.4vw, 19px);
+      font-style: italic;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.95);
+      letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 900px) {
+      .db-wb-center { padding-right: 20px; }
+      .db-wb-left { padding: 16px; }
+      #lanyard-container { display: none; }
+    }
+
+
     /* Styling for Kehadiran Bulan Ini Widget (Bigger font sizes) */
+
     .db-attendance-stats {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -244,10 +394,51 @@
 
     <main class="dashboard-content">
 
-      <!-- ===== Welcome Banner ===== -->
-      <div class="db-welcome-img-container">
-        <img class="db-welcome-img" src="../media/work_can_be_fun.png" alt="Work Can Be Fun" />
+      <!-- ===== Welcome Banner (Dynamic HTML) ===== -->
+      <div style="position:relative; margin-bottom:20px;">
+        <!-- Banner utama -->
+        <div id="db-welcome-banner" class="db-welcome-banner">
+          <!-- Watermark Logo -->
+          <div class="db-wb-watermark">
+            <img src="../media/bisa_icon_white.png" alt="" class="db-wb-watermark-img" />
+          </div>
+
+          <!-- Kolom kiri: logo atas + tagline bawah -->
+          <div class="db-wb-left">
+            <div class="db-wb-logo">
+              <img src="../media/bisa_icon_white.png" alt="Bisa Media" class="db-wb-logo-img" />
+              <div class="db-wb-logo-text">
+                <span class="db-wb-logo-title">Bisa</span>
+                <span class="db-wb-logo-title">Media</span>
+              </div>
+            </div>
+            <div class="db-wb-tagline">
+              <span class="db-wb-hash">#</span>
+              <span>Work Can<br>Be Fun</span>
+            </div>
+          </div>
+
+          <!-- Konten tengah: Greeting + Nama + Role -->
+          <div class="db-wb-center">
+            <div class="db-wb-text-group">
+              <span class="db-wb-greeting">Selamat Datang</span>
+              <h2 class="db-wb-name" id="banner-user-name">Awan Setiawan</h2>
+              <div class="db-wb-role-wrap">
+                <span class="db-wb-role" id="banner-user-role">Information Technology</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Lanyard container -->
+        <div id="lanyard-container" style="position:absolute;top:-28px;right:22px;width:220px;height:350px;pointer-events:all;z-index:10;"></div>
       </div>
+
+
+
+
+
+
 
       <!-- ===== Main Dashboard Layout (2 Columns) ===== -->
       <div class="db-main-layout">
@@ -1387,6 +1578,115 @@
     updateTopMetrics();
   </script>
   <script src="../assets/js/layout.js?v=1002"></script>
+  <script src="../assets/js/banner_assets.js"></script>
+  <script src="../assets/js/lanyard.js"></script>
+  <script>
+    (function () {
+      function drawIDCard(userName, role) {
+        const W = 320, H = 480;
+        const cv = document.createElement('canvas');
+        cv.width = W; cv.height = H;
+        const ctx = cv.getContext('2d');
+
+        // Pure white badge holder
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
+
+        // Slot punch hole at top
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(W/2 - 32, 16, 64, 15, 7);
+        else ctx.rect(W/2 - 32, 16, 64, 15);
+        ctx.fill();
+
+        // Inner photo frame with solid vibrant red background
+        const px = 18, py = 48, pw = W - 36, ph = 406, pr = 16;
+        ctx.save();
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, pr);
+        else ctx.rect(px, py, pw, ph);
+        ctx.fillStyle = '#d81a24';
+        ctx.fill();
+        ctx.clip();
+
+        // Draw employee photo if available
+        if (window._lanyardUserImg && window._lanyardUserImg.complete && window._lanyardUserImg.naturalWidth) {
+          const img = window._lanyardUserImg;
+          const sx = 50, sy = 25, sw = 580, sh = 800;
+          ctx.drawImage(img, sx, sy, sw, sh, px, py, pw, ph);
+        }
+        ctx.restore();
+
+        // Thin dark border around photo
+        ctx.strokeStyle = '#222938';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, pr);
+        else ctx.rect(px, py, pw, ph);
+        ctx.stroke();
+
+        return cv.toDataURL('image/jpeg', 0.95);
+      }
+
+      function startLanyard() {
+        const container = document.getElementById('lanyard-container');
+        if (!container || typeof initLanyard !== 'function' || typeof THREE === 'undefined') return;
+        const userName = document.querySelector('.user-menu-dropdown__name')?.textContent?.trim()
+          || document.querySelector('.topbar-user-name')?.textContent?.trim()
+          || 'Rayi (Staff)';
+        const role = 'Staff KOL';
+
+        // Populate banner text
+        const bannerName = document.getElementById('banner-user-name');
+        const bannerRole = document.getElementById('banner-user-role');
+        if (bannerName) bannerName.textContent = userName;
+        if (bannerRole) bannerRole.textContent = role;
+
+        function launch() {
+          const cardDataURL = drawIDCard(userName, role);
+          initLanyard(container, {
+            frontImage: cardDataURL,
+            backImage: cardDataURL,
+            imageFit: 'cover',
+            cardColor: '#ffffff',
+            orientation: 'portrait',
+            finish: 'glossy',
+            cornerRadius: 0.28,
+            size: 0.68,
+            anchor: 'center',
+            strapLength: 0.38,
+            strapColor: '#1e3a8a',
+            strapWidth: 0.55,
+            metal: 'silver',
+            gravity: 1.0,
+            damping: 0.5,
+            elasticity: 0.4,
+            breeze: 0.35,
+            interactive: true,
+            intro: true
+          });
+        }
+
+        if (window.LANYARD_USER_B64) {
+          const img = new Image();
+          img.onload = () => {
+            window._lanyardUserImg = img;
+            launch();
+          };
+          img.onerror = () => launch();
+          img.src = window.LANYARD_USER_B64;
+        } else {
+          launch();
+        }
+
+      }
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', startLanyard);
+      else setTimeout(startLanyard, 150);
+    })();
+  </script>
+
+
 </body>
 
 </html>

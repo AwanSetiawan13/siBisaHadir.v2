@@ -782,7 +782,7 @@
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
             <!-- Green Excel Button with tooltip -->
-            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Kelola Data Excel (Import / Export)" title="Kelola Data Excel (Import / Export)">
+            <button id="btnExportExcel" class="small-action-button btn-excel-green" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx). Centang baris untuk mengekspor sebagian data.">
               <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
                 <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
                 <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
@@ -866,17 +866,6 @@
               </button>
             </div>
 
-            <!-- Bulk Delete Button (Muncul jika ada baris dipilih) -->
-            <button type="button" class="btn-bulk-delete" id="btnBulkDelete" style="display: none;" title="Hapus data terpilih">
-              <i class="bx bx-trash" style="font-size: 15px;"></i> Hapus (<span class="bulk-count">0</span>)
-              <span class="btn-bulk-cancel" id="btnBulkCancel" title="Batal memilih" aria-hidden="true">&times;</span>
-            </button>
-          </div>
-
-          <div class="campaign-toolbar__right" style="display: flex; align-items: center; gap: 8px;">
-            <button class="btn-tambah" style="margin-right: 6px;" type="button">
-              + Tambah
-            </button>
           </div>
         </div>
 
@@ -896,7 +885,7 @@
             <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
           </svg>
           <div class="app-empty-state__title">Belum ada data Kreator</div>
-          <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan kreator baru.</div>
+          <div class="app-empty-state__subtitle">Data kreator akan tampil di sini setelah tersedia.</div>
         </div>
 
         <div class="table-wrap campaign-table" id="tableContainerWrapper">
@@ -1289,7 +1278,7 @@
     </div>
   </div>
 
-      <!-- Modal Pilihan Aksi Excel (Import / Export) - Clean List Style -->
+      <!-- Modal Export Excel -->
   <div id="modalOpsiExcelKreator" class="modal-overlay">
     <div class="modal-box" style="max-width: 380px; border-radius: 14px; padding: 22px 22px 20px; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);">
       <!-- Header -->
@@ -1299,8 +1288,8 @@
             <i class="bx bx-spreadsheet"></i>
           </div>
           <div>
-            <div style="font-size: 15px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif; line-height: 1.2;">Data Excel</div>
-            <div style="font-size: 12px; color: #94a3b8; font-family: 'Outfit', sans-serif;">Pilih tindakan</div>
+            <div style="font-size: 15px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif; line-height: 1.2;">Export Data</div>
+            <div style="font-size: 12px; color: #94a3b8; font-family: 'Outfit', sans-serif;">Unduh ke Excel</div>
           </div>
         </div>
         <button type="button" id="closeOpsiExcelModal" aria-label="Tutup" style="background: #f1f5f9; border: none; width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #64748b; cursor: pointer; transition: all 0.15s ease; line-height: 1; padding: 0;" onmouseover="this.style.background='#e2e8f0';this.style.color='#1e293b';" onmouseout="this.style.background='#f1f5f9';this.style.color='#64748b';">&times;</button>
@@ -1311,18 +1300,6 @@
 
       <!-- Action List -->
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <!-- Import -->
-        <button type="button" id="btnPilihImportExcel" class="excel-action-item excel-action-item--import">
-          <div class="excel-action-icon excel-action-icon--import">
-            <i class="bx bx-upload"></i>
-          </div>
-          <div style="flex: 1;">
-            <div style="font-size: 13.5px; font-weight: 700; color: #1e293b;">Import Data</div>
-            <div style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Unggah file .xlsx atau .csv</div>
-          </div>
-          <i class="bx bx-chevron-right excel-action-arrow"></i>
-        </button>
-
         <!-- Export -->
         <button type="button" id="btnPilihExportExcel" class="excel-action-item excel-action-item--export">
           <div class="excel-action-icon excel-action-icon--export">
@@ -1441,6 +1418,7 @@
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../../assets/js/app.js"></script>
+  <script src="../../assets/js/campaign_pic_shared.js"></script>
   <script>
     (function () {
       // ===== Toast Notification Function =====
@@ -1541,10 +1519,51 @@
             { id: 1, kategori: "Fashion Muslim", pic: "Setiawan" },
             { id: 2, kategori: "Beauty & Care", pic: "Amanda" },
             { id: 3, kategori: "Food & Beverage", pic: "Dimas" },
-            { id: 4, kategori: "Mom & Baby", pic: "Clarissa" }
+            { id: 4, kategori: "Mom & Baby", pic: "Clarissa" },
+            { id: 5, kategori: "Otomotif", pic: "Dimas" }
           ];
+        } else {
+          const hasOtomotif = list.some(item => {
+            const k = (typeof item === "string" ? item : (item.kategori || item.namaKategori || "")).toLowerCase().trim();
+            return k === "otomotif";
+          });
+          if (!hasOtomotif) {
+            list.push({ id: 5, kategori: "Otomotif", pic: "Dimas" });
+            try { localStorage.setItem("spv_kategori_produk_v1", JSON.stringify(list)); } catch (e) {}
+          }
         }
         return list;
+      }
+
+      function getCurrentStaffPic() {
+        if (window.BMCampaignShared && typeof window.BMCampaignShared.getCurrentPic === "function") {
+          const p = window.BMCampaignShared.getCurrentPic();
+          if (p) return p;
+        }
+        const role = String(localStorage.getItem("user_role") || "").trim().toLowerCase();
+        if (role === "staff_kol") {
+          return String(localStorage.getItem("user_pic") || "").trim();
+        }
+        return "";
+      }
+
+      const currentStaffPic = getCurrentStaffPic();
+
+      function isCreatorBelongsToStaff(creator, staffPic) {
+        if (!staffPic) return true;
+        if (!creator) return false;
+        if (window.BMCampaignShared && typeof window.BMCampaignShared.isCreatorAllowedForPic === "function") {
+          return window.BMCampaignShared.isCreatorAllowedForPic(creator, staffPic);
+        }
+        const sKey = String(staffPic).trim().toLowerCase();
+        const explicit = [creator.pic1, creator.pic2, creator.pic3, creator.pic].map(p => String(p || "").trim().toLowerCase());
+        if (explicit.includes(sKey)) return true;
+        const cats = [creator.kategori1, creator.kategori2, creator.kategori3, creator.kategori].filter(Boolean);
+        const { categoryToPicMap } = getMasterCategoriesAndPics();
+        return cats.some(c => {
+          const cParts = String(c).split(",").map(x => x.trim().toLowerCase());
+          return cParts.some(p => String(categoryToPicMap[p] || "").trim().toLowerCase() === sKey);
+        });
       }
 
       function getMasterCategoriesAndPics() {
@@ -1572,6 +1591,19 @@
       // Populate 3 pairs of Kategori Produk (Dropdown kiri) & PIC (Text real-time kanan)
       function populateKreatorCategories(values = {}) {
         const { categoryNames, categoryToPicMap } = getMasterCategoriesAndPics();
+
+        // Jika login sebagai Staff KOL tertentu, batasi kategori hanya pada kategori miliknya
+        let availableCategoryNames = categoryNames;
+        if (currentStaffPic) {
+          const staffPicKey = currentStaffPic.trim().toLowerCase();
+          availableCategoryNames = categoryNames.filter(cat => {
+            const mappedPic = String(categoryToPicMap[cat.toLowerCase().trim()] || (window.BMCampaignShared ? window.BMCampaignShared.getPicForCategory(cat) : "")).trim().toLowerCase();
+            return mappedPic === staffPicKey;
+          });
+          if (availableCategoryNames.length === 0) {
+            availableCategoryNames = categoryNames;
+          }
+        }
 
         const sets = [
           {
@@ -1604,7 +1636,7 @@
               : `<option value="">-- Pilih Kategori Produk ${num} (Opsional) --</option>`;
 
             let hasMatched = false;
-            categoryNames.forEach(cat => {
+            availableCategoryNames.forEach(cat => {
               const opt = document.createElement("option");
               opt.value = cat;
               opt.textContent = cat;
@@ -1615,7 +1647,7 @@
               katEl.appendChild(opt);
             });
 
-            // If valKat exists but was not present in standard master categoryNames, append it dynamically
+            // If valKat exists but was not present in availableCategoryNames, append it dynamically
             if (valKat && !hasMatched && valKat !== "-" && valKat !== "Kategori Produk") {
               const opt = document.createElement("option");
               opt.value = valKat;
@@ -1627,21 +1659,41 @@
 
             if (valKat && hasMatched) {
               katEl.value = valKat;
-              const matchedPic = categoryToPicMap[valKat.toLowerCase().trim()] || (values[`pic${num}`] || "");
-              if (picInp) picInp.value = matchedPic;
+              const matchedPic = currentStaffPic || categoryToPicMap[valKat.toLowerCase().trim()] || (values[`pic${num}`] || "");
+              if (picInp) {
+                picInp.value = matchedPic;
+                if (currentStaffPic) {
+                  picInp.readOnly = true;
+                  picInp.style.backgroundColor = "#f8fafc";
+                  picInp.style.cursor = "not-allowed";
+                }
+              }
             } else if (isReq) {
               katEl.selectedIndex = 0;
-              if (picInp) picInp.value = "";
+              if (picInp) {
+                picInp.value = currentStaffPic || "";
+                if (currentStaffPic) {
+                  picInp.readOnly = true;
+                  picInp.style.backgroundColor = "#f8fafc";
+                  picInp.style.cursor = "not-allowed";
+                }
+              }
             } else {
               katEl.value = "";
-              if (picInp) picInp.value = "";
+              if (picInp) {
+                picInp.value = "";
+                if (currentStaffPic) {
+                  picInp.readOnly = true;
+                  picInp.style.backgroundColor = "#f8fafc";
+                  picInp.style.cursor = "not-allowed";
+                }
+              }
             }
 
             // Real-time update of PIC text input on category change & duplicate category check
             katEl.onchange = function () {
               const selectedCat = this.value;
               if (selectedCat) {
-                // Check if this category is already selected in other category dropdowns
                 const otherSets = sets.filter(s => s.num !== num);
                 const duplicateSet = otherSets.find(s => {
                   const el = s.katEl;
@@ -1664,19 +1716,25 @@
                     alert(`Kategori "${selectedCat}" sudah dipilih pada Kategori ${duplicateSet.num}. Silakan pilih kategori yang berbeda.`);
                   }
 
-                  // Reset dropdown to default empty state
                   if (isReq) {
                     this.selectedIndex = 0;
                   } else {
                     this.value = "";
                   }
-                  if (picInp) picInp.value = "";
+                  if (picInp) picInp.value = currentStaffPic || "";
                   return;
                 }
 
                 const freshData = getMasterCategoriesAndPics();
-                const matchedPic = freshData.categoryToPicMap[selectedCat.toLowerCase().trim()] || "";
-                if (picInp) picInp.value = matchedPic;
+                const matchedPic = currentStaffPic || freshData.categoryToPicMap[selectedCat.toLowerCase().trim()] || "";
+                if (picInp) {
+                  picInp.value = matchedPic;
+                  if (currentStaffPic) {
+                    picInp.readOnly = true;
+                    picInp.style.backgroundColor = "#f8fafc";
+                    picInp.style.cursor = "not-allowed";
+                  }
+                }
               } else {
                 if (picInp) picInp.value = "";
               }
@@ -1696,7 +1754,7 @@
         if (filterSelect) {
           const currentFilter = filterSelect.value;
           filterSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Kategori</option>';
-          categoryNames.forEach(cat => {
+          availableCategoryNames.forEach(cat => {
             const opt = document.createElement("option");
             opt.value = cat.toLowerCase();
             opt.textContent = cat;
@@ -1944,10 +2002,25 @@
         const wrap3 = document.getElementById('wrapKategori3Row');
         const btnTambah = document.getElementById('btnTambahKategori');
         if (!btnTambah) return;
-        if (wrap2 && wrap3 && wrap2.style.display === 'grid' && wrap3.style.display === 'grid') {
-            btnTambah.style.display = 'none';
+
+        let maxSlots = 3;
+        if (currentStaffPic) {
+          const { categoryNames, categoryToPicMap } = getMasterCategoriesAndPics();
+          const staffCats = categoryNames.filter(cat => {
+            const mappedPic = String(categoryToPicMap[cat.toLowerCase().trim()] || (window.BMCampaignShared ? window.BMCampaignShared.getPicForCategory(cat) : "")).trim().toLowerCase();
+            return mappedPic === currentStaffPic.trim().toLowerCase();
+          });
+          maxSlots = Math.max(1, staffCats.length);
+        }
+
+        let currentActiveSlots = 1;
+        if (wrap2 && wrap2.style.display === 'grid') currentActiveSlots++;
+        if (wrap3 && wrap3.style.display === 'grid') currentActiveSlots++;
+
+        if (currentActiveSlots >= maxSlots || (wrap2 && wrap3 && wrap2.style.display === 'grid' && wrap3.style.display === 'grid')) {
+          btnTambah.style.display = 'none';
         } else {
-            btnTambah.style.display = 'flex';
+          btnTambah.style.display = 'flex';
         }
       }
 
@@ -2168,12 +2241,45 @@
           video: "12 Video",
           aktivitas: "Aktif Live"
         },
+        {
+          id: 3,
+          uid: "UID-0003",
+          username: "@jualan.berkah",
+          nama: "Jualan Berkah",
+          alamat: "Jl. Ir. H. Juanda No. 45, Tasikmalaya",
+          nomorWa: "082199887766",
+          kategori: "Otomotif",
+          kategori1: "Otomotif",
+          pic1: "Dimas",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Aksesoris Mobil & Motor",
+          spesifik: "Aksesoris Mobil & Motor",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "jualanberkah@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 80.000.000",
+          gmvBerjalan: "Rp 95.000.000",
+          progresGmv: "118%",
+          siaranLive: "36 Jam",
+          video: "15 Video",
+          aktivitas: "Aktif Konten & Live"
+        }
       ];
 
       // Ensure clean 1-category dummy data reset once
-      if (!localStorage.getItem("bisa_kreator_clean_v13")) {
+      if (!localStorage.getItem("bisa_kreator_clean_v14")) {
         try {
           const oldKeys = [
+            "bisa_kreator_list_v13",
             "bisa_kreator_list_v12",
             "bisa_kreator_list_v11",
             "bisa_kreator_list_v10",
@@ -2184,7 +2290,7 @@
           ];
           oldKeys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
           localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(DEFAULT_KREATOR));
-          localStorage.setItem("bisa_kreator_clean_v13", "true");
+          localStorage.setItem("bisa_kreator_clean_v14", "true");
         } catch(e){}
       }
 
@@ -2204,6 +2310,15 @@
         }
       } catch (e) {
         kreatorDb = DEFAULT_KREATOR;
+      }
+
+      // Pastikan UID-0003 (Jualan Berkah) selalu tersedia di database
+      if (!kreatorDb.some(k => k.uid === "UID-0003" || (k.username && k.username.toLowerCase() === "@jualan.berkah"))) {
+        const dummyJualanBerkah = DEFAULT_KREATOR.find(k => k.uid === "UID-0003");
+        if (dummyJualanBerkah) {
+          kreatorDb.push(dummyJualanBerkah);
+          try { localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(kreatorDb)); } catch (e) {}
+        }
       }
 
       function saveKreatorDb() {
@@ -2300,6 +2415,12 @@
         if (typeof updateKategoriDeleteButtonsVisibility === "function") {
           updateKategoriDeleteButtonsVisibility();
         }
+
+        const wrap2 = document.getElementById("wrapKategori2Row");
+        const wrap3 = document.getElementById("wrapKategori3Row");
+        if (wrap2) wrap2.style.display = "none";
+        if (wrap3) wrap3.style.display = "none";
+        if (typeof updateBtnTambahVisibility === "function") updateBtnTambahVisibility();
       }
       window.resetKreatorForm = resetKreatorForm;
 
@@ -2329,70 +2450,52 @@
         const waInp = document.getElementById("kreatorWaInput");
         if (waInp) waInp.value = item.nomorWa || "";
 
-        // Extract 3 categories & PICs
-        let kat1 = (item.kategori1 && item.kategori1 !== "-" && item.kategori1 !== "Kategori Produk") ? item.kategori1.trim() : "";
-        let pic1 = item.pic1 || "";
-        let kat2 = (item.kategori2 && item.kategori2 !== "-" && item.kategori2 !== "Kategori Produk") ? item.kategori2.trim() : "";
-        let pic2 = item.pic2 || "";
-        let kat3 = (item.kategori3 && item.kategori3 !== "-" && item.kategori3 !== "Kategori Produk") ? item.kategori3.trim() : "";
-        let pic3 = item.pic3 || "";
-
-        // If item has comma-separated categories in `kategori`, fill any missing slot
+        // Extract categories belonging to this staff PIC (or all categories if no restriction)
+        let staffCategoryPairs = [];
+        const rawPairs = [
+          { kat: item.kategori1, pic: item.pic1 },
+          { kat: item.kategori2, pic: item.pic2 },
+          { kat: item.kategori3, pic: item.pic3 }
+        ];
         if (item.kategori && item.kategori !== "-") {
-          const splitCats = item.kategori.split(",").map(s => s.trim()).filter(c => c && c !== "-" && c !== "Kategori Produk");
-          if (!kat1 && splitCats[0]) kat1 = splitCats[0];
-          if (!kat2 && splitCats[1]) kat2 = splitCats[1];
-          if (!kat3 && splitCats[2]) kat3 = splitCats[2];
+          item.kategori.split(",").forEach(c => {
+            const cClean = c.trim();
+            if (cClean && cClean !== "-" && !rawPairs.some(p => p.kat && p.kat.toLowerCase() === cClean.toLowerCase())) {
+              rawPairs.push({ kat: cClean, pic: "" });
+            }
+          });
         }
 
-        // Also check if creator is assigned to any campaigns with another category
-        try {
-          const campSaved = localStorage.getItem("bisa_campaign_list_v14") || localStorage.getItem("bisa_campaign_list_v13") || localStorage.getItem("bisa_campaign_list_v12") || localStorage.getItem("bisa_campaign_list_v11") || localStorage.getItem("bisa_campaign_list_v1");
-          if (campSaved) {
-            const campList = JSON.parse(campSaved);
-            if (Array.isArray(campList)) {
-              const cId = String(item.id || item.uid || '');
-              const cName = String(item.nama || item.name || '').toLowerCase().trim();
-              const cUser = String(item.username || '').replace(/^@/, '').toLowerCase().trim();
-
-              campList.forEach(camp => {
-                let isInCamp = false;
-                if (Array.isArray(camp.kreatorDetails)) {
-                  isInCamp = camp.kreatorDetails.some(kd =>
-                    (kd.id && String(kd.id) === cId) ||
-                    (kd.name && kd.name.toLowerCase().trim() === cName) ||
-                    (kd.username && kd.username.replace(/^@/, '').toLowerCase().trim() === cUser)
-                  );
-                }
-                if (!isInCamp && camp.kreator && typeof camp.kreator === 'string') {
-                  const kNames = camp.kreator.split(',').map(s => s.toLowerCase().trim());
-                  if (kNames.includes(cName)) isInCamp = true;
-                }
-
-                if (isInCamp && camp.kategori && camp.kategori.trim() !== "" && camp.kategori !== "-") {
-                  const campCat = camp.kategori.trim();
-                  const existing = [kat1.toLowerCase(), kat2.toLowerCase(), kat3.toLowerCase()].filter(Boolean);
-                  if (!existing.some(ex => ex === campCat.toLowerCase() || campCat.toLowerCase().includes(ex) || ex.includes(campCat.toLowerCase()))) {
-                    if (!kat1) kat1 = campCat;
-                    else if (!kat2) kat2 = campCat;
-                    else if (!kat3) kat3 = campCat;
-                  }
-                }
-              });
+        const { categoryToPicMap } = getMasterCategoriesAndPics();
+        rawPairs.forEach(p => {
+          if (!p.kat || p.kat === "-" || p.kat === "Kategori Produk") return;
+          const kName = p.kat.trim();
+          const pName = p.pic || categoryToPicMap[kName.toLowerCase()] || (window.BMCampaignShared ? window.BMCampaignShared.getPicForCategory(kName) : "");
+          if (!currentStaffPic || pName.toLowerCase() === currentStaffPic.toLowerCase()) {
+            if (!staffCategoryPairs.some(sp => sp.kat.toLowerCase() === kName.toLowerCase())) {
+              staffCategoryPairs.push({ kat: kName, pic: pName });
             }
           }
-        } catch (e) {}
+        });
 
-        const { categoryToPicMap } = getMasterCategoriesAndPics();
-        if (!pic1 && kat1) pic1 = categoryToPicMap[kat1.toLowerCase()] || "";
-        if (!pic2 && kat2) pic2 = categoryToPicMap[kat2.toLowerCase()] || "";
-        if (!pic3 && kat3) pic3 = categoryToPicMap[kat3.toLowerCase()] || "";
+        let kat1 = staffCategoryPairs[0] ? staffCategoryPairs[0].kat : "";
+        let pic1 = staffCategoryPairs[0] ? staffCategoryPairs[0].pic : "";
+        let kat2 = staffCategoryPairs[1] ? staffCategoryPairs[1].kat : "";
+        let pic2 = staffCategoryPairs[1] ? staffCategoryPairs[1].pic : "";
+        let kat3 = staffCategoryPairs[2] ? staffCategoryPairs[2].kat : "";
+        let pic3 = staffCategoryPairs[2] ? staffCategoryPairs[2].pic : "";
 
         populateKreatorCategories({ kat1, pic1, kat2, pic2, kat3, pic3 });
         populateKreatorLeads(item.leads || "");
         if (typeof updateKategoriDeleteButtonsVisibility === "function") {
           updateKategoriDeleteButtonsVisibility();
         }
+
+        const wrap2 = document.getElementById("wrapKategori2Row");
+        const wrap3 = document.getElementById("wrapKategori3Row");
+        if (wrap2) wrap2.style.display = (kat2 && kat2 !== "-") ? "grid" : "none";
+        if (wrap3) wrap3.style.display = (kat3 && kat3 !== "-") ? "grid" : "none";
+        if (typeof updateBtnTambahVisibility === "function") updateBtnTambahVisibility();
 
         const katSpesifikInp = document.getElementById("kreatorKatSpesifikInput");
         if (katSpesifikInp) {
@@ -2456,7 +2559,11 @@
         let countTidakAktif = 0;
         let countPerhatian = 0;
 
-        kreatorDb.forEach(k => {
+        const targetList = currentStaffPic
+          ? kreatorDb.filter(k => isCreatorBelongsToStaff(k, currentStaffPic))
+          : kreatorDb;
+
+        targetList.forEach(k => {
           const s = (k.status || "").toLowerCase();
           if (s === "bind" || s === "aktif") {
             countAktif++;
@@ -2481,6 +2588,9 @@
       function getFilteredKreators(query = "") {
         const q = (query !== undefined && query !== null ? query : (searchKreatorInput ? searchKreatorInput.value : "")).trim().toLowerCase();
         return kreatorDb.filter(k => {
+          if (currentStaffPic && !isCreatorBelongsToStaff(k, currentStaffPic)) {
+            return false;
+          }
           if (q) {
             const matchQ = (k.uid && k.uid.toLowerCase().includes(q)) ||
               (k.username && k.username.toLowerCase().includes(q)) ||
@@ -2525,12 +2635,16 @@
 
         const filtered = getFilteredKreators(query);
 
+        const scopedKreators = currentStaffPic
+          ? kreatorDb.filter(k => isCreatorBelongsToStaff(k, currentStaffPic))
+          : kreatorDb;
+
         const tableWrapper = document.getElementById("tableContainerWrapper");
         const emptyTableState = document.getElementById("emptyTableState");
         if (typeof window.bmToggleEmptyState === 'function') {
-          window.bmToggleEmptyState(emptyTableState, tableWrapper, kreatorDb.length === 0);
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, scopedKreators.length === 0);
         } else {
-          if (kreatorDb.length === 0) {
+          if (scopedKreators.length === 0) {
             if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
             if (emptyTableState) {
               emptyTableState.classList.remove("is-hidden");
@@ -2550,7 +2664,7 @@
           }
         }
 
-        if (kreatorDb.length === 0) {
+        if (scopedKreators.length === 0) {
           return;
         }
 
@@ -2584,7 +2698,7 @@
           }
 
           // Build multiple category badges
-          const categories = [];
+          let categories = [];
           if (item.kategori1 && item.kategori1 !== "-") categories.push({ name: item.kategori1, pic: item.pic1 });
           if (item.kategori2 && item.kategori2 !== "-") categories.push({ name: item.kategori2, pic: item.pic2 });
           if (item.kategori3 && item.kategori3 !== "-") categories.push({ name: item.kategori3, pic: item.pic3 });
@@ -2593,6 +2707,18 @@
             const splitCats = item.kategori.split(",").map(s => s.trim()).filter(Boolean);
             splitCats.forEach(c => {
               if (c && c !== "-") categories.push({ name: c, pic: "" });
+            });
+          }
+
+          // Jika login sebagai Staff KOL tertentu, saring badge kategori HANYA milik PIC tersebut
+          if (currentStaffPic) {
+            const { categoryToPicMap } = getMasterCategoriesAndPics();
+            const staffPicKey = currentStaffPic.trim().toLowerCase();
+            categories = categories.filter(c => {
+              const explicitPic = String(c.pic || "").trim().toLowerCase();
+              if (explicitPic && explicitPic === staffPicKey) return true;
+              const mappedPic = String(categoryToPicMap[String(c.name).trim().toLowerCase()] || (window.BMCampaignShared ? window.BMCampaignShared.getPicForCategory(c.name) : "")).trim().toLowerCase();
+              return mappedPic === staffPicKey;
             });
           }
 
@@ -2628,7 +2754,6 @@
               return { bg: "#f1f5f9", color: "#334155", border: "#cbd5e1", dot: "#64748b" };
             }
 
-            // Deterministic pastel palette for other custom categories
             const fallbacks = [
               { bg: "#f0fdf4", color: "#166534", border: "#bbf7d0", dot: "#22c55e" },
               { bg: "#fdf4ff", color: "#86198f", border: "#f5d0fe", dot: "#a21caf" },
@@ -2826,20 +2951,39 @@
               if (!p2 && k2) p2 = categoryToPicMap[k2.toLowerCase()] || "-";
               if (!p3 && k3) p3 = categoryToPicMap[k3.toLowerCase()] || "-";
 
-              if (elKat1) elKat1.value = k1 || "-";
-              if (elPic1) elPic1.value = p1 || "-";
-              if (elKat2) elKat2.value = k2 || "-";
-              if (elPic2) elPic2.value = p2 || "-";
-              if (elKat3) elKat3.value = k3 || "-";
-              if (elPic3) elPic3.value = p3 || "-";
+              // Saring kategori pada modal lihat jika login sebagai Staff KOL
+              let viewCategories = [];
+              const rawViewList = [
+                { k: k1, p: p1 },
+                { k: k2, p: p2 },
+                { k: k3, p: p3 }
+              ];
+              rawViewList.forEach(itemCat => {
+                if (!itemCat.k || itemCat.k === "-" || itemCat.k === "Kategori Produk") return;
+                const pEff = itemCat.p || categoryToPicMap[itemCat.k.toLowerCase()] || (window.BMCampaignShared ? window.BMCampaignShared.getPicForCategory(itemCat.k) : "");
+                if (!currentStaffPic || pEff.toLowerCase() === currentStaffPic.toLowerCase()) {
+                  viewCategories.push({ k: itemCat.k, p: pEff });
+                }
+              });
+
+              const v1 = viewCategories[0] || { k: "-", p: "-" };
+              const v2 = viewCategories[1] || { k: "", p: "" };
+              const v3 = viewCategories[2] || { k: "", p: "" };
+
+              if (elKat1) elKat1.value = v1.k;
+              if (elPic1) elPic1.value = v1.p;
+              if (elKat2) elKat2.value = v2.k || "-";
+              if (elPic2) elPic2.value = v2.p || "-";
+              if (elKat3) elKat3.value = v3.k || "-";
+              if (elPic3) elPic3.value = v3.p || "-";
 
               const wrapKat1 = document.getElementById("wrapViewKategori1Row");
               const wrapKat2 = document.getElementById("wrapViewKategori2Row");
               const wrapKat3 = document.getElementById("wrapViewKategori3Row");
 
               if (wrapKat1) wrapKat1.style.display = "grid";
-              if (wrapKat2) wrapKat2.style.display = (k2 && k2 !== "-") ? "grid" : "none";
-              if (wrapKat3) wrapKat3.style.display = (k3 && k3 !== "-") ? "grid" : "none";
+              if (wrapKat2) wrapKat2.style.display = (v2.k && v2.k !== "-") ? "grid" : "none";
+              if (wrapKat3) wrapKat3.style.display = (v3.k && v3.k !== "-") ? "grid" : "none";
 
               if (elKatSpesifik) {
                 const sVal = item.kategoriSpesifik || item.spesifik || "";
@@ -3017,11 +3161,49 @@
         const editId = window.editingKreatorId;
         const formattedUser = userVal.startsWith("@") ? userVal : "@" + userVal;
         const masaKontrak = `${tglAwalVal} - ${tglAkhirVal}`;
-
-        // Combined string of categories
-        const categoriesList = [kat1Val, kat2Val, kat3Val].filter(Boolean);
-        const combinedKategori = categoriesList.join(", ");
         const existingItem = editId ? kreatorDb.find(k => String(k.id) === String(editId)) : null;
+
+        let finalKat1 = kat1Val;
+        let finalPic1 = pic1Val;
+        let finalKat2 = kat2Val;
+        let finalPic2 = pic2Val;
+        let finalKat3 = kat3Val;
+        let finalPic3 = pic3Val;
+
+        if (editId && existingItem && currentStaffPic) {
+          const { categoryToPicMap } = getMasterCategoriesAndPics();
+          const staffPicKey = currentStaffPic.trim().toLowerCase();
+
+          // Ambil kategori existing yang BUKAN milik staff ini agar tidak terhapus
+          const otherPicPairs = [];
+          const checkOther = (k, p) => {
+            if (!k || k === "-" || k === "Kategori Produk") return;
+            const pEff = p || categoryToPicMap[k.toLowerCase()] || (window.BMCampaignShared ? window.BMCampaignShared.getPicForCategory(k) : "");
+            if (pEff.toLowerCase() !== staffPicKey) {
+              otherPicPairs.push({ kat: k, pic: pEff });
+            }
+          };
+          checkOther(existingItem.kategori1, existingItem.pic1);
+          checkOther(existingItem.kategori2, existingItem.pic2);
+          checkOther(existingItem.kategori3, existingItem.pic3);
+
+          const currentStaffPairs = [
+            { kat: kat1Val, pic: pic1Val },
+            { kat: kat2Val, pic: pic2Val },
+            { kat: kat3Val, pic: pic3Val }
+          ].filter(p => p.kat && p.kat !== "-");
+
+          const allMergedPairs = [...currentStaffPairs, ...otherPicPairs];
+          finalKat1 = allMergedPairs[0] ? allMergedPairs[0].kat : "";
+          finalPic1 = allMergedPairs[0] ? allMergedPairs[0].pic : "";
+          finalKat2 = allMergedPairs[1] ? allMergedPairs[1].kat : "";
+          finalPic2 = allMergedPairs[1] ? allMergedPairs[1].pic : "";
+          finalKat3 = allMergedPairs[2] ? allMergedPairs[2].kat : "";
+          finalPic3 = allMergedPairs[2] ? allMergedPairs[2].pic : "";
+        }
+
+        const categoriesList = [finalKat1, finalKat2, finalKat3].filter(Boolean);
+        const combinedKategori = categoriesList.join(", ");
 
         const kreatorData = {
           id: editId || ('k_' + Date.now()),
@@ -3031,12 +3213,12 @@
           alamat: alamatVal,
           nomorWa: waVal,
           kategori: combinedKategori,
-          kategori1: kat1Val,
-          pic1: pic1Val,
-          kategori2: kat2Val,
-          pic2: pic2Val,
-          kategori3: kat3Val,
-          pic3: pic3Val,
+          kategori1: finalKat1,
+          pic1: finalPic1,
+          kategori2: finalKat2,
+          pic2: finalPic2,
+          kategori3: finalKat3,
+          pic3: finalPic3,
           kategoriSpesifik: katSpesifikVal,
           spesifik: katSpesifikVal,
           kontrakAwal: tglAwalVal,
@@ -3956,14 +4138,6 @@
       }
 
 
-      const tambahBtn = document.querySelector(".btn-tambah");
-      if (tambahBtn) {
-        tambahBtn.addEventListener("click", function () {
-          resetKreatorForm();
-          if (kreatorModalEl) kreatorModalEl.classList.add("is-active");
-        });
-      }
-
       // Toolbar: Real-time Search with Clear Button (Sama dengan Campaign)
       const searchKreatorInput = document.getElementById("searchKreatorInput") || document.querySelector(".campaign-search input");
       const searchInput = searchKreatorInput;
@@ -4083,13 +4257,11 @@
         });
       }
 
-      // ================= BULK CHECKBOX & DELETE DATA KREATOR =================
+      // ================= BULK CHECKBOX UNTUK EXPORT DATA KREATOR =================
       function updateBulkActionsState() {
         const rowCheckboxes = Array.from(document.querySelectorAll(".row-select-checkbox"));
         const checkedBoxes = rowCheckboxes.filter(cb => cb.checked);
         const checkAll = document.getElementById("checkAllRows");
-        const btnBulkDelete = document.getElementById("btnBulkDelete");
-        const bulkCountSpan = document.querySelector(".bulk-count");
 
         if (checkAll) {
           if (rowCheckboxes.length > 0 && checkedBoxes.length === rowCheckboxes.length) {
@@ -4102,14 +4274,6 @@
             checkAll.checked = false;
             checkAll.indeterminate = false;
           }
-        }
-
-        if (bulkCountSpan) {
-          bulkCountSpan.textContent = checkedBoxes.length;
-        }
-
-        if (btnBulkDelete) {
-          btnBulkDelete.style.display = checkedBoxes.length > 0 ? "inline-flex" : "none";
         }
       }
 
@@ -4129,62 +4293,6 @@
             updateBulkActionsState();
           }
         });
-      }
-
-      function handleBulkDeleteKreator() {
-        const checkedBoxes = Array.from(document.querySelectorAll(".row-select-checkbox:checked"));
-        if (checkedBoxes.length === 0) return;
-        const selectedIds = new Set(checkedBoxes.map(cb => String(cb.value)));
-
-        if (typeof Swal !== "undefined") {
-          Swal.fire({
-            title: 'Hapus Data Terpilih?',
-            html: `Apakah Anda yakin ingin menghapus <strong>${selectedIds.size} data kreator</strong> yang dipilih?<br><span style="font-size: 12.5px; color: #94a3b8;">Tindakan ini tidak dapat dibatalkan.</span>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: '<i class="bx bx-trash"></i> Ya, Hapus',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-            customClass: { popup: 'swal2-bisa-popup' }
-          }).then((result) => {
-            if (result.isConfirmed) {
-              kreatorDb = kreatorDb.filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
-              saveKreatorDb();
-              renderKreatorTable(searchKreatorInput ? searchKreatorInput.value : "");
-              Swal.fire({
-                icon: 'success',
-                title: 'Berhasil Dihapus',
-                text: `${selectedIds.size} data kreator berhasil dihapus.`,
-                timer: 1800,
-                showConfirmButton: false,
-                customClass: { popup: 'swal2-bisa-popup' }
-              });
-            }
-          });
-        } else {
-          if (confirm(`Hapus ${selectedIds.size} data kreator?`)) {
-            kreatorDb = kreatorDb.filter(k => !selectedIds.has(String(k.id)) && !selectedIds.has(String(k.uid)));
-            saveKreatorDb();
-            renderKreatorTable(searchKreatorInput ? searchKreatorInput.value : "");
-          }
-        }
-      }
-
-      const btnBulkCancelEl = document.getElementById("btnBulkCancel");
-      if (btnBulkCancelEl) {
-        btnBulkCancelEl.addEventListener("click", function (event) {
-          event.preventDefault();
-          event.stopPropagation();
-          document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
-          updateBulkActionsState();
-        });
-      }
-
-      const btnBulkDeleteEl = document.getElementById("btnBulkDelete");
-      if (btnBulkDeleteEl) {
-        btnBulkDeleteEl.addEventListener("click", handleBulkDeleteKreator);
       }
 
       // Toolbar: Excel Export (CSV / XLSX)
@@ -4223,10 +4331,26 @@
         ];
 
         const rows = exportRows.map((item, idx) => {
-          const cats = [item.kategori1, item.kategori2, item.kategori3].filter(c => c && c !== "-");
-          const catStr = cats.length > 0 ? cats.join(", ") : (item.kategori || "-");
-          const pics = [item.pic1, item.pic2, item.pic3].filter(p => p && p !== "-");
-          const picStr = pics.length > 0 ? pics.join(", ") : "-";
+          let catPairs = [];
+          const checkCat = (c, p) => {
+            if (!c || c === "-") return;
+            const effPic = p || (window.BMCampaignShared ? window.BMCampaignShared.getPicForCategory(c) : "");
+            if (!currentStaffPic || effPic.toLowerCase() === currentStaffPic.toLowerCase()) {
+              catPairs.push({ cat: c, pic: effPic });
+            }
+          };
+          checkCat(item.kategori1, item.pic1);
+          checkCat(item.kategori2, item.pic2);
+          checkCat(item.kategori3, item.pic3);
+
+          if (catPairs.length === 0 && item.kategori && item.kategori !== "-") {
+            item.kategori.split(",").forEach(c => {
+              checkCat(c.trim(), "");
+            });
+          }
+
+          const catStr = catPairs.map(cp => cp.cat).join(", ") || "-";
+          const picStr = catPairs.map(cp => cp.pic).filter(Boolean).join(", ") || (currentStaffPic || "-");
           const spesifik = item.kategoriSpesifik || item.spesifik || "-";
           const masaKontrak = item.masaKontrak || (item.kontrakAwal && item.kontrakAkhir ? `${item.kontrakAwal} - ${item.kontrakAkhir}` : "-");
 
@@ -4302,7 +4426,7 @@
       }
       window.handleExportKreator = handleExportKreator;
 
-      // Helper: lepas semua pilihan checkbox & sembunyikan tombol hapus setelah export
+      // Helper: lepas semua pilihan checkbox setelah export
       function clearBulkSelection() {
         document.querySelectorAll(".row-select-checkbox").forEach(cb => { cb.checked = false; });
         const checkAll = document.getElementById("checkAllRows");
@@ -4312,10 +4436,9 @@
 
       const btnExportExcel = document.getElementById("btnExportExcel");
 
-      // ===== MODAL PILIHAN EXCEL (IMPORT / EXPORT) =====
+      // ===== MODAL EXPORT EXCEL =====
       const modalOpsiExcel = document.getElementById("modalOpsiExcelKreator");
       const closeOpsiExcelModal = document.getElementById("closeOpsiExcelModal");
-      const btnPilihImportExcel = document.getElementById("btnPilihImportExcel");
       const btnPilihExportExcel = document.getElementById("btnPilihExportExcel");
       const exportChoiceSubtext = document.getElementById("exportChoiceSubtext");
       const exportChoiceBadge = document.getElementById("exportChoiceBadge");
@@ -4362,13 +4485,6 @@
         });
       }
 
-      if (btnPilihImportExcel) {
-        btnPilihImportExcel.addEventListener("click", function() {
-          closeOpsiExcelModalFunc();
-          openImportModal();
-        });
-      }
-
       if (btnPilihExportExcel) {
         btnPilihExportExcel.addEventListener("click", function() {
           closeOpsiExcelModalFunc();
@@ -4388,7 +4504,7 @@
       setInterval(cleanEditBtns, 400);
     })();
   </script>
-  <script src="../../assets/js/layout.js?v=1002"></script>
+  <script src="../../assets/js/layout.js?v=1004"></script>
 </body>
 
 </html>

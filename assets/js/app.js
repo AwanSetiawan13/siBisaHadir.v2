@@ -16668,17 +16668,23 @@
         }
       });
 
-      const demoBody = demoPopup.querySelector(".demo-popup-body");
-      if (demoBody && username && password) {
-        demoBody.title = "Klik untuk mengisi otomatis";
-        demoBody.addEventListener("click", () => {
-          username.value = "admin";
-          password.value = "123456";
-          username.classList.remove("is-invalid");
-          password.classList.remove("is-invalid");
-          loginAlert?.classList.remove("is-show");
-          demoPopup.style.display = "none";
-          showToast("Akun demo terisi otomatis!");
+      const demoAccounts = demoPopup.querySelectorAll(".demo-account");
+      if (demoAccounts.length > 0 && username && password) {
+        demoAccounts.forEach((accountBtn) => {
+          accountBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const demoUser = accountBtn.getAttribute("data-demo-user") || "";
+            const demoPass = accountBtn.getAttribute("data-demo-pass") || "";
+            const demoLabel = accountBtn.getAttribute("data-demo-label") || demoUser;
+            if (!demoUser || !demoPass) return;
+            username.value = demoUser;
+            password.value = demoPass;
+            username.classList.remove("is-invalid");
+            password.classList.remove("is-invalid");
+            loginAlert?.classList.remove("is-show");
+            demoPopup.style.display = "none";
+            showToast(`Akun ${demoLabel} terisi otomatis.`);
+          });
         });
       }
     }
@@ -17008,23 +17014,43 @@
         localStorage.removeItem("bisaMediaRememberedUser");
       }
 
+      const staffPicAccounts = {
+        setiawan: 'Setiawan',
+        amanda: 'Amanda',
+        dimas: 'Dimas',
+        clarissa: 'Clarissa'
+      };
+      const staffLoginName = userVal.replace('@bisamedia.com', '');
+      const isStaffPassword = passVal === 'staff123' || passVal === '123456';
+
       if ((userVal === 'admin@bisamedia.com' || userVal === 'admin') && (passVal === 'admin123' || passVal === '123456')) {
         localStorage.setItem('user_role', 'admin');
         localStorage.setItem('user_name', 'Rayi (Admin)');
         localStorage.setItem('user_display_role', 'Admin');
         localStorage.setItem('user_avatar', 'media/avatar.png');
+        localStorage.removeItem('user_pic');
         window.location.href = 'BM/BM_dashboard.html';
       } else if ((userVal === 'spv@bisamedia.com' || userVal === 'spv') && (passVal === 'spv123' || passVal === '123456')) {
         localStorage.setItem('user_role', 'spv_kol');
         localStorage.setItem('user_name', 'Rayi');
         localStorage.setItem('user_display_role', 'SPV KOL');
         localStorage.setItem('user_avatar', 'media/avatar.png');
+        localStorage.removeItem('user_pic');
         window.location.href = 'SpvKol/spvkol_dashboard.html';
-      } else if ((userVal === 'staff@bisamedia.com' || userVal === 'staff') && (passVal === 'staff123' || passVal === '123456')) {
+      } else if ((userVal === 'staff@bisamedia.com' || userVal === 'staff') && isStaffPassword) {
         localStorage.setItem('user_role', 'staff_kol');
-        localStorage.setItem('user_name', 'Rayi (Staff)');
+        localStorage.setItem('user_name', 'Setiawan');
         localStorage.setItem('user_display_role', 'Staff KOL');
         localStorage.setItem('user_avatar', 'media/avatar.png');
+        localStorage.setItem('user_pic', 'Setiawan');
+        window.location.href = 'StaffKol/staffkol_dashboard.html';
+      } else if (staffPicAccounts[staffLoginName] && isStaffPassword) {
+        const staffPic = staffPicAccounts[staffLoginName];
+        localStorage.setItem('user_role', 'staff_kol');
+        localStorage.setItem('user_name', staffPic);
+        localStorage.setItem('user_display_role', 'Staff KOL');
+        localStorage.setItem('user_avatar', 'media/avatar.png');
+        localStorage.setItem('user_pic', staffPic);
         window.location.href = 'StaffKol/staffkol_dashboard.html';
       } else {
         showLoginError();

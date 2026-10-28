@@ -41,9 +41,10 @@
   // 2. Deteksi Role Pengguna berdasarkan path halaman
   let role = 'admin';
   const lowerPath = normalizedPath.toLowerCase();
+  const lowerFile = currentFile.toLowerCase();
   if (lowerPath.includes('/bm/')) role = 'admin';
-  else if (lowerPath.includes('/spvkol/')) role = 'spv_kol';
-  else if (lowerPath.includes('/staffkol/')) role = 'staff_kol';
+  else if (lowerPath.includes('/spvkol/') || lowerFile.startsWith('spvkol_')) role = 'spv_kol';
+  else if (lowerPath.includes('/staffkol/') || lowerFile.startsWith('staffkol_')) role = 'staff_kol';
   else role = localStorage.getItem('user_role') || 'admin';
 
   // 3. Konfigurasi Menu & Hierarki (Heading Kategori, 100% Lengkap Sesuai Alur Perusahaan)
@@ -55,9 +56,9 @@
       { type: 'item', label: 'Isi dengan Panduan', icon: 'book', link: 'BM/BM_panduan.html' },
       { type: 'item', label: 'Spv KOL', icon: 'spv', link: 'SpvKol/spvkol_dashboard.html' },
       { type: 'item', label: 'Staff KOL', icon: 'staff', link: 'StaffKol/staffkol_dashboard.html' },
-      
+
       { type: 'heading', label: 'Manajemen Karyawan' },
-      { 
+      {
         type: 'group', label: 'Data Karyawan', icon: 'users', id: 'm-bm-karyawan',
         children: [
           { label: 'Karyawan', link: 'BM/data_karyawan/BM_karyawan.html' },
@@ -65,7 +66,7 @@
           { label: 'Kegiatan Karyawan', link: 'BM/data_karyawan/BM_kegiatan_karyawan.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Tugas & Pekerjaan', icon: 'task', id: 'm-bm-tugas',
         children: [
           { label: 'Instruksi Tugas', link: 'BM/tugas_pekerjaan/BM_instruksi_tugas.html' },
@@ -73,7 +74,7 @@
           { label: 'Report Pengerjaan', link: 'BM/tugas_pekerjaan/BM_report_pengerjaan.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Absensi', icon: 'clock', id: 'm-bm-absensi',
         children: [
           { label: 'Kehadiran', link: 'BM/absensi/BM_kehadiran.html' },
@@ -109,11 +110,11 @@
     ],
     spv_kol: [
       { type: 'heading', label: 'Menu Utama' },
-      { type: 'item', label: 'Dashboard', icon: 'home', link: 'SpvKol/spvkol_dashboard.html' },
+      { type: 'item', label: 'Beranda SPVKOL', icon: 'home', link: 'SpvKol/spvkol_dashboard.html' },
       { type: 'item', label: 'Kalender', icon: 'calendar', link: 'SpvKol/spvkol_kalender.html' },
 
       { type: 'heading', label: 'Operasional KOL' },
-      { 
+      {
         type: 'group', label: 'Absensi', icon: 'clock', id: 'm-spv-absensi',
         children: [
           { label: 'Absensi', link: 'SpvKol/absensi/spvkol_kehadiran.html' },
@@ -121,7 +122,7 @@
           { label: 'Presensi Lembur', link: 'SpvKol/absensi/spvkol_presensi_lembur.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Operasional', icon: 'briefcase', id: 'm-spv-operasional',
         children: [
           { label: 'Dashboard Campaign', link: 'SpvKol/operasional/spvkol_dashboard_campaign.html' },
@@ -132,7 +133,7 @@
           { label: 'Performa Kreator', link: 'SpvKol/operasional/spvkol_Performa_Kreator.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Brands', icon: 'brand', id: 'm-spv-brands',
         children: [
           { label: 'Dashboard Brands', link: 'SpvKol/brand/spvkol_dashboard_brand.html' },
@@ -149,7 +150,7 @@
           { label: 'My Folders', link: 'SpvKol/dokumen_kolaborasi/spvkol_folder.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Perancangan Kerja', icon: 'task', id: 'm-spv-perancangan',
         children: [
           { label: 'RRK', link: 'SpvKol/perancangan_kerja/spvkol_rrk.html' },
@@ -184,7 +185,7 @@
       { type: 'item', label: 'Kalender', icon: 'calendar', link: 'StaffKol/staffkol_kalender.html' },
 
       { type: 'heading', label: 'Operasional Staff' },
-      { 
+      {
         type: 'group', label: 'Absensi', icon: 'clock', id: 'm-staff-absensi',
         children: [
           { label: 'Absensi', link: 'StaffKol/absensi/staffkol_kehadiran.html' },
@@ -192,7 +193,7 @@
           { label: 'Presensi Lembur', link: 'StaffKol/absensi/staffkol_presensi_lembur.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Operasional', icon: 'briefcase', id: 'm-staff-operasional',
         children: [
           { label: 'Dashboard Campaign', link: 'StaffKol/operasional/staffkol_dashboard_campaign.html' },
@@ -204,7 +205,7 @@
           { label: 'Performa Kreator', link: 'StaffKol/operasional/staffkol_Performa_Kreator.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Brands', icon: 'brand', id: 'm-staff-brands',
         children: [
           { label: 'Dashboard Brands', link: 'StaffKol/brand/staffkol_dashboard_brand.html' },
@@ -221,7 +222,7 @@
           { label: 'My Folders', link: 'StaffKol/dokumen_kolaborasi/staffkol_folder.html' }
         ]
       },
-      { 
+      {
         type: 'group', label: 'Perancangan Kerja', icon: 'task', id: 'm-staff-perancangan',
         children: [
           { label: 'RRK', link: 'StaffKol/perancangan_kerja/staffkol_rrk.html' },
@@ -383,13 +384,23 @@
   };
   const portalLabels = {
     admin: 'Beranda Admin',
-    spv_kol: 'Beranda SPV KOL',
+    spv_kol: 'Beranda SPVKOL',
     staff_kol: 'Beranda Staff KOL'
   };
 
-  const currentUserName = localStorage.getItem('user_name') || roleDisplayNames[role] || 'Rayi';
-  const currentPortalLabel = portalLabels[role] || 'Beranda SPV KOL';
-  const currentRoleLabel = localStorage.getItem('user_display_role') || (role === 'staff_kol' ? 'Staff KOL' : role === 'admin' ? 'Admin' : 'SPV KOL');
+  const currentUserPic = role === 'staff_kol' ? String(localStorage.getItem('user_pic') || '').trim() : '';
+  const storedUserName = String(localStorage.getItem('user_name') || '').trim();
+  const currentUserName = role === 'staff_kol'
+    ? (currentUserPic || storedUserName || 'Staff KOL')
+    : role === 'spv_kol'
+      ? 'Rayi'
+      : (storedUserName || roleDisplayNames[role] || 'Rayi (Admin)');
+  const currentPortalLabel = portalLabels[role] || 'Beranda SPVKOL';
+  const currentRoleLabel = role === 'spv_kol'
+    ? 'SPV KOL'
+    : role === 'staff_kol'
+      ? ('Staff KOL' + (currentUserPic ? ' — PIC ' + currentUserPic : ''))
+      : 'Admin';
   const rawAvatar = localStorage.getItem('user_avatar');
   const currentAvatar = (rawAvatar && !rawAvatar.includes('undefined'))
     ? (rawAvatar.startsWith('http') ? rawAvatar : rootPrefix + rawAvatar.replace(/^\/+/, ''))
@@ -795,9 +806,9 @@
     }
 
     // Reset & Rapikan Layout Utama
-    const shell = document.querySelector('.dashboard-shell') || 
-                  document.querySelector('.layout-page') || 
-                  document.querySelector('.layout-container');
+    const shell = document.querySelector('.dashboard-shell') ||
+      document.querySelector('.layout-page') ||
+      document.querySelector('.layout-container');
     if (shell) {
       const collapsed = document.body.classList.contains('sidebar-collapsed');
       if (window.innerWidth >= 1024) {
@@ -886,9 +897,9 @@
 
   // Helper: Dedicated App Footer Template
   function renderAppFooter() {
-    const shell = document.querySelector('.dashboard-shell') || 
-                  document.querySelector('.layout-page') || 
-                  document.querySelector('.layout-container');
+    const shell = document.querySelector('.dashboard-shell') ||
+      document.querySelector('.layout-page') ||
+      document.querySelector('.layout-container');
     if (!shell) return;
 
     // Pastikan container utama adalah flex column dengan min-height: 100vh
@@ -935,7 +946,7 @@
 
         // Jangan buat duplikat jika pagination sudah ada setelah scroll container atau di dalam parent
         if ((scrollWrap && scrollWrap.nextElementSibling && scrollWrap.nextElementSibling.classList.contains('hirezy-pagination-wrap')) ||
-            parent.querySelector(':scope > .hirezy-pagination-wrap')) {
+          parent.querySelector(':scope > .hirezy-pagination-wrap')) {
           return;
         }
 
@@ -1125,6 +1136,141 @@
     }, 150);
   }
 
+  const CAMPAIGN_NOTIFICATION_KEY = 'bisa_notifikasi_campaign_v1';
+
+  function getCampaignNotifications() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(CAMPAIGN_NOTIFICATION_KEY) || '[]');
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .filter(function (item) { return item && item.targetRole === 'spv_kol'; })
+        .sort(function (a, b) { return (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0); });
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveCampaignNotifications(list) {
+    const safeList = (Array.isArray(list) ? list : [])
+      .sort(function (a, b) { return (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0); })
+      .slice(0, 100);
+    localStorage.setItem(CAMPAIGN_NOTIFICATION_KEY, JSON.stringify(safeList));
+  }
+
+  function escapeNotificationText(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatNotificationDate(value) {
+    const date = value ? new Date(value) : new Date();
+    const safeDate = isNaN(date.getTime()) ? new Date() : date;
+    try {
+      const text = new Intl.DateTimeFormat('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).format(safeDate);
+      return text.replace(/\./g, ':');
+    } catch (error) {
+      return safeDate.toLocaleString('id-ID');
+    }
+  }
+
+  function renderSpvNotifications() {
+    const dropdown = document.getElementById('notifMenuDropdown');
+    if (!dropdown) return;
+    const notifications = getCampaignNotifications();
+    const unreadCount = notifications.filter(function (item) { return !item.dibaca; }).length;
+    const dot = document.querySelector('#notifMenuButton .hirezy-notif-dot');
+    if (dot) dot.style.display = unreadCount > 0 ? '' : 'none';
+
+    const items = notifications.slice(0, 8).map(function (item) {
+      const isUnread = !item.dibaca;
+      const type = String(item.tipe || '');
+      const iconBg = type === 'keluarkan_kreator' ? '#fee2e2' : (type === 'tambah_kreator' ? '#dcfce7' : '#e0f2fe');
+      const iconColor = type === 'keluarkan_kreator' ? '#dc2626' : (type === 'tambah_kreator' ? '#16a34a' : '#0284c7');
+      return `
+        <div class="hirezy-dropdown-notif-item" data-notif-id="${escapeNotificationText(item.id)}" data-campaign-id="${escapeNotificationText(item.campaignId)}" style="display: flex; gap: 12px; padding: 10px 16px; cursor: pointer; transition: background 0.15s ease; background: ${isUnread ? '#f0f9ff' : 'transparent'};" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='${isUnread ? '#f0f9ff' : 'transparent'}'">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: ${iconBg}; color: ${iconColor}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+              <div style="font-size: 12.5px; font-weight: ${isUnread ? '700' : '600'}; color: #1e293b;">${escapeNotificationText(item.judul || 'Pemberitahuan')}</div>
+              ${isUnread ? '<span style="width: 7px; height: 7px; border-radius: 50%; background: #0284c7; flex-shrink: 0;"></span>' : ''}
+            </div>
+            <p style="font-size: 11.5px; color: #64748b; margin: 0; line-height: 1.35;">${escapeNotificationText(item.pesan || '')}</p>
+            <span style="font-size: 10px; color: #94a3b8; display: inline-block; margin-top: 4px;">${escapeNotificationText(formatNotificationDate(item.timestamp))}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    dropdown.innerHTML = `
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #f1f5f9; background: #ffffff;">
+        <div style="font-size: 14px; font-weight: 700; color: #0f172a; font-family: 'Outfit', sans-serif;">Pemberitahuan</div>
+        <span style="font-size: 11px; font-weight: 600; color: ${unreadCount > 0 ? '#0284c7' : '#16a34a'}; background: ${unreadCount > 0 ? '#e0f2fe' : '#dcfce7'}; padding: 2px 8px; border-radius: 12px;">${unreadCount > 0 ? unreadCount + ' Baru' : 'Aktif'}</span>
+      </div>
+      <div style="max-height: 320px; overflow-y: auto; padding: 6px 0;">
+        ${items || '<div style="padding: 26px 18px; text-align: center; color: #94a3b8; font-size: 12.5px; font-family: \'Outfit\', sans-serif;">Belum ada pemberitahuan campaign.</div>'}
+      </div>
+      <div style="padding: 10px 16px; border-top: 1px solid #f1f5f9; background: #fafafa; text-align: center;">
+        <button type="button" data-notif-action="read-all" style="border: none; background: transparent; font-size: 12px; font-weight: 600; color: ${unreadCount > 0 ? '#0284c7' : '#94a3b8'}; cursor: ${unreadCount > 0 ? 'pointer' : 'default'}; font-family: \'Outfit\', sans-serif;">Tandai Semua Telah Dibaca</button>
+      </div>
+    `;
+  }
+
+  document.addEventListener('click', function (event) {
+    const notifItem = event.target.closest('#notifMenuDropdown [data-notif-id]');
+    if (notifItem) {
+      event.preventDefault();
+      const notifId = notifItem.getAttribute('data-notif-id');
+      const campaignId = notifItem.getAttribute('data-campaign-id');
+      const list = getCampaignNotifications();
+      const target = list.find(function (item) { return String(item.id) === String(notifId); });
+      if (target && !target.dibaca) {
+        target.dibaca = true;
+        saveCampaignNotifications(list);
+      }
+      const dropdown = document.getElementById('notifMenuDropdown');
+      if (dropdown) dropdown.classList.remove('is-open', 'show');
+      document.getElementById('notifMenuButton')?.setAttribute('aria-expanded', 'false');
+      if (campaignId) {
+        window.location.href = rootPrefix + 'SpvKol/operasional/spvkol_campaign.html?campaign=' + encodeURIComponent(campaignId);
+      } else {
+        renderSpvNotifications();
+      }
+      return;
+    }
+
+    const readAllButton = event.target.closest('#notifMenuDropdown [data-notif-action="read-all"]');
+    if (readAllButton) {
+      event.preventDefault();
+      const list = getCampaignNotifications();
+      let changed = false;
+      list.forEach(function (item) {
+        if (!item.dibaca) {
+          item.dibaca = true;
+          changed = true;
+        }
+      });
+      if (changed) saveCampaignNotifications(list);
+      renderSpvNotifications();
+    }
+  });
+
+  window.addEventListener('storage', function (event) {
+    if (event.key === CAMPAIGN_NOTIFICATION_KEY) renderSpvNotifications();
+  });
+
   // Helper: Render SPV KOL Unified Topbar
   function renderSpvKolNavbar() {
     let topbarEl = document.querySelector('header.topbar');
@@ -1141,7 +1287,7 @@
     topbarEl.classList.add('hirezy-topbar');
 
     const spvTitles = {
-      'spvkol_dashboard.html': 'Dashboard',
+      'spvkol_dashboard.html': 'Beranda SPVKOL',
       'spvkol_kalender.html': 'Kalender',
       'spvkol_kehadiran.html': 'Kehadiran',
       'spvkol_presensi_istirahat.html': 'Presensi Istirahat',
@@ -1361,6 +1507,8 @@
         </div>
       </div>
     `;
+
+    renderSpvNotifications();
   }
 
   // Helper: Render Staff KOL Unified Topbar
@@ -1552,9 +1700,9 @@
     });
 
     // 3. Efek Outro Tenang (Tanpa pergeseran posisi / translateY)
-    const content = document.querySelector('.dashboard-shell') || 
-                    document.querySelector('.layout-page') || 
-                    document.querySelector('main');
+    const content = document.querySelector('.dashboard-shell') ||
+      document.querySelector('.layout-page') ||
+      document.querySelector('main');
     if (content) {
       content.style.transition = 'opacity 0.12s ease';
       content.style.opacity = '0.9';
@@ -1574,8 +1722,8 @@
 
         // Update shell margin/width with smooth transition
         const shell = document.querySelector('.dashboard-shell') ||
-                      document.querySelector('.layout-page') ||
-                      document.querySelector('.layout-container');
+          document.querySelector('.layout-page') ||
+          document.querySelector('.layout-container');
         if (shell) {
           shell.style.setProperty('margin-left', isCollapsed ? '0' : '240px', 'important');
           shell.style.setProperty('width', isCollapsed ? '100%' : 'calc(100% - 240px)', 'important');
@@ -1647,6 +1795,7 @@
     if (notifBtn && notifDrop) {
       e.preventDefault();
       e.stopPropagation();
+      renderSpvNotifications();
       const isOpen = notifDrop.classList.toggle('is-open');
       notifDrop.classList.toggle('show', isOpen);
       notifBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
@@ -1772,9 +1921,9 @@
 
   // Handle resize event untuk responsivitas dinamis
   window.addEventListener('resize', function () {
-    const shell = document.querySelector('.dashboard-shell') || 
-                  document.querySelector('.layout-page') || 
-                  document.querySelector('.layout-container');
+    const shell = document.querySelector('.dashboard-shell') ||
+      document.querySelector('.layout-page') ||
+      document.querySelector('.layout-container');
     if (shell) {
       if (window.innerWidth >= 1024) {
         const isCollapsed = document.body.classList.contains('sidebar-collapsed');
@@ -1794,7 +1943,7 @@
   }
 
   // Helper Global Minimalist Empty State Component (Sesuai Referensi Pengguna)
-  window.getAppEmptyStateHTML = function(title, subtitle) {
+  window.getAppEmptyStateHTML = function (title, subtitle) {
     return `
       <div class="app-empty-state">
         <svg class="app-empty-state__icon" viewBox="0 0 24 24">
@@ -1860,7 +2009,7 @@
 
     function updateEmptyStateForTable(table) {
       if (!table || table.closest('#app-calendar, .flatpickr-calendar, .datepicker, .mini-table, .modal, .modal-box, .db-calendar-table, .db-calendar-card')) return;
-      
+
       const parentWrap = table.closest('.table-wrap, .table-responsive, #tableContainerWrapper, .campaign-scroll-table-wrap, .db-attendance-table-wrap, .db-topk-table-wrap, .table-scroll-wrap') || table.parentElement;
       const card = parentWrap ? (parentWrap.closest('.card, .campaign-panel, .panel, section, main, .db-attendance-card, .db-top-kreator-card, .brand-card-box, .campaign-white-card') || parentWrap.parentElement) : null;
       if (!card) return;
@@ -2089,7 +2238,7 @@
       document.querySelectorAll('.milestone-card-grid, #tugasCardGrid, #milestoneCardGrid').forEach(updateEmptyStateForGrid);
     }
 
-    window.bmToggleEmptyState = function(emptyEl, wrapperEl, isEmpty) {
+    window.bmToggleEmptyState = function (emptyEl, wrapperEl, isEmpty) {
       const empty = typeof emptyEl === 'string' ? document.querySelector(emptyEl) : emptyEl;
       const wrap = typeof wrapperEl === 'string' ? document.querySelector(wrapperEl) : wrapperEl;
       if (isEmpty) {
@@ -2112,7 +2261,7 @@
       }
     };
 
-    window.bmUpdateEmptyState = function(target) {
+    window.bmUpdateEmptyState = function (target) {
       if (!target) {
         checkAll();
       } else if (target.tagName === 'TABLE') {
