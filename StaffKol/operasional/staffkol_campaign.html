@@ -4704,26 +4704,33 @@
       }
 
       function finalizePilihKreator() {
+        const tempIdStrs = new Set(Array.from(tempSelectedKreatorIds).map(id => String(id)));
+
         // 1. Pulihkan stok untuk kreator yang dibatalkan/dihapus
         for (const id of Array.from(selectedKreatorIds)) {
-          if (!tempSelectedKreatorIds.has(id)) {
+          const idStr = String(id);
+          if (!tempIdStrs.has(idStr)) {
+            if (kreatorSampleMap[idStr]) {
+              kreatorSampleMap[idStr].forEach(sName => adjustSampleStock(sName, +1));
+              delete kreatorSampleMap[idStr];
+            }
             if (kreatorSampleMap[id]) {
-              kreatorSampleMap[id].forEach(sName => adjustSampleStock(sName, +1));
               delete kreatorSampleMap[id];
             }
           }
         }
 
-        // 2. Inisialisasi data untuk kreator yang baru dipilih
+        // 2. Inisialisasi data untuk kreator yang baru dipilih jika belum ada
         for (const id of Array.from(tempSelectedKreatorIds)) {
-          if (!kreatorSampleMap[id]) {
-            kreatorSampleMap[id] = [];
+          const idStr = String(id);
+          if (!kreatorSampleMap[idStr] && !kreatorSampleMap[id]) {
+            kreatorSampleMap[idStr] = [];
           }
         }
 
-        // 3. Terapkan state
+        // 3. Terapkan state strictly as strings
         selectedKreatorIds.clear();
-        tempSelectedKreatorIds.forEach(id => selectedKreatorIds.add(id));
+        tempIdStrs.forEach(idStr => selectedKreatorIds.add(idStr));
 
         closeKreatorDropdownTable();
         renderSelectedKreatorRows();
@@ -5118,8 +5125,11 @@
         const availableSamples = getAvailableSamplesForBrand();
 
         selectedList.forEach(k => {
-          if (!kreatorSampleMap[k.id]) kreatorSampleMap[k.id] = [];
-          const assignedSamples = kreatorSampleMap[k.id] || kreatorSampleMap[String(k.id)] || [];
+          const kIdStr = String(k.id);
+          if (!kreatorSampleMap[kIdStr]) {
+            kreatorSampleMap[kIdStr] = (kreatorSampleMap[k.id] && Array.isArray(kreatorSampleMap[k.id])) ? kreatorSampleMap[k.id] : [];
+          }
+          const assignedSamples = kreatorSampleMap[kIdStr];
 
           const rowWrap = document.createElement("div");
           rowWrap.style.cssText = "display: grid; grid-template-columns: 1fr 1.15fr; gap: 18px; align-items: start; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; position: relative;";
@@ -5167,11 +5177,14 @@
               promptKeluarkanKreator(k);
             } else {
               selectedKreatorIds.delete(k.id);
+              selectedKreatorIds.delete(kIdStr);
               tempSelectedKreatorIds.delete(k.id);
-              if (kreatorSampleMap[k.id]) {
-                kreatorSampleMap[k.id].forEach(sName => adjustSampleStock(sName, +1));
-                delete kreatorSampleMap[k.id];
+              tempSelectedKreatorIds.delete(kIdStr);
+              if (kreatorSampleMap[kIdStr]) {
+                kreatorSampleMap[kIdStr].forEach(sName => adjustSampleStock(sName, +1));
+                delete kreatorSampleMap[kIdStr];
               }
+              delete kreatorSampleMap[k.id];
               updatePilihButtonState();
               renderSelectedKreatorRows();
             }
@@ -5219,7 +5232,7 @@
             const btnDel = sampleRow.querySelector(".btn-sample-delete");
             btnDel.addEventListener("click", (e) => {
               e.stopPropagation();
-              const removed = kreatorSampleMap[k.id].splice(sIdx, 1)[0];
+              const removed = (kreatorSampleMap[kIdStr] || []).splice(sIdx, 1)[0];
               if (removed) adjustSampleStock(removed, +1);
               renderSelectedKreatorRows();
             });
@@ -5265,7 +5278,7 @@
           // 3. Floating Popover Element with Sample & Variant Picker Views
           const popover = document.createElement("div");
           popover.className = "sample-picker-popover";
-          popover.style.cssText = "display: none; position: absolute; left: 0; min-width: 400px; max-width: 480px; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 100; overflow: hidden;";
+          popover.style.cssText = "display: none; position: absolute; left: 0; min-width: 450px; max-width: 520px; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; overflow: hidden;";
           popover.innerHTML = `
             <!-- View 1: Daftar Sampel -->
             <div class="sample-view-main" style="display: block;">
@@ -5314,6 +5327,20 @@
               </div>
 
               <div class="variant-picker-list" style="max-height: 180px; overflow-y: auto; padding: 4px 0;"></div>
+
+              <!-- Footer with Simpan Button at Bottom Right -->
+              <div class="variant-picker-footer" style="padding: 9px 12px; border-top: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; justify-content: space-between;">
+                <div class="variant-selected-summary" style="font-size: 11.5px; color: #64748b; font-weight: 500;">0 varian dipilih</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <button type="button" class="btn-cancel-variants" style="background: #ffffff; border: 1px solid #cbd5e1; color: #64748b; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.15s ease;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">Batal</button>
+                  <button type="button" class="btn-save-all-variants" style="background: #0284c7; color: #ffffff; border: none; border-radius: 6px; padding: 5px 16px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; font-family: 'Outfit', sans-serif; box-shadow: 0 1px 2px rgba(2, 132, 199, 0.25); transition: background 0.15s ease;" onmouseover="this.style.background='#0369a1'" onmouseout="this.style.background='#0284c7'">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Simpan</span>
+                  </button>
+                </div>
+              </div>
             </div>
           `;
 
@@ -5329,8 +5356,12 @@
           const varSearchInp = popover.querySelector(".variant-picker-search");
           const varFilterPills = popover.querySelectorAll(".variant-filter-pill");
           const closePopoverBtns = popover.querySelectorAll(".btn-close-sample-popover");
+          const btnCancelVariants = popover.querySelector(".btn-cancel-variants");
+          const btnSaveAllVariants = popover.querySelector(".btn-save-all-variants");
+          const variantSelectedSummary = popover.querySelector(".variant-selected-summary");
 
           let currentSampleForVariants = null;
+          let variantSelectionState = {};
           let currentVariantFilter = "all"; // "all" | "ready" | "habis"
 
           function updateVariantFilterPills() {
@@ -5368,6 +5399,15 @@
             });
           });
 
+          if (btnCancelVariants) {
+            btnCancelVariants.addEventListener("click", (e) => {
+              e.stopPropagation();
+              popover.style.display = "none";
+              sampleViewVariants.style.display = "none";
+              sampleViewMain.style.display = "block";
+            });
+          }
+
           if (varSearchInp) {
             varSearchInp.addEventListener("input", (e) => {
               e.stopPropagation();
@@ -5384,6 +5424,30 @@
             });
           }
 
+          function updateVariantSummary() {
+            let count = 0;
+            let totalUnits = 0;
+            Object.keys(variantSelectionState).forEach(name => {
+              const st = variantSelectionState[name];
+              if (st && st.qty > 0 && st.isSelectable) {
+                count++;
+                totalUnits += st.qty;
+              }
+            });
+            if (variantSelectedSummary) {
+              variantSelectedSummary.textContent = `${count} varian dipilih (${totalUnits} unit)`;
+            }
+            if (btnSaveAllVariants) {
+              if (totalUnits > 0) {
+                btnSaveAllVariants.style.opacity = "1";
+                btnSaveAllVariants.style.cursor = "pointer";
+              } else {
+                btnSaveAllVariants.style.opacity = "0.6";
+                btnSaveAllVariants.style.cursor = "not-allowed";
+              }
+            }
+          }
+
           function renderFilteredVariants() {
             if (!currentSampleForVariants) return;
             variantListCont.innerHTML = "";
@@ -5391,6 +5455,7 @@
             const variants = getVariantsForSample(currentSampleForVariants.nama) || [];
             if (variants.length === 0) {
               variantListCont.innerHTML = `<div style="padding: 10px 12px; font-size: 12px; color: #94a3b8; text-align: center; font-style: italic;">Tidak ada varian tersedia</div>`;
+              updateVariantSummary();
               return;
             }
 
@@ -5412,45 +5477,32 @@
 
             if (filtered.length === 0) {
               variantListCont.innerHTML = `<div style="padding: 12px; font-size: 12px; color: #94a3b8; text-align: center; font-style: italic;">Varian tidak ditemukan</div>`;
+              updateVariantSummary();
               return;
             }
 
             filtered.forEach(v => {
+              const state = variantSelectionState[v.nama] || { qty: 0, maxQty: 1, isSelectable: false };
+              const currentQty = state.qty;
+              const maxQty = state.maxQty;
+              const isSelectable = state.isSelectable;
               const vStock = Math.max(0, Number(v.stok) || 0);
-              const swapEntry = activeSwapIndex !== null ? parseSampleItem(assignedSamples[activeSwapIndex]) : null;
-              let existingQty = 0;
+              const badgeText = vStock > 0 ? `Ready (${vStock})` : (currentQty > 0 ? `Dipakai (${currentQty})` : "Habis");
 
-              if (activeSwapIndex !== null) {
-                if (swapEntry && sampleIdentity(swapEntry.nama, swapEntry.varian) === sampleIdentity(currentSampleForVariants.nama, v.nama)) {
-                  existingQty += swapEntry.qty;
-                }
-                const duplicateIdx = findSampleIndex(assignedSamples, currentSampleForVariants.nama, v.nama);
-                if (duplicateIdx !== -1 && duplicateIdx !== activeSwapIndex) {
-                  existingQty += parseSampleItem(assignedSamples[duplicateIdx]).qty;
-                }
-              } else {
-                const existingIdx = findSampleIndex(assignedSamples, currentSampleForVariants.nama, v.nama);
-                if (existingIdx !== -1) existingQty = parseSampleItem(assignedSamples[existingIdx]).qty;
-              }
-
-              const maxQty = vStock + existingQty;
-              const isSelectable = maxQty > 0;
-              const qtyDefault = existingQty > 0 ? existingQty : 1;
-              const badgeText = vStock > 0 ? `Ready (${vStock})` : (existingQty > 0 ? `Dipakai (${existingQty})` : "Habis");
               const itemEl = document.createElement("div");
-              itemEl.style.cssText = `display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; cursor: ${isSelectable ? 'pointer' : 'not-allowed'}; opacity: ${isSelectable ? '1' : '0.55'}; transition: background 0.15s;`;
+              itemEl.className = "variant-item-row";
+              itemEl.style.cssText = `display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px; cursor: ${isSelectable ? 'pointer' : 'not-allowed'}; opacity: ${isSelectable ? '1' : '0.55'}; transition: background 0.15s; background: ${currentQty > 0 ? '#f0f9ff' : 'transparent'}; border-bottom: 1px solid #f1f5f9;`;
               itemEl.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
-                  <span style="width: 7px; height: 7px; border-radius: 50%; background: ${isSelectable ? '#22c55e' : '#cbd5e1'}; flex-shrink: 0;"></span>
-                  <span title="${(v.nama || '').replace(/"/g, '&quot;')}" style="font-size: 12.5px; color: #1e293b; font-weight: 500; word-break: break-word; line-height: 1.35;">${v.nama}</span>
+                <div style="display: flex; align-items: center; min-width: 0; flex: 1;">
+                  <span title="${(v.nama || '').replace(/"/g, '&quot;')}" style="font-size: 13px; color: ${currentQty > 0 ? '#1e293b' : '#64748b'}; font-weight: ${currentQty > 0 ? '600' : '500'}; font-weight: 500; word-break: break-word; line-height: 1.35;">${v.nama}</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: auto;">
                   ${isSelectable ? `
-                    <div class="variant-qty-control">
+                    <div class="variant-qty-control" style="${currentQty === 0 ? 'opacity: 0.65;' : ''}">
                       <button type="button" class="variant-qty-btn" data-step="-1" title="Kurangi" aria-label="Kurangi jumlah">
                         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="10" x2="15" y2="10" /></svg>
                       </button>
-                      <input type="text" inputmode="numeric" class="variant-qty-input" value="${qtyDefault}" maxlength="4" aria-label="Jumlah sampel" />
+                      <input type="text" inputmode="numeric" class="variant-qty-input" value="${currentQty}" maxlength="4" aria-label="Jumlah sampel" />
                       <button type="button" class="variant-qty-btn" data-step="1" title="Tambah" aria-label="Tambah jumlah">
                         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="10" y1="5" x2="10" y2="15" /><line x1="5" y1="10" x2="15" y2="10" /></svg>
                       </button>
@@ -5467,19 +5519,28 @@
               const qtyBtns = itemEl.querySelectorAll(".variant-qty-btn");
 
               function getRowQty() {
-                const raw = qtyInput ? parseInt(String(qtyInput.value).replace(/[^0-9]/g, ""), 10) : qtyDefault;
-                return Math.min(maxQty, Math.max(1, Number.isFinite(raw) ? raw : 1));
+                const raw = qtyInput ? parseInt(String(qtyInput.value).replace(/[^0-9]/g, ""), 10) : state.qty;
+                return Math.min(maxQty, Math.max(0, Number.isFinite(raw) ? raw : 0));
               }
 
               function syncQtyInput() {
                 if (!qtyInput) return;
                 const q = getRowQty();
                 qtyInput.value = String(q);
+                state.qty = q;
+                itemEl.style.background = q > 0 ? "#f0f9ff" : "transparent";
+                const nameSpan = itemEl.querySelector("span[title]");
+                if (nameSpan) {
+                  nameSpan.style.color = q > 0 ? "#1e293b" : "#64748b";
+                  nameSpan.style.fontWeight = q > 0 ? "600" : "500";
+                }
+                if (qtyControl) qtyControl.style.opacity = q > 0 ? "1" : "0.65";
                 qtyBtns.forEach(btn => {
                   const step = Number(btn.getAttribute("data-step")) || 0;
-                  const disabled = (step < 0 && q <= 1) || (step > 0 && q >= maxQty);
+                  const disabled = (step < 0 && q <= 0) || (step > 0 && q >= maxQty);
                   btn.disabled = disabled;
                 });
+                updateVariantSummary();
               }
 
               if (qtyControl) {
@@ -5495,24 +5556,21 @@
                 btn.addEventListener("click", (e) => {
                   e.stopPropagation();
                   const step = Number(btn.getAttribute("data-step")) || 0;
-                  const next = Math.min(maxQty, Math.max(1, getRowQty() + step));
+                  const next = Math.min(maxQty, Math.max(0, getRowQty() + step));
                   if (qtyInput) qtyInput.value = String(next);
                   syncQtyInput();
                 });
               });
               syncQtyInput();
 
-              if (isSelectable) {
-                itemEl.addEventListener("mouseenter", () => {
-                  itemEl.style.background = "#f0f9ff";
-                });
-                itemEl.addEventListener("mouseleave", () => {
-                  itemEl.style.background = "transparent";
-                });
-              }
+              itemEl.addEventListener("mouseenter", () => {
+                if (isSelectable && state.qty === 0) itemEl.style.background = "#f8fafc";
+              });
+              itemEl.addEventListener("mouseleave", () => {
+                if (isSelectable) itemEl.style.background = state.qty > 0 ? "#f0f9ff" : "transparent";
+              });
 
               itemEl.addEventListener("click", (e) => {
-                e.stopPropagation();
                 if (!isSelectable) {
                   if (typeof Swal !== "undefined") {
                     Swal.fire({
@@ -5524,29 +5582,70 @@
                   }
                   return;
                 }
+                // Jika masih 0, klik baris otomatis aktifkan ke 1
+                if (state.qty === 0) {
+                  if (qtyInput) qtyInput.value = "1";
+                  syncQtyInput();
+                }
+              });
 
-                const qty = getRowQty();
-                const newEntry = createSampleItem(currentSampleForVariants.nama, v.nama, qty, currentSampleForVariants.pid);
-                const samples = kreatorSampleMap[k.id];
-                if (!Array.isArray(samples)) return;
+              variantListCont.appendChild(itemEl);
+            });
+            updateVariantSummary();
+          }
 
-                if (activeSwapIndex !== null) {
-                  const oldItem = samples[activeSwapIndex];
-                  if (oldItem) adjustSampleStock(oldItem, +1);
+          if (btnSaveAllVariants) {
+            btnSaveAllVariants.addEventListener("click", (e) => {
+              e.stopPropagation();
+              if (!kreatorSampleMap[kIdStr]) kreatorSampleMap[kIdStr] = [];
+              const samples = kreatorSampleMap[kIdStr];
+              if (!Array.isArray(samples)) return;
 
-                  let targetIndex = findSampleIndex(samples, currentSampleForVariants.nama, v.nama);
-                  if (targetIndex !== -1 && targetIndex !== activeSwapIndex) {
-                    adjustSampleStock(samples[targetIndex], +1);
-                    samples.splice(targetIndex, 1);
-                    if (targetIndex < activeSwapIndex) activeSwapIndex -= 1;
-                    targetIndex = activeSwapIndex;
+              const toSave = [];
+              Object.keys(variantSelectionState).forEach(vName => {
+                const st = variantSelectionState[vName];
+                if (st && st.qty > 0 && st.isSelectable) {
+                  toSave.push({ name: vName, qty: st.qty });
+                }
+              });
+
+              if (toSave.length === 0) {
+                if (typeof Swal !== "undefined") {
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Sampel',
+                    text: 'Silakan tentukan jumlah minimal 1 varian sampel untuk disimpan.',
+                    confirmButtonColor: '#29A3D8'
+                  });
+                }
+                return;
+              }
+
+              if (activeSwapIndex !== null) {
+                const oldItem = samples[activeSwapIndex];
+                if (oldItem) adjustSampleStock(oldItem, +1);
+
+                const first = toSave[0];
+                const firstEntry = createSampleItem(currentSampleForVariants.nama, first.name, first.qty, currentSampleForVariants.pid);
+                samples[activeSwapIndex] = firstEntry;
+                adjustSampleStock(firstEntry, -1);
+
+                for (let i = 1; i < toSave.length; i++) {
+                  const item = toSave[i];
+                  const dupIdx = findSampleIndex(samples, currentSampleForVariants.nama, item.name);
+                  const newEntry = createSampleItem(currentSampleForVariants.nama, item.name, item.qty, currentSampleForVariants.pid);
+                  if (dupIdx !== -1) {
+                    adjustSampleStock(samples[dupIdx], +1);
+                    samples[dupIdx] = newEntry;
+                  } else {
+                    samples.push(newEntry);
                   }
-
-                  const destIndex = targetIndex === -1 ? activeSwapIndex : targetIndex;
-                  samples[destIndex] = newEntry;
                   adjustSampleStock(newEntry, -1);
-                } else {
-                  const existingIdx = findSampleIndex(samples, currentSampleForVariants.nama, v.nama);
+                }
+              } else {
+                toSave.forEach(item => {
+                  const existingIdx = findSampleIndex(samples, currentSampleForVariants.nama, item.name);
+                  const newEntry = createSampleItem(currentSampleForVariants.nama, item.name, item.qty, currentSampleForVariants.pid);
                   if (existingIdx !== -1) {
                     adjustSampleStock(samples[existingIdx], +1);
                     samples[existingIdx] = newEntry;
@@ -5554,13 +5653,11 @@
                     samples.push(newEntry);
                   }
                   adjustSampleStock(newEntry, -1);
-                }
+                });
+              }
 
-                popover.style.display = "none";
-                renderSelectedKreatorRows();
-              });
-
-              variantListCont.appendChild(itemEl);
+              popover.style.display = "none";
+              renderSelectedKreatorRows();
             });
           }
 
@@ -5573,6 +5670,38 @@
             sampleViewMain.style.display = "none";
             sampleViewVariants.style.display = "block";
             if (variantSampleTitle) variantSampleTitle.textContent = sampleObj.nama;
+
+            // Initialize selection state for all variants of this sample
+            variantSelectionState = {};
+            const variants = getVariantsForSample(sampleObj.nama) || [];
+            variants.forEach(v => {
+              const vStock = Math.max(0, Number(v.stok) || 0);
+              const swapEntry = activeSwapIndex !== null ? parseSampleItem(assignedSamples[activeSwapIndex]) : null;
+              let existingQty = 0;
+
+              if (activeSwapIndex !== null) {
+                if (swapEntry && sampleIdentity(swapEntry.nama, swapEntry.varian) === sampleIdentity(sampleObj.nama, v.nama)) {
+                  existingQty += swapEntry.qty;
+                }
+                const duplicateIdx = findSampleIndex(assignedSamples, sampleObj.nama, v.nama);
+                if (duplicateIdx !== -1 && duplicateIdx !== activeSwapIndex) {
+                  existingQty += parseSampleItem(assignedSamples[duplicateIdx]).qty;
+                }
+              } else {
+                const existingIdx = findSampleIndex(assignedSamples, sampleObj.nama, v.nama);
+                if (existingIdx !== -1) existingQty = parseSampleItem(assignedSamples[existingIdx]).qty;
+              }
+
+              const maxQty = vStock + existingQty;
+              const isSelectable = maxQty > 0;
+              const defaultQty = existingQty > 0 ? existingQty : 0;
+
+              variantSelectionState[v.nama] = {
+                qty: defaultQty,
+                maxQty: maxQty,
+                isSelectable: isSelectable
+              };
+            });
 
             renderFilteredVariants();
             if (varSearchInp) setTimeout(() => varSearchInp.focus(), 50);
@@ -7226,18 +7355,14 @@
                 item.kreatorDetails.forEach(kd => {
                   const kId = String(kd.id);
                   selectedKreatorIds.add(kId);
-                  if (!isNaN(Number(kId))) selectedKreatorIds.add(Number(kId));
                   const matchedK = allKreatorList.find(k => String(k.id) === kId || (k.name && k.name.toLowerCase() === String(kd.name || '').toLowerCase()));
                   if (matchedK) {
-                    selectedKreatorIds.add(matchedK.id);
                     selectedKreatorIds.add(String(matchedK.id));
                   }
                   const samples = Array.isArray(kd.samples) ? [...kd.samples] : [];
-                  kreatorSampleMap[kId] = samples;
-                  if (!isNaN(Number(kId))) kreatorSampleMap[Number(kId)] = samples;
-                  if (matchedK) {
-                    kreatorSampleMap[matchedK.id] = samples;
-                    kreatorSampleMap[String(matchedK.id)] = samples;
+                  kreatorSampleMap[kId] = [...samples];
+                  if (matchedK && String(matchedK.id) !== kId) {
+                    kreatorSampleMap[String(matchedK.id)] = [...samples];
                   }
                 });
               } else if (item.kreator && item.kreator !== "-") {
@@ -7245,8 +7370,9 @@
                 const availSamples = getAvailableSamplesForBrand();
                 allKreatorList.forEach((k, idx) => {
                   if (names.includes(k.name.toLowerCase()) || (k.username && names.includes(k.username.toLowerCase()))) {
-                    selectedKreatorIds.add(k.id);
-                    kreatorSampleMap[k.id] = (idx === 0 && availSamples.length >= 2) 
+                    const kIdStr = String(k.id);
+                    selectedKreatorIds.add(kIdStr);
+                    kreatorSampleMap[kIdStr] = (idx === 0 && availSamples.length >= 2) 
                       ? [availSamples[0].nama, availSamples[1].nama] 
                       : (availSamples.length > 0 ? [availSamples[0].nama] : []);
                   }
@@ -7648,7 +7774,7 @@
         const selectedKreatorList = allKreatorList
           .filter(k => {
             const kIdStr = String(k.id);
-            return selectedKreatorIds.has(k.id) || selectedKreatorIds.has(kIdStr) || tempSelectedKreatorIds.has(k.id) || tempSelectedKreatorIds.has(kIdStr);
+            return selectedKreatorIds.has(k.id) || selectedKreatorIds.has(kIdStr);
           })
           .map(k => {
             const kIdStr = String(k.id);

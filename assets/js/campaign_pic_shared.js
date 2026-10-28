@@ -91,7 +91,8 @@
       { kategori: 'Fashion Muslim', pic: 'Setiawan' },
       { kategori: 'Beauty & Care', pic: 'Amanda' },
       { kategori: 'Food & Beverage', pic: 'Dimas' },
-      { kategori: 'Mom & Baby', pic: 'Clarissa' }
+      { kategori: 'Mom & Baby', pic: 'Clarissa' },
+      { kategori: 'Otomotif', pic: 'Dimas' }
     ];
   }
 
@@ -117,8 +118,47 @@
       .filter(Boolean);
     const categories = normalizeArray(creator.categories);
     if (categories.length === 0 && creator.category) categories.push(creator.category);
+    if (creator.kategori1 && creator.kategori1 !== '-') categories.push(creator.kategori1);
+    if (creator.kategori2 && creator.kategori2 !== '-') categories.push(creator.kategori2);
+    if (creator.kategori3 && creator.kategori3 !== '-') categories.push(creator.kategori3);
+    if (creator.kategori && creator.kategori !== '-') {
+      creator.kategori.split(',').forEach(function (c) {
+        const clean = c.trim();
+        if (clean && clean !== '-') categories.push(clean);
+      });
+    }
     const fromCategories = categories.map(getPicForCategory).map(cleanKey).filter(Boolean);
     return Array.from(new Set(explicit.concat(fromCategories)));
+  }
+
+  function getCreatorCategoriesForPic(creator, targetPic) {
+    if (!creator || typeof creator !== 'object') return [];
+    const picKey = cleanKey(targetPic);
+    if (!picKey) return [];
+
+    const result = [];
+    const checkCat = function (catName, explicitPic) {
+      if (!catName || catName === '-') return;
+      const cleanName = cleanText(catName);
+      const pic = cleanKey(explicitPic) || cleanKey(getPicForCategory(cleanName));
+      if (pic === picKey && !result.includes(cleanName)) {
+        result.push(cleanName);
+      }
+    };
+
+    if (creator.kategori1) checkCat(creator.kategori1, creator.pic1);
+    if (creator.kategori2) checkCat(creator.kategori2, creator.pic2);
+    if (creator.kategori3) checkCat(creator.kategori3, creator.pic3);
+
+    const categories = normalizeArray(creator.categories);
+    categories.forEach(function (c) { checkCat(c, ''); });
+
+    if (creator.kategori && creator.kategori !== '-') {
+      creator.kategori.split(',').forEach(function (c) { checkCat(c.trim(), ''); });
+    }
+    if (creator.category) checkCat(creator.category, '');
+
+    return result;
   }
 
   function isCreatorAllowedForPic(creator, pic) {
@@ -381,6 +421,7 @@
     getPicForCategory: getPicForCategory,
     getCampaignPic: getCampaignPic,
     getCreatorPicKeys: getCreatorPicKeys,
+    getCreatorCategoriesForPic: getCreatorCategoriesForPic,
     isCreatorAllowedForPic: isCreatorAllowedForPic,
     canViewCampaign: canViewCampaign,
     canManageCampaign: canManageCampaign,

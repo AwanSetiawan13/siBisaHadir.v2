@@ -1496,8 +1496,18 @@
             { id: 1, kategori: "Fashion Muslim", pic: "Setiawan" },
             { id: 2, kategori: "Beauty & Care", pic: "Amanda" },
             { id: 3, kategori: "Food & Beverage", pic: "Dimas" },
-            { id: 4, kategori: "Mom & Baby", pic: "Clarissa" }
+            { id: 4, kategori: "Mom & Baby", pic: "Clarissa" },
+            { id: 5, kategori: "Otomotif", pic: "Dimas" }
           ];
+        } else {
+          const hasOtomotif = list.some(item => {
+            const k = (typeof item === "string" ? item : (item.kategori || item.namaKategori || "")).toLowerCase().trim();
+            return k === "otomotif";
+          });
+          if (!hasOtomotif) {
+            list.push({ id: 5, kategori: "Otomotif", pic: "Dimas" });
+            try { localStorage.setItem("spv_kategori_produk_v1", JSON.stringify(list)); } catch (e) {}
+          }
         }
         return list;
       }
@@ -2123,12 +2133,45 @@
           video: "12 Video",
           aktivitas: "Aktif Live"
         },
+        {
+          id: 3,
+          uid: "UID-0003",
+          username: "@jualan.berkah",
+          nama: "Jualan Berkah",
+          alamat: "Jl. Ir. H. Juanda No. 45, Tasikmalaya",
+          nomorWa: "082199887766",
+          kategori: "Otomotif",
+          kategori1: "Otomotif",
+          pic1: "Dimas",
+          kategori2: "",
+          pic2: "",
+          kategori3: "",
+          pic3: "",
+          kategoriSpesifik: "Aksesoris Mobil & Motor",
+          spesifik: "Aksesoris Mobil & Motor",
+          masaKontrak: "01/01/2026 - 31/12/2026",
+          kontrakAwal: "2026-01-01",
+          kontrakAkhir: "2026-12-31",
+          status: "Bind",
+          leads: "Member",
+          email: "jualanberkah@gmail.com",
+          password: "password123",
+          foto: "../../media/avatar.png",
+          level: "TOP",
+          targetGmv: "Rp 80.000.000",
+          gmvBerjalan: "Rp 95.000.000",
+          progresGmv: "118%",
+          siaranLive: "36 Jam",
+          video: "15 Video",
+          aktivitas: "Aktif Konten & Live"
+        }
       ];
 
       // Ensure clean 1-category dummy data reset once
-      if (!localStorage.getItem("bisa_kreator_clean_v13")) {
+      if (!localStorage.getItem("bisa_kreator_clean_v14")) {
         try {
           const oldKeys = [
+            "bisa_kreator_list_v13",
             "bisa_kreator_list_v12",
             "bisa_kreator_list_v11",
             "bisa_kreator_list_v10",
@@ -2139,7 +2182,7 @@
           ];
           oldKeys.forEach(k => { try { localStorage.removeItem(k); } catch(e){} });
           localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(DEFAULT_KREATOR));
-          localStorage.setItem("bisa_kreator_clean_v13", "true");
+          localStorage.setItem("bisa_kreator_clean_v14", "true");
         } catch(e){}
       }
 
@@ -2159,6 +2202,15 @@
         }
       } catch (e) {
         kreatorDb = DEFAULT_KREATOR;
+      }
+
+      // Pastikan UID-0003 (Jualan Berkah) selalu tersedia di database
+      if (!kreatorDb.some(k => k.uid === "UID-0003" || (k.username && k.username.toLowerCase() === "@jualan.berkah"))) {
+        const dummyJualanBerkah = DEFAULT_KREATOR.find(k => k.uid === "UID-0003");
+        if (dummyJualanBerkah) {
+          kreatorDb.push(dummyJualanBerkah);
+          try { localStorage.setItem(KREATOR_STORAGE_KEY, JSON.stringify(kreatorDb)); } catch (e) {}
+        }
       }
 
       function saveKreatorDb() {
