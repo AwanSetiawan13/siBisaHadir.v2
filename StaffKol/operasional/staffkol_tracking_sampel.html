@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -1611,6 +1611,7 @@
       <span id="toastMsg" style="font-size: 13.5px; font-weight: 600; color: #1e293b;">Data berhasil diperbarui</span>
     </div>
   </div>
+  <script src="../../assets/js/campaign_pic_shared.js"></script>
   <script src="../../assets/js/layout.js?v=1004"></script>
 
   <script>
@@ -1711,6 +1712,69 @@
             { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
           ]
+        },
+        {
+          id: "TRK-005",
+          brand: "Bisa Otomotif Care",
+          sampel: "Pengkilap Bodi Motor Nano Ceramic 250ml",
+          pid: "PID 031",
+          type: "Campaign",
+          kreator: "@jualan.berkah",
+          varian: "250ml Spray",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel pengkilap motor", waktu: "22/09/2026 10:00" },
+            { status: "Dikirim", lampiran: "resi_jnt_oto.jpg", keterangan: "Nomor resi JNT-778811", waktu: "23/09/2026 14:00" },
+            { status: "Diterima", lampiran: "foto_diterima.png", keterangan: "Sampel diterima kondisi prima", waktu: "24/09/2026 16:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Siap dipakai untuk sesi live otomotif", waktu: "25/09/2026 19:00" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-006",
+          brand: "Bisa Kuliner Nusantara",
+          sampel: "Sambal Kemasan & Bumbu Rendang Instan",
+          pid: "PID 041",
+          type: "Campaign",
+          kreator: "@arnoldi.food",
+          varian: "Paket Bundle 3 Rasa",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel bumbu kuliner", waktu: "21/09/2026 11:00" },
+            { status: "Dikirim", lampiran: "resi_jnt.jpg", keterangan: "Nomor resi JNT-334411", waktu: "22/09/2026 15:00" },
+            { status: "Diterima", lampiran: "foto_diterima.png", keterangan: "Sampel diterima dalam kondisi baik", waktu: "24/09/2026 14:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Sedang dipakai memasak live", waktu: "24/09/2026 19:30" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-007",
+          brand: "Bisa Kids & Baby",
+          sampel: "Set Piyama Katun Organik Bayi & Balita",
+          pid: "PID 051",
+          type: "Campaign",
+          kreator: "@gigikids.daily",
+          varian: "Ukuran M (1-2 Tahun)",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "25/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel piyama anak", waktu: "22/09/2026 09:30" },
+            { status: "Dikirim", lampiran: "resi_sicepat.jpg", keterangan: "Nomor resi SICEPAT-998811", waktu: "23/09/2026 11:00" },
+            { status: "Diterima", lampiran: "bukti_terima.jpg", keterangan: "Sampel diterima oleh kreator", waktu: "25/09/2026 13:00" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Siap untuk sesi live parenting", waktu: "25/09/2026 16:00" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
         }
       ];
 
@@ -1728,6 +1792,87 @@
         }
       } catch (e) {
         trackingData = DEFAULT_TRACKING_DATA;
+      }
+
+      
+      
+      // Pastikan seluruh sample default selalu tersedia di trackingData
+      let trackingNeedsSync = false;
+      DEFAULT_TRACKING_DATA.forEach(dt => {
+        const exists = trackingData.some(t => t.id === dt.id || (t.sampel === dt.sampel && t.kreator === dt.kreator));
+        if (!exists) {
+          trackingData.push(dt);
+          trackingNeedsSync = true;
+        }
+      });
+      if (trackingNeedsSync) {
+        try { localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(trackingData)); } catch(e){}
+      }
+
+      function getCurrentStaffPic() {
+        if (window.BMCampaignShared && typeof window.BMCampaignShared.getCurrentPic === "function") {
+          return window.BMCampaignShared.getCurrentPic();
+        }
+        const role = localStorage.getItem("user_role");
+        if (role === "staff_kol") {
+          return String(localStorage.getItem("user_pic") || "").trim();
+        }
+        return "";
+      }
+
+      const currentStaffPic = getCurrentStaffPic();
+
+      function getCreatorMasterList() {
+        const KREATOR_STORAGE_KEYS = [
+          "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19",
+          "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16",
+          "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13"
+        ];
+        for (const k of KREATOR_STORAGE_KEYS) {
+          try {
+            const s = localStorage.getItem(k);
+            if (s) {
+              const p = JSON.parse(s);
+              if (Array.isArray(p) && p.length > 0) return p;
+            }
+          } catch(e) {}
+        }
+        return [
+          { id: 1, uid: "UID-0001", username: "@aura.beauty", nama: "Aura Cantika", kategori1: "Fashion Muslim", pic1: "Setiawan" },
+          { id: 2, uid: "UID-0002", username: "@clarissa.style", nama: "Clarissa Putri", kategori1: "Beauty & Care", pic1: "Amanda" },
+          { id: 3, uid: "UID-0003", username: "@jualan.berkah", nama: "Jualan Berkah", kategori1: "Otomotif", pic1: "Dimas" }
+        ];
+      }
+
+      function isSampleAllowedForStaff(item, staffPic) {
+        if (!staffPic) return true;
+        if (!item) return false;
+        const targetUser = String(item.kreator || item.username || item.kreatorUser || '').trim().replace(/^@/, '').toLowerCase();
+        const allKreators = getCreatorMasterList();
+        const matched = allKreators.find(k => {
+          const ku = String(k.username || '').trim().replace(/^@/, '').toLowerCase();
+          const kn = String(k.nama || k.name || '').trim().toLowerCase();
+          return (targetUser && (ku === targetUser || kn === targetUser));
+        });
+        if (matched && window.BMCampaignShared && typeof window.BMCampaignShared.isCreatorAllowedForPic === 'function') {
+          return window.BMCampaignShared.isCreatorAllowedForPic(matched, staffPic);
+        }
+        const staffKey = String(staffPic).trim().toLowerCase();
+        if (staffKey === 'dimas') {
+          if (targetUser.includes('jualan.berkah') || targetUser.includes('arnoldi')) return true;
+        } else if (staffKey === 'setiawan') {
+          if (targetUser.includes('aura') || targetUser.includes('nabila') || targetUser.includes('riva') || targetUser.includes('citra')) return true;
+        } else if (staffKey === 'amanda') {
+          if (targetUser.includes('clarissa') || targetUser.includes('citra')) return true;
+        } else if (staffKey === 'clarissa') {
+          if (targetUser.includes('gigi')) return true;
+        }
+        return false;
+      }
+
+      function getScopedTrackingData() {
+        if (!currentStaffPic) return trackingData;
+        return trackingData.filter(item => isSampleAllowedForStaff(item, currentStaffPic));
       }
 
       function saveTrackingData() {
@@ -1977,7 +2122,8 @@
       function populateBrandFilterOptions() {
         if (!filterBrandSelect) return;
         const curVal = filterBrandSelect.value;
-        const uniqueBrands = Array.from(new Set(trackingData.map(item => item.brand).filter(Boolean)));
+        const scopedData = getScopedTrackingData();
+        const uniqueBrands = Array.from(new Set(scopedData.map(item => item.brand).filter(Boolean)));
         filterBrandSelect.innerHTML = '<option value="">Semua Brand</option>';
         uniqueBrands.forEach(b => {
           const opt = document.createElement("option");
@@ -1989,7 +2135,8 @@
       }
 
       function getFilteredData() {
-        return trackingData.filter(item => {
+        const scopedData = getScopedTrackingData();
+        return scopedData.filter(item => {
           // 1. Search Query
           if (currentSearchQuery) {
             const q = currentSearchQuery.toLowerCase();

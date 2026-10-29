@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -923,6 +923,7 @@
   </div>
 
   <script src="../../assets/js/app.js"></script>
+  <script src="../../assets/js/campaign_pic_shared.js"></script>
   <script src="../../assets/js/layout.js?v=1004"></script>
 
   <script>
@@ -1070,6 +1071,29 @@
           dibagikan: 1050,
           suka: 39500,
           hargaRataRata: 70487
+        },
+        {
+          id: 7,
+          kreatorNama: "Jualan Berkah",
+          kreatorUser: "@jualan.berkah",
+          kreatorFoto: "../../media/avatar.png",
+          idLive: "74238719283918231",
+          liveTitle: "FLASH SALE ONDERDIL & PARFUM MOBIL DISKON 60%",
+          waktuMulai: "15/10/2026 20:00",
+          gmvKreator: 38200000,
+          gmvLangsung: 34100000,
+          produkTerjual: 620,
+          penonton: 17500,
+          gpmSesi: 1948717,
+          rasioKetukTayang: 15.3,
+          pesananSku: 670,
+          pembeli: 540,
+          durasi: "02:50:00",
+          tayangan: 56000,
+          komentar: 3120,
+          dibagikan: 980,
+          suka: 45000,
+          hargaRataRata: 61612
         }
       ];
 
@@ -1086,6 +1110,87 @@
         }
       } catch (e) {
         reportDb = DEFAULT_REPORT_LIVE_DATA;
+      }
+
+      
+      // Pastikan Jualan Berkah selalu tersedia di reportDb
+      if (!reportDb.some(d => d.kreatorUser === "@jualan.berkah" || (d.kreatorNama && d.kreatorNama.toLowerCase() === "jualan berkah"))) {
+        const dummyJualan = DEFAULT_REPORT_LIVE_DATA.find(d => d.kreatorUser === "@jualan.berkah");
+        if (dummyJualan) {
+          reportDb.push(dummyJualan);
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(reportDb)); } catch (e) {}
+        }
+      }
+
+      function getCurrentStaffPic() {
+        if (window.BMCampaignShared && typeof window.BMCampaignShared.getCurrentPic === "function") {
+          return window.BMCampaignShared.getCurrentPic();
+        }
+        const role = localStorage.getItem("user_role");
+        if (role === "staff_kol") {
+          return String(localStorage.getItem("user_pic") || "").trim();
+        }
+        return "";
+      }
+
+      const currentStaffPic = getCurrentStaffPic();
+
+      function getCreatorMasterList() {
+        const KREATOR_STORAGE_KEYS = [
+          "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19",
+          "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16",
+          "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13"
+        ];
+        for (const k of KREATOR_STORAGE_KEYS) {
+          try {
+            const s = localStorage.getItem(k);
+            if (s) {
+              const p = JSON.parse(s);
+              if (Array.isArray(p) && p.length > 0) return p;
+            }
+          } catch(e) {}
+        }
+        return [
+          { id: 1, uid: "UID-0001", username: "@aura.beauty", nama: "Aura Cantika", kategori1: "Fashion Muslim", pic1: "Setiawan" },
+          { id: 2, uid: "UID-0002", username: "@clarissa.style", nama: "Clarissa Putri", kategori1: "Beauty & Care", pic1: "Amanda" },
+          { id: 3, uid: "UID-0003", username: "@jualan.berkah", nama: "Jualan Berkah", kategori1: "Otomotif", pic1: "Dimas" }
+        ];
+      }
+
+      function isItemAllowedForStaff(item, staffPic) {
+        if (!staffPic) return true;
+        if (!item) return false;
+        
+        const targetUser = String(item.kreatorUser || item.username || item.kreator || '').trim().replace(/^@/, '').toLowerCase();
+        const targetNama = String(item.kreatorNama || item.nama || item.name || '').trim().toLowerCase();
+        
+        const allKreators = getCreatorMasterList();
+        const matched = allKreators.find(k => {
+          const ku = String(k.username || '').trim().replace(/^@/, '').toLowerCase();
+          const kn = String(k.nama || k.name || '').trim().toLowerCase();
+          return (targetUser && ku === targetUser) || (targetNama && kn === targetNama);
+        });
+
+        if (matched && window.BMCampaignShared && typeof window.BMCampaignShared.isCreatorAllowedForPic === 'function') {
+          return window.BMCampaignShared.isCreatorAllowedForPic(matched, staffPic);
+        }
+
+        const staffKey = String(staffPic).trim().toLowerCase();
+        if (staffKey === 'dimas') {
+          if (targetUser.includes('jualan.berkah') || targetNama.includes('jualan berkah') || targetNama.includes('arnoldi') || targetUser.includes('arnoldi')) return true;
+        } else if (staffKey === 'setiawan') {
+          if (targetUser.includes('aura') || targetNama.includes('aura') || targetNama.includes('nabila') || targetNama.includes('riva')) return true;
+        } else if (staffKey === 'amanda') {
+          if (targetUser.includes('clarissa') || targetNama.includes('clarissa')) return true;
+        } else if (staffKey === 'clarissa') {
+          if (targetNama.includes('mama gigi') || targetUser.includes('gigikids')) return true;
+        }
+        return false;
+      }
+
+      function getScopedReportDb() {
+        if (!currentStaffPic) return reportDb;
+        return reportDb.filter(item => isItemAllowedForStaff(item, currentStaffPic));
       }
 
       function saveReportDb() {
@@ -1117,7 +1222,8 @@
         if (!filterKreatorSelect) return;
         const currentVal = filterKreatorSelect.value;
         filterKreatorSelect.innerHTML = '<option value="">Semua Kreator</option>';
-        const uniqueKreators = Array.from(new Set(reportDb.map(d => d.kreatorNama).filter(Boolean)));
+        const scopedList = getScopedReportDb();
+        const uniqueKreators = Array.from(new Set(scopedList.map(d => d.kreatorNama).filter(Boolean)));
         uniqueKreators.forEach(k => {
           const opt = document.createElement("option");
           opt.value = k;
@@ -1154,7 +1260,8 @@
         const selKreator = (filterKreatorSelect?.value || "").toLowerCase().trim();
         const selGmv = filterGmvSelect?.value || "";
 
-        const filtered = reportDb.filter(item => {
+        const scopedList = getScopedReportDb();
+        const filtered = scopedList.filter(item => {
           // Search query match
           const matchQuery = !q ||
             (item.kreatorNama && item.kreatorNama.toLowerCase().includes(q)) ||
@@ -1700,7 +1807,8 @@
           const selKreator = (filterKreatorSelect?.value || "").toLowerCase().trim();
           const selGmv = filterGmvSelect?.value || "";
 
-          let exportList = reportDb.filter(item => {
+          const scopedList = getScopedReportDb();
+          let exportList = scopedList.filter(item => {
             const matchQuery = !q ||
               (item.kreatorNama && item.kreatorNama.toLowerCase().includes(q)) ||
               (item.kreatorUser && item.kreatorUser.toLowerCase().includes(q)) ||

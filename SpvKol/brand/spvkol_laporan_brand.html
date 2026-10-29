@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -56,6 +56,8 @@
       flex-wrap: wrap;
       gap: 12px;
       border-bottom: 1px solid #f1f5f9;
+      position: relative;
+      z-index: 20;
     }
 
     .campaign-toolbar__left {
@@ -110,6 +112,7 @@
 
     .filter-dropdown-wrapper {
       position: relative;
+      display: inline-block;
     }
 
     .filter-popover {
@@ -119,15 +122,31 @@
       left: 0;
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
       padding: 16px;
-      z-index: 50;
-      min-width: 260px;
+      z-index: 9999;
+      min-width: 280px;
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
     }
 
-    .filter-popover.is-open {
-      display: block;
+    .filter-popover.is-open,
+    .filter-popover.is-active {
+      display: block !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
+    }
+
+    .small-action-button.is-active,
+    .small-action-button.active {
+      background: #eff6ff !important;
+      border-color: #3b82f6 !important;
+      color: #1d4ed8 !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
     }
 
     .table-wrap {
@@ -510,7 +529,7 @@
             </button>
 
             <div class="filter-dropdown-wrapper">
-              <button id="btnFilterLaporanBrand" class="small-action-button" type="button" aria-label="Filter" title="Filter Brand & Kreator">
+              <button id="btnFilterLaporanBrand" class="small-action-button" type="button" aria-label="Filter" title="Filter Nama Toko, Kreator & Produk">
                 <svg viewBox="0 0 24 24">
                   <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
                 </svg>
@@ -518,23 +537,39 @@
 
               <div id="filterLaporanBrandDropdown" class="filter-popover" style="width: 280px;">
                 <div class="form-group" style="margin-bottom: 12px;">
-                  <label class="form-label" style="display:block; margin-bottom:6px; font-size:11.5px; font-weight:700;">Pilih Brand</label>
-                  <select id="filterBrand" class="form-select" style="width:100%; font-size:12px; padding:6px 10px;">
-                    <option value="Semua">Semua Brand</option>
+                  <label class="form-label" style="display:block; margin-bottom:6px; font-size:11.5px; font-weight:700; color:#334155;">Pilih Nama Toko</label>
+                  <select id="filterBrand" class="form-select" style="width:100%; font-size:12px; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a;">
+                    <option value="Semua">Semua Nama Toko</option>
                   </select>
                 </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                  <label class="form-label" style="display:block; margin-bottom:6px; font-size:11.5px; font-weight:700;">Pilih Kreator</label>
-                  <select id="filterKreator" class="form-select" style="width:100%; font-size:12px; padding:6px 10px;">
+                <div class="form-group" style="margin-bottom: 12px;">
+                  <label class="form-label" style="display:block; margin-bottom:6px; font-size:11.5px; font-weight:700; color:#334155;">Pilih Kreator</label>
+                  <select id="filterKreator" class="form-select" style="width:100%; font-size:12px; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a;">
                     <option value="Semua">Semua Kreator</option>
                   </select>
                 </div>
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label class="form-label" style="display:block; margin-bottom:6px; font-size:11.5px; font-weight:700; color:#334155;">Pilih Produk</label>
+                  <select id="filterProduk" class="form-select" style="width:100%; font-size:12px; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a;">
+                    <option value="Semua">Semua Produk</option>
+                  </select>
+                </div>
                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                  <button id="resetFilterLaporanBrand" type="button" style="background: #ef4444; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">Reset</button>
-                  <button id="applyFilterLaporanBrand" type="button" style="background: #1c64f2; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer;">Terapkan</button>
+                  <button id="resetFilterLaporanBrand" type="button" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">Reset</button>
+                  <button id="applyFilterLaporanBrand" type="button" style="background: #1c64f2; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;">Terapkan</button>
                 </div>
               </div>
             </div>
+
+            <!-- Real-time Search Input -->
+            <label class="campaign-search">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="search" id="searchInput" placeholder="Cari data laporan..." autocomplete="off" />
+            </label>
           </div>
 
           <div class="campaign-toolbar__right"></div>
@@ -594,6 +629,19 @@
                     <span>ID Produk</span>
                     <label class="pin-check-btn" title="Kunci / Pin kolom ID Produk agar tetap terlihat saat scroll">
                       <input type="checkbox" class="chk-pin-col" data-col="id_produk" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="nama_toko">
+                  <div class="th-pin-wrapper">
+                    <span>Nama Toko</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Nama Toko agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="nama_toko" />
                       <span class="pin-check-indicator">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                           <polyline points="20 6 9 17 4 12"></polyline>
@@ -1041,26 +1089,83 @@
         return JSON.parse(JSON.stringify(DEFAULT_DATA));
       }
 
-      const reportDb = loadReportData();
+      let reportDb = loadReportData();
+
+      let brandNameByShopCode = new Map();
+      let brandNameByProductId = new Map();
+      let brandNameByProductName = new Map();
+      let brandNameByName = new Map();
+      let kreatorByUsername = new Map();
+      let kreatorByName = new Map();
+
+      function normalizeCode(value) {
+        return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+      }
+
+      function normalizeName(value) {
+        return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+      }
+
+      function refreshReferenceData() {
+        const brandMap = new Map();
+        const productMap = new Map();
+        const productNameMap = new Map();
+        const nameMap = new Map();
+        readStorageArray(BRAND_STORAGE_KEY).forEach((brand) => {
+          const code = normalizeCode(brand?.shopCode);
+          const name = String(brand?.nama || "").trim();
+          if (code && name) brandMap.set(code, name);
+          if (name) nameMap.set(normalizeName(name), name);
+          const samples = Array.isArray(brand?.sampel) ? brand.sampel : [];
+          samples.forEach((sample) => {
+            const pid = normalizeCode(sample?.pid);
+            if (pid && name) productMap.set(pid, name);
+            const productName = normalizeName(sample?.nama);
+            if (productName && name && !productNameMap.has(productName)) productNameMap.set(productName, name);
+          });
+        });
+        brandNameByShopCode = brandMap;
+        brandNameByProductId = productMap;
+        brandNameByProductName = productNameMap;
+        brandNameByName = nameMap;
+
+        const kreatorMap = new Map();
+        const kreatorNameMap = new Map();
+        readStorageArray(KREATOR_STORAGE_KEY).forEach((kreator) => {
+          const username = String(kreator?.username || "").trim().replace(/^@/, "").toLowerCase();
+          const nama = String(kreator?.nama || "").trim();
+          const uid = String(kreator?.uid || "").trim().toLowerCase();
+          const entry = { username, nama, uid };
+          if (username) kreatorMap.set(username, entry);
+          if (uid) kreatorMap.set(uid, entry);
+          if (nama) kreatorNameMap.set(nama.toLowerCase(), entry);
+        });
+        kreatorByUsername = kreatorMap;
+        kreatorByName = kreatorNameMap;
+      }
+
+      refreshReferenceData();
 
       const tbody = document.getElementById("tbodyLaporanBrand");
       const filterBrand = document.getElementById("filterBrand");
       const filterKreator = document.getElementById("filterKreator");
+      const filterProduk = document.getElementById("filterProduk");
       const btnFilter = document.getElementById("btnFilterLaporanBrand");
       const filterDropdown = document.getElementById("filterLaporanBrandDropdown");
       const applyFilterBtn = document.getElementById("applyFilterLaporanBrand");
       const resetFilterBtn = document.getElementById("resetFilterLaporanBrand");
       const btnExportExcel = document.getElementById("btnExportExcel");
+      const searchInput = document.getElementById("searchInput");
       const viewModal = document.getElementById("laporanBrandViewModal");
 
       // ================= COLUMN PIN / FREEZE FUNCTIONALITY =================
       const PINNED_STORAGE_KEY = "bisa_laporan_brand_pinned_cols";
-      const DEFAULT_PINNED_COLS = { nama_kreator: true, info_produk: true, id_produk: true };
+      const DEFAULT_PINNED_COLS = { nama_kreator: true, info_produk: true, id_produk: true, nama_toko: true };
 
       function getSavedPinnedCols() {
         try {
           const saved = JSON.parse(localStorage.getItem(PINNED_STORAGE_KEY));
-          return saved && typeof saved === "object" ? saved : { ...DEFAULT_PINNED_COLS };
+          return saved && typeof saved === "object" ? { ...DEFAULT_PINNED_COLS, ...saved } : { ...DEFAULT_PINNED_COLS };
         } catch (e) {
           return { ...DEFAULT_PINNED_COLS };
         }
@@ -1156,10 +1261,15 @@
 
       function openDetailModal(item) {
         if (!item) return;
+        const viewItem = {
+          ...item,
+          nama_kreator: getKreatorValue(item),
+          nama_toko: getNamaTokoValue(item)
+        };
         Object.keys(DETAIL_FIELD_MAP).forEach((id) => {
           const el = document.getElementById(id);
           if (!el) return;
-          const value = item[DETAIL_FIELD_MAP[id]];
+          const value = viewItem[DETAIL_FIELD_MAP[id]];
           el.value = (value === undefined || value === null || value === "") ? "-" : value;
         });
         if (viewModal) viewModal.classList.add("is-active");
@@ -1182,26 +1292,90 @@
         }, 3000);
       }
 
-      function getBrandOptions() {
-        const names = readStorageArray(BRAND_STORAGE_KEY)
-          .map((brand) => String(brand?.nama || "").trim())
-          .filter(Boolean);
+      function getNamaTokoValue(item) {
+        if (!item) return "-";
+        const idToko = normalizeCode(item.id_toko);
+        if (idToko && brandNameByShopCode.has(idToko)) {
+          return brandNameByShopCode.get(idToko);
+        }
+        const namaToko = String(item.nama_toko || "").trim();
+        const nameKey = normalizeName(namaToko);
+        if (nameKey && brandNameByName.has(nameKey)) {
+          return brandNameByName.get(nameKey);
+        }
+        const idProduk = normalizeCode(item.id_produk);
+        if (idProduk && brandNameByProductId.has(idProduk)) {
+          return brandNameByProductId.get(idProduk);
+        }
+        const infoProduk = normalizeName(item.info_produk);
+        if (infoProduk && brandNameByProductName.has(infoProduk)) {
+          return brandNameByProductName.get(infoProduk);
+        }
+        const kodeToko = normalizeCode(item.kode_toko);
+        if (kodeToko && brandNameByShopCode.has(kodeToko)) {
+          return brandNameByShopCode.get(kodeToko);
+        }
+        return namaToko || "-";
+      }
+
+      function getNamaTokoOptions() {
+        const tokoSet = new Set();
         reportDb.forEach((item) => {
-          const name = String(item?.nama_toko || "").trim();
-          if (name) names.push(name);
+          const name = getNamaTokoValue(item);
+          if (name && name !== "-") tokoSet.add(name);
         });
-        return Array.from(new Set(names));
+        readStorageArray(BRAND_STORAGE_KEY).forEach((brand) => {
+          const name = String(brand?.nama || "").trim();
+          if (name) tokoSet.add(name);
+        });
+        return Array.from(tokoSet).sort();
+      }
+
+      function getKreatorEntry(item) {
+        const raw = String(item?.nama_kreator || "").trim();
+        const key = raw.replace(/^@/, "").toLowerCase();
+        return kreatorByUsername.get(key) || kreatorByName.get(raw.toLowerCase()) || null;
+      }
+
+      function getKreatorValue(item) {
+        const raw = String(item?.nama_kreator || "").trim();
+        const entry = getKreatorEntry(item);
+        if (entry) {
+          if (entry.username) return "@" + entry.username;
+          if (entry.nama) return entry.nama;
+        }
+        return raw || "-";
       }
 
       function getKreatorOptions() {
-        const names = readStorageArray(KREATOR_STORAGE_KEY)
-          .map((kreator) => String(kreator?.username || kreator?.nama || "").trim())
-          .filter(Boolean);
+        const kreatorSet = new Set();
         reportDb.forEach((item) => {
           const name = String(item?.nama_kreator || "").trim();
-          if (name) names.push(name);
+          if (name) kreatorSet.add(name);
         });
-        return Array.from(new Set(names));
+        readStorageArray(KREATOR_STORAGE_KEY).forEach((kreator) => {
+          const uname = String(kreator?.username || "").trim();
+          if (uname) kreatorSet.add(uname.startsWith("@") ? uname : "@" + uname);
+          const name = String(kreator?.nama || "").trim();
+          if (name) kreatorSet.add(name);
+        });
+        return Array.from(kreatorSet).sort();
+      }
+
+      function getProdukOptions() {
+        const produkSet = new Set();
+        reportDb.forEach((item) => {
+          const name = String(item?.info_produk || "").trim();
+          if (name && name !== "-") produkSet.add(name);
+        });
+        readStorageArray(BRAND_STORAGE_KEY).forEach((brand) => {
+          const samples = Array.isArray(brand?.sampel) ? brand.sampel : [];
+          samples.forEach((sample) => {
+            const name = String(sample?.nama || "").trim();
+            if (name) produkSet.add(name);
+          });
+        });
+        return Array.from(produkSet).sort();
       }
 
       function fillSelect(select, allLabel, options) {
@@ -1223,29 +1397,52 @@
       }
 
       function updateFilterOptions() {
-        fillSelect(filterBrand, "Semua Brand", getBrandOptions());
+        fillSelect(filterBrand, "Semua Nama Toko", getNamaTokoOptions());
         fillSelect(filterKreator, "Semua Kreator", getKreatorOptions());
+        fillSelect(filterProduk, "Semua Produk", getProdukOptions());
       }
 
       function getFilteredData() {
         const selectedBrand = filterBrand ? filterBrand.value : "Semua";
         const selectedKreator = filterKreator ? filterKreator.value : "Semua";
-        const brandRow = readStorageArray(BRAND_STORAGE_KEY)
-          .find((brand) => String(brand?.nama || "").trim() === selectedBrand);
-        const brandCode = brandRow ? String(brandRow.shopCode || "").trim() : "";
+        const selectedProduk = filterProduk ? filterProduk.value : "Semua";
+        const q = (searchInput ? searchInput.value : "").toLowerCase().trim();
+
+        const normSelectedBrand = normalizeName(selectedBrand);
+        const normSelectedKreator = selectedKreator.replace(/^@/, "").trim().toLowerCase();
+        const normSelectedProduk = normalizeName(selectedProduk);
 
         return reportDb.filter((item) => {
           const matchBrand = selectedBrand === "Semua"
-            || item.nama_toko === selectedBrand
-            || (brandCode && item.id_toko === brandCode);
-          const matchKreator = selectedKreator === "Semua" || item.nama_kreator === selectedKreator;
-          return matchBrand && matchKreator;
+            || normalizeName(getNamaTokoValue(item)) === normSelectedBrand;
+
+          const itemKreator = String(item.nama_kreator || "").trim();
+          const normItemKreator = itemKreator.replace(/^@/, "").toLowerCase();
+          const kreatorEntry = getKreatorEntry(item);
+          const normKreatorNama = kreatorEntry && kreatorEntry.nama ? kreatorEntry.nama.toLowerCase() : "";
+          const normKreatorValue = getKreatorValue(item).replace(/^@/, "").toLowerCase();
+          const matchKreator = selectedKreator === "Semua"
+            || itemKreator === selectedKreator
+            || normItemKreator === normSelectedKreator
+            || normKreatorValue === normSelectedKreator
+            || (normKreatorNama && normKreatorNama === normSelectedKreator);
+
+          const itemProduk = String(item.info_produk || "").trim();
+          const matchProduk = selectedProduk === "Semua"
+            || normalizeName(itemProduk) === normSelectedProduk;
+
+          let matchQuery = true;
+          if (q) {
+            const combined = [...Object.values(item), getKreatorValue(item), getNamaTokoValue(item)].join(" ").toLowerCase();
+            matchQuery = combined.includes(q);
+          }
+
+          return matchBrand && matchKreator && matchProduk && matchQuery;
         });
       }
 
       function renderTable() {
         if (!tbody) return;
-        updateFilterOptions();
 
         const filtered = getFilteredData();
         const tableWrapper = document.getElementById("tableContainerWrapper");
@@ -1268,7 +1465,7 @@
         if (filtered.length === 0) {
           tbody.innerHTML = `
             <tr>
-              <td colspan="17" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+              <td colspan="18" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
                 Tidak ditemukan data Laporan Brand yang sesuai dengan filter.
               </td>
             </tr>
@@ -1280,9 +1477,10 @@
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${index + 1}</td>
-            <td data-col="nama_kreator" style="font-weight: 700; color: #0284c7;">${item.nama_kreator || "-"}</td>
+            <td data-col="nama_kreator" style="font-weight: 700; color: #0284c7;">${getKreatorValue(item)}</td>
             <td data-col="info_produk">${item.info_produk || "-"}</td>
             <td data-col="id_produk" style="font-weight: 600;">${item.id_produk || "-"}</td>
+            <td data-col="nama_toko">${getNamaTokoValue(item)}</td>
             <td style="font-weight: 700; color: #1c64f2;">${item.gmv_kreator || "-"}</td>
             <td>${item.gmv_live_kreator || "-"}</td>
             <td>${item.gmv_video_afiliasi || "-"}</td>
@@ -1310,31 +1508,71 @@
         updatePinnedColumns();
       }
 
-      if (btnFilter && filterDropdown) {
-        btnFilter.addEventListener("click", (event) => {
-          event.stopPropagation();
-          filterDropdown.classList.toggle("is-open");
-        });
+      window.toggleLaporanBrandFilter = function (event) {
+        if (event) event.stopPropagation();
+        if (!filterDropdown) return;
+        const isOpen = filterDropdown.classList.contains("is-open") || filterDropdown.classList.contains("is-active");
+        if (isOpen) {
+          filterDropdown.classList.remove("is-open", "is-active");
+          const hasFilter = (filterBrand && filterBrand.value !== "Semua") || (filterKreator && filterKreator.value !== "Semua") || (filterProduk && filterProduk.value !== "Semua");
+          if (!hasFilter && btnFilter) btnFilter.classList.remove("is-active", "active");
+        } else {
+          filterDropdown.classList.add("is-open", "is-active");
+          if (btnFilter) btnFilter.classList.add("is-active", "active");
+        }
+      };
 
-        document.addEventListener("click", (event) => {
-          if (!filterDropdown.contains(event.target) && !btnFilter.contains(event.target)) {
-            filterDropdown.classList.remove("is-open");
-          }
+      if (btnFilter) {
+        btnFilter.addEventListener("click", window.toggleLaporanBrandFilter);
+      }
+
+      if (filterDropdown) {
+        filterDropdown.addEventListener("click", (event) => {
+          event.stopPropagation();
         });
       }
 
+      document.addEventListener("click", (event) => {
+        if (filterDropdown && btnFilter && !filterDropdown.contains(event.target) && !btnFilter.contains(event.target)) {
+          filterDropdown.classList.remove("is-open", "is-active");
+          const hasFilter = (filterBrand && filterBrand.value !== "Semua") || (filterKreator && filterKreator.value !== "Semua") || (filterProduk && filterProduk.value !== "Semua");
+          if (!hasFilter) btnFilter.classList.remove("is-active", "active");
+        }
+      });
+
       if (applyFilterBtn) {
-        applyFilterBtn.addEventListener("click", () => {
-          if (filterDropdown) filterDropdown.classList.remove("is-open");
+        applyFilterBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (filterDropdown) filterDropdown.classList.remove("is-open", "is-active");
+          const hasFilter = (filterBrand && filterBrand.value !== "Semua") || (filterKreator && filterKreator.value !== "Semua") || (filterProduk && filterProduk.value !== "Semua");
+          if (btnFilter) {
+            if (hasFilter) {
+              btnFilter.classList.add("is-active", "active");
+            } else {
+              btnFilter.classList.remove("is-active", "active");
+            }
+          }
           renderTable();
+          showToast("Filter berhasil diterapkan");
         });
       }
 
       if (resetFilterBtn) {
-        resetFilterBtn.addEventListener("click", () => {
+        resetFilterBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
           if (filterBrand) filterBrand.value = "Semua";
           if (filterKreator) filterKreator.value = "Semua";
-          if (filterDropdown) filterDropdown.classList.remove("is-open");
+          if (filterProduk) filterProduk.value = "Semua";
+          if (searchInput) searchInput.value = "";
+          if (filterDropdown) filterDropdown.classList.remove("is-open", "is-active");
+          if (btnFilter) btnFilter.classList.remove("is-active", "active");
+          renderTable();
+          showToast("Filter berhasil direset");
+        });
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
           renderTable();
         });
       }
@@ -1348,16 +1586,17 @@
           }
 
           const headers = [
-            "No", "Kreator", "Produk", "ID Produk", "GMV", "GMV Live", "GMV Video",
+            "No", "Kreator", "Produk", "ID Produk", "Nama Toko", "GMV", "GMV Live", "GMV Video",
             "Pesanan", "Pesanan Live", "Pesanan Video", "Produk Terjual", "GMV Langsung",
             "Refund", "Qty Refund", "CTR", "CTOR"
           ];
 
           const rows = exportList.map((item, index) => [
             index + 1,
-            item.nama_kreator || "-",
+            getKreatorValue(item),
             item.info_produk || "-",
             item.id_produk || "-",
+            getNamaTokoValue(item),
             item.gmv_kreator || "-",
             item.gmv_live_kreator || "-",
             item.gmv_video_afiliasi || "-",
@@ -1407,7 +1646,48 @@
         if (btn) btn.addEventListener("click", closeDetailModal);
       });
 
+      function refreshFromOperationalData() {
+        reportDb = loadReportData();
+        refreshReferenceData();
+        updateFilterOptions();
+        renderTable();
+      }
+
+      function getDataSignature() {
+        return [REPORT_STORAGE_KEY, BRAND_STORAGE_KEY, KREATOR_STORAGE_KEY]
+          .map((key) => localStorage.getItem(key) || "")
+          .join("|");
+      }
+
+      let lastDataSignature = getDataSignature();
+
+      function syncIfChanged() {
+        const signature = getDataSignature();
+        if (signature !== lastDataSignature) {
+          refreshFromOperationalData();
+          lastDataSignature = getDataSignature();
+        }
+      }
+
+      window.addEventListener("storage", (event) => {
+        if (!event.key || [REPORT_STORAGE_KEY, BRAND_STORAGE_KEY, KREATOR_STORAGE_KEY].includes(event.key)) {
+          refreshFromOperationalData();
+          lastDataSignature = getDataSignature();
+        }
+      });
+      window.addEventListener("focus", syncIfChanged);
+      window.addEventListener("pageshow", syncIfChanged);
+      window.addEventListener("bisa-brand-updated", () => {
+        refreshFromOperationalData();
+        lastDataSignature = getDataSignature();
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) syncIfChanged();
+      });
+      setInterval(syncIfChanged, 3000);
+
       initPinnedColumns();
+      updateFilterOptions();
       renderTable();
     })();
   </script>

@@ -1711,6 +1711,69 @@
             { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
           ]
+        },
+        {
+          id: "TRK-005",
+          brand: "Bisa Otomotif Nusantara",
+          sampel: "Parfum Mobil Aroma Kopi & Pembersih Mesin",
+          pid: "PID 031",
+          type: "Campaign",
+          kreator: "@jualan.berkah",
+          varian: "Paket Spray 250ml",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel parfum mobil", waktu: "20/09/2026 10:00" },
+            { status: "Dikirim", lampiran: "resi_jnt.jpg", keterangan: "Nomor resi JNT-7788991", waktu: "21/09/2026 14:00" },
+            { status: "Diterima", lampiran: "foto_sampel.png", keterangan: "Sampel diterima dalam kondisi baik", waktu: "23/09/2026 16:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Sedang dipakai untuk sesi live review", waktu: "24/09/2026 19:00" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-006",
+          brand: "Bisa Kuliner Nusantara",
+          sampel: "Sambal Kemasan & Bumbu Rendang Instan",
+          pid: "PID 041",
+          type: "Campaign",
+          kreator: "@arnoldi.food",
+          varian: "Paket Bundle 3 Rasa",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel bumbu kuliner", waktu: "21/09/2026 11:00" },
+            { status: "Dikirim", lampiran: "resi_jnt.jpg", keterangan: "Nomor resi JNT-334411", waktu: "22/09/2026 15:00" },
+            { status: "Diterima", lampiran: "foto_diterima.png", keterangan: "Sampel diterima dalam kondisi baik", waktu: "24/09/2026 14:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Sedang dipakai memasak live", waktu: "24/09/2026 19:30" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-007",
+          brand: "Bisa Kids & Baby",
+          sampel: "Set Piyama Katun Organik Bayi & Balita",
+          pid: "PID 051",
+          type: "Campaign",
+          kreator: "@gigikids.daily",
+          varian: "Ukuran M (1-2 Tahun)",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "25/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel piyama anak", waktu: "22/09/2026 09:30" },
+            { status: "Dikirim", lampiran: "resi_sicepat.jpg", keterangan: "Nomor resi SICEPAT-998811", waktu: "23/09/2026 11:00" },
+            { status: "Diterima", lampiran: "bukti_terima.jpg", keterangan: "Sampel diterima oleh kreator", waktu: "25/09/2026 13:00" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Siap untuk sesi live parenting", waktu: "25/09/2026 16:00" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
         }
       ];
 
@@ -1730,6 +1793,19 @@
         trackingData = DEFAULT_TRACKING_DATA;
       }
 
+      
+      // Pastikan seluruh sample default selalu tersedia di trackingData
+      let trackingNeedsSync = false;
+      DEFAULT_TRACKING_DATA.forEach(dt => {
+        const exists = trackingData.some(t => t.id === dt.id || (t.sampel === dt.sampel && t.kreator === dt.kreator));
+        if (!exists) {
+          trackingData.push(dt);
+          trackingNeedsSync = true;
+        }
+      });
+      if (trackingNeedsSync) {
+        try { localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(trackingData)); } catch(e){}
+      }
       function saveTrackingData() {
         try {
           localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(trackingData));
