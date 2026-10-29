@@ -33,7 +33,7 @@
     return num.toLocaleString('id-ID');
   }
 
-  function loadAllCampaigns() {
+  function loadAllCampaign() {
     try {
       const saved = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
       if (saved) {
@@ -477,7 +477,8 @@
                         (item.kreator && item.kreator.toLowerCase().includes(q));
           if (!match) return false;
         }
-        if (activeFilters.pic && cleanKey(item.pic) !== cleanKey(activeFilters.pic)) return false;
+        const itemPic = item.pic || getCampaignPic(item);
+        if (activeFilters.pic && cleanKey(itemPic) !== cleanKey(activeFilters.pic)) return false;
         if (activeFilters.status && cleanKey(item.statusCampaign) !== cleanKey(activeFilters.status)) return false;
         if (activeFilters.priority && cleanKey(item.priority) !== cleanKey(activeFilters.priority)) return false;
         if (activeFilters.jenis && cleanKey(item.jenis) !== cleanKey(activeFilters.jenis)) return false;
@@ -559,6 +560,7 @@
 
   // Setup search and filter listeners
   function initDashboardControls() {
+    const allCampaigns = loadAllCampaigns();
     const searchInput = document.querySelector('.cc-search-input');
     if (searchInput) {
       searchInput.addEventListener('input', function (e) {
@@ -571,41 +573,115 @@
     const filterDropdown = document.getElementById('filterCampaignDropdown');
     const filterForm = document.getElementById('filterCampaignForm');
 
-    if (btnFilter && filterDropdown) {
-      btnFilter.addEventListener('click', function (e) {
+    // Populate dynamic brand & PIC options from campaigns
+    const selectBrand = document.getElementById('filterCampaignBrand');
+    if (selectBrand && allCampaigns && allCampaigns.length) {
+      const brands = Array.from(new Set(allCampaigns.map(function (c) { return cleanText(c.brand); }).filter(Boolean))).sort();
+      if (brands.length) {
+        const curVal = selectBrand.value;
+        selectBrand.innerHTML = '<option value="">Semua Brand</option>' +
+          brands.map(function (b) { return '<option value="' + b + '">' + b + '</option>'; }).join('');
+        selectBrand.value = curVal;
+      }
+    }
+
+    const selectPic = document.getElementById('filterCampaignPic');
+    if (selectPic && allCampaigns && allCampaigns.length) {
+      const pics = Array.from(new Set(allCampaigns.map(function (c) { return cleanText(c.pic || getCampaignPic(c)); }).filter(Boolean))).sort();
+      if (pics.length) {
+        const curVal = selectPic.value;
+        selectPic.innerHTML = '<option value="">Semua PIC</option>' +
+          pics.map(function (p) { return '<option value="' + p + '">' + p + '</option>'; }).join('');
+        selectPic.value = curVal;
+      }
+    }
+
+    function checkActiveFilterButton() {
+      const hasFilter = Boolean(activeFilters.pic || activeFilters.status || activeFilters.priority || activeFilters.jenis || activeFilters.brand);
+      if (btnFilter) {
+        if (hasFilter) {
+          btnFilter.classList.add('is-active', 'active');
+        } else {
+          btnFilter.classList.remove('is-active', 'active');
+        }
+      }
+    }
+
+    window.toggleCampaignFilter = function (e) {
+      if (e) {
+        e.preventDefault();
         e.stopPropagation();
-        filterDropdown.classList.toggle('is-active');
-      });
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      }
+      const dd = document.getElementById('filterCampaignDropdown');
+      const btn = document.getElementById('btnFilterCampaign');
+      if (!dd) return;
+      const isOpen = dd.classList.contains('is-active') || dd.classList.contains('is-open');
+      if (isOpen) {
+        dd.classList.remove('is-active', 'is-open');
+        checkActiveFilterButton();
+      } else {
+        dd.classList.add('is-active', 'is-open');
+        if (btn) btn.classList.add('is-active', 'active');
+      }
+    };
+
+    if (btnFilter && filterDropdown) {
+      btnFilter.onclick = window.toggleCampaignFilter;
+
+      filterDropdown.onclick = function (e) {
+        e.stopPropagation();
+      };
+
       document.addEventListener('click', function (e) {
-        if (!filterDropdown.contains(e.target) && e.target !== btnFilter) {
-          filterDropdown.classList.remove('is-active');
+        const dd = document.getElementById('filterCampaignDropdown');
+        const btn = document.getElementById('btnFilterCampaign');
+        if (dd && btn && !dd.contains(e.target) && !btn.contains(e.target)) {
+          dd.classList.remove('is-active', 'is-open');
+          checkActiveFilterButton();
         }
       });
     }
 
+    function syncAndApplyCampaignFilters() {
+      const picEl = document.getElementById('filterCampaignPic');
+      const statusEl = document.getElementById('filterCampaignStatus');
+      const priorityEl = document.getElementById('filterCampaignPriority');
+      const jenisEl = document.getElementById('filterCampaignJenis');
+      const brandEl = document.getElementById('filterCampaignBrand');
+
+      activeFilters.pic = picEl ? picEl.value.trim() : '';
+      activeFilters.status = statusEl ? statusEl.value.trim() : '';
+      activeFilters.priority = priorityEl ? priorityEl.value.trim() : '';
+      activeFilters.jenis = jenisEl ? jenisEl.value.trim() : '';
+      activeFilters.brand = brandEl ? brandEl.value.trim() : '';
+
+      checkActiveFilterButton();
+      renderDashboardCampaign();
+    }
+
     if (filterForm) {
-      filterForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const selects = filterForm.querySelectorAll('select');
-        selects.forEach(function (sel) {
-          const label = sel.closest('.form-group')?.querySelector('label')?.textContent?.trim().toLowerCase();
-          const val = sel.value;
-          if (label && label.includes('pic')) activeFilters.pic = val;
-          else if (label && label.includes('status')) activeFilters.status = val;
-          else if (label && label.includes('priority')) activeFilters.priority = val;
-          else if (label && label.includes('jenis')) activeFilters.jenis = val;
-          else if (label && label.includes('brand')) activeFilters.brand = val;
-        });
-        if (filterDropdown) filterDropdown.classList.remove('is-active');
-        renderDashboardCampaign();
+      // Dynamic filter response on select change
+      filterForm.querySelectorAll('select').forEach(function (sel) {
+        sel.addEventListener('change', syncAndApplyCampaignFilters);
       });
 
+      // Submit
+      filterForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        syncAndApplyCampaignFilters();
+        if (filterDropdown) filterDropdown.classList.remove('is-active', 'is-open');
+      });
+
+      // Reset
       filterForm.addEventListener('reset', function () {
         activeFilters.pic = '';
         activeFilters.status = '';
         activeFilters.priority = '';
         activeFilters.jenis = '';
         activeFilters.brand = '';
+        checkActiveFilterButton();
+        if (filterDropdown) filterDropdown.classList.remove('is-active', 'is-open');
         setTimeout(renderDashboardCampaign, 50);
       });
     }
@@ -623,10 +699,15 @@
     if (!document.hidden) renderDashboardCampaign();
   });
 
-  document.addEventListener('DOMContentLoaded', function () {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      renderDashboardCampaign();
+      initDashboardControls();
+    });
+  } else {
     renderDashboardCampaign();
     initDashboardControls();
-  });
+  }
 
   // Expose global render function
   window.renderDashboardCampaign = renderDashboardCampaign;

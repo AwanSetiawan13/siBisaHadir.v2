@@ -17687,7 +17687,13 @@
   const btnFilterCampaign = document.getElementById("btnFilterCampaign");
   const filterCampaignForm = document.getElementById("filterCampaignForm");
 
-  if (filterCampaignDropdown && btnFilterCampaign) {
+  if (
+    filterCampaignDropdown &&
+    btnFilterCampaign &&
+    !document.getElementById("campaignControlTable") &&
+    !document.getElementById("campaignControlTableBody") &&
+    !window.location.href.includes("dashboard_campaign")
+  ) {
     // Toggle popover on click
     btnFilterCampaign.addEventListener("click", (e) => {
       e.stopPropagation();

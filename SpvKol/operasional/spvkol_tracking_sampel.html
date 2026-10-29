@@ -153,10 +153,6 @@
       box-shadow: 0 2px 6px rgba(34, 197, 94, 0.15) !important;
     }
 
-    .filter-dropdown-wrapper {
-      position: relative;
-    }
-
     .toolbar-active-badge {
       position: absolute;
       top: -5px;
@@ -177,10 +173,18 @@
     }
 
     .btn-filter-active,
-    .btn-calendar-active {
+    .btn-calendar-active,
+    .small-action-button.btn-filter-active,
+    .small-action-button.is-active {
       background: #e0f2fe !important;
       border-color: #38bdf8 !important;
       color: #0284c7 !important;
+    }
+
+    .filter-dropdown-wrapper {
+      position: relative !important;
+      display: inline-block !important;
+      z-index: 100 !important;
     }
 
     /* Filter Popover */
@@ -192,14 +196,22 @@
       width: 290px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-      z-index: 1000;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      z-index: 9999 !important;
       padding: 16px;
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
     }
 
-    .filter-popover.is-open {
+    .filter-popover.is-open,
+    .filter-popover.is-active {
       display: block !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
     }
 
     .filter-popover-header {
@@ -995,11 +1007,11 @@
 
             <!-- 2. Filter Dropdown & Popover -->
             <div class="filter-dropdown-wrapper">
-              <button id="btnFilterTrigger" class="small-action-button" type="button" aria-label="Filter" title="Filter Tracking Sampel" onclick="window.toggleTrackingFilterPopover(event)">
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px;">
-                  <path d="M4 5h16l-6 7v5l-4 2v-7z" fill="none" stroke="#29A3D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              <button id="btnFilterTrigger" class="small-action-button" type="button" aria-label="Filter" title="Filter Tracking Sampel">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; pointer-events: none;">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z" fill="none" stroke="#29A3D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;"></path>
                 </svg>
-                <span id="filterActiveBadge" class="toolbar-active-badge" style="display: none;">0</span>
+                <span id="filterActiveBadge" class="toolbar-active-badge" style="display: none; pointer-events: none;">0</span>
               </button>
 
               <!-- Filter Popover Content -->
@@ -1116,9 +1128,9 @@
                 </th>
                 <th style="width: 50px;">#</th>
                 <th>Nama Brand</th>
-                <th>Daftar Sampel</th>
-                <th>Type</th>
                 <th>Username Kreator</th>
+                <th>Type</th>
+                <th>Daftar Sampel</th>
                 <th class="text-center" style="text-align: center;">Status Sampel</th>
                 <th>Type Sampel</th>
                 <th class="text-center col-sticky-action" style="text-align: center; width: 80px;">Aksi</th>
@@ -1611,7 +1623,7 @@
       <span id="toastMsg" style="font-size: 13.5px; font-weight: 600; color: #1e293b;">Data berhasil diperbarui</span>
     </div>
   </div>
-  <script src="../../assets/js/layout.js?v=1004"></script>
+  <script src="../../assets/js/layout.js?v=1006"></script>
 
   <script>
     (function () {
@@ -2286,12 +2298,12 @@
               <div style="font-weight: 600;">${escapeTrackingHtml(group.brand)}</div>
               ${group.campaignId ? `<div class="tracking-group-subtext">${escapeTrackingHtml(group.campaignId)}</div>` : ""}
             </td>
-            <td>${renderSampleChips(items)}</td>
-            <td>${typeValues.map(value => escapeTrackingHtml(value)).join("<br>") || "-"}</td>
             <td>
               <span style="font-weight: 500; color: #1e293b;">${escapeTrackingHtml(displayKreator)}</span>
               <div class="tracking-group-subtext">${items.length} sampel · ${totalQty} unit</div>
             </td>
+            <td>${typeValues.map(value => escapeTrackingHtml(value)).join("<br>") || "-"}</td>
+            <td>${renderSampleChips(items)}</td>
             <td class="text-center">
               <div class="tracking-group-statuses">${statusHtml}</div>
             </td>
@@ -3133,32 +3145,61 @@
       }
 
       // Filter popover toggle
+      let lastFilterToggleTime = 0;
       window.toggleTrackingFilterPopover = function (e) {
         if (e) {
           e.preventDefault();
           e.stopPropagation();
         }
+        const now = Date.now();
+        if (now - lastFilterToggleTime < 250) return;
+        lastFilterToggleTime = now;
         if (filterPopover) {
-          filterPopover.classList.toggle("is-open");
+          populateBrandFilterOptions();
+          const willOpen = !filterPopover.classList.contains("is-open") && !filterPopover.classList.contains("is-active");
+          if (willOpen) {
+            filterPopover.classList.add("is-open", "is-active");
+            if (btnFilterTrigger) btnFilterTrigger.classList.add("btn-filter-active", "is-active");
+          } else {
+            filterPopover.classList.remove("is-open", "is-active");
+            if (btnFilterTrigger) {
+              const hasActive = !!(currentFilterBrand || currentFilterStatus || currentFilterType);
+              btnFilterTrigger.classList.toggle("btn-filter-active", hasActive);
+              btnFilterTrigger.classList.remove("is-active");
+            }
+          }
         }
       };
 
-      if (btnFilterTrigger && filterPopover) {
-        btnFilterTrigger.addEventListener("click", (e) => {
-          window.toggleTrackingFilterPopover(e);
-        });
+      if (btnFilterTrigger) {
+        btnFilterTrigger.onclick = window.toggleTrackingFilterPopover;
+      }
+
+      if (filterPopover) {
+        filterPopover.onclick = function (e) {
+          e.stopPropagation();
+        };
       }
 
       if (btnCloseFilterPop && filterPopover) {
-        btnCloseFilterPop.addEventListener("click", (e) => {
+        btnCloseFilterPop.onclick = function (e) {
           if (e) e.stopPropagation();
-          filterPopover.classList.remove("is-open");
-        });
+          filterPopover.classList.remove("is-open", "is-active");
+          if (btnFilterTrigger) {
+            const hasActive = !!(currentFilterBrand || currentFilterStatus || currentFilterType);
+            btnFilterTrigger.classList.toggle("btn-filter-active", hasActive);
+            btnFilterTrigger.classList.remove("is-active");
+          }
+        };
       }
 
       document.addEventListener("click", (e) => {
+        if (!document.body.contains(e.target)) return;
         if (filterPopover && !filterPopover.contains(e.target) && btnFilterTrigger && !btnFilterTrigger.contains(e.target)) {
-          filterPopover.classList.remove("is-open");
+          filterPopover.classList.remove("is-open", "is-active");
+          if (btnFilterTrigger && !currentFilterBrand && !currentFilterStatus && !currentFilterType) {
+            btnFilterTrigger.classList.remove("btn-filter-active", "is-active");
+          }
         }
       });
 
@@ -3204,7 +3245,7 @@
         formFilterTracking.addEventListener("submit", (e) => {
           e.preventDefault();
           applyFilterState(true);
-          if (filterPopover) filterPopover.classList.remove("is-open");
+          if (filterPopover) filterPopover.classList.remove("is-open", "is-active");
         });
 
         const btnResetFilter = document.getElementById("btnResetFilter");
@@ -3218,7 +3259,7 @@
             currentFilterType = "";
             currentPage = 1;
             updateFilterBadge();
-            if (filterPopover) filterPopover.classList.remove("is-open");
+            if (filterPopover) filterPopover.classList.remove("is-open", "is-active");
             renderTable();
             showToast("Filter berhasil di-reset", "info");
           });
