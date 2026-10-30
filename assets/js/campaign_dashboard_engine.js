@@ -33,7 +33,7 @@
     return num.toLocaleString('id-ID');
   }
 
-  function loadAllCampaign() {
+  function loadAllCampaigns() {
     try {
       const saved = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
       if (saved) {
