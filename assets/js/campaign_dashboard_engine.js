@@ -129,7 +129,7 @@
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     return [
       { id: 1, uid: "UID-0001", username: "@aura.beauty", nama: "Aura Cantika", kategori1: "Fashion Muslim", pic1: "Setiawan", status: "Bind" },
@@ -199,19 +199,19 @@
     // Partition campaigns dynamically
     const scopedCampaigns = (isStaff && currentPic)
       ? allCampaigns.filter(function (c) {
-          return cleanKey(getCampaignPic(c)) === cleanKey(currentPic);
-        })
+        return cleanKey(getCampaignPic(c)) === cleanKey(currentPic);
+      })
       : allCampaigns;
 
     // Partition creators dynamically
     const scopedCreators = (isStaff && currentPic)
       ? allCreators.filter(function (cr) {
-          if (shared && typeof shared.isCreatorAllowedForPic === 'function') {
-            return shared.isCreatorAllowedForPic(cr, currentPic);
-          }
-          const p1 = cleanKey(cr.pic1 || cr.pic);
-          return p1 === cleanKey(currentPic);
-        })
+        if (shared && typeof shared.isCreatorAllowedForPic === 'function') {
+          return shared.isCreatorAllowedForPic(cr, currentPic);
+        }
+        const p1 = cleanKey(cr.pic1 || cr.pic);
+        return p1 === cleanKey(currentPic);
+      })
       : allCreators;
 
     // Aggregate statistics
@@ -472,9 +472,9 @@
         if (activeFilters.search) {
           const q = activeFilters.search.toLowerCase();
           const match = (item.idCampaign && item.idCampaign.toLowerCase().includes(q)) ||
-                        (item.brand && item.brand.toLowerCase().includes(q)) ||
-                        (item.pic && item.pic.toLowerCase().includes(q)) ||
-                        (item.kreator && item.kreator.toLowerCase().includes(q));
+            (item.brand && item.brand.toLowerCase().includes(q)) ||
+            (item.pic && item.pic.toLowerCase().includes(q)) ||
+            (item.kreator && item.kreator.toLowerCase().includes(q));
           if (!match) return false;
         }
         const itemPic = item.pic || getCampaignPic(item);
