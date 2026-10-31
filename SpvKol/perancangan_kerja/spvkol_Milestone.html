@@ -591,14 +591,13 @@
                   <div class="form-group">
                     <label class="form-label">PIC</label>
                     <div class="select-wrapper">
-                      <select class="form-select">
+                      <select class="form-select" id="filterMilestonePic">
                         <option value="" disabled selected hidden>Pilih PIC</option>
-                        <option value="Riva">Riva</option>
-                        <option value="Sri">Sri</option>
-                        <option value="Ahmad">Ahmad</option>
-                        <option value="Fauzi">Fauzi</option>
-                        <option value="Budi">Budi</option>
-                        <option value="Siti">Siti</option>
+                        <option value="Semua">Semua PIC</option>
+                        <option value="Setiawan">Setiawan (Fashion Muslim)</option>
+                        <option value="Amanda">Amanda (Beauty & Care)</option>
+                        <option value="Dimas">Dimas (Food & Beverage)</option>
+                        <option value="Clarissa">Clarissa (Mom & Baby)</option>
                       </select>
                     </div>
                   </div>
@@ -606,14 +605,14 @@
                   <div class="form-group">
                     <label class="form-label">Tim</label>
                     <div class="select-wrapper">
-                      <select class="form-select">
+                      <select class="form-select" id="filterMilestoneTim">
                         <option value="" disabled selected hidden>Pilih Tim</option>
-                        <option value="Riva">Riva</option>
-                        <option value="Sri">Sri</option>
-                        <option value="Ahmad">Ahmad</option>
-                        <option value="Fauzi">Fauzi</option>
-                        <option value="Budi">Budi</option>
-                        <option value="Siti">Siti</option>
+                        <option value="Semua">Semua Tim</option>
+                        <option value="Setiawan">Setiawan</option>
+                        <option value="Amanda">Amanda</option>
+                        <option value="Dimas">Dimas</option>
+                        <option value="Clarissa">Clarissa</option>
+                        <option value="Supervisi KOL">Supervisi KOL</option>
                       </select>
                     </div>
                   </div>
@@ -625,6 +624,16 @@
                 </form>
               </div>
             </div>
+
+            <button id="btnCalendarCampaign" class="small-action-button" type="button" aria-label="Pilih tanggal" title="Pilih Periode / Tanggal" style="margin-right: 6px;">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </button>
 
             <!-- Search Bar -->
             <label class="campaign-search">
@@ -956,6 +965,80 @@
     </div>
   </div>
 
+  <!-- Modal PopUp Kalender Milestone -->
+  <div id="calendarCampaignModal" class="modal-overlay">
+    <div class="modal-box modal-box--large" style="width: 820px; max-width: 95%;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 class="modal-title" style="font-weight: 700; font-size: 16px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+            <i class="bx bx-calendar" style="color: #0284c7; font-size: 20px;"></i>
+            Kalender &amp; Periode Milestone
+          </h2>
+          <p style="font-size: 12px; color: #64748b; margin-top: 2px;">Filter milestone berdasarkan minggu pelaksanaan atau rentang tanggal</p>
+        </div>
+        <button id="closeCalendarModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider" style="margin: 12px 0 16px;"></div>
+
+      <div class="calendar-picker-body">
+        <!-- Left: Quick Options tailored for Milestone -->
+        <div class="calendar-quick-options" style="width: 220px; border-right: 1px solid #e2e8f0; padding-right: 16px;">
+          <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Pilihan Cepat</div>
+          <button type="button" class="quick-option-btn is-active" data-period="all">Semua Periode</button>
+          <button type="button" class="quick-option-btn" data-period="month-current">Bulan Ini (Agustus 2026)</button>
+          <button type="button" class="quick-option-btn" data-period="week-1">Minggu ke 1 (01 - 07 Agu)</button>
+          <button type="button" class="quick-option-btn" data-period="week-2">Minggu ke 2 (08 - 14 Agu)</button>
+          <button type="button" class="quick-option-btn" data-period="week-3">Minggu ke 3 (15 - 21 Agu)</button>
+          <button type="button" class="quick-option-btn" data-period="week-4">Minggu ke 4 (22 - 28 Agu)</button>
+          <button type="button" class="quick-option-btn" data-period="month-next">Bulan Depan (September 2026)</button>
+        </div>
+
+        <!-- Right: Interactive Calendar View -->
+        <div class="calendar-months-container" style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Calendar Nav -->
+          <div class="calendar-month-header" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 10px 14px; border-radius: 6px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <button type="button" id="btnCalPrevYear" class="nav-arrow" title="Tahun Sebelumnya" style="border: none; background: none; font-size: 16px; cursor: pointer; padding: 2px 8px; border-radius: 4px;">&laquo;</button>
+              <button type="button" id="btnCalPrevMonth" class="nav-arrow" title="Bulan Sebelumnya" style="border: none; background: none; font-size: 16px; cursor: pointer; padding: 2px 8px; border-radius: 4px;">&lsaquo;</button>
+            </div>
+            <span class="month-title" id="calMonthTitle" style="font-size: 15px; font-weight: 700; color: #1e293b;">Agustus 2026</span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <button type="button" id="btnCalNextMonth" class="nav-arrow" title="Bulan Berikutnya" style="border: none; background: none; font-size: 16px; cursor: pointer; padding: 2px 8px; border-radius: 4px;">&rsaquo;</button>
+              <button type="button" id="btnCalNextYear" class="nav-arrow" title="Tahun Berikutnya" style="border: none; background: none; font-size: 16px; cursor: pointer; padding: 2px 8px; border-radius: 4px;">&raquo;</button>
+            </div>
+          </div>
+
+          <!-- Weekdays & Days -->
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px;">
+            <div class="calendar-weekdays" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; font-size: 11.5px; font-weight: 700; color: #64748b; margin-bottom: 6px;">
+              <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span style="color: #ef4444;">Sab</span><span style="color: #ef4444;">Min</span>
+            </div>
+            <div id="calendarDaysGrid" class="calendar-days" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Info hint -->
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: #64748b; background: #f0f9ff; border: 1px solid #e0f2fe; padding: 6px 12px; border-radius: 6px;">
+            <i class="bx bx-info-circle" style="color: #0284c7; font-size: 15px;"></i>
+            <span>Pilih Minggu di panel kiri, atau klik tanggal awal &amp; akhir pada kalender untuk rentang kustom.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar-picker-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 14px; border-top: 1px solid #e2e8f0;">
+        <div class="selected-range-info" style="font-size: 13px; color: #334155;">
+          Periode Terpilih: <span id="selectedRangeText" style="font-weight: 700; color: #0284c7;">Semua Periode</span>
+        </div>
+        <div class="calendar-footer-buttons" style="display: flex; gap: 8px;">
+          <button type="button" class="btn-calendar-cancel" id="btnCancelCalendar" style="padding: 8px 18px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; font-weight: 600; cursor: pointer;">Reset / Batal</button>
+          <button type="button" class="btn-calendar-apply" id="btnApplyCalendar" style="padding: 8px 22px; border-radius: 6px; border: none; background: #0284c7; color: #ffffff; font-weight: 700; cursor: pointer;">Terapkan Filter</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="../../assets/js/app.js"></script>
@@ -996,110 +1079,128 @@
         updateTimDropdownLabel();
       };
       /* Ã¢â€â‚¬Ã¢â€â‚¬ LocalStorage Persistence & Default Milestones Ã¢â€â‚¬Ã¢â€â‚¬ */
-      const MILESTONE_STORAGE_KEY = "bisa_milestone_data_v2";
-      const MILESTONE_RESET_KEY = "bisa_milestone_reset_v2";
+      const MILESTONE_STORAGE_KEY = "bisa_milestone_data_v3";
+      const MILESTONE_RESET_KEY = "bisa_milestone_reset_v3";
 
       const DEFAULT_MILESTONES = [
         {
-                "id": 1,
-                "title": "Kurasi & Screening 100 Database Kreator Hijab",
-                "week": "Minggu ke 1",
-                "progress": 100,
-                "status": "Selesai",
-                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
-                "output": "100 kreator fashion muslim terkurasi dengan engagement rate > 4.5%",
-                "pic": "Setiawan",
-                "tim": "Supervisi KOL, Setiawan"
+          "id": 1,
+          "title": "Kurasi & Screening 100 Database Kreator Hijab",
+          "week": "Minggu ke 1",
+          "progress": 100,
+          "status": "Selesai",
+          "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+          "output": "100 kreator fashion muslim terkurasi dengan engagement rate > 4.5%",
+          "pic": "Setiawan",
+          "tim": "Supervisi KOL, Setiawan",
+          "timelineMulai": "2026-08-01",
+          "timelineSelesai": "2026-08-07"
         },
         {
-                "id": 2,
-                "title": "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
-                "week": "Minggu ke 2",
-                "progress": 100,
-                "status": "Selesai",
-                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
-                "output": "50 kreator menandatangani MoU kerjasama affiliate",
-                "pic": "Setiawan",
-                "tim": "Setiawan, Amanda"
+          "id": 2,
+          "title": "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
+          "week": "Minggu ke 2",
+          "progress": 100,
+          "status": "Selesai",
+          "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+          "output": "50 kreator menandatangani MoU kerjasama affiliate",
+          "pic": "Setiawan",
+          "tim": "Setiawan, Amanda",
+          "timelineMulai": "2026-08-08",
+          "timelineSelesai": "2026-08-14"
         },
         {
-                "id": 3,
-                "title": "Distribusi Sample Produk & Briefing Live Streaming",
-                "week": "Minggu ke 3",
-                "progress": 40,
-                "status": "Berjalan",
-                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
-                "output": "Sample hijab terkirim dan jadwal live TikTok Shop tersusun",
-                "pic": "Setiawan",
-                "tim": "Setiawan, Amanda"
+          "id": 3,
+          "title": "Distribusi Sample Produk & Briefing Live Streaming",
+          "week": "Minggu ke 3",
+          "progress": 40,
+          "status": "Berjalan",
+          "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+          "output": "Sample hijab terkirim dan jadwal live TikTok Shop tersusun",
+          "pic": "Setiawan",
+          "tim": "Setiawan, Amanda",
+          "timelineMulai": "2026-08-15",
+          "timelineSelesai": "2026-08-21"
         },
         {
-                "id": 4,
-                "title": "Distribusi Sampel & Brief Konten Beauty",
-                "week": "Minggu ke 1",
-                "progress": 100,
-                "status": "Selesai",
-                "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
-                "output": "30 paket sampel skincare terkirim beserta brief konten",
-                "pic": "Amanda",
-                "tim": "Amanda"
+          "id": 4,
+          "title": "Distribusi Sampel & Brief Konten Beauty",
+          "week": "Minggu ke 1",
+          "progress": 100,
+          "status": "Selesai",
+          "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
+          "output": "30 paket sampel skincare terkirim beserta brief konten",
+          "pic": "Amanda",
+          "tim": "Amanda",
+          "timelineMulai": "2026-08-01",
+          "timelineSelesai": "2026-08-07"
         },
         {
-                "id": 5,
-                "title": "Review Draft Video & Quality Control",
-                "week": "Minggu ke 2",
-                "progress": 50,
-                "status": "Berjalan",
-                "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
-                "output": "15 draft video disetujui untuk penayangan",
-                "pic": "Amanda",
-                "tim": "Amanda, Clarissa"
+          "id": 5,
+          "title": "Review Draft Video & Quality Control",
+          "week": "Minggu ke 2",
+          "progress": 50,
+          "status": "Berjalan",
+          "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
+          "output": "15 draft video disetujui untuk penayangan",
+          "pic": "Amanda",
+          "tim": "Amanda, Clarissa",
+          "timelineMulai": "2026-08-08",
+          "timelineSelesai": "2026-08-14"
         },
         {
-                "id": 6,
-                "title": "Penjadwalan Kunjungan Food Vlogger",
-                "week": "Minggu ke 1",
-                "progress": 100,
-                "status": "Selesai",
-                "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
-                "output": "Jadwal kunjungan liputan 25 food vlogger terkonfirmasi",
-                "pic": "Dimas",
-                "tim": "Dimas"
+          "id": 6,
+          "title": "Penjadwalan Kunjungan Food Vlogger",
+          "week": "Minggu ke 1",
+          "progress": 100,
+          "status": "Selesai",
+          "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+          "output": "Jadwal kunjungan liputan 25 food vlogger terkonfirmasi",
+          "pic": "Dimas",
+          "tim": "Dimas",
+          "timelineMulai": "2026-08-01",
+          "timelineSelesai": "2026-08-07"
         },
         {
-                "id": 7,
-                "title": "Publikasi Konten Review Kuliner TikTok",
-                "week": "Minggu ke 2",
-                "progress": 30,
-                "status": "Berjalan",
-                "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
-                "output": "8 video review kuliner tayang di TikTok",
-                "pic": "Dimas",
-                "tim": "Dimas, Setiawan"
+          "id": 7,
+          "title": "Publikasi Konten Review Kuliner TikTok",
+          "week": "Minggu ke 2",
+          "progress": 30,
+          "status": "Berjalan",
+          "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+          "output": "8 video review kuliner tayang di TikTok",
+          "pic": "Dimas",
+          "tim": "Dimas, Setiawan",
+          "timelineMulai": "2026-08-08",
+          "timelineSelesai": "2026-08-14"
         },
         {
-                "id": 8,
-                "title": "Kurasi Mom Creator Komunitas Parenting",
-                "week": "Minggu ke 1",
-                "progress": 100,
-                "status": "Selesai",
-                "rrk": "Program Edukasi & Review Mom Influencer",
-                "output": "20 mom creator terkurasi dari komunitas",
-                "pic": "Clarissa",
-                "tim": "Clarissa"
+          "id": 8,
+          "title": "Kurasi Mom Creator Komunitas Parenting",
+          "week": "Minggu ke 1",
+          "progress": 100,
+          "status": "Selesai",
+          "rrk": "Program Edukasi & Review Mom Influencer",
+          "output": "20 mom creator terkurasi dari komunitas",
+          "pic": "Clarissa",
+          "tim": "Clarissa",
+          "timelineMulai": "2026-08-01",
+          "timelineSelesai": "2026-08-07"
         },
         {
-                "id": 9,
-                "title": "Penyusunan Script Konten Edukasi Parenting",
-                "week": "Minggu ke 2",
-                "progress": 40,
-                "status": "Berjalan",
-                "rrk": "Program Edukasi & Review Mom Influencer",
-                "output": "Draft panduan edukasi produk bayi rampung",
-                "pic": "Clarissa",
-                "tim": "Clarissa, Amanda"
+          "id": 9,
+          "title": "Penyusunan Script Konten Edukasi Parenting",
+          "week": "Minggu ke 2",
+          "progress": 40,
+          "status": "Berjalan",
+          "rrk": "Program Edukasi & Review Mom Influencer",
+          "output": "Draft panduan edukasi produk bayi rampung",
+          "pic": "Clarissa",
+          "tim": "Clarissa, Amanda",
+          "timelineMulai": "2026-08-08",
+          "timelineSelesai": "2026-08-14"
         }
-];
+      ];
 
       if (!localStorage.getItem(MILESTONE_RESET_KEY)) {
         try {
@@ -1142,7 +1243,7 @@
 
         let rrkList = [];
         try {
-          const savedRrk = localStorage.getItem("bisa_rrk_data_v2");
+          const savedRrk = localStorage.getItem("bisa_rrk_data_v3");
           if (savedRrk) {
             const parsed = JSON.parse(savedRrk);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -1211,18 +1312,125 @@
       const btnTambah = document.getElementById("btnTambahMilestone");
       const btnClose = document.getElementById("closeMilestoneModal");
 
+      /* ----------------- Filter & Calendar State ----------------- */
+      let currentFilterQuery = "";
+      let currentFilterPic = "";
+      let currentFilterTim = "";
+
+      let activeFilterPeriodType = "all";
+      let activeFilterStartDate = null;
+      let activeFilterEndDate = null;
+      let activeFilterLabel = "Semua Periode";
+
+      let calViewYear = 2026;
+      let calViewMonth = 7; // August (0-indexed)
+
+      let tempPeriodType = "all";
+      let tempStartDate = null;
+      let tempEndDate = null;
+      let tempLabel = "Semua Periode";
+      let dateClickStep = 0;
+
+      const monthNamesID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const monthNamesShortID = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+
+      function formatDateID(dateStr) {
+        if (!dateStr) return "-";
+        const parts = dateStr.split("-");
+        if (parts.length === 3) {
+          const d = parts[2];
+          const m = parseInt(parts[1], 10);
+          const y = parts[0];
+          return `${d} ${monthNamesShortID[m - 1]} ${y}`;
+        }
+        return dateStr;
+      }
+
+      function weekToDateRange(weekStr) {
+        const w = (weekStr || "").toLowerCase().replace("minggu ke", "").replace("minggu", "").trim();
+        if (w === "1") return { start: "2026-08-01", end: "2026-08-07" };
+        if (w === "2") return { start: "2026-08-08", end: "2026-08-14" };
+        if (w === "3") return { start: "2026-08-15", end: "2026-08-21" };
+        if (w === "4") return { start: "2026-08-22", end: "2026-08-28" };
+        return null;
+      }
+
+      function isMilestoneInActivePeriod(item) {
+        if (activeFilterPeriodType === "all") return true;
+
+        if (activeFilterPeriodType.startsWith("week-")) {
+          const weekNum = activeFilterPeriodType.replace("week-", "");
+          const itemWeekClean = (item.week || "").toLowerCase().replace("minggu ke", "").replace("minggu", "").trim();
+          if (itemWeekClean === weekNum) return true;
+        }
+
+        if (activeFilterStartDate && activeFilterEndDate) {
+          const itemStart = item.timelineMulai || (item.week && weekToDateRange(item.week)?.start);
+          const itemEnd = item.timelineSelesai || (item.week && weekToDateRange(item.week)?.end);
+
+          if (itemStart && itemEnd) {
+            return (itemStart <= activeFilterEndDate && itemEnd >= activeFilterStartDate);
+          }
+        }
+
+        return false;
+      }
+
       function renderCards() {
         if (!cardGrid) return;
         cardGrid.innerHTML = "";
-        milestoneData.forEach(item => {
+
+        const q = currentFilterQuery;
+        const selPic = currentFilterPic;
+        const selTim = currentFilterTim;
+
+        const filteredList = milestoneData.filter(item => {
+          const matchQuery = !q ||
+            (item.title && item.title.toLowerCase().includes(q)) ||
+            (item.rrk && item.rrk.toLowerCase().includes(q)) ||
+            (item.output && item.output.toLowerCase().includes(q)) ||
+            (item.pic && item.pic.toLowerCase().includes(q));
+
+          const matchPic = !selPic || selPic === "Semua" ||
+            (item.pic && item.pic.toLowerCase() === selPic.toLowerCase());
+
+          const matchTim = !selTim || selTim === "Semua" ||
+            (item.tim && item.tim.toLowerCase().includes(selTim.toLowerCase()));
+
+          const matchPeriod = isMilestoneInActivePeriod(item);
+
+          return matchQuery && matchPic && matchTim && matchPeriod;
+        });
+
+        if (filteredList.length === 0) {
+          const emptyDiv = document.createElement("div");
+          emptyDiv.style.cssText = "grid-column: 1 / -1; text-align: center; padding: 48px 20px; background: #fff; border: 1px dashed #cbd5e1; border-radius: 8px;";
+          emptyDiv.innerHTML = `
+            <i class="bx bx-calendar-x" style="font-size: 42px; color: #94a3b8; display: block; margin-bottom: 8px;"></i>
+            <div style="font-size: 14px; font-weight: 700; color: #334155; margin-bottom: 4px;">Tidak Ada Milestone Pada Filter Ini</div>
+            <div style="font-size: 12px; color: #64748b; margin-bottom: 14px;">Tidak ditemukan milestone yang cocok dengan filter atau periode <strong>${activeFilterLabel}</strong>.</div>
+            <button type="button" onclick="window.resetAllMilestoneFilters()" style="display: inline-flex; align-items: center; gap: 6px; background: #0284c7; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='#0369a1';" onmouseout="this.style.background='#0284c7';">
+              <i class="bx bx-reset"></i> Reset Semua Filter
+            </button>
+          `;
+          cardGrid.appendChild(emptyDiv);
+          updateMilestoneCounts(filteredList);
+          return;
+        }
+
+        filteredList.forEach(item => {
           const card = document.createElement("div");
           card.className = "milestone-card";
           card.style.cursor = "pointer";
 
+          const dateRangeHint = (item.timelineMulai && item.timelineSelesai)
+            ? `${formatDateID(item.timelineMulai)} - ${formatDateID(item.timelineSelesai)}`
+            : item.week;
+
           card.innerHTML = `
             <div class="milestone-card__header">
               <h3 class="milestone-card__title">${item.title}</h3>
-              <span class="milestone-card__week">${item.week}</span>
+              <span class="milestone-card__week" title="Periode: ${dateRangeHint}">${item.week}</span>
             </div>
 
             <div class="milestone-card__progress-container">
@@ -1256,7 +1464,13 @@
             </div>
 
             <div class="milestone-card__footer" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-              <span class="milestone-card__status" style="background: ${item.status === 'Selesai' ? '#00e676' : (item.status === 'Berjalan' ? '#2264c6' : '#8c8c8c')};">${item.status}</span>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span class="milestone-card__status" style="background: ${item.status === 'Selesai' ? '#00e676' : (item.status === 'Berjalan' ? '#2264c6' : '#8c8c8c')};">${item.status}</span>
+                <span class="milestone-card__pic-badge" style="display: inline-flex; align-items: center; gap: 4px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: 11px; font-weight: 600; padding: 2.5px 8px; border-radius: 4px;" title="PIC: ${item.pic || '-'}">
+                  <i class="bx bx-user" style="font-size: 12px; color: #2563eb;"></i>
+                  <span>PIC: ${item.pic || "-"}</span>
+                </span>
+              </div>
               <div style="display: flex; align-items: center; gap: 6px;">
                 <button type="button" class="btn-card-action" onclick="event.stopPropagation(); window.openEditMilestone(${item.id});" title="Edit Milestone" style="border: 1px solid #cbd5e1; background: #fff; color: #0284c7; width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease;">
                   <i class="bx bx-edit-alt" style="font-size: 15px;"></i>
@@ -1275,7 +1489,354 @@
           cardGrid.appendChild(card);
         });
 
-        updateMilestoneCounts();
+        updateMilestoneCounts(filteredList);
+      }
+
+      window.resetAllMilestoneFilters = function() {
+        currentFilterQuery = "";
+        currentFilterPic = "";
+        currentFilterTim = "";
+        activeFilterPeriodType = "all";
+        activeFilterStartDate = null;
+        activeFilterEndDate = null;
+        activeFilterLabel = "Semua Periode";
+        tempPeriodType = "all";
+        tempStartDate = null;
+        tempEndDate = null;
+        tempLabel = "Semua Periode";
+        const searchInput = document.querySelector(".campaign-search input");
+        if (searchInput) searchInput.value = "";
+        updateCalendarBtnState();
+        renderCards();
+        showToastNotification("Semua filter milestone berhasil direset");
+      };
+
+      /* ----------------- Calendar Picker Implementation ----------------- */
+      const calendarModal = document.getElementById("calendarCampaignModal");
+      const btnCalendar = document.getElementById("btnCalendarCampaign");
+      const closeCalendar = document.getElementById("closeCalendarModal");
+      const btnCancelCal = document.getElementById("btnCancelCalendar");
+      const btnApplyCal = document.getElementById("btnApplyCalendar");
+      const calMonthTitle = document.getElementById("calMonthTitle");
+      const calendarDaysGrid = document.getElementById("calendarDaysGrid");
+      const selectedRangeText = document.getElementById("selectedRangeText");
+
+      function showToastNotification(message) {
+        const toast = document.getElementById("toast");
+        if (toast) {
+          toast.textContent = message;
+          toast.classList.add("toast--show");
+          setTimeout(() => toast.classList.remove("toast--show"), 3000);
+        } else if (window.ceoToast) {
+          window.ceoToast(message, "info");
+        }
+      }
+
+      function updateCalendarBtnState() {
+        if (!btnCalendar) return;
+        const isActive = activeFilterPeriodType !== "all";
+        btnCalendar.classList.toggle("btn-calendar-active", isActive);
+        if (isActive) {
+          btnCalendar.setAttribute("title", "Periode Aktif: " + activeFilterLabel + " (Klik untuk ubah/reset)");
+          btnCalendar.setAttribute("aria-label", "Periode Aktif: " + activeFilterLabel);
+          btnCalendar.style.background = "#e0f2fe";
+          btnCalendar.style.borderColor = "#38bdf8";
+          btnCalendar.style.color = "#0284c7";
+        } else {
+          btnCalendar.setAttribute("title", "Pilih Periode / Tanggal");
+          btnCalendar.setAttribute("aria-label", "Pilih Periode / Tanggal");
+          btnCalendar.style.background = "";
+          btnCalendar.style.borderColor = "";
+          btnCalendar.style.color = "";
+        }
+      }
+
+      function renderCalendarDaysGrid() {
+        if (!calendarDaysGrid || !calMonthTitle) return;
+        calMonthTitle.textContent = `${monthNamesID[calViewMonth]} ${calViewYear}`;
+
+        const firstDayIdx = (new Date(calViewYear, calViewMonth, 1).getDay() + 6) % 7;
+        const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+        const daysInPrevMonth = new Date(calViewYear, calViewMonth, 0).getDate();
+
+        calendarDaysGrid.innerHTML = "";
+
+        // Prev month overflow
+        for (let i = firstDayIdx - 1; i >= 0; i--) {
+          const span = document.createElement("span");
+          span.className = "day-muted";
+          span.textContent = daysInPrevMonth - i;
+          calendarDaysGrid.appendChild(span);
+        }
+
+        // Current month days
+        for (let d = 1; d <= daysInMonth; d++) {
+          const span = document.createElement("span");
+          const mStr = String(calViewMonth + 1).padStart(2, "0");
+          const dStr = String(d).padStart(2, "0");
+          const fullDate = `${calViewYear}-${mStr}-${dStr}`;
+          span.setAttribute("data-date", fullDate);
+          span.textContent = d;
+
+          let isStart = tempStartDate && fullDate === tempStartDate;
+          let isEnd = tempEndDate && fullDate === tempEndDate;
+          let inRange = tempStartDate && tempEndDate && fullDate > tempStartDate && fullDate < tempEndDate;
+
+          if (isStart && isEnd) {
+            span.className = "day-active selected-start selected-end";
+          } else if (isStart) {
+            span.className = "day-active selected-start";
+          } else if (isEnd) {
+            span.className = "day-active selected-end";
+          } else if (inRange) {
+            span.className = "day-selected-range";
+          }
+
+          span.addEventListener("click", () => {
+            onCalendarDayClick(fullDate);
+          });
+
+          calendarDaysGrid.appendChild(span);
+        }
+
+        // Next month overflow
+        const totalRendered = firstDayIdx + daysInMonth;
+        const remaining = (7 - (totalRendered % 7)) % 7;
+        for (let n = 1; n <= remaining; n++) {
+          const span = document.createElement("span");
+          span.className = "day-muted";
+          span.textContent = n;
+          calendarDaysGrid.appendChild(span);
+        }
+
+        if (selectedRangeText) {
+          selectedRangeText.textContent = tempLabel;
+        }
+
+        // Update quick option button active class
+        document.querySelectorAll(".calendar-quick-options .quick-option-btn").forEach(btn => {
+          btn.classList.toggle("is-active", btn.getAttribute("data-period") === tempPeriodType);
+        });
+      }
+
+      function onCalendarDayClick(dateStr) {
+        if (dateClickStep === 0) {
+          tempStartDate = dateStr;
+          tempEndDate = dateStr;
+          tempPeriodType = "custom";
+          tempLabel = formatDateID(dateStr);
+          dateClickStep = 1;
+        } else {
+          if (dateStr < tempStartDate) {
+            tempEndDate = tempStartDate;
+            tempStartDate = dateStr;
+          } else {
+            tempEndDate = dateStr;
+          }
+          tempPeriodType = "custom";
+          tempLabel = `${formatDateID(tempStartDate)} - ${formatDateID(tempEndDate)}`;
+          dateClickStep = 0;
+        }
+        renderCalendarDaysGrid();
+      }
+
+      function setQuickPeriod(type) {
+        tempPeriodType = type;
+        dateClickStep = 0;
+
+        if (type === "all") {
+          tempStartDate = null;
+          tempEndDate = null;
+          tempLabel = "Semua Periode";
+        } else if (type === "month-current") {
+          calViewYear = 2026;
+          calViewMonth = 7;
+          tempStartDate = "2026-08-01";
+          tempEndDate = "2026-08-31";
+          tempLabel = "Bulan Agustus 2026";
+        } else if (type === "week-1") {
+          calViewYear = 2026;
+          calViewMonth = 7;
+          tempStartDate = "2026-08-01";
+          tempEndDate = "2026-08-07";
+          tempLabel = "Minggu ke 1 (01 - 07 Agu 2026)";
+        } else if (type === "week-2") {
+          calViewYear = 2026;
+          calViewMonth = 7;
+          tempStartDate = "2026-08-08";
+          tempEndDate = "2026-08-14";
+          tempLabel = "Minggu ke 2 (08 - 14 Agu 2026)";
+        } else if (type === "week-3") {
+          calViewYear = 2026;
+          calViewMonth = 7;
+          tempStartDate = "2026-08-15";
+          tempEndDate = "2026-08-21";
+          tempLabel = "Minggu ke 3 (15 - 21 Agu 2026)";
+        } else if (type === "week-4") {
+          calViewYear = 2026;
+          calViewMonth = 7;
+          tempStartDate = "2026-08-22";
+          tempEndDate = "2026-08-28";
+          tempLabel = "Minggu ke 4 (22 - 28 Agu 2026)";
+        } else if (type === "month-next") {
+          calViewYear = 2026;
+          calViewMonth = 8;
+          tempStartDate = "2026-09-01";
+          tempEndDate = "2026-09-30";
+          tempLabel = "Bulan September 2026";
+        }
+        renderCalendarDaysGrid();
+      }
+
+      function openMilestoneCalendar() {
+        tempPeriodType = activeFilterPeriodType;
+        tempStartDate = activeFilterStartDate;
+        tempEndDate = activeFilterEndDate;
+        tempLabel = activeFilterLabel;
+        dateClickStep = 0;
+
+        if (tempStartDate) {
+          const parts = tempStartDate.split("-");
+          calViewYear = parseInt(parts[0], 10);
+          calViewMonth = parseInt(parts[1], 10) - 1;
+        } else {
+          calViewYear = 2026;
+          calViewMonth = 7;
+        }
+
+        renderCalendarDaysGrid();
+        if (calendarModal) calendarModal.classList.add("is-active");
+      }
+
+      function closeMilestoneCalendar() {
+        if (calendarModal) calendarModal.classList.remove("is-active");
+      }
+
+      // Event Listeners for Calendar Modal
+      if (btnCalendar) {
+        btnCalendar.addEventListener("click", openMilestoneCalendar);
+      }
+      if (closeCalendar) {
+        closeCalendar.addEventListener("click", closeMilestoneCalendar);
+      }
+      if (calendarModal) {
+        calendarModal.addEventListener("click", (e) => {
+          if (e.target === calendarModal) closeMilestoneCalendar();
+        });
+      }
+
+      // Quick options click handlers
+      document.querySelectorAll(".calendar-quick-options .quick-option-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const p = btn.getAttribute("data-period");
+          setQuickPeriod(p);
+        });
+      });
+
+      // Calendar month/year navigation
+      const btnCalPrevMonth = document.getElementById("btnCalPrevMonth");
+      const btnCalNextMonth = document.getElementById("btnCalNextMonth");
+      const btnCalPrevYear = document.getElementById("btnCalPrevYear");
+      const btnCalNextYear = document.getElementById("btnCalNextYear");
+
+      if (btnCalPrevMonth) {
+        btnCalPrevMonth.addEventListener("click", () => {
+          calViewMonth--;
+          if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+          renderCalendarDaysGrid();
+        });
+      }
+      if (btnCalNextMonth) {
+        btnCalNextMonth.addEventListener("click", () => {
+          calViewMonth++;
+          if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+          renderCalendarDaysGrid();
+        });
+      }
+      if (btnCalPrevYear) {
+        btnCalPrevYear.addEventListener("click", () => {
+          calViewYear--;
+          renderCalendarDaysGrid();
+        });
+      }
+      if (btnCalNextYear) {
+        btnCalNextYear.addEventListener("click", () => {
+          calViewYear++;
+          renderCalendarDaysGrid();
+        });
+      }
+
+      // Apply & Cancel buttons
+      if (btnApplyCal) {
+        btnApplyCal.addEventListener("click", () => {
+          activeFilterPeriodType = tempPeriodType;
+          activeFilterStartDate = tempStartDate;
+          activeFilterEndDate = tempEndDate;
+          activeFilterLabel = tempLabel;
+
+          updateCalendarBtnState();
+          renderCards();
+          closeMilestoneCalendar();
+
+          const toastMsg = activeFilterPeriodType === "all"
+            ? "Filter periode dibersihkan"
+            : `Filter periode diterapkan: ${activeFilterLabel}`;
+          showToastNotification(toastMsg);
+        });
+      }
+
+      if (btnCancelCal) {
+        btnCancelCal.addEventListener("click", () => {
+          const wasActive = activeFilterPeriodType !== "all";
+          activeFilterPeriodType = "all";
+          activeFilterStartDate = null;
+          activeFilterEndDate = null;
+          activeFilterLabel = "Semua Periode";
+          tempPeriodType = "all";
+          tempStartDate = null;
+          tempEndDate = null;
+          tempLabel = "Semua Periode";
+
+          updateCalendarBtnState();
+          renderCards();
+          closeMilestoneCalendar();
+
+          if (wasActive) {
+            showToastNotification("Filter periode dibersihkan");
+          }
+        });
+      }
+
+      // Search input event
+      const searchInput = document.querySelector(".campaign-search input");
+      if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+          currentFilterQuery = e.target.value.trim().toLowerCase();
+          renderCards();
+        });
+      }
+
+      // Filter Form (PIC / Tim) event
+      const filterCampaignForm = document.getElementById("filterCampaignForm");
+      if (filterCampaignForm) {
+        filterCampaignForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const picEl = document.getElementById("filterMilestonePic");
+          const timEl = document.getElementById("filterMilestoneTim");
+          currentFilterPic = picEl ? picEl.value : "";
+          currentFilterTim = timEl ? timEl.value : "";
+          renderCards();
+          document.getElementById("filterCampaignDropdown")?.classList.remove("is-active");
+        });
+
+        filterCampaignForm.addEventListener("reset", () => {
+          setTimeout(() => {
+            currentFilterPic = "";
+            currentFilterTim = "";
+            renderCards();
+            document.getElementById("filterCampaignDropdown")?.classList.remove("is-active");
+          }, 50);
+        });
       }
 
       let currentDetailMilestone = null;
@@ -1355,7 +1916,7 @@
         // Load tasks dynamically from Tugas module (localStorage)
         let allTasks = [];
         try {
-          const savedTasks = localStorage.getItem("bisa_tugas_data_v1");
+          const savedTasks = localStorage.getItem("bisa_tugas_data_v3");
           if (savedTasks) allTasks = JSON.parse(savedTasks);
         } catch (e) {
           console.error("Error reading tasks for Milestone:", e);
