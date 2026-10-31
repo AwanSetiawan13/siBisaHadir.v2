@@ -431,6 +431,28 @@
         margin: 2px 0 4px 0;
       }
 
+      /* Topbar User Profile Dropdown Display Guarantee */
+      .topbar-user-dropdown-wrap {
+        position: relative !important;
+        z-index: 1001 !important;
+      }
+      .hirezy-user-pill {
+        cursor: pointer !important;
+      }
+      .topbar-user-dropdown-wrap.is-open .user-menu-dropdown,
+      .user-menu-dropdown.is-open,
+      .user-menu-dropdown.show {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+      }
+      .topbar-user-dropdown-wrap.is-open .hirezy-chevron-down,
+      .hirezy-user-pill[aria-expanded="true"] .hirezy-chevron-down {
+        transform: rotate(180deg) !important;
+      }
+
       /* Hover Header Grup */
       .app-group-header:hover {
         background-color: #f8fafc;
@@ -1459,7 +1481,7 @@
 
         <!-- User Profile Pill & Dropdown -->
         <div class="topbar-user-dropdown-wrap" style="position: relative;">
-          <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false">
+          <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false" onclick="window.__toggleHirezyUserDropdown(event)">
             <div class="hirezy-avatar-box">
               <img src="${currentAvatar}" alt="${currentUserName}" class="hirezy-avatar-img" data-ceo-avatar=""
                 onerror="this.src='${rootPrefix}media/avatar.png'" />
@@ -1599,7 +1621,7 @@
 
         <!-- User Profile Pill & Dropdown -->
         <div class="topbar-user-dropdown-wrap">
-          <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+          <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna" onclick="window.__toggleHirezyUserDropdown(event)">
             <div class="hirezy-avatar-box">
               <img src="${currentAvatar}" alt="${currentUserName}" class="hirezy-avatar-img" data-ceo-avatar="" onerror="this.src='${rootPrefix}media/avatar.png'" />
             </div>
@@ -1772,14 +1794,51 @@
   });
 
   // 8. Topbar Dropdowns Toggle (Chat, Notification, & User Profile)
+  window.__toggleHirezyUserDropdown = function (event, forceOpen) {
+    if (event) {
+      if (typeof event.preventDefault === 'function') event.preventDefault();
+      if (typeof event.stopPropagation === 'function') event.stopPropagation();
+    }
+    const userBtn = document.getElementById('userMenuButton') || document.querySelector('.hirezy-user-pill');
+    const wrap = userBtn ? userBtn.closest('.topbar-user-dropdown-wrap') : document.querySelector('.topbar-user-dropdown-wrap');
+    const userDrop = document.getElementById('userMenuDropdown') || (wrap ? wrap.querySelector('.user-menu-dropdown') : null);
+    if (!userDrop) return;
+
+    const isOpen = userDrop.classList.contains('is-open') || (wrap && wrap.classList.contains('is-open'));
+    const shouldOpen = (forceOpen !== undefined) ? forceOpen : !isOpen;
+
+    // Close any other open dropdowns first
+    const chatDrop = document.getElementById('chatMenuDropdown');
+    if (chatDrop) {
+      chatDrop.classList.remove('is-open', 'show');
+      chatDrop.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.remove('is-open');
+      document.getElementById('chatMenuButton')?.setAttribute('aria-expanded', 'false');
+    }
+    const notifDrop = document.getElementById('notifMenuDropdown');
+    if (notifDrop) {
+      notifDrop.classList.remove('is-open', 'show');
+      notifDrop.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.remove('is-open');
+      document.getElementById('notifMenuButton')?.setAttribute('aria-expanded', 'false');
+    }
+
+    if (shouldOpen) {
+      userDrop.classList.add('is-open', 'show');
+      if (wrap) wrap.classList.add('is-open');
+      if (userBtn) userBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      userDrop.classList.remove('is-open', 'show');
+      if (wrap) wrap.classList.remove('is-open');
+      if (userBtn) userBtn.setAttribute('aria-expanded', 'false');
+    }
+  };
+
   document.addEventListener('click', function (e) {
     const chatBtn = e.target.closest('#chatMenuButton');
     const notifBtn = e.target.closest('#notifMenuButton');
-    const userBtn = e.target.closest('#userMenuButton');
+    const userBtn = e.target.closest('#userMenuButton, .hirezy-user-pill');
 
     const chatDrop = document.getElementById('chatMenuDropdown');
     const notifDrop = document.getElementById('notifMenuDropdown');
-    const userDrop = document.getElementById('userMenuDropdown');
 
     if (chatBtn && chatDrop) {
       e.preventDefault();
@@ -1787,8 +1846,13 @@
       const isOpen = chatDrop.classList.toggle('is-open');
       chatDrop.classList.toggle('show', isOpen);
       chatBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      if (notifDrop) { notifDrop.classList.remove('is-open', 'show'); document.getElementById('notifMenuButton')?.setAttribute('aria-expanded', 'false'); }
-      if (userDrop) { userDrop.classList.remove('is-open', 'show'); document.getElementById('userMenuButton')?.setAttribute('aria-expanded', 'false'); }
+      chatBtn.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.toggle('is-open', isOpen);
+      if (notifDrop) {
+        notifDrop.classList.remove('is-open', 'show');
+        notifDrop.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.remove('is-open');
+        document.getElementById('notifMenuButton')?.setAttribute('aria-expanded', 'false');
+      }
+      window.__toggleHirezyUserDropdown(null, false);
       return;
     }
 
@@ -1799,34 +1863,40 @@
       const isOpen = notifDrop.classList.toggle('is-open');
       notifDrop.classList.toggle('show', isOpen);
       notifBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      if (chatDrop) { chatDrop.classList.remove('is-open', 'show'); document.getElementById('chatMenuButton')?.setAttribute('aria-expanded', 'false'); }
-      if (userDrop) { userDrop.classList.remove('is-open', 'show'); document.getElementById('userMenuButton')?.setAttribute('aria-expanded', 'false'); }
+      notifBtn.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.toggle('is-open', isOpen);
+      if (chatDrop) {
+        chatDrop.classList.remove('is-open', 'show');
+        chatDrop.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.remove('is-open');
+        document.getElementById('chatMenuButton')?.setAttribute('aria-expanded', 'false');
+      }
+      window.__toggleHirezyUserDropdown(null, false);
       return;
     }
 
-    if (userBtn && userDrop) {
-      e.preventDefault();
-      e.stopPropagation();
-      const isOpen = userDrop.classList.toggle('is-open');
-      userDrop.classList.toggle('show', isOpen);
-      userBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      if (chatDrop) { chatDrop.classList.remove('is-open', 'show'); document.getElementById('chatMenuButton')?.setAttribute('aria-expanded', 'false'); }
-      if (notifDrop) { notifDrop.classList.remove('is-open', 'show'); document.getElementById('notifMenuButton')?.setAttribute('aria-expanded', 'false'); }
+    if (userBtn) {
+      window.__toggleHirezyUserDropdown(e);
       return;
     }
 
     // Close all dropdowns if clicking outside
-    if (!e.target.closest('#chatMenuDropdown') && chatDrop) {
+    if (!e.target.closest('#chatMenuDropdown') && !e.target.closest('#chatMenuButton') && chatDrop) {
       chatDrop.classList.remove('is-open', 'show');
+      chatDrop.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.remove('is-open');
       document.getElementById('chatMenuButton')?.setAttribute('aria-expanded', 'false');
     }
-    if (!e.target.closest('#notifMenuDropdown') && notifDrop) {
+    if (!e.target.closest('#notifMenuDropdown') && !e.target.closest('#notifMenuButton') && notifDrop) {
       notifDrop.classList.remove('is-open', 'show');
+      notifDrop.closest('.topbar-user-dropdown-wrap, .topbar-dropdown-wrap')?.classList.remove('is-open');
       document.getElementById('notifMenuButton')?.setAttribute('aria-expanded', 'false');
     }
-    if (!e.target.closest('#userMenuDropdown') && userDrop) {
-      userDrop.classList.remove('is-open', 'show');
-      document.getElementById('userMenuButton')?.setAttribute('aria-expanded', 'false');
+    if (!e.target.closest('#userMenuDropdown') && !e.target.closest('#userMenuButton') && !e.target.closest('.hirezy-user-pill')) {
+      window.__toggleHirezyUserDropdown(null, false);
+    }
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      window.__toggleHirezyUserDropdown(null, false);
     }
   });
 

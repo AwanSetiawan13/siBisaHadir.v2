@@ -440,8 +440,10 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      flex: 1;
-      max-width: 340px;
+      width: 320px;
+      min-width: 280px;
+      flex: 0 0 320px;
+      flex-shrink: 0;
       background: #fff;
       border: 1.5px solid #e2e8f0;
       border-radius: 8px;
@@ -466,21 +468,23 @@
     }
 
     .kreator-hasil-filter-wrap {
-      display: flex;
+      display: none;
       align-items: center;
       gap: 8px;
-      font-size: 13px;
+      font-size: 12.5px;
       color: #64748b;
       font-weight: 500;
       font-family: 'Outfit', sans-serif;
-      margin-left: auto;
+      padding: 0 18px 12px 18px;
+      background: #fff;
       flex-wrap: wrap;
-      justify-content: flex-end;
+      justify-content: flex-start;
     }
 
     .kreator-hasil-filter-label {
       font-weight: 600;
       color: #475569;
+      white-space: nowrap;
     }
 
     .kreator-filter-tag {
@@ -1937,12 +1941,12 @@
                     <input type="text" id="searchKreatorInput" class="kreator-search-input" placeholder="Cari" autocomplete="off" />
                   </div>
                 </div>
+              </div>
 
-                <!-- Right Side: Hasil Filter -->
-                <div class="kreator-hasil-filter-wrap" id="kreatorHasilFilterWrap">
-                  <span class="kreator-hasil-filter-label" id="kreatorHasilFilterLabel">Hasil Filter</span>
-                  <div id="kreatorActiveFilterChips" style="display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap;"></div>
-                </div>
+              <!-- Hasil Filter: Ditampilkan di bawah bar pencarian -->
+              <div class="kreator-hasil-filter-wrap" id="kreatorHasilFilterWrap" style="display: none;">
+                <span class="kreator-hasil-filter-label" id="kreatorHasilFilterLabel">Hasil Filter:</span>
+                <div id="kreatorActiveFilterChips" style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;"></div>
               </div>
 
               <!-- Dropdown Table Pilihan Kreator (Mockup Gambar 1) -->
@@ -4107,6 +4111,7 @@
         if (!kreatorActiveFilterChips) return;
         kreatorActiveFilterChips.innerHTML = "";
         const totalFilters = selectedFilterCategories.size + selectedFilterRiwayat.size;
+        const hasilFilterWrap = document.getElementById("kreatorHasilFilterWrap");
 
         if (kreatorFilterCountBadge) {
           if (totalFilters > 0) {
@@ -4117,6 +4122,10 @@
             kreatorFilterCountBadge.style.display = "none";
             if (btnToggleFilterKreator) btnToggleFilterKreator.classList.remove("is-active");
           }
+        }
+
+        if (hasilFilterWrap) {
+          hasilFilterWrap.style.display = totalFilters > 0 ? "flex" : "none";
         }
 
         if (totalFilters === 0) {
@@ -4134,13 +4143,17 @@
             <span>${cat}</span>
             <span class="kreator-filter-tag-close" title="Hapus filter">&times;</span>
           `;
-          chip.querySelector(".kreator-filter-tag-close").addEventListener("click", () => {
+          chip.querySelector(".kreator-filter-tag-close").addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
             selectedFilterCategories.delete(cat);
             currentKreatorPage = 1;
             populateCategoryFilterOptions(filterKatSearchInput ? filterKatSearchInput.value : "");
             updateHasilFilterDisplay();
             renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
+            openKreatorDropdownTable();
           });
+          chip.addEventListener("click", (e) => e.stopPropagation());
           kreatorActiveFilterChips.appendChild(chip);
         });
 
@@ -4154,7 +4167,9 @@
             <span>${rw}</span>
             <span class="kreator-filter-tag-close" title="Hapus filter">&times;</span>
           `;
-          chip.querySelector(".kreator-filter-tag-close").addEventListener("click", () => {
+          chip.querySelector(".kreator-filter-tag-close").addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
             selectedFilterRiwayat.delete(rw);
             currentKreatorPage = 1;
             if (filterRiwayatOptionsList) {
@@ -4163,9 +4178,16 @@
             }
             updateHasilFilterDisplay();
             renderKreatorTableRows(searchKreatorInput ? searchKreatorInput.value : "");
+            openKreatorDropdownTable();
           });
+          chip.addEventListener("click", (e) => e.stopPropagation());
           kreatorActiveFilterChips.appendChild(chip);
         });
+      }
+
+      const kreatorHasilFilterWrapEl = document.getElementById("kreatorHasilFilterWrap");
+      if (kreatorHasilFilterWrapEl) {
+        kreatorHasilFilterWrapEl.addEventListener("click", (e) => e.stopPropagation());
       }
 
       // Search input live filtering & trigger open
@@ -4783,6 +4805,7 @@
       }
 
       document.addEventListener("click", (e) => {
+        if (!document.body.contains(e.target)) return;
         if (kreatorFilterPopover && !kreatorFilterPopover.contains(e.target) && (!btnToggleFilterKreator || !btnToggleFilterKreator.contains(e.target))) {
           closeKreatorFilterPopover();
         }
@@ -6218,25 +6241,29 @@
 
       let campaignDb = DEFAULT_CAMPAIGN;
 
-      try {
-        const saved = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            campaignDb = parsed.map(c => ({
-              ...c,
-              kreator: String(c.kreator || "").replace(/@/g, ""),
-              riwayatPerubahan: Array.isArray(c.riwayatPerubahan) ? c.riwayatPerubahan : []
-            }));
-          } else if (Array.isArray(parsed) && parsed.length === 0) {
-            campaignDb = [];
+      function reloadCampaignDb() {
+        try {
+          const saved = localStorage.getItem(CAMPAIGN_STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              campaignDb = parsed.map(c => ({
+                ...c,
+                kreator: String(c.kreator || "").replace(/@/g, ""),
+                riwayatPerubahan: Array.isArray(c.riwayatPerubahan) ? c.riwayatPerubahan : []
+              }));
+            } else if (Array.isArray(parsed) && parsed.length === 0) {
+              campaignDb = [];
+            }
+          } else {
+            campaignDb = DEFAULT_CAMPAIGN;
+            localStorage.setItem(CAMPAIGN_STORAGE_KEY, JSON.stringify(DEFAULT_CAMPAIGN));
           }
-        } else {
-          localStorage.setItem(CAMPAIGN_STORAGE_KEY, JSON.stringify(DEFAULT_CAMPAIGN));
+        } catch (err) {
+          campaignDb = DEFAULT_CAMPAIGN;
         }
-      } catch (err) {
-        campaignDb = DEFAULT_CAMPAIGN;
       }
+      reloadCampaignDb();
 
       function saveCampaignDb() {
         try {
@@ -6630,7 +6657,17 @@
         }
       }
 
+      function handleDataUpdate() {
+        reloadCampaignDb();
+        renderCampaignTable();
+        updateCampaignOverview();
+        refreshBrandAndSampleData();
+      }
+
       window.addEventListener("storage", (e) => {
+        if (!e.key || e.key === CAMPAIGN_STORAGE_KEY || e.key === 'user_pic' || e.key === 'user_name' || e.key.includes("kreator")) {
+          handleDataUpdate();
+        }
         if (e.key && e.key.includes("brand")) {
           refreshBrandAndSampleData();
           if (campaignBrandSelect && campaignBrandSelect.value) {
@@ -6638,17 +6675,11 @@
           }
         }
       });
-      window.addEventListener("focus", () => {
-        refreshBrandAndSampleData();
-      });
-      window.addEventListener("pageshow", () => {
-        refreshBrandAndSampleData();
-      });
-      window.addEventListener("bisa-brand-updated", () => {
-        refreshBrandAndSampleData();
-      });
+      window.addEventListener("focus", handleDataUpdate);
+      window.addEventListener("pageshow", handleDataUpdate);
+      window.addEventListener("bisa-brand-updated", handleDataUpdate);
       document.addEventListener("visibilitychange", () => {
-        if (!document.hidden) refreshBrandAndSampleData();
+        if (!document.hidden) handleDataUpdate();
       });
 
       const openModalBtn = document.querySelector(".btn-tambah");
@@ -8446,7 +8477,7 @@
 
     })();
   </script>
-  <script src="../../assets/js/layout.js?v=1004"></script>
+  <script src="../../assets/js/layout.js?v=1007"></script>
 </body>
 
 </html>

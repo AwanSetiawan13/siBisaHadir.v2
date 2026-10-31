@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -1179,7 +1179,8 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="../../assets/js/app.js"></script>
-  <script src="../../assets/js/layout.js?v=1004"></script>
+  <script src="../../assets/js/campaign_pic_shared.js"></script>
+  <script src="../../assets/js/layout.js?v=1007"></script>
   <script>
     (function () {
       const PERFORMA_STORAGE_KEY = "bisa_performa_kreator_list_v7";
@@ -1262,6 +1263,105 @@
           videos: "12",
           partner_gmv: "Rp 21.000.000",
           partner_orders: "350"
+        },
+        {
+          id: 3,
+          tanggal: "19/05/2026",
+          uid: "UID-0003",
+          username: "@jualan.berkah",
+          followers: "120.000",
+          gmv: "Rp 95.000.000",
+          pesanan: "2.150",
+          live_gmv: "Rp 68.000.000",
+          video_gmv: "Rp 27.000.000",
+          live_orders: "1.520",
+          video_orders: "630",
+          ctr_live: "5.1%",
+          ctr_video: "3.8%",
+          direct_gmv: "Rp 72.000.000",
+          direct_live: "Rp 52.000.000",
+          direct_video: "Rp 20.000.000",
+          direct_orders: "1.650",
+          sold: "2.980",
+          direct_live_orders: "1.180",
+          live_sold: "2.100",
+          direct_video_orders: "470",
+          video_sold: "880",
+          kreator_sold: "2.980",
+          komisi: "Rp 9.500.000",
+          dasar: "10%",
+          live_views: "42.000",
+          views: "115.000",
+          live_broadcasts: "36",
+          videos: "15",
+          partner_gmv: "Rp 23.000.000",
+          partner_orders: "500"
+        },
+        {
+          id: 4,
+          tanggal: "19/05/2026",
+          uid: "UID-0004",
+          username: "@arnoldi.food",
+          followers: "88.000",
+          gmv: "Rp 85.000.000",
+          pesanan: "1.890",
+          live_gmv: "Rp 60.000.000",
+          video_gmv: "Rp 25.000.000",
+          live_orders: "1.320",
+          video_orders: "570",
+          ctr_live: "4.8%",
+          ctr_video: "3.5%",
+          direct_gmv: "Rp 64.000.000",
+          direct_live: "Rp 45.000.000",
+          direct_video: "Rp 19.000.000",
+          direct_orders: "1.450",
+          sold: "2.650",
+          direct_live_orders: "1.050",
+          live_sold: "1.850",
+          direct_video_orders: "400",
+          video_sold: "800",
+          kreator_sold: "2.650",
+          komisi: "Rp 8.500.000",
+          dasar: "10%",
+          live_views: "38.000",
+          views: "95.000",
+          live_broadcasts: "40",
+          videos: "20",
+          partner_gmv: "Rp 21.000.000",
+          partner_orders: "440"
+        },
+        {
+          id: 5,
+          tanggal: "19/05/2026",
+          uid: "UID-0005",
+          username: "@gigikids.daily",
+          followers: "145.000",
+          gmv: "Rp 110.000.000",
+          pesanan: "2.540",
+          live_gmv: "Rp 80.000.000",
+          video_gmv: "Rp 30.000.000",
+          live_orders: "1.850",
+          video_orders: "690",
+          ctr_live: "5.4%",
+          ctr_video: "4.0%",
+          direct_gmv: "Rp 85.000.000",
+          direct_live: "Rp 62.000.000",
+          direct_video: "Rp 23.000.000",
+          direct_orders: "1.950",
+          sold: "3.520",
+          direct_live_orders: "1.420",
+          live_sold: "2.520",
+          direct_video_orders: "530",
+          video_sold: "1.000",
+          kreator_sold: "3.520",
+          komisi: "Rp 11.000.000",
+          dasar: "10%",
+          live_views: "52.000",
+          views: "140.000",
+          live_broadcasts: "44",
+          videos: "22",
+          partner_gmv: "Rp 25.000.000",
+          partner_orders: "590"
         }
       ];
 
@@ -1281,6 +1381,88 @@
         }
       } catch (err) {
         performaDb = DEFAULT_PERFORMA;
+      }
+
+      
+      
+      // Pastikan seluruh data performa default selalu tersedia di performaDb
+      let performaNeedsSync = false;
+      DEFAULT_PERFORMA.forEach(dp => {
+        const exists = performaDb.some(p => p.uid === dp.uid || p.username === dp.username);
+        if (!exists) {
+          performaDb.push(dp);
+          performaNeedsSync = true;
+        }
+      });
+      if (performaNeedsSync) {
+        try { localStorage.setItem(PERFORMA_STORAGE_KEY, JSON.stringify(performaDb)); } catch(e){}
+      }
+
+      function getCurrentStaffPic() {
+        if (window.BMCampaignShared && typeof window.BMCampaignShared.getCurrentPic === "function") {
+          return window.BMCampaignShared.getCurrentPic();
+        }
+        const role = localStorage.getItem("user_role");
+        if (role === "staff_kol") {
+          return String(localStorage.getItem("user_pic") || "").trim();
+        }
+        return "";
+      }
+
+      const currentStaffPic = getCurrentStaffPic();
+
+      function getCreatorMasterList() {
+        const KREATOR_STORAGE_KEYS = [
+          "bisa_kreator_list_v21", "bisa_kreator_list_v20", "bisa_kreator_list_v19",
+          "bisa_kreator_list_v18", "bisa_kreator_list_v17", "bisa_kreator_list_v16",
+          "bisa_kreator_list_v15", "bisa_kreator_list_v14", "bisa_kreator_list_v13"
+        ];
+        for (const k of KREATOR_STORAGE_KEYS) {
+          try {
+            const s = localStorage.getItem(k);
+            if (s) {
+              const p = JSON.parse(s);
+              if (Array.isArray(p) && p.length > 0) return p;
+            }
+          } catch(e) {}
+        }
+        return [
+          { id: 1, uid: "UID-0001", username: "@aura.beauty", nama: "Aura Cantika", kategori1: "Fashion Muslim", pic1: "Setiawan" },
+          { id: 2, uid: "UID-0002", username: "@clarissa.style", nama: "Clarissa Putri", kategori1: "Beauty & Care", pic1: "Amanda" },
+          { id: 3, uid: "UID-0003", username: "@jualan.berkah", nama: "Jualan Berkah", kategori1: "Otomotif", pic1: "Dimas" }
+        ];
+      }
+
+      function isPerformaAllowedForStaff(item, staffPic) {
+        if (!staffPic) return true;
+        if (!item) return false;
+        const targetUser = String(item.username || '').trim().replace(/^@/, '').toLowerCase();
+        const targetUid = String(item.uid || '').trim().toLowerCase();
+        const allKreators = getCreatorMasterList();
+        const matched = allKreators.find(k => {
+          const ku = String(k.username || '').trim().replace(/^@/, '').toLowerCase();
+          const kid = String(k.uid || '').trim().toLowerCase();
+          return (targetUser && ku === targetUser) || (targetUid && kid === targetUid);
+        });
+        if (matched && window.BMCampaignShared && typeof window.BMCampaignShared.isCreatorAllowedForPic === 'function') {
+          return window.BMCampaignShared.isCreatorAllowedForPic(matched, staffPic);
+        }
+        const staffKey = String(staffPic).trim().toLowerCase();
+        if (staffKey === 'dimas') {
+          if (targetUser.includes('jualan.berkah') || targetUid === 'uid-0003' || targetUser.includes('arnoldi') || targetUid === 'uid-0004') return true;
+        } else if (staffKey === 'setiawan') {
+          if (targetUser.includes('aura') || targetUid === 'uid-0001' || targetUser.includes('nabila') || targetUid === 'uid-0006' || targetUser.includes('riva') || targetUid === 'uid-0007' || targetUser.includes('citra') || targetUid === 'uid-0008') return true;
+        } else if (staffKey === 'amanda') {
+          if (targetUser.includes('clarissa') || targetUid === 'uid-0002' || targetUser.includes('citra') || targetUid === 'uid-0008') return true;
+        } else if (staffKey === 'clarissa') {
+          if (targetUser.includes('gigi') || targetUid === 'uid-0005') return true;
+        }
+        return false;
+      }
+
+      function getScopedPerformaDb() {
+        if (!currentStaffPic) return performaDb;
+        return performaDb.filter(item => isPerformaAllowedForStaff(item, currentStaffPic));
       }
 
       function savePerformaDb() {
@@ -1341,7 +1523,8 @@
       function updateUserFilterOptions() {
         if (!selUser) return;
         const currentVal = selUser.value || "Semua";
-        const users = Array.from(new Set(performaDb.map(p => p.username).filter(Boolean)));
+        const scopedList = getScopedPerformaDb();
+        const users = Array.from(new Set(scopedList.map(p => p.username).filter(Boolean)));
         selUser.innerHTML = '<option value="Semua">Semua</option>';
         users.forEach(u => {
           const opt = document.createElement("option");
@@ -1356,7 +1539,8 @@
         const valUser = selUser ? selUser.value : "Semua";
         const valKomisi = selKomisi ? selKomisi.value : "Semua";
         const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : "";
-        return performaDb.filter(item => {
+        const scopedList = getScopedPerformaDb();
+        return scopedList.filter(item => {
           const matchUser = (valUser === "Semua" || item.username === valUser);
           let matchKomisi = true;
           if (valKomisi === "Ada Komisi") {
@@ -1391,9 +1575,9 @@
         const emptyTableState = document.getElementById("emptyTableState");
 
         if (typeof window.bmToggleEmptyState === 'function') {
-          window.bmToggleEmptyState(emptyTableState, tableWrapper, performaDb.length === 0);
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, getScopedPerformaDb().length === 0);
         } else {
-          if (performaDb.length === 0) {
+          if (getScopedPerformaDb().length === 0) {
             if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
             if (emptyTableState) {
               emptyTableState.classList.remove("is-hidden");

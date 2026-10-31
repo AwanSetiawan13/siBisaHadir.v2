@@ -153,10 +153,6 @@
       box-shadow: 0 2px 6px rgba(34, 197, 94, 0.15) !important;
     }
 
-    .filter-dropdown-wrapper {
-      position: relative;
-    }
-
     .toolbar-active-badge {
       position: absolute;
       top: -5px;
@@ -177,10 +173,18 @@
     }
 
     .btn-filter-active,
-    .btn-calendar-active {
+    .btn-calendar-active,
+    .small-action-button.btn-filter-active,
+    .small-action-button.is-active {
       background: #e0f2fe !important;
       border-color: #38bdf8 !important;
       color: #0284c7 !important;
+    }
+
+    .filter-dropdown-wrapper {
+      position: relative !important;
+      display: inline-block !important;
+      z-index: 100 !important;
     }
 
     /* Filter Popover */
@@ -192,14 +196,22 @@
       width: 290px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-      z-index: 1000;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      z-index: 9999 !important;
       padding: 16px;
+      opacity: 0;
+      transform: translateY(-6px);
+      pointer-events: none;
+      transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
     }
 
-    .filter-popover.is-open {
+    .filter-popover.is-open,
+    .filter-popover.is-active {
       display: block !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
     }
 
     .filter-popover-header {
@@ -490,7 +502,6 @@
       cursor: default !important;
       font-style: italic !important;
     }
-
     /* Select arrow wrapper */
     .select-wrapper {
       position: relative;
@@ -498,20 +509,29 @@
     }
 
     .select-wrapper::after {
-      content: "Ã¢â€“Â¼";
-      font-size: 8px;
-      color: #707075;
+      content: "";
       position: absolute;
-      right: 12px;
+      right: 13px;
       top: 50%;
-      transform: translateY(-50%);
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid #64748b;
+      border-bottom: 2px solid #64748b;
+      border-radius: 1px;
+      transform: translateY(-65%) rotate(45deg);
       pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .select-wrapper:hover::after {
+      border-color: #0284c7;
     }
 
     .select-wrapper select {
       appearance: none;
       -webkit-appearance: none;
-      padding-right: 28px;
+      padding-right: 32px;
+      cursor: pointer;
     }
 
     /* Varian Multiline Box in Modals */
@@ -995,11 +1015,11 @@
 
             <!-- 2. Filter Dropdown & Popover -->
             <div class="filter-dropdown-wrapper">
-              <button id="btnFilterTrigger" class="small-action-button" type="button" aria-label="Filter" title="Filter Tracking Sampel" onclick="window.toggleTrackingFilterPopover(event)">
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px;">
-                  <path d="M4 5h16l-6 7v5l-4 2v-7z" fill="none" stroke="#29A3D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              <button id="btnFilterTrigger" class="small-action-button" type="button" aria-label="Filter" title="Filter Tracking Sampel">
+                <svg viewBox="0 0 24 24" aria-hidden="true" style="width: 16px; height: 16px; pointer-events: none;">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z" fill="none" stroke="#29A3D8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events: none;"></path>
                 </svg>
-                <span id="filterActiveBadge" class="toolbar-active-badge" style="display: none;">0</span>
+                <span id="filterActiveBadge" class="toolbar-active-badge" style="display: none; pointer-events: none;">0</span>
               </button>
 
               <!-- Filter Popover Content -->
@@ -1116,9 +1136,9 @@
                 </th>
                 <th style="width: 50px;">#</th>
                 <th>Nama Brand</th>
-                <th>Daftar Sampel</th>
-                <th>Type</th>
                 <th>Username Kreator</th>
+                <th>Type</th>
+                <th>Daftar Sampel</th>
                 <th class="text-center" style="text-align: center;">Status Sampel</th>
                 <th>Type Sampel</th>
                 <th class="text-center col-sticky-action" style="text-align: center; width: 80px;">Aksi</th>
@@ -1571,7 +1591,7 @@
         <!-- Metadata Pill Bar -->
         <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; background: #ffffff; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
           <div style="font-size: 12px; color: #64748b;">Status: <strong id="previewLampiranStatus" style="color: #0284c7;">-</strong></div>
-          <div style="color: #cbd5e1;">Ã¢â‚¬Â¢</div>
+          <div style="color: #cbd5e1;">&bull;</div>
           <div style="font-size: 12px; color: #64748b;">File: <strong id="previewLampiranFileName" style="color: #1e293b;">-</strong></div>
         </div>
 
@@ -1611,7 +1631,7 @@
       <span id="toastMsg" style="font-size: 13.5px; font-weight: 600; color: #1e293b;">Data berhasil diperbarui</span>
     </div>
   </div>
-  <script src="../../assets/js/layout.js?v=1004"></script>
+  <script src="../../assets/js/layout.js?v=1007"></script>
 
   <script>
     (function () {
@@ -1711,6 +1731,69 @@
             { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
             { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
           ]
+        },
+        {
+          id: "TRK-005",
+          brand: "Bisa Otomotif Nusantara",
+          sampel: "Parfum Mobil Aroma Kopi & Pembersih Mesin",
+          pid: "PID 031",
+          type: "Campaign",
+          kreator: "@jualan.berkah",
+          varian: "Paket Spray 250ml",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel parfum mobil", waktu: "20/09/2026 10:00" },
+            { status: "Dikirim", lampiran: "resi_jnt.jpg", keterangan: "Nomor resi JNT-7788991", waktu: "21/09/2026 14:00" },
+            { status: "Diterima", lampiran: "foto_sampel.png", keterangan: "Sampel diterima dalam kondisi baik", waktu: "23/09/2026 16:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Sedang dipakai untuk sesi live review", waktu: "24/09/2026 19:00" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-006",
+          brand: "Bisa Kuliner Nusantara",
+          sampel: "Sambal Kemasan & Bumbu Rendang Instan",
+          pid: "PID 041",
+          type: "Campaign",
+          kreator: "@arnoldi.food",
+          varian: "Paket Bundle 3 Rasa",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "24/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel bumbu kuliner", waktu: "21/09/2026 11:00" },
+            { status: "Dikirim", lampiran: "resi_jnt.jpg", keterangan: "Nomor resi JNT-334411", waktu: "22/09/2026 15:00" },
+            { status: "Diterima", lampiran: "foto_diterima.png", keterangan: "Sampel diterima dalam kondisi baik", waktu: "24/09/2026 14:30" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Sedang dipakai memasak live", waktu: "24/09/2026 19:30" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
+        },
+        {
+          id: "TRK-007",
+          brand: "Bisa Kids & Baby",
+          sampel: "Set Piyama Katun Organik Bayi & Balita",
+          pid: "PID 051",
+          type: "Campaign",
+          kreator: "@gigikids.daily",
+          varian: "Ukuran M (1-2 Tahun)",
+          keterangan: "Diambil",
+          statusSampel: "Request",
+          tanggal: "25/09/2026",
+          logRiwayat: [
+            { status: "Request", lampiran: "-", keterangan: "Pengajuan sampel piyama anak", waktu: "22/09/2026 09:30" },
+            { status: "Dikirim", lampiran: "resi_sicepat.jpg", keterangan: "Nomor resi SICEPAT-998811", waktu: "23/09/2026 11:00" },
+            { status: "Diterima", lampiran: "bukti_terima.jpg", keterangan: "Sampel diterima oleh kreator", waktu: "25/09/2026 13:00" },
+            { status: "Dipakai", lampiran: "-", keterangan: "Siap untuk sesi live parenting", waktu: "25/09/2026 16:00" },
+            { status: "Retur", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Rusak", lampiran: "-", keterangan: "-", waktu: "-" },
+            { status: "Hilang", lampiran: "-", keterangan: "-", waktu: "-" }
+          ]
         }
       ];
 
@@ -1730,6 +1813,19 @@
         trackingData = DEFAULT_TRACKING_DATA;
       }
 
+      
+      // Pastikan seluruh sample default selalu tersedia di trackingData
+      let trackingNeedsSync = false;
+      DEFAULT_TRACKING_DATA.forEach(dt => {
+        const exists = trackingData.some(t => t.id === dt.id || (t.sampel === dt.sampel && t.kreator === dt.kreator));
+        if (!exists) {
+          trackingData.push(dt);
+          trackingNeedsSync = true;
+        }
+      });
+      if (trackingNeedsSync) {
+        try { localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(trackingData)); } catch(e){}
+      }
       function saveTrackingData() {
         try {
           localStorage.setItem(TRACKING_STORAGE_KEY, JSON.stringify(trackingData));
@@ -2210,12 +2306,12 @@
               <div style="font-weight: 600;">${escapeTrackingHtml(group.brand)}</div>
               ${group.campaignId ? `<div class="tracking-group-subtext">${escapeTrackingHtml(group.campaignId)}</div>` : ""}
             </td>
-            <td>${renderSampleChips(items)}</td>
-            <td>${typeValues.map(value => escapeTrackingHtml(value)).join("<br>") || "-"}</td>
             <td>
               <span style="font-weight: 500; color: #1e293b;">${escapeTrackingHtml(displayKreator)}</span>
               <div class="tracking-group-subtext">${items.length} sampel · ${totalQty} unit</div>
             </td>
+            <td>${typeValues.map(value => escapeTrackingHtml(value)).join("<br>") || "-"}</td>
+            <td>${renderSampleChips(items)}</td>
             <td class="text-center">
               <div class="tracking-group-statuses">${statusHtml}</div>
             </td>
@@ -3057,32 +3153,61 @@
       }
 
       // Filter popover toggle
+      let lastFilterToggleTime = 0;
       window.toggleTrackingFilterPopover = function (e) {
         if (e) {
           e.preventDefault();
           e.stopPropagation();
         }
+        const now = Date.now();
+        if (now - lastFilterToggleTime < 250) return;
+        lastFilterToggleTime = now;
         if (filterPopover) {
-          filterPopover.classList.toggle("is-open");
+          populateBrandFilterOptions();
+          const willOpen = !filterPopover.classList.contains("is-open") && !filterPopover.classList.contains("is-active");
+          if (willOpen) {
+            filterPopover.classList.add("is-open", "is-active");
+            if (btnFilterTrigger) btnFilterTrigger.classList.add("btn-filter-active", "is-active");
+          } else {
+            filterPopover.classList.remove("is-open", "is-active");
+            if (btnFilterTrigger) {
+              const hasActive = !!(currentFilterBrand || currentFilterStatus || currentFilterType);
+              btnFilterTrigger.classList.toggle("btn-filter-active", hasActive);
+              btnFilterTrigger.classList.remove("is-active");
+            }
+          }
         }
       };
 
-      if (btnFilterTrigger && filterPopover) {
-        btnFilterTrigger.addEventListener("click", (e) => {
-          window.toggleTrackingFilterPopover(e);
-        });
+      if (btnFilterTrigger) {
+        btnFilterTrigger.onclick = window.toggleTrackingFilterPopover;
+      }
+
+      if (filterPopover) {
+        filterPopover.onclick = function (e) {
+          e.stopPropagation();
+        };
       }
 
       if (btnCloseFilterPop && filterPopover) {
-        btnCloseFilterPop.addEventListener("click", (e) => {
+        btnCloseFilterPop.onclick = function (e) {
           if (e) e.stopPropagation();
-          filterPopover.classList.remove("is-open");
-        });
+          filterPopover.classList.remove("is-open", "is-active");
+          if (btnFilterTrigger) {
+            const hasActive = !!(currentFilterBrand || currentFilterStatus || currentFilterType);
+            btnFilterTrigger.classList.toggle("btn-filter-active", hasActive);
+            btnFilterTrigger.classList.remove("is-active");
+          }
+        };
       }
 
       document.addEventListener("click", (e) => {
+        if (!document.body.contains(e.target)) return;
         if (filterPopover && !filterPopover.contains(e.target) && btnFilterTrigger && !btnFilterTrigger.contains(e.target)) {
-          filterPopover.classList.remove("is-open");
+          filterPopover.classList.remove("is-open", "is-active");
+          if (btnFilterTrigger && !currentFilterBrand && !currentFilterStatus && !currentFilterType) {
+            btnFilterTrigger.classList.remove("btn-filter-active", "is-active");
+          }
         }
       });
 
@@ -3128,7 +3253,7 @@
         formFilterTracking.addEventListener("submit", (e) => {
           e.preventDefault();
           applyFilterState(true);
-          if (filterPopover) filterPopover.classList.remove("is-open");
+          if (filterPopover) filterPopover.classList.remove("is-open", "is-active");
         });
 
         const btnResetFilter = document.getElementById("btnResetFilter");
@@ -3142,7 +3267,7 @@
             currentFilterType = "";
             currentPage = 1;
             updateFilterBadge();
-            if (filterPopover) filterPopover.classList.remove("is-open");
+            if (filterPopover) filterPopover.classList.remove("is-open", "is-active");
             renderTable();
             showToast("Filter berhasil di-reset", "info");
           });

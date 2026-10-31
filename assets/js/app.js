@@ -603,6 +603,7 @@
     'tblKehadiranV2',
     'tblIstirahatV2',
     'tblLemburV2',
+    'tblRrk',
   ]);
 
   function removeEditButtonsForNoEditTables(root = document) {
@@ -17049,7 +17050,11 @@
         localStorage.setItem('user_role', 'staff_kol');
         localStorage.setItem('user_name', staffPic);
         localStorage.setItem('user_display_role', 'Staff KOL');
-        localStorage.setItem('user_avatar', 'media/avatar.png');
+        let staffAvatar = 'media/avatar.png';
+        if (staffLoginName === 'amanda') staffAvatar = 'media/creator-alya.svg';
+        else if (staffLoginName === 'dimas') staffAvatar = 'media/creator-bima.svg';
+        else if (staffLoginName === 'clarissa') staffAvatar = 'media/creator-caca.svg';
+        localStorage.setItem('user_avatar', staffAvatar);
         localStorage.setItem('user_pic', staffPic);
         window.location.href = 'StaffKol/staffkol_dashboard.html';
       } else {
@@ -17076,6 +17081,7 @@
 
   // Topbar user avatar dropdown popup in KOL
   document.addEventListener("click", (e) => {
+    if (window.__bmSidebarEngineLoaded) return;
     const btn = e.target.closest("#userMenuButton");
     const wrap = e.target.closest(".topbar-user-dropdown-wrap");
 
@@ -17107,6 +17113,7 @@
   });
 
   document.addEventListener("keydown", (e) => {
+    if (window.__bmSidebarEngineLoaded) return;
     if (e.key === "Escape") {
       document.querySelectorAll(".topbar-user-dropdown-wrap.is-open").forEach((w) => {
         w.classList.remove("is-open");
@@ -17687,7 +17694,13 @@
   const btnFilterCampaign = document.getElementById("btnFilterCampaign");
   const filterCampaignForm = document.getElementById("filterCampaignForm");
 
-  if (filterCampaignDropdown && btnFilterCampaign) {
+  if (
+    filterCampaignDropdown &&
+    btnFilterCampaign &&
+    !document.getElementById("campaignControlTable") &&
+    !document.getElementById("campaignControlTableBody") &&
+    !window.location.href.includes("dashboard_campaign")
+  ) {
     // Toggle popover on click
     btnFilterCampaign.addEventListener("click", (e) => {
       e.stopPropagation();

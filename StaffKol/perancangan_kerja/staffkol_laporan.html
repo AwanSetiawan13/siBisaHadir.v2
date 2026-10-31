@@ -1232,7 +1232,7 @@
               <h2 class="analytics-card__title">Trend Pencapaian</h2>
             </div>
             <span class="analytics-badge-pill analytics-badge-pill--green" id="trendRateBadge">
-              Ã¢â€“Â² +14.2%
+              &#9650; +14.2%
             </span>
           </div>
 
@@ -1307,12 +1307,64 @@
         <!-- Toolbar -->
         <div class="campaign-toolbar">
           <div class="campaign-toolbar__left">
-            <button class="small-action-button-blue" type="button" aria-label="Filter">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-              </svg>
-            </button>
+            <div class="filter-dropdown-wrapper" style="position: relative; display: inline-block;">
+              <button id="btnFilterLaporan" class="small-action-button-blue" type="button" aria-label="Filter">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </button>
+
+              <!-- Dropdown Content -->
+              <div id="filterLaporanDropdown" class="filter-popover" style="top: 100%; left: 0;">
+                <form id="filterLaporanForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">Hierarki</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterHierarkiSelect">
+                        <option value="Semua">Semua Hierarki</option>
+                        <option value="Project">Project</option>
+                        <option value="RRK">RRK</option>
+                        <option value="Milestone">Milestone</option>
+                        <option value="Tugas">Tugas</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">PIC</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterPicSelect">
+                        <option value="Semua">Semua PIC</option>
+                        <option value="Setiawan">Setiawan</option>
+                        <option value="Amanda">Amanda</option>
+                        <option value="Dimas">Dimas</option>
+                        <option value="Clarissa">Clarissa</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterStatusSelect">
+                        <option value="Semua">Semua Status</option>
+                        <option value="Berjalan">Berjalan</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Proses">Proses</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+                    <button type="button" id="btnResetFilterLaporan" class="btn-reset"
+                      style="background-color: #f44336; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px;">Reset</button>
+                    <button type="submit" class="btn-simpan"
+                      style="background-color: #2264c6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px; margin: 0;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
             <label class="campaign-search-blue" style="margin-left: 10px;">
               <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -1364,7 +1416,7 @@
       </section>
     </main>
 
-    <footer class="dashboard-footer">Ã‚Â© 2026 Bisa Media</footer>
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
   </div>
 
   <script src="../../assets/js/app.js"></script>
@@ -1380,11 +1432,11 @@
 
       if (isExpanded) {
         toggleIcon.classList.remove('toggle-icon--expanded');
-        toggleIcon.textContent = 'Ã¢â€“Â¶';
+        toggleIcon.innerHTML = '&#9654;';
         setCollapseState(rowId, true);
       } else {
         toggleIcon.classList.add('toggle-icon--expanded');
-        toggleIcon.textContent = 'Ã¢â€“Â¼';
+        toggleIcon.innerHTML = '&#9660;';
         setCollapseState(rowId, false);
       }
     };
@@ -1410,7 +1462,7 @@
       });
     }
 
-    /* Ã¢â€â‚¬Ã¢â€â‚¬ Date Helpers Ã¢â€â‚¬Ã¢â€â‚¬ */
+    /* ─── Date Helpers ─── */
     function formatDateIndo(dateStr) {
       if (!dateStr || dateStr === "-") return "-";
       let d, m, y;
@@ -1510,179 +1562,593 @@
       return `<span class="status-badge status-badge--proses">${status || "Proses"}</span>`;
     }
 
-    /* Ã¢â€â‚¬Ã¢â€â‚¬ Default Synchronized Data (100% Sesuai Fitur Masing-Masing) Ã¢â€â‚¬Ã¢â€â‚¬ */
+    /* ─── Default Synchronized Data (100% Sesuai Fitur Masing-Masing) ─── */
     const DEFAULT_RRK = [
-      {
-        id: 1,
-        rencana: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
-        program: "Program KOL Affiliate",
-        bulan: "September",
-        deskripsi: "Menjangkau, mengurasi, dan mengontrak 50 creator mikro & makro kategori fashion muslim untuk program affiliate TikTok Shop & Shopee Video dengan target GMV Rp 150.000.000.",
-        timelineMulai: "2026-09-01",
-        timelineSelesai: "2026-09-22",
-        prioritas: "Tinggi",
-        status: "Berjalan",
-        pic: "Riva",
-        tim: "Supervisi KOL, Riva, Sri",
-        dokumen: "SOP_Onboarding_KOL_Affiliate_2026.pdf",
-        catatan: "Prioritaskan kreator dengan audience usia 18-35 tahun dan engagement rate di atas 4.5%."
-      }
-    ];
+        {
+                "id": 1,
+                "rencana": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "program": "Program KOL Affiliate",
+                "deskripsi": "Menjangkau, mengurasi, dan mengontrak 50 creator mikro & makro kategori fashion muslim untuk program affiliate TikTok Shop & Shopee Video dengan target GMV Rp 150.000.000.",
+                "timelineMulai": "2026-09-01",
+                "timelineSelesai": "2026-09-22",
+                "prioritas": "Tinggi",
+                "status": "Berjalan",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan, Amanda",
+                "dokumen": "SOP_Onboarding_KOL_Affiliate_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Prioritaskan kreator dengan audience usia 18-35 tahun dan engagement rate di atas 4.5%."
+        },
+        {
+                "id": 2,
+                "rencana": "Aktivasi 30 KOL Beauty & Skincare Review",
+                "program": "Program KOL Endorsement",
+                "deskripsi": "Kolaborasi endorsement produk perawatan kulit bersama 30 kreator kecantikan untuk meningkatkan awareness dan penjualan produk baru.",
+                "timelineMulai": "2026-09-05",
+                "timelineSelesai": "2026-09-28",
+                "prioritas": "Tinggi",
+                "status": "Berjalan",
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda, Clarissa",
+                "dokumen": "Brief_Endorsement_Skincare_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Pastikan kreator memiliki ulasan autentik dan fokus pada solusi kulit sensitif."
+        },
+        {
+                "id": 3,
+                "rencana": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+                "program": "Program Liputan & Review F&B",
+                "deskripsi": "Mengundang 25 food vlogger untuk meliput menu spesial dan menaikkan traffic kunjungan store serta pesanan online.",
+                "timelineMulai": "2026-09-10",
+                "timelineSelesai": "2026-10-02",
+                "prioritas": "Sedang",
+                "status": "Berjalan",
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas, Setiawan",
+                "dokumen": "Guideline_Food_Review_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Target views konten viral minimal 500k per video di TikTok & Instagram."
+        },
+        {
+                "id": 4,
+                "rencana": "Program Edukasi & Review Mom Influencer",
+                "program": "Program Mom & Baby Community",
+                "deskripsi": "Menggandeng 20 mom influencer untuk sharing tips parenting dan review perlengkapan bayi.",
+                "timelineMulai": "2026-09-12",
+                "timelineSelesai": "2026-10-05",
+                "prioritas": "Sedang",
+                "status": "Berjalan",
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa, Amanda",
+                "dokumen": "Panduan_Parenting_MomBaby_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Pastikan konten informatif, edukatif, dan bebas klaim medis berlebih."
+        }
+];
 
     const DEFAULT_MILESTONES = [
-      {
-        id: 1,
-        title: "Kurasi & Screening 100 Database Kreator Hijab",
-        week: "Minggu ke-1",
-        progress: 100,
-        status: "Selesai",
-        rrk: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
-        output: "100 kreator fashion muslim terkurasi dengan engagement rate > 4.5%",
-        pic: "Riva",
-        tim: "Supervisi KOL, Riva",
-        timelineMulai: "2026-09-01",
-        timelineSelesai: "2026-09-08"
-      },
-      {
-        id: 2,
-        title: "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
-        week: "Minggu ke-2",
-        progress: 100,
-        status: "Selesai",
-        rrk: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
-        output: "50 kreator menandatangani MoU kerjasama affiliate",
-        pic: "Riva",
-        tim: "Riva, Sri",
-        timelineMulai: "2026-09-08",
-        timelineSelesai: "2026-09-15"
-      },
-      {
-        id: 3,
-        title: "Distribusi Sample Produk & Briefing Live Streaming",
-        week: "Minggu ke-3",
-        progress: 40,
-        status: "Berjalan",
-        rrk: "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
-        output: "Sample hijab terkirim dan jadwal live TikTok Shop tersusun",
-        pic: "Sri",
-        tim: "Sri, Ahmad",
-        timelineMulai: "2026-09-15",
-        timelineSelesai: "2026-09-22"
-      }
-    ];
+        {
+                "id": 1,
+                "title": "Kurasi & Screening 100 Database Kreator Hijab",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "output": "100 kreator fashion muslim terkurasi dengan engagement rate > 4.5%",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan"
+        },
+        {
+                "id": 2,
+                "title": "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
+                "week": "Minggu ke 2",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "output": "50 kreator menandatangani MoU kerjasama affiliate",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan"
+        },
+        {
+                "id": 3,
+                "title": "Distribusi Sample Produk & Briefing Live Streaming",
+                "week": "Minggu ke 3",
+                "progress": 40,
+                "status": "Berjalan",
+                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "output": "Sample hijab terkirim dan jadwal live TikTok Shop tersusun",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan"
+        },
+        {
+                "id": 4,
+                "title": "Distribusi Sampel & Brief Konten Beauty",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
+                "output": "30 paket sampel skincare terkirim beserta brief konten",
+                "pic": "Amanda",
+                "tim": "Amanda"
+        },
+        {
+                "id": 5,
+                "title": "Review Draft Video & Quality Control",
+                "week": "Minggu ke 2",
+                "progress": 50,
+                "status": "Berjalan",
+                "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
+                "output": "15 draft video disetujui untuk penayangan",
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda"
+        },
+        {
+                "id": 6,
+                "title": "Penjadwalan Kunjungan Food Vlogger",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+                "output": "Jadwal kunjungan liputan 25 food vlogger terkonfirmasi",
+                "pic": "Dimas",
+                "tim": "Dimas"
+        },
+        {
+                "id": 7,
+                "title": "Publikasi Konten Review Kuliner TikTok",
+                "week": "Minggu ke 2",
+                "progress": 30,
+                "status": "Berjalan",
+                "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+                "output": "8 video review kuliner tayang di TikTok",
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas"
+        },
+        {
+                "id": 8,
+                "title": "Kurasi Mom Creator Komunitas Parenting",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Program Edukasi & Review Mom Influencer",
+                "output": "20 mom creator terkurasi dari komunitas",
+                "pic": "Clarissa",
+                "tim": "Clarissa"
+        },
+        {
+                "id": 9,
+                "title": "Penyusunan Script Konten Edukasi Parenting",
+                "week": "Minggu ke 2",
+                "progress": 40,
+                "status": "Berjalan",
+                "rrk": "Program Edukasi & Review Mom Influencer",
+                "output": "Draft panduan edukasi produk bayi rampung",
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa"
+        }
+];
 
     const DEFAULT_TUGAS = [
-      {
-        id: 1,
-        title: "Screening Database 100 KOL Hijab",
-        milestone: "Kurasi & Screening 100 Database Kreator Hijab",
-        progress: 100,
-        pic: "Riva",
-        tim: "Supervisi KOL, Riva",
-        timelineMulai: "2026-12-01",
-        deadline: "12-12-2026",
-        prioritas: "Tinggi",
-        status: "Selesai",
-        deskripsi: "Screening metrik engagement rate > 4.5% dan relevansi audiens fashion hijab",
-        subtasks: [
-          { id: 1, name: "Export database dari TikTok & Instagram", status: "Selesai", bukti: "db_kreator_raw.xlsx", revisi: "-" },
-          { id: 2, name: "Pengecekan analitik engagement rate", status: "Selesai", bukti: "analitik_er.pdf", revisi: "-" },
-          { id: 3, name: "Finalisasi 100 list terpilih", status: "Selesai", bukti: "list_100_final.xlsx", revisi: "-" }
-        ]
-      },
-      {
-        id: 2,
-        title: "Pengiriman MoU & Brief Kerjasama",
-        milestone: "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
-        progress: 100,
-        pic: "Sri",
-        tim: "Riva, Sri",
-        timelineMulai: "2026-12-08",
-        deadline: "19-12-2026",
-        prioritas: "Tinggi",
-        status: "Selesai",
-        deskripsi: "Kirim draft kontrak MoU dan brief komisi affiliate ke 50 kreator terpilih",
-        subtasks: [
-          { id: 1, name: "Drafting template kontrak affiliate", status: "Selesai", bukti: "kontrak_template.docx", revisi: "-" },
-          { id: 2, name: "Distribusi ke 50 kreator via WhatsApp", status: "Selesai", bukti: "wa_broadcast_log.pdf", revisi: "-" },
-          { id: 3, name: "Konfirmasi tanda tangan MoU", status: "Selesai", bukti: "signed_mou_drive.pdf", revisi: "-" }
-        ]
-      },
-      {
-        id: 3,
-        title: "Pengemasan & Pengiriman Sample Hijab",
-        milestone: "Distribusi Sample Produk & Briefing Live Streaming",
-        progress: 40,
-        pic: "Ahmad",
-        tim: "Sri, Ahmad",
-        timelineMulai: "2026-12-15",
-        deadline: "26-12-2026",
-        prioritas: "Sedang",
-        status: "Berjalan",
-        deskripsi: "Packing sample produk hijab premium dan briefing jadwal live streaming affiliate",
-        subtasks: [
-          { id: 1, name: "Packing 50 paket sample hijab", status: "Selesai", bukti: "resi_pengiriman.pdf", revisi: "-" },
-          { id: 2, name: "Monitoring pengiriman ekspedisi", status: "Diproses", bukti: "-", revisi: "Follow up resi yang belum bergerak" },
-          { id: 3, name: "Briefing jadwal live TikTok Shop", status: "Belum Mulai", bukti: "-", revisi: "-" }
-        ]
-      }
-    ];
+        {
+                "id": 1,
+                "title": "Screening Database 100 KOL Hijab",
+                "milestone": "Kurasi & Screening 100 Database Kreator Hijab",
+                "progress": 100,
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "deadline": "12-12-2026",
+                "prioritas": "Tinggi",
+                "deskripsi": "Screening metrik engagement rate > 4.5% dan relevansi audiens fashion hijab",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Export database dari TikTok & Instagram",
+                                "status": "Selesai",
+                                "bukti": "db_kreator_raw.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Pengecekan analitik engagement rate",
+                                "status": "Selesai",
+                                "bukti": "analitik_er.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "name": "Finalisasi 100 list terpilih",
+                                "status": "Selesai",
+                                "bukti": "list_100_final.xlsx",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 2,
+                "title": "Pengiriman MoU & Brief Kerjasama",
+                "milestone": "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
+                "progress": 100,
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "deadline": "19-12-2026",
+                "prioritas": "Tinggi",
+                "deskripsi": "Kirim draft kontrak MoU dan brief komisi affiliate ke 50 kreator terpilih",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Drafting template kontrak affiliate",
+                                "status": "Selesai",
+                                "bukti": "kontrak_template.docx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Distribusi ke 50 kreator via WhatsApp",
+                                "status": "Selesai",
+                                "bukti": "wa_broadcast_log.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "name": "Konfirmasi tanda tangan MoU",
+                                "status": "Selesai",
+                                "bukti": "signed_mou_drive.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 3,
+                "title": "Pengemasan & Pengiriman Sample Hijab",
+                "milestone": "Distribusi Sample Produk & Briefing Live Streaming",
+                "progress": 40,
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "deadline": "26-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Packing sample produk hijab premium dan briefing jadwal live streaming affiliate",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Packing 50 paket sample hijab",
+                                "status": "Selesai",
+                                "bukti": "resi_pengiriman.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Monitoring pengiriman ekspedisi",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Follow up resi yang belum bergerak"
+                        },
+                        {
+                                "id": 3,
+                                "name": "Briefing jadwal live TikTok Shop",
+                                "status": "Belum Mulai",
+                                "bukti": "-",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 4,
+                "title": "Pengiriman Paket Sampel Serum & Sunscreen",
+                "milestone": "Distribusi Sampel & Brief Konten Beauty",
+                "progress": 100,
+                "pic": "Amanda",
+                "tim": "Amanda",
+                "deadline": "14-12-2026",
+                "prioritas": "Tinggi",
+                "deskripsi": "Distribusi 30 paket skincare kepada kreator beauty terpilih",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Verifikasi alamat pengiriman kreator",
+                                "status": "Selesai",
+                                "bukti": "alamat_kreator.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Pengiriman via ekspedisi kilat",
+                                "status": "Selesai",
+                                "bukti": "resi_skincare.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 5,
+                "title": "Quality Control Draft Video Review Skincare",
+                "milestone": "Review Draft Video & Quality Control",
+                "progress": 50,
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda",
+                "deadline": "21-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Pengecekan kesesuaian klaim produk dan pencahayaan video review",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Review 15 video kloter pertama",
+                                "status": "Selesai",
+                                "bukti": "qc_log_batch1.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Revisi kloter kedua",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Koreksi pencahayaan swatch produk"
+                        }
+                ]
+        },
+        {
+                "id": 6,
+                "title": "Koordinasi Reservasi Meja & Menu Food Vlogger",
+                "milestone": "Penjadwalan Kunjungan Food Vlogger",
+                "progress": 100,
+                "pic": "Dimas",
+                "tim": "Dimas",
+                "deadline": "15-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Reservasi 5 outlet utama dan briefing chef untuk menu testing",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Konfirmasi reservasi meja resto",
+                                "status": "Selesai",
+                                "bukti": "reservasi_outlet.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Briefing paket menu spesial ramadan",
+                                "status": "Selesai",
+                                "bukti": "menu_testing.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 7,
+                "title": "Monitoring Tayang Konten Kuliner TikTok",
+                "milestone": "Publikasi Konten Review Kuliner TikTok",
+                "progress": 30,
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas",
+                "deadline": "25-12-2026",
+                "prioritas": "Rendah",
+                "deskripsi": "Tracking link video review dan respon audiens di kolom komentar",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Koleksi link postingan 8 vlogger",
+                                "status": "Selesai",
+                                "bukti": "link_posting.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Rekap engagement dan views",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Update harian metrics"
+                        }
+                ]
+        },
+        {
+                "id": 8,
+                "title": "Screening 20 Mom Influencer Mikro",
+                "milestone": "Kurasi Mom Creator Komunitas Parenting",
+                "progress": 100,
+                "pic": "Clarissa",
+                "tim": "Clarissa",
+                "deadline": "16-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Kurasi kreator ibu muda dengan anak balita untuk review produk bayi",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Database kreator parenting IG & TikTok",
+                                "status": "Selesai",
+                                "bukti": "db_parenting.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Pengecekan kredibilitas review",
+                                "status": "Selesai",
+                                "bukti": "review_audit.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 9,
+                "title": "Briefing Script Konten Edukasi Parenting",
+                "milestone": "Penyusunan Script Konten Edukasi Parenting",
+                "progress": 40,
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa",
+                "deadline": "28-12-2026",
+                "prioritas": "Rendah",
+                "deskripsi": "Briefing angle edukasi pentingnya nutrisi balita dan sanitasi peralatan bayi",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Penyusunan outline script video",
+                                "status": "Selesai",
+                                "bukti": "outline_script.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Review draft script bersama brand",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Tambahkan poin keamanan bahan"
+                        }
+                ]
+        }
+];
 
     const DEFAULT_PROJECTS = [
-      {
-        id: 1,
-        namaProject: "Pemuatan Konten Podcast KOL Hijab",
-        deskripsi: "Produksi episode podcast kolaborasi bersama top kreator hijab BISA Media",
-        pic: "Sri",
-        tim: "Riva, Ahmad",
-        timelineMulai: "2026-08-01",
-        timelineSelesai: "2026-08-30",
-        status: "Berjalan",
-        progress: 25,
-        catatan: "Menunggu finalisasi jadwal syuting episode 2",
-        subtasks: [
-          { id: 1, recipient: "Sri (PIC)", name: "Penyusunan rundown podcast KOL", status: "Selesai", bukti: "rundown_v1.pdf", revisi: "-" },
-          { id: 2, recipient: "Riva", name: "Booking studio & gear recording", status: "Selesai", bukti: "invoice_studio.pdf", revisi: "-" },
-          { id: 3, recipient: "Ahmad", name: "Shooting & editing episode perdana", status: "Diproses", bukti: "-", revisi: "Tambahkan bumper opening" }
-        ]
-      },
-      {
-        id: 2,
-        namaProject: "Campaign Ramadhan Kreator Beauty",
-        deskripsi: "Aktivasi 30 mega kreator beauty untuk promosi bundling Ramadhan berkah",
-        pic: "Riva",
-        tim: "Sri, Maya",
-        timelineMulai: "2026-07-15",
-        timelineSelesai: "2026-08-20",
-        status: "Selesai",
-        progress: 100,
-        catatan: "Campaign sukses melampaui target GMV 130%",
-        subtasks: [
-          { id: 1, recipient: "Riva (PIC)", name: "Briefing materi campaign Ramadhan", status: "Selesai", bukti: "deck_briefing_ramadhan.pdf", revisi: "-" },
-          { id: 2, recipient: "Sri", name: "Review draft video reels & TikTok", status: "Selesai", bukti: "drive_link_reels.xlsx", revisi: "-" },
-          { id: 3, recipient: "Maya", name: "Laporan performa & ROI campaign", status: "Selesai", bukti: "final_roi_report.pdf", revisi: "-" }
-        ]
-      },
-      {
-        id: 3,
-        namaProject: "Launching Koleksi Baru Q4",
-        deskripsi: "Persiapan peluncuran brand kolaborasi eksklusif akhir tahun",
-        pic: "Ahmad",
-        tim: "Budi, Siti",
-        timelineMulai: "2026-09-01",
-        timelineSelesai: "2026-10-15",
-        status: "Belum Mulai",
-        progress: 0,
-        catatan: "Menunggu approval materi promosi",
-        subtasks: [
-          { id: 1, recipient: "Ahmad (PIC)", name: "Perencanaan konsep live launch", status: "Belum Mulai", bukti: "-", revisi: "-" }
-        ]
-      }
-    ];
+        {
+                "id": 1,
+                "namaProject": "Aktivasi KOL Hijab & Fashion Muslim 2026",
+                "deskripsi": "Campaign promosi koleksi hijab premium dan modest fashion di TikTok Shop & Shopee",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "timelineMulai": "2026-09-01",
+                "timelineSelesai": "2026-09-30",
+                "status": "Berjalan",
+                "progress": 75,
+                "catatan": "Fokus pada engagement TikTok & IG Reels",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Penyusunan guideline konten video hijab",
+                                "status": "Selesai",
+                                "bukti": "guideline_hijab_2026.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Kurasi 25 kreator fashion hijab mikro & makro",
+                                "status": "Selesai",
+                                "bukti": "list_kreator_hijab.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "recipient": "Amanda (Tim)",
+                                "name": "Review draft video TikTok Shop kreator",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Perbaiki hook video awal"
+                        },
+                        {
+                                "id": 4,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Approval final video & scheduling tayang",
+                                "status": "Belum Mulai",
+                                "bukti": "-",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 2,
+                "namaProject": "Campaign Glowing Skincare Beauty Ramadhan",
+                "deskripsi": "Aktivasi kolaborasi endorsement kreator beauty & skincare untuk peluncuran bundle ramadhan",
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda",
+                "timelineMulai": "2026-09-05",
+                "timelineSelesai": "2026-10-05",
+                "status": "Berjalan",
+                "progress": 60,
+                "catatan": "Target 10M views reels & TikTok",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Amanda (PIC)",
+                                "name": "Penyusunan brief review serum & sunscreen",
+                                "status": "Selesai",
+                                "bukti": "brief_skincare.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Amanda (PIC)",
+                                "name": "Kurasi 30 beauty creator TikTok & Instagram",
+                                "status": "Selesai",
+                                "bukti": "beauty_creators_list.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "recipient": "Clarissa (Tim)",
+                                "name": "Monitoring posting review dan engagement",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Cek hashtag campaign"
+                        }
+                ]
+        },
+        {
+                "id": 3,
+                "namaProject": "Viral Food Review F&B Ramadan Special",
+                "deskripsi": "Campaign liputan dan review menu buka puasa bersama food vlogger kuliner se-Jabodetabek",
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas",
+                "timelineMulai": "2026-09-10",
+                "timelineSelesai": "2026-10-10",
+                "status": "Berjalan",
+                "progress": 50,
+                "catatan": "Target traffic store dan GMV online Rp 200.000.000",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Dimas (PIC)",
+                                "name": "Kurasi 25 food vlogger TikTok & Reels",
+                                "status": "Selesai",
+                                "bukti": "food_vlogger_list.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Dimas (PIC)",
+                                "name": "Distribusi voucher kunjungan outlet & menu tasting",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Konfirmasi jadwal kehadiran"
+                        }
+                ]
+        },
+        {
+                "id": 4,
+                "namaProject": "Edukasi Nutrisi & Perlengkapan Ibu-Anak",
+                "deskripsi": "Campaign awareness produk MPASI dan perlengkapan bayi bersama komunitas mom influencer",
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa",
+                "timelineMulai": "2026-09-12",
+                "timelineSelesai": "2026-10-15",
+                "status": "Berjalan",
+                "progress": 45,
+                "catatan": "Fokus pada edukasi dan testimoni autentik para ibu",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Clarissa (PIC)",
+                                "name": "Penyusunan panduan edukasi produk ramah bayi",
+                                "status": "Selesai",
+                                "bukti": "panduan_mom_baby.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Clarissa (PIC)",
+                                "name": "Kurasi 20 mom influencer komunitas parenting",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Verifikasi usia anak kreator"
+                        }
+                ]
+        }
+];
 
     function loadRrkData() {
       try {
-        const saved = localStorage.getItem("bisa_rrk_data_v2");
+        const saved = localStorage.getItem("bisa_rrk_data_v3");
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length >= 1) {
@@ -1696,14 +2162,14 @@
         console.error("Error loading RRK data:", e);
       }
       try {
-        localStorage.setItem("bisa_rrk_data_v2", JSON.stringify(DEFAULT_RRK));
+        localStorage.setItem("bisa_rrk_data_v3", JSON.stringify(DEFAULT_RRK));
       } catch (e) { }
       return JSON.parse(JSON.stringify(DEFAULT_RRK));
     }
 
     function loadMilestoneData() {
       try {
-        const saved = localStorage.getItem("bisa_milestone_data_v1");
+        const saved = localStorage.getItem("bisa_milestone_data_v2");
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length >= 3) {
@@ -1719,14 +2185,14 @@
         console.error("Error loading Milestone data:", e);
       }
       try {
-        localStorage.setItem("bisa_milestone_data_v1", JSON.stringify(DEFAULT_MILESTONES));
+        localStorage.setItem("bisa_milestone_data_v2", JSON.stringify(DEFAULT_MILESTONES));
       } catch (e) { }
       return JSON.parse(JSON.stringify(DEFAULT_MILESTONES));
     }
 
     function loadTugasData() {
       try {
-        const saved = localStorage.getItem("bisa_tugas_data_v1");
+        const saved = localStorage.getItem("bisa_tugas_data_v3");
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length >= 3) {
@@ -1741,14 +2207,14 @@
         console.error("Error loading Tugas data:", e);
       }
       try {
-        localStorage.setItem("bisa_tugas_data_v1", JSON.stringify(DEFAULT_TUGAS));
+        localStorage.setItem("bisa_tugas_data_v3", JSON.stringify(DEFAULT_TUGAS));
       } catch (e) { }
       return JSON.parse(JSON.stringify(DEFAULT_TUGAS));
     }
 
     function loadProjectData() {
       try {
-        const saved = localStorage.getItem("bisa_project_data_v4") || localStorage.getItem("bisa_project_data_v3") || localStorage.getItem("bisa_project_data_v2");
+        const saved = localStorage.getItem("bisa_project_data_v5") || localStorage.getItem("bisa_project_data_v3") || localStorage.getItem("bisa_project_data_v2");
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length >= 3) return parsed;
@@ -1757,12 +2223,12 @@
         console.error("Error loading Project data:", e);
       }
       try {
-        localStorage.setItem("bisa_project_data_v4", JSON.stringify(DEFAULT_PROJECTS));
+        localStorage.setItem("bisa_project_data_v5", JSON.stringify(DEFAULT_PROJECTS));
       } catch (e) { }
       return JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
     }
 
-    /* Ã¢â€â‚¬Ã¢â€â‚¬ Navigation to Specific Detail Page Helper Ã¢â€â‚¬Ã¢â€â‚¬ */
+    /* ─── Navigation to Specific Detail Page Helper ─── */
     function navigateToDetail(type, id) {
       if (!id) return;
       if (type === 'project') {
@@ -1777,16 +2243,39 @@
     }
     window.navigateToDetail = navigateToDetail;
 
-    /* Ã¢â€â‚¬Ã¢â€â‚¬ Hierarchy Rendering Logic Ã¢â€â‚¬Ã¢â€â‚¬ */
+    /* ─── Hierarchy Rendering Logic ─── */
+    
+    function getActiveStaffPic() {
+      const userPic = (localStorage.getItem("user_pic") || "").trim();
+      if (userPic) return userPic;
+      const role = (localStorage.getItem("user_role") || "").trim();
+      const name = (localStorage.getItem("user_name") || "").trim();
+      if (role === "staff_kol" && name) {
+        const known = ["Setiawan", "Amanda", "Dimas", "Clarissa"];
+        const match = known.find(k => name.toLowerCase().includes(k.toLowerCase()));
+        if (match) return match;
+        return name;
+      }
+      return "Setiawan";
+    }
+
     function renderHierarchyTable() {
       const tableBody = document.getElementById("laporanTableBody");
       if (!tableBody) return;
       tableBody.innerHTML = "";
 
-      const projectList = loadProjectData();
-      const rrkList = loadRrkData();
-      const milestoneList = loadMilestoneData();
-      const tugasList = loadTugasData();
+      let projectList = loadProjectData();
+      let rrkList = loadRrkData();
+      let milestoneList = loadMilestoneData();
+      let tugasList = loadTugasData();
+
+      const activeStaffPic = (typeof getActiveStaffPic === 'function') ? getActiveStaffPic().toLowerCase() : '';
+      if (activeStaffPic) {
+        projectList = projectList.filter(p => (p.pic || '').toLowerCase() === activeStaffPic || (p.pic || '').toLowerCase().includes(activeStaffPic));
+        rrkList = rrkList.filter(r => (r.pic || '').toLowerCase() === activeStaffPic || (r.pic || '').toLowerCase().includes(activeStaffPic));
+        milestoneList = milestoneList.filter(m => (m.pic || '').toLowerCase() === activeStaffPic || (m.pic || '').toLowerCase().includes(activeStaffPic));
+        tugasList = tugasList.filter(t => (t.pic || '').toLowerCase() === activeStaffPic || (t.pic || '').toLowerCase().includes(activeStaffPic));
+      }
 
       const tableWrapper = document.getElementById("tableContainerWrapper");
       const emptyTableState = document.getElementById("emptyTableState");
@@ -1898,7 +2387,7 @@
           <td style="font-weight: 700; color: #29A3D8;">${rowCounter++}</td>
           <td style="text-align: left; padding-left: 14px; font-weight: 700; color: #0f172a;">
             <div style="display: flex; align-items: center;">
-              ${childMilestones.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick="toggleRow('${rrkId}')">Ã¢â€“Â¼</span>` : `<span style="display:inline-block; width:18px; margin-right:6px;"></span>`}
+              ${childMilestones.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick=\"toggleRow('${rrkId}')\">&#9660;</span>` : `<span style="display:inline-block; width:18px; margin-right:6px;"></span>`}
               <span class="hierarki-tag hierarki-tag--rrk">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                 RRK
@@ -1929,11 +2418,14 @@
             return match;
           });
 
-          // If only 1 milestone exists, any unmatched tasks belong to it
+          // If only 1 milestone exists, any unmatched tasks belong to it (strictly matching active staff PIC)
           if (childMilestones.length === 1 && childTasks.length === 0) {
             tugasList.forEach(t => {
-              childTasks.push(t);
-              matchedTugasIds.add(t.id);
+              const isMyPic = !activeStaffPic || (t.pic || '').toLowerCase().includes(activeStaffPic);
+              if (isMyPic) {
+                childTasks.push(t);
+                matchedTugasIds.add(t.id);
+              }
             });
           }
 
@@ -1964,7 +2456,7 @@
             <td style="text-align: left; padding-left: 14px; font-weight: 600; color: #1e293b;">
               <div style="display: flex; align-items: center;">
                 <span class="tree-branch tree-branch--l1" title="Sub dari RRK"></span>
-                ${childTasks.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick="toggleRow('${msId}')">Ã¢â€“Â¼</span>` : `<span style="display:inline-block; width:18px; margin-right:6px;"></span>`}
+                ${childTasks.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick=\"toggleRow('${msId}')\">&#9660;</span>` : `<span style="display:inline-block; width:18px; margin-right:6px;"></span>`}
                 <span class="hierarki-tag hierarki-tag--milestone">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
                   Milestone
@@ -2020,12 +2512,20 @@
       });
     }
 
-    /* Ã¢â€â‚¬Ã¢â€â‚¬ Metrics and Dashboard Calculation Ã¢â€â‚¬Ã¢â€â‚¬ */
+    /* ─── Metrics and Dashboard Calculation ─── */
     function updateLaporanMetrics() {
-      const rrkList = loadRrkData();
-      const milestoneList = loadMilestoneData();
-      const tugasList = loadTugasData();
-      const projectList = loadProjectData();
+      let rrkList = loadRrkData();
+      let milestoneList = loadMilestoneData();
+      let tugasList = loadTugasData();
+      let projectList = loadProjectData();
+
+      const activeStaffPic = (typeof getActiveStaffPic === 'function') ? getActiveStaffPic().toLowerCase() : '';
+      if (activeStaffPic) {
+        projectList = projectList.filter(p => (p.pic || '').toLowerCase() === activeStaffPic || (p.pic || '').toLowerCase().includes(activeStaffPic));
+        rrkList = rrkList.filter(r => (r.pic || '').toLowerCase() === activeStaffPic || (r.pic || '').toLowerCase().includes(activeStaffPic));
+        milestoneList = milestoneList.filter(m => (m.pic || '').toLowerCase() === activeStaffPic || (m.pic || '').toLowerCase().includes(activeStaffPic));
+        tugasList = tugasList.filter(t => (t.pic || '').toLowerCase() === activeStaffPic || (t.pic || '').toLowerCase().includes(activeStaffPic));
+      }
 
       const statTotalProject = document.getElementById("statTotalProject");
       const statTotalRrk = document.getElementById("statTotalRrk");
@@ -2147,7 +2647,7 @@
               </div>
             </td>
             <td style="text-align: right;">
-              <span class="task-success-pill">Ã¢Å“â€œ ${actualSelesai} / ${calcTotal}</span>
+              <span class="task-success-pill">&#10003; ${actualSelesai} / ${calcTotal}</span>
             </td>
           </tr>
         `).join('');
@@ -2187,56 +2687,176 @@
       });
     }
 
-    // Search bar functionality & Initialization
+    // Search & Filter Laporan functionality
+    function applyLaporanFilters() {
+      const searchInput = document.getElementById("laporanSearchInput");
+      const query = (searchInput ? searchInput.value : "").trim().toLowerCase();
+      const selHierarki = document.getElementById("filterHierarkiSelect") ? document.getElementById("filterHierarkiSelect").value : "Semua";
+      const selPic = document.getElementById("filterPicSelect") ? document.getElementById("filterPicSelect").value : "Semua";
+      const selStatus = document.getElementById("filterStatusSelect") ? document.getElementById("filterStatusSelect").value : "Semua";
+
+      const rows = Array.from(document.querySelectorAll("#laporanTableBody tr:not(#laporanEmptyFilteredRow)"));
+      const isDefault = (query === "" && selHierarki === "Semua" && selPic === "Semua" && selStatus === "Semua");
+
+      const emptyRow = document.getElementById("laporanEmptyFilteredRow");
+
+      if (isDefault) {
+        if (emptyRow) emptyRow.style.display = "none";
+        // Restore expansion states based on toggle icons
+        rows.forEach(row => {
+          const parentId = row.getAttribute("data-parent");
+          if (!parentId) {
+            row.style.display = "";
+          } else {
+            let currentParent = parentId;
+            let isVisible = true;
+            while (currentParent) {
+              const pRow = document.getElementById(currentParent);
+              const pToggle = pRow ? pRow.querySelector('.toggle-icon') : null;
+              if (pToggle && !pToggle.classList.contains('toggle-icon--expanded')) {
+                isVisible = false;
+                break;
+              }
+              currentParent = pRow ? pRow.getAttribute("data-parent") : null;
+            }
+            row.style.display = isVisible ? "" : "none";
+          }
+        });
+        return;
+      }
+
+      // Check matching rows
+      const matchMap = new Map();
+      rows.forEach(row => {
+        let matchH = true;
+        if (selHierarki === "Project") matchH = row.classList.contains("row-project");
+        else if (selHierarki === "RRK") matchH = row.classList.contains("row-rrk");
+        else if (selHierarki === "Milestone") matchH = row.classList.contains("row-milestone");
+        else if (selHierarki === "Tugas") matchH = row.classList.contains("row-tugas");
+
+        let matchP = true;
+        if (selPic !== "Semua") {
+          const picCell = row.cells[2] ? row.cells[2].textContent.trim().toLowerCase() : "";
+          matchP = picCell.includes(selPic.toLowerCase());
+        }
+
+        let matchS = true;
+        if (selStatus !== "Semua") {
+          const statusCell = row.cells[5] ? row.cells[5].textContent.trim().toLowerCase() : "";
+          matchS = statusCell.includes(selStatus.toLowerCase());
+        }
+
+        let matchQ = true;
+        if (query !== "") {
+          const rowText = row.textContent.toLowerCase();
+          matchQ = rowText.includes(query);
+        }
+
+        matchMap.set(row, matchH && matchP && matchS && matchQ);
+      });
+
+      // Keep ancestors visible if a child matches
+      rows.forEach(row => {
+        if (matchMap.get(row)) {
+          let parentId = row.getAttribute("data-parent");
+          while (parentId) {
+            const pRow = document.getElementById(parentId);
+            if (pRow) {
+              matchMap.set(pRow, true);
+              parentId = pRow.getAttribute("data-parent");
+            } else {
+              break;
+            }
+          }
+        }
+      });
+
+      let visibleCount = 0;
+      rows.forEach(row => {
+        const isVisible = !!matchMap.get(row);
+        row.style.display = isVisible ? "" : "none";
+        if (isVisible) visibleCount++;
+      });
+
+      // Show empty row if 0 visible
+      const tbody = document.getElementById("laporanTableBody");
+      if (visibleCount === 0) {
+        if (!emptyRow) {
+          const tr = document.createElement("tr");
+          tr.id = "laporanEmptyFilteredRow";
+          tr.innerHTML = `<td colspan="6" class="db-empty-row" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">Tidak ada data laporan yang sesuai dengan filter atau pencarian</td>`;
+          tbody.appendChild(tr);
+        } else {
+          emptyRow.style.display = "";
+        }
+      } else if (emptyRow) {
+        emptyRow.style.display = "none";
+      }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       renderHierarchyTable();
       updateLaporanMetrics();
 
       const searchInput = document.getElementById("laporanSearchInput");
       if (searchInput) {
-        searchInput.addEventListener("input", () => {
-          const query = searchInput.value.trim().toLowerCase();
-          const rows = document.querySelectorAll("#laporanTableBody tr");
-          if (query === "") {
-            // Restore expansion states based on toggle icons
-            rows.forEach(row => {
-              const parentId = row.getAttribute("data-parent");
-              if (!parentId) {
-                row.style.display = "";
-              } else {
-                let currentParent = parentId;
-                let isVisible = true;
-                while (currentParent) {
-                  const pRow = document.getElementById(currentParent);
-                  const pToggle = pRow ? pRow.querySelector('.toggle-icon') : null;
-                  if (pToggle && !pToggle.classList.contains('toggle-icon--expanded')) {
-                    isVisible = false;
-                    break;
-                  }
-                  currentParent = pRow ? pRow.getAttribute("data-parent") : null;
-                }
-                row.style.display = isVisible ? "" : "none";
-              }
-            });
-            return;
-          }
+        searchInput.addEventListener("input", applyLaporanFilters);
+      }
 
-          // Apply query filter to rows
-          rows.forEach(row => {
-            const cells = row.querySelectorAll("td");
-            let match = false;
-            cells.forEach(cell => {
-              if (cell.textContent.toLowerCase().includes(query)) {
-                match = true;
-              }
-            });
-            row.style.display = match ? "" : "none";
-          });
+      /* ─── Filter Popover ─── */
+      const btnFilter = document.getElementById("btnFilterLaporan");
+      const filterDropdown = document.getElementById("filterLaporanDropdown");
+      const filterForm = document.getElementById("filterLaporanForm");
+      const btnResetFilter = document.getElementById("btnResetFilterLaporan");
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          filterDropdown.classList.toggle("is-active");
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!filterDropdown.contains(e.target) && !btnFilter.contains(e.target)) {
+            filterDropdown.classList.remove("is-active");
+          }
+        });
+      }
+
+      if (filterForm) {
+        filterForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          applyLaporanFilters();
+          if (filterDropdown) filterDropdown.classList.remove("is-active");
+          if (typeof showToast === "function") {
+            showToast("Filter berhasil diterapkan");
+          } else if (window.ceoToast) {
+            window.ceoToast("Filter berhasil diterapkan", "success");
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener("click", () => {
+          const selHierarki = document.getElementById("filterHierarkiSelect");
+          const selPic = document.getElementById("filterPicSelect");
+          const selStatus = document.getElementById("filterStatusSelect");
+          if (selHierarki) selHierarki.value = "Semua";
+          if (selPic) selPic.value = "Semua";
+          if (selStatus) selStatus.value = "Semua";
+          if (searchInput) searchInput.value = "";
+          applyLaporanFilters();
+          if (filterDropdown) filterDropdown.classList.remove("is-active");
+          if (typeof showToast === "function") {
+            showToast("Filter berhasil di-reset");
+          } else if (window.ceoToast) {
+            window.ceoToast("Filter berhasil di-reset", "info");
+          }
         });
       }
     });
   </script>
-  <script src="../../assets/js/layout.js?v=1004"></script>
+  <script src="../../assets/js/layout.js?v=1007"></script>
 </body>
 
 </html>
