@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects Accounting | Bisa Media</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <!-- Boxicons for action icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css"
+  />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <style>
+    /* Table headers italic & background matching mockup */
+    .campaign-table th {
+      font-style: italic !important;
+      color: #334155 !important;
+      font-weight: 500 !important;
+      letter-spacing: 0.2px;
+    }
+
+    /* Custom design matching mockup exactly */
+    .priority-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .priority-badge--tinggi {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: #ff5252;
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+    .priority-badge--sedang {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+    .priority-badge--rendah {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .status-badge--belum-mulai {
+      background-color: rgba(140, 140, 140, 0.1);
+      color: #8c8c8c;
+      border: 1px solid rgba(140, 140, 140, 0.3);
+    }
+    .status-badge--berjalan {
+      background-color: rgba(34, 100, 198, 0.1);
+      color: #2264c6;
+      border: 1px solid rgba(34, 100, 198, 0.3);
+    }
+    .status-badge--selesai {
+      background-color: rgba(0, 230, 118, 0.12);
+      color: #00d26a;
+      border: 1px solid rgba(0, 230, 118, 0.35);
+    }
+
+    /* Actions: 3-Dots Button & Dropdown Menu */
+    .tdActions {
+      text-align: center;
+      position: relative;
+    }
+    .tdActions button[data-bm-dots="true"],
+    .btn-action-dots {
+      background: #edf2f7 !important;
+      border: none !important;
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      color: #1e293b !important;
+      transition: all 0.15s ease !important;
+      outline: none !important;
+      padding: 0 !important;
+      margin: 0 auto !important;
+      box-shadow: none !important;
+    }
+    .tdActions button[data-bm-dots="true"]:hover,
+    .btn-action-dots:hover,
+    .tdActions button[data-bm-dots="true"].show,
+    .btn-action-dots.show {
+      background: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    .tdActions button[data-bm-dots="true"] i,
+    .btn-action-dots i {
+      font-size: 20px !important;
+      color: #1e293b !important;
+      pointer-events: none;
+    }
+
+    .bm-table-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 140px;
+      padding: 10px 8px;
+      margin: 0;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.05);
+      list-style: none;
+    }
+    .bm-table-action-menu.show {
+      display: block !important;
+    }
+    .bm-table-action-menu li {
+      margin: 0;
+      padding: 2px 0;
+      list-style: none;
+    }
+    .bm-table-action-menu .dropdown-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      width: 100% !important;
+      padding: 6px 10px !important;
+      border-radius: 10px !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 14.5px !important;
+      font-weight: 500 !important;
+      font-style: italic !important;
+      color: #334155 !important;
+      background: transparent !important;
+      border: none !important;
+      cursor: pointer !important;
+      text-align: left !important;
+      white-space: nowrap !important;
+      transition: background-color 0.15s ease !important;
+      text-decoration: none !important;
+    }
+    .bm-table-action-menu .dropdown-item:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    .bm-table-action-menu .dropdown-item.text-danger {
+      color: #334155 !important;
+    }
+    .bm-table-action-menu .dropdown-item.text-danger:hover {
+      background-color: #fef2f2 !important;
+      color: #dc2626 !important;
+    }
+    .bm-table-action-menu .bm-menu-iconify {
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 9px !important;
+      background: #0077c8 !important;
+      color: #fff !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex: 0 0 34px !important;
+      box-shadow: 0 4px 10px rgba(0, 119, 200, 0.35) !important;
+      pointer-events: none;
+    }
+    .bm-table-action-menu .bm-menu-iconify--danger {
+      background: #e02424 !important;
+      box-shadow: 0 4px 10px rgba(224, 36, 36, 0.35) !important;
+    }
+    .bm-table-action-menu .bm-menu-iconify i {
+      color: #fff !important;
+      font-size: 18px !important;
+      line-height: 1 !important;
+    }
+    .bm-table-action-menu .bm-menu-text {
+      font-style: italic !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      font-size: 14.5px !important;
+    }
+
+    /* Blue style search and buttons matching mockup style exactly */
+    .small-action-button-blue {
+      border: 1px solid #29A3D8;
+      color: #29A3D8;
+      background: #fff;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+    .small-action-button-blue:hover {
+      background-color: rgba(41, 163, 216, 0.08);
+    }
+    
+    .btn-tambah-blue {
+      background-color: #29A3D8;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.15s ease;
+    }
+    .btn-tambah-blue:hover {
+      background-color: #1e87b7;
+    }
+    
+    .campaign-search-blue {
+      display: flex;
+      align-items: center;
+      border: 1px solid #c5c5c8;
+      border-radius: 6px;
+      padding: 4px 10px;
+      background: #fff;
+      gap: 8px;
+    }
+    .campaign-search-blue svg {
+      width: 14px;
+      height: 14px;
+      color: #a1a1a5;
+    }
+    .campaign-search-blue input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: #333;
+      width: 120px;
+    }
+
+    /* Floating Chat Widget styles copied from accounting_tugas.html */
+    .chat-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .chat-trigger-btn {
+      width: 56px;
+      height: 56px;
+      border-radius: 50% 50% 0 50%;
+      background-color: #39add9;
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 16px rgba(57, 173, 217, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .chat-trigger-btn:hover {
+      transform: scale(1.05);
+      background-color: #2ea7d2;
+    }
+
+    .chat-trigger-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .chat-popup {
+      position: absolute;
+      bottom: 72px;
+      right: 0;
+      width: 300px;
+      height: 380px;
+      background-color: #fff;
+      border: 1.5px solid #39add9;
+      border-radius: 20px 20px 0 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideUp 0.25s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-header {
+      background-color: #e9ecef;
+      padding: 12px 16px;
+      border-bottom: 1.5px solid #39add9;
+    }
+
+    .chat-header h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      font-style: italic;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background-color: #fff;
+    }
+
+    .chat-msg {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 85%;
+    }
+
+    .chat-msg.left {
+      align-self: flex-start;
+      flex-direction: row;
+    }
+
+    .chat-msg.right {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: #0076c6;
+      flex-shrink: 0;
+    }
+
+    .chat-bubble {
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      background-color: #fff;
+      border: 1px solid #cdd0d5;
+      color: #333;
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+
+    .chat-msg.left .chat-bubble {
+      border-bottom-left-radius: 2px;
+    }
+
+    .chat-msg.right .chat-bubble {
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-footer {
+      padding: 12px;
+      background-color: #fff;
+      border-top: 1px solid #f1f3f5;
+    }
+
+    .chat-input-wrap {
+      display: flex;
+      align-items: center;
+      border: 1px solid #a0a5b0;
+      border-radius: 20px;
+      padding: 4px 6px 4px 12px;
+      background-color: #fff;
+    }
+
+    .chat-input-wrap input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      background: transparent;
+      padding: 4px 0;
+    }
+
+    .chat-send-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #0076c6;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s;
+    }
+
+    .chat-send-btn:hover {
+      background-color: #0064a7;
+    }
+
+    .chat-send-btn svg {
+      transform: rotate(-30deg);
+    }
+
+    /* Detail Panel Tabs (Clean, zero scrollbars/arrows, consistent with RRK, Milestone, Tugas) */
+    .detail-tabs-nav {
+      background: #ffffff !important;
+      border-bottom: 2px solid #e2e8f0 !important;
+      padding: 0 !important;
+      display: flex !important;
+      gap: 24px !important;
+      align-items: center !important;
+      overflow: visible !important;
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .detail-tabs-nav::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    .detail-tab {
+      background: none !important;
+      border: none !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      color: #64748b !important;
+      cursor: pointer !important;
+      padding: 12px 2px !important;
+      height: auto !important;
+      position: relative !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      border-bottom: 2.5px solid transparent !important;
+      margin-bottom: -2px !important;
+      transition: all 0.2s ease !important;
+      font-family: 'Outfit', sans-serif !important;
+      white-space: nowrap !important;
+    }
+    .detail-tab:hover {
+      color: #1e293b !important;
+    }
+    .detail-tab.active {
+      font-weight: 700 !important;
+      color: #2865b5 !important;
+      border-bottom-color: #2865b5 !important;
+    }
+
+    /* Project Metadata Grid Card */
+    .project-meta-card {
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .project-meta-card:hover {
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    /* Detail Progress Card */
+    .detail-progress-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+    .detail-progress-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .detail-progress-percent {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #2865b5;
+      font-family: 'Outfit', sans-serif;
+    }
+    .detail-progress-track {
+      width: 100%;
+      height: 7px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .detail-progress-bar {
+      height: 100%;
+      background: #2865b5;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* Detail Content Box */
+    .detail-content-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .detail-content-box-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+    .detail-content-box-text {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #475569;
+    }
+  </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js?v=2"></script>
+</head>
+
+<body class="dashboard-body">
+        <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Accounting</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Projects</h1>
+      </div>
+
+
+
+      <!-- Main Project Panel -->
+      <section class="panel campaign-panel" style="padding-bottom: 24px;">
+        <!-- Top border thick blue bar -->
+        <div class="campaign-panel__line" style="height: 4px; background: var(--blue-800);"></div>
+
+        <!-- Toolbar -->
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <div class="filter-dropdown-wrapper" style="margin-right: 6px;">
+              <button id="btnFilterCampaign" class="small-action-button-blue" type="button" aria-label="Filter">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </button>
+
+              <!-- Dropdown Content -->
+              <div id="filterCampaignDropdown" class="filter-popover" style="top: 100%; left: 0;">
+                <form id="filterCampaignForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">Prioritas</label>
+                    <div class="select-wrapper">
+                      <select class="form-select">
+                        <option value="" disabled selected hidden>Pilih Prioritas</option>
+                        <option value="Tinggi">Tinggi</option>
+                        <option value="Sedang">Sedang</option>
+                        <option value="Rendah">Rendah</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Penugasan</label>
+                    <div class="select-wrapper">
+                      <select class="form-select">
+                        <option value="" disabled selected hidden>Pilih Penugasan</option>
+                        <option value="Riva">Riva</option>
+                        <option value="Sri">Sri</option>
+                        <option value="Ahmad">Ahmad</option>
+                        <option value="Fauzi">Fauzi</option>
+                        <option value="Budi">Budi</option>
+                        <option value="Siti">Siti</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+                    <button type="reset" class="btn-reset" style="background-color: #f44336; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px;">Reset</button>
+                    <button type="submit" class="btn-simpan" style="background-color: #2264c6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px; margin: 0;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <button id="btnCalendarCampaign" class="small-action-button-blue" type="button" aria-label="Pilih tanggal" style="margin-right: 6px;">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </button>
+            <label class="campaign-search-blue">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="search" id="projectSearchInput" placeholder="Cari..." />
+            </label>
+          </div>
+          <div class="campaign-toolbar__right">
+            <button id="btnTambahProject" class="btn-tambah-blue" type="button">
+              + Tambah
+            </button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap campaign-table" style="padding: 0 0 24px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 60px;">#</th>
+                <th>Nama Project</th>
+                <th>PIC</th>
+                <th>Tim</th>
+                <th>Timeline</th>
+                <th style="width: 120px;">Status</th>
+                <th style="width: 100px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="projectTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Project Detail Modal -->
+      <!-- Project Detail Modal (Consistent with RRK, Milestone, and Tugas) -->
+      <div id="projectDetailModal" class="modal-overlay" style="z-index: 2147483000;">
+        <input type="hidden" id="currentActiveProjectId" value="" />
+        <div class="modal-box modal-box--large" style="width: 860px; max-width: 95%; max-height: 90vh; overflow-y: auto; padding: 24px; border-radius: 12px; background: #fff;">
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h2 class="modal-title" style="font-weight: 500; font-size: 16px; color: #17171a;">Detail
+              <strong style="font-weight: 700;">Project</strong>
+            </h2>
+            <button id="closeProjectDetailModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+          </div>
+
+          <div class="modal-divider"></div>
+
+          <!-- Structured Information Header Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px;">
+            <div style="flex: 1; min-width: 0;">
+              <h3 id="detailTitle" style="margin: 0 0 6px; font-size: 17px; font-weight: 800; color: #1e293b; font-family: 'Outfit', sans-serif; line-height: 1.4;">-</h3>
+              <span id="detailDateBadge" style="display: inline-block; font-size: 11.5px; font-weight: 700; background: #35a9d2; color: #fff; padding: 2px 10px; border-radius: 4px;">-</span>
+            </div>
+            <div id="detailStatusBadgeWrapper" style="flex-shrink: 0;">
+              <span id="detailStatusBadge" class="status-badge status-badge--selesai" style="font-size: 12.5px; padding: 4px 14px; border-radius: 6px;">Selesai</span>
+            </div>
+          </div>
+
+          <!-- Structured Metadata Information Cards (Clean 2-Column Responsive Grid) -->
+          <div class="project-meta-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+            <!-- PIC Project -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(99, 102, 241, 0.12); color: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-user-pin"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">PIC Project</div>
+                <div id="detailPic" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+
+            <!-- Timeline Mulai -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(41, 163, 216, 0.12); color: #29A3D8; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-calendar"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Tanggal Mulai</div>
+                <div id="detailTimelineMulai" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+
+            <!-- Batas Waktu (Deadline) -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-time-five"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Batas Waktu (Deadline)</div>
+                <div id="detailDeadline" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+
+            <!-- Status Realisasi -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-check-circle"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Status Realisasi</div>
+                <div id="detailStatusCard" style="font-size: 13.5px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+
+            <!-- Anggota Tim Project -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(168, 85, 247, 0.12); color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-group"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Anggota Tim Project</div>
+                <div id="detailTim" style="font-size: 13px; font-weight: 700; color: #1e293b; line-height: 1.4;">-</div>
+              </div>
+            </div>
+
+            <!-- Dokumen Lampiran Status -->
+            <div class="project-meta-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+              <div style="width: 38px; height: 38px; border-radius: 8px; background: rgba(245, 158, 11, 0.12); color: #d97706; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0;">
+                <i class="bx bx-paperclip"></i>
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">Dokumen Lampiran</div>
+                <div id="detailDokumenStatus" style="font-size: 13px; font-weight: 700; color: #1e293b;">-</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Overview Card -->
+          <div class="detail-progress-card" style="margin-bottom: 20px;">
+            <div class="detail-progress-card-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="bx bx-trending-up" style="color: #2865b5; font-size: 18px;"></i>
+                <span style="font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Outfit', sans-serif;">Kemajuan Project</span>
+              </div>
+              <span id="detailProgressText" class="detail-progress-percent">0%</span>
+            </div>
+            <div class="detail-progress-track">
+              <div id="detailProgressFill" class="detail-progress-bar" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Modern Tabs Navigation Bar (Clean, zero scrollbars/arrows) -->
+          <div class="detail-tabs-nav">
+            <button class="detail-tab detail-tab-btn active" data-tab="rincian" type="button">
+              <i class="bx bx-file-blank" style="font-size: 16px;"></i> Rincian Project
+            </button>
+            <button class="detail-tab detail-tab-btn" data-tab="subtasks" type="button">
+              <i class="bx bx-list-check" style="font-size: 16px;"></i> Daftar Sub-Tugas
+            </button>
+            <button class="detail-tab detail-tab-btn" data-tab="dokument" type="button">
+              <i class="bx bx-paperclip" style="font-size: 16px;"></i> Dokumen Lampiran
+            </button>
+            <button class="detail-tab detail-tab-btn" data-tab="catatan" type="button">
+              <i class="bx bx-notepad" style="font-size: 16px;"></i> Catatan
+            </button>
+          </div>
+
+          <!-- Tab Content Area -->
+          <div id="detailTabContent" class="detail-tab-container">
+            <!-- Tab: Rincian Project -->
+            <div id="tab-rincian" class="tab-pane">
+              <div class="detail-content-box">
+                <div class="detail-content-box-title">
+                  <i class="bx bx-file" style="color: #2865b5; font-size: 16px;"></i>
+                  <span>Deskripsi Lingkup & Sasaran Project</span>
+                </div>
+                <p id="detailDesc" class="detail-content-box-text">-</p>
+              </div>
+            </div>
+
+            <!-- Tab: Sub-tasks Section -->
+            <div id="tab-subtasks" class="tab-pane" style="display: none;">
+              <div class="detail-sub-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 13.5px; font-weight: 700; color: #1e293b; font-family: 'Outfit', sans-serif;">
+                    <i class="bx bx-list-check" style="color: #2865b5; font-size: 17px; vertical-align: -2px; margin-right: 4px;"></i>Daftar Sub-Tugas Project
+                  </span>
+                </div>
+                <!-- Tambah Tugas button -->
+                <button id="btnTambahTugasFromDetail" class="btn-tambah" type="button" style="height: 34px; padding: 0 14px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 6px; background: #2865b5; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                  <i class="bx bx-plus" style="font-size: 16px;"></i> Tambah Tugas
+                </button>
+              </div>
+
+              <!-- Table Section -->
+              <div class="table-wrap campaign-table" style="padding: 0; max-height: 260px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <table style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px;">#</th>
+                      <th>Nama Tugas</th>
+                      <th style="width: 150px; text-align: center;">Status</th>
+                      <th>Bukti</th>
+                      <th>Revisi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailProjectTasksTableBody">
+                    <!-- Grouped list rendered via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Tab: Dokumen Lampiran -->
+            <div id="tab-dokument" class="tab-pane" style="display: none;">
+              <div id="detailDokumenContainer">
+                <p style="margin: 0; color: #64748b; font-size: 13.5px;" id="detailDokumenText">Belum ada dokumen yang diunggah.</p>
+              </div>
+            </div>
+
+            <!-- Tab: Catatan -->
+            <div id="tab-catatan" class="tab-pane" style="display: none;">
+              <div class="detail-content-box">
+                <div class="detail-content-box-title">
+                  <i class="bx bx-notepad" style="color: #2865b5; font-size: 16px;"></i>
+                  <span>Catatan & Evaluasi Pelaksanaan</span>
+                </div>
+                <p id="detailCatatanText" class="detail-content-box-text">Belum ada catatan.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal Footer with Tutup button only (View-only focus consistent with RRK, Milestone, and Tugas) -->
+          <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 20px; padding-top: 14px; border-top: 1px dashed #cbd5e1; width: 100%;">
+            <button type="button" id="btnCloseProjectDetail" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; padding: 9px 28px; font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.15s ease; font-family: 'Outfit', sans-serif;"
+              onmouseover="this.style.background='#e2e8f0';"
+              onmouseout="this.style.background='#f1f5f9';">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+  </div>
+
+  <!-- Modal PopUp Tambah/Edit Project -->
+  <div id="projectModal" class="modal-overlay">
+    <div class="modal-box modal-box--medium">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Tambah <strong style="font-weight: 700;">Project</strong></h2>
+        <button id="closeProjectModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <form id="projectForm" class="modal-form-grid" style="grid-template-columns: repeat(12, 1fr); gap: 20px;">
+        <input type="hidden" id="editIndex" value="" />
+        <input type="hidden" id="editStatus" value="" />
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Nama Project</label>
+          <input type="text" id="inputNamaProject" class="form-input" placeholder="Masukkan Nama Project" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Deskripsi</label>
+          <input type="text" id="inputDeskripsi" class="form-input" placeholder="Tambahkan Output" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">PIC</label>
+          <div class="dropdown-select-tree">
+            <div class="dropdown-select-trigger" id="picDropdownTrigger" onclick="toggleDropdownTree(this)">
+              <span class="dropdown-select-label">Pilih PIC</span>
+              <span class="dropdown-select-arrow">Ã¢â€“Â¼</span>
+            </div>
+            <div class="dropdown-tree-panel">
+              <div class="tree-picker-container" id="picTreePicker">
+                <div class="tree-picker-left">
+                  <!-- KOL group -->
+                  <div class="tree-node">
+                    <div class="tree-node-parent" onclick="toggleTreeNode(this, event)">
+                      <input type="checkbox" data-parent="KOL" onchange="parentCheckboxChanged(this, 'pic')" />
+                      <span>KOL</span>
+                      <span class="tree-node-arrow">v</span>
+                    </div>
+                    <div class="tree-node-children">
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Supervisi KOL" onchange="childCheckboxChanged('pic')" />
+                        <span>Supervisi KOL</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Setiawan" onchange="childCheckboxChanged('pic')" />
+                        <span>Setiawan</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Amanda" onchange="childCheckboxChanged('pic')" />
+                        <span>Amanda</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Dimas" onchange="childCheckboxChanged('pic')" />
+                        <span>Dimas</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Clarissa" onchange="childCheckboxChanged('pic')" />
+                        <span>Clarissa</span>
+                      </label>
+                    </div>
+                  </div>
+                  <!-- Ads group -->
+                  <div class="tree-node">
+                    <div class="tree-node-parent" onclick="toggleTreeNode(this, event)">
+                      <input type="checkbox" data-parent="Ads" onchange="parentCheckboxChanged(this, 'pic')" />
+                      <span>Ads</span>
+                      <span class="tree-node-arrow">v</span>
+                    </div>
+                    <div class="tree-node-children">
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Supervisi KOL" onchange="childCheckboxChanged('pic')" />
+                        <span>Supervisi KOL</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Setiawan" onchange="childCheckboxChanged('pic')" />
+                        <span>Setiawan</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Amanda" onchange="childCheckboxChanged('pic')" />
+                        <span>Amanda</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Dimas" onchange="childCheckboxChanged('pic')" />
+                        <span>Dimas</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="pic-child-checkbox" data-parent="KOL" data-value="Clarissa" onchange="childCheckboxChanged('pic')" />
+                        <span>Clarissa</span>
+                      </label>
+                    </div>
+                  </div>
+                  <!-- Ads group -->
+                  <div class="tree-node">
+                    <div class="tree-node-parent" onclick="toggleTreeNode(this, event)">
+                      <input type="checkbox" data-parent="Ads" onchange="parentCheckboxChanged(this, 'tim')" />
+                      <span>Ads</span>
+                      <span class="tree-node-arrow">v</span>
+                    </div>
+                    <div class="tree-node-children">
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Ads" data-value="Supervisi Ads" onchange="childCheckboxChanged('tim')" />
+                        <span>Supervisi Ads</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Ads" data-value="Tim 1" onchange="childCheckboxChanged('tim')" />
+                        <span>Tim 1</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Ads" data-value="Ahmad" onchange="childCheckboxChanged('tim')" />
+                        <span>Ahmad</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Ads" data-value="Fauzi" onchange="childCheckboxChanged('tim')" />
+                        <span>Fauzi</span>
+                      </label>
+                    </div>
+                  </div>
+                  <!-- Marketing group -->
+                  <div class="tree-node">
+                    <div class="tree-node-parent" onclick="toggleTreeNode(this, event)">
+                      <input type="checkbox" data-parent="Marketing" onchange="parentCheckboxChanged(this, 'tim')" />
+                      <span>Marketing</span>
+                      <span class="tree-node-arrow">v</span>
+                    </div>
+                    <div class="tree-node-children">
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Marketing" data-value="Supervisi Marketing" onchange="childCheckboxChanged('tim')" />
+                        <span>Supervisi Marketing</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Marketing" data-value="Tim 1" onchange="childCheckboxChanged('tim')" />
+                        <span>Tim 1</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Marketing" data-value="Budi" onchange="childCheckboxChanged('tim')" />
+                        <span>Budi</span>
+                      </label>
+                      <label class="tree-node-child">
+                        <input type="checkbox" class="tim-child-checkbox" data-parent="Marketing" data-value="Siti" onchange="childCheckboxChanged('tim')" />
+                        <span>Siti</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="tree-picker-right" id="timSelectedContainer">
+                  <!-- Selected cards rendered dynamically -->
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="inputPIC" />
+            <input type="hidden" id="inputTim" />
+          </div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Tanggal Mulai</label>
+          <input type="date" id="inputTimelineMulai" class="form-input" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Deadline</label>
+          <input type="date" id="inputTimelineSelesai" class="form-input" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Dokumen (Opsional)</label>
+          <input type="file" id="inputDokumen" class="form-input" style="padding: 4px;" />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Catatan (Opsional)</label>
+          <input type="text" id="inputCatatan" class="form-input" placeholder="Tambah Catatan" />
+        </div>
+
+        <div class="modal-footer"
+          style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ababaf; width: 100%; grid-column: span 12;">
+          <button class="btn-save-modal" id="btnSubmitProject" type="submit"
+            style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;"
+            onmouseover="this.style.background='#29A3D8';this.style.color='#fff';"
+            onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal PopUp Hapus Project -->
+  <div id="projectDeleteModal" class="modal-overlay">
+    <div class="modal-box delete-modal-box">
+      <h3 class="delete-modal-title">Hapus</h3>
+      <div class="delete-modal-icon-box">
+        <i class="bx bx-trash"></i>
+      </div>
+      <p class="delete-modal-desc">
+        Apakah Anda yakin ingin menghapus project "<span id="deleteProjectNamaText">-</span>"?
+      </p>
+      <div class="delete-modal-actions">
+        <button type="button" class="btn-delete-cancel"
+          onclick="document.getElementById('projectDeleteModal').classList.remove('is-active')">Batal</button>
+        <button type="button" class="btn-delete-confirm" id="confirmDeleteProjectBtn">Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal PopUp Tambah Tugas (Nested under project detail view) -->
+  <div id="tugasProjectModal" class="modal-overlay" style="z-index: 2147483010;">
+    <div class="modal-box modal-box--medium" style="max-width: 500px; padding: 24px;">
+      <div class="modal-header">
+        <h2 class="modal-title" id="tugasModalTitle">Tambah <strong style="font-weight: 700;">Tugas</strong></h2>
+        <button id="closeTugasProjectModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider" style="margin: 15px 0; border-top: 1px dashed #dcdcdc;"></div>
+
+      <form id="tugasProjectForm">
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label" style="font-weight: bold; margin-bottom: 6px; display: block;">Tim</label>
+          <select id="inputTugasTim" class="form-select" style="width: 100%;" required>
+            <option value="" disabled selected hidden>Pilih Tim</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label class="form-label" style="font-weight: bold; margin-bottom: 6px; display: block;">Tugas</label>
+          <input type="text" id="inputTugasName" class="form-input" style="width: 100%;" placeholder="Masukkan Tugas" required />
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; border-top: 1px dashed #ababaf; padding-top: 14px;">
+          <button class="btn-save-modal" type="submit"
+            style="background: #fff; border: 1.5px solid #29A3D8; color: #29A3D8; border-radius: 6px; padding: 8px 30px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease-in-out; font-family: 'Outfit', sans-serif;"
+            onmouseover="this.style.background='#29A3D8';this.style.color='#fff';"
+            onmouseout="this.style.background='#fff';this.style.color='#29A3D8';">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal PopUp Kalender Campaign -->
+  <div id="calendarCampaignModal" class="modal-overlay">
+    <div class="modal-box modal-box--large" style="width: 820px; max-width: 95%;">
+      <div class="modal-header">
+        <h2 class="modal-title">Pilih Tanggal</h2>
+        <button id="closeCalendarModal" class="modal-close" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <div class="calendar-picker-body">
+        <!-- Left Quick Options -->
+        <div class="calendar-quick-options">
+          <button type="button" class="quick-option-btn">Hari ini</button>
+          <button type="button" class="quick-option-btn">Kemarin</button>
+          <button type="button" class="quick-option-btn">7 hari terakhir</button>
+          <button type="button" class="quick-option-btn">30 hari terakhir</button>
+          <button type="button" class="quick-option-btn">3 bulan terakhir</button>
+          <button type="button" class="quick-option-btn">6 bulan terakhir</button>
+          <button type="button" class="quick-option-btn">12 bulan terakhir</button>
+        </div>
+
+        <!-- Right Side: Dual Calendars -->
+        <div class="calendar-months-container">
+          <!-- Month 1: Agustus -->
+          <div class="calendar-month-box">
+            <div class="calendar-month-header">
+              <span class="nav-arrow">&laquo;</span>
+              <span class="month-title">2026 - 08</span>
+              <span class="nav-arrow">&lsaquo;</span>
+            </div>
+            <div class="calendar-weekdays">
+              <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span
+                class="weekend">Sab</span><span class="weekend">Min</span>
+            </div>
+            <div class="calendar-days">
+              <span class="day-muted">27</span>
+              <span class="day-muted">28</span>
+              <span class="day-muted">29</span>
+              <span class="day-muted">30</span>
+              <span class="day-muted">31</span>
+              <span class="day-active selected-start">1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+              <span>6</span>
+              <span>7</span>
+              <span>8</span>
+              <span>9</span>
+              <span>10</span>
+              <span>11</span>
+              <span>12</span>
+              <span>13</span>
+              <span>14</span>
+              <span>15</span>
+              <span>16</span>
+              <span>17</span>
+              <span>18</span>
+              <span>19</span>
+              <span>20</span>
+              <span>21</span>
+              <span>22</span>
+              <span>23</span>
+              <span>24</span>
+              <span>25</span>
+              <span>26</span>
+              <span>27</span>
+              <span>28</span>
+              <span>29</span>
+              <span>30</span>
+              <span>31</span>
+              <span class="day-muted">1</span>
+              <span class="day-muted">2</span>
+              <span class="day-muted">3</span>
+              <span class="day-muted">4</span>
+              <span class="day-muted">5</span>
+              <span class="day-muted">6</span>
+            </div>
+          </div>
+
+          <!-- Month 2: September -->
+          <div class="calendar-month-box">
+            <div class="calendar-month-header">
+              <span class="nav-arrow">&rsaquo;</span>
+              <span class="month-title">2026 - 09</span>
+              <span class="nav-arrow">&raquo;</span>
+            </div>
+            <div class="calendar-weekdays">
+              <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span
+                class="weekend">Sab</span><span class="weekend">Min</span>
+            </div>
+            <div class="calendar-days">
+              <span class="day-muted">31</span>
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+              <span>6</span>
+              <span>7</span>
+              <span>8</span>
+              <span>9</span>
+              <span>10</span>
+              <span>11</span>
+              <span>12</span>
+              <span>13</span>
+              <span>14</span>
+              <span>15</span>
+              <span>16</span>
+              <span class="day-active selected-end">17</span>
+              <span>18</span>
+              <span>19</span>
+              <span>20</span>
+              <span>21</span>
+              <span>22</span>
+              <span>23</span>
+              <span>24</span>
+              <span>25</span>
+              <span>26</span>
+              <span>27</span>
+              <span>28</span>
+              <span>29</span>
+              <span>30</span>
+              <span class="day-muted">1</span>
+              <span class="day-muted">2</span>
+              <span class="day-muted">3</span>
+              <span class="day-muted">4</span>
+              <span class="day-muted">5</span>
+              <span class="day-muted">6</span>
+              <span class="day-muted">7</span>
+              <span class="day-muted">8</span>
+              <span class="day-muted">9</span>
+              <span class="day-muted">10</span>
+              <span class="day-muted">11</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar-picker-footer">
+        <div class="selected-range-info">
+          Dipilih: <span id="selectedRangeText">2026-08-01 - 2026-09-17</span>
+        </div>
+        <div class="calendar-footer-buttons">
+          <button type="button" class="btn-calendar-cancel" id="btnCancelCalendar">Batal</button>
+          <button type="button" class="btn-calendar-apply" id="btnApplyCalendar">Terapkan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="../../assets/js/app.js?v=3"></script>
+
+  <script>
+    // Tree Picker functions globally available
+    function toggleTreeNode(element, event) {
+      if (event && (event.target.tagName === 'INPUT' || event.target.closest('input'))) {
+        return;
+      }
+      const node = element.closest('.tree-node');
+      const children = node.querySelector('.tree-node-children');
+      const arrow = element.querySelector('.tree-node-arrow');
+      if (children) {
+        const isHidden = children.style.display === 'none';
+        children.style.display = isHidden ? 'flex' : 'none';
+        if (arrow) {
+          arrow.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+      }
+    }
+
+    function parentCheckboxChanged(parentCb, type) {
+      const parentName = parentCb.dataset.parent;
+      const node = parentCb.closest('.tree-node');
+      const childCbs = node.querySelectorAll(`.${type}-child-checkbox`);
+      childCbs.forEach(cb => {
+        cb.checked = parentCb.checked;
+      });
+      childCheckboxChanged(type);
+    }
+
+    function childCheckboxChanged(type) {
+      const container = document.getElementById(type === 'pic' ? 'picTreePicker' : 'timTreePicker');
+      if (!container) return;
+
+      const parentNodes = container.querySelectorAll('.tree-node');
+      const selectedValues = [];
+
+      parentNodes.forEach(node => {
+        const parentCb = node.querySelector('.tree-node-parent input[type="checkbox"]');
+        const childCbs = Array.from(node.querySelectorAll(`.${type}-child-checkbox`));
+        const checkedChildren = childCbs.filter(cb => cb.checked);
+
+        if (parentCb) {
+          if (checkedChildren.length === childCbs.length && childCbs.length > 0) {
+            parentCb.checked = true;
+            parentCb.indeterminate = false;
+          } else if (checkedChildren.length > 0) {
+            parentCb.checked = false;
+            parentCb.indeterminate = true;
+          } else {
+            parentCb.checked = false;
+            parentCb.indeterminate = false;
+          }
+        }
+
+        checkedChildren.forEach(cb => {
+          selectedValues.push({
+            value: cb.dataset.value,
+            parent: cb.dataset.parent
+          });
+        });
+      });
+
+      // Rebuild selected cards
+      const rightContainer = document.getElementById(type === 'pic' ? 'picSelectedContainer' : 'timSelectedContainer');
+      if (rightContainer) {
+        rightContainer.innerHTML = selectedValues.map(item => `
+          <div class="tree-selected-card">
+            <input type="checkbox" checked onclick="removeSelectedItem('${type}', '${item.value}', '${item.parent}')" />
+            <div class="tree-selected-info">
+              <span class="tree-selected-name">${item.value}</span>
+              <span class="tree-selected-category">${item.parent}</span>
+            </div>
+            <button type="button" class="tree-selected-remove" onclick="removeSelectedItem('${type}', '${item.value}', '${item.parent}')">Remove</button>
+          </div>
+        `).join('');
+      }
+
+      // Update label on trigger
+      const labelSpan = document.querySelector(type === 'pic' ? '#picDropdownTrigger .dropdown-select-label' : '#timDropdownTrigger .dropdown-select-label');
+      const hiddenInput = document.getElementById(type === 'pic' ? 'inputPIC' : 'inputTim');
+      const valuesStr = selectedValues.map(item => item.value).join(', ');
+      
+      if (labelSpan) {
+        labelSpan.textContent = valuesStr || (type === 'pic' ? 'Pilih PIC' : 'Pilih Tim');
+      }
+      if (hiddenInput) {
+        hiddenInput.value = valuesStr;
+      }
+    }
+
+    function removeSelectedItem(type, value, parent) {
+      const container = document.getElementById(type === 'pic' ? 'picTreePicker' : 'timTreePicker');
+      if (!container) return;
+
+      const childCbs = container.querySelectorAll(`.${type}-child-checkbox`);
+      childCbs.forEach(cb => {
+        if (cb.dataset.value === value && cb.dataset.parent === parent) {
+          cb.checked = false;
+        }
+      });
+
+      childCheckboxChanged(type);
+    }
+
+    function syncTreePickerFromHidden(type) {
+      const hiddenInput = document.getElementById(type === 'pic' ? 'inputPIC' : 'inputTim');
+      if (!hiddenInput) return;
+
+      const values = hiddenInput.value.split(',').map(v => v.trim()).filter(Boolean);
+      const container = document.getElementById(type === 'pic' ? 'picTreePicker' : 'timTreePicker');
+      if (!container) return;
+
+      const childCbs = container.querySelectorAll(`.${type}-child-checkbox`);
+      childCbs.forEach(cb => {
+        cb.checked = values.includes(cb.dataset.value);
+      });
+
+      childCheckboxChanged(type);
+    }
+
+    function resetTreePickers() {
+      ['pic', 'tim'].forEach(type => {
+        const container = document.getElementById(type === 'pic' ? 'picTreePicker' : 'timTreePicker');
+        if (!container) return;
+        const childCbs = container.querySelectorAll(`.${type}-child-checkbox`);
+        childCbs.forEach(cb => cb.checked = false);
+        childCheckboxChanged(type);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      let baseTotal = 100;
+      let baseBerjalan = 100;
+      let baseSelesai = 100;
+
+      /* Ã¢â€â‚¬Ã¢â€â‚¬ LocalStorage Persistence & Default Project Data Ã¢â€â‚¬Ã¢â€â‚¬ */
+      const PROJECT_STORAGE_KEY = "accounting_project_data_v5";
+      const PROJECT_RESET_KEY = "accounting_project_reset_v4";
+
+      const DEFAULT_PROJECTS = [
+        {
+                "id": 1,
+                "namaProject": "Aktivasi KOL Hijab & Fashion Muslim 2026",
+                "deskripsi": "Campaign promosi koleksi hijab premium dan modest fashion di TikTok Shop & Shopee",
+                "pic": "Setiawan",
+                "tim": "Setiawan, Amanda",
+                "timelineMulai": "2026-09-01",
+                "timelineSelesai": "2026-09-30",
+                "status": "Berjalan",
+                "progress": 75,
+                "catatan": "Fokus pada engagement TikTok & IG Reels",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Penyusunan guideline konten video hijab",
+                                "status": "Selesai",
+                                "bukti": "guideline_hijab_2026.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Kurasi 25 kreator fashion hijab mikro & makro",
+                                "status": "Selesai",
+                                "bukti": "list_kreator_hijab.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "recipient": "Amanda (Tim)",
+                                "name": "Review draft video TikTok Shop kreator",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Perbaiki hook video awal"
+                        },
+                        {
+                                "id": 4,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Approval final video & scheduling tayang",
+                                "status": "Belum Mulai",
+                                "bukti": "-",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 2,
+                "namaProject": "Campaign Glowing Skincare Beauty Ramadhan",
+                "deskripsi": "Aktivasi kolaborasi endorsement kreator beauty & skincare untuk peluncuran bundle ramadhan",
+                "pic": "Amanda",
+                "tim": "Amanda, Clarissa",
+                "timelineMulai": "2026-09-05",
+                "timelineSelesai": "2026-10-05",
+                "status": "Berjalan",
+                "progress": 60,
+                "catatan": "Target 10M views reels & TikTok",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Amanda (PIC)",
+                                "name": "Penyusunan brief review serum & sunscreen",
+                                "status": "Selesai",
+                                "bukti": "brief_skincare.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Amanda (PIC)",
+                                "name": "Kurasi 30 beauty creator TikTok & Instagram",
+                                "status": "Selesai",
+                                "bukti": "beauty_creators_list.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "recipient": "Clarissa (Tim)",
+                                "name": "Monitoring posting review dan engagement",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Cek hashtag campaign"
+                        }
+                ]
+        },
+        {
+                "id": 3,
+                "namaProject": "Viral Food Review F&B Ramadan Special",
+                "deskripsi": "Campaign liputan dan review menu buka puasa bersama food vlogger kuliner se-Jabodetabek",
+                "pic": "Dimas",
+                "tim": "Dimas, Setiawan",
+                "timelineMulai": "2026-09-10",
+                "timelineSelesai": "2026-10-10",
+                "status": "Berjalan",
+                "progress": 50,
+                "catatan": "Target traffic store dan GMV online Rp 200.000.000",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Dimas (PIC)",
+                                "name": "Kurasi 25 food vlogger TikTok & Reels",
+                                "status": "Selesai",
+                                "bukti": "food_vlogger_list.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Dimas (PIC)",
+                                "name": "Distribusi voucher kunjungan outlet & menu tasting",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Konfirmasi jadwal kehadiran"
+                        }
+                ]
+        },
+        {
+                "id": 4,
+                "namaProject": "Edukasi Nutrisi & Perlengkapan Ibu-Anak",
+                "deskripsi": "Campaign awareness produk MPASI dan perlengkapan bayi bersama komunitas mom influencer",
+                "pic": "Clarissa",
+                "tim": "Clarissa, Amanda",
+                "timelineMulai": "2026-09-12",
+                "timelineSelesai": "2026-10-15",
+                "status": "Berjalan",
+                "progress": 45,
+                "catatan": "Fokus pada edukasi dan testimoni autentik para ibu",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Clarissa (PIC)",
+                                "name": "Penyusunan panduan edukasi produk ramah bayi",
+                                "status": "Selesai",
+                                "bukti": "panduan_mom_baby.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Clarissa (PIC)",
+                                "name": "Kurasi 20 mom influencer komunitas parenting",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Verifikasi usia anak kreator"
+                        }
+                ]
+        }
+];
+
+      if (!localStorage.getItem(PROJECT_RESET_KEY)) {
+        try {
+          localStorage.removeItem("accounting_project_data");
+          localStorage.removeItem("accounting_project_data_v1");
+          localStorage.removeItem("accounting_project_data_v2");
+          localStorage.removeItem("accounting_project_data_v3");
+          localStorage.removeItem(PROJECT_STORAGE_KEY);
+          localStorage.setItem(PROJECT_RESET_KEY, "true");
+        } catch (e) { }
+      }
+
+      function loadProjectData() {
+        try {
+          const saved = localStorage.getItem(PROJECT_STORAGE_KEY);
+          if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error("Error loading project data:", e);
+        }
+        try {
+          localStorage.setItem(PROJECT_STORAGE_KEY, JSON.stringify(DEFAULT_PROJECTS));
+        } catch (e) { }
+        return JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
+      }
+
+      function saveProjectData() {
+        try {
+          localStorage.setItem(PROJECT_STORAGE_KEY, JSON.stringify(projectData));
+        } catch (e) {
+          console.error("Error saving project data:", e);
+        }
+      }
+
+      let projectData = loadProjectData();
+
+      /* Ã¢â€â‚¬Ã¢â€â‚¬ Dynamic Dropdowns for "Tambah Tugas" Inside Project Detail Ã¢â€â‚¬Ã¢â€â‚¬ */
+      function populateTugasTimDropdown(projectItem) {
+        const timSelect = document.getElementById("inputTugasTim");
+        if (!timSelect) return;
+        timSelect.innerHTML = '<option value="" disabled selected hidden>Pilih Tim</option>';
+
+        const members = [];
+        if (projectItem && projectItem.pic && projectItem.pic !== "-") {
+          const pics = projectItem.pic.split(',').map(p => p.trim()).filter(Boolean);
+          pics.forEach(p => {
+            const label = p.includes("(PIC)") ? p : `${p} (PIC)`;
+            if (!members.some(m => m.value === label)) {
+              members.push({ name: label, value: label });
+            }
+          });
+        }
+
+        if (projectItem && projectItem.tim && projectItem.tim !== "-") {
+          const tims = projectItem.tim.split(',').map(t => t.trim()).filter(Boolean);
+          tims.forEach(t => {
+            const label = t.includes("(Tim)") || t.includes("(PIC)") ? t : `${t} (Tim)`;
+            if (!members.some(m => m.value === label)) {
+              members.push({ name: label, value: label });
+            }
+          });
+        }
+
+        if (members.length === 0) {
+          members.push(
+            { name: "Sri (PIC)", value: "Sri (PIC)" },
+            { name: "Riva (Tim)", value: "Riva (Tim)" },
+            { name: "Ahmad (Tim)", value: "Ahmad (Tim)" }
+          );
+        }
+
+        members.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m.value;
+          opt.textContent = m.name;
+          timSelect.appendChild(opt);
+        });
+      }
+
+      const tableBody = document.getElementById("projectTableBody");
+      const projectModal = document.getElementById("projectModal");
+      const projectForm = document.getElementById("projectForm");
+      const btnTambah = document.getElementById("btnTambahProject");
+      const btnClose = document.getElementById("closeProjectModal");
+      const btnBatal = document.getElementById("btnBatal");
+      const searchInput = document.getElementById("projectSearchInput");
+
+      const countTotalEl = document.getElementById("countTotal");
+      const countBerjalanEl = document.getElementById("countBerjalan");
+      const countSelesaiEl = document.getElementById("countSelesai");
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "-";
+        const parts = dateStr.split("-");
+        if (parts.length !== 3) return dateStr;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+
+      function formatTanggalBulanTahun(dateStr) {
+        if (!dateStr) return "-";
+        const clean = dateStr.trim();
+        const parts = clean.split("-");
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+        // Format dd-mm-yyyy (e.g. 12-12-2026)
+        if (parts.length === 3 && parts[0].length === 2 && parts[2].length === 4) {
+          const d = parts[0];
+          const m = parseInt(parts[1], 10);
+          const y = parts[2];
+          if (m >= 1 && m <= 12) {
+            return `${d} ${monthNames[m - 1]} ${y}`;
+          }
+        }
+        // Format yyyy-mm-dd (e.g. 2026-09-01)
+        if (parts.length === 3 && parts[0].length === 4) {
+          const y = parts[0];
+          const m = parseInt(parts[1], 10);
+          const d = parts[2];
+          if (m >= 1 && m <= 12) {
+            return `${d} ${monthNames[m - 1]} ${y}`;
+          }
+        }
+        return clean;
+      }
+
+      function updateCounts() {
+        const berjalanCount = projectData.filter(item => item.status === "Berjalan").length;
+        const selesaiCount = projectData.filter(item => item.status === "Selesai").length;
+        
+        const totalOffset = baseTotal + projectData.length;
+        const berjalanOffset = baseBerjalan + berjalanCount;
+        const selesaiOffset = baseSelesai + selesaiCount;
+
+        if (countTotalEl) countTotalEl.textContent = totalOffset;
+        if (countBerjalanEl) countBerjalanEl.textContent = berjalanOffset;
+        if (countSelesaiEl) countSelesaiEl.textContent = selesaiOffset;
+      }
+
+      const mainPanel = document.getElementById("mainProjectPanel");
+      const projectDetailModal = document.getElementById("projectDetailModal");
+      const closeProjectDetailModal = document.getElementById("closeProjectDetailModal");
+      const btnCloseProjectDetail = document.getElementById("btnCloseProjectDetail");
+      const btnEditProjectFromDetail = document.getElementById("btnEditProjectFromDetail");
+      const btnTambahTugasFromDetail = document.getElementById("btnTambahTugasFromDetail");
+
+      const tugasProjectModal = document.getElementById("tugasProjectModal");
+      const closeTugasProjectModal = document.getElementById("closeTugasProjectModal");
+      const tugasProjectForm = document.getElementById("tugasProjectForm");
+
+      function renderDetailTable(subtasks) {
+        const detailTableBody = document.getElementById("detailProjectTasksTableBody");
+        if (!detailTableBody) return;
+        detailTableBody.innerHTML = "";
+
+        if (!subtasks || subtasks.length === 0) {
+          detailTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="db-empty-row" style="text-align: center; padding: 24px; color: #a1a1a5;">
+                Belum ada tugas yang ditambahkan
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        // Get unique recipients
+        const recipients = [...new Set(subtasks.map(s => s.recipient))];
+        recipients.forEach(rec => {
+          // Subheader row
+          const subheaderRow = document.createElement("tr");
+          subheaderRow.className = "recipient-group-row";
+          subheaderRow.innerHTML = `
+            <td colspan="5" style="font-weight: 700; padding: 12px 15px; text-align: left; background-color: #fafafa; color: #4c4c4c;">Nama Penerima : ${rec}</td>
+          `;
+          detailTableBody.appendChild(subheaderRow);
+
+          // Subtasks under this recipient
+          const filtered = subtasks.filter(s => s.recipient === rec);
+          filtered.forEach((task, tIdx) => {
+            const row = document.createElement("tr");
+
+            let statusClass = "status-badge--belum-mulai";
+            if (task.status === "Selesai") statusClass = "status-badge--selesai";
+            if (task.status === "Diproses" || task.status === "Berjalan") statusClass = "status-badge--berjalan";
+
+            row.innerHTML = `
+              <td style="padding-left: 20px;">${tIdx + 1}</td>
+              <td style="color: #2264c6; font-weight: 600; text-align: left; padding-left: 15px;">${task.name}</td>
+              <td style="text-align: center;"><span class="status-badge ${statusClass}">${task.status}</span></td>
+              <td style="text-align: center;">${task.bukti !== "-" ? `<a href="#" style="color: #2264c6; text-decoration: underline;">${task.bukti}</a>` : "-"}</td>
+              <td style="text-align: center; padding: 4px;">
+                <input type="text" class="revisi-input" value="${task.revisi !== '-' ? task.revisi : ''}" placeholder="Tambah revisi..." style="width: 90%; max-width: 250px; border: none; background: transparent; padding: 4px 8px; font-size: 12px; outline: none; box-sizing: border-box; text-align: center;" />
+              </td>
+            `;
+            detailTableBody.appendChild(row);
+
+            const input = row.querySelector(".revisi-input");
+            const saveRevisi = () => {
+              const newVal = input.value.trim();
+              const oldVal = task.revisi;
+              const normalizedVal = newVal || "-";
+              if (oldVal !== normalizedVal) {
+                task.revisi = normalizedVal;
+                saveProjectData();
+                if (window.ceoToast) {
+                  window.ceoToast("Revisi berhasil disimpan", "success");
+                }
+              }
+            };
+            input.addEventListener("keydown", (e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                saveRevisi();
+                input.blur();
+              }
+            });
+            input.addEventListener("blur", () => {
+              saveRevisi();
+            });
+          });
+        });
+      }
+
+      function openDetailPanel(item) {
+        document.getElementById("currentActiveProjectId").value = item.id;
+        activeChatId = item.id;
+
+        // Header Title & Badges
+        document.getElementById("detailTitle").textContent = item.namaProject;
+        
+        const dateBadge = document.getElementById("detailDateBadge");
+        if (dateBadge) {
+          dateBadge.textContent = formatTanggalBulanTahun(item.timelineSelesai);
+        }
+
+        const statusVal = item.status || "Belum Mulai";
+        const statusBadge = document.getElementById("detailStatusBadge");
+        if (statusBadge) {
+          statusBadge.textContent = statusVal;
+          statusBadge.className = "status-badge";
+          if (statusVal === "Selesai") {
+            statusBadge.classList.add("status-badge--selesai");
+          } else if (statusVal === "Berjalan" || statusVal === "Diproses") {
+            statusBadge.classList.add("status-badge--berjalan");
+          } else {
+            statusBadge.classList.add("status-badge--belum-mulai");
+          }
+        }
+
+        // 2-Column Metadata Cards
+        if (document.getElementById("detailPic")) {
+          document.getElementById("detailPic").textContent = item.pic || "-";
+        }
+        if (document.getElementById("detailTimelineMulai")) {
+          document.getElementById("detailTimelineMulai").textContent = formatTanggalBulanTahun(item.timelineMulai) || "-";
+        }
+        if (document.getElementById("detailDeadline")) {
+          document.getElementById("detailDeadline").textContent = formatTanggalBulanTahun(item.timelineSelesai) || "-";
+        }
+        
+        const detailStatusCard = document.getElementById("detailStatusCard");
+        if (detailStatusCard) {
+          let sStyle = "background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;";
+          if (statusVal === "Selesai") sStyle = "background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0;";
+          else if (statusVal === "Berjalan" || statusVal === "Diproses") sStyle = "background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;";
+          detailStatusCard.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; ${sStyle}">${statusVal}</span>`;
+        }
+
+        const detailTimWrapper = document.getElementById("detailTim");
+        if (detailTimWrapper) {
+          const teams = (item.tim || item.pic || "").split(',').map(t => t.trim()).filter(Boolean);
+          if (teams.length > 0) {
+            detailTimWrapper.innerHTML = teams.map(t => `
+              <span style="display: inline-flex; align-items: center; gap: 4px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11.5px; font-weight: 600; color: #475569; margin-right: 4px; margin-bottom: 4px;">
+                <i class="bx bx-user" style="color: #a855f7;"></i> ${t}
+              </span>
+            `).join('');
+          } else {
+            detailTimWrapper.textContent = "-";
+          }
+        }
+
+        const detailDokumenStatus = document.getElementById("detailDokumenStatus");
+        if (detailDokumenStatus) {
+          detailDokumenStatus.textContent = item.dokumen ? item.dokumen : ((item.subtasks && item.subtasks.some(s => s.bukti !== "-")) ? "Lampiran Sub-Tugas" : "Tidak ada dokumen");
+        }
+
+        // Initialize subtasks if not already present
+        if (!item.subtasks) {
+          item.subtasks = [
+            { id: 1, recipient: `${(item.pic || "Sri").split(',')[0].trim()} (PIC)`, name: `Perencanaan & Briefing ${item.namaProject}`, status: "Selesai", bukti: "view_doc.pdf", revisi: "-" },
+            { id: 2, recipient: `${(item.pic || "Sri").split(',')[0].trim()} (PIC)`, name: `Monitoring & Kontrol Kualitas ${item.namaProject}`, status: "Diproses", bukti: "-", revisi: "Revisi detail UI" },
+            { id: 3, recipient: `${(item.tim || "Riva").split(',')[0].trim()} (Tim)`, name: `Eksekusi Tugas Lapangan ${item.namaProject}`, status: "Belum Mulai", bukti: "-", revisi: "-" }
+          ];
+        }
+
+        // Calculate and display Progress Overview
+        const subtasks = item.subtasks || [];
+        const selesaiCount = subtasks.filter(s => s.status === "Selesai").length;
+        const progressVal = subtasks.length > 0 ? Math.round((selesaiCount / subtasks.length) * 100) : (item.status === "Selesai" ? 100 : (item.status === "Berjalan" ? 50 : 0));
+        const progressText = document.getElementById("detailProgressText");
+        const progressFill = document.getElementById("detailProgressFill");
+        if (progressText) progressText.textContent = `${progressVal}%`;
+        if (progressFill) progressFill.style.width = `${progressVal}%`;
+
+        // Tab: Rincian Project
+        if (document.getElementById("detailDesc")) {
+          document.getElementById("detailDesc").textContent = item.deskripsi || "-";
+        }
+
+        // Tab: Sub-tasks Table
+        populateTugasTimDropdown(item);
+        renderDetailTable(item.subtasks);
+
+        // Tab: Dokumen Lampiran
+        const detailDokumenContainer = document.getElementById("detailDokumenContainer");
+        if (detailDokumenContainer) {
+          let docs = [];
+          if (item.dokumen) {
+            docs.push({ name: item.dokumen, label: "Dokumen Utama Project" });
+          }
+          (item.subtasks || []).forEach(s => {
+            if (s.bukti && s.bukti !== "-") {
+              docs.push({ name: s.bukti, label: `Lampiran: ${s.name}` });
+            }
+          });
+          if (docs.length > 0) {
+            detailDokumenContainer.innerHTML = docs.map(d => `
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <i class="bx bxs-file-pdf" style="color: #ef4444; font-size: 22px;"></i>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 600; color: #1e293b;">${d.name}</div>
+                    <div style="font-size: 11px; color: #64748b;">${d.label}</div>
+                  </div>
+                </div>
+                <a href="#" style="font-size: 12px; color: #2865b5; font-weight: 600; text-decoration: underline;">Unduh File</a>
+              </div>
+            `).join("");
+          } else {
+            detailDokumenContainer.innerHTML = `<p style="margin: 0; color: #64748b; font-size: 13.5px;">Belum ada dokumen yang diunggah.</p>`;
+          }
+        }
+
+        // Tab: Catatan
+        const detailCatatanText = document.getElementById("detailCatatanText");
+        if (detailCatatanText) {
+          detailCatatanText.textContent = item.catatan || `Project "${item.namaProject}" terpantau berjalan dengan PIC ${item.pic || 'terkait'}. Catatan koordinasi dan evaluasi dapat diperbarui secara berkala.`;
+        }
+
+        // Reset active tab to 'rincian'
+        const allDetailTabs = document.querySelectorAll("#projectDetailModal .detail-tab");
+        allDetailTabs.forEach(t => {
+          if (t.getAttribute("data-tab") === "rincian") {
+            t.classList.add("active");
+          } else {
+            t.classList.remove("active");
+          }
+        });
+        const allDetailPanes = document.querySelectorAll("#projectDetailModal .tab-pane");
+        allDetailPanes.forEach(p => p.style.display = "none");
+        const rincianPane = document.getElementById("tab-rincian");
+        if (rincianPane) rincianPane.style.display = "block";
+
+        // Show chat widget
+        const chatWidget = document.getElementById("chatWidget");
+        if (chatWidget) {
+          chatWidget.style.display = "block";
+        }
+        renderChatHistory();
+
+        // Open Detail Modal
+        if (projectDetailModal) {
+          projectDetailModal.classList.add("is-active");
+        }
+      }
+
+      function hideProjectDetailModal() {
+        if (projectDetailModal) {
+          projectDetailModal.classList.remove("is-active");
+        }
+      }
+
+      // Detail Modal Tab Switching Handlers
+      const detailModalTabs = document.querySelectorAll("#projectDetailModal .detail-tab");
+      detailModalTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          const tabKey = tab.getAttribute("data-tab");
+          detailModalTabs.forEach(t => t.classList.remove("active"));
+          tab.classList.add("active");
+
+          const panes = document.querySelectorAll("#projectDetailModal .tab-pane");
+          panes.forEach(p => p.style.display = "none");
+
+          const activePane = document.getElementById(`tab-${tabKey}`);
+          if (activePane) activePane.style.display = "block";
+        });
+      });
+
+      if (closeProjectDetailModal) closeProjectDetailModal.addEventListener("click", hideProjectDetailModal);
+      if (btnCloseProjectDetail) btnCloseProjectDetail.addEventListener("click", hideProjectDetailModal);
+      if (projectDetailModal) {
+        projectDetailModal.addEventListener("click", (e) => {
+          if (e.target === projectDetailModal) hideProjectDetailModal();
+        });
+      }
+
+      if (btnEditProjectFromDetail) {
+        btnEditProjectFromDetail.addEventListener("click", () => {
+          const currentProjectId = parseInt(document.getElementById("currentActiveProjectId").value);
+          if (currentProjectId) {
+            hideProjectDetailModal();
+            window.openEditProjectById(currentProjectId);
+          }
+        });
+      }
+
+      if (btnTambahTugasFromDetail) {
+        btnTambahTugasFromDetail.addEventListener("click", () => {
+          const currentProjectId = parseInt(document.getElementById("currentActiveProjectId").value);
+          const projectItem = projectData.find(p => p.id === currentProjectId);
+          if (projectItem) {
+            populateTugasTimDropdown(projectItem);
+          }
+          if (tugasProjectModal) tugasProjectModal.classList.add("is-active");
+        });
+      }
+
+      if (closeTugasProjectModal) {
+        closeTugasProjectModal.addEventListener("click", () => {
+          tugasProjectModal.classList.remove("is-active");
+          tugasProjectForm.reset();
+        });
+      }
+
+      if (tugasProjectModal) {
+        tugasProjectModal.addEventListener("click", (e) => {
+          if (e.target === tugasProjectModal) {
+            tugasProjectModal.classList.remove("is-active");
+            tugasProjectForm.reset();
+          }
+        });
+      }
+
+      if (tugasProjectForm) {
+        tugasProjectForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const timVal = document.getElementById("inputTugasTim").value;
+          const taskName = (document.getElementById("inputTugasName")?.value || "").trim();
+
+          if (!taskName) {
+            alert("Silakan masukkan tugas.");
+            return;
+          }
+
+          const currentProjectId = parseInt(document.getElementById("currentActiveProjectId").value);
+          const projectItem = projectData.find(p => p.id === currentProjectId);
+          if (projectItem) {
+            if (!projectItem.subtasks) {
+              projectItem.subtasks = [];
+            }
+            const nextId = projectItem.subtasks.length > 0 ? Math.max(...projectItem.subtasks.map(s => s.id)) + 1 : 1;
+            projectItem.subtasks.push({
+              id: nextId,
+              recipient: timVal,
+              name: taskName,
+              status: "Belum Mulai",
+              bukti: "-",
+              revisi: "-"
+            });
+            saveProjectData();
+            renderDetailTable(projectItem.subtasks);
+          }
+
+          tugasProjectModal.classList.remove("is-active");
+          tugasProjectForm.reset();
+          if (window.ceoToast) {
+            window.ceoToast("Tugas berhasil ditambahkan", "success");
+          } else {
+            alert("Tugas berhasil ditambahkan");
+          }
+        });
+      }
+
+      function closeAllProjectActionMenus() {
+        document.querySelectorAll(".bm-table-action-menu.show").forEach(m => {
+          m.classList.remove("show");
+          m.style.display = "";
+        });
+      }
+
+      window.toggleProjectActionMenu = function (btn, e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        const dropdown = btn.closest(".bm-action-dropdown");
+        const menu = dropdown ? dropdown.querySelector(".bm-table-action-menu") : null;
+        if (!menu) return;
+
+        const isOpen = menu.classList.contains("show");
+        closeAllProjectActionMenus();
+        if (!isOpen) {
+          menu.classList.add("show");
+
+          const rect = btn.getBoundingClientRect();
+          const menuWidth = menu.offsetWidth || 140;
+          const menuHeight = menu.offsetHeight || 145;
+          const vw = window.innerWidth || document.documentElement.clientWidth;
+          const vh = window.innerHeight || document.documentElement.clientHeight;
+
+          let topPos = rect.bottom + 6;
+          if (topPos + menuHeight > vh - 10 && rect.top - menuHeight - 6 > 10) {
+            topPos = rect.top - menuHeight - 6;
+          }
+
+          let leftPos = rect.right - menuWidth;
+          if (leftPos < 10) leftPos = 10;
+          if (leftPos + menuWidth > vw - 10) {
+            leftPos = vw - menuWidth - 10;
+          }
+
+          menu.style.position = "fixed";
+          menu.style.top = topPos + "px";
+          menu.style.left = leftPos + "px";
+          menu.style.bottom = "auto";
+          menu.style.right = "auto";
+          menu.style.zIndex = "2147483000";
+        }
+      };
+
+      window.openViewProjectById = function (id) {
+        closeAllProjectActionMenus();
+        const item = projectData.find(p => String(p.id) === String(id));
+        if (item) openDetailPanel(item);
+      };
+
+      window.openEditProjectById = function (id) {
+        closeAllProjectActionMenus();
+        const item = projectData.find(p => p.id === Number(id));
+        if (item) openEditModal(item);
+      };
+
+      let pendingDeleteProjectId = null;
+      window.openDeleteProjectById = function (id) {
+        closeAllProjectActionMenus();
+        const item = projectData.find(p => p.id === Number(id));
+        if (item) {
+          pendingDeleteProjectId = item.id;
+          const nameEl = document.getElementById("deleteProjectNamaText");
+          if (nameEl) nameEl.textContent = item.namaProject || "Project";
+          const modal = document.getElementById("projectDeleteModal");
+          if (modal) modal.classList.add("is-active");
+        }
+      };
+
+      function renderTable(dataToRender) {
+        tableBody.innerHTML = "";
+        
+        if (dataToRender.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" class="db-empty-row" style="text-align: center; padding: 24px; color: #a1a1a5;">
+                Tidak ada data project
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        dataToRender.forEach((item, index) => {
+          const row = document.createElement("tr");
+
+          let statusClass = "status-badge--belum-mulai";
+          let statusStyle = "background-color: rgba(140, 140, 140, 0.1) !important; color: #8c8c8c !important; border: 1px solid rgba(140, 140, 140, 0.3) !important;";
+          if (item.status === "Berjalan") {
+            statusClass = "status-badge--berjalan";
+            statusStyle = "background-color: rgba(34, 100, 198, 0.1) !important; color: #2264c6 !important; border: 1px solid rgba(34, 100, 198, 0.3) !important;";
+          }
+          if (item.status === "Selesai") {
+            statusClass = "status-badge--selesai";
+            statusStyle = "background-color: rgba(0, 230, 118, 0.12) !important; color: #00d26a !important; border: 1px solid rgba(0, 230, 118, 0.35) !important;";
+          }
+
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td style="text-align: left; padding-left: 15px; font-weight: 600; color: #333;">
+              ${item.namaProject}
+            </td>
+            <td>${item.pic || "-"}</td>
+            <td>${item.tim || "-"}</td>
+            <td>${formatDate(item.timelineMulai)} s/d ${formatDate(item.timelineSelesai)}</td>
+            <td><span class="status-badge ${statusClass}" style="${statusStyle}">${item.status || "Belum Mulai"}</span></td>
+            <td class="tdActions text-center" style="position: relative;">
+              <div class="dropdown bm-action-dropdown" style="display: inline-block;">
+                <button class="btn btn-sm btn-icon btn-text-secondary rounded-pill dropdown-toggle hide-arrow"
+                  data-bm-dots="true" type="button" aria-expanded="false" aria-label="Aksi" title="Aksi"
+                  onclick="window.toggleProjectActionMenu(this, event)"
+                  style="background: #edf2f7 !important; border: none !important; width: 34px !important; height: 34px !important; border-radius: 50% !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; color: #1e293b !important; padding: 0 !important; box-shadow: none !important;">
+                  <i class="bx bx-dots-vertical-rounded" style="font-size: 20px !important; color: #1e293b !important;"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end bm-table-action-menu" style="background: #ffffff !important; border-radius: 16px !important; border: 1px solid rgba(0, 0, 0, 0.04) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.05) !important; padding: 10px 8px !important; min-width: 140px !important;">
+                  <li style="margin: 0; padding: 2px 0; list-style: none;">
+                    <button class="dropdown-item btn-act-view" type="button" data-id="${item.id}" onclick="window.openViewProjectById(${item.id})" title="Lihat"
+                      style="display: flex !important; align-items: center !important; gap: 12px !important; width: 100% !important; padding: 6px 10px !important; border-radius: 10px !important; font-family: 'Outfit', sans-serif !important; font-size: 14.5px !important; font-weight: 500 !important; font-style: italic !important; color: #334155 !important; background: transparent !important; border: none !important; cursor: pointer !important;">
+                      <span class="bm-menu-iconify" style="background: #0077c8 !important; box-shadow: 0 4px 10px rgba(0, 119, 200, 0.35) !important; width: 34px !important; height: 34px !important; border-radius: 9px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 34px !important; color: #ffffff !important;">
+                        <i class="bx bx-show" style="font-size: 18px !important; color: #ffffff !important;"></i>
+                      </span>
+                      <span class="bm-menu-text" style="font-style: italic !important; font-weight: 500 !important; color: #334155 !important; font-size: 14.5px !important;">Lihat</span>
+                    </button>
+                  </li>
+                  <li style="margin: 0; padding: 2px 0; list-style: none;">
+                    <button class="dropdown-item btn-act-edit" type="button" data-id="${item.id}" onclick="window.openEditProjectById(${item.id})" title="Edit"
+                      style="display: flex !important; align-items: center !important; gap: 12px !important; width: 100% !important; padding: 6px 10px !important; border-radius: 10px !important; font-family: 'Outfit', sans-serif !important; font-size: 14.5px !important; font-weight: 500 !important; font-style: italic !important; color: #334155 !important; background: transparent !important; border: none !important; cursor: pointer !important;">
+                      <span class="bm-menu-iconify" style="background: #0077c8 !important; box-shadow: 0 4px 10px rgba(0, 119, 200, 0.35) !important; width: 34px !important; height: 34px !important; border-radius: 9px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 34px !important; color: #ffffff !important;">
+                        <i class="bx bx-edit-alt" style="font-size: 18px !important; color: #ffffff !important;"></i>
+                      </span>
+                      <span class="bm-menu-text" style="font-style: italic !important; font-weight: 500 !important; color: #334155 !important; font-size: 14.5px !important;">Edit</span>
+                    </button>
+                  </li>
+                  <li style="margin: 0; padding: 2px 0; list-style: none;">
+                    <button class="dropdown-item text-danger btn-act-delete" type="button" data-id="${item.id}" onclick="window.openDeleteProjectById(${item.id})" title="Hapus"
+                      style="display: flex !important; align-items: center !important; gap: 12px !important; width: 100% !important; padding: 6px 10px !important; border-radius: 10px !important; font-family: 'Outfit', sans-serif !important; font-size: 14.5px !important; font-weight: 500 !important; font-style: italic !important; color: #334155 !important; background: transparent !important; border: none !important; cursor: pointer !important;">
+                      <span class="bm-menu-iconify bm-menu-iconify--danger" style="background: #e02424 !important; box-shadow: 0 4px 10px rgba(224, 36, 36, 0.35) !important; width: 34px !important; height: 34px !important; border-radius: 9px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 34px !important; color: #ffffff !important;">
+                        <i class="bx bx-trash" style="font-size: 18px !important; color: #ffffff !important;"></i>
+                      </span>
+                      <span class="bm-menu-text" style="font-style: italic !important; font-weight: 500 !important; color: #334155 !important; font-size: 14.5px !important;">Hapus</span>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function showModal() {
+        projectModal.classList.add("is-active");
+        syncTreePickerFromHidden('pic');
+        syncTreePickerFromHidden('tim');
+      }
+
+      function hideModal() {
+        projectModal.classList.remove("is-active");
+        projectForm.reset();
+        resetTreePickers();
+        document.getElementById("editIndex").value = "";
+        document.getElementById("editStatus").value = "";
+        document.getElementById("modalTitle").innerHTML = "Tambah <strong style='font-weight: 700;'>Project</strong>";
+      }
+
+      btnTambah.addEventListener("click", showModal);
+      btnClose.addEventListener("click", hideModal);
+      if (btnBatal) {
+        btnBatal.addEventListener("click", hideModal);
+      }
+
+      projectModal.addEventListener("click", (e) => {
+        if (e.target === projectModal) hideModal();
+      });
+
+      projectForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const idVal = document.getElementById("editIndex").value;
+        const namaProject = document.getElementById("inputNamaProject").value.trim();
+        const pic = document.getElementById("inputPIC").value.trim();
+        const tim = document.getElementById("inputTim").value.trim();
+        const timelineMulai = document.getElementById("inputTimelineMulai").value;
+        const timelineSelesai = document.getElementById("inputTimelineSelesai").value;
+        const status = document.getElementById("editStatus").value || "Belum Mulai";
+
+        const deskripsi = document.getElementById("inputDeskripsi").value.trim();
+        const catatan = document.getElementById("inputCatatan").value.trim();
+
+        if (!namaProject) {
+          alert("Silakan masukkan Nama Project.");
+          return;
+        }
+
+        if (!pic) {
+          alert("Silakan pilih PIC terlebih dahulu.");
+          return;
+        }
+
+        if (!tim) {
+          alert("Silakan pilih Tim terlebih dahulu.");
+          return;
+        }
+
+        if (idVal) {
+          const idNum = parseInt(idVal);
+          const itemIdx = projectData.findIndex(item => item.id === idNum);
+          if (itemIdx !== -1) {
+            projectData[itemIdx] = {
+              ...projectData[itemIdx],
+              namaProject,
+              pic,
+              tim,
+              timelineMulai,
+              timelineSelesai,
+              status,
+              deskripsi,
+              catatan
+            };
+            saveProjectData();
+            if (window.ceoToast) {
+              window.ceoToast("Project berhasil diubah", "success");
+            } else {
+              alert("Project berhasil diubah");
+            }
+          }
+        } else {
+          const nextId = projectData.length > 0 ? Math.max(...projectData.map(d => d.id)) + 1 : 1;
+          const primaryPic = pic.split(',')[0].trim();
+          projectData.push({
+            id: nextId,
+            namaProject,
+            pic,
+            tim,
+            timelineMulai,
+            timelineSelesai,
+            status: "Berjalan",
+            deskripsi,
+            catatan,
+            subtasks: [
+              {
+                id: 1,
+                recipient: `${primaryPic} (PIC)`,
+                name: `Perencanaan ${namaProject}`,
+                status: "Belum Mulai",
+                bukti: "-",
+                revisi: "-"
+              }
+            ]
+          });
+          saveProjectData();
+          if (window.ceoToast) {
+            window.ceoToast("Project berhasil ditambahkan", "success");
+          } else {
+            alert("Project berhasil ditambahkan");
+          }
+        }
+
+        hideModal();
+        updateCounts();
+        renderTable(projectData);
+      });
+
+      function openEditModal(item) {
+        document.getElementById("editIndex").value = item.id;
+        document.getElementById("editStatus").value = item.status;
+        document.getElementById("inputNamaProject").value = item.namaProject || "";
+        document.getElementById("inputPIC").value = item.pic || "";
+        document.getElementById("inputTim").value = item.tim || "";
+        document.getElementById("inputTimelineMulai").value = item.timelineMulai || "";
+        document.getElementById("inputTimelineSelesai").value = item.timelineSelesai || "";
+
+        document.getElementById("inputDeskripsi").value = item.deskripsi || "";
+        document.getElementById("inputCatatan").value = item.catatan || "";
+
+        document.getElementById("modalTitle").innerHTML = "Edit <strong style='font-weight: 700;'>Project</strong>";
+        showModal();
+      }
+
+      const confirmDeleteProjectBtn = document.getElementById("confirmDeleteProjectBtn");
+      if (confirmDeleteProjectBtn) {
+        confirmDeleteProjectBtn.addEventListener("click", () => {
+          if (pendingDeleteProjectId !== null) {
+            projectData = projectData.filter(item => item.id !== pendingDeleteProjectId);
+            saveProjectData();
+            if (window.ceoToast) {
+              window.ceoToast("Project berhasil dihapus", "success");
+            } else {
+              alert("Project berhasil dihapus");
+            }
+            updateCounts();
+            renderTable(projectData);
+            pendingDeleteProjectId = null;
+          }
+          const modal = document.getElementById("projectDeleteModal");
+          if (modal) modal.classList.remove("is-active");
+        });
+      }
+
+      // Close all action dropdown menus when clicking outside or scrolling
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".bm-action-dropdown")) {
+          closeAllProjectActionMenus();
+        }
+      });
+      window.addEventListener("scroll", closeAllProjectActionMenus, true);
+
+      searchInput.addEventListener("input", () => {
+        const query = searchInput.value.trim().toLowerCase();
+        const filtered = projectData.filter(item => {
+          return (item.namaProject && item.namaProject.toLowerCase().includes(query)) || 
+                 (item.pic && item.pic.toLowerCase().includes(query)) ||
+                 (item.tim && item.tim.toLowerCase().includes(query)) ||
+                 (item.status && item.status.toLowerCase().includes(query));
+        });
+        renderTable(filtered);
+      });
+
+      // Chat Forum / Diskusi Logic
+      let activeChatId = "general";
+      let chatHistories = {
+        "general": [
+          { type: "left", text: "Halo tim pelaksana, silakan update progres pengerjaan podcast di sini." },
+          { type: "right", text: "Siap, pengerjaan front-end dan backend berjalan sesuai jadwal." },
+          { type: "left", text: "Semua video sudah diapprove dan siap posting." }
+        ]
+      };
+
+      const chatTriggerBtn = document.getElementById("chatTriggerBtn");
+      const chatPopup = document.getElementById("chatPopup");
+      const chatForm = document.getElementById("chatForm");
+      const chatInput = document.getElementById("chatInput");
+      const chatBody = document.getElementById("chatBody");
+
+      function renderChatHistory() {
+        if (!chatBody) return;
+        chatBody.innerHTML = "";
+
+        const headerTitle = document.getElementById("chatHeaderTitle");
+        if (headerTitle) {
+          if (activeChatId === "general") {
+            headerTitle.innerHTML = "<em>Diskusi</em>";
+          } else {
+            const projectItem = projectData.find(p => p.id === activeChatId);
+            const title = projectItem ? projectItem.namaProject : "Project Detail";
+            headerTitle.innerHTML = `<em>Diskusi - ${title}</em>`;
+          }
+        }
+
+        const history = chatHistories[activeChatId] || [];
+        history.forEach(msg => {
+          const msgDiv = document.createElement("div");
+          msgDiv.className = `chat-msg ${msg.type}`;
+          if (msg.type === "left") {
+            msgDiv.innerHTML = `
+              <div class="chat-avatar"></div>
+              <div class="chat-bubble">${msg.text}</div>
+            `;
+          } else {
+            msgDiv.innerHTML = `
+              <div class="chat-bubble">${msg.text}</div>
+              <div class="chat-avatar"></div>
+            `;
+          }
+          chatBody.appendChild(msgDiv);
+        });
+
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      if (chatTriggerBtn && chatPopup) {
+        chatTriggerBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const isHidden = chatPopup.style.display === "none";
+          chatPopup.style.display = isHidden ? "flex" : "none";
+          if (isHidden) {
+            renderChatHistory();
+          }
+        });
+
+        // Close on clicking outside the widget
+        document.addEventListener("click", (e) => {
+          if (chatPopup.style.display === "flex") {
+            const chatWidget = document.getElementById("chatWidget");
+            if (chatWidget && !chatWidget.contains(e.target)) {
+              chatPopup.style.display = "none";
+            }
+          }
+        });
+
+        // Submit chat form
+        chatForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const text = chatInput.value.trim();
+          if (!text) return;
+
+          // Save to active history
+          if (!chatHistories[activeChatId]) {
+            chatHistories[activeChatId] = [];
+          }
+          chatHistories[activeChatId].push({ type: "right", text: text });
+          renderChatHistory();
+
+          chatInput.value = "";
+
+          // Simulate automatic reply after 1 second
+          setTimeout(() => {
+            const replyText = activeChatId === "general"
+              ? "Pesan Anda diterima. Penugasan Project akan segera merespon diskusi ini."
+              : `Pertanyaan Anda mengenai detail project "${projectData.find(p => p.id === activeChatId)?.namaProject || 'ini'}" telah diteruskan ke pihak Penugasan.`;
+
+            chatHistories[activeChatId].push({ type: "left", text: replyText });
+            renderChatHistory();
+          }, 1000);
+        });
+      }
+
+      updateCounts();
+      renderTable(projectData);
+
+      // Auto-open Detail Modal if navigated with ?openDetail=ID
+      const urlParams = new URLSearchParams(window.location.search);
+      const openDetailId = urlParams.get('openDetail');
+      if (openDetailId) {
+        setTimeout(() => {
+          window.openViewProjectById(openDetailId);
+        }, 120);
+      }
+    });
+  </script>
+
+  <!-- Floating Chat Widget -->
+  <div id="chatWidget" class="chat-widget" style="display: none;">
+    <!-- Chat Popup -->
+    <div id="chatPopup" class="chat-popup" style="display: none;">
+      <div class="chat-header">
+        <h3 id="chatHeaderTitle"><em>Diskusi</em></h3>
+      </div>
+      <div class="chat-body" id="chatBody">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="chat-footer">
+        <form id="chatForm" class="chat-input-wrap">
+          <input type="text" id="chatInput" placeholder="Teks..." required />
+          <button type="submit" class="chat-send-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Trigger Button -->
+    <button id="chatTriggerBtn" class="chat-trigger-btn" type="button" aria-label="Buka Diskusi">
+      <!-- Chat icon (speech bubble with text lines) -->
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+      </svg>
+    </button>
+  </div>
+  <script src="../../assets/js/layout.js?v=1008"></script>
+</body>
+
+</html>
+
+
+
+

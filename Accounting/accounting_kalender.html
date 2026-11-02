@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kalender Accounting | Bisa Media</title>
+  <link rel="stylesheet" href="../assets/css/style.css?v=20261031" />
+  <link rel="icon" type="image/png" href="../media/logo.png" />
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../vendor/exceljs.min.js"></script>
+  <script src="../assets/js/excel_engine.js?v=2"></script>
+</head>
+
+<body class="dashboard-body">
+                  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar"></header>
+
+    <main class="dashboard-content">
+      
+
+      <!-- ===== Main Layout (2 Columns) ===== -->
+      <div class="db-calendar-page-layout">
+        <!-- Left Column: Unified Sidebar widget (Calendar + Activities) -->
+        <div class="db-sidebar-widget-container" style="background: #e8e8eb; padding: 24px 16px;">
+          <div>
+            <div class="db-calendar-card">
+              <div class="db-calendar-header">
+                <button class="db-cal-nav" id="calPrev" type="button" aria-label="Bulan sebelumnya">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <span class="db-cal-month" id="calMonthLabel">AGUSTUS</span>
+                <button class="db-cal-nav" id="calNext" type="button" aria-label="Bulan berikutnya">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+              <table class="db-calendar-table" id="calendarTable">
+                <thead>
+                  <tr>
+                    <th>S</th>
+                    <th>S</th>
+                    <th>R</th>
+                    <th>K</th>
+                    <th>J</th>
+                    <th>S</th>
+                    <th>M</th>
+                  </tr>
+                </thead>
+                <tbody id="calendarBody">
+                  <!-- Filled by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Kegiatan Hari Ini -->
+          <div class="db-activity-section">
+            <h2 class="db-activity-title">Kegiatan bulan ini</h2>
+            <div class="db-activity-list" id="activityList">
+              <!-- Filled dynamically by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Jadwal Card -->
+        <div class="db-schedule-card">
+          <div class="db-sched-header">
+            <div class="db-sched-title-wrap">
+              <h2 class="db-sched-title">Jadwal</h2>
+              <span class="db-sched-date" id="selectedDateLabel">Kamis, 01 - 05 - 2020</span>
+            </div>
+            <button type="button" id="openAddSchedModalBtn" class="btn-tambah">
+              <i class="bx bx-plus"></i> Tambah Jadwal
+            </button>
+          </div>
+
+          <div class="db-sched-list" id="scheduleListContainer">
+            <!-- Schedule Items for Selected Date -->
+            <div class="db-sched-item" id="sched-item-1">
+              <div class="db-sched-info">
+                <strong id="sched-title-1" style="font-style: italic;">Diskusii dengan A terkait keberjalannya Campaign A</strong>
+                <span id="sched-desc-1">Meeting</span>
+                <span id="sched-time-1" style="font-weight: bold; color: var(--blue-700);">09.00 - 11.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+    </main>
+  </div>
+
+  <!-- Add Schedule Modal -->
+  <div id="addScheduleModal" class="modal-overlay">
+    <div class="modal-box" style="width: min(600px, 95vw); max-width: 95%;">
+      <div class="modal-header">
+        <h2 class="modal-title">Tambah <span style="font-weight: 900; font-style: italic;">JADWALL</span></h2>
+        <button class="modal-close" id="closeModalBtn" type="button" aria-label="Tutup popup">&times;</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <div class="modal-form-grid" style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+        <div class="form-group" style="width: 100%;">
+          <label class="form-label" for="schedTitleInput">Judul</label>
+          <input type="text" id="schedTitleInput" class="form-input" placeholder="Tambah Judul" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; width: 100%;"
+          class="modal-grid-row-3">
+          <div class="form-group">
+            <label class="form-label" for="schedDateInput">Tanggal</label>
+            <input type="date" id="schedDateInput" class="form-input" placeholder="dd/mm/yyyy" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="schedStartTimeInput">Mulai</label>
+            <input type="time" id="schedStartTimeInput" class="form-input" placeholder="--:--" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="schedEndTimeInput">Selesai</label>
+            <input type="time" id="schedEndTimeInput" class="form-input" placeholder="--:--" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; width: 100%;" class="modal-grid-row-2">
+          <div class="form-group">
+            <label class="form-label" for="schedTypeSelect">Tipe</label>
+            <div class="select-wrapper">
+              <select id="schedTypeSelect" class="form-select">
+                <option value="Meeting">Meeting</option>
+                <option value="Visit">Visit</option>
+                <option value="HR">HR</option>
+                <option value="Deadline">Deadline</option>
+                <option value="Tanggal Merah">Tanggal Merah</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="schedNotesInput">Catatan <span
+                style="font-weight: normal; color: var(--muted); font-size: 11px;">(opsional)</span></label>
+            <input type="text" id="schedNotesInput" class="form-input" placeholder="Tambah Catatan" />
+          </div>
+        </div>
+
+        <div class="form-group" style="width: 100%;">
+          <label class="form-label">Untuk (Karyawan)</label>
+          <div class="karyawan-select-box">
+            <div class="karyawan-select-header" id="karyawanSelectHeader">
+              <span id="karyawanSelectLabel">Tambah Karyawan...</span>
+              <span class="chevron-down">v</span>
+            </div>
+            <div class="karyawan-select-dropdown" id="karyawanSelectDropdown" style="display: none;">
+              <div class="karyawan-select-left">
+                <label class="karyawan-option">
+                  <input type="checkbox" id="checkSemua" />
+                  <span>Semua Karyawan</span>
+                </label>
+                <div class="karyawan-group">
+                  <div class="karyawan-group-header"
+                    style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; width: 100%;">
+                    <label class="karyawan-option" style="flex: 1;">
+                      <input type="checkbox" id="checkGroup" />
+                      <span>PT Bisa Media Grup</span>
+                    </label>
+                    <span class="group-arrow" id="groupArrow"
+                      style="padding: 4px 8px; cursor: pointer; font-size: 12px; color: var(--muted);">&#9654;</span>
+                  </div>
+                  <div class="karyawan-suboptions" id="karyawanSuboptions" style="display: none;">
+                    <label class="karyawan-option">
+                      <input type="checkbox" class="karyawan-subcheck" value="Setiawan" />
+                      <span>Setiawan</span>
+                    </label>
+                    <label class="karyawan-option">
+                      <input type="checkbox" class="karyawan-subcheck" value="Setia" />
+                      <span>Setia</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="karyawan-select-right">
+                <span class="selected-placeholder" id="selectedPlaceholder">Karyawan terpilih</span>
+                <div id="selectedKaryawanList" class="selected-karyawan-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 14px; margin-top: 10px; width: 100%;">
+          <button class="db-modal-btn db-modal-btn--cancel" id="cancelModalBtn" type="button">Batal</button>
+          <button class="btn-simpan" id="saveScheduleBtn" type="button"
+            style="width: auto; padding: 0 36px; height: 40px; font-size: 14px;">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="../assets/js/app.js?v=3"></script>
+  <script>
+    /* ===== Calendar Rendering & Logic ===== */
+    (function () {
+      const now = new Date();
+      let calYear = now.getFullYear();
+      let calMonth = now.getMonth();
+      let activeDay = now.getDate();
+
+      const monthNames = [
+        "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI",
+        "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"
+      ];
+
+      const dayNamesLong = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+      const monthLabel = document.getElementById("calMonthLabel");
+      const calBody = document.getElementById("calendarBody");
+      const btnPrev = document.getElementById("calPrev");
+      const btnNext = document.getElementById("calNext");
+      const selectedDateLabel = document.getElementById("selectedDateLabel");
+
+      // Initial dummy schedule database
+      const todayDay = now.getDate();
+      const scheduleDb = {
+        [String(todayDay)]: [
+          { id: 1, title: "Meeting", desc: "Diskusi dengan Brand A terkait dengan Keberjalannya Campaign A", time: "09.00 - 11.00", status: "pending" }
+        ],
+        "12": [
+          { id: 2, title: "Meeting", desc: "Bersama Bisa Hijab Official", time: "09.00 - 12.00", status: "pending" }
+        ]
+      };
+      let schedIdCounter = 3;
+
+      const SCHEDULE_STORAGE_KEY = "accounting_kalender_schedule_v1";
+      function saveSchedules() {
+        try {
+          localStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(scheduleDb));
+        } catch (e) {}
+      }
+      function loadSchedules() {
+        try {
+          const raw = localStorage.getItem(SCHEDULE_STORAGE_KEY);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return;
+          Object.keys(scheduleDb).forEach(key => delete scheduleDb[key]);
+          let maxId = 0;
+          Object.entries(parsed).forEach(([key, list]) => {
+            if (!Array.isArray(list)) return;
+            scheduleDb[key] = list;
+            list.forEach(item => {
+              const id = Number(item && item.id);
+              if (Number.isFinite(id) && id > maxId) maxId = id;
+            });
+          });
+          schedIdCounter = maxId + 1;
+        } catch (e) {}
+      }
+      loadSchedules();
+
+      function formatDateLabel(year, month, day) {
+        const d = new Date(year, month, day);
+        const dayName = dayNamesLong[d.getDay()];
+        const mm = String(month + 1).padStart(2, '0');
+        const dd = String(day).padStart(2, '0');
+        return `${dayName}, ${dd} - ${mm} - ${year}`;
+      }
+
+      function updateScheduleList(day) {
+        const key = String(day);
+        const listContainer = document.getElementById("scheduleListContainer");
+        if (!listContainer) return;
+
+        listContainer.innerHTML = "";
+        const items = scheduleDb[key] || [];
+
+        if (items.length === 0) {
+          listContainer.innerHTML = `<div class="db-empty-row" style="padding: 40px 0; color: var(--muted); text-align: center; width: 100%;">Tidak ada jadwal untuk tanggal ini.</div>`;
+          return;
+        }
+
+        items.forEach(item => {
+          let itemBg = "#fff8e1";
+          let itemBorder = "#ffe082";
+          let titleStyle = "";
+
+          if (item.status === "done") {
+            itemBg = "#e8f5e9";
+            itemBorder = "#c8e6c9";
+            titleStyle = "text-decoration: line-through; color: #2e7d32;";
+          } else if (item.status === "cancelled") {
+            itemBg = "#ffebee";
+            itemBorder = "#ffcdd2";
+            titleStyle = "text-decoration: line-through; color: #c62828;";
+          }
+
+          const div = document.createElement("div");
+          div.className = "db-sched-item";
+          div.style.background = itemBg;
+          div.style.borderColor = itemBorder;
+          div.id = `sched-item-${item.id}`;
+          div.innerHTML = `
+            <div class="db-sched-info">
+              <strong style="${titleStyle}">${item.title}</strong>
+              <span>${item.desc}</span>
+              <span style="font-weight: bold; color: var(--blue-700);">${item.time}</span>
+            </div>
+          `;
+          listContainer.appendChild(div);
+        });
+      }
+
+      function updateMonthActivities() {
+        const listContainer = document.getElementById("activityList");
+        if (!listContainer) return;
+        listContainer.innerHTML = "";
+
+        // Gather all activities in scheduleDb
+        let allActivities = [];
+        for (const [day, items] of Object.entries(scheduleDb)) {
+          items.forEach(item => {
+            allActivities.push({
+              day: parseInt(day),
+              ...item
+            });
+          });
+        }
+
+        // Sort by day
+        allActivities.sort((a, b) => a.day - b.day);
+
+        if (allActivities.length === 0) {
+          listContainer.innerHTML = `<div class="db-empty-row" style="padding: 20px 0; color: var(--muted); text-align: center; width: 100%;">Tidak ada kegiatan bulan ini.</div>`;
+          return;
+        }
+
+        allActivities.forEach(item => {
+          const mm = String(calMonth + 1).padStart(2, '0');
+          const dd = String(item.day).padStart(2, '0');
+          const dateStr = `${dd}/${mm}/${calYear}`;
+          
+          let badgeBg = "#ffcc00";
+          let badgeColor = "#111";
+          if (item.title.includes("Meeting") || (item.desc && item.desc.includes("Meeting"))) {
+            badgeBg = "#ffcc00";
+            badgeColor = "#111";
+          } else if (item.title.includes("Visit") || (item.desc && item.desc.includes("Visit"))) {
+            badgeBg = "#2196f3";
+            badgeColor = "#fff";
+          } else if (item.title.includes("HR") || (item.desc && item.desc.includes("HR"))) {
+            badgeBg = "#9c27b0";
+            badgeColor = "#fff";
+          } else if (item.title.includes("Deadline") || (item.desc && item.desc.includes("Deadline"))) {
+            badgeBg = "#f44336";
+            badgeColor = "#fff";
+          } else if (item.title.includes("Tanggal Merah") || (item.desc && item.desc.includes("Tanggal Merah"))) {
+            badgeBg = "#ff5252";
+            badgeColor = "#fff";
+          } else {
+            badgeBg = "#29A3D8";
+            badgeColor = "#fff";
+          }
+
+          // Strip type prefix if present
+          let displayTitle = item.title.replace(/^\[.*?\]\s*/, "");
+          let typeLabel = "Kegiatan";
+          if (item.title.match(/^\[(.*?)\]/)) {
+            typeLabel = item.title.match(/^\[(.*?)\]/)[1];
+          } else if (item.title === "Meeting") {
+            displayTitle = item.desc || item.title;
+            typeLabel = "Meeting";
+          } else if (item.desc === "Meeting") {
+            displayTitle = item.title;
+            typeLabel = "Meeting";
+          } else {
+            typeLabel = item.desc || "Kegiatan";
+          }
+
+          const div = document.createElement("div");
+          div.className = "db-activity-item";
+          div.innerHTML = `
+            <div class="db-activity-info">
+              <strong>${displayTitle}</strong>
+              <span class="db-activity-time">${dateStr} | ${item.time}</span>
+            </div>
+            <span class="db-activity-badge" style="background: ${badgeBg}; color: ${badgeColor}; box-shadow: none;">${typeLabel}</span>
+          `;
+          listContainer.appendChild(div);
+        });
+      }
+
+      function renderCalendar() {
+        if (!monthLabel || !calBody) return;
+        monthLabel.textContent = monthNames[calMonth];
+        const firstDay = new Date(calYear, calMonth, 1).getDay();
+        const shift = (firstDay === 0) ? 6 : firstDay - 1;
+        const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+        let html = "";
+        let day = 1;
+        for (let row = 0; row < 6; row++) {
+          html += "<tr>";
+          for (let col = 0; col < 7; col++) {
+            const idx = row * 7 + col;
+            if (idx < shift || day > daysInMonth) {
+              html += "<td></td>";
+            } else {
+              const isToday = (day === activeDay);
+              const isSunday = col === 6;
+              let cls = "";
+              if (isToday) cls = ' class="db-cal-today"';
+              else if (isSunday) cls = ' class="db-cal-sunday"';
+
+              html += `<td${cls} style="cursor:pointer;" onclick="selectCalendarDay(${day})">${day}</td>`;
+              day++;
+            }
+          }
+          html += "</tr>";
+          if (day > daysInMonth) break;
+        }
+        calBody.innerHTML = html;
+        selectedDateLabel.textContent = formatDateLabel(calYear, calMonth, activeDay);
+        updateScheduleList(activeDay);
+        updateMonthActivities();
+      }
+
+      window.selectCalendarDay = function (day) {
+        activeDay = day;
+        renderCalendar();
+      };
+
+      if (btnPrev) btnPrev.addEventListener("click", function () {
+        calMonth--;
+        if (calMonth < 0) { calMonth = 11; calYear--; }
+        activeDay = 1;
+        renderCalendar();
+      });
+      if (btnNext) btnNext.addEventListener("click", function () {
+        calMonth++;
+        if (calMonth > 11) { calMonth = 0; calYear++; }
+        activeDay = 1;
+        renderCalendar();
+      });
+
+      renderCalendar();
+
+      /* ===== Schedule Actions ===== */
+      window.markDone = function (id) {
+        const key = String(activeDay);
+        const list = scheduleDb[key] || [];
+        const item = list.find(x => x.id === id);
+        if (item) {
+          item.status = "done";
+          saveSchedules();
+          updateScheduleList(activeDay);
+          showToast("Jadwal diselesaikan!");
+        }
+      };
+
+      window.markCancel = function (id) {
+        const key = String(activeDay);
+        const list = scheduleDb[key] || [];
+        const item = list.find(x => x.id === id);
+        if (item) {
+          item.status = "cancelled";
+          saveSchedules();
+          updateScheduleList(activeDay);
+          showToast("Jadwal dibatalkan!");
+        }
+      };
+
+      window.deleteSchedule = function (id) {
+        const key = String(activeDay);
+        const list = scheduleDb[key] || [];
+        const index = list.findIndex(x => x.id === id);
+        if (index > -1) {
+          list.splice(index, 1);
+          saveSchedules();
+          updateScheduleList(activeDay);
+          showToast("Jadwal dihapus!");
+        }
+      };
+
+      /* ===== Modal Handlers ===== */
+      const modal = document.getElementById("addScheduleModal");
+      const openModalBtn = document.getElementById("openAddSchedModalBtn");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const cancelModalBtn = document.getElementById("cancelModalBtn");
+      const saveScheduleBtn = document.getElementById("saveScheduleBtn");
+
+      const titleInput = document.getElementById("schedTitleInput");
+      const dateInput = document.getElementById("schedDateInput");
+      const startTimeInput = document.getElementById("schedStartTimeInput");
+      const endTimeInput = document.getElementById("schedEndTimeInput");
+      const typeSelect = document.getElementById("schedTypeSelect");
+      const notesInput = document.getElementById("schedNotesInput");
+
+      const checkSemua = document.getElementById("checkSemua");
+      const checkGroup = document.getElementById("checkGroup");
+      const subcheckList = document.querySelectorAll(".karyawan-subcheck");
+      const selectedList = document.getElementById("selectedKaryawanList");
+      const selectedPlaceholder = document.getElementById("selectedPlaceholder");
+      const selectHeader = document.getElementById("karyawanSelectHeader");
+      const selectDropdown = document.getElementById("karyawanSelectDropdown");
+
+      // Toggle dropdown display
+      if (selectHeader && selectDropdown) {
+        selectHeader.onclick = () => {
+          const isClosed = selectDropdown.style.display === "none" || selectDropdown.style.display === "";
+          const headerLabel = document.getElementById("karyawanSelectLabel");
+          if (isClosed) {
+            selectDropdown.style.display = "flex";
+            if (headerLabel) headerLabel.textContent = "Cari Karyawan...";
+          } else {
+             selectDropdown.style.display = "none";
+             if (headerLabel) headerLabel.textContent = "Tambah Karyawan...";
+           }
+        };
+      }
+
+      // Collapsible sub-dropdown logic for PT Bisa Media Grup
+      const groupArrow = document.getElementById("groupArrow");
+      const suboptions = document.getElementById("karyawanSuboptions");
+      if (groupArrow && suboptions) {
+        groupArrow.onclick = (e) => {
+          e.stopPropagation(); // Prevent clicking group checkbox
+          const isHidden = suboptions.style.display === "none" || suboptions.style.display === "";
+          if (isHidden) {
+            suboptions.style.display = "flex";
+            groupArrow.innerHTML = "&#9660;";
+          } else {
+            suboptions.style.display = "none";
+            groupArrow.innerHTML = "&#9654;";
+          }
+        };
+      }
+
+      // Update Karyawan Terpilih UI
+      function updateKaryawanSelection() {
+        if (!selectedList || !selectedPlaceholder) return;
+        selectedList.innerHTML = "";
+
+        const selected = [];
+        subcheckList.forEach(cb => {
+          if (cb.checked) {
+            selected.push(cb.value);
+            const tag = document.createElement("span");
+            tag.className = "selected-karyawan-tag";
+            tag.textContent = cb.value;
+            selectedList.appendChild(tag);
+          }
+        });
+
+        if (selected.length > 0) {
+          selectedPlaceholder.style.display = "none";
+        } else {
+          selectedPlaceholder.style.display = "block";
+        }
+      }
+
+      // Checkbox event listeners
+      if (checkSemua) {
+        checkSemua.onchange = () => {
+          const val = checkSemua.checked;
+          if (checkGroup) checkGroup.checked = val;
+          subcheckList.forEach(cb => {
+            cb.checked = val;
+          });
+          updateKaryawanSelection();
+        };
+      }
+
+      if (checkGroup) {
+        checkGroup.onchange = () => {
+          const val = checkGroup.checked;
+          subcheckList.forEach(cb => {
+            cb.checked = val;
+          });
+          updateKaryawanSelection();
+        };
+      }
+
+      subcheckList.forEach(cb => {
+        cb.onchange = () => {
+          updateKaryawanSelection();
+          // Adjust PT checkbox if children change
+          const allChecked = Array.from(subcheckList).every(c => c.checked);
+          const noneChecked = Array.from(subcheckList).every(c => !c.checked);
+          if (checkGroup) {
+            if (allChecked) checkGroup.checked = true;
+            else if (noneChecked) checkGroup.checked = false;
+          }
+        };
+      });
+
+      if (openModalBtn) {
+        openModalBtn.onclick = () => {
+          modal.classList.add("is-active");
+          // Pre-populate date input
+          if (dateInput) {
+            const y = calYear;
+            const m = String(calMonth + 1).padStart(2, '0');
+            const d = String(activeDay).padStart(2, '0');
+            dateInput.value = `${y}-${m}-${d}`;
+          }
+          // Expand select panel by default
+          if (selectDropdown) {
+            selectDropdown.style.display = "flex";
+            const headerLabel = document.getElementById("karyawanSelectLabel");
+            if (headerLabel) headerLabel.textContent = "Cari Karyawan...";
+          }
+        };
+      }
+
+      const hideModal = () => {
+        modal.classList.remove("is-active");
+        // Reset form values
+        if (titleInput) titleInput.value = "";
+        if (startTimeInput) startTimeInput.value = "";
+        if (endTimeInput) endTimeInput.value = "";
+        if (notesInput) notesInput.value = "";
+        if (typeSelect) typeSelect.selectedIndex = 0;
+        if (checkSemua) checkSemua.checked = false;
+        if (checkGroup) checkGroup.checked = false;
+        subcheckList.forEach(cb => cb.checked = false);
+
+        // Reset employee select box labels and states
+        const headerLabel = document.getElementById("karyawanSelectLabel");
+        if (headerLabel) headerLabel.textContent = "Tambah Karyawan...";
+        if (selectDropdown) selectDropdown.style.display = "none";
+        if (suboptions) suboptions.style.display = "none";
+        if (groupArrow) groupArrow.innerHTML = "&#9654;";
+
+        updateKaryawanSelection();
+      };
+
+      if (closeModalBtn) closeModalBtn.onclick = hideModal;
+      if (cancelModalBtn) cancelModalBtn.onclick = hideModal;
+
+      if (saveScheduleBtn) {
+        saveScheduleBtn.onclick = () => {
+          const title = titleInput.value.trim();
+          const dateVal = dateInput.value;
+          const startTime = startTimeInput.value;
+          const endTime = endTimeInput.value;
+          const type = typeSelect.value;
+          const notes = notesInput.value.trim();
+
+          if (!title || !dateVal || !startTime || !endTime) {
+            showToast("Harap isi Judul, Tanggal, Mulai, dan Selesai!");
+            return;
+          }
+
+          // Parse selected date day
+          const dParts = dateVal.split("-");
+          const targetDay = parseInt(dParts[2], 10);
+          const key = String(targetDay);
+
+          // Get selected employees
+          const employees = [];
+          subcheckList.forEach(cb => {
+            if (cb.checked) employees.push(cb.value);
+          });
+
+          const timeStr = `${startTime} - ${endTime}`;
+          const noteDesc = notes ? notes : "Catatan Tambahan";
+          const descStr = employees.length > 0
+            ? `${noteDesc} | Untuk: ${employees.join(", ")}`
+            : noteDesc;
+          const titleStr = `[${type}] ${title}`;
+
+          if (!scheduleDb[key]) scheduleDb[key] = [];
+
+          scheduleDb[key].push({
+            id: schedIdCounter++,
+            title: titleStr,
+            desc: descStr,
+            time: timeStr,
+            status: "pending"
+          });
+          saveSchedules();
+
+          hideModal();
+
+          // Render current calendar and active day list
+          activeDay = targetDay;
+          renderCalendar();
+          showToast("Jadwal berhasil ditambahkan!");
+        };
+      }
+
+      // Toast notification helper
+      function showToast(msg) {
+        const toast = document.getElementById("toast");
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2200);
+      }
+    })();
+  </script>
+  <script src="../assets/js/layout.js?v=1008"></script>
+</body>
+
+</html>
+
+
+
+
+
+

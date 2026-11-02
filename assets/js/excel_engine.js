@@ -24,7 +24,7 @@
     let depth = 1;
     const normalizedPath = (window.location.pathname || '').replace(/\\/g, '/');
     const segments = normalizedPath.split('/').filter(Boolean);
-    const folderIndex = segments.findIndex(s => ['bm', 'spvkol', 'staffkol'].includes(s.toLowerCase()));
+    const folderIndex = segments.findIndex(s => ['bm', 'spvkol', 'staffkol', 'accounting'].includes(s.toLowerCase()));
     if (folderIndex !== -1) {
       depth = segments.length - folderIndex - 1;
     }
