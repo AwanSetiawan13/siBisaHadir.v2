@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | Staff KOL - Bisa Media</title>
-  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../media/logo.png" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="../vendor/three.min.js"></script>
@@ -303,7 +303,9 @@
     .db-pk-branch--l1 { margin-right: 2px; }
     .db-pk-branch--l2 { margin-left: 18px; margin-right: 2px; }
     .db-pk-is-hidden { display: none !important; }
-    .db-pk-ext { width: 12px; height: 12px; flex-shrink: 0; color: #0284c7; opacity: 0; transition: opacity .15s ease; }
+    .db-pk-ext-link { display: inline-flex; align-items: center; flex-shrink: 0; color: #0284c7; text-decoration: none; }
+    .db-pk-ext-link:hover { color: #0369a1; }
+    .db-pk-ext { width: 12px; height: 12px; flex-shrink: 0; color: inherit; opacity: 0; transition: opacity .15s ease; }
     .db-pk-tr:hover .db-pk-ext { opacity: .9; }
     .db-pk-tag { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; padding: 2.5px 7px; border-radius: 5px; font-family: 'Outfit', sans-serif; font-size: 9px; font-weight: 700; line-height: 1.2; letter-spacing: .02em; text-transform: uppercase; }
     .db-pk-tag svg { width: 10px; height: 10px; display: block; stroke-width: 2.2; }
@@ -674,7 +676,7 @@
                 </div>
                 <h2 class="db-pk-title">Perancangan Kerja</h2>
               </div>
-              <span class="db-pk-head-pill db-pk-head-pill--blue" id="pkRrkCount">1 RRK</span>
+              <span class="db-pk-head-pill db-pk-head-pill--blue" id="pkRrkCount">0 RRK</span>
             </div>
             <p class="db-pk-desc">Alur project, RRK, milestone, dan tugas beserta progresnya.</p>
             <div class="db-pk-table" id="pkTree"></div>
@@ -696,7 +698,7 @@
                   </div>
                   <h2 class="db-pk-title">Ringkasan Tugas</h2>
                 </div>
-                <span class="db-pk-head-pill db-pk-head-pill--blue" id="pkTaskCount">3 Tugas</span>
+                <span class="db-pk-head-pill db-pk-head-pill--blue" id="pkTaskCount">0 Tugas</span>
               </div>
               <p class="db-pk-desc">Status tugas perancangan secara real-time.</p>
               <div class="db-pk-summary" id="pkTaskSummary"></div>
@@ -716,7 +718,7 @@
                   </div>
                   <h2 class="db-pk-title">Ringkasan Project</h2>
                 </div>
-                <span class="db-pk-head-pill db-pk-head-pill--indigo" id="pkProjectCount">3 Project</span>
+                <span class="db-pk-head-pill db-pk-head-pill--indigo" id="pkProjectCount">0 Project</span>
               </div>
               <p class="db-pk-desc">Status project secara real-time.</p>
               <div class="db-pk-summary" id="pkProjectSummary"></div>
@@ -808,10 +810,10 @@
       "use strict";
 
       const STORAGE_KEYS = {
-        rrk: "bisa_rrk_data_v2",
-        milestone: "bisa_milestone_data_v1",
-        tugas: "bisa_tugas_data_v1",
-        project: "bisa_project_data_v4"
+        rrk: "bisa_rrk_data_v3",
+        milestone: "bisa_milestone_data_v2",
+        tugas: "bisa_tugas_data_v3",
+        project: "bisa_project_data_v5"
       };
 
       const DEFAULT_RRK = [
@@ -1055,10 +1057,11 @@
       }
 
       function buildModel() {
-        const rrkSource = readArray(STORAGE_KEYS.rrk, DEFAULT_RRK);
-        const milestoneSource = readArray(STORAGE_KEYS.milestone, DEFAULT_MILESTONES);
-        const taskSource = readArray(STORAGE_KEYS.tugas, DEFAULT_TUGAS);
-        const projectSource = readArray(STORAGE_KEYS.project, DEFAULT_PROJECTS);
+        const scoped = getStaffScopedSources();
+        const rrkSource = scoped.rrks;
+        const milestoneSource = scoped.milestones;
+        const taskSource = scoped.tasks;
+        const projectSource = scoped.projects;
 
         const milestones = milestoneSource.map(function (item, index) {
           return Object.assign({}, item, {
@@ -1094,6 +1097,14 @@
           if (target) target.milestones.push(milestone);
         });
 
+        const linkedMilestoneKeys = new Set();
+        rrks.forEach(function (rrk) {
+          rrk.milestones.forEach(function (milestone) { linkedMilestoneKeys.add(milestone._key); });
+        });
+        const orphanMilestones = milestones.filter(function (milestone) {
+          return !linkedMilestoneKeys.has(milestone._key);
+        });
+
         const linkedTaskKeys = new Set();
         milestones.forEach(function (milestone) {
           milestone.tasks.forEach(function (task) { linkedTaskKeys.add(task._key); });
@@ -1107,7 +1118,7 @@
           });
         });
 
-        return { rrks: rrks, milestones: milestones, tasks: tasks, unlinkedTasks: unlinkedTasks, projects: projects };
+        return { rrks: rrks, milestones: milestones, orphanMilestones: orphanMilestones, tasks: tasks, unlinkedTasks: unlinkedTasks, projects: projects };
       }
 
 
@@ -1121,8 +1132,11 @@
         return '<svg class="db-pk-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg>';
       }
 
-      function externalIcon() {
-        return '<svg class="db-pk-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>';
+      function externalIcon(href, label) {
+        const title = "Buka halaman " + (label || "perancangan kerja");
+        return '<a class="db-pk-ext-link" href="' + esc(href) + '" title="' + esc(title) + '" aria-label="' + esc(title) + '">' +
+          '<svg class="db-pk-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>' +
+          '</a>';
       }
 
       function tag(type, label) {
@@ -1180,7 +1194,7 @@
           '<span class="db-pk-lead"></span>',
           tag("project", "Project"),
           '<span class="db-pk-title">' + esc(project.namaProject || project.title || "Project") + '</span>',
-          externalIcon(),
+          externalIcon("perancangan_kerja/staffkol_project.html", "Project"),
           '</span>',
           picCell(project.pic),
           progressCell(progress),
@@ -1199,7 +1213,7 @@
           '<span class="db-pk-lead">' + chevron() + '</span>',
           tag("rrk", "RRK"),
           '<span class="db-pk-title">' + esc(rrk.rencana || rrk.program || "RRK") + '</span>',
-          externalIcon(),
+          externalIcon("perancangan_kerja/staffkol_rrk.html", "RRK"),
           '</span>',
           picCell(rrk.pic),
           progressCell(progress),
@@ -1219,7 +1233,7 @@
           '<span class="db-pk-lead">' + chevron() + '</span>',
           tag("ms", "Milestone"),
           '<span class="db-pk-title">' + esc(milestone.title || "Milestone") + '</span>',
-          externalIcon(),
+          externalIcon("perancangan_kerja/staffkol_Milestone.html", "Milestone"),
           '</span>',
           picCell(milestone.pic),
           progressCell(progress),
@@ -1239,7 +1253,7 @@
           '<span class="db-pk-lead"></span>',
           tag("tugas", "Tugas"),
           '<span class="db-pk-title">' + esc(task.title || "Tugas") + '</span>',
-          externalIcon(),
+          externalIcon("perancangan_kerja/staffkol_tugas.html", "Tugas"),
           '</span>',
           picCell(task.pic),
           progressCell(progress),
@@ -1248,6 +1262,24 @@
         ].join("");
       }
 
+
+      function renderOrphanMilestoneGroupRow(number, isOpen) {
+        const progress = average(model.orphanMilestones.map(milestoneProgress));
+        const status = rowStatusLabel("ms", statusFromProgress(progress), progress);
+        return [
+          '<div class="db-pk-tr db-pk-tr--group' + (isOpen ? " is-open" : "") + '" data-pk-toggle="group" data-pk-key="orphan-milestones">',
+          numberCell(number),
+          '<span class="db-pk-td db-pk-td--hier">',
+          '<span class="db-pk-lead">' + chevron() + '</span>',
+          tag("ms", "Milestone"),
+          '<span class="db-pk-title">Milestone Tanpa RRK</span>',
+          '</span>',
+          '<span class="db-pk-td db-pk-td--pic">-</span>',
+          progressCell(progress),
+          statusCell(status),
+          '</div>'
+        ].join("");
+      }
 
       function renderUnlinkedGroupRow(number, isOpen) {
         const progress = average(model.unlinkedTasks.map(taskProgress));
@@ -1298,6 +1330,22 @@
             });
           });
         });
+
+        if (model.orphanMilestones.length) {
+          const groupOpen = state.open.has("orphan-milestones");
+          number += 1;
+          rows.push(renderOrphanMilestoneGroupRow(number, groupOpen));
+          model.orphanMilestones.forEach(function (milestone) {
+            const msOpen = state.open.has(milestone._key);
+            const tasks = Array.isArray(milestone.tasks) ? milestone.tasks : [];
+            number += 1;
+            rows.push(renderMilestoneRow(milestone, number, msOpen, !groupOpen));
+            tasks.forEach(function (task) {
+              number += 1;
+              rows.push(renderTaskRow(task, number, !groupOpen || !msOpen));
+            });
+          });
+        }
 
         if (model.unlinkedTasks.length) {
           const groupOpen = state.open.has("unlinked-tasks");
@@ -1413,6 +1461,7 @@
       const tree = document.getElementById("pkTree");
       if (tree) {
         tree.addEventListener("click", function (event) {
+          if (event.target.closest(".db-pk-ext-link")) return;
           const trigger = event.target.closest("[data-pk-toggle]");
           if (!trigger || !tree.contains(trigger)) return;
           const key = trigger.getAttribute("data-pk-key");
@@ -1459,6 +1508,71 @@
       } catch (e) {
         return [];
       }
+    }
+
+    function getActiveStaffPic() {
+      const userPic = (localStorage.getItem("user_pic") || "").trim();
+      if (userPic) return userPic;
+      const role = (localStorage.getItem("user_role") || "").trim();
+      const name = (localStorage.getItem("user_name") || "").trim();
+      if (role === "staff_kol" && name) {
+        const known = ["Setiawan", "Amanda", "Dimas", "Clarissa"];
+        const match = known.find(function (k) {
+          return name.toLowerCase().indexOf(k.toLowerCase()) !== -1;
+        });
+        if (match) return match;
+        return name;
+      }
+      return "Setiawan";
+    }
+
+    function pkNormName(value) {
+      return String(value == null ? "" : value).trim().toLowerCase();
+    }
+
+    function pkStaffMatchTeam(item, target) {
+      if (!target) return true;
+      const pic = pkNormName(item && item.pic);
+      const tim = pkNormName(item && item.tim);
+      return pic === target || tim.indexOf(target) !== -1;
+    }
+
+    function pkStaffMatchTask(item, target) {
+      if (!target) return true;
+      const pic = pkNormName(item && item.pic);
+      return pic === target || pic.indexOf(target) !== -1;
+    }
+
+    function pkStaffMatchProject(item, target) {
+      if (!target) return true;
+      const pic = pkNormName(item && item.pic);
+      const tim = pkNormName(item && item.tim);
+      return pic.indexOf(target) !== -1 || tim.indexOf(target) !== -1;
+    }
+
+    function getStaffScopedSources() {
+      const allRrks = readStoredArray("bisa_rrk_data_v3");
+      const allMilestones = readStoredArray("bisa_milestone_data_v2");
+      const allTasks = readStoredArray("bisa_tugas_data_v3");
+      const allProjects = readStoredArray("bisa_project_data_v5");
+      const role = pkNormName(localStorage.getItem("user_role"));
+      const hasPic = Boolean((localStorage.getItem("user_pic") || "").trim());
+
+      if (role !== "staff_kol" && !hasPic) {
+        return { rrks: allRrks, milestones: allMilestones, tasks: allTasks, projects: allProjects };
+      }
+
+      const active = pkNormName(getActiveStaffPic());
+      if (!active) {
+        return { rrks: allRrks, milestones: allMilestones, tasks: allTasks, projects: allProjects };
+      }
+
+      return {
+        rrks: allRrks.filter(function (rrk) { return pkStaffMatchTeam(rrk, active); }),
+        milestones: allMilestones.filter(function (milestone) { return pkStaffMatchTeam(milestone, active); }),
+        tasks: allTasks.filter(function (task) { return pkStaffMatchTask(task, active); }),
+        projects: allProjects.filter(function (project) { return pkStaffMatchProject(project, active); })
+      };
     }
 
     function readMetricCount(keys, fallback) {
@@ -1591,9 +1705,10 @@
     }
 
     function updateTopMetrics() {
-      const countRrk = readMetricCount(["bisa_rrk_data_v2"], 1);
-      const countMilestone = readMetricCount(["bisa_milestone_data_v1"], 3);
-      const countTugas = readMetricCount(["bisa_tugas_data_v1"], 3);
+      const scoped = getStaffScopedSources();
+      const countRrk = scoped.rrks.length;
+      const countMilestone = scoped.milestones.length;
+      const countTugas = scoped.tasks.length;
 
       const setMetric = (id, value) => {
         const el = document.getElementById(id);
