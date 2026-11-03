@@ -33,7 +33,7 @@
     }
     if (!window.exportBisaExcel && !document.querySelector('script[src*="excel_engine"]')) {
       const excelScript = document.createElement('script');
-      excelScript.src = rootPrefix + 'assets/js/excel_engine.js';
+      excelScript.src = rootPrefix + 'assets/js/excel_engine.js?v=20261103_grup';
       document.head.appendChild(excelScript);
     }
   })();

@@ -1,5 +1,5 @@
 /**
- * excel_engine.js - PT Bisa Media Group
+ * excel_engine.js - PT Bisa Media Grup
  * Universal Styled Excel (.xlsx) Exporter with Professional Table Design
  * Features:
  * - Real .xlsx binary generation via ExcelJS
@@ -329,7 +329,7 @@
       <body>
         <table>
           <tr>
-            <th colspan="${totalCols}" class="title-row">PT BISA MEDIA GROUP - ${title.toUpperCase()}</th>
+            <th colspan="${totalCols}" class="title-row">PT BISA MEDIA GRUP - ${title.toUpperCase()}</th>
           </tr>
           <tr>
             <td colspan="${totalCols}" class="sub-row">
@@ -438,8 +438,8 @@
 
     try {
       const wb = new ExcelJS.Workbook();
-      wb.creator = 'PT Bisa Media Group - SI BISA HADIR';
-      wb.lastModifiedBy = 'PT Bisa Media Group';
+      wb.creator = 'PT Bisa Media Grup - SI BISA HADIR';
+      wb.lastModifiedBy = 'PT Bisa Media Grup';
       wb.created = new Date();
       wb.modified = new Date();
 
@@ -453,7 +453,7 @@
       // Row 1: Company & Title Banner
       ws.mergeCells(1, 1, 1, totalCols);
       const titleCell = ws.getCell(1, 1);
-      titleCell.value = 'PT BISA MEDIA GROUP - ' + title.toUpperCase();
+      titleCell.value = 'PT BISA MEDIA GRUP - ' + title.toUpperCase();
       titleCell.font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
       titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E87B7' } };
       titleCell.alignment = { vertical: 'middle', horizontal: 'center' };

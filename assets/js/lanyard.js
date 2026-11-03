@@ -1,5 +1,5 @@
 /**
- * lanyard.js — PT Bisa Media Group
+ * lanyard.js — PT Bisa Media Grup
  * Vanilla JS 3D physics lanyard card using Three.js
  * initLanyard(container, options) → destroy()
  */
