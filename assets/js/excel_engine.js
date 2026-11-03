@@ -83,8 +83,8 @@
     const s = String(val).trim().toLowerCase();
     if (!s) return null;
 
-    // Green / Positive
-    if (['bind', 'aktif', 'selesai', 'approved', 'disetujui', 'hadir', 'tepat waktu', 'berhasil', 'normal', 'high', 'terkirim', 'lunas', 'clear'].includes(s)) {
+    // Green / Positive (Disetujui, Lunas, dsb.)
+    if (['bind', 'aktif', 'selesai', 'approved', 'disetujui', 'hadir', 'tepat waktu', 'berhasil', 'normal', 'high', 'terkirim', 'lunas', 'clear'].includes(s) || (s.includes('setuju') && !s.includes('tidak'))) {
       return {
         bg: 'FFDCFCE7',
         fontColor: 'FF166534',
@@ -95,8 +95,8 @@
       };
     }
 
-    // Amber / Warning / Process
-    if (['tenggang', 'pending', 'menunggu', 'dalam proses', 'review', 'sedang diproses', 'medium', 'warning', 'revisi', 'draft', 'follow up'].includes(s)) {
+    // Amber / Warning / Process (Menunggu Review, Menunggu Approval, dsb.)
+    if (['tenggang', 'pending', 'menunggu', 'dalam proses', 'review', 'sedang diproses', 'medium', 'warning', 'revisi', 'draft', 'follow up', 'menunggu review', 'menunggu approval'].includes(s) || s.includes('tunggu') || s.includes('review') || s.includes('proses')) {
       return {
         bg: 'FFFEF3C7',
         fontColor: 'FF92400E',
@@ -107,8 +107,8 @@
       };
     }
 
-    // Red / Danger / Inactive
-    if (['berhenti', 'ditolak', 'rejected', 'cancel', 'batal', 'terlambat', 'alpa', 'low', 'gagal', 'hilang', 'rusak', 'non-aktif', 'nonaktif'].includes(s)) {
+    // Red / Danger / Inactive (Ditolak, Tidak Setuju, Belum Bayar, dsb.)
+    if (['berhenti', 'ditolak', 'rejected', 'cancel', 'batal', 'terlambat', 'alpa', 'low', 'gagal', 'hilang', 'rusak', 'non-aktif', 'nonaktif', 'tidak setuju', 'belum bayar'].includes(s) || s.includes('tolak') || s.includes('tidak setuju') || s.includes('belum bayar')) {
       return {
         bg: 'FFFEE2E2',
         fontColor: 'FF991B1B',
@@ -222,31 +222,61 @@
       return;
     }
 
-    let container = document.getElementById('bisaExcelToastContainer');
-    if (!container) {
+    let container = typeof document !== 'undefined' && document.getElementById ? document.getElementById('bisaExcelToastContainer') : null;
+    if (!container && typeof document !== 'undefined' && document.createElement) {
       container = document.createElement('div');
       container.id = 'bisaExcelToastContainer';
       container.style.cssText = 'position:fixed;top:24px;right:24px;z-index:9999999;display:flex;flex-direction:column;gap:10px;pointer-events:none;font-family:Outfit,sans-serif;';
-      document.body.appendChild(container);
+      if (document.body) document.body.appendChild(container);
     }
 
-    const toast = document.createElement('div');
-    toast.style.cssText = 'background:#107C41;color:#ffffff;padding:12px 20px;border-radius:10px;box-shadow:0 10px 25px rgba(0,0,0,0.18);display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;opacity:0;transform:translateY(-10px);transition:all 0.3s ease;pointer-events:auto;';
-    toast.innerHTML = `<svg style="width:20px;height:20px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>${message || 'File Excel (.xlsx) berhasil diunduh!'}</span>`;
-    container.appendChild(toast);
+    if (container) {
+      const toast = document.createElement('div');
+      toast.style.cssText = 'background:#107C41;color:#ffffff;padding:12px 20px;border-radius:10px;box-shadow:0 10px 25px rgba(0,0,0,0.18);display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;opacity:0;transform:translateY(-10px);transition:all 0.3s ease;pointer-events:auto;';
+      toast.innerHTML = `<svg style="width:20px;height:20px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span>${message || 'File Excel (.xlsx) berhasil diunduh!'}</span>`;
+      container.appendChild(toast);
 
-    requestAnimationFrame(() => {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateY(0)';
-    });
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => {
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateY(0)';
+        });
+      } else {
+        setTimeout(() => {
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateY(0)';
+        }, 10);
+      }
 
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(-10px)';
       setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 350);
-    }, 3000);
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 350);
+      }, 3000);
+    }
+  }
+
+  // Helper untuk parsing nilai mata uang / angka numerik
+  function parseCurrencyOrNumber(val) {
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    if (!val) return 0;
+    const str = String(val).trim();
+    const clean = str.replace(/[^0-9,-]/g, '').replace(/,/g, '.');
+    const n = parseFloat(clean);
+    return isNaN(n) ? 0 : n;
+  }
+
+  // Helper konversi index kolom (1-based) ke huruf Excel (1 -> A, 2 -> B, 27 -> AA)
+  function getColumnLetter(colNumber) {
+    let temp, letter = '';
+    while (colNumber > 0) {
+      temp = (colNumber - 1) % 26;
+      letter = String.fromCharCode(temp + 65) + letter;
+      colNumber = Math.floor((colNumber - temp - 1) / 26);
+    }
+    return letter;
   }
 
   // Fallback exporter: Generates a styled HTML spreadsheet that Excel opens with complete formatting
@@ -342,6 +372,15 @@
           </tr>
     `;
 
+    const CURRENCY_HEADER_KEYWORDS = ['nominal', 'tagihan', 'biaya', 'uang', 'beban', 'dpp', 'ppn', 'kas', 'utang', 'piutang', 'saldo', 'harga', 'total', 'tarif', 'jumlah'];
+    const currencyColIndices = [];
+    headers.forEach((h, idx) => {
+      const hLower = String(h).toLowerCase().trim();
+      if (CURRENCY_HEADER_KEYWORDS.some(kw => hLower.includes(kw))) {
+        currencyColIndices.push(idx);
+      }
+    });
+
     rows.forEach((row, rIdx) => {
       const zebraClass = rIdx % 2 === 1 ? 'td-even' : 'td-odd';
       html += '<tr>';
@@ -351,10 +390,15 @@
 
         let cellStyle = '';
         let alignClass = 'align-left';
+        let displayVal = rawStr;
 
-        if (cIdx === 0 || rawStr.length <= 4 || /^\d{4}-\d{2}-\d{2}/.test(rawStr)) {
+        if (currencyColIndices.includes(cIdx)) {
+          alignClass = 'align-right';
+          const n = parseCurrencyOrNumber(rawStr);
+          displayVal = 'Rp ' + Math.round(n).toLocaleString('id-ID');
+        } else if (cIdx === 0 || rawStr.length <= 4 || /^\d{4}-\d{2}-\d{2}/.test(rawStr) || /^\d{2}\/\d{2}\/\d{4}/.test(rawStr)) {
           alignClass = 'align-center';
-        } else if (rawStr.startsWith('Rp') || rawStr.endsWith('%') || /^[0-9.,]+$/.test(rawStr) && rawStr.length > 5) {
+        } else if (rawStr.startsWith('Rp') || rawStr.endsWith('%') || (/^[0-9.,]+$/.test(rawStr) && rawStr.length > 5)) {
           alignClass = 'align-right';
         }
 
@@ -362,7 +406,7 @@
           cellStyle = `background-color: ${stStyle.htmlBg}; color: ${stStyle.htmlColor}; font-weight: bold; text-align: center; border: 1px solid ${stStyle.htmlBorder};`;
         }
 
-        html += `<td class="td-cell ${zebraClass} ${alignClass}" style="${cellStyle}">${rawStr}</td>`;
+        html += `<td class="td-cell ${zebraClass} ${alignClass}" style="${cellStyle}">${displayVal}</td>`;
       });
       html += '</tr>';
     });
@@ -502,6 +546,10 @@
       const callerTextCols = new Set((options.textColumnIndices || []).map(i => i + 1)); // 0-based → 1-based
       const textColSet = new Set(); // kolom yang perlu dipaksa Text
 
+      // ===== Deteksi Kolom Finansial / Mata Uang (Currency) =====
+      const CURRENCY_HEADER_KEYWORDS = ['nominal', 'tagihan', 'biaya', 'uang', 'beban', 'dpp', 'ppn', 'kas', 'utang', 'piutang', 'saldo', 'harga', 'total', 'tarif', 'jumlah'];
+      const currencyColSet = new Set();
+
       headers.forEach((h, idx) => {
         const colNum = idx + 1;
         const hLower = String(h).toLowerCase().trim();
@@ -510,6 +558,8 @@
           // Gunakan .style (bukan hanya .numFmt) agar ExcelJS menulis format teks ke <col> XML
           ws.getColumn(colNum).style = { numFmt: '@', font: { name: 'Calibri', size: 10 } };
           textColSet.add(colNum);
+        } else if (CURRENCY_HEADER_KEYWORDS.some(kw => hLower.includes(kw))) {
+          currencyColSet.add(colNum);
         }
       });
 
@@ -546,13 +596,19 @@
           const valStr = String(cleanVal != null ? cleanVal : '').trim();
           const stStyle = getStatusStyle(valStr);
 
-          if (stStyle) {
+          if (currencyColSet.has(colNum)) {
+            const numVal = parseCurrencyOrNumber(cleanVal);
+            cell.value = numVal;
+            cell.numFmt = '"Rp "#,##0;[Red]"-Rp "#,##0;"Rp 0"';
+            cell.alignment = { vertical: 'middle', horizontal: 'right' };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraBg } };
+          } else if (stStyle) {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: stStyle.bg } };
             cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: stStyle.fontColor } };
             cell.alignment = { vertical: 'middle', horizontal: 'center' };
           } else {
             cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraBg } };
-            if (colNum === 1 || valStr.length <= 4 || /^\d{4}-\d{2}-\d{2}/.test(valStr)) {
+            if (colNum === 1 || valStr.length <= 4 || /^\d{4}-\d{2}-\d{2}/.test(valStr) || /^\d{2}\/\d{2}\/\d{4}/.test(valStr)) {
               cell.alignment = { vertical: 'middle', horizontal: 'center' };
             } else if (valStr.startsWith('Rp') || valStr.endsWith('%') || (/^[0-9.,]+$/.test(valStr) && valStr.length > 5)) {
               cell.alignment = { vertical: 'middle', horizontal: 'right' };
@@ -569,7 +625,6 @@
           }
         });
       });
-
 
       // Auto-fit column widths
       headers.forEach((h, idx) => {

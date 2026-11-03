@@ -1,0 +1,3809 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengeluaran & Beban | Bisa Media</title>
+
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Global & Vendor CSS -->
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/accounting.css" />
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       PENGELUARAN & BEBAN - CLEAN, CONSISTENT & DETAILED DESIGN
+       ========================================================================== */
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+
+    /* 4 Summary Cards */
+    .pnd-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .pnd-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .pnd-card__info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pnd-card__label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .pnd-card__value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      font-style: italic;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .pnd-card__icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.3);
+    }
+
+    .pnd-card__icon-box svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2;
+    }
+
+    /* Main Panel & Blue Line */
+    .panel.campaign-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 22px 24px 22px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .pnd-panel-line {
+      height: 3.5px;
+      margin: 0 0 16px 0;
+      border-radius: 4px;
+      background: #0076C5;
+      width: 100%;
+    }
+
+    /* Toolbar Layout */
+    .pnd-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pnd-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pnd-toolbar__right {
+      display: flex;
+      align-items: center;
+    }
+
+        .pnd-btn-icon {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #0076C5;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-icon.has-filter {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0284c7 !important;
+    }
+
+    .pnd-btn-icon.has-filter::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
+
+    .pnd-btn-icon:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .pnd-btn-icon svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pnd-btn-excel:hover svg rect {
+      fill: #0b5e31 !important;
+    }
+
+    .pnd-search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .pnd-search-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 15px;
+      height: 15px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .pnd-search-wrap input {
+      height: 36px;
+      padding: 0 12px 0 32px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      width: 190px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-search-wrap input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.15);
+    }
+
+    /* Button Tambah (Konsisten dengan Kas & Bank & Pendapatan) */
+    .btn-tambah-pnd {
+      height: 36px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-pnd:hover {
+      background: #0284c7;
+    }
+
+    .btn-tambah-pnd:active {
+      transform: scale(0.98);
+    }
+
+    .pnd-dashed-divider {
+      border: none;
+      border-top: 1px dashed #cbd5e1;
+      margin: 0 0 14px 0;
+    }
+
+    /* Table Styles */
+    .table-wrap.campaign-table {
+      overflow-x: auto;
+      border-radius: 6px;
+    }
+
+    #pndTable {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    #pndTable th,
+    #pndTable td {
+      vertical-align: middle;
+      padding: 13px 14px;
+    }
+
+    #pndTable th:nth-child(1),
+    #pndTable td:nth-child(1) {
+      width: 44px;
+      text-align: center;
+    }
+
+    #pndTable th:nth-child(2),
+    #pndTable td:nth-child(2) {
+      width: 140px;
+    }
+
+    #pndTable th:nth-child(3),
+    #pndTable td:nth-child(3) {
+      width: 130px;
+    }
+
+    #pndTable th:nth-child(4),
+    #pndTable td:nth-child(4) {
+      width: 110px;
+    }
+
+    #pndTable th:nth-child(5),
+    #pndTable td:nth-child(5) {
+      width: 120px;
+    }
+
+    #pndTable th:nth-child(6),
+    #pndTable td:nth-child(6) {
+      min-width: 180px;
+    }
+
+    #pndTable th:nth-child(7),
+    #pndTable td:nth-child(7) {
+      width: 140px;
+      text-align: left;
+    }
+
+    #pndTable th:nth-child(8),
+    #pndTable td:nth-child(8) {
+      width: 60px;
+      text-align: center;
+    }
+
+    #pndTable th {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #475569;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    #pndTable td {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+      background: #ffffff;
+    }
+
+    #pndTable tbody tr:hover td {
+      background: #f8fafc;
+    }
+
+    .pnd-cell-italic {
+      font-style: italic;
+      color: #334155;
+    }
+
+    /* Action Toggle Button */
+        .pnd-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .pnd-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .pnd-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Fixed Floating Action Menu (Konsisten dengan Kas & Bank dan Pendapatan) */
+    .pnd-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .pnd-action-menu.is-open {
+      display: block;
+    }
+
+    .pnd-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .pnd-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .pnd-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 26px;
+      color: #fff;
+      background: #0076C5;
+    }
+
+    .pnd-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pnd-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .pnd-action-menu button.is-danger:hover {
+      background: #fef2f2;
+    }
+
+    .pnd-action-menu .pnd-action-icon.is-danger {
+      background: #e02424;
+    }
+
+    /* ==========================================================================
+       MODAL CRUD (EXACT MATCH FOR REFERENSI GAMBAR USER)
+       ========================================================================== */
+    .pnd-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .pnd-modal-overlay.is-active {
+      display: flex;
+    }
+
+    .pnd-modal-box {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 900px;
+      max-height: 92vh;
+      overflow-y: auto;
+      position: relative;
+      padding: 24px 28px;
+    }
+
+    .pnd-modal-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #0076C5;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .pnd-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .pnd-modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .pnd-modal-title em {
+      font-style: normal;
+      font-weight: 800;
+    }
+
+    .pnd-modal-title span.title-subtitle {
+      font-style: italic;
+      font-weight: 400;
+      color: #64748b;
+    }
+
+    .pnd-modal-close {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      font-size: 12px;
+      font-family: 'Outfit', sans-serif;
+      color: #64748b;
+      cursor: pointer;
+      line-height: 1;
+      padding: 5px 9px;
+      border-radius: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-modal-close:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+
+    .pnd-modal-divider {
+      height: 1px;
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 18px;
+    }
+
+    /* 3-Column 9-Row Grid */
+    .pnd-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 20px;
+      row-gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .pnd-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .pnd-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .pnd-input {
+      height: 38px;
+      padding: 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .pnd-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .pnd-input.is-muted {
+      background: #f8fafc;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* Datepicker Wrap with Sleek Calendar Icon */
+    .bisa-datepicker-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .bisa-datepicker-wrap input {
+      width: 100%;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .bisa-datepicker-icon {
+      position: absolute;
+      right: 10px;
+      pointer-events: none;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bisa-datepicker-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Custom Checkbox/Radio Dropdowns (Exact Match to Image 2 with sleek panah SVG) */
+    .pnd-select-wrap {
+      position: relative;
+    }
+
+    .pnd-select-btn {
+      height: 38px;
+      padding: 0 12px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #94a3b8;
+      font-style: italic;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.15s ease;
+    }
+
+    .pnd-select-btn:hover {
+      border-color: #94a3b8;
+    }
+
+    .pnd-select-btn.has-value {
+      color: #1e293b;
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    .pnd-select-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      pointer-events: none;
+      margin-left: 6px;
+    }
+
+    .pnd-select-arrow svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .pnd-select-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      max-height: 190px;
+      overflow-y: auto;
+      z-index: 2200;
+      display: none;
+      padding: 6px 0;
+    }
+
+    .pnd-select-wrap.is-open .pnd-select-dropdown {
+      display: block;
+    }
+
+    .pnd-select-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      color: #334155;
+      transition: background 0.1s ease;
+    }
+
+    .pnd-select-item:hover {
+      background: #f1f5f9;
+      color: #0076C5;
+    }
+
+    .pnd-select-item input[type="checkbox"],
+    .pnd-select-item input[type="radio"] {
+      width: 15px;
+      height: 15px;
+      accent-color: #0076C5;
+      cursor: pointer;
+    }
+
+    /* Custom File Box with Dynamic Eye Preview Icon */
+    .pnd-file-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 3px 8px;
+      height: 38px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .pnd-file-btn {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: #0284c7;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+
+    .pnd-file-btn:hover {
+      background: #e0f2fe;
+    }
+
+    .pnd-file-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      color: #64748b;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 120px;
+      font-style: italic;
+    }
+
+    .pnd-eye-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: #0284c7;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+    }
+
+    .pnd-eye-btn:hover {
+      background: #bae6fd;
+    }
+
+    .pnd-eye-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Tombol Lihat Bukti Outline (Pada Modal Lihat - Sesuai Gambar 3) */
+    .pnd-btn-lihat-bukti-outline {
+      width: 100%;
+      height: 38px;
+      background: #ffffff;
+      border: 1.5px solid #0076C5;
+      color: #0076C5;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-lihat-bukti-outline:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    /* Modal Footer Buttons */
+    .pnd-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-top: 10px;
+    }
+
+    .pnd-btn-footer-outline {
+      height: 38px;
+      min-width: 120px;
+      padding: 0 24px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a;
+      background: #ffffff;
+      border: 1.5px solid #0076C5;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pnd-btn-footer-outline:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    /* Custom Popover Datepicker Dialog */
+    .bisa-dp-popover {
+      position: fixed;
+      z-index: 3000;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      width: 250px;
+      padding: 12px;
+      display: none;
+    }
+
+    .bisa-dp-popover.is-open {
+      display: block;
+    }
+
+    .bisa-dp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .bisa-dp-header span {
+      cursor: pointer;
+      user-select: none;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #64748b;
+    }
+
+    .bisa-dp-header span:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .bisa-dp-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .bisa-dp-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .bisa-dp-day {
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: #334155;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .bisa-dp-day:hover:not(.is-muted) {
+      background: #f1f5f9;
+    }
+
+    .bisa-dp-day.is-muted {
+      color: #cbd5e1;
+      cursor: default;
+    }
+
+    .bisa-dp-day.is-selected {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .bisa-dp-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .bisa-dp-btn-action {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      color: #0284c7;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 2px 4px;
+    }
+
+    /* Popover Filter COA & Dual-Month Calendar */
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+
+        /* ===== POPOVER FILTER (Sesuai Referensi Gambar 1 & 2 User) ===== */
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+
+    .pnd-filter-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 280px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+      padding: 18px 18px 16px 18px;
+      z-index: 120;
+      display: none;
+      box-sizing: border-box;
+    }
+
+    .pnd-filter-popover.is-active {
+      display: block;
+    }
+
+    .pnd-filter-group {
+      margin-bottom: 14px;
+    }
+
+    .pnd-filter-label {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .pnd-filter-box {
+      position: relative;
+      width: 100%;
+    }
+
+    .pnd-filter-input-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .pnd-filter-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 30px 0 12px;
+      border: 2px solid #008be2;
+      border-radius: 8px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-filter-input.pnd-filter-blue-border {
+      border: 2px solid #008be2;
+    }
+
+    .pnd-filter-input.pnd-filter-cyan-border {
+      border: 2px solid #38bdf8;
+    }
+
+    .pnd-filter-input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .pnd-filter-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.15s ease;
+    }
+
+    .pnd-filter-arrow svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      pointer-events: none;
+    }
+
+    .pnd-filter-box.is-open .pnd-filter-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #28a5de;
+    }
+
+    .pnd-filter-box.is-open .pnd-filter-input {
+      border-radius: 8px 8px 0 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pnd-filter-dropdown-list {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 2px solid #008be2;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+      padding: 6px 0;
+      z-index: 60;
+      max-height: 140px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .pnd-filter-dropdown-list.pnd-filter-blue-border {
+      border: 2px solid #008be2;
+      border-top: none;
+    }
+
+    .pnd-filter-dropdown-list.pnd-filter-cyan-border {
+      border: 2px solid #38bdf8;
+      border-top: none;
+    }
+
+    .pnd-filter-box.is-open .pnd-filter-dropdown-list {
+      display: block;
+    }
+
+    .pnd-filter-item {
+      padding: 7px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .pnd-filter-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .pnd-filter-item.is-selected {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .pnd-filter-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .pnd-filter-btn-reset {
+      flex: 1;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      background: #f8fafc;
+      color: #0f172a;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-filter-btn-reset em {
+      font-style: italic;
+    }
+
+    .pnd-filter-btn-reset:hover {
+      background: #e2e8f0;
+      border-color: #0284c7;
+    }
+
+    .pnd-filter-btn-apply {
+      flex: 1;
+      height: 38px;
+      border: none;
+      background: #28a5de;
+      color: #ffffff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 8px rgba(40, 165, 222, 0.35);
+    }
+
+    .pnd-filter-btn-apply em {
+      font-style: italic;
+    }
+
+    .pnd-filter-btn-apply:hover {
+      background: #0284c7;
+    }
+
+    /* Dual Month Calendar Popover */
+    .pnd-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 1000;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+      width: 580px;
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pnd-calendar-popover.is-active {
+      display: flex;
+    }
+
+    .pnd-cal-body {
+      display: flex;
+      gap: 16px;
+    }
+
+    .pnd-cal-sidebar {
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-right: 1px solid #f1f5f9;
+      padding-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .pnd-cal-preset-btn {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: #475569;
+      background: transparent;
+      border: none;
+      text-align: left;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+
+    .pnd-cal-preset-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .pnd-cal-preset-btn.is-active {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .pnd-cal-months {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .pnd-cal-month-box {
+      flex: 1;
+    }
+
+    .pnd-cal-month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .pnd-cal-nav {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      user-select: none;
+      color: #64748b;
+    }
+
+    .pnd-cal-nav:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .pnd-cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .pnd-cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .pnd-cal-day {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      color: #334155;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s ease;
+    }
+
+    .pnd-cal-day:hover:not(.pnd-day-muted) {
+      background: #f1f5f9;
+    }
+
+    .pnd-cal-day.pnd-day-muted {
+      color: #cbd5e1;
+      cursor: default;
+    }
+
+    .pnd-cal-day.pnd-day-selected-start,
+    .pnd-cal-day.pnd-day-selected-end {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .pnd-cal-day.pnd-day-in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .pnd-cal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 10px;
+    }
+
+    .pnd-cal-selected-info {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .pnd-cal-selected-info span {
+      font-weight: 600;
+      color: #0284c7;
+    }
+
+    .pnd-cal-footer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pnd-cal-btn-cancel {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      color: #64748b;
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .pnd-cal-btn-apply {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      color: #ffffff;
+      background: #0284c7;
+      border: none;
+      padding: 5px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    @media (max-width: 992px) {
+      .pnd-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .pnd-form-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .pnd-summary-cards {
+        grid-template-columns: 1fr;
+      }
+      .pnd-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar"></header>
+
+    <main class="dashboard-content">
+      <!-- ===== 4 SUMMARY CARDS ===== -->
+      <section class="pnd-summary-cards">
+        <!-- Card 1: Total Tagihan -->
+        <div class="pnd-card">
+          <div class="pnd-card__info">
+            <span class="pnd-card__label">Total Tagihan</span>
+            <span class="pnd-card__value" id="cardTotalTagihan">Rp. -</span>
+          </div>
+          <div class="pnd-card__icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Terbayar Kas -->
+        <div class="pnd-card">
+          <div class="pnd-card__info">
+            <span class="pnd-card__label">Terbayar Kas</span>
+            <span class="pnd-card__value" id="cardTerbayarKas">Rp. -</span>
+          </div>
+          <div class="pnd-card__icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+              <circle cx="12" cy="12" r="2"></circle>
+              <path d="M6 12h.01M18 12h.01"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Sisa Piutang -->
+        <div class="pnd-card">
+          <div class="pnd-card__info">
+            <span class="pnd-card__label">Sisa Piutang</span>
+            <span class="pnd-card__value" id="cardSisaPiutang">Rp. 000</span>
+          </div>
+          <div class="pnd-card__icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Perlu Approval -->
+        <div class="pnd-card">
+          <div class="pnd-card__info">
+            <span class="pnd-card__label">Perlu Approval</span>
+            <span class="pnd-card__value" id="cardPerluApproval">0 Menunggu</span>
+          </div>
+          <div class="pnd-card__icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MAIN PANEL ===== -->
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line pnd-panel-line"></div>
+
+                <!-- Toolbar Pengeluaran & Beban (Konsisten dengan Kas & Bank) -->
+        <div class="pnd-toolbar">
+          <div class="pnd-toolbar__left">
+            <!-- Filter Popover Button -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterPnd" class="pnd-btn-icon" type="button" aria-label="Filter" title="Filter Pengeluaran & Beban">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <!-- Popover Filter Kode COA & Status Bayar Lama (Sesuai Referensi Gambar 1 & 2 User) -->
+              <div id="filterPndDropdown" class="pnd-filter-popover">
+                <!-- Group 1: Kode COA -->
+                <div class="pnd-filter-group">
+                  <label class="pnd-filter-label" for="filterKodeCoa">Kode COA</label>
+                  <div class="pnd-filter-box" id="boxFilterKodeCoa">
+                    <div class="pnd-filter-input-wrap">
+                      <input type="text" id="filterKodeCoa" class="pnd-filter-input pnd-filter-blue-border" placeholder="Pilih Arus Kas" autocomplete="off" />
+                      <span class="pnd-filter-arrow" title="Buka pilihan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="pnd-filter-dropdown-list pnd-filter-blue-border" id="listFilterKodeCoa"></div>
+                  </div>
+                </div>
+
+                <!-- Group 2: Status Bayar Lama -->
+                <div class="pnd-filter-group">
+                  <label class="pnd-filter-label" for="filterStatusBayarLama">Status Bayar Lama</label>
+                  <div class="pnd-filter-box" id="boxFilterStatusBayarLama">
+                    <div class="pnd-filter-input-wrap">
+                      <input type="text" id="filterStatusBayarLama" class="pnd-filter-input pnd-filter-cyan-border" placeholder="Pilih Status Bayar Lama" autocomplete="off" />
+                      <span class="pnd-filter-arrow" title="Buka pilihan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="pnd-filter-dropdown-list pnd-filter-cyan-border" id="listFilterStatusBayarLama"></div>
+                  </div>
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="pnd-filter-actions">
+                  <button type="button" id="resetFilterPnd" class="pnd-filter-btn-reset"><em>Riset</em></button>
+                  <button type="button" id="applyFilterPnd" class="pnd-filter-btn-apply"><em>Terapkan</em></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kalender Popover Button -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnCalendarPnd" class="pnd-btn-icon" type="button" aria-label="Pilih Tanggal" title="Filter Berdasarkan Tanggal">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </button>
+
+              <!-- Dual Month Calendar Popover -->
+              <div id="calendarPndDropdown" class="pnd-calendar-popover">
+                <div class="pnd-cal-body">
+                  <div class="pnd-cal-sidebar">
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="today">Hari ini</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="yesterday">Kemarin</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last7">7 hari terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last30">30 hari terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last3m">3 bulan terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last6m">6 bulan terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last12m">12 bulan terakhir</button>
+                  </div>
+
+                  <div class="pnd-cal-months">
+                    <div class="pnd-cal-month-box">
+                      <div class="pnd-cal-month-header">
+                        <span class="pnd-cal-nav" id="pndCalPrevYear" title="Tahun Sebelumnya">&laquo;</span>
+                        <span class="pnd-cal-month-title" id="pndCalTitleLeft">2026 - 08</span>
+                        <span class="pnd-cal-nav" id="pndCalPrevMonth" title="Bulan Sebelumnya">&lsaquo;</span>
+                      </div>
+                      <div class="pnd-cal-weekdays">
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                      </div>
+                      <div class="pnd-cal-days-grid" id="pndCalGridLeft"></div>
+                    </div>
+
+                    <div class="pnd-cal-month-box">
+                      <div class="pnd-cal-month-header">
+                        <span class="pnd-cal-nav" id="pndCalNextMonth" title="Bulan Berikutnya">&rsaquo;</span>
+                        <span class="pnd-cal-month-title" id="pndCalTitleRight">2026 - 09</span>
+                        <span class="pnd-cal-nav" id="pndCalNextYear" title="Tahun Berikutnya">&raquo;</span>
+                      </div>
+                      <div class="pnd-cal-weekdays">
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                      </div>
+                      <div class="pnd-cal-days-grid" id="pndCalGridRight"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pnd-cal-footer">
+                  <div class="pnd-cal-selected-info">
+                    Dipilih: <span id="pndCalSelectedText">2026-08-01 - --</span>
+                  </div>
+                  <div class="pnd-cal-footer-actions">
+                    <button type="button" id="btnCancelCalendarPnd" class="pnd-cal-btn-cancel">Batal</button>
+                    <button type="button" id="btnApplyCalendarPnd" class="pnd-cal-btn-apply">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Export Excel Button -->
+            <button id="btnExportPnd" class="pnd-btn-icon pnd-btn-excel" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+              <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <!-- Search Bar -->
+            <div class="pnd-search-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="pndSearch" type="search" placeholder="Cari...." autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="pnd-toolbar__right">
+            <button id="btnTambahPnd" class="btn-tambah-pnd" type="button">+ Tambah</button>
+          </div>
+        </div>
+
+        <div class="pnd-dashed-divider"></div>
+
+        <div class="table-wrap campaign-table" id="pndTableWrap">
+          <table id="pndTable">
+            <thead>
+              <tr>
+                <th style="width: 44px; text-align: center;">#</th>
+                <th style="width: 140px;">ID Dokumen</th>
+                <th style="width: 130px;">Tgl Pengakuan</th>
+                <th style="width: 110px;">Kode COA</th>
+                <th style="width: 120px;">Divisi</th>
+                <th style="min-width: 180px;">Keterangan</th>
+                <th style="width: 140px; text-align: left;">Status Approval</th>
+                <th style="width: 60px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="pndTableBody">
+              <!-- Diisi via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== MODAL TAMBAH / EDIT PENGELUARAN & BEBAN (EXACT MATCH REFERENCE MOCKUP) ===== -->
+  <div id="pndFormModal" class="pnd-modal-overlay">
+    <div class="pnd-modal-box">
+      <div class="pnd-modal-accent"></div>
+
+      <div class="pnd-modal-header">
+        <h2 class="pnd-modal-title">
+          <em><span id="pndFormActionText">Tambah</span></em> <span class="title-subtitle">Pengeluaran & Beban</span>
+        </h2>
+        <button type="button" class="pnd-modal-close" data-close-modal="pndFormModal" aria-label="Tutup">x</button>
+      </div>
+
+      <div class="pnd-modal-divider"></div>
+
+      <form id="pndForm" autocomplete="off">
+        <input type="hidden" id="pndEditId" />
+
+        <div class="pnd-form-grid">
+          <!-- Row 1: ID Dokumen, ID Approval, Tanggal Pengakuan -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndIdDokumen">ID Dokumen</label>
+            <input type="text" id="pndIdDokumen" class="pnd-input is-muted" placeholder="EXP-2609-001" readonly required />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label">ID Approval</label>
+            <div class="pnd-select-wrap" id="wrapIdApproval">
+              <div class="pnd-select-btn" id="btnTriggerIdApproval">
+                <span id="labelIdApproval">Pilih ID Approval</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndIdApproval" />
+              <div class="pnd-select-dropdown" id="dropdownIdApproval">
+                <label class="pnd-select-item">
+                  <input type="radio" name="optIdApproval" value="APR-2609-001" data-label="APR-2609-001" />
+                  <span>APR-2609-001</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optIdApproval" value="APR-2609-002" data-label="APR-2609-002" />
+                  <span>APR-2609-002</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndTglPengakuan">Tanggal Pengakuan</label>
+            <div class="bisa-datepicker-wrap">
+              <input type="text" id="pndTglPengakuan" class="pnd-input bisa-datepicker-input" placeholder="Tanggal Pengakuan" autocomplete="off" required />
+              <span class="bisa-datepicker-icon" title="Pilih Tanggal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- Row 2: Vendor / Karyawan, Divisi, Keterangan -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndVendorKaryawan">Vendor / Karyawan</label>
+            <input type="text" id="pndVendorKaryawan" class="pnd-input" placeholder="Vendor / Karyawan" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndDivisi">Divisi</label>
+            <input type="text" id="pndDivisi" class="pnd-input" placeholder="Divisi" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndKeterangan">Keterangan</label>
+            <input type="text" id="pndKeterangan" class="pnd-input" placeholder="Keterangan" />
+          </div>
+
+          <!-- Row 3: Status Approval, Kode COA, DPP/Beban -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndStatusApproval">Status Approval</label>
+            <input type="text" id="pndStatusApproval" class="pnd-input" placeholder="Status Approval" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label">Kode COA</label>
+            <div class="pnd-select-wrap" id="wrapKodeCoa">
+              <div class="pnd-select-btn" id="btnTriggerKodeCoa">
+                <span id="labelKodeCoa">Pilih Kode COA</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndKodeCoa" />
+              <div class="pnd-select-dropdown" id="dropdownKodeCoa">
+                <label class="pnd-select-item">
+                  <input type="radio" name="optKodeCoa" value="1001" data-label="1001 | Kas Kecil" data-nama="Kas Kecil" data-kelompok="Aset Lancar" data-status="Aktif" />
+                  <span>1001 | Kas Kecil</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optKodeCoa" value="1002" data-label="1002 | Bank BCA" data-nama="Bank BCA" data-kelompok="Kas & Bank" data-status="Aktif" />
+                  <span>1002 | Bank BCA</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optKodeCoa" value="5009" data-label="5009 | Beban Berlangganan / Admin Bank" data-nama="Beban Berlangganan" data-kelompok="Beban Operasional" data-status="Aktif" />
+                  <span>5009 | Beban Berlangganan</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optKodeCoa" value="5001" data-label="5001 | Beban Gaji & Honor" data-nama="Beban Gaji & Honor" data-kelompok="Beban Operasional" data-status="Aktif" />
+                  <span>5001 | Beban Gaji & Honor</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optKodeCoa" value="5002" data-label="5002 | Sewa Studio & Properti" data-nama="Sewa Studio & Properti" data-kelompok="Beban Operasional" data-status="Aktif" />
+                  <span>5002 | Sewa Studio & Properti</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndDpp">DPP/Beban</label>
+            <input type="number" id="pndDpp" class="pnd-input" placeholder="Rp. -" min="0" />
+          </div>
+
+          <!-- Row 4: PPN, Tagihan Bruto, Status Bayar Lama -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndPpn">PPN</label>
+            <input type="number" id="pndPpn" class="pnd-input" placeholder="Rp. -" min="0" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndTagihanBruto">Tagihan Bruto</label>
+            <input type="text" id="pndTagihanBruto" class="pnd-input is-muted" placeholder="Rp. -" readonly />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label">Status Bayar Lama</label>
+            <div class="pnd-select-wrap" id="wrapStatusBayarLama">
+              <div class="pnd-select-btn" id="btnTriggerStatusBayarLama">
+                <span id="labelStatusBayarLama">Pilih Status</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndStatusBayarLama" />
+              <div class="pnd-select-dropdown" id="dropdownStatusBayarLama">
+                <label class="pnd-select-item">
+                  <input type="radio" name="optStatusBayarLama" value="Lunas" data-label="Lunas" />
+                  <span>Lunas</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optStatusBayarLama" value="Menunggu Approval" data-label="Menunggu Approval" />
+                  <span>Menunggu Approval</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 5: Tanggal Bayar Lama, Akun Lama, Project/Brand -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndTanggalBayarLama">Tanggal Bayar Lama</label>
+            <div class="bisa-datepicker-wrap">
+              <input type="text" id="pndTanggalBayarLama" class="pnd-input bisa-datepicker-input" placeholder="dd/mm/yyyy" autocomplete="off" />
+              <span class="bisa-datepicker-icon" title="Pilih Tanggal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label">Akun Lama</label>
+            <div class="pnd-select-wrap" id="wrapAkunLama">
+              <div class="pnd-select-btn" id="btnTriggerAkunLama">
+                <span id="labelAkunLama">Pilih Akun Lama</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndAkunLama" />
+              <div class="pnd-select-dropdown" id="dropdownAkunLama">
+                <label class="pnd-select-item">
+                  <input type="radio" name="optAkunLama" value="BCA | 123" data-label="BCA | 123" />
+                  <span>BCA | 123</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optAkunLama" value="BNI | 123" data-label="BNI | 123" />
+                  <span>BNI | 123</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optAkunLama" value="Mandiri | 123" data-label="Mandiri | 123" />
+                  <span>Mandiri | 123</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label">Project/Brand</label>
+            <div class="pnd-select-wrap" id="wrapProjectBrand">
+              <div class="pnd-select-btn" id="btnTriggerProjectBrand">
+                <span id="labelProjectBrand">Pilih Project / Brand</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndProjectBrand" />
+              <div class="pnd-select-dropdown" id="dropdownProjectBrand">
+                <label class="pnd-select-item">
+                  <input type="radio" name="optProjectBrand" value="Pendapatan" data-label="Pendapatan" />
+                  <span>Pendapatan</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optProjectBrand" value="Project 2" data-label="Project 2" />
+                  <span>Project 2</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 6: Jenis, Beban di Akui, Terbayar Kas -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndJenis">Jenis</label>
+            <input type="text" id="pndJenis" class="pnd-input" placeholder="Tambah Jenis" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndBebanDiAkui">Beban di Akui</label>
+            <input type="number" id="pndBebanDiAkui" class="pnd-input" placeholder="Rp. -" min="0" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndTerbayarKas">Terbayar Kas</label>
+            <input type="number" id="pndTerbayarKas" class="pnd-input" placeholder="Rp. -" min="0" />
+          </div>
+
+          <!-- Row 7: Sisa Utang, Jatuh Tempo, Bukti -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndSisaUtang">Sisa Utang</label>
+            <input type="text" id="pndSisaUtang" class="pnd-input is-muted" placeholder="Rp. -" readonly />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndJatuhTempo">Jatuh Tempo</label>
+            <div class="bisa-datepicker-wrap">
+              <input type="text" id="pndJatuhTempo" class="pnd-input bisa-datepicker-input" placeholder="dd/mm/yyyy" autocomplete="off" />
+              <span class="bisa-datepicker-icon" title="Pilih Tanggal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label">Bukti</label>
+            <div class="pnd-file-box">
+              <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <label for="pndBuktiInput" class="pnd-file-btn">Choose File</label>
+                <span id="pndBuktiFileName" class="pnd-file-name">Belum ada file</span>
+              </div>
+              <button type="button" id="btnPreviewBuktiForm" class="pnd-eye-btn" title="Lihat Bukti Transaksi" style="display: none;">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+            <input type="file" id="pndBuktiInput" style="display: none;" accept="image/*,.pdf" />
+          </div>
+
+          <!-- Row 8: Invoice, Catatan, Divisi Pengecualian -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndInvoice">Invoice</label>
+            <input type="text" id="pndInvoice" class="pnd-input" placeholder="Tambah Invoice" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndCatatan">Catatan</label>
+            <input type="text" id="pndCatatan" class="pnd-input" placeholder="Tambah Catatan" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndDivisiPengecualian">Divisi Pengecualian</label>
+            <input type="text" id="pndDivisiPengecualian" class="pnd-input" placeholder="Divisi Pengecualian" />
+          </div>
+
+          <!-- Row 9: Nama Akun COA, Kelompok COA, Status COA -->
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndNamaAkunCoa">Nama Akun COA</label>
+            <input type="text" id="pndNamaAkunCoa" class="pnd-input" placeholder="Nama Akun COA" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndKelompokCoa">Kelompok COA</label>
+            <input type="text" id="pndKelompokCoa" class="pnd-input" placeholder="Kelompok COA" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndStatusCoa">Status COA</label>
+            <input type="text" id="pndStatusCoa" class="pnd-input" placeholder="Status COA" />
+          </div>
+        </div>
+
+        <div class="pnd-modal-footer">
+          <button type="submit" class="pnd-btn-footer-outline">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETAIL PENGELUARAN & BEBAN (EXACT MATCH REFERENCE MOCKUP GAMBAR 3) ===== -->
+  <div id="pndDetailModal" class="pnd-modal-overlay">
+    <div class="pnd-modal-box">
+      <div class="pnd-modal-accent"></div>
+
+      <div class="pnd-modal-header">
+        <h2 class="pnd-modal-title">
+          <em>Lihat</em> <span class="title-subtitle">Pengeluaran & Beban</span>
+        </h2>
+        <button type="button" class="pnd-modal-close" data-close-modal="pndDetailModal" aria-label="Tutup">x</button>
+      </div>
+
+      <div class="pnd-modal-divider"></div>
+
+      <div class="pnd-form-grid">
+        <!-- Row 1 -->
+        <div class="pnd-field">
+          <label class="pnd-label">ID Dokumen</label>
+          <input type="text" id="viewPndIdDokumen" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">ID Approval</label>
+          <input type="text" id="viewPndIdApproval" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Tanggal Pengakuan</label>
+          <input type="text" id="viewPndTglPengakuan" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 2 -->
+        <div class="pnd-field">
+          <label class="pnd-label">Vendor / Karyawan</label>
+          <input type="text" id="viewPndVendorKaryawan" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Divisi</label>
+          <input type="text" id="viewPndDivisi" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Keterangan</label>
+          <input type="text" id="viewPndKeterangan" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 3 -->
+        <div class="pnd-field">
+          <label class="pnd-label">Status Approval</label>
+          <input type="text" id="viewPndStatusApproval" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Kode COA</label>
+          <input type="text" id="viewPndKodeCoa" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">DPP/Beban</label>
+          <input type="text" id="viewPndDpp" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 4 -->
+        <div class="pnd-field">
+          <label class="pnd-label">PPN</label>
+          <input type="text" id="viewPndPpn" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Tagihan Bruto</label>
+          <input type="text" id="viewPndTagihanBruto" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Status Bayar Lama</label>
+          <input type="text" id="viewPndStatusBayarLama" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 5 -->
+        <div class="pnd-field">
+          <label class="pnd-label">Tanggal Bayar Lama</label>
+          <input type="text" id="viewPndTanggalBayarLama" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Akun Lama</label>
+          <input type="text" id="viewPndAkunLama" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Project/Brand</label>
+          <input type="text" id="viewPndProjectBrand" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 6 -->
+        <div class="pnd-field">
+          <label class="pnd-label">Jenis</label>
+          <input type="text" id="viewPndJenis" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Beban di Akui</label>
+          <input type="text" id="viewPndBebanDiAkui" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Terbayar Kas</label>
+          <input type="text" id="viewPndTerbayarKas" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 7 -->
+        <div class="pnd-field">
+          <label class="pnd-label">Sisa Utang</label>
+          <input type="text" id="viewPndSisaUtang" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Jatuh Tempo</label>
+          <input type="text" id="viewPndJatuhTempo" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Bukti</label>
+          <button type="button" id="viewPndBuktiBtn" class="pnd-btn-lihat-bukti-outline">Lihat Bukti</button>
+        </div>
+
+        <!-- Row 8 -->
+        <div class="pnd-field">
+          <label class="pnd-label">Invoice</label>
+          <input type="text" id="viewPndInvoice" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Catatan</label>
+          <input type="text" id="viewPndCatatan" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Divisi Pengecualian</label>
+          <input type="text" id="viewPndDivisiPengecualian" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 9 -->
+        <div class="pnd-field">
+          <label class="pnd-label">Nama Akun COA</label>
+          <input type="text" id="viewPndNamaAkunCoa" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Kelompok COA</label>
+          <input type="text" id="viewPndKelompokCoa" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Status COA</label>
+          <input type="text" id="viewPndStatusCoa" class="pnd-input is-muted" readonly />
+        </div>
+      </div>
+
+      <div class="pnd-modal-footer">
+        <button type="button" class="pnd-btn-footer-outline" data-close-modal="pndDetailModal">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Menu Container -->
+    <!-- Floating Action Menu (Konsisten dengan Kas & Bank) -->
+  <div id="pndActionMenu" class="pnd-action-menu" role="menu">
+    <button type="button" data-action="view">
+      <span class="pnd-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" data-action="edit">
+      <span class="pnd-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" class="is-danger" data-action="delete">
+      <span class="pnd-action-icon is-danger">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <!-- Custom Popover Datepicker Dialog -->
+  <div id="bisaDatePickerPopover" class="bisa-dp-popover">
+    <div class="bisa-dp-header">
+      <span id="bisaDpPrev" title="Bulan Sebelumnya">&laquo;</span>
+      <span id="bisaDpTitle">Oktober 2026</span>
+      <span id="bisaDpNext" title="Bulan Berikutnya">&raquo;</span>
+    </div>
+    <div class="bisa-dp-weekdays">
+      <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+    </div>
+    <div class="bisa-dp-days" id="bisaDpGrid"></div>
+    <div class="bisa-dp-footer">
+      <button type="button" class="bisa-dp-btn-action" id="bisaDpClear">Hapus</button>
+      <button type="button" class="bisa-dp-btn-action" id="bisaDpToday">Hari ini</button>
+    </div>
+  </div>
+
+  <!-- Universal Scripts -->
+  <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+  <script src="../../assets/js/excel_engine.js?v=20261103_grup_v3"></script>
+
+  <!-- Main Logic Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const STORAGE_KEY = 'accounting_pengeluaran_beban_data_v5';
+
+      // DOM Elements
+      const tableBody = document.getElementById('pndTableBody');
+      const searchInput = document.getElementById('pndSearch');
+      const btnTambah = document.getElementById('btnTambahPnd');
+      const btnExport = document.getElementById('btnExportPnd');
+      const btnFilter = document.getElementById('btnFilterPnd');
+      const filterDropdown = document.getElementById('filterPndDropdown');
+      const filterKodeCoaInput = document.getElementById('filterKodeCoa');
+      const filterStatusBayarLamaInput = document.getElementById('filterStatusBayarLama');
+      const applyFilterBtn = document.getElementById('applyFilterPnd');
+      const resetFilterBtn = document.getElementById('resetFilterPnd');
+
+      const btnCalendar = document.getElementById('btnCalendarPnd');
+      const calendarDropdown = document.getElementById('calendarPndDropdown');
+      const applyCalendarBtn = document.getElementById('btnApplyCalendarPnd');
+      const cancelCalendarBtn = document.getElementById('btnCancelCalendarPnd');
+
+      const formModal = document.getElementById('pndFormModal');
+      const detailModal = document.getElementById('pndDetailModal');
+      const form = document.getElementById('pndForm');
+      const actionMenu = document.getElementById('pndActionMenu');
+
+      // Form Inputs
+      const pndIdDokumen = document.getElementById('pndIdDokumen');
+      const pndIdApproval = document.getElementById('pndIdApproval');
+      const labelIdApproval = document.getElementById('labelIdApproval');
+      const wrapIdApproval = document.getElementById('wrapIdApproval');
+      const btnTriggerIdApproval = document.getElementById('btnTriggerIdApproval');
+
+      const pndTglPengakuan = document.getElementById('pndTglPengakuan');
+      const pndVendorKaryawan = document.getElementById('pndVendorKaryawan');
+      const pndDivisi = document.getElementById('pndDivisi');
+      const pndKeterangan = document.getElementById('pndKeterangan');
+      const pndStatusApproval = document.getElementById('pndStatusApproval');
+
+      const pndKodeCoa = document.getElementById('pndKodeCoa');
+      const labelKodeCoa = document.getElementById('labelKodeCoa');
+      const wrapKodeCoa = document.getElementById('wrapKodeCoa');
+      const btnTriggerKodeCoa = document.getElementById('btnTriggerKodeCoa');
+
+      const pndDpp = document.getElementById('pndDpp');
+      const pndPpn = document.getElementById('pndPpn');
+      const pndTagihanBruto = document.getElementById('pndTagihanBruto');
+
+      const pndStatusBayarLama = document.getElementById('pndStatusBayarLama');
+      const labelStatusBayarLama = document.getElementById('labelStatusBayarLama');
+      const wrapStatusBayarLama = document.getElementById('wrapStatusBayarLama');
+      const btnTriggerStatusBayarLama = document.getElementById('btnTriggerStatusBayarLama');
+
+      const pndTanggalBayarLama = document.getElementById('pndTanggalBayarLama');
+
+      const pndAkunLama = document.getElementById('pndAkunLama');
+      const labelAkunLama = document.getElementById('labelAkunLama');
+      const wrapAkunLama = document.getElementById('wrapAkunLama');
+      const btnTriggerAkunLama = document.getElementById('btnTriggerAkunLama');
+
+      const pndProjectBrand = document.getElementById('pndProjectBrand');
+      const labelProjectBrand = document.getElementById('labelProjectBrand');
+      const wrapProjectBrand = document.getElementById('wrapProjectBrand');
+      const btnTriggerProjectBrand = document.getElementById('btnTriggerProjectBrand');
+
+      const pndJenis = document.getElementById('pndJenis');
+      const pndBebanDiAkui = document.getElementById('pndBebanDiAkui');
+      const pndTerbayarKas = document.getElementById('pndTerbayarKas');
+      const pndSisaUtang = document.getElementById('pndSisaUtang');
+      const pndJatuhTempo = document.getElementById('pndJatuhTempo');
+
+      const pndInvoice = document.getElementById('pndInvoice');
+      const pndCatatan = document.getElementById('pndCatatan');
+      const pndDivisiPengecualian = document.getElementById('pndDivisiPengecualian');
+      const pndNamaAkunCoa = document.getElementById('pndNamaAkunCoa');
+      const pndKelompokCoa = document.getElementById('pndKelompokCoa');
+      const pndStatusCoa = document.getElementById('pndStatusCoa');
+
+      const pndBuktiInput = document.getElementById('pndBuktiInput');
+      const pndBuktiFileName = document.getElementById('pndBuktiFileName');
+      const btnPreviewBuktiForm = document.getElementById('btnPreviewBuktiForm');
+      const viewPndBuktiBtn = document.getElementById('viewPndBuktiBtn');
+
+      let currentActionId = null;
+      let tempUploadedFile = '';
+      let tempUploadedFileDataUrl = '';
+      let pndData = loadData();
+      let filters = { kodeCoa: '', statusBayarLama: '', tglMulai: '', tglSelesai: '' };
+
+      const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          const parsed = raw ? JSON.parse(raw) : null;
+          if (Array.isArray(parsed) && parsed.length >= 3) {
+            return parsed;
+          }
+          // Seed data multi-baris mencakup Kode 1, Kode 2, Kode 3, dan beragam Status
+          const seedData = [
+            {
+              id: 'exp-1',
+              idDokumen: 'EXP-2609-001',
+              idApproval: 'APR-2609-001',
+              tanggalPengakuan: '2026-10-04',
+              vendorKaryawan: 'BCA',
+              divisi: 'General',
+              keterangan: 'Admin Bank BCA',
+              statusApproval: 'Disetujui',
+              kodeCoa: '5009',
+              namaAkunCoa: 'Beban Berlangganan',
+              kelompokCoa: 'Beban Operasional',
+              statusCoa: 'Aktif',
+              dpp: 30000,
+              ppn: 0,
+              tagihanBruto: 30000,
+              statusBayarLama: 'Lunas',
+              tanggalBayarLama: '2026-09-05',
+              akunLama: 'BCA | 123',
+              projectBrand: '-',
+              jenis: 'Beban',
+              bebanDiAkui: 30000,
+              terbayarKas: 30000,
+              sisaUtang: 0,
+              jatuhTempo: '2026-09-05',
+              buktiUrl: '',
+              buktiDataUrl: '',
+              invoice: '',
+              catatan: 'Biaya admin transfer bulanan',
+              divisiPengecualian: ''
+            },
+            {
+              id: 'exp-2',
+              idDokumen: 'EXP-2609-002',
+              idApproval: 'APR-2609-002',
+              tanggalPengakuan: '2026-10-08',
+              vendorKaryawan: 'Meta Ads',
+              divisi: 'Marketing',
+              keterangan: 'Iklan Digital Campaign Oktober',
+              statusApproval: 'Disetujui',
+              kodeCoa: '5001',
+              namaAkunCoa: 'Beban Pemasaran & Iklan',
+              kelompokCoa: 'Beban Pemasaran',
+              statusCoa: 'Aktif',
+              dpp: 1500000,
+              ppn: 165000,
+              tagihanBruto: 1665000,
+              statusBayarLama: 'Menunggu Approval',
+              tanggalBayarLama: '2026-10-10',
+              akunLama: 'Mandiri | 456',
+              projectBrand: 'Brand A',
+              jenis: 'Beban',
+              bebanDiAkui: 1665000,
+              terbayarKas: 0,
+              sisaUtang: 1665000,
+              jatuhTempo: '2026-10-25',
+              buktiUrl: '',
+              buktiDataUrl: '',
+              invoice: 'INV-FB-202610',
+              catatan: 'Pengajuan campaign Facebook Ads',
+              divisiPengecualian: ''
+            },
+            {
+              id: 'exp-3',
+              idDokumen: 'EXP-2609-003',
+              idApproval: 'APR-2609-003',
+              tanggalPengakuan: '2026-10-12',
+              vendorKaryawan: 'PT Gedung Megah',
+              divisi: 'Operasional',
+              keterangan: 'Sewa Ruang Kantor Lt. 3',
+              statusApproval: 'Menunggu',
+              kodeCoa: '5002',
+              namaAkunCoa: 'Beban Sewa Gedung',
+              kelompokCoa: 'Beban Operasional',
+              statusCoa: 'Aktif',
+              dpp: 4500000,
+              ppn: 495000,
+              tagihanBruto: 4995000,
+              statusBayarLama: 'Belum Bayar',
+              tanggalBayarLama: '2026-10-15',
+              akunLama: 'BNI | 789',
+              projectBrand: '-',
+              jenis: 'Beban',
+              bebanDiAkui: 4995000,
+              terbayarKas: 0,
+              sisaUtang: 4995000,
+              jatuhTempo: '2026-10-30',
+              buktiUrl: '',
+              buktiDataUrl: '',
+              invoice: 'INV-SEWA-10',
+              catatan: 'Pembayaran termin 1',
+              divisiPengecualian: ''
+            },
+            {
+              id: 'exp-4',
+              idDokumen: 'EXP-2609-004',
+              idApproval: 'APR-2609-004',
+              tanggalPengakuan: '2026-10-18',
+              vendorKaryawan: 'Google Cloud',
+              divisi: 'IT',
+              keterangan: 'Server & Cloud Hosting Database',
+              statusApproval: 'Disetujui',
+              kodeCoa: '1001',
+              namaAkunCoa: 'Beban Server & IT',
+              kelompokCoa: 'Beban Operasional',
+              statusCoa: 'Aktif',
+              dpp: 850000,
+              ppn: 93500,
+              tagihanBruto: 943500,
+              statusBayarLama: 'Lunas',
+              tanggalBayarLama: '2026-10-19',
+              akunLama: 'BCA | 123',
+              projectBrand: '-',
+              jenis: 'Beban',
+              bebanDiAkui: 943500,
+              terbayarKas: 943500,
+              sisaUtang: 0,
+              jatuhTempo: '2026-10-20',
+              buktiUrl: '',
+              buktiDataUrl: '',
+              invoice: 'INV-GCP-8831',
+              catatan: 'Hosting server cloud Q4',
+              divisiPengecualian: ''
+            }
+          ];
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
+          return seedData;
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(pndData));
+        } catch (e) {
+          console.error('Gagal menyimpan data pengeluaran & beban', e);
+        }
+      }
+
+      function escapeHtml(val) {
+        return String(val || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function formatRupiah(num) {
+        if (num === null || num === undefined || num === '' || isNaN(num) || Number(num) === 0) {
+          return 'Rp. -';
+        }
+        return 'Rp ' + Number(num).toLocaleString('id-ID');
+      }
+
+      function formatTanggalDisplay(isoDateStr) {
+        if (!isoDateStr) return '-';
+        const parts = String(isoDateStr).split('-');
+        if (parts.length === 3) {
+          const y = parts[0];
+          const m = parseInt(parts[1], 10);
+          const d = parts[2].padStart(2, '0');
+          const monthName = MONTH_NAMES_SHORT[m - 1] || parts[1];
+          return d + ' ' + monthName + ' ' + y;
+        }
+        return isoDateStr;
+      }
+
+      function updateSummaryCards(customList) {
+        const listToCount = Array.isArray(customList) ? customList : pndData;
+        let totalTagihan = 0;
+        let terbayarKas = 0;
+        let sisaPiutang = 0;
+        let waitingApproval = 0;
+
+        listToCount.forEach(function (item) {
+          totalTagihan += Number(item.tagihanBruto || item.dpp || 0);
+          terbayarKas += Number(item.terbayarKas || 0);
+          sisaPiutang += Number(item.sisaUtang || 0);
+          const st = String(item.statusApproval || '').toLowerCase();
+          if (st === 'menunggu' || st === 'pending') {
+            waitingApproval++;
+          }
+        });
+
+        const card1 = document.getElementById('cardTotalTagihan');
+        const card2 = document.getElementById('cardTerbayarKas');
+        const card3 = document.getElementById('cardSisaPiutang');
+        const card4 = document.getElementById('cardPerluApproval');
+
+        if (card1) card1.textContent = totalTagihan > 0 ? ('Rp ' + totalTagihan.toLocaleString('id-ID')) : 'Rp. -';
+        if (card2) card2.textContent = terbayarKas > 0 ? ('Rp ' + terbayarKas.toLocaleString('id-ID')) : 'Rp. -';
+        if (card3) card3.textContent = sisaPiutang > 0 ? ('Rp ' + sisaPiutang.toLocaleString('id-ID')) : 'Rp. 000';
+        if (card4) card4.textContent = waitingApproval + ' Menunggu';
+      }
+
+      function getFilteredData() {
+        const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        const fKode = (filters.kodeCoa || '').toLowerCase().trim();
+        const fStatus = (filters.statusBayarLama || '').toLowerCase().trim();
+        const fMulai = filters.tglMulai;
+        const fSelesai = filters.tglSelesai;
+
+        return pndData.filter(function (item) {
+          const matchesQuery = !query || [
+            item.idDokumen,
+            item.kodeCoa,
+            formatTanggalDisplay(item.tanggalPengakuan),
+            item.divisi,
+            item.keterangan,
+            item.statusApproval,
+            item.vendorKaryawan
+          ].some(function (val) {
+            return String(val || '').toLowerCase().includes(query);
+          });
+
+          let matchesKode = true;
+          if (fKode) {
+            const itemCoa = String(item.kodeCoa || '').toLowerCase();
+            const itemName = String(item.namaAkunCoa || '').toLowerCase();
+            const itemKet = String(item.keterangan || '').toLowerCase();
+            const filterCoaCode = fKode.split('|')[0].trim().toLowerCase();
+
+            if (fKode === 'kode 1') {
+              matchesKode = itemCoa.includes('5009') || itemCoa.includes('kode 1');
+            } else if (fKode === 'kode 2') {
+              matchesKode = itemCoa.includes('5001') || itemCoa.includes('kode 2');
+            } else if (fKode === 'kode 3') {
+              matchesKode = itemCoa.includes('5002') || itemCoa.includes('kode 3');
+            } else {
+              matchesKode = itemCoa.includes(fKode) || itemName.includes(fKode) || itemKet.includes(fKode) || itemCoa.includes(filterCoaCode);
+            }
+          }
+
+          let matchesStatus = true;
+          if (fStatus && fStatus !== 'status bayar lama' && fStatus !== 'semua') {
+            const itemStatus = String(item.statusBayarLama || '').toLowerCase();
+            matchesStatus = itemStatus.includes(fStatus);
+          }
+
+          let matchesDate = true;
+          if (fMulai && item.tanggalPengakuan) {
+            if (item.tanggalPengakuan < fMulai) matchesDate = false;
+          }
+          if (fSelesai && item.tanggalPengakuan) {
+            if (item.tanggalPengakuan > fSelesai) matchesDate = false;
+          }
+
+          return matchesQuery && matchesKode && matchesStatus && matchesDate;
+        });
+      }
+
+      function renderTable() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        const filtered = getFilteredData();
+        if (filtered.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data pengeluaran & beban yang sesuai.</td></tr>';
+          updateSummaryCards(filtered);
+          updateFilterButtonState();
+          return;
+        }
+
+        filtered.forEach(function (item, index) {
+          const row = document.createElement('tr');
+          row.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '.</td>',
+            '<td class="pnd-cell-italic" style="font-weight: 500;">' + escapeHtml(item.idDokumen || '-') + '</td>',
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(formatTanggalDisplay(item.tanggalPengakuan)) + '</td>',
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(item.kodeCoa || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.divisi || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.keterangan || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.statusApproval || 'Disetujui') + '</td>',
+            '<td style="text-align: center;">' +
+              '<button type="button" class="pnd-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+          tableBody.appendChild(row);
+        });
+
+        updateSummaryCards(filtered);
+        updateFilterButtonState();
+      }
+
+      function updateFilterButtonState() {
+        if (btnFilter) {
+          if (filters.kodeCoa || filters.statusBayarLama) {
+            btnFilter.classList.add('has-filter');
+            btnFilter.setAttribute('title', 'Filter aktif: ' + [filters.kodeCoa, filters.statusBayarLama].filter(Boolean).join(', '));
+          } else {
+            btnFilter.classList.remove('has-filter');
+            btnFilter.setAttribute('title', 'Filter Pengeluaran & Beban');
+          }
+        }
+        if (btnCalendar) {
+          if (filters.tglMulai || filters.tglSelesai) {
+            btnCalendar.classList.add('has-filter');
+            btnCalendar.setAttribute('title', 'Filter tanggal aktif: ' + (filters.tglMulai || '') + ' s/d ' + (filters.tglSelesai || ''));
+          } else {
+            btnCalendar.classList.remove('has-filter');
+            btnCalendar.setAttribute('title', 'Filter Berdasarkan Tanggal');
+          }
+        }
+      }
+
+      /* Modal Helpers */
+      function openModal(modal) {
+        if (modal) modal.classList.add('is-active');
+      }
+
+      function closeModal(modal) {
+        if (modal) modal.classList.remove('is-active');
+      }
+
+      function closePopovers() {
+        if (filterDropdown) filterDropdown.classList.remove('is-active');
+        if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        closeFilterSearchBoxes();
+      }
+
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = 120;
+
+        let left = rect.left - menuWidth + 24;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
+      /* ===== DROPDOWNS DALAM MODAL CRUD (ID Approval, Kode COA, Status Bayar, Akun, Project) ===== */
+      function closeAllModalDropdowns() {
+        document.querySelectorAll('.pnd-select-wrap').forEach(function (wrap) {
+          wrap.classList.remove('is-open');
+        });
+      }
+
+      function setupModalDropdown(wrapId, triggerId, labelId, hiddenInputId, radioName) {
+        const wrap = document.getElementById(wrapId);
+        const trigger = document.getElementById(triggerId);
+        const label = document.getElementById(labelId);
+        const hidden = document.getElementById(hiddenInputId);
+        if (!wrap || !trigger) return;
+
+        trigger.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrap.classList.contains('is-open');
+          closeAllModalDropdowns();
+          if (!isOpen) {
+            wrap.classList.add('is-open');
+          }
+        });
+
+        document.querySelectorAll('input[name="' + radioName + '"]').forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            if (this.checked) {
+              const val = this.value;
+              const lbl = this.getAttribute('data-label') || val;
+              if (hidden) hidden.value = val;
+              if (label) label.textContent = lbl;
+              trigger.classList.add('has-value');
+
+              // Khusus Kode COA: Auto isi Nama Akun, Kelompok, Status
+              if (radioName === 'optKodeCoa') {
+                if (pndNamaAkunCoa) pndNamaAkunCoa.value = this.getAttribute('data-nama') || '';
+                if (pndKelompokCoa) pndKelompokCoa.value = this.getAttribute('data-kelompok') || '';
+                if (pndStatusCoa) pndStatusCoa.value = this.getAttribute('data-status') || 'Aktif';
+              }
+
+              closeAllModalDropdowns();
+            }
+          });
+        });
+      }
+
+      setupModalDropdown('wrapIdApproval', 'btnTriggerIdApproval', 'labelIdApproval', 'pndIdApproval', 'optIdApproval');
+      setupModalDropdown('wrapKodeCoa', 'btnTriggerKodeCoa', 'labelKodeCoa', 'pndKodeCoa', 'optKodeCoa');
+      setupModalDropdown('wrapStatusBayarLama', 'btnTriggerStatusBayarLama', 'labelStatusBayarLama', 'pndStatusBayarLama', 'optStatusBayarLama');
+      setupModalDropdown('wrapAkunLama', 'btnTriggerAkunLama', 'labelAkunLama', 'pndAkunLama', 'optAkunLama');
+      setupModalDropdown('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand');
+
+      function setDropdownVal(wrapId, triggerId, labelId, hiddenId, radioName, val, defaultLabel) {
+        const trigger = document.getElementById(triggerId);
+        const label = document.getElementById(labelId);
+        const hidden = document.getElementById(hiddenId);
+
+        if (hidden) hidden.value = val || '';
+        if (label) label.textContent = val || defaultLabel;
+
+        if (val) {
+          if (trigger) trigger.classList.add('has-value');
+        } else {
+          if (trigger) trigger.classList.remove('has-value');
+        }
+
+        document.querySelectorAll('input[name="' + radioName + '"]').forEach(function (radio) {
+          radio.checked = radio.value === val;
+        });
+      }
+
+      /* Auto calculate Tagihan Bruto & Sisa Utang */
+      function autoCalcTagihan() {
+        const dpp = Number(pndDpp ? pndDpp.value : 0) || 0;
+        const ppn = Number(pndPpn ? pndPpn.value : 0) || 0;
+        const tagihanBruto = dpp + ppn;
+        const terbayar = Number(pndTerbayarKas ? pndTerbayarKas.value : 0) || 0;
+        const sisa = Math.max(0, tagihanBruto - terbayar);
+
+        if (pndTagihanBruto) pndTagihanBruto.value = tagihanBruto > 0 ? formatRupiah(tagihanBruto) : 'Rp. -';
+        if (pndSisaUtang) pndSisaUtang.value = sisa > 0 ? formatRupiah(sisa) : 'Rp. -';
+      }
+
+      if (pndDpp) pndDpp.addEventListener('input', autoCalcTagihan);
+      if (pndPpn) pndPpn.addEventListener('input', autoCalcTagihan);
+      if (pndTerbayarKas) pndTerbayarKas.addEventListener('input', autoCalcTagihan);
+
+      /* File upload handler dengan ikon mata (HANYA MUNCUL JIKA SUDAH ADA FILE) */
+      if (pndBuktiInput) {
+        pndBuktiInput.addEventListener('change', function () {
+          if (this.files && this.files[0]) {
+            const file = this.files[0];
+            tempUploadedFile = file.name;
+            if (pndBuktiFileName) pndBuktiFileName.textContent = tempUploadedFile;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              tempUploadedFileDataUrl = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
+          } else {
+            if (!tempUploadedFile && btnPreviewBuktiForm) {
+              btnPreviewBuktiForm.style.display = 'none';
+            }
+          }
+        });
+      }
+
+      function getFormContext() {
+        return {
+          idDokumen: (pndIdDokumen ? pndIdDokumen.value.trim() : '') || 'EXP-2609-001',
+          tglPengakuan: pndTglPengakuan ? pndTglPengakuan.value.trim() : '04 Oct 2026',
+          kodeCoa: (pndKodeCoa ? pndKodeCoa.value.trim() : '') || '5009',
+          divisi: (pndDivisi ? pndDivisi.value : '') || 'General',
+          keterangan: (pndKeterangan ? pndKeterangan.value.trim() : '') || 'Admin Bank BCA',
+          tagihanBruto: Number(pndDpp ? pndDpp.value : 0) + Number(pndPpn ? pndPpn.value : 0) || 0,
+          vendorKaryawan: (pndVendorKaryawan ? pndVendorKaryawan.value.trim() : '') || 'BCA'
+        };
+      }
+
+      /* Preview Bukti Modal */
+      function previewBuktiModal(fileName, dataUrl, itemContext) {
+        const name = (fileName || '').trim();
+        const ctx = itemContext || {};
+
+        let previewContent = '';
+        if (dataUrl && (dataUrl.startsWith('data:image/') || dataUrl.startsWith('http') || dataUrl.startsWith('blob:'))) {
+          previewContent = '<div style="margin: 6px 0; text-align: center; max-height: 480px; overflow-y: auto; padding: 4px; border-radius: 8px;">' +
+            '<img src="' + dataUrl + '" alt="Bukti Transaksi" style="max-width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 18px rgba(0,0,0,0.1); object-fit: contain;" />' +
+            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">📎 ' + escapeHtml(name || 'Bukti Transaksi') + '</div>' +
+            '</div>';
+        } else {
+          const nom = ctx.tagihanBruto || ctx.dpp || 0;
+          const tgl = ctx.tglPengakuan || '04 Oct 2026';
+          const idDok = ctx.idDokumen || 'EXP-2609-001';
+          const vendor = ctx.vendorKaryawan || 'BCA';
+          const ket = ctx.keterangan || 'Admin Bank BCA';
+          const div = ctx.divisi || 'General';
+          const coa = ctx.kodeCoa || '5009';
+
+          previewContent = '<div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 22px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: left; font-family: \'Outfit\', sans-serif; max-width: 440px; margin: 4px auto 0;">' +
+            '<div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px dashed #e2e8f0; padding-bottom: 14px; margin-bottom: 16px;">' +
+              '<div>' +
+                '<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700;">BUKTI PENGELUARAN & BEBAN</div>' +
+                '<div style="font-size: 17px; font-weight: 800; color: #0076C5; margin-top: 2px;">' + escapeHtml(idDok) + '</div>' +
+              '</div>' +
+              '<div style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;">' +
+                'VALID' +
+              '</div>' +
+            '</div>' +
+            '<div style="display: flex; flex-direction: column; gap: 9px; font-size: 13px;">' +
+              '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Tanggal:</span><strong style="color: #1e293b;">' + escapeHtml(tgl) + '</strong></div>' +
+              '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Vendor:</span><strong style="color: #1e293b;">' + escapeHtml(vendor) + '</strong></div>' +
+              '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Kode COA:</span><span style="color: #1e293b; font-weight: 600;">' + escapeHtml(coa) + '</span></div>' +
+              '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Divisi:</span><span style="color: #1e293b; font-weight: 600;">' + escapeHtml(div) + '</span></div>' +
+              '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Keterangan:</span><span style="color: #1e293b; font-weight: 600;">' + escapeHtml(ket) + '</span></div>' +
+              '<div style="border-top: 1.5px dashed #e2e8f0; margin-top: 8px; padding-top: 10px; display: flex; justify-content: space-between; align-items: baseline;">' +
+                '<span style="font-size: 14px; font-weight: 700; color: #0f172a;">Tagihan Bruto</span>' +
+                '<strong style="font-size: 18px; color: #0076C5; font-weight: 800;">' + formatRupiah(nom) + '</strong>' +
+              '</div>' +
+            '</div>' +
+            '<div style="margin-top: 16px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">' +
+              'Terverifikasi oleh Tim Keuangan PT BISA MEDIA GRUP' +
+            '</div>' +
+          '</div>';
+        }
+
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: '<span style="font-family: \'Outfit\', sans-serif; font-size: 17px; font-weight: 700; color: #0f172a;">Pratinjau Bukti Transaksi</span>',
+            html: previewContent,
+            showCloseButton: true,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#0076C5'
+          });
+        }
+      }
+
+      if (btnPreviewBuktiForm) {
+        btnPreviewBuktiForm.addEventListener('click', function (e) {
+          e.preventDefault();
+          previewBuktiModal(tempUploadedFile, tempUploadedFileDataUrl, getFormContext());
+        });
+      }
+
+      /* ===== FORM OPEN & SUBMIT ===== */
+      function openForm(item) {
+        const actionText = document.getElementById('pndFormActionText');
+        const editIdInput = document.getElementById('pndEditId');
+
+        form.reset();
+        closeAllModalDropdowns();
+        tempUploadedFile = '';
+        tempUploadedFileDataUrl = '';
+
+        if (item) {
+          if (actionText) actionText.textContent = 'Edit';
+          if (editIdInput) editIdInput.value = item.id;
+
+          if (pndIdDokumen) pndIdDokumen.value = item.idDokumen || '';
+          setDropdownVal('wrapIdApproval', 'btnTriggerIdApproval', 'labelIdApproval', 'pndIdApproval', 'optIdApproval', item.idApproval, 'Pilih ID Approval');
+          if (pndTglPengakuan) pndTglPengakuan.value = item.tanggalPengakuan || '04 Oct 2026';
+
+          if (pndVendorKaryawan) pndVendorKaryawan.value = item.vendorKaryawan || '';
+          if (pndDivisi) pndDivisi.value = item.divisi || '';
+          if (pndKeterangan) pndKeterangan.value = item.keterangan || '';
+
+          if (pndStatusApproval) pndStatusApproval.value = item.statusApproval || 'Disetujui';
+          setDropdownVal('wrapKodeCoa', 'btnTriggerKodeCoa', 'labelKodeCoa', 'pndKodeCoa', 'optKodeCoa', item.kodeCoa, 'Pilih Kode COA');
+
+          if (pndDpp) pndDpp.value = item.dpp !== undefined && item.dpp !== 0 ? item.dpp : '';
+          if (pndPpn) pndPpn.value = item.ppn !== undefined && item.ppn !== 0 ? item.ppn : '';
+          if (pndTagihanBruto) pndTagihanBruto.value = formatRupiah(item.tagihanBruto || item.dpp);
+
+          setDropdownVal('wrapStatusBayarLama', 'btnTriggerStatusBayarLama', 'labelStatusBayarLama', 'pndStatusBayarLama', 'optStatusBayarLama', item.statusBayarLama, 'Pilih Status');
+          if (pndTanggalBayarLama) pndTanggalBayarLama.value = item.tanggalBayarLama || '';
+
+          setDropdownVal('wrapAkunLama', 'btnTriggerAkunLama', 'labelAkunLama', 'pndAkunLama', 'optAkunLama', item.akunLama, 'Pilih Akun Lama');
+          setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', item.projectBrand, 'Pilih Project / Brand');
+
+          if (pndJenis) pndJenis.value = item.jenis || 'Beban';
+          if (pndBebanDiAkui) pndBebanDiAkui.value = item.bebanDiAkui !== undefined && item.bebanDiAkui !== 0 ? item.bebanDiAkui : '';
+          if (pndTerbayarKas) pndTerbayarKas.value = item.terbayarKas !== undefined && item.terbayarKas !== 0 ? item.terbayarKas : '';
+          if (pndSisaUtang) pndSisaUtang.value = formatRupiah(item.sisaUtang);
+          if (pndJatuhTempo) pndJatuhTempo.value = item.jatuhTempo || '';
+
+          if (pndInvoice) pndInvoice.value = item.invoice || '';
+          if (pndCatatan) pndCatatan.value = item.catatan || '';
+          if (pndDivisiPengecualian) pndDivisiPengecualian.value = item.divisiPengecualian || '';
+
+          if (pndNamaAkunCoa) pndNamaAkunCoa.value = item.namaAkunCoa || '';
+          if (pndKelompokCoa) pndKelompokCoa.value = item.kelompokCoa || '';
+          if (pndStatusCoa) pndStatusCoa.value = item.statusCoa || '';
+
+          if (item.buktiUrl || item.buktiDataUrl) {
+            tempUploadedFile = item.buktiUrl || 'bukti_transaksi.png';
+            tempUploadedFileDataUrl = item.buktiDataUrl || '';
+            if (pndBuktiFileName) pndBuktiFileName.textContent = tempUploadedFile;
+            if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
+          } else {
+            if (pndBuktiFileName) pndBuktiFileName.textContent = 'Belum ada file';
+            if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+          }
+        } else {
+          if (actionText) actionText.textContent = 'Tambah';
+          if (editIdInput) editIdInput.value = '';
+
+          const nextNum = pndData.length + 1;
+          const nextId = 'EXP-2609-' + String(nextNum).padStart(3, '0');
+          if (pndIdDokumen) pndIdDokumen.value = nextId;
+
+          setDropdownVal('wrapIdApproval', 'btnTriggerIdApproval', 'labelIdApproval', 'pndIdApproval', 'optIdApproval', '', 'Pilih ID Approval');
+          if (pndTglPengakuan) pndTglPengakuan.value = '';
+
+          if (pndVendorKaryawan) pndVendorKaryawan.value = '';
+          if (pndDivisi) pndDivisi.value = '';
+          if (pndKeterangan) pndKeterangan.value = '';
+
+          if (pndStatusApproval) pndStatusApproval.value = '';
+          setDropdownVal('wrapKodeCoa', 'btnTriggerKodeCoa', 'labelKodeCoa', 'pndKodeCoa', 'optKodeCoa', '', 'Pilih Kode COA');
+
+          if (pndDpp) pndDpp.value = '';
+          if (pndPpn) pndPpn.value = '';
+          if (pndTagihanBruto) pndTagihanBruto.value = 'Rp. -';
+
+          setDropdownVal('wrapStatusBayarLama', 'btnTriggerStatusBayarLama', 'labelStatusBayarLama', 'pndStatusBayarLama', 'optStatusBayarLama', '', 'Pilih Status');
+          if (pndTanggalBayarLama) pndTanggalBayarLama.value = '';
+
+          setDropdownVal('wrapAkunLama', 'btnTriggerAkunLama', 'labelAkunLama', 'pndAkunLama', 'optAkunLama', '', 'Pilih Akun Lama');
+          setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', '', 'Pilih Project / Brand');
+
+          if (pndJenis) pndJenis.value = '';
+          if (pndBebanDiAkui) pndBebanDiAkui.value = '';
+          if (pndTerbayarKas) pndTerbayarKas.value = '';
+          if (pndSisaUtang) pndSisaUtang.value = 'Rp. -';
+          if (pndJatuhTempo) pndJatuhTempo.value = '';
+
+          if (pndInvoice) pndInvoice.value = '';
+          if (pndCatatan) pndCatatan.value = '';
+          if (pndDivisiPengecualian) pndDivisiPengecualian.value = '';
+
+          if (pndNamaAkunCoa) pndNamaAkunCoa.value = '';
+          if (pndKelompokCoa) pndKelompokCoa.value = '';
+          if (pndStatusCoa) pndStatusCoa.value = '';
+
+          if (pndBuktiFileName) pndBuktiFileName.textContent = 'Belum ada file';
+          if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+        }
+
+        openModal(formModal);
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const editId = document.getElementById('pndEditId').value;
+        const dppVal = Number(pndDpp ? pndDpp.value : 0) || 0;
+        const ppnVal = Number(pndPpn ? pndPpn.value : 0) || 0;
+        const tagihanBruto = dppVal + ppnVal;
+        const terbayarKas = Number(pndTerbayarKas ? pndTerbayarKas.value : 0) || 0;
+        const sisaUtang = Math.max(0, tagihanBruto - terbayarKas);
+
+        const record = {
+          id: editId || ('exp-' + Date.now()),
+          idDokumen: pndIdDokumen.value.trim(),
+          idApproval: pndIdApproval.value.trim(),
+          tanggalPengakuan: pndTglPengakuan.value.trim(),
+          vendorKaryawan: pndVendorKaryawan.value.trim(),
+          divisi: pndDivisi.value.trim(),
+          keterangan: pndKeterangan.value.trim(),
+          statusApproval: pndStatusApproval.value.trim() || 'Disetujui',
+          kodeCoa: pndKodeCoa.value.trim() || '5009',
+          dpp: dppVal,
+          ppn: ppnVal,
+          tagihanBruto: tagihanBruto,
+          statusBayarLama: pndStatusBayarLama.value.trim(),
+          tanggalBayarLama: pndTanggalBayarLama.value.trim(),
+          akunLama: pndAkunLama.value.trim(),
+          projectBrand: pndProjectBrand.value.trim(),
+          jenis: pndJenis.value.trim(),
+          bebanDiAkui: Number(pndBebanDiAkui ? pndBebanDiAkui.value : 0) || 0,
+          terbayarKas: terbayarKas,
+          sisaUtang: sisaUtang,
+          jatuhTempo: pndJatuhTempo.value.trim(),
+          buktiUrl: tempUploadedFile,
+          buktiDataUrl: tempUploadedFileDataUrl,
+          invoice: pndInvoice.value.trim(),
+          catatan: pndCatatan.value.trim(),
+          divisiPengecualian: pndDivisiPengecualian.value.trim(),
+          namaAkunCoa: pndNamaAkunCoa.value.trim(),
+          kelompokCoa: pndKelompokCoa.value.trim(),
+          statusCoa: pndStatusCoa.value.trim()
+        };
+
+        if (editId) {
+          const idx = pndData.findIndex(function (d) { return String(d.id) === String(editId); });
+          if (idx !== -1) {
+            pndData[idx] = record;
+          }
+        } else {
+          pndData.push(record);
+        }
+
+        saveData();
+        renderTable();
+        closeModal(formModal);
+
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: 'Data pengeluaran & beban berhasil disimpan.',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        }
+      });
+
+      /* ===== DETAIL MODAL (EXACT MATCH REFERENCE GAMBAR 3) ===== */
+      function openDetail(item) {
+        if (!item) return;
+
+        document.getElementById('viewPndIdDokumen').value = item.idDokumen || '-';
+        document.getElementById('viewPndIdApproval').value = item.idApproval || '-';
+        document.getElementById('viewPndTglPengakuan').value = formatTanggalDisplay(item.tanggalPengakuan);
+
+        document.getElementById('viewPndVendorKaryawan').value = item.vendorKaryawan || '-';
+        document.getElementById('viewPndDivisi').value = item.divisi || '-';
+        document.getElementById('viewPndKeterangan').value = item.keterangan || '-';
+
+        document.getElementById('viewPndStatusApproval').value = item.statusApproval || 'Disetujui';
+        document.getElementById('viewPndKodeCoa').value = item.kodeCoa ? (item.kodeCoa + ' | ' + (item.namaAkunCoa || '')) : '-';
+        document.getElementById('viewPndDpp').value = formatRupiah(item.dpp);
+
+        document.getElementById('viewPndPpn').value = item.ppn > 0 ? formatRupiah(item.ppn) : (item.idApproval || '-');
+        document.getElementById('viewPndTagihanBruto').value = formatRupiah(item.tagihanBruto || item.dpp);
+        document.getElementById('viewPndStatusBayarLama').value = item.statusBayarLama || '-';
+
+        document.getElementById('viewPndTanggalBayarLama').value = item.tanggalBayarLama || '-';
+        document.getElementById('viewPndAkunLama').value = item.akunLama || '-';
+        document.getElementById('viewPndProjectBrand').value = item.projectBrand || '-';
+
+        document.getElementById('viewPndJenis').value = item.jenis || 'Beban';
+        document.getElementById('viewPndBebanDiAkui').value = formatRupiah(item.bebanDiAkui || item.dpp);
+        document.getElementById('viewPndTerbayarKas').value = formatRupiah(item.terbayarKas);
+
+        document.getElementById('viewPndSisaUtang').value = item.sisaUtang > 0 ? formatRupiah(item.sisaUtang) : 'Rp. -';
+        document.getElementById('viewPndJatuhTempo').value = formatTanggalDisplay(item.jatuhTempo);
+
+        if (viewPndBuktiBtn) {
+          viewPndBuktiBtn.onclick = function () {
+            previewBuktiModal(item.buktiUrl, item.buktiDataUrl, item);
+          };
+        }
+
+        document.getElementById('viewPndInvoice').value = item.invoice || 'Tambah Invoice';
+        document.getElementById('viewPndCatatan').value = item.catatan || 'Tambah Catatan';
+        document.getElementById('viewPndDivisiPengecualian').value = item.divisiPengecualian || 'Divisi Pengecualian';
+
+        document.getElementById('viewPndNamaAkunCoa').value = item.namaAkunCoa || 'Nama Akun COA';
+        document.getElementById('viewPndKelompokCoa').value = item.kelompokCoa || 'Kelompok COA';
+        document.getElementById('viewPndStatusCoa').value = item.statusCoa || 'Status COA';
+
+        openModal(detailModal);
+      }
+
+            /* ===== SEARCHABLE FILTER COA & STATUS BAYAR LAMA (POPOVER) ===== */
+
+      function getCoaOptions() {
+        const set = new Set(['Kode 1', 'Kode 2', 'Kode 3', '5009 | Beban Berlangganan', '5001 | Beban Pemasaran', '5002 | Beban Sewa', '1001 | Beban Server']);
+        pndData.forEach(function (d) {
+          if (d.kodeCoa) set.add(d.kodeCoa + (d.namaAkunCoa ? ' | ' + d.namaAkunCoa : ''));
+        });
+        return Array.from(set);
+      }
+
+      function getStatusBayarOptions() {
+        return ['Lunas', 'Menunggu Approval', 'Belum Bayar', 'Status Bayar Lama'];
+      }
+
+      function initSearchableCoaFilter() {
+        const box = document.getElementById('boxFilterKodeCoa');
+        const input = document.getElementById('filterKodeCoa');
+        const list = document.getElementById('listFilterKodeCoa');
+        if (!box || !input || !list) return;
+
+        function renderList(query) {
+          const q = (query || '').toLowerCase().trim();
+          const options = getCoaOptions();
+          const filtered = options.filter(function (opt) {
+            return !q || String(opt).toLowerCase().includes(q);
+          });
+
+          list.innerHTML = '';
+          if (filtered.length === 0) {
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'pnd-filter-item';
+            emptyItem.style.color = '#94a3b8';
+            emptyItem.style.fontStyle = 'italic';
+            emptyItem.textContent = 'Tidak ditemukan';
+            list.appendChild(emptyItem);
+            return;
+          }
+
+          filtered.forEach(function (opt) {
+            const itemDiv = document.createElement('div');
+            const isSelected = input.value.trim().toLowerCase() === String(opt).toLowerCase();
+            itemDiv.className = 'pnd-filter-item' + (isSelected ? ' is-selected' : '');
+            itemDiv.textContent = opt;
+            itemDiv.addEventListener('click', function (e) {
+              e.stopPropagation();
+              input.value = opt;
+              box.classList.remove('is-open');
+              input.placeholder = 'Pilih Arus Kas';
+            });
+            list.appendChild(itemDiv);
+          });
+        }
+
+        input.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = box.classList.contains('is-open');
+          closeFilterSearchBoxes();
+          if (!isOpen) {
+            box.classList.add('is-open');
+            input.placeholder = 'Cari Arus Kas';
+            renderList(input.value);
+          }
+        });
+
+        input.addEventListener('input', function () {
+          if (!box.classList.contains('is-open')) {
+            box.classList.add('is-open');
+          }
+          renderList(input.value);
+        });
+
+        const arrow = box.querySelector('.pnd-filter-arrow');
+        if (arrow) {
+          arrow.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = box.classList.contains('is-open');
+            closeFilterSearchBoxes();
+            if (!isOpen) {
+              box.classList.add('is-open');
+              input.placeholder = 'Cari Arus Kas';
+              renderList('');
+              input.focus();
+            }
+          });
+        }
+      }
+
+      function initSearchableStatusBayarFilter() {
+        const box = document.getElementById('boxFilterStatusBayarLama');
+        const input = document.getElementById('filterStatusBayarLama');
+        const list = document.getElementById('listFilterStatusBayarLama');
+        if (!box || !input || !list) return;
+
+        function renderList(query) {
+          const q = (query || '').toLowerCase().trim();
+          const options = getStatusBayarOptions();
+          const filtered = options.filter(function (opt) {
+            return !q || String(opt).toLowerCase().includes(q);
+          });
+
+          list.innerHTML = '';
+          if (filtered.length === 0) {
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'pnd-filter-item';
+            emptyItem.style.color = '#94a3b8';
+            emptyItem.style.fontStyle = 'italic';
+            emptyItem.textContent = 'Tidak ditemukan';
+            list.appendChild(emptyItem);
+            return;
+          }
+
+          filtered.forEach(function (opt) {
+            const itemDiv = document.createElement('div');
+            const isSelected = input.value.trim().toLowerCase() === String(opt).toLowerCase();
+            itemDiv.className = 'pnd-filter-item' + (isSelected ? ' is-selected' : '');
+            itemDiv.textContent = opt;
+            itemDiv.addEventListener('click', function (e) {
+              e.stopPropagation();
+              input.value = opt;
+              box.classList.remove('is-open');
+              input.placeholder = 'Pilih Status Bayar Lama';
+            });
+            list.appendChild(itemDiv);
+          });
+        }
+
+        input.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = box.classList.contains('is-open');
+          closeFilterSearchBoxes();
+          if (!isOpen) {
+            box.classList.add('is-open');
+            input.placeholder = 'Cari Status Bayar Lama';
+            renderList(input.value);
+          }
+        });
+
+        input.addEventListener('input', function () {
+          if (!box.classList.contains('is-open')) {
+            box.classList.add('is-open');
+          }
+          renderList(input.value);
+        });
+
+        const arrow = box.querySelector('.pnd-filter-arrow');
+        if (arrow) {
+          arrow.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = box.classList.contains('is-open');
+            closeFilterSearchBoxes();
+            if (!isOpen) {
+              box.classList.add('is-open');
+              input.placeholder = 'Cari Status Bayar Lama';
+              renderList('');
+              input.focus();
+            }
+          });
+        }
+      }
+
+      function closeFilterSearchBoxes() {
+        const boxCoa = document.getElementById('boxFilterKodeCoa');
+        if (boxCoa) {
+          boxCoa.classList.remove('is-open');
+          const inp = document.getElementById('filterKodeCoa');
+          if (inp && !inp.value) inp.placeholder = 'Pilih Arus Kas';
+        }
+        const boxStatus = document.getElementById('boxFilterStatusBayarLama');
+        if (boxStatus) {
+          boxStatus.classList.remove('is-open');
+          const inp = document.getElementById('filterStatusBayarLama');
+          if (inp && !inp.value) inp.placeholder = 'Pilih Status Bayar Lama';
+        }
+      }
+
+      initSearchableCoaFilter();
+      initSearchableStatusBayarFilter();
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const willOpen = !filterDropdown.classList.contains('is-active');
+          closePopovers();
+          if (willOpen) filterDropdown.classList.add('is-active');
+        });
+      }
+
+      if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          filters.kodeCoa = filterKodeCoaInput ? filterKodeCoaInput.value.trim() : '';
+          filters.statusBayarLama = filterStatusBayarLamaInput ? filterStatusBayarLamaInput.value.trim() : '';
+          renderTable();
+          closePopovers();
+        });
+      }
+
+      if (resetFilterBtn) {
+        resetFilterBtn.addEventListener('click', function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (filterKodeCoaInput) {
+            filterKodeCoaInput.value = '';
+            filterKodeCoaInput.placeholder = 'Pilih Arus Kas';
+          }
+          if (filterStatusBayarLamaInput) {
+            filterStatusBayarLamaInput.value = '';
+            filterStatusBayarLamaInput.placeholder = 'Pilih Status Bayar Lama';
+          }
+          filters.kodeCoa = '';
+          filters.statusBayarLama = '';
+          closeFilterSearchBoxes();
+          renderTable();
+          closePopovers();
+        });
+      }
+
+      /* ===== DUAL-MONTH CALENDAR ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 9; // Sep
+      let calSelectedStart = '2026-10-01';
+      let calSelectedEnd = null;
+
+      function formatYMD(y, m, d) {
+        return String(y) + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      }
+
+      function updateCalendarSelectedText() {
+        const infoEl = document.getElementById('pndCalSelectedText');
+        if (!infoEl) return;
+        if (calSelectedStart && calSelectedEnd) {
+          infoEl.textContent = calSelectedStart + ' - ' + calSelectedEnd;
+        } else if (calSelectedStart) {
+          infoEl.textContent = calSelectedStart + ' - --';
+        } else {
+          infoEl.textContent = '- - -';
+        }
+      }
+
+      function renderCalendarMonth(containerId, titleId, year, month) {
+        const container = document.getElementById(containerId);
+        const titleEl = document.getElementById(titleId);
+        if (!container || !titleEl) return;
+
+        titleEl.textContent = year + ' - ' + String(month).padStart(2, '0');
+        container.innerHTML = '';
+
+        const firstDayIdx = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+        const daysInMonth = new Date(year, month, 0).getDate();
+        const prevMonthDays = new Date(year, month - 1, 0).getDate();
+
+        for (let i = firstDayIdx - 1; i >= 0; i--) {
+          const dayNum = prevMonthDays - i;
+          const cell = document.createElement('div');
+          cell.className = 'pnd-cal-day pnd-day-muted';
+          cell.textContent = dayNum;
+          container.appendChild(cell);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dateStr = formatYMD(year, month, d);
+          const cell = document.createElement('div');
+          cell.className = 'pnd-cal-day';
+          cell.textContent = d;
+
+          if (dateStr === calSelectedStart) {
+            cell.classList.add('pnd-day-selected-start');
+          } else if (dateStr === calSelectedEnd) {
+            cell.classList.add('pnd-day-selected-end');
+          } else if (calSelectedStart && calSelectedEnd && dateStr > calSelectedStart && dateStr < calSelectedEnd) {
+            cell.classList.add('pnd-day-in-range');
+          }
+
+          cell.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!calSelectedStart || (calSelectedStart && calSelectedEnd)) {
+              calSelectedStart = dateStr;
+              calSelectedEnd = null;
+            } else if (calSelectedStart && !calSelectedEnd) {
+              if (dateStr < calSelectedStart) {
+                calSelectedStart = dateStr;
+                calSelectedEnd = null;
+              } else {
+                calSelectedEnd = dateStr;
+              }
+            }
+            updateCalendarSelectedText();
+            renderDualCalendar();
+          });
+
+          container.appendChild(cell);
+        }
+
+        const totalSlots = container.children.length;
+        const remaining = (totalSlots % 7 === 0) ? 0 : 7 - (totalSlots % 7);
+        for (let nextD = 1; nextD <= remaining; nextD++) {
+          const cell = document.createElement('div');
+          cell.className = 'pnd-cal-day pnd-day-muted';
+          cell.textContent = nextD;
+          container.appendChild(cell);
+        }
+      }
+
+      function renderDualCalendar() {
+        renderCalendarMonth('pndCalGridLeft', 'pndCalTitleLeft', calViewYear, calViewMonth);
+
+        let nextM = calViewMonth + 1;
+        let nextY = calViewYear;
+        if (nextM > 12) {
+          nextM = 1;
+          nextY++;
+        }
+        renderCalendarMonth('pndCalGridRight', 'pndCalTitleRight', nextY, nextM);
+        updateCalendarSelectedText();
+      }
+
+      const navPrevYear = document.getElementById('pndCalPrevYear');
+      const navNextYear = document.getElementById('pndCalNextYear');
+      const navPrevMonth = document.getElementById('pndCalPrevMonth');
+      const navNextMonth = document.getElementById('pndCalNextMonth');
+
+      if (navPrevYear) navPrevYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear--; renderDualCalendar(); });
+      if (navNextYear) navNextYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear++; renderDualCalendar(); });
+      if (navPrevMonth) {
+        navPrevMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calViewMonth--;
+          if (calViewMonth < 1) { calViewMonth = 12; calViewYear--; }
+          renderDualCalendar();
+        });
+      }
+      if (navNextMonth) {
+        navNextMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calViewMonth++;
+          if (calViewMonth > 12) { calViewMonth = 1; calViewYear++; }
+          renderDualCalendar();
+        });
+      }
+
+      document.querySelectorAll('.pnd-cal-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          document.querySelectorAll('.pnd-cal-preset-btn').forEach(function (b) { b.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+
+          const preset = btn.getAttribute('data-preset');
+          const now = new Date(2026, 9, 4);
+          let startD = new Date(now);
+          let endD = new Date(now);
+
+          if (preset === 'today') {
+            // today
+          } else if (preset === 'yesterday') {
+            startD.setDate(startD.getDate() - 1);
+            endD.setDate(endD.getDate() - 1);
+          } else if (preset === 'last7') {
+            startD.setDate(startD.getDate() - 6);
+          } else if (preset === 'last30') {
+            startD.setDate(startD.getDate() - 29);
+          } else if (preset === 'last3m') {
+            startD.setMonth(startD.getMonth() - 3);
+          } else if (preset === 'last6m') {
+            startD.setMonth(startD.getMonth() - 6);
+          } else if (preset === 'last12m') {
+            startD.setFullYear(startD.getFullYear() - 1);
+          }
+
+          calSelectedStart = formatYMD(startD.getFullYear(), startD.getMonth() + 1, startD.getDate());
+          calSelectedEnd = formatYMD(endD.getFullYear(), endD.getMonth() + 1, endD.getDate());
+          calViewYear = startD.getFullYear();
+          calViewMonth = startD.getMonth() + 1;
+
+          renderDualCalendar();
+        });
+      });
+
+      if (btnCalendar && calendarDropdown) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const willOpen = !calendarDropdown.classList.contains('is-active');
+          closePopovers();
+          if (willOpen) {
+            calendarDropdown.classList.add('is-active');
+            renderDualCalendar();
+          }
+        });
+      }
+
+      if (applyCalendarBtn) {
+        applyCalendarBtn.addEventListener('click', function () {
+          filters.tglMulai = calSelectedStart || '';
+          filters.tglSelesai = calSelectedEnd || calSelectedStart || '';
+          renderTable();
+          closePopovers();
+        });
+      }
+
+      if (cancelCalendarBtn) {
+        cancelCalendarBtn.addEventListener('click', function () {
+          calSelectedStart = filters.tglMulai || '2026-10-01';
+          calSelectedEnd = filters.tglSelesai || null;
+          renderDualCalendar();
+          closePopovers();
+        });
+      }
+
+      renderDualCalendar();
+
+      /* ===== EXPORT TO EXCEL (.xlsx) ===== */
+      function exportToExcel() {
+        const filtered = getFilteredData();
+        if (filtered.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'warning', title: 'Data Kosong', text: 'Tidak ada data pengeluaran & beban untuk diekspor.' });
+          }
+          return;
+        }
+
+        const headers = [
+          'No',
+          'ID Dokumen',
+          'ID Approval',
+          'Tgl Pengakuan',
+          'Vendor / Karyawan',
+          'Divisi',
+          'Keterangan',
+          'Kode COA',
+          'Status Approval',
+          'DPP / Beban',
+          'PPN',
+          'Tagihan Bruto',
+          'Status Bayar Lama',
+          'Terbayar Kas',
+          'Sisa Utang'
+        ];
+
+        const rows = filtered.map(function (item, idx) {
+          return [
+            idx + 1,
+            item.idDokumen || '-',
+            item.idApproval || '-',
+            formatTanggalDisplay(item.tanggalPengakuan),
+            item.vendorKaryawan || '-',
+            item.divisi || '-',
+            item.keterangan || '-',
+            item.kodeCoa || '-',
+            item.statusApproval || 'Disetujui',
+            Number(item.dpp || 0),
+            Number(item.ppn || 0),
+            Number(item.tagihanBruto || item.dpp || 0),
+            item.statusBayarLama || '-',
+            Number(item.terbayarKas || 0),
+            Number(item.sisaUtang || 0)
+          ];
+        });
+
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const filename = 'Pengeluaran_Beban_' + todayStr + '.xlsx';
+
+        if (typeof window.exportBisaExcel === 'function') {
+          window.exportBisaExcel({
+            title: 'LAPORAN PENGELUARAN & BEBAN',
+            filename: filename,
+            sheetName: 'Pengeluaran & Beban',
+            headers: headers,
+            rows: rows
+          });
+        } else {
+          let csv = headers.join(',') + '\n';
+          rows.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'Pengeluaran_Beban_' + todayStr + '.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+
+      /* Event Listeners */
+      if (btnTambah) {
+        btnTambah.addEventListener('click', function () {
+          openForm(null);
+        });
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', renderTable);
+      }
+
+      if (btnExport) {
+        btnExport.addEventListener('click', exportToExcel);
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener('click', function (event) {
+          const toggle = event.target.closest('[data-action-toggle]');
+          if (toggle) {
+            event.preventDefault();
+            event.stopPropagation();
+            openActionMenu(toggle);
+          }
+        });
+      }
+
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (event) {
+          const actionButton = event.target.closest('[data-action]');
+          if (!actionButton || !currentActionId) return;
+
+          const action = actionButton.getAttribute('data-action');
+          const targetItem = pndData.find(function (item) {
+            return String(item.id) === String(currentActionId);
+          });
+
+          closeActionMenus();
+
+          if (!targetItem) return;
+
+          if (action === 'view') {
+            openDetail(targetItem);
+          } else if (action === 'edit') {
+            openForm(targetItem);
+          } else if (action === 'delete') {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: 'Hapus Pengeluaran & Beban?',
+                text: 'Apakah Anda yakin ingin menghapus dokumen "' + (targetItem.idDokumen || '') + '" (' + (targetItem.keterangan || '') + ')?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e02424',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+              }).then(function (result) {
+                if (result.isConfirmed) {
+                  pndData = pndData.filter(function (item) {
+                    return String(item.id) !== String(targetItem.id);
+                  });
+                  saveData();
+                  renderTable();
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Data telah berhasil dihapus.',
+                    timer: 1500,
+                    showConfirmButton: false
+                  });
+                }
+              });
+            } else {
+              if (confirm('Hapus dokumen ini?')) {
+                pndData = pndData.filter(function (item) {
+                  return String(item.id) !== String(targetItem.id);
+                });
+                saveData();
+                renderTable();
+              }
+            }
+          }
+        });
+      }
+
+      document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const targetId = this.getAttribute('data-close-modal');
+          closeModal(document.getElementById(targetId));
+        });
+      });
+
+      document.querySelectorAll('.pnd-modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (e) {
+          if (e.target === this) {
+            closeModal(this);
+          }
+        });
+      });
+
+      /* ===== BISA CUSTOM DATEPICKER LOGIC (Form Inputs) ===== */
+      const dpPopover = document.getElementById('bisaDatePickerPopover');
+      const dpTitle = document.getElementById('bisaDpTitle');
+      const dpGrid = document.getElementById('bisaDpGrid');
+      const dpPrev = document.getElementById('bisaDpPrev');
+      const dpNext = document.getElementById('bisaDpNext');
+      const dpClear = document.getElementById('bisaDpClear');
+      const dpToday = document.getElementById('bisaDpToday');
+
+      let dpActiveInput = null;
+      let dpViewYear = 2026;
+      let dpViewMonth = 10; // 1-12
+
+      const DP_MONTH_NAMES = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+
+      function renderBisaDatePicker() {
+        if (!dpPopover || !dpGrid || !dpTitle) return;
+
+        dpTitle.textContent = DP_MONTH_NAMES[dpViewMonth - 1] + ' ' + dpViewYear;
+        dpGrid.innerHTML = '';
+
+        const firstDayIdx = new Date(dpViewYear, dpViewMonth - 1, 1).getDay();
+        const daysInMonth = new Date(dpViewYear, dpViewMonth, 0).getDate();
+        const prevMonthDays = new Date(dpViewYear, dpViewMonth - 1, 0).getDate();
+
+        const currentVal = dpActiveInput ? dpActiveInput.value.trim() : '';
+
+        for (let i = firstDayIdx - 1; i >= 0; i--) {
+          const cell = document.createElement('div');
+          cell.className = 'bisa-dp-day is-muted';
+          cell.textContent = prevMonthDays - i;
+          dpGrid.appendChild(cell);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'bisa-dp-day';
+          cell.textContent = d;
+
+          const dateStr = String(d).padStart(2, '0') + ' ' + MONTH_NAMES_SHORT[dpViewMonth - 1] + ' ' + dpViewYear;
+          if (currentVal && (dateStr === currentVal || currentVal.startsWith(String(d).padStart(2, '0')))) {
+            cell.classList.add('is-selected');
+          }
+
+          cell.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (dpActiveInput) {
+              dpActiveInput.value = dateStr;
+            }
+            closeBisaDatePicker();
+          });
+
+          dpGrid.appendChild(cell);
+        }
+
+        const totalSlots = dpGrid.children.length;
+        const remaining = (totalSlots % 7 === 0) ? 0 : 7 - (totalSlots % 7);
+        for (let nextD = 1; nextD <= remaining; nextD++) {
+          const cell = document.createElement('div');
+          cell.className = 'bisa-dp-day is-muted';
+          cell.textContent = nextD;
+          dpGrid.appendChild(cell);
+        }
+      }
+
+      function openBisaDatePicker(inputEl) {
+        if (!dpPopover || !inputEl) return;
+        dpActiveInput = inputEl;
+
+        dpViewYear = 2026;
+        dpViewMonth = 10;
+
+        const rect = inputEl.getBoundingClientRect();
+        let top = rect.bottom + 6;
+        let left = rect.left;
+
+        if (left + 250 > window.innerWidth - 10) {
+          left = window.innerWidth - 260;
+        }
+        if (top + 280 > window.innerHeight - 10) {
+          top = rect.top - 286;
+        }
+
+        dpPopover.style.top = Math.max(10, top) + 'px';
+        dpPopover.style.left = Math.max(10, left) + 'px';
+        dpPopover.classList.add('is-open');
+
+        renderBisaDatePicker();
+      }
+
+      function closeBisaDatePicker() {
+        if (dpPopover) {
+          dpPopover.classList.remove('is-open');
+        }
+        dpActiveInput = null;
+      }
+
+      if (dpPrev) {
+        dpPrev.addEventListener('click', function (e) {
+          e.stopPropagation();
+          dpViewMonth--;
+          if (dpViewMonth < 1) {
+            dpViewMonth = 12;
+            dpViewYear--;
+          }
+          renderBisaDatePicker();
+        });
+      }
+
+      if (dpNext) {
+        dpNext.addEventListener('click', function (e) {
+          e.stopPropagation();
+          dpViewMonth++;
+          if (dpViewMonth > 12) {
+            dpViewMonth = 1;
+            dpViewYear++;
+          }
+          renderBisaDatePicker();
+        });
+      }
+
+      if (dpClear) {
+        dpClear.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (dpActiveInput) {
+            dpActiveInput.value = '';
+          }
+          closeBisaDatePicker();
+        });
+      }
+
+      if (dpToday) {
+        dpToday.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (dpActiveInput) {
+            dpActiveInput.value = '04 Oct 2026';
+          }
+          closeBisaDatePicker();
+        });
+      }
+
+      document.querySelectorAll('.bisa-datepicker-input').forEach(function (inp) {
+        inp.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openBisaDatePicker(this);
+        });
+      });
+
+      // Global click handler to dismiss popovers and dropdowns
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.filter-dropdown-wrapper')) {
+          closePopovers();
+        }
+        if (!e.target.closest('#boxFilterKodeCoa') && !e.target.closest('#boxFilterStatusBayarLama')) {
+          closeFilterSearchBoxes();
+        }
+        if (!e.target.closest('#pndActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('.pnd-select-wrap')) {
+          closeAllModalDropdowns();
+        }
+        if (!e.target.closest('.bisa-datepicker-input') && !e.target.closest('#bisaDatePickerPopover')) {
+          closeBisaDatePicker();
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+      window.addEventListener('resize', function () {
+        closeActionMenus();
+        closeBisaDatePicker();
+      });
+
+      // Enforce Page Title & Sidebar Menu text to Pengeluaran & Beban
+      function enforcePengeluaranBebanTitle() {
+        const topbarTitle = document.querySelector('.hirezy-page-title');
+        if (topbarTitle) {
+          topbarTitle.textContent = 'Pengeluaran & Beban';
+        }
+        document.querySelectorAll('#app-sidebar a, .sidebar a, .sidebar-subitem span, .sidebar-item span').forEach(function (el) {
+          if (el.textContent.includes('Pengurangan & Beban')) {
+            el.innerHTML = el.innerHTML.replace(/Pengurangan & Beban/g, 'Pengeluaran & Beban');
+          }
+        });
+      }
+      enforcePengeluaranBebanTitle();
+      setTimeout(enforcePengeluaranBebanTitle, 50);
+      setTimeout(enforcePengeluaranBebanTitle, 200);
+      setTimeout(enforcePengeluaranBebanTitle, 500);
+      setTimeout(enforcePengeluaranBebanTitle, 1000);
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
+</body>
+
+</html>

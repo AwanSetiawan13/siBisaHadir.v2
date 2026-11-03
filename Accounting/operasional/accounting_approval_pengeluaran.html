@@ -5,19 +5,3008 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Approval Pengeluaran | Bisa Media</title>
-  <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
-  <link rel="icon" type="image/png" href="../../media/logo.png" />
+
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Global & Vendor CSS -->
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/accounting.css" />
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       APPROVAL PENGELUARAN - EXACT MATCH FOR USER MOCKUP & DESIGN SYSTEM
+       ========================================================================== */
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+
+    /* 4 Summary Cards */
+    .pnd-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .pnd-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .pnd-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pnd-card-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .pnd-card-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .pnd-card-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
+    }
+
+    .pnd-card-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: #ffffff;
+      stroke-width: 2.2;
+    }
+
+    /* Main Table Panel */
+    .pnd-panel-line {
+      height: 3.5px;
+      background: #0076C5;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .pnd-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pnd-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pnd-toolbar__right {
+      display: flex;
+      align-items: center;
+    }
+
+    .pnd-btn-icon {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #0076C5;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-icon:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .pnd-btn-icon svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Indikator Filter Aktif (Titik Merah Konsisten) */
+    .pnd-btn-icon.has-filter {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0284c7 !important;
+    }
+
+    .pnd-btn-icon.has-filter::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
+
+    .pnd-btn-excel:hover svg rect {
+      fill: #0b5e31 !important;
+    }
+
+    .pnd-search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .pnd-search-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 15px;
+      height: 15px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .pnd-search-wrap input {
+      height: 36px;
+      padding: 0 12px 0 32px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      width: 190px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-search-wrap input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 2px rgba(0, 118, 197, 0.12);
+    }
+
+    .btn-tambah-pnd {
+      height: 36px;
+      padding: 0 18px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-pnd:hover {
+      background: #0284c7;
+    }
+
+    .btn-tambah-pnd:active {
+      transform: scale(0.98);
+    }
+
+    .pnd-dashed-divider {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 14px;
+    }
+
+    /* Table Typography & Styling */
+    .campaign-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .campaign-table th {
+      padding: 10px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: #1e293b;
+      background: #ffffff;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .campaign-table td {
+      padding: 11px 12px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .campaign-table tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .pnd-cell-italic {
+      font-style: italic;
+      color: #334155;
+    }
+
+    /* Status Badges */
+    .approval-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      font-style: italic;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      white-space: nowrap;
+    }
+
+    .approval-badge.badge-approved {
+      background-color: #dcfce7;
+      color: #15803d;
+    }
+
+    .approval-badge.badge-pending {
+      background-color: #fef9c3;
+      color: #a16207;
+    }
+
+    .approval-badge.badge-rejected {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* Action Button (Circle) */
+    .pnd-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .pnd-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .pnd-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Fixed Floating Action Menu */
+    .pnd-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .pnd-action-menu.is-open {
+      display: block;
+    }
+
+    .pnd-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .pnd-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .pnd-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 26px;
+      color: #fff;
+      background: #0076C5;
+    }
+
+    .pnd-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pnd-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .pnd-action-menu button.is-danger:hover {
+      background: #fef2f2;
+    }
+
+    .pnd-action-menu .pnd-action-icon.is-danger {
+      background: #e02424;
+    }
+
+    /* ===== POPOVER FILTER (Sesuai Referensi Gambar User) ===== */
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+
+    .pnd-filter-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 280px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+      padding: 18px 18px 16px 18px;
+      z-index: 120;
+      display: none;
+      box-sizing: border-box;
+    }
+
+    .pnd-filter-popover.is-active {
+      display: block;
+    }
+
+    .pnd-filter-group {
+      margin-bottom: 14px;
+    }
+
+    .pnd-filter-label {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .pnd-filter-box {
+      position: relative;
+      width: 100%;
+    }
+
+    .pnd-filter-input-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .pnd-filter-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 30px 0 12px;
+      border: 2px solid #008be2;
+      border-radius: 8px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-filter-input.pnd-filter-blue-border {
+      border: 2px solid #008be2;
+    }
+
+    .pnd-filter-input.pnd-filter-cyan-border {
+      border: 2px solid #38bdf8;
+    }
+
+    .pnd-filter-input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .pnd-filter-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: transform 0.2s ease, color 0.15s ease;
+    }
+
+    .pnd-filter-arrow svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      pointer-events: none;
+    }
+
+    .pnd-filter-box.is-open .pnd-filter-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #28a5de;
+    }
+
+    .pnd-filter-box.is-open .pnd-filter-input {
+      border-radius: 8px 8px 0 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .pnd-filter-dropdown-list {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 2px solid #008be2;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+      padding: 6px 0;
+      z-index: 60;
+      max-height: 140px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .pnd-filter-dropdown-list.pnd-filter-blue-border {
+      border: 2px solid #008be2;
+      border-top: none;
+    }
+
+    .pnd-filter-dropdown-list.pnd-filter-cyan-border {
+      border: 2px solid #38bdf8;
+      border-top: none;
+    }
+
+    .pnd-filter-box.is-open .pnd-filter-dropdown-list {
+      display: block;
+    }
+
+    .pnd-filter-item {
+      padding: 7px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .pnd-filter-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .pnd-filter-item.is-selected {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .pnd-filter-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .pnd-filter-btn-reset {
+      flex: 1;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      background: #f8fafc;
+      color: #0f172a;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-filter-btn-reset em {
+      font-style: italic;
+    }
+
+    .pnd-filter-btn-reset:hover {
+      background: #e2e8f0;
+      border-color: #0284c7;
+    }
+
+    .pnd-filter-btn-apply {
+      flex: 1;
+      height: 38px;
+      border: none;
+      background: #28a5de;
+      color: #ffffff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 8px rgba(40, 165, 222, 0.35);
+    }
+
+    .pnd-filter-btn-apply em {
+      font-style: italic;
+    }
+
+    .pnd-filter-btn-apply:hover {
+      background: #0284c7;
+    }
+
+    /* Dual Month Calendar Popover */
+    .pnd-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 1000;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+      width: 580px;
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pnd-calendar-popover.is-active {
+      display: flex;
+    }
+
+    .pnd-cal-body {
+      display: flex;
+      gap: 16px;
+    }
+
+    .pnd-cal-sidebar {
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-right: 1px solid #f1f5f9;
+      padding-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .pnd-cal-preset-btn {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: #475569;
+      background: transparent;
+      border: none;
+      text-align: left;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+
+    .pnd-cal-preset-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .pnd-cal-preset-btn.is-active {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .pnd-cal-months {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .pnd-cal-month-box {
+      flex: 1;
+    }
+
+    .pnd-cal-month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .pnd-cal-nav {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      user-select: none;
+      color: #64748b;
+    }
+
+    .pnd-cal-nav:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .pnd-cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .pnd-cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .pnd-cal-day {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #334155;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.1s ease;
+    }
+
+    .pnd-cal-day:hover {
+      background: #f1f5f9;
+    }
+
+    .pnd-cal-day.is-empty {
+      pointer-events: none;
+    }
+
+    .pnd-cal-day.is-selected {
+      background: #0076C5 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .pnd-cal-day.is-in-range {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 0;
+    }
+
+    .pnd-cal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 10px;
+    }
+
+    .pnd-cal-selected-info {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .pnd-cal-selected-info span {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .pnd-cal-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pnd-cal-btn-cancel {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: #64748b;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .pnd-cal-btn-apply {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      color: #ffffff;
+      background: #0076C5;
+      border: none;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       MODAL CRUD (EXACT MATCH FOR GAMBAR 1, 2 & 3 USER)
+       ========================================================================== */
+    .pnd-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .pnd-modal-overlay.is-active {
+      display: flex;
+    }
+
+    .pnd-modal-box {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 820px;
+      max-height: 92vh;
+      overflow-y: auto;
+      position: relative;
+      padding: 24px 28px;
+    }
+
+    .pnd-modal-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #0076C5;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .pnd-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .pnd-modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .pnd-modal-title em {
+      font-style: normal;
+      font-weight: 800;
+    }
+
+    .pnd-modal-title span.title-subtitle {
+      font-style: italic;
+      font-weight: 400;
+      color: #64748b;
+    }
+
+    .pnd-modal-close {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      font-size: 12px;
+      font-family: 'Outfit', sans-serif;
+      color: #64748b;
+      cursor: pointer;
+      line-height: 1;
+      padding: 5px 9px;
+      border-radius: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-modal-close:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+
+    .pnd-modal-divider {
+      height: 1px;
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 18px;
+    }
+
+    /* Modal Form Grid (3 Columns) */
+    .pnd-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 20px;
+      row-gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .pnd-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .pnd-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .pnd-input {
+      height: 38px;
+      padding: 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .pnd-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .pnd-input.is-muted {
+      background: #f8fafc;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* Datepicker Wrap with Sleek Calendar Icon */
+    .bisa-datepicker-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .bisa-datepicker-wrap input {
+      width: 100%;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    .bisa-datepicker-icon {
+      position: absolute;
+      right: 10px;
+      pointer-events: none;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+    }
+
+    .bisa-datepicker-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Custom Dropdown in Modal Form (Sesuai Gambar 1 & 2) */
+    .pnd-select-wrap {
+      position: relative;
+    }
+
+    .pnd-select-btn {
+      width: 100%;
+      height: 38px;
+      padding: 0 32px 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      position: relative;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-select-btn span.selected-text {
+      font-style: italic;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pnd-select-btn span.selected-text.is-placeholder {
+      color: #94a3b8;
+    }
+
+    .pnd-select-arrow {
+      position: absolute;
+      right: 12px;
+      pointer-events: none;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, color 0.15s ease;
+    }
+
+    .pnd-select-arrow svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2.2;
+    }
+
+    .pnd-select-wrap.is-open .pnd-select-arrow {
+      transform: rotate(180deg);
+      color: #0076C5;
+    }
+
+    .pnd-select-wrap.is-open .pnd-select-btn {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .pnd-select-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      max-height: 160px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+      padding: 6px 4px;
+    }
+
+    .pnd-select-wrap.is-open .pnd-select-dropdown {
+      display: block;
+    }
+
+    .pnd-select-option {
+      padding: 7px 12px;
+      font-size: 12.5px;
+      font-family: 'Outfit', sans-serif;
+      color: #334155;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 4px;
+      transition: background 0.1s ease;
+    }
+
+    .pnd-select-option:hover {
+      background: #f1f5f9;
+      color: #0076C5;
+    }
+
+    .pnd-select-option input[type="radio"] {
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      accent-color: #0076C5;
+    }
+
+    /* Modal Actions Footer */
+    .pnd-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .pnd-btn-submit {
+      min-width: 120px;
+      height: 38px;
+      padding: 0 22px;
+      background: #ffffff;
+      color: #0f172a;
+      border: 1.5px solid #28a5de;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-submit:hover {
+      background: #28a5de;
+      color: #ffffff;
+    }
+
+    .pnd-btn-keluar {
+      min-width: 110px;
+      height: 38px;
+      padding: 0 22px;
+      background: #ffffff;
+      color: #0f172a;
+      border: 1.5px solid #28a5de;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-keluar:hover {
+      background: #28a5de;
+      color: #ffffff;
+    }
+
+    /* Custom Datepicker Popover Floating Box */
+    .bisa-dp-popover {
+      position: fixed;
+      z-index: 2147483647;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      padding: 14px;
+      width: 270px;
+      display: none;
+      box-sizing: border-box;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .bisa-dp-popover.is-active {
+      display: block;
+    }
+
+    .bisa-dp-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .bisa-dp-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .bisa-dp-nav-btn {
+      width: 26px;
+      height: 26px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .bisa-dp-nav-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .bisa-dp-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .bisa-dp-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .bisa-dp-cell {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12.5px;
+      color: #1e293b;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+
+    .bisa-dp-cell:hover:not(.is-empty) {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .bisa-dp-cell.is-selected {
+      background: #0076C5 !important;
+      color: #ffffff !important;
+      font-weight: 700;
+    }
+
+    .bisa-dp-cell.is-today {
+      border: 1px solid #0076C5;
+      font-weight: 600;
+    }
+
+    .bisa-dp-footer {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+
+    .bisa-dp-footer-btn {
+      font-size: 11.5px;
+      color: #0284c7;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 2px 4px;
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
+  <!-- Layout Sidebar & Shell -->
   <aside id="app-sidebar"></aside>
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <!-- 4 Summary Cards Approval Pengeluaran -->
+      <section class="pnd-summary-cards" aria-label="Ringkasan Approval Pengeluaran">
+        <!-- Card 1: Disetujui -->
+        <div class="pnd-card">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Disetujui</span>
+            <span class="pnd-card-value" id="cardDisetujui">0</span>
+          </div>
+          <div class="pnd-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Menunggu Review -->
+        <div class="pnd-card">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Menunggu Review</span>
+            <span class="pnd-card-value" id="cardMenungguReview">0</span>
+          </div>
+          <div class="pnd-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Ditolak -->
+        <div class="pnd-card">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Ditolak</span>
+            <span class="pnd-card-value" id="cardDitolak">0</span>
+          </div>
+          <div class="pnd-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Total Nominal -->
+        <div class="pnd-card">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Total Nominal</span>
+            <span class="pnd-card-value" id="cardTotalNominal">Rp. -</span>
+          </div>
+          <div class="pnd-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="6" width="20" height="13" rx="2"></rect>
+              <path d="M16 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"></path>
+              <path d="M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Panel & Toolbar -->
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line pnd-panel-line"></div>
+
+        <!-- Toolbar Approval Pengeluaran (Konsisten Kas & Bank) -->
+        <div class="pnd-toolbar">
+          <div class="pnd-toolbar__left">
+            <!-- Filter Popover Button -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterPnd" class="pnd-btn-icon" type="button" aria-label="Filter" title="Filter Approval Pengeluaran">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <!-- Popover Filter Divisi (Sesuai Referensi Gambar User) -->
+              <div id="filterPndDropdown" class="pnd-filter-popover" style="width: 270px; padding: 18px 18px 16px 18px;">
+                <!-- Single Group: Divisi -->
+                <div class="pnd-filter-group" style="margin-bottom: 16px;">
+                  <label class="pnd-filter-label" for="filterDivisi" style="font-size: 14.5px; font-weight: 500; color: #1e293b; margin-bottom: 8px;">Divisi</label>
+                  <div class="pnd-filter-box" id="boxFilterDivisi">
+                    <div class="pnd-filter-input-wrap">
+                      <input type="text" id="filterDivisi" class="pnd-filter-input pnd-filter-cyan-border" placeholder="Pilih Divisi" autocomplete="off" />
+                      <span class="pnd-filter-arrow" title="Buka pilihan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="pnd-filter-dropdown-list pnd-filter-cyan-border" id="listFilterDivisi"></div>
+                  </div>
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="pnd-filter-actions">
+                  <button type="button" id="resetFilterPnd" class="pnd-filter-btn-reset"><em>Riset</em></button>
+                  <button type="button" id="applyFilterPnd" class="pnd-filter-btn-apply"><em>Terapkan</em></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kalender Popover Button -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnCalendarPnd" class="pnd-btn-icon" type="button" aria-label="Pilih Tanggal" title="Filter Berdasarkan Tanggal">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </button>
+
+              <!-- Dual Month Calendar Popover -->
+              <div id="calendarPndDropdown" class="pnd-calendar-popover">
+                <div class="pnd-cal-body">
+                  <div class="pnd-cal-sidebar">
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="today">Hari ini</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="yesterday">Kemarin</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last7">7 hari terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last30">30 hari terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last3m">3 bulan terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last6m">6 bulan terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last12m">12 bulan terakhir</button>
+                  </div>
+
+                  <div class="pnd-cal-months">
+                    <div class="pnd-cal-month-box">
+                      <div class="pnd-cal-month-header">
+                        <span class="pnd-cal-nav" id="pndCalPrevYear" title="Tahun Sebelumnya">&laquo;</span>
+                        <span class="pnd-cal-month-title" id="pndCalTitleLeft">2026 - 08</span>
+                        <span class="pnd-cal-nav" id="pndCalPrevMonth" title="Bulan Sebelumnya">&lsaquo;</span>
+                      </div>
+                      <div class="pnd-cal-weekdays">
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                      </div>
+                      <div class="pnd-cal-days-grid" id="pndCalGridLeft"></div>
+                    </div>
+
+                    <div class="pnd-cal-month-box">
+                      <div class="pnd-cal-month-header">
+                        <span class="pnd-cal-nav" id="pndCalNextMonth" title="Bulan Berikutnya">&rsaquo;</span>
+                        <span class="pnd-cal-month-title" id="pndCalTitleRight">2026 - 09</span>
+                        <span class="pnd-cal-nav" id="pndCalNextYear" title="Tahun Berikutnya">&raquo;</span>
+                      </div>
+                      <div class="pnd-cal-weekdays">
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                      </div>
+                      <div class="pnd-cal-days-grid" id="pndCalGridRight"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pnd-cal-footer">
+                  <div class="pnd-cal-selected-info">
+                    Dipilih: <span id="pndCalSelectedText">2026-08-01 - --</span>
+                  </div>
+                  <div class="pnd-cal-footer-actions">
+                    <button type="button" id="btnCancelCalendarPnd" class="pnd-cal-btn-cancel">Batal</button>
+                    <button type="button" id="btnApplyCalendarPnd" class="pnd-cal-btn-apply">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Export Excel Button -->
+            <button id="btnExportPnd" class="pnd-btn-icon pnd-btn-excel" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+              <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <!-- Search Bar -->
+            <div class="pnd-search-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="pndSearch" type="search" placeholder="Cari...." autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="pnd-toolbar__right">
+            <button id="btnTambahPnd" class="btn-tambah-pnd" type="button">+ Tambah</button>
+          </div>
+        </div>
+
+        <div class="pnd-dashed-divider"></div>
+
+        <!-- Table Approval Pengeluaran (12 Kolom Sesuai Mockup Gambar 2 & CRUD User) -->
+        <div class="table-wrap campaign-table" id="pndTableWrap" style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 35px; text-align: center;">#</th>
+                <th style="white-space: nowrap;">ID Approval</th>
+                <th style="white-space: nowrap;">Tanggal Request</th>
+                <th style="white-space: nowrap;">Pemohon</th>
+                <th style="white-space: nowrap;">Divisi</th>
+                <th style="white-space: nowrap;">Keperluan</th>
+                <th style="white-space: nowrap;">Nominal</th>
+                <th style="white-space: nowrap; text-align: center;">Status Manager</th>
+                <th style="white-space: nowrap; text-align: center;">Status Direktur</th>
+                <th style="white-space: nowrap; text-align: center;">Status Final</th>
+                <th style="white-space: nowrap;">Catatan</th>
+                <th style="width: 60px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="pndTableBody">
+              <!-- Dynamically populated via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Floating Action Menu (Konsisten Kas & Bank dan Pendapatan) -->
+      <div id="pndActionMenu" class="pnd-action-menu" role="menu">
+        <button type="button" data-action="view">
+          <span class="pnd-action-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </span>
+          <span>Lihat</span>
+        </button>
+        <button type="button" data-action="edit">
+          <span class="pnd-action-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+          </span>
+          <span>Edit</span>
+        </button>
+        <button type="button" class="is-danger" data-action="delete">
+          <span class="pnd-action-icon is-danger">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+          </span>
+          <span>Hapus</span>
+        </button>
+      </div>
+
+      <!-- =====================================================================
+           MODAL CRUD FORM (TAMBAH / EDIT APPROVAL PENGELUARAN)
+           PERSIS 100% SESUAI REFERENSI GAMBAR 1 & 2 USER
+           ===================================================================== -->
+      <div id="pndFormModal" class="pnd-modal-overlay">
+        <div class="pnd-modal-box">
+          <div class="pnd-modal-accent"></div>
+          <div class="pnd-modal-header">
+            <h3 class="pnd-modal-title" id="formModalTitle">
+              <em id="formModeText">Tambah</em> <span class="title-subtitle">Approval Pengeluaran</span>
+            </h3>
+            <button type="button" class="pnd-modal-close" data-close-modal="pndFormModal" aria-label="Tutup">x</button>
+          </div>
+          <div class="pnd-modal-divider"></div>
+
+          <form id="pndForm" autocomplete="off">
+            <input type="hidden" id="pndEditId" />
+
+            <div class="pnd-form-grid">
+              <!-- Baris 1: ID Approval, Tanggal Request, Pemohon -->
+              <div class="pnd-field">
+                <label class="pnd-label" for="pndIdApproval">ID Approval</label>
+                <input type="text" id="pndIdApproval" class="pnd-input" placeholder="Tambah ID" required />
+              </div>
+              <div class="pnd-field">
+                <label class="pnd-label" for="pndTanggalRequest">Tanggal Request</label>
+                <div class="bisa-datepicker-wrap">
+                  <input type="text" id="pndTanggalRequest" class="pnd-input bisa-datepicker-input" placeholder="dd/mm/yyyy" readonly required />
+                  <span class="bisa-datepicker-icon">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="pnd-field">
+                <label class="pnd-label" for="pndPemohon">Pemohon</label>
+                <input type="text" id="pndPemohon" class="pnd-input" placeholder="Tambah Pemohon" required />
+              </div>
+
+              <!-- Baris 2: Divisi, Keperluan, Nominal -->
+              <div class="pnd-field">
+                <label class="pnd-label" for="pndDivisi">Divisi</label>
+                <input type="text" id="pndDivisi" class="pnd-input" placeholder="Tambah Divisi" required />
+              </div>
+              <div class="pnd-field">
+                <label class="pnd-label" for="pndKeperluan">Keperluan</label>
+                <input type="text" id="pndKeperluan" class="pnd-input" placeholder="Tambah Keperluan" required />
+              </div>
+              <div class="pnd-field">
+                <label class="pnd-label" for="pndNominal">Nominal</label>
+                <input type="text" id="pndNominal" class="pnd-input" placeholder="Rp. -" required />
+              </div>
+
+              <!-- Baris 3: Status Manager, Status Direktur, Status Final -->
+              <div class="pnd-field">
+                <label class="pnd-label">Status Manager</label>
+                <div class="pnd-select-wrap" id="wrapStatusManager">
+                  <input type="hidden" id="pndStatusManager" value="" />
+                  <button type="button" class="pnd-select-btn" id="btnTriggerStatusManager">
+                    <span class="selected-text is-placeholder" id="labelStatusManager">Pilih Status</span>
+                    <span class="pnd-select-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                  </button>
+                  <div class="pnd-select-dropdown">
+                    <label class="pnd-select-option">
+                      <input type="radio" name="optStatusManager" value="Disetujui" />
+                      <span>Disetujui</span>
+                    </label>
+                    <label class="pnd-select-option">
+                      <input type="radio" name="optStatusManager" value="Tidak Setuju" />
+                      <span>Tidak Setuju</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pnd-field">
+                <label class="pnd-label">Status Direktur</label>
+                <div class="pnd-select-wrap" id="wrapStatusDirektur">
+                  <input type="hidden" id="pndStatusDirektur" value="" />
+                  <button type="button" class="pnd-select-btn" id="btnTriggerStatusDirektur">
+                    <span class="selected-text is-placeholder" id="labelStatusDirektur">Pilih Status</span>
+                    <span class="pnd-select-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                  </button>
+                  <div class="pnd-select-dropdown">
+                    <label class="pnd-select-option">
+                      <input type="radio" name="optStatusDirektur" value="Disetujui" />
+                      <span>Disetujui</span>
+                    </label>
+                    <label class="pnd-select-option">
+                      <input type="radio" name="optStatusDirektur" value="Tidak Setuju" />
+                      <span>Tidak Setuju</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pnd-field">
+                <label class="pnd-label" for="pndStatusFinal">Status Final</label>
+                <input type="text" id="pndStatusFinal" class="pnd-input is-muted" placeholder="Status" readonly />
+              </div>
+
+              <!-- Baris 4: Catatan (Span Full Width 3 Columns Sesuai Gambar 1 & 2) -->
+              <div class="pnd-field" style="grid-column: span 3;">
+                <label class="pnd-label" for="pndCatatan">Catatan</label>
+                <input type="text" id="pndCatatan" class="pnd-input" placeholder="Tambah Catatan" />
+              </div>
+            </div>
+
+            <div class="pnd-modal-actions">
+              <button type="submit" class="pnd-btn-submit">Simpan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           MODAL LIHAT (VIEW DETAIL) - PERSIS 100% SESUAI REFERENSI GAMBAR 3 USER
+           ===================================================================== -->
+      <div id="pndDetailModal" class="pnd-modal-overlay">
+        <div class="pnd-modal-box">
+          <div class="pnd-modal-accent"></div>
+          <div class="pnd-modal-header">
+            <h3 class="pnd-modal-title">
+              <em>Lihat</em> <span class="title-subtitle">Approval Pengeluaran</span>
+            </h3>
+            <button type="button" class="pnd-modal-close" data-close-modal="pndDetailModal" aria-label="Tutup">x</button>
+          </div>
+          <div class="pnd-modal-divider"></div>
+
+          <div class="pnd-form-grid">
+            <div class="pnd-field">
+              <label class="pnd-label">ID Approval</label>
+              <input type="text" id="viewPndIdApproval" class="pnd-input is-muted" readonly />
+            </div>
+            <div class="pnd-field">
+              <label class="pnd-label">Tanggal Request</label>
+              <input type="text" id="viewPndTanggalRequest" class="pnd-input is-muted" readonly />
+            </div>
+            <div class="pnd-field">
+              <label class="pnd-label">Pemohon</label>
+              <input type="text" id="viewPndPemohon" class="pnd-input is-muted" readonly />
+            </div>
+
+            <div class="pnd-field">
+              <label class="pnd-label">Divisi</label>
+              <input type="text" id="viewPndDivisi" class="pnd-input is-muted" readonly />
+            </div>
+            <div class="pnd-field">
+              <label class="pnd-label">Keperluan</label>
+              <input type="text" id="viewPndKeperluan" class="pnd-input is-muted" readonly />
+            </div>
+            <div class="pnd-field">
+              <label class="pnd-label">Nominal</label>
+              <input type="text" id="viewPndNominal" class="pnd-input is-muted" readonly />
+            </div>
+
+            <div class="pnd-field">
+              <label class="pnd-label">Status Manager</label>
+              <input type="text" id="viewPndStatusManager" class="pnd-input is-muted" readonly />
+            </div>
+            <div class="pnd-field">
+              <label class="pnd-label">Status Direktur</label>
+              <input type="text" id="viewPndStatusDirektur" class="pnd-input is-muted" readonly />
+            </div>
+            <div class="pnd-field">
+              <label class="pnd-label">Status Final</label>
+              <input type="text" id="viewPndStatusFinal" class="pnd-input is-muted" readonly />
+            </div>
+
+            <div class="pnd-field" style="grid-column: span 3;">
+              <label class="pnd-label">Catatan</label>
+              <input type="text" id="viewPndCatatan" class="pnd-input is-muted" readonly />
+            </div>
+          </div>
+
+          <div class="pnd-modal-actions">
+            <button type="button" class="pnd-btn-keluar" data-close-modal="pndDetailModal">Keluar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Popover Custom Datepicker Mini untuk Input Form -->
+      <div id="bisaDatePickerPopover" class="bisa-dp-popover">
+        <div class="bisa-dp-header">
+          <button type="button" class="bisa-dp-nav-btn" id="bisaDpPrev" aria-label="Bulan sebelumnya">&lsaquo;</button>
+          <span class="bisa-dp-title" id="bisaDpTitle">Januari 2026</span>
+          <button type="button" class="bisa-dp-nav-btn" id="bisaDpNext" aria-label="Bulan berikutnya">&rsaquo;</button>
+        </div>
+        <div class="bisa-dp-weekdays">
+          <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+        </div>
+        <div class="bisa-dp-grid" id="bisaDpGrid"></div>
+        <div class="bisa-dp-footer">
+          <button type="button" class="bisa-dp-footer-btn" id="bisaDpToday">Hari ini</button>
+          <button type="button" class="bisa-dp-footer-btn" id="bisaDpClear" style="color: #ef4444;">Hapus</button>
+        </div>
+      </div>
+    </main>
   </div>
 
-  <script src="../../assets/js/layout.js?v=1008"></script>
+  <!-- Layout Script -->
+  <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+  <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
+
+  <!-- Module Implementation Script -->
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'BISA_APPROVAL_PENGELUARAN_DATA_V3';
+
+      // Elements
+      const tableBody = document.getElementById('pndTableBody');
+      const searchInput = document.getElementById('pndSearch');
+      const btnExport = document.getElementById('btnExportPnd');
+      const btnTambah = document.getElementById('btnTambahPnd');
+
+      const btnFilter = document.getElementById('btnFilterPnd');
+      const filterDropdown = document.getElementById('filterPndDropdown');
+      const filterDivisiInput = document.getElementById('filterDivisi');
+      const applyFilterBtn = document.getElementById('applyFilterPnd');
+      const resetFilterBtn = document.getElementById('resetFilterPnd');
+
+      const btnCalendar = document.getElementById('btnCalendarPnd');
+      const calendarDropdown = document.getElementById('calendarPndDropdown');
+      const applyCalendarBtn = document.getElementById('btnApplyCalendarPnd');
+      const cancelCalendarBtn = document.getElementById('btnCancelCalendarPnd');
+
+      const formModal = document.getElementById('pndFormModal');
+      const detailModal = document.getElementById('pndDetailModal');
+      const form = document.getElementById('pndForm');
+      const actionMenu = document.getElementById('pndActionMenu');
+
+      // Form Inputs
+      const pndEditId = document.getElementById('pndEditId');
+      const formModeText = document.getElementById('formModeText');
+      const pndIdApproval = document.getElementById('pndIdApproval');
+      const pndTanggalRequest = document.getElementById('pndTanggalRequest');
+      const pndPemohon = document.getElementById('pndPemohon');
+      const pndDivisi = document.getElementById('pndDivisi');
+      const pndKeperluan = document.getElementById('pndKeperluan');
+      const pndNominal = document.getElementById('pndNominal');
+      const pndStatusManager = document.getElementById('pndStatusManager');
+      const labelStatusManager = document.getElementById('labelStatusManager');
+      const pndStatusDirektur = document.getElementById('pndStatusDirektur');
+      const labelStatusDirektur = document.getElementById('labelStatusDirektur');
+      const pndStatusFinal = document.getElementById('pndStatusFinal');
+      const pndCatatan = document.getElementById('pndCatatan');
+
+      let currentActionId = null;
+      let appData = loadData();
+      let filters = { status: '', divisi: '', tglMulai: '', tglSelesai: '' };
+
+      const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          const parsed = raw ? JSON.parse(raw) : null;
+          if (Array.isArray(parsed) && parsed.length >= 3) {
+            return parsed;
+          }
+          // Seed data multi-baris mencakup Divisi 1 (General), Divisi 2 (Marketing), Divisi 3 (Operasional)
+          const seedData = [
+            {
+              id: 'apr-1',
+              idApproval: 'APR-2609-001',
+              tanggalRequest: '2026-01-04',
+              pemohon: 'BCA',
+              divisi: 'General',
+              keperluan: 'Admin Bank BCA',
+              nominal: 30000,
+              statusManager: 'Disetujui',
+              statusDirektur: 'Disetujui',
+              statusFinal: 'Disetujui',
+              catatan: 'Admin Bank BCA'
+            },
+            {
+              id: 'apr-2',
+              idApproval: 'APR-2609-002',
+              tanggalRequest: '2026-01-10',
+              pemohon: 'Meta Ads',
+              divisi: 'Marketing',
+              keperluan: 'Iklan Digital Campaign Meta Ads',
+              nominal: 1500000,
+              statusManager: 'Disetujui',
+              statusDirektur: 'Menunggu Review',
+              statusFinal: 'Menunggu Review',
+              catatan: 'Campaign FB Ads Q1'
+            },
+            {
+              id: 'apr-3',
+              idApproval: 'APR-2609-003',
+              tanggalRequest: '2026-01-15',
+              pemohon: 'Operasional Office',
+              divisi: 'Operasional',
+              keperluan: 'Pengadaan Perlengkapan Kantor',
+              nominal: 450000,
+              statusManager: 'Tidak Setuju',
+              statusDirektur: 'Ditolak',
+              statusFinal: 'Ditolak',
+              catatan: 'Perlu revisi anggaran alat tulis kantor'
+            }
+          ];
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
+          return seedData;
+        } catch (e) {
+          console.error('Error loading data:', e);
+          return [];
+        }
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        } catch (e) {
+          console.error('Error saving data:', e);
+        }
+      }
+
+      function formatRupiah(num) {
+        if (num === null || num === undefined || isNaN(num) || num === 0) return 'Rp. 0';
+        return 'Rp. ' + Number(num).toLocaleString('id-ID');
+      }
+
+      function parseRupiah(str) {
+        if (!str) return 0;
+        const clean = String(str).replace(/[^0-9]/g, '');
+        return clean ? parseInt(clean, 10) : 0;
+      }
+
+      function formatTanggalDisplay(isoDateStr) {
+        if (!isoDateStr) return '-';
+        const parts = isoDateStr.split('-');
+        if (parts.length === 3) {
+          return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+        return isoDateStr;
+      }
+
+      function computeStatusFinal(statusMgr, statusDir) {
+        const sm = String(statusMgr || '').trim().toLowerCase();
+        const sd = String(statusDir || '').trim().toLowerCase();
+
+        if (sm.includes('tidak') || sd.includes('tidak') || sm.includes('tolak') || sd.includes('tolak')) {
+          return 'Ditolak';
+        }
+        if (sm.includes('setuju') && sd.includes('setuju')) {
+          return 'Disetujui';
+        }
+        if (sm.includes('setuju') && !sd) {
+          return 'Menunggu Review';
+        }
+        if (!sm && !sd) {
+          return 'Menunggu Review';
+        }
+        return 'Menunggu Review';
+      }
+
+      function updateFormStatusFinal() {
+        if (!pndStatusFinal) return;
+        const sm = pndStatusManager ? pndStatusManager.value : '';
+        const sd = pndStatusDirektur ? pndStatusDirektur.value : '';
+        const finalStatus = computeStatusFinal(sm, sd);
+        pndStatusFinal.value = finalStatus;
+      }
+
+      function updateSummaryCards(customList) {
+        const listToCount = Array.isArray(customList) ? customList : appData;
+        let disetujuiCount = 0;
+        let pendingCount = 0;
+        let rejectedCount = 0;
+        let totalNominal = 0;
+
+        listToCount.forEach(function (item) {
+          const st = String(item.statusFinal || item.statusManager || '').toLowerCase();
+          if (st.includes('setuju') && !st.includes('tidak')) {
+            disetujuiCount++;
+          } else if (st.includes('tolak') || st.includes('tidak')) {
+            rejectedCount++;
+          } else {
+            pendingCount++;
+          }
+          totalNominal += Number(item.nominal || 0);
+        });
+
+        document.getElementById('cardDisetujui').textContent = disetujuiCount;
+        document.getElementById('cardMenungguReview').textContent = pendingCount;
+        document.getElementById('cardDitolak').textContent = rejectedCount;
+        document.getElementById('cardTotalNominal').textContent = totalNominal > 0 ? formatRupiah(totalNominal) : 'Rp. -';
+      }
+
+      function updateFilterButtonState() {
+        if (btnFilter) {
+          if (filters.divisi) {
+            btnFilter.classList.add('has-filter');
+            btnFilter.setAttribute('title', 'Filter aktif Divisi: ' + filters.divisi);
+          } else {
+            btnFilter.classList.remove('has-filter');
+            btnFilter.setAttribute('title', 'Filter Approval Pengeluaran');
+          }
+        }
+        if (btnCalendar) {
+          if (filters.tglMulai || filters.tglSelesai) {
+            btnCalendar.classList.add('has-filter');
+            btnCalendar.setAttribute('title', 'Filter tanggal aktif: ' + (filters.tglMulai || '') + ' s/d ' + (filters.tglSelesai || ''));
+          } else {
+            btnCalendar.classList.remove('has-filter');
+            btnCalendar.setAttribute('title', 'Filter Berdasarkan Tanggal');
+          }
+        }
+      }
+
+      function getBadgeHtml(status) {
+        const st = String(status || '-').trim();
+        const lower = st.toLowerCase();
+        let badgeClass = 'badge-approved';
+        if (lower.includes('review') || lower.includes('tunggu')) {
+          badgeClass = 'badge-pending';
+        } else if (lower.includes('tolak') || lower.includes('tidak')) {
+          badgeClass = 'badge-rejected';
+        }
+        return '<span class="approval-badge ' + badgeClass + '">' + escapeHtml(st) + '</span>';
+      }
+
+      function getFilteredData() {
+        const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        const fDivisi = (filters.divisi || '').toLowerCase().trim();
+        const fStatus = (filters.status || '').toLowerCase().trim();
+        const fMulai = filters.tglMulai || '';
+        const fSelesai = filters.tglSelesai || '';
+
+        return appData.filter(function (item) {
+          const matchesQuery = !query || [
+            item.idApproval,
+            item.pemohon,
+            item.divisi,
+            item.keperluan,
+            formatTanggalDisplay(item.tanggalRequest),
+            String(item.nominal),
+            item.statusManager,
+            item.statusDirektur,
+            item.statusFinal,
+            item.catatan
+          ].some(function (val) {
+            return String(val || '').toLowerCase().includes(query);
+          });
+
+          let matchesDivisi = true;
+          if (fDivisi) {
+            const d = String(item.divisi || '').toLowerCase();
+            const p = String(item.pemohon || '').toLowerCase();
+            const k = String(item.keperluan || '').toLowerCase();
+
+            if (fDivisi === 'divisi 1') {
+              matchesDivisi = d.includes('divisi 1') || d.includes('general') || p.includes('divisi 1') || p.includes('bca');
+            } else if (fDivisi === 'divisi 2') {
+              matchesDivisi = d.includes('divisi 2') || d.includes('marketing') || p.includes('divisi 2');
+            } else if (fDivisi === 'divisi 3') {
+              matchesDivisi = d.includes('divisi 3') || d.includes('operasional') || p.includes('divisi 3');
+            } else {
+              matchesDivisi = d.includes(fDivisi) || p.includes(fDivisi) || k.includes(fDivisi);
+            }
+          }
+
+          let matchesStatus = true;
+          if (fStatus && fStatus !== 'semua') {
+            const stFinal = String(item.statusFinal || '').toLowerCase();
+            const stMgr = String(item.statusManager || '').toLowerCase();
+            const stDir = String(item.statusDirektur || '').toLowerCase();
+            matchesStatus = stFinal.includes(fStatus) || stMgr.includes(fStatus) || stDir.includes(fStatus);
+          }
+
+          let matchesDate = true;
+          if (fMulai && item.tanggalRequest) {
+            if (item.tanggalRequest < fMulai) matchesDate = false;
+          }
+          if (fSelesai && item.tanggalRequest) {
+            if (item.tanggalRequest > fSelesai) matchesDate = false;
+          }
+
+          return matchesQuery && matchesDivisi && matchesStatus && matchesDate;
+        });
+      }
+
+      function renderTable() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        const filtered = getFilteredData();
+        if (filtered.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data approval pengeluaran yang sesuai.</td></tr>';
+          updateSummaryCards(filtered);
+          updateFilterButtonState();
+          return;
+        }
+
+        filtered.forEach(function (item, index) {
+          const row = document.createElement('tr');
+          row.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '.</td>',
+            '<td class="pnd-cell-italic" style="font-weight: 500;">' + escapeHtml(item.idApproval || '-') + '</td>',
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(formatTanggalDisplay(item.tanggalRequest)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.pemohon || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.divisi || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.keperluan || '-') + '</td>',
+            '<td class="pnd-cell-italic" style="white-space: nowrap; font-weight: 600;">' + escapeHtml(formatRupiah(item.nominal)) + '</td>',
+            '<td style="text-align: center;">' + getBadgeHtml(item.statusManager) + '</td>',
+            '<td style="text-align: center;">' + getBadgeHtml(item.statusDirektur) + '</td>',
+            '<td style="text-align: center;">' + getBadgeHtml(item.statusFinal) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.catatan || '-') + '</td>',
+            '<td style="text-align: center;">' +
+              '<button type="button" class="pnd-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+          tableBody.appendChild(row);
+        });
+
+        updateSummaryCards(filtered);
+        updateFilterButtonState();
+      }
+
+      /* Modal Helpers */
+      function openModal(modal) {
+        if (modal) modal.classList.add('is-active');
+      }
+
+      function closeModal(modal) {
+        if (modal) modal.classList.remove('is-active');
+      }
+
+      function closePopovers() {
+        if (filterDropdown) filterDropdown.classList.remove('is-active');
+        if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        closeFilterSearchBoxes();
+      }
+
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = 120;
+
+        let left = rect.left - menuWidth + 24;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
+      /* ===== BISA CUSTOM DATEPICKER LOGIC (Form Inputs) ===== */
+      const dpPopover = document.getElementById('bisaDatePickerPopover');
+      const dpTitle = document.getElementById('bisaDpTitle');
+      const dpGrid = document.getElementById('bisaDpGrid');
+      const dpPrev = document.getElementById('bisaDpPrev');
+      const dpNext = document.getElementById('bisaDpNext');
+      const dpClear = document.getElementById('bisaDpClear');
+      const dpToday = document.getElementById('bisaDpToday');
+
+      let dpActiveInput = null;
+      let dpViewYear = 2026;
+      let dpViewMonth = 1; // 1-12
+
+      const DP_MONTH_NAMES = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+
+      function formatDisplayDate(iso) {
+        if (!iso) return '';
+        const parts = String(iso).split('-');
+        if (parts.length === 3) {
+          return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+        return iso;
+      }
+
+      function parseDisplayToIso(display) {
+        if (!display) return '';
+        const parts = String(display).trim().split('/');
+        if (parts.length === 3) {
+          return parts[2] + '-' + parts[1].padStart(2, '0') + '-' + parts[0].padStart(2, '0');
+        }
+        if (/^d{4}-d{2}-d{2}$/.test(display)) return display;
+        return '';
+      }
+
+      function setBisaDateValue(inputEl, isoOrDisplay) {
+        if (!inputEl) return;
+        if (!isoOrDisplay) {
+          inputEl.value = '';
+          delete inputEl.dataset.iso;
+          return;
+        }
+        let iso = '';
+        let display = '';
+        if (isoOrDisplay.includes('/')) {
+          display = isoOrDisplay;
+          iso = parseDisplayToIso(isoOrDisplay);
+        } else {
+          iso = isoOrDisplay;
+          display = formatDisplayDate(isoOrDisplay);
+        }
+        inputEl.value = display;
+        inputEl.dataset.iso = iso;
+      }
+
+      function getBisaDateValue(inputEl) {
+        if (!inputEl) return '';
+        return inputEl.dataset.iso || parseDisplayToIso(inputEl.value) || '';
+      }
+
+      function openBisaDatePicker(inputEl) {
+        if (!dpPopover || !inputEl) return;
+        dpActiveInput = inputEl;
+
+        const currentIso = getBisaDateValue(inputEl);
+        if (currentIso) {
+          const parts = currentIso.split('-');
+          dpViewYear = parseInt(parts[0], 10);
+          dpViewMonth = parseInt(parts[1], 10);
+        } else {
+          dpViewYear = 2026;
+          dpViewMonth = 1;
+        }
+
+        renderBisaDatePicker();
+
+        const rect = inputEl.getBoundingClientRect();
+        const popoverWidth = 270;
+        let left = rect.left;
+        let top = rect.bottom + 6;
+
+        if (left + popoverWidth > window.innerWidth - 10) {
+          left = window.innerWidth - popoverWidth - 10;
+        }
+        if (left < 10) left = 10;
+
+        dpPopover.style.left = left + 'px';
+        dpPopover.style.top = top + 'px';
+        dpPopover.classList.add('is-active');
+      }
+
+      function closeBisaDatePicker() {
+        if (dpPopover) dpPopover.classList.remove('is-active');
+        dpActiveInput = null;
+      }
+
+      function renderBisaDatePicker() {
+        if (!dpTitle || !dpGrid) return;
+        dpTitle.textContent = DP_MONTH_NAMES[dpViewMonth - 1] + ' ' + dpViewYear;
+        dpGrid.innerHTML = '';
+
+        const firstDayOfWeek = new Date(dpViewYear, dpViewMonth - 1, 1).getDay();
+        const daysInMonth = new Date(dpViewYear, dpViewMonth, 0).getDate();
+
+        const selectedIso = dpActiveInput ? getBisaDateValue(dpActiveInput) : '';
+        const todayIso = new Date().toISOString().split('T')[0];
+
+        for (let i = 0; i < firstDayOfWeek; i++) {
+          const emptyCell = document.createElement('div');
+          emptyCell.className = 'bisa-dp-cell is-empty';
+          dpGrid.appendChild(emptyCell);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'bisa-dp-cell';
+          cell.textContent = d;
+
+          const currentCellIso = dpViewYear + '-' + String(dpViewMonth).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+          if (currentCellIso === selectedIso) cell.classList.add('is-selected');
+          if (currentCellIso === todayIso) cell.classList.add('is-today');
+
+          cell.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (dpActiveInput) {
+              setBisaDateValue(dpActiveInput, currentCellIso);
+            }
+            closeBisaDatePicker();
+          });
+
+          dpGrid.appendChild(cell);
+        }
+      }
+
+      if (dpPrev) {
+        dpPrev.addEventListener('click', function (e) {
+          e.stopPropagation();
+          dpViewMonth--;
+          if (dpViewMonth < 1) {
+            dpViewMonth = 12;
+            dpViewYear--;
+          }
+          renderBisaDatePicker();
+        });
+      }
+
+      if (dpNext) {
+        dpNext.addEventListener('click', function (e) {
+          e.stopPropagation();
+          dpViewMonth++;
+          if (dpViewMonth > 12) {
+            dpViewMonth = 1;
+            dpViewYear++;
+          }
+          renderBisaDatePicker();
+        });
+      }
+
+      if (dpToday) {
+        dpToday.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const today = new Date();
+          const iso = today.toISOString().split('T')[0];
+          if (dpActiveInput) setBisaDateValue(dpActiveInput, iso);
+          closeBisaDatePicker();
+        });
+      }
+
+      if (dpClear) {
+        dpClear.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (dpActiveInput) setBisaDateValue(dpActiveInput, '');
+          closeBisaDatePicker();
+        });
+      }
+
+      document.querySelectorAll('.bisa-datepicker-input').forEach(function (inp) {
+        inp.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openBisaDatePicker(this);
+        });
+      });
+
+      /* Helper Setup Custom Dropdown in Modal Form */
+      function setupModalDropdown(wrapId, triggerId, labelId, hiddenInputId, radioName) {
+        const wrap = document.getElementById(wrapId);
+        const trigger = document.getElementById(triggerId);
+        const label = document.getElementById(labelId);
+        const hidden = document.getElementById(hiddenInputId);
+        if (!wrap || !trigger) return;
+
+        trigger.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrap.classList.contains('is-open');
+          closeAllModalDropdowns();
+          if (!isOpen) wrap.classList.add('is-open');
+        });
+
+        wrap.querySelectorAll('input[type="radio"]').forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            if (this.checked) {
+              hidden.value = this.value;
+              label.textContent = this.value;
+              label.classList.remove('is-placeholder');
+              wrap.classList.remove('is-open');
+              updateFormStatusFinal();
+            }
+          });
+        });
+      }
+
+      function closeAllModalDropdowns() {
+        document.querySelectorAll('.pnd-select-wrap').forEach(function (w) {
+          w.classList.remove('is-open');
+        });
+      }
+
+      setupModalDropdown('wrapStatusManager', 'btnTriggerStatusManager', 'labelStatusManager', 'pndStatusManager', 'optStatusManager');
+      setupModalDropdown('wrapStatusDirektur', 'btnTriggerStatusDirektur', 'labelStatusDirektur', 'pndStatusDirektur', 'optStatusDirektur');
+
+      // Nominal Rupiah Input Formatter
+      if (pndNominal) {
+        pndNominal.addEventListener('input', function () {
+          const val = parseRupiah(this.value);
+          this.value = val > 0 ? formatRupiah(val) : '';
+        });
+      }
+
+      /* Open Form (Tambah / Edit) */
+      function openForm(item) {
+        closeActionMenus();
+        closePopovers();
+        form.reset();
+
+        if (item) {
+          formModeText.textContent = 'Edit';
+          pndEditId.value = item.id;
+          pndIdApproval.value = item.idApproval || '';
+          setBisaDateValue(pndTanggalRequest, item.tanggalRequest || '2026-01-04');
+          pndPemohon.value = item.pemohon || '';
+          pndDivisi.value = item.divisi || '';
+          pndKeperluan.value = item.keperluan || '';
+          pndNominal.value = formatRupiah(item.nominal || 0);
+
+          // Status Manager
+          const sm = item.statusManager || 'Disetujui';
+          pndStatusManager.value = sm;
+          labelStatusManager.textContent = sm;
+          labelStatusManager.classList.remove('is-placeholder');
+          const rMgr = form.querySelector('input[name="optStatusManager"][value="' + sm + '"]');
+          if (rMgr) rMgr.checked = true;
+
+          // Status Direktur
+          const sd = item.statusDirektur || 'Disetujui';
+          pndStatusDirektur.value = sd;
+          labelStatusDirektur.textContent = sd;
+          labelStatusDirektur.classList.remove('is-placeholder');
+          const rDir = form.querySelector('input[name="optStatusDirektur"][value="' + sd + '"]');
+          if (rDir) rDir.checked = true;
+
+          // Status Final
+          pndStatusFinal.value = item.statusFinal || computeStatusFinal(sm, sd);
+
+          pndCatatan.value = item.catatan || '';
+        } else {
+          formModeText.textContent = 'Tambah';
+          pndEditId.value = '';
+          const nextIndex = appData.length + 1;
+          pndIdApproval.value = 'APR-2609-' + String(nextIndex).padStart(3, '0');
+          setBisaDateValue(pndTanggalRequest, '2026-01-04');
+          pndPemohon.value = '';
+          pndDivisi.value = '';
+          pndKeperluan.value = '';
+          pndNominal.value = '';
+
+          // Reset dropdowns to placeholder (Sesuai Gambar 1)
+          pndStatusManager.value = '';
+          labelStatusManager.textContent = 'Pilih Status';
+          labelStatusManager.classList.add('is-placeholder');
+          form.querySelectorAll('input[name="optStatusManager"]').forEach(function (r) { r.checked = false; });
+
+          pndStatusDirektur.value = '';
+          labelStatusDirektur.textContent = 'Pilih Status';
+          labelStatusDirektur.classList.add('is-placeholder');
+          form.querySelectorAll('input[name="optStatusDirektur"]').forEach(function (r) { r.checked = false; });
+
+          pndStatusFinal.value = '';
+          pndCatatan.value = '';
+        }
+
+        openModal(formModal);
+      }
+
+      /* Open Detail (Lihat - Sesuai Gambar 3) */
+      function openDetail(item) {
+        closeActionMenus();
+        closePopovers();
+
+        document.getElementById('viewPndIdApproval').value = item.idApproval || '-';
+        document.getElementById('viewPndTanggalRequest').value = formatTanggalDisplay(item.tanggalRequest);
+        document.getElementById('viewPndPemohon').value = item.pemohon || '-';
+        document.getElementById('viewPndDivisi').value = item.divisi || '-';
+        document.getElementById('viewPndKeperluan').value = item.keperluan || '-';
+        document.getElementById('viewPndNominal').value = formatRupiah(item.nominal || 0);
+        document.getElementById('viewPndStatusManager').value = item.statusManager || '-';
+        document.getElementById('viewPndStatusDirektur').value = item.statusDirektur || '-';
+        document.getElementById('viewPndStatusFinal').value = item.statusFinal || '-';
+        document.getElementById('viewPndCatatan').value = item.catatan || '-';
+
+        openModal(detailModal);
+      }
+
+      /* Form Submit */
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const sm = pndStatusManager.value || 'Disetujui';
+          const sd = pndStatusDirektur.value || 'Disetujui';
+          const sf = pndStatusFinal.value || computeStatusFinal(sm, sd);
+
+          const editId = pndEditId.value;
+          const payload = {
+            idApproval: pndIdApproval.value.trim(),
+            tanggalRequest: getBisaDateValue(pndTanggalRequest) || '2026-01-04',
+            pemohon: pndPemohon.value.trim(),
+            divisi: pndDivisi.value.trim(),
+            keperluan: pndKeperluan.value.trim(),
+            nominal: parseRupiah(pndNominal.value),
+            statusManager: sm,
+            statusDirektur: sd,
+            statusFinal: sf,
+            catatan: pndCatatan.value.trim() || '-'
+          };
+
+          if (editId) {
+            const index = appData.findIndex(function (d) { return String(d.id) === String(editId); });
+            if (index !== -1) {
+              appData[index] = Object.assign({}, appData[index], payload);
+            }
+          } else {
+            payload.id = 'apr-' + Date.now();
+            appData.unshift(payload);
+          }
+
+          saveData();
+          renderTable();
+          closeModal(formModal);
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil!',
+              text: 'Data Approval Pengeluaran telah disimpan.',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+
+      /* ===== SEARCHABLE FILTER DIVISI (POPOVER SESUAI GAMBAR USER) ===== */
+      function getDivisiOptions() {
+        const set = new Set(['Divisi 1', 'Divisi 2', 'Divisi 3', 'General', 'Marketing', 'Operasional', 'IT', 'BCA']);
+        appData.forEach(function (d) {
+          if (d.divisi) set.add(d.divisi);
+        });
+        return Array.from(set);
+      }
+
+      function initSearchableDivisiFilter() {
+        const box = document.getElementById('boxFilterDivisi');
+        const input = document.getElementById('filterDivisi');
+        const list = document.getElementById('listFilterDivisi');
+        if (!box || !input || !list) return;
+
+        function render(query) {
+          const q = (query || '').toLowerCase().trim();
+          const options = getDivisiOptions();
+          const filtered = options.filter(function (opt) {
+            return !q || String(opt).toLowerCase().includes(q);
+          });
+
+          list.innerHTML = '';
+          if (filtered.length === 0) {
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'pnd-filter-item';
+            emptyItem.style.color = '#94a3b8';
+            emptyItem.style.fontStyle = 'italic';
+            emptyItem.textContent = 'Tidak ditemukan';
+            list.appendChild(emptyItem);
+            return;
+          }
+
+          filtered.forEach(function (opt) {
+            const itemDiv = document.createElement('div');
+            const isSelected = input.value.trim().toLowerCase() === String(opt).toLowerCase();
+            itemDiv.className = 'pnd-filter-item' + (isSelected ? ' is-selected' : '');
+            itemDiv.textContent = opt;
+            itemDiv.addEventListener('click', function (e) {
+              e.stopPropagation();
+              input.value = opt;
+              box.classList.remove('is-open');
+              input.placeholder = 'Pilih Divisi';
+            });
+            list.appendChild(itemDiv);
+          });
+        }
+
+        input.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = box.classList.contains('is-open');
+          closeFilterSearchBoxes();
+          if (!isOpen) {
+            box.classList.add('is-open');
+            input.placeholder = 'Cari Divisi';
+            render(input.value);
+          }
+        });
+
+        input.addEventListener('input', function () {
+          if (!box.classList.contains('is-open')) box.classList.add('is-open');
+          render(input.value);
+        });
+
+        const arrow = box.querySelector('.pnd-filter-arrow');
+        if (arrow) {
+          arrow.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = box.classList.contains('is-open');
+            closeFilterSearchBoxes();
+            if (!isOpen) {
+              box.classList.add('is-open');
+              input.placeholder = 'Cari Divisi';
+              render('');
+              input.focus();
+            }
+          });
+        }
+      }
+
+      function closeFilterSearchBoxes() {
+        const boxDivisi = document.getElementById('boxFilterDivisi');
+        if (boxDivisi) {
+          boxDivisi.classList.remove('is-open');
+          const inp = document.getElementById('filterDivisi');
+          if (inp && !inp.value) inp.placeholder = 'Pilih Divisi';
+        }
+      }
+
+      initSearchableDivisiFilter();
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const willOpen = !filterDropdown.classList.contains('is-active');
+          closePopovers();
+          if (willOpen) filterDropdown.classList.add('is-active');
+        });
+      }
+
+      if (applyFilterBtn) {
+        applyFilterBtn.addEventListener('click', function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          filters.divisi = filterDivisiInput ? filterDivisiInput.value.trim() : '';
+          renderTable();
+          closePopovers();
+        });
+      }
+
+      if (resetFilterBtn) {
+        resetFilterBtn.addEventListener('click', function (e) {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          if (filterDivisiInput) {
+            filterDivisiInput.value = '';
+            filterDivisiInput.placeholder = 'Pilih Divisi';
+          }
+          filters.divisi = '';
+          closeFilterSearchBoxes();
+          renderTable();
+          closePopovers();
+        });
+      }
+
+      /* ===== DUAL-MONTH CALENDAR ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 1; // Jan
+      let calSelectedStart = '2026-01-01';
+      let calSelectedEnd = null;
+
+      function formatYMD(y, m, d) {
+        return String(y) + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      }
+
+      function updateCalendarSelectedText() {
+        const infoEl = document.getElementById('pndCalSelectedText');
+        if (!infoEl) return;
+        if (calSelectedStart && calSelectedEnd) {
+          infoEl.textContent = calSelectedStart + ' s/d ' + calSelectedEnd;
+        } else if (calSelectedStart) {
+          infoEl.textContent = calSelectedStart + ' - (Pilih tanggal akhir)';
+        } else {
+          infoEl.textContent = 'Belum dipilih';
+        }
+      }
+
+      function renderCalendarMonths() {
+        renderCalendarMonth(calViewYear, calViewMonth, 'pndCalTitleLeft', 'pndCalGridLeft');
+        let nextYear = calViewYear;
+        let nextMonth = calViewMonth + 1;
+        if (nextMonth > 12) {
+          nextMonth = 1;
+          nextYear++;
+        }
+        renderCalendarMonth(nextYear, nextMonth, 'pndCalTitleRight', 'pndCalGridRight');
+        updateCalendarSelectedText();
+      }
+
+      function renderCalendarMonth(year, month, titleId, gridId) {
+        const titleEl = document.getElementById(titleId);
+        const gridEl = document.getElementById(gridId);
+        if (!titleEl || !gridEl) return;
+
+        titleEl.textContent = year + ' - ' + String(month).padStart(2, '0');
+        gridEl.innerHTML = '';
+
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        const startOffset = (firstDay + 6) % 7;
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        for (let i = 0; i < startOffset; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'pnd-cal-day is-empty';
+          gridEl.appendChild(empty);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'pnd-cal-day';
+          dayEl.textContent = d;
+
+          const dateStr = formatYMD(year, month, d);
+
+          if (calSelectedStart === dateStr || calSelectedEnd === dateStr) {
+            dayEl.classList.add('is-selected');
+          } else if (calSelectedStart && calSelectedEnd && dateStr > calSelectedStart && dateStr < calSelectedEnd) {
+            dayEl.classList.add('is-in-range');
+          }
+
+          dayEl.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!calSelectedStart || (calSelectedStart && calSelectedEnd)) {
+              calSelectedStart = dateStr;
+              calSelectedEnd = null;
+            } else if (calSelectedStart && !calSelectedEnd) {
+              if (dateStr < calSelectedStart) {
+                calSelectedEnd = calSelectedStart;
+                calSelectedStart = dateStr;
+              } else {
+                calSelectedEnd = dateStr;
+              }
+            }
+            renderCalendarMonths();
+          });
+
+          gridEl.appendChild(dayEl);
+        }
+      }
+
+      if (btnCalendar && calendarDropdown) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const willOpen = !calendarDropdown.classList.contains('is-active');
+          closePopovers();
+          if (willOpen) {
+            calendarDropdown.classList.add('is-active');
+            renderCalendarMonths();
+          }
+        });
+      }
+
+      document.getElementById('pndCalPrevMonth')?.addEventListener('click', function (e) {
+        e.stopPropagation();
+        calViewMonth--;
+        if (calViewMonth < 1) {
+          calViewMonth = 12;
+          calViewYear--;
+        }
+        renderCalendarMonths();
+      });
+
+      document.getElementById('pndCalNextMonth')?.addEventListener('click', function (e) {
+        e.stopPropagation();
+        calViewMonth++;
+        if (calViewMonth > 12) {
+          calViewMonth = 1;
+          calViewYear++;
+        }
+        renderCalendarMonths();
+      });
+
+      document.getElementById('pndCalPrevYear')?.addEventListener('click', function (e) {
+        e.stopPropagation();
+        calViewYear--;
+        renderCalendarMonths();
+      });
+
+      document.getElementById('pndCalNextYear')?.addEventListener('click', function (e) {
+        e.stopPropagation();
+        calViewYear++;
+        renderCalendarMonths();
+      });
+
+      if (applyCalendarBtn) {
+        applyCalendarBtn.addEventListener('click', function () {
+          filters.tglMulai = calSelectedStart || '';
+          filters.tglSelesai = calSelectedEnd || calSelectedStart || '';
+          renderTable();
+          closePopovers();
+        });
+      }
+
+      if (cancelCalendarBtn) {
+        cancelCalendarBtn.addEventListener('click', function () {
+          calSelectedStart = null;
+          calSelectedEnd = null;
+          filters.tglMulai = '';
+          filters.tglSelesai = '';
+          renderTable();
+          closePopovers();
+        });
+      }
+
+      // Quick presets
+      document.querySelectorAll('.pnd-cal-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          document.querySelectorAll('.pnd-cal-preset-btn').forEach(function (b) { b.classList.remove('is-active'); });
+          this.classList.add('is-active');
+
+          const preset = this.getAttribute('data-preset');
+          const today = new Date();
+          const y = today.getFullYear();
+          const m = today.getMonth() + 1;
+          const d = today.getDate();
+          const todayStr = formatYMD(y, m, d);
+
+          if (preset === 'today') {
+            calSelectedStart = todayStr;
+            calSelectedEnd = todayStr;
+          } else if (preset === 'yesterday') {
+            const yday = new Date(today);
+            yday.setDate(today.getDate() - 1);
+            const ydayStr = formatYMD(yday.getFullYear(), yday.getMonth() + 1, yday.getDate());
+            calSelectedStart = ydayStr;
+            calSelectedEnd = ydayStr;
+          } else if (preset === 'last7') {
+            const past = new Date(today);
+            past.setDate(today.getDate() - 6);
+            calSelectedStart = formatYMD(past.getFullYear(), past.getMonth() + 1, past.getDate());
+            calSelectedEnd = todayStr;
+          } else if (preset === 'last30') {
+            const past = new Date(today);
+            past.setDate(today.getDate() - 29);
+            calSelectedStart = formatYMD(past.getFullYear(), past.getMonth() + 1, past.getDate());
+            calSelectedEnd = todayStr;
+          } else if (preset === 'last3m') {
+            const past = new Date(today);
+            past.setMonth(today.getMonth() - 3);
+            calSelectedStart = formatYMD(past.getFullYear(), past.getMonth() + 1, past.getDate());
+            calSelectedEnd = todayStr;
+          } else if (preset === 'last6m') {
+            const past = new Date(today);
+            past.setMonth(today.getMonth() - 6);
+            calSelectedStart = formatYMD(past.getFullYear(), past.getMonth() + 1, past.getDate());
+            calSelectedEnd = todayStr;
+          } else if (preset === 'last12m') {
+            const past = new Date(today);
+            past.setFullYear(today.getFullYear() - 1);
+            calSelectedStart = formatYMD(past.getFullYear(), past.getMonth() + 1, past.getDate());
+            calSelectedEnd = todayStr;
+          }
+
+          renderCalendarMonths();
+        });
+      });
+
+      /* ===== EXPORT TO EXCEL ===== */
+      function escapeCsv(val) {
+        if (val === null || val === undefined) return '""';
+        let str = String(val).replace(/"/g, '""');
+        return '"' + str + '"';
+      }
+
+      /* ===== EXPORT TO EXCEL (.xlsx) ===== */
+      function exportToExcel() {
+        const filtered = getFilteredData();
+        if (filtered.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Data Kosong',
+              text: 'Tidak ada data approval pengeluaran untuk diekspor.'
+            });
+          }
+          return;
+        }
+
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const filename = 'Approval_Pengeluaran_' + todayStr + '.xlsx';
+
+        const headers = [
+          'No',
+          'ID Approval',
+          'Tanggal Request',
+          'Pemohon',
+          'Divisi',
+          'Keperluan',
+          'Nominal',
+          'Status Manager',
+          'Status Direktur',
+          'Status Final',
+          'Catatan'
+        ];
+
+        const rows = filtered.map(function (item, idx) {
+          return [
+            idx + 1,
+            item.idApproval || '-',
+            formatTanggalDisplay(item.tanggalRequest),
+            item.pemohon || '-',
+            item.divisi || '-',
+            item.keperluan || '-',
+            Number(item.nominal || 0),
+            item.statusManager || '-',
+            item.statusDirektur || '-',
+            item.statusFinal || '-',
+            item.catatan || '-'
+          ];
+        });
+
+        if (typeof window.exportBisaExcel === 'function') {
+          window.exportBisaExcel({
+            title: 'LAPORAN APPROVAL PENGELUARAN',
+            filename: filename,
+            sheetName: 'Approval Pengeluaran',
+            headers: headers,
+            rows: rows
+          });
+        } else {
+          let csv = headers.join(',') + '\n';
+          rows.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'Approval_Pengeluaran_' + todayStr + '.csv');
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+
+      /* Event Listeners */
+      if (btnTambah) {
+        btnTambah.addEventListener('click', function () {
+          openForm(null);
+        });
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', renderTable);
+      }
+
+      if (btnExport) {
+        btnExport.addEventListener('click', exportToExcel);
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener('click', function (event) {
+          const toggle = event.target.closest('[data-action-toggle]');
+          if (toggle) {
+            event.preventDefault();
+            event.stopPropagation();
+            openActionMenu(toggle);
+          }
+        });
+      }
+
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (event) {
+          const actionButton = event.target.closest('[data-action]');
+          if (!actionButton || !currentActionId) return;
+
+          const action = actionButton.getAttribute('data-action');
+          const targetItem = appData.find(function (item) {
+            return String(item.id) === String(currentActionId);
+          });
+
+          closeActionMenus();
+
+          if (!targetItem) return;
+
+          if (action === 'view') {
+            openDetail(targetItem);
+          } else if (action === 'edit') {
+            openForm(targetItem);
+          } else if (action === 'delete') {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: 'Hapus Approval Pengeluaran?',
+                text: 'Apakah Anda yakin ingin menghapus data request "' + (targetItem.idApproval || '') + '" (' + (targetItem.keperluan || '') + ')?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e02424',
+                cancelButtonColor: '#94a3b8',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+              }).then(function (result) {
+                if (result.isConfirmed) {
+                  appData = appData.filter(function (item) {
+                    return String(item.id) !== String(targetItem.id);
+                  });
+                  saveData();
+                  renderTable();
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Data telah berhasil dihapus.',
+                    timer: 1500,
+                    showConfirmButton: false
+                  });
+                }
+              });
+            } else {
+              if (confirm('Hapus request ini?')) {
+                appData = appData.filter(function (item) {
+                  return String(item.id) !== String(targetItem.id);
+                });
+                saveData();
+                renderTable();
+              }
+            }
+          }
+        });
+      }
+
+      document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const targetId = this.getAttribute('data-close-modal');
+          closeModal(document.getElementById(targetId));
+        });
+      });
+
+      document.querySelectorAll('.pnd-modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (e) {
+          if (e.target === this) {
+            closeModal(this);
+          }
+        });
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('.filter-dropdown-wrapper')) {
+          closePopovers();
+        }
+        if (!e.target.closest('#boxFilterStatusApproval') && !e.target.closest('#boxFilterDivisi')) {
+          closeFilterSearchBoxes();
+        }
+        if (!e.target.closest('#pndActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('.pnd-select-wrap')) {
+          closeAllModalDropdowns();
+        }
+        if (!e.target.closest('.bisa-datepicker-input') && !e.target.closest('#bisaDatePickerPopover')) {
+          closeBisaDatePicker();
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+      window.addEventListener('resize', function () {
+        closeActionMenus();
+        closeBisaDatePicker();
+      });
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // Initial Render
+      renderTable();
+    })();
+  </script>
 </body>
 
 </html>

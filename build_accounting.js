@@ -23,7 +23,7 @@ const blankFiles = [
   { dest: 'Accounting/operasional/accounting_operasional_dashboard.html', title: 'Dashboard Operasional' },
   { dest: 'Accounting/operasional/accounting_kas_bank.html', title: 'Kas & Bank' },
   { dest: 'Accounting/operasional/accounting_pendapatan.html', title: 'Pendapatan' },
-  { dest: 'Accounting/operasional/accounting_pengurangan_beban.html', title: 'Pengurangan & Beban' },
+  { dest: 'Accounting/operasional/accounting_pengeluaran_beban.html', title: 'Pengeluaran & Beban' },
   { dest: 'Accounting/operasional/accounting_approval_pengeluaran.html', title: 'Approval Pengeluaran' },
   { dest: 'Accounting/operasional/accounting_profit_project_brand.html', title: 'Profit Project & Brand' },
   { dest: 'Accounting/operasional/accounting_arus_kas.html', title: 'Arus Kas' },
