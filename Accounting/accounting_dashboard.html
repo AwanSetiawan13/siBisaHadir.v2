@@ -195,7 +195,7 @@
     <header class="topbar"></header>
     <main class="dashboard-content">
       <div style="position:relative; margin-bottom:20px;">
-        <div id="db-welcome-banner" class="db-welcome-banner" data-banner-name="Rida" data-banner-role="Accounting">
+        <div id="db-welcome-banner" class="db-welcome-banner" data-banner-name="Ridha Ayu" data-banner-role="Accounting">
           <div class="db-wb-watermark">
             <img src="../media/bisa_icon_white.png" alt="" class="db-wb-watermark-img" />
           </div>
@@ -217,7 +217,7 @@
           <div class="db-wb-center">
             <div class="db-wb-text-group">
               <span class="db-wb-greeting">Selamat Datang</span>
-              <h2 class="db-wb-name" id="banner-user-name">Rida</h2>
+              <h2 class="db-wb-name" id="banner-user-name">Ridha Ayu</h2>
               <div class="db-wb-role-wrap">
                 <span class="db-wb-role" id="banner-user-role">Accounting</span>
               </div>
@@ -237,42 +237,41 @@
   <script>
     (function () {
       function drawIDCard(userName, role) {
-        const W = 320, H = 480;
+        const W = 1024, H = 1440;
         const cv = document.createElement('canvas');
         cv.width = W; cv.height = H;
         const ctx = cv.getContext('2d');
 
+        // White badge holder background
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, W, H);
 
-        ctx.fillStyle = '#1e293b';
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(W / 2 - 32, 16, 64, 15, 7);
-        else ctx.rect(W / 2 - 32, 16, 64, 15);
-        ctx.fill();
+        const img = window._lanyardUserImg;
+        if (img && img.complete && (img.naturalWidth || img.width)) {
+          const sw = img.naturalWidth || img.width;
+          const sh = img.naturalHeight || img.height;
+          // Scale to fit cleanly within the 1024x1440 3D lanyard badge
+          // padTop allows clear clearance for the 3D metal clip punch slot
+          const padTop = 32;
+          const availH = H - padTop - 12;
+          const s = availH / sh;
+          const dw = sw * s;
+          const dh = sh * s;
+          const dx = (W - dw) / 2;
+          const dy = padTop;
 
-        const px = 18, py = 48, pw = W - 36, ph = 406, pr = 16;
-        ctx.save();
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, pr);
-        else ctx.rect(px, py, pw, ph);
-        ctx.fillStyle = '#d81a24';
-        ctx.fill();
-        ctx.clip();
-
-        if (window._lanyardUserImg && window._lanyardUserImg.complete && window._lanyardUserImg.naturalWidth) {
-          const img = window._lanyardUserImg;
-          const sx = 50, sy = 25, sw = 580, sh = 800;
-          ctx.drawImage(img, sx, sy, sw, sh, px, py, pw, ph);
+          ctx.drawImage(img, 0, 0, sw, sh, dx, dy, dw, dh);
+        } else {
+          // Fallback if image not ready
+          ctx.fillStyle = '#1e3a8a';
+          ctx.fillRect(40, 60, W - 80, H - 120);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 48px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(userName, W / 2, 400);
+          ctx.font = '32px sans-serif';
+          ctx.fillText(role, W / 2, 460);
         }
-        ctx.restore();
-
-        ctx.strokeStyle = '#222938';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, pr);
-        else ctx.rect(px, py, pw, ph);
-        ctx.stroke();
 
         return cv.toDataURL('image/jpeg', 0.95);
       }
@@ -282,7 +281,7 @@
         if (!container || typeof initLanyard !== 'function' || typeof THREE === 'undefined') return;
 
         const bannerEl = document.getElementById('db-welcome-banner');
-        const userName = bannerEl?.dataset.bannerName || 'Rida';
+        const userName = bannerEl?.dataset.bannerName || 'Ridha Ayu';
         const role = bannerEl?.dataset.bannerRole || 'Accounting';
 
         const bannerName = document.getElementById('banner-user-name');
@@ -316,17 +315,20 @@
           });
         }
 
-        if (window.LANYARD_USER_B64) {
-          const img = new Image();
-          img.onload = () => {
-            window._lanyardUserImg = img;
-            launch();
-          };
-          img.onerror = () => launch();
-          img.src = window.LANYARD_USER_B64;
-        } else {
+        const ridhaImgSrc = window.LANYARD_RIDHA_AYU_B64 || '../media/ridha_ayu_id_card.jpg';
+        const img = new Image();
+        img.onload = () => {
+          window._lanyardUserImg = img;
           launch();
-        }
+        };
+        img.onerror = () => {
+          if (img.src !== '../media/ridha_ayu_id_card.jpg') {
+            img.src = '../media/ridha_ayu_id_card.jpg';
+          } else {
+            launch();
+          }
+        };
+        img.src = ridhaImgSrc;
       }
 
       if (document.readyState === 'loading') {

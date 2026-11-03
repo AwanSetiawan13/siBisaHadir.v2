@@ -446,7 +446,7 @@
     admin: 'Rayi (Admin)',
     spv_kol: 'Rayi',
     staff_kol: 'Rayi (Staff)',
-    accounting: 'Rida'
+    accounting: 'Ridha Ayu'
   };
   const portalLabels = {
     admin: 'Beranda Admin',
@@ -462,7 +462,7 @@
     : role === 'spv_kol'
       ? 'Rayi'
       : role === 'accounting'
-        ? 'Rida'
+        ? (storedUserName === 'Rida' ? 'Ridha Ayu' : (storedUserName || 'Ridha Ayu'))
         : (storedUserName || roleDisplayNames[role] || 'Rayi (Admin)');
   const currentPortalLabel = portalLabels[role] || 'Beranda SPVKOL';
   const currentRoleLabel = role === 'spv_kol'

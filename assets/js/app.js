@@ -17059,7 +17059,7 @@
         window.location.href = 'StaffKol/staffkol_dashboard.html';
       } else if ((userVal === 'accounting@bisamedia.com' || userVal === 'accounting') && (passVal === 'accounting123' || passVal === '123456')) {
         localStorage.setItem('user_role', 'accounting');
-        localStorage.setItem('user_name', 'Rida');
+        localStorage.setItem('user_name', 'Ridha Ayu');
         localStorage.setItem('user_display_role', 'Accounting');
         localStorage.setItem('user_avatar', 'media/avatar.png');
         localStorage.removeItem('user_pic');
