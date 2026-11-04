@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Accounting | Bisa Media</title>
+  <link rel="stylesheet" href="../assets/css/style.css?v=20261031" />
+  <link rel="icon" type="image/png" href="../media/logo.png" />
+  <script src="../vendor/three.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Nunito:wght@400;600;700;800;900&display=swap');
+
+    .db-welcome-banner {
+      position: relative;
+      width: 100%;
+      min-height: clamp(210px, 18vw, 315px);
+      padding: 0;
+      background: linear-gradient(108deg, #1f9ad6 0%, #28a5de 38%, #49b6e7 78%, #5ec2ed 100%);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: stretch;
+      box-shadow: 0 8px 24px rgba(27, 138, 211, 0.25);
+      box-sizing: border-box;
+    }
+
+    .db-wb-watermark {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(-4deg);
+      width: 340px;
+      height: 340px;
+      pointer-events: none;
+      opacity: 0.15;
+      filter: brightness(2.1) contrast(1.05) drop-shadow(0 0 20px rgba(255, 255, 255, 0.35));
+      z-index: 1;
+    }
+
+    .db-wb-watermark-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .db-wb-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px 16px 20px;
+      min-width: 112px;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+
+    .db-wb-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 22px;
+      margin-top: 12px;
+    }
+
+    .db-wb-logo-img {
+      width: clamp(40px, 3.8vw, 60px);
+      height: clamp(40px, 3.8vw, 60px);
+      object-fit: contain;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .db-wb-logo-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      text-align: left;
+      gap: 1px;
+      line-height: 1.02;
+    }
+
+    .db-wb-logo-title {
+      color: #ffffff;
+      font-family: 'Nunito', sans-serif;
+      font-size: clamp(13px, 1.2vw, 20px);
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    .db-wb-tagline {
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      color: #ffffff;
+      font-family: "Century Gothic", "CenturyGothic", "AppleGothic", "Gill Sans", Arial, sans-serif;
+      font-size: clamp(14px, 1.4vw, 24px);
+      font-weight: 600;
+      font-style: italic;
+      line-height: 1.2;
+      margin-left: 22px;
+      margin-bottom: 8px;
+    }
+
+    .db-wb-hash {
+      font-size: clamp(22px, 2vw, 34px);
+      font-weight: 800;
+      line-height: 1;
+      color: #ffffff;
+      opacity: 0.95;
+    }
+
+    .db-wb-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 200px 20px 20px;
+      z-index: 2;
+    }
+
+    .db-wb-text-group {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-width: 100%;
+    }
+
+    .db-wb-greeting {
+      font-family: 'Great Vibes', cursive;
+      font-size: clamp(38px, 4.2vw, 74px);
+      font-weight: 400;
+      color: #ffffff;
+      line-height: 1;
+      margin-bottom: -8px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      margin-left: -0.25em;
+    }
+
+    .db-wb-name {
+      font-family: "Century Gothic", "CenturyGothic", "AppleGothic", "Gill Sans", Arial, sans-serif;
+      font-size: clamp(40px, 4.6vw, 84px);
+      font-weight: 700;
+      font-style: italic;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1;
+      letter-spacing: 0;
+      white-space: nowrap;
+      text-shadow: 0 4px 14px rgba(0, 30, 80, 0.4), 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .db-wb-role-wrap {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .db-wb-role {
+      font-family: "Century Gothic", "CenturyGothic", "AppleGothic", "Gill Sans", Arial, sans-serif;
+      font-size: clamp(15px, 1.5vw, 26px);
+      font-style: italic;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.95);
+      letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 900px) {
+      .db-wb-center {
+        padding-right: 20px;
+      }
+
+      .db-wb-left {
+        padding: 16px;
+      }
+
+      #lanyard-container {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .db-wb-name {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar"></header>
+    <main class="dashboard-content">
+      <div style="position:relative; margin-bottom:20px;">
+        <div id="db-welcome-banner" class="db-welcome-banner" data-banner-name="Ridha Ayu" data-banner-role="Accounting">
+          <div class="db-wb-watermark">
+            <img src="../media/bisa_icon_white.png" alt="" class="db-wb-watermark-img" />
+          </div>
+
+          <div class="db-wb-left">
+            <div class="db-wb-logo">
+              <img src="../media/bisa_icon_white.png" alt="Bisa Media" class="db-wb-logo-img" />
+              <div class="db-wb-logo-text">
+                <span class="db-wb-logo-title">Bisa</span>
+                <span class="db-wb-logo-title">Media</span>
+              </div>
+            </div>
+            <div class="db-wb-tagline">
+              <span class="db-wb-hash">#</span>
+              <span>Work Can<br>Be Fun</span>
+            </div>
+          </div>
+
+          <div class="db-wb-center">
+            <div class="db-wb-text-group">
+              <span class="db-wb-greeting">Selamat Datang</span>
+              <h2 class="db-wb-name" id="banner-user-name">Ridha Ayu</h2>
+              <div class="db-wb-role-wrap">
+                <span class="db-wb-role" id="banner-user-role">Accounting</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="lanyard-container"
+          style="position:absolute;top:-47px;right:-2px;width:220px;height:350px;pointer-events:auto;z-index:30;"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/layout.js?v=20261103_pengeluaran"></script>
+  <script src="../assets/js/banner_assets.js"></script>
+  <script src="../assets/js/lanyard.js"></script>
+  <script>
+    (function () {
+      function drawIDCard(userName, role) {
+        const W = 1024, H = 1440;
+        const cv = document.createElement('canvas');
+        cv.width = W; cv.height = H;
+        const ctx = cv.getContext('2d');
+
+        // White badge holder background
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, W, H);
+
+        const img = window._lanyardUserImg;
+        if (img && img.complete && (img.naturalWidth || img.width)) {
+          const sw = img.naturalWidth || img.width;
+          const sh = img.naturalHeight || img.height;
+          // Scale to fit cleanly within the 1024x1440 3D lanyard badge
+          // padTop allows clear clearance for the 3D metal clip punch slot
+          const padTop = 32;
+          const availH = H - padTop - 12;
+          const s = availH / sh;
+          const dw = sw * s;
+          const dh = sh * s;
+          const dx = (W - dw) / 2;
+          const dy = padTop;
+
+          ctx.drawImage(img, 0, 0, sw, sh, dx, dy, dw, dh);
+        } else {
+          // Fallback if image not ready
+          ctx.fillStyle = '#1e3a8a';
+          ctx.fillRect(40, 60, W - 80, H - 120);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 48px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(userName, W / 2, 400);
+          ctx.font = '32px sans-serif';
+          ctx.fillText(role, W / 2, 460);
+        }
+
+        return cv.toDataURL('image/jpeg', 0.95);
+      }
+
+      function startLanyard() {
+        const container = document.getElementById('lanyard-container');
+        if (!container || typeof initLanyard !== 'function' || typeof THREE === 'undefined') return;
+
+        const bannerEl = document.getElementById('db-welcome-banner');
+        const userName = bannerEl?.dataset.bannerName || 'Ridha Ayu';
+        const role = bannerEl?.dataset.bannerRole || 'Accounting';
+
+        const bannerName = document.getElementById('banner-user-name');
+        const bannerRole = document.getElementById('banner-user-role');
+        if (bannerName) bannerName.textContent = userName;
+        if (bannerRole) bannerRole.textContent = role;
+
+        function launch() {
+          const cardDataURL = drawIDCard(userName, role);
+          initLanyard(container, {
+            frontImage: cardDataURL,
+            backImage: cardDataURL,
+            imageFit: 'cover',
+            cardColor: '#ffffff',
+            orientation: 'portrait',
+            finish: 'glossy',
+            cornerRadius: 0.28,
+            size: 0.68,
+            anchor: 'center',
+            strapLength: 0.38,
+            strapColor: '#1e3a8a',
+            strapWidth: 0.55,
+            showStrap: true,
+            metal: 'silver',
+            gravity: 1.0,
+            damping: 0.5,
+            elasticity: 0.4,
+            breeze: 0.35,
+            interactive: true,
+            intro: true
+          });
+        }
+
+        const ridhaImgSrc = window.LANYARD_RIDHA_AYU_B64 || '../media/ridha_ayu_id_card.jpg';
+        const img = new Image();
+        img.onload = () => {
+          window._lanyardUserImg = img;
+          launch();
+        };
+        img.onerror = () => {
+          if (img.src !== '../media/ridha_ayu_id_card.jpg') {
+            img.src = '../media/ridha_ayu_id_card.jpg';
+          } else {
+            launch();
+          }
+        };
+        img.src = ridhaImgSrc;
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startLanyard);
+      } else {
+        setTimeout(startLanyard, 150);
+      }
+    })();
+  </script>
+</body>
+
+</html>

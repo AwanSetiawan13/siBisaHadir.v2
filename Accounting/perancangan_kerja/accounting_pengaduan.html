@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengaduan Accounting | Bisa Media</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* Custom design matching mockup exactly */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .status-badge--belum-diproses {
+      background-color: rgba(140, 140, 140, 0.1);
+      color: #8c8c8c;
+      border: 1px solid rgba(140, 140, 140, 0.3);
+    }
+    .status-badge--diproses {
+      background-color: rgba(34, 100, 198, 0.1);
+      color: #2264c6;
+      border: 1px solid rgba(34, 100, 198, 0.3);
+    }
+    .status-badge--selesai {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+
+
+    .btn-tambah-blue {
+      background-color: #29A3D8;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.15s ease;
+    }
+    .btn-tambah-blue:hover {
+      background-color: #1e87b7;
+    }
+
+    #karyawanOptions {
+      max-height: 320px;
+    }
+    .karyawan-dropdown-tools {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 6px 10px 8px;
+      margin-bottom: 4px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+    }
+    .karyawan-search-input,
+    .karyawan-divisi-select {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 12.5px;
+      border: 1px solid #c5c5c8;
+      border-radius: 5px;
+      font-family: inherit;
+      color: #333;
+      background: #fff;
+    }
+    .karyawan-search-input:focus,
+    .karyawan-divisi-select:focus {
+      outline: none;
+      border-color: #29A3D8;
+    }
+    .karyawan-empty-filter {
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: #94a3b8;
+      font-style: italic;
+    }
+  </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
+</head>
+
+<body class="dashboard-body">
+        <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Accounting</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1 style="padding-left: 0;">Pengaduan</h1>
+      </div>
+
+      <!-- Main Panel -->
+      <section class="panel campaign-panel" style="padding-bottom: 24px;">
+        <!-- Top border thick blue bar -->
+        <div class="campaign-panel__line" style="height: 4px; background: var(--blue-800);"></div>
+
+        <!-- Toolbar -->
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <!-- Left empty as requested in mockup -->
+          </div>
+          <div class="campaign-toolbar__right">
+            <button id="btnTambahPengaduan" class="btn-tambah-blue" type="button">
+              + Tambah
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State Container (Sesuai Referensi Pengguna) -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Pengaduan</div>
+          <div class="app-empty-state__subtitle">Klik tombol "+ Tambah" di atas untuk menambahkan pengaduan baru.</div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap campaign-table" id="tableContainerWrapper" style="padding: 0 0 24px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 60px;">#</th>
+                <th>Tanggal</th>
+                <th>Pengaduan</th>
+                <th>Kategori</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="pengaduanTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+  </div>
+
+  <!-- Modal PopUp Tambah Pengaduan -->
+  <div id="pengaduanModal" class="modal-overlay">
+    <div class="modal-box modal-box--medium">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Tambah <strong style="font-weight: 700;">Pengaduan</strong></h2>
+        <button id="closePengaduanModal" class="modal-close" type="button" aria-label="Tutup popup" style="border: 1px solid #ccc; padding: 2px 8px; border-radius: 4px; background: #fff; font-weight: bold; cursor: pointer;">X</button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <form id="pengaduanForm" class="modal-form-grid" style="grid-template-columns: repeat(12, 1fr); gap: 20px;">
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Pengaduan</label>
+          <input type="text" id="inputPengaduan" class="form-input" placeholder="Judul Pengaduan" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 6;">
+          <label class="form-label" style="font-weight: bold;">Kategori</label>
+          <select id="inputKategori" class="form-select" required>
+            <option value="" disabled selected hidden>Pilih Pengaduan</option>
+            <option value="Fasilitas">Fasilitas</option>
+            <option value="Layanan">Layanan</option>
+            <option value="Sistem">Sistem</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Deskripsi</label>
+          <input type="text" id="inputDeskripsi" class="form-input" placeholder="Deskripsi Pengaduan" required />
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Karyawan</label>
+          <div class="dropdown-select-checkbox">
+            <div class="dropdown-select-trigger" onclick="toggleDropdownChecklist(this)">
+              <span class="dropdown-select-label">Pilih Karyawan</span>
+              <span class="dropdown-select-arrow">&#9662;</span>
+            </div>
+            <div class="dropdown-select-options" id="karyawanOptions"></div>
+            <input type="hidden" id="inputKaryawan" />
+          </div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 12;">
+          <label class="form-label" style="font-weight: bold;">Lampiran</label>
+          <input type="file" id="inputLampiran" class="form-input" style="padding: 4px;" />
+        </div>
+
+        <div style="grid-column: span 12; margin-top: 15px; display: flex; justify-content: flex-end;">
+          <button class="btn-submit-blue-outline" type="submit" style="background-color: #fff; color: #29A3D8; border: 1.5px solid #29A3D8; padding: 10px 42px; border-radius: 6px; font-weight: 700; font-size: 15px; cursor: pointer; transition: background-color 0.15s ease;">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="../../assets/js/app.js?v=3"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      /* Ã¢â€â‚¬Ã¢â€â‚¬ LocalStorage Persistence & Default Demo Data Ã¢â€â‚¬Ã¢â€â‚¬ */
+      const PENGADUAN_STORAGE_KEY = "accounting_pengaduan_data_v1";
+      const PENGADUAN_RESET_KEY = "accounting_pengaduan_reset_v1";
+
+      const DEFAULT_PENGADUAN = [
+        {
+          id: 1,
+          tanggal: "2026-08-15",
+          pengaduan: "Kendala Akses Upload Bukti Draft Konten Kreator",
+          kategori: "Sistem",
+          status: "Diproses",
+          deskripsi: "Server sering mengalami kendala timeout saat tim KOL mengunggah file draft video MP4 dan bukti postingan di atas 20MB, mohon dibantu optimasi kapasitas server.",
+          lampiran: "bukti_kendala_upload.png"
+        }
+      ];
+
+      // Reset legacy empty keys so user automatically gets exactly 1 demo data item
+      if (!localStorage.getItem(PENGADUAN_RESET_KEY)) {
+        try {
+          localStorage.removeItem("accounting_pengaduan_data");
+          localStorage.removeItem(PENGADUAN_STORAGE_KEY);
+          localStorage.setItem(PENGADUAN_RESET_KEY, "true");
+        } catch (e) {
+          console.warn("Could not clean legacy localStorage keys:", e);
+        }
+      }
+
+      function loadPengaduanData() {
+        try {
+          const saved = localStorage.getItem(PENGADUAN_STORAGE_KEY);
+          if (saved !== null) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error("Error loading pengaduan data:", e);
+        }
+        try {
+          localStorage.setItem(PENGADUAN_STORAGE_KEY, JSON.stringify(DEFAULT_PENGADUAN));
+        } catch (e) { }
+        return JSON.parse(JSON.stringify(DEFAULT_PENGADUAN));
+      }
+
+      function savePengaduanData() {
+        try {
+          localStorage.setItem(PENGADUAN_STORAGE_KEY, JSON.stringify(pengaduanData));
+        } catch (e) {
+          console.error("Error saving pengaduan data:", e);
+        }
+      }
+
+      let pengaduanData = loadPengaduanData();
+
+      const tableBody = document.getElementById("pengaduanTableBody");
+      const pengaduanModal = document.getElementById("pengaduanModal");
+      const pengaduanForm = document.getElementById("pengaduanForm");
+      const btnTambah = document.getElementById("btnTambahPengaduan");
+      const btnClose = document.getElementById("closePengaduanModal");
+      const btnBatal = document.getElementById("btnBatal");
+      const karyawanOptions = document.getElementById("karyawanOptions");
+      const inputKaryawan = document.getElementById("inputKaryawan");
+      const karyawanLabel = karyawanOptions
+        ? karyawanOptions.closest(".dropdown-select-checkbox").querySelector(".dropdown-select-label")
+        : null;
+
+      const FALLBACK_KARYAWAN = ["Supervisi KOL", "Riva", "Sri", "Ahmad", "Fauzi"];
+
+      function readStorageArray(key) {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function getDivisiNameMap() {
+        const map = {};
+        readStorageArray("ceoDivisiV2").forEach((div) => {
+          const id = String(div?.id || "").trim();
+          if (id) map[id] = String(div?.name || "").trim();
+        });
+        return map;
+      }
+
+      function getEmployeeOptions() {
+        const divisiMap = getDivisiNameMap();
+        const rows = [];
+        const seen = new Set();
+
+        readStorageArray("ceoEmployeesV2").forEach((emp) => {
+          const name = String(emp?.name || emp?.employee_no || emp?.id || "").trim();
+          if (!name || seen.has(name)) return;
+          seen.add(name);
+
+          const divisiIds = Array.isArray(emp?.divisi_ids)
+            ? emp.divisi_ids
+            : [emp?.divisi_id].filter(Boolean);
+          let divisiList = divisiIds
+            .map((id) => divisiMap[String(id)] || "")
+            .filter(Boolean);
+          if (!divisiList.length && emp?.divisi) {
+            divisiList = String(emp.divisi).split(",").map((s) => s.trim()).filter(Boolean);
+          }
+
+          rows.push({ name, divisiList: Array.from(new Set(divisiList)) });
+        });
+
+        if (rows.length) return rows;
+        return FALLBACK_KARYAWAN.map((name) => ({ name, divisiList: [] }));
+      }
+
+      function renderKaryawanOptions() {
+        if (!karyawanOptions) return;
+        karyawanOptions.innerHTML = "";
+
+        const tools = document.createElement("div");
+        tools.className = "karyawan-dropdown-tools";
+
+        const search = document.createElement("input");
+        search.type = "text";
+        search.className = "karyawan-search-input";
+        search.placeholder = "Cari karyawan...";
+        search.setAttribute("autocomplete", "off");
+
+        const divisiSelect = document.createElement("select");
+        divisiSelect.className = "karyawan-divisi-select";
+
+        const allOption = document.createElement("option");
+        allOption.value = "";
+        allOption.textContent = "Semua Divisi";
+        divisiSelect.appendChild(allOption);
+
+        const list = document.createElement("div");
+        list.className = "karyawan-option-list";
+
+        const employees = getEmployeeOptions();
+        const divisiNames = Array.from(new Set(employees.flatMap((emp) => emp.divisiList)))
+          .sort((a, b) => a.localeCompare(b));
+
+        divisiNames.forEach((name) => {
+          const option = document.createElement("option");
+          option.value = name;
+          option.textContent = name;
+          divisiSelect.appendChild(option);
+        });
+
+        employees.forEach((emp) => {
+          const label = document.createElement("label");
+          label.className = "dropdown-option-item karyawan-option";
+          label.dataset.name = emp.name.toLowerCase();
+          label.dataset.divisi = emp.divisiList.length ? `|${emp.divisiList.join("|")}|` : "|";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "karyawan-checkbox";
+          checkbox.value = emp.name;
+
+          const text = document.createElement("span");
+          text.textContent = emp.name;
+
+          label.appendChild(checkbox);
+          label.appendChild(text);
+          list.appendChild(label);
+        });
+
+        const emptyFilter = document.createElement("div");
+        emptyFilter.className = "karyawan-empty-filter";
+        emptyFilter.textContent = "Karyawan tidak ditemukan.";
+        emptyFilter.style.display = "none";
+        list.appendChild(emptyFilter);
+
+        function applyFilter() {
+          const keyword = search.value.trim().toLowerCase();
+          const selectedDivisi = divisiSelect.value;
+          let visibleCount = 0;
+
+          list.querySelectorAll(".karyawan-option").forEach((option) => {
+            const matchName = !keyword || option.dataset.name.includes(keyword);
+            const matchDivisi = !selectedDivisi || option.dataset.divisi.includes(`|${selectedDivisi}|`);
+            const visible = matchName && matchDivisi;
+            option.style.display = visible ? "" : "none";
+            if (visible) visibleCount += 1;
+          });
+
+          emptyFilter.style.display = visibleCount ? "none" : "block";
+        }
+
+        search.addEventListener("input", applyFilter);
+        search.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") e.preventDefault();
+        });
+        divisiSelect.addEventListener("change", applyFilter);
+
+        tools.appendChild(search);
+        tools.appendChild(divisiSelect);
+        karyawanOptions.appendChild(tools);
+        karyawanOptions.appendChild(list);
+      }
+
+      function updateKaryawanLabel() {
+        if (!karyawanOptions) return;
+        const selected = Array.from(karyawanOptions.querySelectorAll(".karyawan-checkbox"))
+          .filter((cb) => cb.checked)
+          .map((cb) => cb.value);
+        if (karyawanLabel) {
+          karyawanLabel.textContent = selected.length ? selected.join(", ") : "Pilih Karyawan";
+        }
+        if (inputKaryawan) inputKaryawan.value = selected.join(", ");
+      }
+
+      function resetKaryawanDropdown() {
+        if (!karyawanOptions) return;
+        karyawanOptions.querySelectorAll(".karyawan-checkbox").forEach((cb) => {
+          cb.checked = false;
+        });
+
+        const search = karyawanOptions.querySelector(".karyawan-search-input");
+        if (search) search.value = "";
+        const divisiSelect = karyawanOptions.querySelector(".karyawan-divisi-select");
+        if (divisiSelect) divisiSelect.value = "";
+        karyawanOptions.querySelectorAll(".karyawan-option").forEach((option) => {
+          option.style.display = "";
+        });
+        const emptyFilter = karyawanOptions.querySelector(".karyawan-empty-filter");
+        if (emptyFilter) emptyFilter.style.display = "none";
+
+        updateKaryawanLabel();
+      }
+
+      renderKaryawanOptions();
+      if (karyawanOptions) {
+        karyawanOptions.addEventListener("change", (e) => {
+          if (e.target.classList.contains("karyawan-checkbox")) updateKaryawanLabel();
+        });
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "-";
+        const parts = dateStr.split("-");
+        if (parts.length !== 3) return dateStr;
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+
+      function renderTable(dataToRender) {
+        tableBody.innerHTML = "";
+        
+        const tableWrapper = document.getElementById("tableContainerWrapper");
+        const emptyTableState = document.getElementById("emptyTableState");
+
+        if (typeof window.bmToggleEmptyState === 'function') {
+          window.bmToggleEmptyState(emptyTableState, tableWrapper, pengaduanData.length === 0);
+        } else {
+          if (pengaduanData.length === 0) {
+            if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+            if (emptyTableState) {
+              emptyTableState.classList.remove("is-hidden");
+              emptyTableState.classList.add("is-visible");
+              emptyTableState.style.setProperty("display", "flex", "important");
+            }
+          } else {
+            if (tableWrapper) {
+              tableWrapper.style.removeProperty("display");
+              if (tableWrapper.style.display === "none") tableWrapper.style.display = "";
+            }
+            if (emptyTableState) {
+              emptyTableState.classList.add("is-hidden");
+              emptyTableState.classList.remove("is-visible");
+              emptyTableState.style.setProperty("display", "none", "important");
+            }
+          }
+        }
+
+        if (pengaduanData.length === 0) {
+          return;
+        }
+
+        if (dataToRender.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="db-empty-row" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">
+                Tidak ditemukan data pengaduan yang sesuai dengan pencarian atau filter.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        dataToRender.forEach((item, index) => {
+          const row = document.createElement("tr");
+
+          let statusClass = "status-badge--belum-diproses";
+          if (item.status === "Diproses") statusClass = "status-badge--diproses";
+          if (item.status === "Selesai") statusClass = "status-badge--selesai";
+
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${formatDate(item.tanggal)}</td>
+            <td style="font-weight: 600; text-align: left; padding-left: 15px;">${item.pengaduan}</td>
+            <td>${item.kategori}</td>
+            <td><span class="status-badge ${statusClass}">${item.status}</span></td>
+          `;
+
+          tableBody.appendChild(row);
+        });
+      }
+
+      function showModal() {
+        pengaduanModal.classList.add("is-active");
+      }
+
+      function hideModal() {
+        pengaduanModal.classList.remove("is-active");
+        pengaduanForm.reset();
+        resetKaryawanDropdown();
+      }
+
+      btnTambah.addEventListener("click", showModal);
+      btnClose.addEventListener("click", hideModal);
+      if (btnBatal) {
+        btnBatal.addEventListener("click", hideModal);
+      }
+
+      pengaduanModal.addEventListener("click", (e) => {
+        if (e.target === pengaduanModal) hideModal();
+      });
+
+      pengaduanForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const pengaduan = document.getElementById("inputPengaduan").value;
+        const kategori = document.getElementById("inputKategori").value;
+        const deskripsi = document.getElementById("inputDeskripsi").value;
+        const karyawan = Array.from(karyawanOptions.querySelectorAll(".karyawan-checkbox"))
+          .filter((cb) => cb.checked)
+          .map((cb) => cb.value);
+        const tanggal = new Date().toISOString().split("T")[0];
+        const status = "Belum Diproses";
+
+        const nextId = pengaduanData.length > 0 ? Math.max(...pengaduanData.map(d => d.id)) + 1 : 1;
+        pengaduanData.push({
+          id: nextId,
+          tanggal,
+          pengaduan,
+          kategori,
+          status,
+          deskripsi,
+          karyawan
+        });
+        savePengaduanData();
+        if (window.ceoToast) {
+          window.ceoToast("Pengaduan berhasil ditambahkan", "success");
+        } else {
+          alert("Pengaduan berhasil ditambahkan");
+        }
+
+        hideModal();
+        renderTable(pengaduanData);
+      });
+
+      // Initial render with loaded demo data
+      renderTable(pengaduanData);
+    });
+  </script>
+  <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+</body>
+
+</html>
+
+
+
+

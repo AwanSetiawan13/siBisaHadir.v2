@@ -1,0 +1,2893 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laporan Accounting | Bisa Media</title>
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <!-- Google Fonts Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* Custom style matching mockup exactly */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .status-badge--proses {
+      background-color: rgba(255, 179, 0, 0.1);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.3);
+    }
+
+    .status-badge--selesai {
+      background-color: rgba(0, 230, 118, 0.1);
+      color: #00e676;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+    }
+
+    .status-badge--aktif {
+      background-color: rgba(34, 100, 198, 0.1);
+      color: #2264c6;
+      border: 1px solid rgba(34, 100, 198, 0.3);
+    }
+
+    .status-badge--belum-mulai {
+      background-color: rgba(140, 140, 140, 0.1);
+      color: #757575;
+      border: 1px solid rgba(140, 140, 140, 0.3);
+    }
+
+    /* Hierarchical table row backgrounds and left accent borders */
+    .row-rrk {
+      background-color: #f8fbfe !important;
+      border-top: 1px solid #e2e8f0;
+      transition: background-color 0.15s ease;
+    }
+
+    .row-rrk:hover {
+      background-color: #eef6fc !important;
+    }
+
+    .row-project {
+      background-color: #f9faff !important;
+      transition: background-color 0.15s ease;
+    }
+
+    .row-project:hover {
+      background-color: #f1f5fd !important;
+    }
+
+    .row-project td:first-child {
+      border-left: 4px solid #6366f1 !important;
+    }
+
+    .row-rrk td:first-child {
+      border-left: 4px solid #29A3D8 !important;
+    }
+
+    .row-milestone {
+      background-color: #fffdfa !important;
+      transition: background-color 0.15s ease;
+    }
+
+    .row-milestone:hover {
+      background-color: #fff8eb !important;
+    }
+
+    .row-milestone td:first-child {
+      border-left: 4px solid #f59e0b !important;
+    }
+
+    .row-tugas {
+      background-color: #ffffff !important;
+      transition: background-color 0.15s ease;
+    }
+
+    .row-tugas:hover {
+      background-color: #f8fafc !important;
+    }
+
+    .row-tugas td:first-child {
+      border-left: 4px solid #cbd5e1 !important;
+    }
+
+    /* Hierarchical badges/tags ("penanda tingkat hierarki") */
+    .hierarki-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2.5px 7px;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 5px;
+      margin-right: 8px;
+      line-height: 1.2;
+      vertical-align: middle;
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .hierarki-tag svg {
+      width: 11px;
+      height: 11px;
+      stroke-width: 2.2;
+      display: block;
+    }
+
+    .hierarki-tag--project {
+      background-color: rgba(99, 102, 241, 0.12);
+      color: #6366f1;
+      border: 1px solid rgba(99, 102, 241, 0.28);
+    }
+    .hierarki-tag--project svg { stroke: #6366f1; }
+
+    .hierarki-tag--rrk {
+      background-color: rgba(41, 163, 216, 0.12);
+      color: #29A3D8;
+      border: 1px solid rgba(41, 163, 216, 0.28);
+    }
+    .hierarki-tag--rrk svg { stroke: #29A3D8; }
+
+    .hierarki-tag--milestone {
+      background-color: rgba(245, 158, 11, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+    }
+    .hierarki-tag--milestone svg { stroke: #d97706; }
+
+    .hierarki-tag--tugas {
+      background-color: rgba(100, 116, 139, 0.1);
+      color: #475569;
+      border: 1px solid rgba(100, 116, 139, 0.22);
+    }
+    .hierarki-tag--tugas svg { stroke: #475569; }
+
+    /* Interactive Clickable Hierarchy Title Link */
+    .hierarki-title-link {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      max-width: calc(100% - 130px);
+      overflow: hidden;
+      vertical-align: middle;
+      border-radius: 4px;
+      padding: 1px 4px;
+      margin: -1px -4px;
+    }
+
+    .hierarki-title-link:hover {
+      color: #0284c7 !important;
+      background: rgba(2, 132, 199, 0.06);
+    }
+
+    .hierarki-title-link:hover .hierarki-title-text {
+      text-decoration: underline;
+    }
+
+    .hierarki-title-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hierarki-ext-icon {
+      font-size: 13px;
+      opacity: 0;
+      transform: translateX(-3px);
+      transition: all 0.15s ease;
+      color: #0284c7;
+      flex-shrink: 0;
+    }
+
+    .hierarki-title-link:hover .hierarki-ext-icon {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* Tree branch connectors */
+    .tree-branch {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    .tree-branch--l1 {
+      width: 14px;
+      height: 14px;
+      border-left: 2px solid #cbd5e1;
+      border-bottom: 2px solid #cbd5e1;
+      border-bottom-left-radius: 4px;
+      margin-left: 10px;
+      margin-right: 6px;
+      margin-top: -6px;
+    }
+
+    .tree-branch--l2 {
+      width: 14px;
+      height: 14px;
+      border-left: 2px solid #cbd5e1;
+      border-bottom: 2px solid #cbd5e1;
+      border-bottom-left-radius: 4px;
+      margin-left: 28px;
+      margin-right: 6px;
+      margin-top: -6px;
+    }
+
+    .hierarki-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Metrics cards for Laporan (Consistent Card Blue) */
+    /* Metrics cards for Laporan (Consistent Card Blue) */
+    .laporan-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1200px) {
+      .laporan-metrics-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .laporan-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .laporan-metric-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 4px solid var(--blue-800, #2865b5);
+      border-radius: 12px;
+      padding: 13px 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      min-width: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .laporan-metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      border-color: #cbd5e1;
+      border-top-color: var(--blue-800, #2865b5);
+    }
+
+    .laporan-metric-icon-box {
+      order: 1 !important;
+      border-radius: 10px !important;
+      width: 40px !important;
+      height: 40px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      flex-shrink: 0 !important;
+      transition: all 0.2s ease;
+    }
+
+    .laporan-metric-icon-box svg {
+      width: 20px !important;
+      height: 20px !important;
+      stroke-width: 2.2 !important;
+      display: block !important;
+    }
+
+    .laporan-metric-icon-box--blue {
+      background: rgba(41, 163, 216, 0.12);
+      border: 1px solid rgba(41, 163, 216, 0.25);
+      color: #29A3D8;
+    }
+    .laporan-metric-icon-box--blue svg { stroke: #29A3D8; }
+
+    .laporan-metric-icon-box--indigo {
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      color: #6366f1;
+    }
+    .laporan-metric-icon-box--indigo svg { stroke: #6366f1; }
+
+    .laporan-metric-icon-box--purple {
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      color: #a855f7;
+    }
+    .laporan-metric-icon-box--purple svg { stroke: #a855f7; }
+
+    .laporan-metric-icon-box--amber {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #f59e0b;
+    }
+    .laporan-metric-icon-box--amber svg { stroke: #f59e0b; }
+
+    .laporan-metric-icon-box--green {
+      background: rgba(0, 168, 84, 0.12);
+      border: 1px solid rgba(0, 168, 84, 0.25);
+      color: #00a854;
+    }
+    .laporan-metric-icon-box--green svg { stroke: #00a854; }
+
+    .laporan-metric-icon-box--teal {
+      background: rgba(20, 184, 166, 0.12);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      color: #0d9488;
+    }
+    .laporan-metric-icon-box--teal svg { stroke: #0d9488; }
+
+    .laporan-metric-card:hover .laporan-metric-icon-box {
+      transform: scale(1.06);
+    }
+
+    .laporan-metric-info {
+      order: 2 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      gap: 2px !important;
+      min-width: 0 !important;
+      flex: 1 1 auto !important;
+      overflow: hidden !important;
+    }
+
+    .laporan-metric-label {
+      order: 1 !important;
+      font-size: 11.5px !important;
+      font-weight: 600 !important;
+      color: #64748b !important;
+      line-height: 1.25 !important;
+      white-space: normal !important;
+      word-break: normal !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+    }
+
+    .laporan-metric-value {
+      order: 2 !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      line-height: 1.15 !important;
+      color: #0f172a !important;
+      letter-spacing: -0.02em !important;
+      white-space: nowrap !important;
+    }
+
+    /* Middle section cards */
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1100px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .analytics-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: all 0.25s ease;
+      min-height: 195px;
+      overflow: hidden;
+    }
+
+    .analytics-card:hover {
+      box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08);
+      border-color: #cbd5e1;
+    }
+
+    .analytics-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .analytics-card__title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .analytics-card__icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .analytics-card__icon-box svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2.2;
+      display: block;
+    }
+
+    .analytics-card__icon-box--blue {
+      background: rgba(41, 163, 216, 0.1);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      color: #29A3D8;
+    }
+    .analytics-card__icon-box--blue svg { stroke: #29A3D8; }
+
+    .analytics-card__icon-box--indigo {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: #6366f1;
+    }
+    .analytics-card__icon-box--indigo svg { stroke: #6366f1; }
+
+    .analytics-card__icon-box--green {
+      background: rgba(0, 168, 84, 0.1);
+      border: 1px solid rgba(0, 168, 84, 0.2);
+      color: #00a854;
+    }
+    .analytics-card__icon-box--green svg { stroke: #00a854; }
+
+    .analytics-card__title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+      letter-spacing: -0.01em;
+      font-family: 'Outfit', sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .analytics-badge-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: 'Outfit', sans-serif;
+      flex-shrink: 0;
+    }
+
+    .analytics-badge-pill--green {
+      background: rgba(0, 168, 84, 0.1);
+      color: #00a854;
+      border: 1px solid rgba(0, 168, 84, 0.25);
+    }
+
+    .analytics-badge-pill--blue {
+      background: rgba(41, 163, 216, 0.1);
+      color: #29A3D8;
+      border: 1px solid rgba(41, 163, 216, 0.25);
+    }
+
+    /* Donut chart component ("Pizza Grafik") */
+    .donut-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .donut-wrapper {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .donut-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .donut-bg-circle {
+      fill: none;
+      stroke: #f1f5f9;
+      stroke-width: 12;
+    }
+
+    .donut-segment {
+      fill: none;
+      stroke-width: 12;
+      stroke-linecap: round;
+      transition: stroke-dasharray 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .donut-center-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+    }
+
+    .donut-center-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .donut-center-lbl {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      line-height: 1.2;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .donut-legend__item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+      transition: all 0.18s ease;
+      font-size: 11px;
+    }
+
+    .donut-legend__item:hover {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+      transform: translateX(2px);
+    }
+
+    .donut-legend__label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    .legend-color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+      box-shadow: 0 0 5px currentColor;
+    }
+
+    .donut-legend__stats {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .donut-count-chip {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .donut-pct-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1.5px 5.5px;
+      border-radius: 5px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .donut-pct-badge--green {
+      background: rgba(0, 168, 84, 0.12);
+      color: #00a854;
+      border: 1px solid rgba(0, 168, 84, 0.25);
+    }
+
+    .donut-pct-badge--blue {
+      background: rgba(41, 163, 216, 0.12);
+      color: #29A3D8;
+      border: 1px solid rgba(41, 163, 216, 0.25);
+    }
+
+    .donut-pct-badge--amber {
+      background: rgba(255, 179, 0, 0.12);
+      color: #d97706;
+      border: 1px solid rgba(255, 179, 0, 0.25);
+    }
+
+    .donut-pct-badge--rose {
+      background: rgba(255, 82, 82, 0.12);
+      color: #dc2626;
+      border: 1px solid rgba(255, 82, 82, 0.25);
+    }
+
+    /* Program Achievement Card & Table */
+    .program-table-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .modern-program-table {
+      width: 100%;
+      table-layout: fixed;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 11px;
+    }
+
+    .modern-program-table th {
+      color: #64748b;
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 6px 4px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+
+    .modern-program-table th:first-child {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+      border-left: 1px solid #e2e8f0;
+      padding-left: 8px;
+    }
+
+    .modern-program-table th:last-child {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 8px;
+    }
+
+    .modern-program-table th:nth-child(1),
+    .modern-program-table td:nth-child(1) {
+      width: 50%;
+    }
+    .modern-program-table th:nth-child(2),
+    .modern-program-table td:nth-child(2) {
+      width: 10%;
+    }
+    .modern-program-table th:nth-child(3),
+    .modern-program-table td:nth-child(3) {
+      width: 18%;
+    }
+    .modern-program-table th:nth-child(4),
+    .modern-program-table td:nth-child(4) {
+      width: 22%;
+      text-align: right;
+    }
+
+    .modern-program-table td {
+      padding: 7px 4px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    .prog-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .prog-icon-badge {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      background: rgba(41, 163, 216, 0.1);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #29A3D8;
+    }
+
+    .prog-icon-badge svg {
+      width: 11px;
+      height: 11px;
+      stroke: #29A3D8;
+      stroke-width: 2.2;
+      display: block;
+    }
+
+    .prog-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .prog-bar-bg {
+      flex: 1;
+      height: 5px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      min-width: 30px;
+    }
+
+    .prog-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1c88e3, #29A3D8);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .prog-pct-txt {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 10.5px;
+      color: #29A3D8;
+      min-width: 24px;
+      text-align: right;
+    }
+
+    .task-success-pill {
+      background: rgba(0, 168, 84, 0.1);
+      color: #00a854;
+      border: 1px solid rgba(0, 168, 84, 0.25);
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      white-space: nowrap;
+    }
+
+    /* Trend Pencapaian (Grafik Trafik Hidup) */
+    .trend-container {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .trend-chart-svg {
+      width: 100%;
+      height: 110px;
+      overflow: visible;
+    }
+
+    .trend-grid-line {
+      stroke: #f1f5f9;
+      stroke-dasharray: 4,4;
+      stroke-width: 1;
+    }
+
+    .trend-axis-text {
+      font-size: 9.5px;
+      font-weight: 600;
+      fill: #94a3b8;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .trend-area-fill {
+      fill: url(#trendAreaGradient);
+      transition: all 0.4s ease;
+    }
+
+    .trend-line-stroke {
+      fill: none;
+      stroke: url(#trendLineGradient);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 4px 8px rgba(41, 163, 216, 0.35));
+      stroke-dasharray: 600;
+      stroke-dashoffset: 0;
+      animation: drawTrendLine 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes drawTrendLine {
+      from {
+        stroke-dashoffset: 600;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    .trend-data-point {
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .trend-data-point:hover circle.point-outer {
+      r: 6.5;
+      stroke-width: 3;
+    }
+
+    .trend-data-point:hover circle.point-inner {
+      r: 3.5;
+      fill: #1c88e3;
+    }
+
+    /* Floating Tooltip for Chart */
+    .trend-chart-tooltip {
+      position: absolute;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -100%);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+
+    .trend-chart-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid #0f172a;
+    }
+
+    /* Interactive hierarchy controls */
+    .toggle-icon {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.05);
+      margin-right: 6px;
+      color: #64748b;
+      font-size: 8px;
+      transition: all 0.15s ease;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .toggle-icon:hover {
+      background: rgba(41, 163, 216, 0.15);
+      color: #29A3D8;
+    }
+
+    /* Topbar blue dropdown selectors */
+    .dropdown-select-blue {
+      background-color: #29A3D8;
+      color: #fff;
+      border: none;
+      padding: 6px 24px 6px 10px;
+      border-radius: 5px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .dropdown-select-blue:hover {
+      background-color: #1e87b7;
+    }
+
+    /* Blue style search and buttons */
+    .small-action-button-blue {
+      border: 1px solid #29A3D8;
+      color: #29A3D8;
+      background: #fff;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .small-action-button-blue:hover {
+      background-color: rgba(41, 163, 216, 0.08);
+    }
+
+    .campaign-search-blue {
+      display: flex;
+      align-items: center;
+      border: 1px solid #c5c5c8;
+      border-radius: 6px;
+      padding: 4px 10px;
+      background: #fff;
+      gap: 8px;
+    }
+
+    .campaign-search-blue svg {
+      width: 14px;
+      height: 14px;
+      color: #a1a1a5;
+    }
+
+    .campaign-search-blue input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: #333;
+      width: 120px;
+    }
+  </style>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="../../vendor/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
+</head>
+
+<body class="dashboard-body">
+        <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+
+        <svg class="topbar-search-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6"></circle>
+          <path d="M15 15l5 5"></path>
+        </svg>
+
+        <input id="menuSearch" class="menu-search" type="search" placeholder="Cari Menu" />
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-button" type="button" aria-label="Notifikasi">
+          <svg class="topbar-action-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 17h14"></path>
+            <path d="M8 17v-7a4 4 0 118 0v7"></path>
+            <path d="M10 20h4"></path>
+          </svg>
+        </button>
+
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="icon-button icon-button--avatar" type="button" aria-label="Menu Pengguna"
+            aria-expanded="false" title="Menu Pengguna">
+            <img src="../../media/avatar.png" alt="Avatar" class="topbar-user-avatar" data-ceo-avatar="" />
+          </button>
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="../../media/avatar.png" alt="Avatar" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">Accounting</span>
+                <span class="user-menu-dropdown__role">PT. Bisa Media Grup</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="../../BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="../../login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading" style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="padding-left: 0;">Laporan</h1>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <select id="monthSelect" class="month-select" aria-label="Pilih bulan">
+            <option>September</option>
+            <option>Oktober</option>
+            <option>November</option>
+            <option>Desember</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Laporan Metrics Grid -->
+      <div class="laporan-metrics-grid">
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box laporan-metric-icon-box--blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <span class="laporan-metric-label">Total Project</span>
+            <strong class="laporan-metric-value" id="statTotalProject">100</strong>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box laporan-metric-icon-box--indigo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <span class="laporan-metric-label">Total RRK</span>
+            <strong class="laporan-metric-value" id="statTotalRrk">100</strong>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box laporan-metric-icon-box--purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+              <line x1="4" y1="22" x2="4" y2="15"></line>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <span class="laporan-metric-label">Total Milestone</span>
+            <strong class="laporan-metric-value" id="statTotalMilestone">100</strong>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box laporan-metric-icon-box--amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <span class="laporan-metric-label">Total Tugas</span>
+            <strong class="laporan-metric-value" id="statTotalTugas">100</strong>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box laporan-metric-icon-box--green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <span class="laporan-metric-label">Tugas Tercapai</span>
+            <strong class="laporan-metric-value" id="statTugasTercapai">100</strong>
+          </div>
+        </article>
+        <article class="laporan-metric-card">
+          <div class="laporan-metric-icon-box laporan-metric-icon-box--teal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </div>
+          <div class="laporan-metric-info">
+            <span class="laporan-metric-label">Rata-rata Progres</span>
+            <strong class="laporan-metric-value" id="statRataProgres">95%</strong>
+          </div>
+        </article>
+      </div>
+
+      <!-- Analytics row with 3 modern structured cards -->
+      <div class="analytics-grid">
+        <!-- 1. Progress Ringkasan ("Pizza Grafik") -->
+        <section class="analytics-card">
+          <div class="analytics-card__header">
+            <div class="analytics-card__title-wrap">
+              <div class="analytics-card__icon-box analytics-card__icon-box--blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                  <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                </svg>
+              </div>
+              <h2 class="analytics-card__title">Ringkasan Progress</h2>
+            </div>
+            <span class="analytics-badge-pill analytics-badge-pill--blue" id="ringkasanPillBadge">Status Tugas</span>
+          </div>
+
+          <div class="donut-container">
+            <div class="donut-wrapper">
+              <svg viewBox="0 0 110 110" class="donut-svg">
+                <!-- Background track -->
+                <circle cx="55" cy="55" r="44" class="donut-bg-circle"></circle>
+                <!-- Segment Belum Selesai (Coral Red) -->
+                <circle id="segBelum" cx="55" cy="55" r="44" class="donut-segment" stroke="#FF5252" stroke-dasharray="70 276.46" stroke-dashoffset="-206"></circle>
+                <!-- Segment Proses (Amber) -->
+                <circle id="segProses" cx="55" cy="55" r="44" class="donut-segment" stroke="#FFB300" stroke-dasharray="70 276.46" stroke-dashoffset="-136"></circle>
+                <!-- Segment Selesai (Emerald Green) -->
+                <circle id="segSelesai" cx="55" cy="55" r="44" class="donut-segment" stroke="#00a854" stroke-dasharray="136 276.46" stroke-dashoffset="0"></circle>
+              </svg>
+              <div class="donut-center-content">
+                <span class="donut-center-val" id="donutCenterVal">104</span>
+                <span class="donut-center-lbl">Total Tugas</span>
+              </div>
+            </div>
+
+            <div class="donut-legend">
+              <div class="donut-legend__item">
+                <div class="donut-legend__label">
+                  <span class="legend-color-dot" style="background-color: #00a854; color: #00a854;"></span>
+                  <span>Selesai</span>
+                </div>
+                <div class="donut-legend__stats">
+                  <span class="donut-count-chip" id="legendSelesaiCount">2</span>
+                  <span class="donut-pct-badge donut-pct-badge--green" id="legendSelesaiPct">50%</span>
+                </div>
+              </div>
+
+              <div class="donut-legend__item">
+                <div class="donut-legend__label">
+                  <span class="legend-color-dot" style="background-color: #FFB300; color: #FFB300;"></span>
+                  <span>Proses</span>
+                </div>
+                <div class="donut-legend__stats">
+                  <span class="donut-count-chip" id="legendProsesCount">1</span>
+                  <span class="donut-pct-badge donut-pct-badge--amber" id="legendProsesPct">25%</span>
+                </div>
+              </div>
+
+              <div class="donut-legend__item">
+                <div class="donut-legend__label">
+                  <span class="legend-color-dot" style="background-color: #FF5252; color: #FF5252;"></span>
+                  <span>Belum Selesai</span>
+                </div>
+                <div class="donut-legend__stats">
+                  <span class="donut-count-chip" id="legendBelumCount">1</span>
+                  <span class="donut-pct-badge donut-pct-badge--rose" id="legendBelumPct">25%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Pencapaian per Program -->
+        <section class="analytics-card">
+          <div class="analytics-card__header">
+            <div class="analytics-card__title-wrap">
+              <div class="analytics-card__icon-box analytics-card__icon-box--indigo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <circle cx="12" cy="12" r="6"></circle>
+                  <circle cx="12" cy="12" r="2"></circle>
+                </svg>
+              </div>
+              <h2 class="analytics-card__title">Pencapaian per Program</h2>
+            </div>
+            <span class="analytics-badge-pill analytics-badge-pill--green" id="programStatusBadge">1 Aktif</span>
+          </div>
+
+          <div class="program-table-container">
+            <table class="modern-program-table no-pagination">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>RRK</th>
+                  <th>Progres</th>
+                  <th style="text-align: right;">Tercapai</th>
+                </tr>
+              </thead>
+              <tbody id="pencapaianProgramBody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 3. Trend Pencapaian (Grafik Trafik Hidup) -->
+        <section class="analytics-card">
+          <div class="analytics-card__header">
+            <div class="analytics-card__title-wrap">
+              <div class="analytics-card__icon-box analytics-card__icon-box--green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+              </div>
+              <h2 class="analytics-card__title">Trend Pencapaian</h2>
+            </div>
+            <span class="analytics-badge-pill analytics-badge-pill--green" id="trendRateBadge">
+              &#9650; +14.2%
+            </span>
+          </div>
+
+          <div class="trend-container" id="trendContainer">
+            <div class="trend-chart-tooltip" id="trendTooltip"></div>
+            <svg viewBox="0 0 280 110" class="trend-chart-svg">
+              <defs>
+                <linearGradient id="trendAreaGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#29A3D8" stop-opacity="0.30" />
+                  <stop offset="100%" stop-color="#29A3D8" stop-opacity="0.0" />
+                </linearGradient>
+                <linearGradient id="trendLineGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#1c88e3" />
+                  <stop offset="100%" stop-color="#29A3D8" />
+                </linearGradient>
+              </defs>
+
+              <!-- Grid Horizontal Lines -->
+              <line x1="28" y1="18" x2="270" y2="18" class="trend-grid-line" />
+              <line x1="28" y1="50" x2="270" y2="50" class="trend-grid-line" />
+              <line x1="28" y1="82" x2="270" y2="82" class="trend-grid-line" />
+
+              <!-- Y-Axis Labels -->
+              <text x="4" y="21" class="trend-axis-text">100%</text>
+              <text x="8" y="53" class="trend-axis-text">50%</text>
+              <text x="12" y="85" class="trend-axis-text">0%</text>
+
+              <!-- X-Axis Labels -->
+              <text x="28" y="102" class="trend-axis-text" text-anchor="middle">1</text>
+              <text x="88" y="102" class="trend-axis-text" text-anchor="middle">7</text>
+              <text x="148" y="102" class="trend-axis-text" text-anchor="middle">15</text>
+              <text x="208" y="102" class="trend-axis-text" text-anchor="middle">22</text>
+              <text x="268" y="102" class="trend-axis-text" text-anchor="middle">30</text>
+
+              <!-- Dynamic Area Path (curved bezier) -->
+              <path class="trend-area-fill" d="M 28 82 C 58 68, 68 36, 88 40 C 118 46, 128 62, 148 54 C 178 44, 188 30, 208 32 C 238 34, 248 22, 268 20 L 268 82 Z"></path>
+
+              <!-- Dynamic Line Curve -->
+              <path class="trend-line-stroke" d="M 28 82 C 58 68, 68 36, 88 40 C 118 46, 128 62, 148 54 C 178 44, 188 30, 208 32 C 238 34, 248 22, 268 20"></path>
+
+              <!-- Interactive Data Nodes -->
+              <g class="trend-data-point" data-date="Hari 1" data-val="0%" data-x="28" data-y="82">
+                <circle class="point-outer" cx="28" cy="82" r="4.5" fill="#ffffff" stroke="#29A3D8" stroke-width="2"></circle>
+                <circle class="point-inner" cx="28" cy="82" r="2" fill="#29A3D8"></circle>
+              </g>
+              <g class="trend-data-point" data-date="Hari 7" data-val="65%" data-x="88" data-y="40">
+                <circle class="point-outer" cx="88" cy="40" r="4.5" fill="#ffffff" stroke="#29A3D8" stroke-width="2"></circle>
+                <circle class="point-inner" cx="88" cy="40" r="2" fill="#29A3D8"></circle>
+              </g>
+              <g class="trend-data-point" data-date="Hari 15" data-val="45%" data-x="148" data-y="54">
+                <circle class="point-outer" cx="148" cy="54" r="4.5" fill="#ffffff" stroke="#29A3D8" stroke-width="2"></circle>
+                <circle class="point-inner" cx="148" cy="54" r="2" fill="#29A3D8"></circle>
+              </g>
+              <g class="trend-data-point" data-date="Hari 22" data-val="75%" data-x="208" data-y="32">
+                <circle class="point-outer" cx="208" cy="32" r="4.5" fill="#ffffff" stroke="#29A3D8" stroke-width="2"></circle>
+                <circle class="point-inner" cx="208" cy="32" r="2" fill="#29A3D8"></circle>
+              </g>
+              <g class="trend-data-point" data-date="Hari 30" data-val="88%" data-x="268" data-y="20">
+                <circle class="point-outer" cx="268" cy="20" r="5" fill="#ffffff" stroke="#29A3D8" stroke-width="2.5"></circle>
+                <circle class="point-inner" cx="268" cy="20" r="2.5" fill="#29A3D8"></circle>
+              </g>
+            </svg>
+          </div>
+        </section>
+      </div>
+
+      <!-- Main Project Panel -->
+      <section class="panel campaign-panel" style="padding-bottom: 24px;">
+        <!-- Top border thick blue bar -->
+        <div class="campaign-panel__line" style="height: 4px; background: var(--blue-800);"></div>
+
+        <!-- Toolbar -->
+        <div class="campaign-toolbar">
+          <div class="campaign-toolbar__left">
+            <div class="filter-dropdown-wrapper" style="position: relative; display: inline-block;">
+              <button id="btnFilterLaporan" class="small-action-button-blue" type="button" aria-label="Filter">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </button>
+
+              <!-- Dropdown Content -->
+              <div id="filterLaporanDropdown" class="filter-popover" style="top: 100%; left: 0;">
+                <form id="filterLaporanForm" class="filter-popover-form">
+                  <div class="form-group">
+                    <label class="form-label">Hierarki</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterHierarkiSelect">
+                        <option value="Semua">Semua Hierarki</option>
+                        <option value="Project">Project</option>
+                        <option value="RRK">RRK</option>
+                        <option value="Milestone">Milestone</option>
+                        <option value="Tugas">Tugas</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">PIC</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterPicSelect">
+                        <option value="Semua">Semua PIC</option>
+                        <option value="Setiawan">Setiawan</option>
+                        <option value="Amanda">Amanda</option>
+                        <option value="Dimas">Dimas</option>
+                        <option value="Clarissa">Clarissa</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <div class="select-wrapper">
+                      <select class="form-select" id="filterStatusSelect">
+                        <option value="Semua">Semua Status</option>
+                        <option value="Berjalan">Berjalan</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Proses">Proses</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end;">
+                    <button type="button" id="btnResetFilterLaporan" class="btn-reset"
+                      style="background-color: #f44336; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px;">Reset</button>
+                    <button type="submit" class="btn-simpan"
+                      style="background-color: #2264c6; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit'; flex: 1; height: 38px; margin: 0;">Terapkan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <label class="campaign-search-blue" style="margin-left: 10px;">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="search" id="laporanSearchInput" placeholder="Cari..." />
+            </label>
+          </div>
+        </div>
+
+        <!-- Empty State Container (Sesuai Referensi Pengguna) -->
+        <div id="emptyTableState" class="app-empty-state" style="display: none;">
+          <svg class="app-empty-state__icon" viewBox="0 0 24 24">
+            <rect x="5" y="2" width="14" height="20" rx="3.5" fill="#94a3b8"/>
+            <rect x="7.5" y="5" width="9" height="3.2" rx="1" fill="#ffffff"/>
+            <circle cx="8.8" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="11.5" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="14.8" r="1.1" fill="#ffffff"/>
+            <circle cx="8.8" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="12" cy="18" r="1.1" fill="#ffffff"/>
+            <circle cx="15.2" cy="18" r="1.1" fill="#ffffff"/>
+          </svg>
+          <div class="app-empty-state__title">Belum ada data Laporan</div>
+          <div class="app-empty-state__subtitle">Data laporan akan terisi otomatis saat RRK, Milestone, atau Tugas ditambahkan.</div>
+        </div>
+
+        <!-- Collapsible Hierarchy Table -->
+        <div class="table-wrap campaign-table" id="tableContainerWrapper" style="padding: 0 0 24px;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 60px;">#</th>
+                <th style="text-align: left; padding-left: 15px;">Hierarki</th>
+                <th>PIC</th>
+                <th>Periode</th>
+                <th>Progres</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="laporanTableBody">
+              <!-- Dynamically rendered hierarchy -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">&copy; 2026 Bisa Media</footer>
+  </div>
+
+  <script src="../../assets/js/app.js?v=3"></script>
+
+  <script>
+    // Collapsible rows logic
+    window.toggleRow = function  (rowId) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      const toggleIcon = row.querySelector('.toggle-icon');
+      if (!toggleIcon) return;
+      const isExpanded = toggleIcon.classList.contains('toggle-icon--expanded');
+
+      if (isExpanded) {
+        toggleIcon.classList.remove('toggle-icon--expanded');
+        toggleIcon.innerHTML = '&#9654;';
+        setCollapseState(rowId, true);
+      } else {
+        toggleIcon.classList.add('toggle-icon--expanded');
+        toggleIcon.innerHTML = '&#9660;';
+        setCollapseState(rowId, false);
+      }
+    };
+
+    function setCollapseState(parentId, hide) {
+      const children = document.querySelectorAll(`tr[data-parent="${parentId}"]`);
+      children.forEach(child => {
+        if (hide) {
+          child.style.display = 'none';
+          const childId = child.getAttribute('id');
+          if (childId) {
+            setCollapseState(childId, true);
+          }
+        } else {
+          child.style.display = '';
+          const childId = child.getAttribute('id');
+          const childToggle = child.querySelector('.toggle-icon');
+          const childIsExpanded = childToggle && childToggle.classList.contains('toggle-icon--expanded');
+          if (childId && childIsExpanded) {
+            setCollapseState(childId, false);
+          }
+        }
+      });
+    }
+
+    /* ─── Date Helpers ─── */
+    function formatDateIndo(dateStr) {
+      if (!dateStr || dateStr === "-") return "-";
+      let d, m, y;
+      if (typeof dateStr === "string" && dateStr.includes("-")) {
+        const parts = dateStr.split("-");
+        if (parts[0].length === 4) {
+          // YYYY-MM-DD
+          y = parts[0];
+          m = parseInt(parts[1], 10);
+          d = parseInt(parts[2], 10);
+        } else {
+          // DD-MM-YYYY
+          d = parseInt(parts[0], 10);
+          m = parseInt(parts[1], 10);
+          y = parts[2];
+        }
+      } else {
+        return dateStr;
+      }
+      if (isNaN(d) || isNaN(m)) return dateStr;
+      const months = ["", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+      return `${d} ${months[m] || m} ${y}`;
+    }
+
+    function formatPeriod(mulai, selesai) {
+      const m = formatDateIndo(mulai);
+      const s = formatDateIndo(selesai);
+      if (m !== "-" && s !== "-") {
+        return `${m} - ${s}`;
+      } else if (m !== "-") {
+        return m;
+      } else if (s !== "-") {
+        return s;
+      }
+      return "-";
+    }
+
+    function formatBulanRRK(mulai, selesai, bulan) {
+      if (bulan && typeof bulan === "string" && bulan.trim() !== "") {
+        return bulan.trim();
+      }
+      const dateStr = mulai || selesai || "";
+      if (!dateStr) return "-";
+      const months = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      for (let i = 1; i <= 12; i++) {
+        if (dateStr.toLowerCase().includes(months[i].toLowerCase())) {
+          return months[i];
+        }
+      }
+      const parts = dateStr.split("-");
+      let m = 0;
+      if (parts[0].length === 4) {
+        m = parseInt(parts[1], 10);
+      } else if (parts[2] && parts[2].length === 4) {
+        m = parseInt(parts[1], 10);
+      }
+      if (m >= 1 && m <= 12) {
+        return months[m];
+      }
+      return dateStr;
+    }
+
+    function formatMilestoneWeek(ms, index = 0) {
+      if (!ms) return `Minggu ke-${index + 1}`;
+      const w = (ms.week || ms.minggu || ms.periode || "").toString().trim();
+      if (w) {
+        const match = w.match(/\d+/);
+        if (match) {
+          return `Minggu ke-${match[0]}`;
+        }
+        return w;
+      }
+      return `Minggu ke-${index + 1}`;
+    }
+
+    function formatTugasPeriod(tg) {
+      if (!tg) return "-";
+      const start = tg.timelineMulai || tg.startDate;
+      const end = tg.timelineSelesai || tg.deadline;
+      return formatPeriod(start, end);
+    }
+
+    function getStatusBadge(status, isRrk = false) {
+      const s = (status || "").toLowerCase().trim();
+      if (s === "selesai") {
+        return `<span class="status-badge status-badge--selesai">Selesai</span>`;
+      }
+      if (s === "aktif" || (isRrk && (s === "berjalan" || s === "aktif"))) {
+        return `<span class="status-badge status-badge--aktif">Aktif</span>`;
+      }
+      if (s === "proses" || s === "berjalan" || s === "diproses") {
+        return `<span class="status-badge status-badge--proses">Proses</span>`;
+      }
+      if (s === "belum mulai" || s === "pending") {
+        return `<span class="status-badge status-badge--belum-mulai">Belum Mulai</span>`;
+      }
+      return `<span class="status-badge status-badge--proses">${status || "Proses"}</span>`;
+    }
+
+    /* ─── Default Synchronized Data (100% Sesuai Fitur Masing-Masing) ─── */
+    const DEFAULT_RRK = [
+        {
+                "id": 1,
+                "rencana": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "program": "Program KOL Affiliate",
+                "deskripsi": "Menjangkau, mengurasi, dan mengontrak 50 creator mikro & makro kategori fashion muslim untuk program affiliate TikTok Shop & Shopee Video dengan target GMV Rp 150.000.000.",
+                "timelineMulai": "2026-09-01",
+                "timelineSelesai": "2026-09-22",
+                "prioritas": "Tinggi",
+                "status": "Berjalan",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan, Amanda",
+                "dokumen": "SOP_Onboarding_KOL_Affiliate_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Prioritaskan kreator dengan audience usia 18-35 tahun dan engagement rate di atas 4.5%."
+        },
+        {
+                "id": 2,
+                "rencana": "Aktivasi 30 KOL Beauty & Skincare Review",
+                "program": "Program KOL Endorsement",
+                "deskripsi": "Kolaborasi endorsement produk perawatan kulit bersama 30 kreator kecantikan untuk meningkatkan awareness dan penjualan produk baru.",
+                "timelineMulai": "2026-09-05",
+                "timelineSelesai": "2026-09-28",
+                "prioritas": "Tinggi",
+                "status": "Berjalan",
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda, Clarissa",
+                "dokumen": "Brief_Endorsement_Skincare_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Pastikan kreator memiliki ulasan autentik dan fokus pada solusi kulit sensitif."
+        },
+        {
+                "id": 3,
+                "rencana": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+                "program": "Program Liputan & Review F&B",
+                "deskripsi": "Mengundang 25 food vlogger untuk meliput menu spesial dan menaikkan traffic kunjungan store serta pesanan online.",
+                "timelineMulai": "2026-09-10",
+                "timelineSelesai": "2026-10-02",
+                "prioritas": "Sedang",
+                "status": "Berjalan",
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas, Setiawan",
+                "dokumen": "Guideline_Food_Review_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Target views konten viral minimal 500k per video di TikTok & Instagram."
+        },
+        {
+                "id": 4,
+                "rencana": "Program Edukasi & Review Mom Influencer",
+                "program": "Program Mom & Baby Community",
+                "deskripsi": "Menggandeng 20 mom influencer untuk sharing tips parenting dan review perlengkapan bayi.",
+                "timelineMulai": "2026-09-12",
+                "timelineSelesai": "2026-10-05",
+                "prioritas": "Sedang",
+                "status": "Berjalan",
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa, Amanda",
+                "dokumen": "Panduan_Parenting_MomBaby_2026.pdf",
+                "dokumenDataUrl": "",
+                "dokumenType": "application/pdf",
+                "catatan": "Pastikan konten informatif, edukatif, dan bebas klaim medis berlebih."
+        }
+];
+
+    const DEFAULT_MILESTONES = [
+        {
+                "id": 1,
+                "title": "Kurasi & Screening 100 Database Kreator Hijab",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "output": "100 kreator fashion muslim terkurasi dengan engagement rate > 4.5%",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan"
+        },
+        {
+                "id": 2,
+                "title": "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
+                "week": "Minggu ke 2",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "output": "50 kreator menandatangani MoU kerjasama affiliate",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan"
+        },
+        {
+                "id": 3,
+                "title": "Distribusi Sample Produk & Briefing Live Streaming",
+                "week": "Minggu ke 3",
+                "progress": 40,
+                "status": "Berjalan",
+                "rrk": "Rekrutmen & Onboarding 50 KOL Affiliate Fashion Hijab",
+                "output": "Sample hijab terkirim dan jadwal live TikTok Shop tersusun",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan"
+        },
+        {
+                "id": 4,
+                "title": "Distribusi Sampel & Brief Konten Beauty",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
+                "output": "30 paket sampel skincare terkirim beserta brief konten",
+                "pic": "Amanda",
+                "tim": "Amanda"
+        },
+        {
+                "id": 5,
+                "title": "Review Draft Video & Quality Control",
+                "week": "Minggu ke 2",
+                "progress": 50,
+                "status": "Berjalan",
+                "rrk": "Aktivasi 30 KOL Beauty & Skincare Review",
+                "output": "15 draft video disetujui untuk penayangan",
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda"
+        },
+        {
+                "id": 6,
+                "title": "Penjadwalan Kunjungan Food Vlogger",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+                "output": "Jadwal kunjungan liputan 25 food vlogger terkonfirmasi",
+                "pic": "Dimas",
+                "tim": "Dimas"
+        },
+        {
+                "id": 7,
+                "title": "Publikasi Konten Review Kuliner TikTok",
+                "week": "Minggu ke 2",
+                "progress": 30,
+                "status": "Berjalan",
+                "rrk": "Kolaborasi 25 Food Vlogger Kuliner Viral",
+                "output": "8 video review kuliner tayang di TikTok",
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas"
+        },
+        {
+                "id": 8,
+                "title": "Kurasi Mom Creator Komunitas Parenting",
+                "week": "Minggu ke 1",
+                "progress": 100,
+                "status": "Selesai",
+                "rrk": "Program Edukasi & Review Mom Influencer",
+                "output": "20 mom creator terkurasi dari komunitas",
+                "pic": "Clarissa",
+                "tim": "Clarissa"
+        },
+        {
+                "id": 9,
+                "title": "Penyusunan Script Konten Edukasi Parenting",
+                "week": "Minggu ke 2",
+                "progress": 40,
+                "status": "Berjalan",
+                "rrk": "Program Edukasi & Review Mom Influencer",
+                "output": "Draft panduan edukasi produk bayi rampung",
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa"
+        }
+];
+
+    const DEFAULT_TUGAS = [
+        {
+                "id": 1,
+                "title": "Screening Database 100 KOL Hijab",
+                "milestone": "Kurasi & Screening 100 Database Kreator Hijab",
+                "progress": 100,
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "deadline": "12-12-2026",
+                "prioritas": "Tinggi",
+                "deskripsi": "Screening metrik engagement rate > 4.5% dan relevansi audiens fashion hijab",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Export database dari TikTok & Instagram",
+                                "status": "Selesai",
+                                "bukti": "db_kreator_raw.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Pengecekan analitik engagement rate",
+                                "status": "Selesai",
+                                "bukti": "analitik_er.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "name": "Finalisasi 100 list terpilih",
+                                "status": "Selesai",
+                                "bukti": "list_100_final.xlsx",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 2,
+                "title": "Pengiriman MoU & Brief Kerjasama",
+                "milestone": "Negosiasi & Pengiriman Kontrak Kerjasama Affiliate",
+                "progress": 100,
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "deadline": "19-12-2026",
+                "prioritas": "Tinggi",
+                "deskripsi": "Kirim draft kontrak MoU dan brief komisi affiliate ke 50 kreator terpilih",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Drafting template kontrak affiliate",
+                                "status": "Selesai",
+                                "bukti": "kontrak_template.docx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Distribusi ke 50 kreator via WhatsApp",
+                                "status": "Selesai",
+                                "bukti": "wa_broadcast_log.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "name": "Konfirmasi tanda tangan MoU",
+                                "status": "Selesai",
+                                "bukti": "signed_mou_drive.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 3,
+                "title": "Pengemasan & Pengiriman Sample Hijab",
+                "milestone": "Distribusi Sample Produk & Briefing Live Streaming",
+                "progress": 40,
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "deadline": "26-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Packing sample produk hijab premium dan briefing jadwal live streaming affiliate",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Packing 50 paket sample hijab",
+                                "status": "Selesai",
+                                "bukti": "resi_pengiriman.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Monitoring pengiriman ekspedisi",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Follow up resi yang belum bergerak"
+                        },
+                        {
+                                "id": 3,
+                                "name": "Briefing jadwal live TikTok Shop",
+                                "status": "Belum Mulai",
+                                "bukti": "-",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 4,
+                "title": "Pengiriman Paket Sampel Serum & Sunscreen",
+                "milestone": "Distribusi Sampel & Brief Konten Beauty",
+                "progress": 100,
+                "pic": "Amanda",
+                "tim": "Amanda",
+                "deadline": "14-12-2026",
+                "prioritas": "Tinggi",
+                "deskripsi": "Distribusi 30 paket skincare kepada kreator beauty terpilih",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Verifikasi alamat pengiriman kreator",
+                                "status": "Selesai",
+                                "bukti": "alamat_kreator.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Pengiriman via ekspedisi kilat",
+                                "status": "Selesai",
+                                "bukti": "resi_skincare.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 5,
+                "title": "Quality Control Draft Video Review Skincare",
+                "milestone": "Review Draft Video & Quality Control",
+                "progress": 50,
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda",
+                "deadline": "21-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Pengecekan kesesuaian klaim produk dan pencahayaan video review",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Review 15 video kloter pertama",
+                                "status": "Selesai",
+                                "bukti": "qc_log_batch1.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Revisi kloter kedua",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Koreksi pencahayaan swatch produk"
+                        }
+                ]
+        },
+        {
+                "id": 6,
+                "title": "Koordinasi Reservasi Meja & Menu Food Vlogger",
+                "milestone": "Penjadwalan Kunjungan Food Vlogger",
+                "progress": 100,
+                "pic": "Dimas",
+                "tim": "Dimas",
+                "deadline": "15-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Reservasi 5 outlet utama dan briefing chef untuk menu testing",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Konfirmasi reservasi meja resto",
+                                "status": "Selesai",
+                                "bukti": "reservasi_outlet.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Briefing paket menu spesial ramadan",
+                                "status": "Selesai",
+                                "bukti": "menu_testing.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 7,
+                "title": "Monitoring Tayang Konten Kuliner TikTok",
+                "milestone": "Publikasi Konten Review Kuliner TikTok",
+                "progress": 30,
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas",
+                "deadline": "25-12-2026",
+                "prioritas": "Rendah",
+                "deskripsi": "Tracking link video review dan respon audiens di kolom komentar",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Koleksi link postingan 8 vlogger",
+                                "status": "Selesai",
+                                "bukti": "link_posting.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Rekap engagement dan views",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Update harian metrics"
+                        }
+                ]
+        },
+        {
+                "id": 8,
+                "title": "Screening 20 Mom Influencer Mikro",
+                "milestone": "Kurasi Mom Creator Komunitas Parenting",
+                "progress": 100,
+                "pic": "Clarissa",
+                "tim": "Clarissa",
+                "deadline": "16-12-2026",
+                "prioritas": "Sedang",
+                "deskripsi": "Kurasi kreator ibu muda dengan anak balita untuk review produk bayi",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Database kreator parenting IG & TikTok",
+                                "status": "Selesai",
+                                "bukti": "db_parenting.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Pengecekan kredibilitas review",
+                                "status": "Selesai",
+                                "bukti": "review_audit.pdf",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 9,
+                "title": "Briefing Script Konten Edukasi Parenting",
+                "milestone": "Penyusunan Script Konten Edukasi Parenting",
+                "progress": 40,
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa",
+                "deadline": "28-12-2026",
+                "prioritas": "Rendah",
+                "deskripsi": "Briefing angle edukasi pentingnya nutrisi balita dan sanitasi peralatan bayi",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "name": "Penyusunan outline script video",
+                                "status": "Selesai",
+                                "bukti": "outline_script.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "name": "Review draft script bersama brand",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Tambahkan poin keamanan bahan"
+                        }
+                ]
+        }
+];
+
+    const DEFAULT_PROJECTS = [
+        {
+                "id": 1,
+                "namaProject": "Aktivasi KOL Hijab & Fashion Muslim 2026",
+                "deskripsi": "Campaign promosi koleksi hijab premium dan modest fashion di TikTok Shop & Shopee",
+                "pic": "Setiawan",
+                "tim": "Supervisi KOL, Setiawan",
+                "timelineMulai": "2026-09-01",
+                "timelineSelesai": "2026-09-30",
+                "status": "Berjalan",
+                "progress": 75,
+                "catatan": "Fokus pada engagement TikTok & IG Reels",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Penyusunan guideline konten video hijab",
+                                "status": "Selesai",
+                                "bukti": "guideline_hijab_2026.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Kurasi 25 kreator fashion hijab mikro & makro",
+                                "status": "Selesai",
+                                "bukti": "list_kreator_hijab.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "recipient": "Amanda (Tim)",
+                                "name": "Review draft video TikTok Shop kreator",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Perbaiki hook video awal"
+                        },
+                        {
+                                "id": 4,
+                                "recipient": "Setiawan (PIC)",
+                                "name": "Approval final video & scheduling tayang",
+                                "status": "Belum Mulai",
+                                "bukti": "-",
+                                "revisi": "-"
+                        }
+                ]
+        },
+        {
+                "id": 2,
+                "namaProject": "Campaign Glowing Skincare Beauty Ramadhan",
+                "deskripsi": "Aktivasi kolaborasi endorsement kreator beauty & skincare untuk peluncuran bundle ramadhan",
+                "pic": "Amanda",
+                "tim": "Supervisi KOL, Amanda",
+                "timelineMulai": "2026-09-05",
+                "timelineSelesai": "2026-10-05",
+                "status": "Berjalan",
+                "progress": 60,
+                "catatan": "Target 10M views reels & TikTok",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Amanda (PIC)",
+                                "name": "Penyusunan brief review serum & sunscreen",
+                                "status": "Selesai",
+                                "bukti": "brief_skincare.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Amanda (PIC)",
+                                "name": "Kurasi 30 beauty creator TikTok & Instagram",
+                                "status": "Selesai",
+                                "bukti": "beauty_creators_list.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 3,
+                                "recipient": "Clarissa (Tim)",
+                                "name": "Monitoring posting review dan engagement",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Cek hashtag campaign"
+                        }
+                ]
+        },
+        {
+                "id": 3,
+                "namaProject": "Viral Food Review F&B Ramadan Special",
+                "deskripsi": "Campaign liputan dan review menu buka puasa bersama food vlogger kuliner se-Jabodetabek",
+                "pic": "Dimas",
+                "tim": "Supervisi KOL, Dimas",
+                "timelineMulai": "2026-09-10",
+                "timelineSelesai": "2026-10-10",
+                "status": "Berjalan",
+                "progress": 50,
+                "catatan": "Target traffic store dan GMV online Rp 200.000.000",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Dimas (PIC)",
+                                "name": "Kurasi 25 food vlogger TikTok & Reels",
+                                "status": "Selesai",
+                                "bukti": "food_vlogger_list.xlsx",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Dimas (PIC)",
+                                "name": "Distribusi voucher kunjungan outlet & menu tasting",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Konfirmasi jadwal kehadiran"
+                        }
+                ]
+        },
+        {
+                "id": 4,
+                "namaProject": "Edukasi Nutrisi & Perlengkapan Ibu-Anak",
+                "deskripsi": "Campaign awareness produk MPASI dan perlengkapan bayi bersama komunitas mom influencer",
+                "pic": "Clarissa",
+                "tim": "Supervisi KOL, Clarissa",
+                "timelineMulai": "2026-09-12",
+                "timelineSelesai": "2026-10-15",
+                "status": "Berjalan",
+                "progress": 45,
+                "catatan": "Fokus pada edukasi dan testimoni autentik para ibu",
+                "subtasks": [
+                        {
+                                "id": 1,
+                                "recipient": "Clarissa (PIC)",
+                                "name": "Penyusunan panduan edukasi produk ramah bayi",
+                                "status": "Selesai",
+                                "bukti": "panduan_mom_baby.pdf",
+                                "revisi": "-"
+                        },
+                        {
+                                "id": 2,
+                                "recipient": "Clarissa (PIC)",
+                                "name": "Kurasi 20 mom influencer komunitas parenting",
+                                "status": "Diproses",
+                                "bukti": "-",
+                                "revisi": "Verifikasi usia anak kreator"
+                        }
+                ]
+        }
+];
+
+    function loadRrkData() {
+      try {
+        const saved = localStorage.getItem("accounting_rrk_data_v3");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 1) {
+            parsed.forEach((r, i) => {
+              if (!r.bulan && DEFAULT_RRK[i]) r.bulan = DEFAULT_RRK[i].bulan;
+            });
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error("Error loading RRK data:", e);
+      }
+      try {
+        localStorage.setItem("accounting_rrk_data_v3", JSON.stringify(DEFAULT_RRK));
+      } catch (e) { }
+      return JSON.parse(JSON.stringify(DEFAULT_RRK));
+    }
+
+    function loadMilestoneData() {
+      try {
+        const saved = localStorage.getItem("accounting_milestone_data_v2");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 3) {
+            parsed.forEach((m, i) => {
+              if (DEFAULT_MILESTONES[i] && (!m.week || m.week.includes("Minggu ke "))) {
+                m.week = DEFAULT_MILESTONES[i].week;
+              }
+            });
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error("Error loading Milestone data:", e);
+      }
+      try {
+        localStorage.setItem("accounting_milestone_data_v2", JSON.stringify(DEFAULT_MILESTONES));
+      } catch (e) { }
+      return JSON.parse(JSON.stringify(DEFAULT_MILESTONES));
+    }
+
+    function loadTugasData() {
+      try {
+        const saved = localStorage.getItem("accounting_tugas_data_v3");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 3) {
+            parsed.forEach((t, i) => {
+              if (!t.timelineMulai && DEFAULT_TUGAS[i]) t.timelineMulai = DEFAULT_TUGAS[i].timelineMulai;
+              if (!t.deadline && DEFAULT_TUGAS[i]) t.deadline = DEFAULT_TUGAS[i].deadline;
+            });
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error("Error loading Tugas data:", e);
+      }
+      try {
+        localStorage.setItem("accounting_tugas_data_v3", JSON.stringify(DEFAULT_TUGAS));
+      } catch (e) { }
+      return JSON.parse(JSON.stringify(DEFAULT_TUGAS));
+    }
+
+    function loadProjectData() {
+      try {
+        const saved = localStorage.getItem("accounting_project_data_v5") || localStorage.getItem("accounting_project_data_v3") || localStorage.getItem("accounting_project_data_v2");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length >= 3) return parsed;
+        }
+      } catch (e) {
+        console.error("Error loading Project data:", e);
+      }
+      try {
+        localStorage.setItem("accounting_project_data_v5", JSON.stringify(DEFAULT_PROJECTS));
+      } catch (e) { }
+      return JSON.parse(JSON.stringify(DEFAULT_PROJECTS));
+    }
+
+    /* ─── Navigation to Specific Detail Page Helper ─── */
+    function navigateToDetail(type, id) {
+      if (!id) return;
+      if (type === 'project') {
+        window.location.href = `accounting_project.html?openDetail=${encodeURIComponent(id)}`;
+      } else if (type === 'rrk') {
+        window.location.href = `accounting_rrk.html?openDetail=${encodeURIComponent(id)}`;
+      } else if (type === 'milestone') {
+        window.location.href = `accounting_Milestone.html?openDetail=${encodeURIComponent(id)}`;
+      } else if (type === 'tugas') {
+        window.location.href = `accounting_tugas.html?openDetail=${encodeURIComponent(id)}`;
+      }
+    }
+    window.navigateToDetail = navigateToDetail;
+
+    /* ─── Hierarchy Rendering Logic ─── */
+    function renderHierarchyTable() {
+      const tableBody = document.getElementById("laporanTableBody");
+      if (!tableBody) return;
+      tableBody.innerHTML = "";
+
+      const projectList = loadProjectData();
+      const rrkList = loadRrkData();
+      const milestoneList = loadMilestoneData();
+      const tugasList = loadTugasData();
+
+      const tableWrapper = document.getElementById("tableContainerWrapper");
+      const emptyTableState = document.getElementById("emptyTableState");
+
+      const isAllEmpty = (projectList.length === 0 && rrkList.length === 0 && milestoneList.length === 0 && tugasList.length === 0);
+      if (typeof window.bmToggleEmptyState === 'function') {
+        window.bmToggleEmptyState(emptyTableState, tableWrapper, isAllEmpty);
+      } else {
+        if (isAllEmpty) {
+          if (tableWrapper) tableWrapper.style.setProperty("display", "none", "important");
+          if (emptyTableState) {
+            emptyTableState.classList.remove("is-hidden");
+            emptyTableState.classList.add("is-visible");
+            emptyTableState.style.setProperty("display", "flex", "important");
+          }
+        } else {
+          if (tableWrapper) {
+            tableWrapper.style.removeProperty("display");
+            if (tableWrapper.style.display === "none") tableWrapper.style.display = "";
+          }
+          if (emptyTableState) {
+            emptyTableState.classList.add("is-hidden");
+            emptyTableState.classList.remove("is-visible");
+            emptyTableState.style.setProperty("display", "none", "important");
+          }
+        }
+      }
+
+      if (isAllEmpty) {
+        return;
+      }
+
+      let rowCounter = 1;
+
+      /* 1. Render Project Rows (Level 1, Sejajar dengan RRK) */
+      projectList.forEach((project, pIdx) => {
+        const pjId = `pj-${pIdx + 1}`;
+        const pjPeriod = formatPeriod(project.timelineMulai, project.timelineSelesai);
+        const pjProgress = parseInt(project.progress) || (project.status === "Selesai" ? 100 : (project.status === "Berjalan" ? 25 : 0));
+        const pjStatus = project.status || (pjProgress === 100 ? "Selesai" : "Berjalan");
+
+        const pjRow = document.createElement("tr");
+        pjRow.id = pjId;
+        pjRow.className = "row-project";
+        pjRow.innerHTML = `
+          <td style="font-weight: 700; color: #6366f1;">${rowCounter++}</td>
+          <td style="text-align: left; padding-left: 14px; font-weight: 700; color: #0f172a;">
+            <div style="display: flex; align-items: center;">
+              <span style="display:inline-block; width:18px; margin-right:6px;"></span>
+              <span class="hierarki-tag hierarki-tag--project">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                Project
+              </span>
+              <a href="javascript:void(0)" onclick="navigateToDetail('project', ${project.id})" class="hierarki-title-link" title="Buka Detail Project di Halaman Project">
+                <span class="hierarki-title-text">${project.namaProject || project.title || 'Project #' + project.id}</span>
+                <i class="bx bx-link-external hierarki-ext-icon"></i>
+              </a>
+            </div>
+          </td>
+          <td style="font-weight: 500;">${project.pic || "-"}</td>
+          <td style="font-weight: 500;">${pjPeriod}</td>
+          <td style="font-weight: 700; color: #6366f1;">${pjProgress}%</td>
+          <td>${getStatusBadge(pjStatus, true)}</td>
+        `;
+        tableBody.appendChild(pjRow);
+      });
+
+      /* 2. Render RRK Rows (Level 1, Sejajar dengan Project) */
+      const matchedMilestoneIds = new Set();
+      const matchedTugasIds = new Set();
+
+      rrkList.forEach((rrk, rIdx) => {
+        // Find matching milestones
+        const childMilestones = milestoneList.filter(m => {
+          const match = m.rrk && rrk.rencana && (
+            m.rrk.trim().toLowerCase() === rrk.rencana.trim().toLowerCase() ||
+            rrk.rencana.toLowerCase().includes(m.rrk.toLowerCase()) ||
+            m.rrk.toLowerCase().includes(rrk.rencana.toLowerCase())
+          );
+          if (match) matchedMilestoneIds.add(m.id);
+          return match;
+        });
+
+        // If only 1 RRK exists, any unmatched milestones belong to it
+        if (rrkList.length === 1 && childMilestones.length === 0) {
+          milestoneList.forEach(m => {
+            childMilestones.push(m);
+            matchedMilestoneIds.add(m.id);
+          });
+        }
+
+        // Calculate RRK progress
+        let rrkProgress = 95;
+        if (childMilestones.length > 0) {
+          const totalProg = childMilestones.reduce((acc, m) => acc + (parseInt(m.progress) || 0), 0);
+          rrkProgress = Math.round(totalProg / childMilestones.length);
+        }
+
+        // RRK Period (Format Bulan, misal: September / Januari)
+        const rrkPeriod = formatBulanRRK(rrk.timelineMulai, rrk.timelineSelesai, rrk.bulan);
+        const rrkId = `rrk-${rIdx + 1}`;
+        const rrkStatus = rrk.status || "Berjalan";
+
+        // Create RRK row
+        const rrkRow = document.createElement("tr");
+        rrkRow.id = rrkId;
+        rrkRow.className = "row-rrk";
+        rrkRow.innerHTML = `
+          <td style="font-weight: 700; color: #29A3D8;">${rowCounter++}</td>
+          <td style="text-align: left; padding-left: 14px; font-weight: 700; color: #0f172a;">
+            <div style="display: flex; align-items: center;">
+              ${childMilestones.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick=\"toggleRow('${rrkId}')\">&#9660;</span>` : `<span style="display:inline-block; width:18px; margin-right:6px;"></span>`}
+              <span class="hierarki-tag hierarki-tag--rrk">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                RRK
+              </span>
+              <a href="javascript:void(0)" onclick="navigateToDetail('rrk', ${rrk.id})" class="hierarki-title-link" title="Buka Detail RRK">
+                <span class="hierarki-title-text">${rrk.rencana}</span>
+                <i class="bx bx-link-external hierarki-ext-icon"></i>
+              </a>
+            </div>
+          </td>
+          <td style="font-weight: 500;">${rrk.pic || "-"}</td>
+          <td style="font-weight: 500;">${rrkPeriod}</td>
+          <td style="font-weight: 700;">${rrkProgress}%</td>
+          <td>${getStatusBadge(rrkStatus, true)}</td>
+        `;
+        tableBody.appendChild(rrkRow);
+
+        // Render child milestones
+        childMilestones.forEach((ms, mIdx) => {
+          // Find matching tasks for this milestone
+          const childTasks = tugasList.filter(t => {
+            const match = t.milestone && ms.title && (
+              t.milestone.trim().toLowerCase() === ms.title.trim().toLowerCase() ||
+              ms.title.toLowerCase().includes(t.milestone.toLowerCase()) ||
+              t.milestone.toLowerCase().includes(ms.title.toLowerCase())
+            );
+            if (match) matchedTugasIds.add(t.id);
+            return match;
+          });
+
+          // If only 1 milestone exists, any unmatched tasks belong to it
+          if (childMilestones.length === 1 && childTasks.length === 0) {
+            tugasList.forEach(t => {
+              childTasks.push(t);
+              matchedTugasIds.add(t.id);
+            });
+          }
+
+          // Calculate milestone progress
+          let msProgress = parseInt(ms.progress);
+          if (isNaN(msProgress) || msProgress === 0) {
+            if (childTasks.length > 0) {
+              const totalTProg = childTasks.reduce((acc, t) => acc + (parseInt(t.progress) || (t.status === "Selesai" ? 100 : 90)), 0);
+              msProgress = Math.round(totalTProg / childTasks.length);
+            } else {
+              msProgress = 90;
+            }
+          }
+
+          // Milestone period - Teks minggu (misal: Minggu ke-1, Minggu ke-2, Minggu ke-3)
+          const msPeriod = formatMilestoneWeek(ms, mIdx);
+
+          const msId = `ms-${rIdx + 1}-${mIdx + 1}`;
+          const msStatus = ms.status || (msProgress === 100 ? "Selesai" : "Proses");
+
+          // Create Milestone row
+          const msRow = document.createElement("tr");
+          msRow.id = msId;
+          msRow.className = "row-milestone";
+          msRow.setAttribute("data-parent", rrkId);
+          msRow.innerHTML = `
+            <td style="font-weight: 600; color: #d97706;">${rowCounter++}</td>
+            <td style="text-align: left; padding-left: 14px; font-weight: 600; color: #1e293b;">
+              <div style="display: flex; align-items: center;">
+                <span class="tree-branch tree-branch--l1" title="Sub dari RRK"></span>
+                ${childTasks.length > 0 ? `<span class="toggle-icon toggle-icon--expanded" onclick=\"toggleRow('${msId}')\">&#9660;</span>` : `<span style="display:inline-block; width:18px; margin-right:6px;"></span>`}
+                <span class="hierarki-tag hierarki-tag--milestone">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                  Milestone
+                </span>
+                <a href="javascript:void(0)" onclick="navigateToDetail('milestone', ${ms.id})" class="hierarki-title-link" title="Buka Detail Milestone">
+                  <span class="hierarki-title-text">${ms.title}</span>
+                  <i class="bx bx-link-external hierarki-ext-icon"></i>
+                </a>
+              </div>
+            </td>
+            <td>${ms.pic || "-"}</td>
+            <td>${msPeriod}</td>
+            <td style="font-weight: 600;">${msProgress}%</td>
+            <td>${getStatusBadge(msStatus)}</td>
+          `;
+          tableBody.appendChild(msRow);
+
+          // Render child tasks
+          childTasks.forEach((tg, tIdx) => {
+            const tgId = `tg-${rIdx + 1}-${mIdx + 1}-${tIdx + 1}`;
+            const tgProg = parseInt(tg.progress) || (tg.status === "Selesai" ? 100 : 90);
+            const tgStatus = tg.status || (tgProg === 100 ? "Selesai" : "Proses");
+            // Tugas period fleksibel seperti Project
+            const tgPeriod = formatTugasPeriod(tg);
+
+            const tgRow = document.createElement("tr");
+            tgRow.id = tgId;
+            tgRow.className = "row-tugas";
+            tgRow.setAttribute("data-parent", msId);
+            tgRow.innerHTML = `
+              <td style="color: #64748b;">${rowCounter++}</td>
+              <td style="text-align: left; padding-left: 14px; color: #334155;">
+                <div style="display: flex; align-items: center;">
+                  <span class="tree-branch tree-branch--l2" title="Tugas dari Milestone"></span>
+                  <span class="hierarki-tag hierarki-tag--tugas">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    Tugas
+                  </span>
+                  <a href="javascript:void(0)" onclick="navigateToDetail('tugas', ${tg.id})" class="hierarki-title-link" title="Buka Detail Tugas">
+                    <span class="hierarki-title-text">${tg.title}</span>
+                    <i class="bx bx-link-external hierarki-ext-icon"></i>
+                  </a>
+                </div>
+              </td>
+              <td>${tg.pic || "-"}</td>
+              <td>${tgPeriod}</td>
+              <td style="font-weight: 600;">${tgProg}%</td>
+              <td>${getStatusBadge(tgStatus)}</td>
+            `;
+            tableBody.appendChild(tgRow);
+          });
+        });
+      });
+    }
+
+    /* ─── Metrics and Dashboard Calculation ─── */
+    function updateLaporanMetrics() {
+      const rrkList = loadRrkData();
+      const milestoneList = loadMilestoneData();
+      const tugasList = loadTugasData();
+      const projectList = loadProjectData();
+
+      const statTotalProject = document.getElementById("statTotalProject");
+      const statTotalRrk = document.getElementById("statTotalRrk");
+      const statTotalMilestone = document.getElementById("statTotalMilestone");
+      const statTotalTugas = document.getElementById("statTotalTugas");
+      const statTugasTercapai = document.getElementById("statTugasTercapai");
+      const statRataProgres = document.getElementById("statRataProgres");
+
+      const totalProj = 100 + projectList.length;
+      const totalR = 100 + rrkList.length;
+      const totalM = 100 + milestoneList.length;
+      const totalT = 100 + tugasList.length;
+      const selesaiCount = tugasList.filter(t => (t.status || "").toLowerCase() === "selesai" || t.progress === 100).length;
+      const prosesCount = tugasList.filter(t => (t.status || "").toLowerCase() === "proses" || (t.status || "").toLowerCase() === "berjalan" || (t.progress > 0 && t.progress < 100)).length;
+      const belumCount = tugasList.length - selesaiCount - prosesCount;
+      const totalTercapai = 100 + selesaiCount;
+      let avgProg = 95;
+      if (tugasList.length > 0) {
+        const sum = tugasList.reduce((acc, t) => acc + (parseInt(t.progress) || (t.status === "Selesai" ? 100 : 90)), 0);
+        avgProg = Math.round(sum / tugasList.length);
+      }
+
+      if (statTotalProject) statTotalProject.textContent = totalProj;
+      if (statTotalRrk) statTotalRrk.textContent = totalR;
+      if (statTotalMilestone) statTotalMilestone.textContent = totalM;
+      if (statTotalTugas) statTotalTugas.textContent = totalT;
+      if (statTugasTercapai) statTugasTercapai.textContent = totalTercapai;
+      if (statRataProgres) statRataProgres.textContent = `${avgProg}%`;
+
+      // Update Donut Chart & Legend ("Pizza Grafik")
+      const actualSelesai = selesaiCount > 0 ? selesaiCount : 2;
+      const actualProses = prosesCount > 0 ? prosesCount : 1;
+      const actualBelum = belumCount > 0 ? belumCount : 1;
+      const calcTotal = actualSelesai + actualProses + actualBelum;
+
+      const pctSelesai = Math.round((actualSelesai / calcTotal) * 100);
+      const pctProses = Math.round((actualProses / calcTotal) * 100);
+      const pctBelum = Math.max(0, 100 - pctSelesai - pctProses);
+
+      // Circumference for r=44 is 2 * PI * 44 = 276.46
+      const C = 276.46;
+      const arcSelesai = (pctSelesai / 100) * C;
+      const arcProses = (pctProses / 100) * C;
+      const arcBelum = (pctBelum / 100) * C;
+
+      const segSelesai = document.getElementById("segSelesai");
+      const segProses = document.getElementById("segProses");
+      const segBelum = document.getElementById("segBelum");
+
+      if (segSelesai) {
+        segSelesai.style.strokeDasharray = `${arcSelesai} ${C}`;
+        segSelesai.style.strokeDashoffset = "0";
+      }
+      if (segProses) {
+        segProses.style.strokeDasharray = `${arcProses} ${C}`;
+        segProses.style.strokeDashoffset = `-${arcSelesai}`;
+      }
+      if (segBelum) {
+        segBelum.style.strokeDasharray = `${arcBelum} ${C}`;
+        segBelum.style.strokeDashoffset = `-${arcSelesai + arcProses}`;
+      }
+
+      const donutCenterVal = document.getElementById("donutCenterVal");
+      if (donutCenterVal) donutCenterVal.textContent = totalT;
+
+      const legendSelesaiCount = document.getElementById("legendSelesaiCount");
+      const legendSelesaiPct = document.getElementById("legendSelesaiPct");
+      const legendProsesCount = document.getElementById("legendProsesCount");
+      const legendProsesPct = document.getElementById("legendProsesPct");
+      const legendBelumCount = document.getElementById("legendBelumCount");
+      const legendBelumPct = document.getElementById("legendBelumPct");
+
+      if (legendSelesaiCount) legendSelesaiCount.textContent = actualSelesai;
+      if (legendSelesaiPct) legendSelesaiPct.textContent = `${pctSelesai}%`;
+      if (legendProsesCount) legendProsesCount.textContent = actualProses;
+      if (legendProsesPct) legendProsesPct.textContent = `${pctProses}%`;
+      if (legendBelumCount) legendBelumCount.textContent = actualBelum;
+      if (legendBelumPct) legendBelumPct.textContent = `${pctBelum}%`;
+
+      // Update Pencapaian per Program
+      const progBody = document.getElementById("pencapaianProgramBody");
+      if (progBody) {
+        const programMap = {};
+        rrkList.forEach(r => {
+          const prog = r.program || "Program KOL Affiliate";
+          if (!programMap[prog]) {
+            programMap[prog] = { name: prog, totalRrk: 0 };
+          }
+          programMap[prog].totalRrk++;
+        });
+
+        if (Object.keys(programMap).length === 0) {
+          programMap["Program KOL Affiliate"] = { name: "Program KOL Affiliate", totalRrk: 1 };
+        }
+
+        const progList = Object.values(programMap);
+        const progBadge = document.getElementById("programStatusBadge");
+        if (progBadge) progBadge.textContent = `${progList.length} Aktif`;
+
+        progBody.innerHTML = progList.map(p => `
+          <tr>
+            <td>
+              <div class="prog-name-cell" title="${p.name}">
+                <span class="prog-icon-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </span>
+                <span>${p.name}</span>
+              </div>
+            </td>
+            <td style="font-family:'Outfit', sans-serif; font-weight:700; color:#1e293b;">${p.totalRrk} RRK</td>
+            <td>
+              <div class="prog-bar-wrap">
+                <div class="prog-bar-bg">
+                  <div class="prog-bar-fill" style="width: ${avgProg}%;"></div>
+                </div>
+                <span class="prog-pct-txt">${avgProg}%</span>
+              </div>
+            </td>
+            <td style="text-align: right;">
+              <span class="task-success-pill">&#10003; ${actualSelesai} / ${calcTotal}</span>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Initialize Interactive Trend Tooltip
+      initTrendTooltip();
+    }
+
+    function initTrendTooltip() {
+      const trendContainer = document.getElementById("trendContainer");
+      const trendTooltip = document.getElementById("trendTooltip");
+      if (!trendContainer || !trendTooltip) return;
+
+      const points = trendContainer.querySelectorAll(".trend-data-point");
+      points.forEach(pt => {
+        pt.addEventListener("mouseenter", () => {
+          const date = pt.getAttribute("data-date");
+          const val = pt.getAttribute("data-val");
+          const x = parseFloat(pt.getAttribute("data-x"));
+          const y = parseFloat(pt.getAttribute("data-y"));
+
+          const leftPct = (x / 280) * 100;
+          const topPct = (y / 110) * 100;
+
+          trendTooltip.innerHTML = `<strong>${date}</strong>: ${val}`;
+          trendTooltip.style.left = `${leftPct}%`;
+          trendTooltip.style.top = `${topPct - 12}%`;
+          trendTooltip.style.opacity = "1";
+          trendTooltip.style.transform = "translate(-50%, -100%) scale(1)";
+        });
+
+        pt.addEventListener("mouseleave", () => {
+          trendTooltip.style.opacity = "0";
+          trendTooltip.style.transform = "translate(-50%, -100%) scale(0.95)";
+        });
+      });
+    }
+
+    // Search & Filter Laporan functionality
+    function applyLaporanFilters() {
+      const searchInput = document.getElementById("laporanSearchInput");
+      const query = (searchInput ? searchInput.value : "").trim().toLowerCase();
+      const selHierarki = document.getElementById("filterHierarkiSelect") ? document.getElementById("filterHierarkiSelect").value : "Semua";
+      const selPic = document.getElementById("filterPicSelect") ? document.getElementById("filterPicSelect").value : "Semua";
+      const selStatus = document.getElementById("filterStatusSelect") ? document.getElementById("filterStatusSelect").value : "Semua";
+
+      const rows = Array.from(document.querySelectorAll("#laporanTableBody tr:not(#laporanEmptyFilteredRow)"));
+      const isDefault = (query === "" && selHierarki === "Semua" && selPic === "Semua" && selStatus === "Semua");
+
+      const emptyRow = document.getElementById("laporanEmptyFilteredRow");
+
+      if (isDefault) {
+        if (emptyRow) emptyRow.style.display = "none";
+        // Restore expansion states based on toggle icons
+        rows.forEach(row => {
+          const parentId = row.getAttribute("data-parent");
+          if (!parentId) {
+            row.style.display = "";
+          } else {
+            let currentParent = parentId;
+            let isVisible = true;
+            while (currentParent) {
+              const pRow = document.getElementById(currentParent);
+              const pToggle = pRow ? pRow.querySelector('.toggle-icon') : null;
+              if (pToggle && !pToggle.classList.contains('toggle-icon--expanded')) {
+                isVisible = false;
+                break;
+              }
+              currentParent = pRow ? pRow.getAttribute("data-parent") : null;
+            }
+            row.style.display = isVisible ? "" : "none";
+          }
+        });
+        return;
+      }
+
+      // Check matching rows
+      const matchMap = new Map();
+      rows.forEach(row => {
+        let matchH = true;
+        if (selHierarki === "Project") matchH = row.classList.contains("row-project");
+        else if (selHierarki === "RRK") matchH = row.classList.contains("row-rrk");
+        else if (selHierarki === "Milestone") matchH = row.classList.contains("row-milestone");
+        else if (selHierarki === "Tugas") matchH = row.classList.contains("row-tugas");
+
+        let matchP = true;
+        if (selPic !== "Semua") {
+          const picCell = row.cells[2] ? row.cells[2].textContent.trim().toLowerCase() : "";
+          matchP = picCell.includes(selPic.toLowerCase());
+        }
+
+        let matchS = true;
+        if (selStatus !== "Semua") {
+          const statusCell = row.cells[5] ? row.cells[5].textContent.trim().toLowerCase() : "";
+          matchS = statusCell.includes(selStatus.toLowerCase());
+        }
+
+        let matchQ = true;
+        if (query !== "") {
+          const rowText = row.textContent.toLowerCase();
+          matchQ = rowText.includes(query);
+        }
+
+        matchMap.set(row, matchH && matchP && matchS && matchQ);
+      });
+
+      // Keep ancestors visible if a child matches
+      rows.forEach(row => {
+        if (matchMap.get(row)) {
+          let parentId = row.getAttribute("data-parent");
+          while (parentId) {
+            const pRow = document.getElementById(parentId);
+            if (pRow) {
+              matchMap.set(pRow, true);
+              parentId = pRow.getAttribute("data-parent");
+            } else {
+              break;
+            }
+          }
+        }
+      });
+
+      let visibleCount = 0;
+      rows.forEach(row => {
+        const isVisible = !!matchMap.get(row);
+        row.style.display = isVisible ? "" : "none";
+        if (isVisible) visibleCount++;
+      });
+
+      // Show empty row if 0 visible
+      const tbody = document.getElementById("laporanTableBody");
+      if (visibleCount === 0) {
+        if (!emptyRow) {
+          const tr = document.createElement("tr");
+          tr.id = "laporanEmptyFilteredRow";
+          tr.innerHTML = `<td colspan="6" class="db-empty-row" style="text-align: center; padding: 40px 24px; color: #94a3b8; font-style: italic;">Tidak ada data laporan yang sesuai dengan filter atau pencarian</td>`;
+          tbody.appendChild(tr);
+        } else {
+          emptyRow.style.display = "";
+        }
+      } else if (emptyRow) {
+        emptyRow.style.display = "none";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderHierarchyTable();
+      updateLaporanMetrics();
+
+      const searchInput = document.getElementById("laporanSearchInput");
+      if (searchInput) {
+        searchInput.addEventListener("input", applyLaporanFilters);
+      }
+
+      /* ─── Filter Popover ─── */
+      const btnFilter = document.getElementById("btnFilterLaporan");
+      const filterDropdown = document.getElementById("filterLaporanDropdown");
+      const filterForm = document.getElementById("filterLaporanForm");
+      const btnResetFilter = document.getElementById("btnResetFilterLaporan");
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          filterDropdown.classList.toggle("is-active");
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!filterDropdown.contains(e.target) && !btnFilter.contains(e.target)) {
+            filterDropdown.classList.remove("is-active");
+          }
+        });
+      }
+
+      if (filterForm) {
+        filterForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          applyLaporanFilters();
+          if (filterDropdown) filterDropdown.classList.remove("is-active");
+          if (typeof showToast === "function") {
+            showToast("Filter berhasil diterapkan");
+          } else if (window.ceoToast) {
+            window.ceoToast("Filter berhasil diterapkan", "success");
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener("click", () => {
+          const selHierarki = document.getElementById("filterHierarkiSelect");
+          const selPic = document.getElementById("filterPicSelect");
+          const selStatus = document.getElementById("filterStatusSelect");
+          if (selHierarki) selHierarki.value = "Semua";
+          if (selPic) selPic.value = "Semua";
+          if (selStatus) selStatus.value = "Semua";
+          if (searchInput) searchInput.value = "";
+          applyLaporanFilters();
+          if (filterDropdown) filterDropdown.classList.remove("is-active");
+          if (typeof showToast === "function") {
+            showToast("Filter berhasil di-reset");
+          } else if (window.ceoToast) {
+            window.ceoToast("Filter berhasil di-reset", "info");
+          }
+        });
+      }
+    });
+  </script>
+  <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+</body>
+
+</html>
+

@@ -2015,7 +2015,7 @@
     const host = ensurePopupHost();
     const frame = host.querySelector('#ceoPopupHostFrame');
 
-    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
     const baseUrl = url || (isSub ? '../popup.html' : 'popup.html');
     const sep = baseUrl.includes('?') ? '&' : '?';
     // host=1 => popup.html tidak bikin backdrop gelap sendiri (biar gak dobel)
@@ -2148,7 +2148,7 @@
       } catch { }
 
       inp.addEventListener('click', () => {
-        const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+        const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
         const url = inp.getAttribute('data-popup-url') || (isSub ? '../popup.html' : 'popup.html');
         const curStart = table._bmFilterState.dateStart || table._bmFilterState.date || '';
         const curEnd = table._bmFilterState.dateEnd || table._bmFilterState.date || '';
@@ -2248,7 +2248,7 @@
 
       // prevent '#' / javascript:void(0)
       e.preventDefault();
-      const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+      const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
       window.location.href = isSub ? '../index.html' : 'index.html';
     });
   }
@@ -6202,7 +6202,7 @@
     const logoFile = $('#cpLogoFile');
     const signatureFile = $('#cpSignatureFile');
 
-    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
     const setPrev = () => {
       if (logoPrev) logoPrev.src = logoDataUrl || ((isSub ? '../' : './') + 'media/logo.png');
     };
@@ -8342,7 +8342,7 @@
       return result;
     }
 
-    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
     const mediaPfx = isSub ? '../media/' : './media/';
     const creatorData = {
       alya: {
@@ -9148,7 +9148,7 @@
       row.appendChild(cell);
     }
 
-    let isSpv = window.location.pathname.toLowerCase().includes("spvkol");
+    let isSpv = window.location.pathname.toLowerCase().includes("spvkol") || window.location.pathname.toLowerCase().includes("accounting");
     const isAttendance = ['tblKehadiranV2', 'tblIstirahatV2', 'tblLemburV2'].includes(row.closest('table')?.id);
     if (isAttendance) {
       cell.className = 'tdActions text-center col-sticky-action';
@@ -9355,7 +9355,7 @@
   }
 
   function fallbackPhotoSrc() {
-    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
     return isSub ? '../media/avatar.png' : 'media/avatar.png';
   }
 
@@ -10545,7 +10545,7 @@
 
   function isSpvKolContext() {
     const loc = (window.location.pathname || '') + ' ' + (window.location.href || '');
-    const isSpvPath = /spvkol|kol_/i.test(loc);
+    const isSpvPath = /spvkol|kol_|accounting/i.test(loc);
     const hasCustomModal = !!document.querySelector('#brandDeleteModal, #kategoriDeleteModal, #levelingDeleteModal, #leadsDeleteModal, #campaignDeleteModal, #kreatorDeleteModal, .delete-modal-box');
     return isSpvPath || hasCustomModal;
   }
@@ -16957,7 +16957,7 @@
 
         // Segera kembali ke halaman login.html (bukan ke dashboard)
         setTimeout(() => {
-          const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+          const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
           window.location.href = isSub ? "../login.html" : "login.html";
         }, 800);
       });
@@ -17057,6 +17057,13 @@
         localStorage.setItem('user_avatar', staffAvatar);
         localStorage.setItem('user_pic', staffPic);
         window.location.href = 'StaffKol/staffkol_dashboard.html';
+      } else if ((userVal === 'accounting@bisamedia.com' || userVal === 'accounting') && (passVal === 'accounting123' || passVal === '123456')) {
+        localStorage.setItem('user_role', 'accounting');
+        localStorage.setItem('user_name', 'Ridha Ayu');
+        localStorage.setItem('user_display_role', 'Accounting');
+        localStorage.setItem('user_avatar', 'media/avatar.png');
+        localStorage.removeItem('user_pic');
+        window.location.href = 'Accounting/accounting_dashboard.html';
       } else {
         showLoginError();
       }
@@ -17075,7 +17082,7 @@
   });
 
   logoutButton?.addEventListener("click", () => {
-    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/');
+    const isSub = window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/bm/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/spvkol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/kol/') || window.location.pathname.replace(/\\/g, '/').toLowerCase().includes('/accounting/');
     window.location.href = isSub ? "../index.html" : "index.html";
   });
 
@@ -17133,6 +17140,8 @@
     ? "staffkol"
     : currentPath.includes("/spvkol/")
     ? "spvkol"
+    : currentPath.includes("/accounting/")
+    ? "accounting"
     : "default";
 
   document.querySelectorAll(".nav-group").forEach((group, index) => {

@@ -17,7 +17,7 @@
   let depth = 1;
   const normalizedPath = window.location.pathname.replace(/\\/g, '/');
   const segments = normalizedPath.split('/').filter(Boolean);
-  const folderIndex = segments.findIndex(s => ['bm', 'spvkol', 'staffkol'].includes(s.toLowerCase()));
+  const folderIndex = segments.findIndex(s => ['bm', 'spvkol', 'staffkol', 'accounting'].includes(s.toLowerCase()));
   if (folderIndex !== -1) {
     depth = segments.length - folderIndex - 1;
   }
@@ -33,7 +33,7 @@
     }
     if (!window.exportBisaExcel && !document.querySelector('script[src*="excel_engine"]')) {
       const excelScript = document.createElement('script');
-      excelScript.src = rootPrefix + 'assets/js/excel_engine.js';
+      excelScript.src = rootPrefix + 'assets/js/excel_engine.js?v=20261103_grup';
       document.head.appendChild(excelScript);
     }
   })();
@@ -45,6 +45,7 @@
   if (lowerPath.includes('/bm/')) role = 'admin';
   else if (lowerPath.includes('/spvkol/') || lowerFile.startsWith('spvkol_')) role = 'spv_kol';
   else if (lowerPath.includes('/staffkol/') || lowerFile.startsWith('staffkol_')) role = 'staff_kol';
+  else if (lowerPath.includes('/accounting/') || lowerFile.startsWith('accounting_')) role = 'accounting';
   else role = localStorage.getItem('user_role') || 'admin';
 
   // 3. Konfigurasi Menu & Hierarki (Heading Kategori, 100% Lengkap Sesuai Alur Perusahaan)
@@ -56,6 +57,7 @@
       { type: 'item', label: 'Isi dengan Panduan', icon: 'book', link: 'BM/BM_panduan.html' },
       { type: 'item', label: 'Spv KOL', icon: 'spv', link: 'SpvKol/spvkol_dashboard.html' },
       { type: 'item', label: 'Staff KOL', icon: 'staff', link: 'StaffKol/staffkol_dashboard.html' },
+      { type: 'item', label: 'Accounting', icon: 'accounting', link: 'Accounting/accounting_dashboard.html' },
 
       { type: 'heading', label: 'Manajemen Karyawan' },
       {
@@ -241,6 +243,67 @@
           { label: 'Upgrade Skill', link: 'StaffKol/kinerja/staffkol_upgrade_skill.html' }
         ]
       }
+    ],
+    accounting: [
+      { type: 'item', label: 'Dashboard', icon: 'home', link: 'Accounting/accounting_dashboard.html' },
+      { type: 'item', label: 'Kalender', icon: 'calendar', link: 'Accounting/accounting_kalender.html' },
+      {
+        type: 'group', label: 'Kehadiran', icon: 'clock', id: 'm-acc-kehadiran',
+        children: [
+          { label: 'Kehadiran', link: 'Accounting/absensi/accounting_kehadiran.html' },
+          { label: 'Absensi Istirahat', link: 'Accounting/absensi/accounting_presensi_istirahat.html' },
+          { label: 'Absensi Lembur', link: 'Accounting/absensi/accounting_presensi_lembur.html' }
+        ]
+      },
+      {
+        type: 'group', label: 'Opersional', icon: 'briefcase', id: 'm-acc-operasional',
+        children: [
+          { label: 'Dashboard', link: 'Accounting/operasional/accounting_operasional_dashboard.html' },
+          { label: 'Kas & Bank', link: 'Accounting/operasional/accounting_kas_bank.html' },
+          { label: 'Pendapatan', link: 'Accounting/operasional/accounting_pendapatan.html' },
+          { label: 'Pengeluaran & Beban', link: 'Accounting/operasional/accounting_pengeluaran_beban.html' },
+          { label: 'Approval Pengeluaran', link: 'Accounting/operasional/accounting_approval_pengeluaran.html' },
+          { label: 'Profit Project & Brand', link: 'Accounting/operasional/accounting_profit_project_brand.html' },
+          { label: 'Arus Kas', link: 'Accounting/operasional/accounting_arus_kas.html' },
+          { label: 'Piutang', link: 'Accounting/operasional/accounting_piutang.html' },
+          { label: 'Utang', link: 'Accounting/operasional/accounting_utang.html' },
+          { label: 'Payroll', link: 'Accounting/operasional/accounting_payroll.html' },
+          { label: 'Pajak', link: 'Accounting/operasional/accounting_pajak.html' },
+          { label: 'Daftar Aset', link: 'Accounting/operasional/accounting_daftar_aset.html' },
+          { label: 'Penyusutan Aset', link: 'Accounting/operasional/accounting_penyusutan_aset.html' },
+          { label: 'Mutasi Aset', link: 'Accounting/operasional/accounting_mutasi_aset.html' },
+          { label: 'Alokasi Aset Project', link: 'Accounting/operasional/accounting_alokasi_aset_project.html' },
+          { label: 'Laba Rugi', link: 'Accounting/operasional/accounting_laba_rugi.html' },
+          { label: 'Neraca', link: 'Accounting/operasional/accounting_neraca.html' },
+          { label: 'Rekap Divisi', link: 'Accounting/operasional/accounting_rekap_divisi.html' },
+          { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html' },
+          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' }
+        ]
+      },
+      {
+        type: 'group', label: 'Dokumen & Kolaborasi', icon: 'folder', id: 'm-acc-dokumen',
+        children: [
+          { label: 'My Folders', link: 'Accounting/dokumen_kolaborasi/accounting_folder.html' }
+        ]
+      },
+      {
+        type: 'group', label: 'Perancangan Kerja', icon: 'task', id: 'm-acc-perancangan',
+        children: [
+          { label: 'RRK', link: 'Accounting/perancangan_kerja/accounting_rrk.html' },
+          { label: 'Milestone', link: 'Accounting/perancangan_kerja/accounting_Milestone.html' },
+          { label: 'Tugas', link: 'Accounting/perancangan_kerja/accounting_tugas.html' },
+          { label: 'Projects', link: 'Accounting/perancangan_kerja/accounting_project.html' },
+          { label: 'Laporan', link: 'Accounting/perancangan_kerja/accounting_laporan.html' },
+          { label: 'Pengaduan', link: 'Accounting/perancangan_kerja/accounting_pengaduan.html' }
+        ]
+      },
+      {
+        type: 'group', label: 'Data Master', icon: 'tag', id: 'm-acc-master',
+        children: [
+          { label: 'Master COA', link: 'Accounting/data_master/accounting_master_coa.html' },
+          { label: 'Bank Lama', link: 'Accounting/data_master/accounting_bank_lama.html' }
+        ]
+      }
     ]
   };
 
@@ -251,6 +314,7 @@
     book: 'book-open',
     spv: 'user-check',
     staff: 'users',
+    accounting: 'calculator',
     users: 'users',
     task: 'clipboard-list',
     clock: 'clock',
@@ -375,17 +439,20 @@
   let homeLink = `${rootPrefix}BM/BM_dashboard.html`;
   if (role === 'spv_kol') homeLink = `${rootPrefix}SpvKol/spvkol_dashboard.html`;
   else if (role === 'staff_kol') homeLink = `${rootPrefix}StaffKol/staffkol_dashboard.html`;
+  else if (role === 'accounting') homeLink = `${rootPrefix}Accounting/accounting_dashboard.html`;
 
   // Info Akun & Keterangan Portal Sesuai Login dan Halaman yang Dibuka
   const roleDisplayNames = {
     admin: 'Rayi (Admin)',
     spv_kol: 'Rayi',
-    staff_kol: 'Rayi (Staff)'
+    staff_kol: 'Rayi (Staff)',
+    accounting: 'Ridha Ayu'
   };
   const portalLabels = {
     admin: 'Beranda Admin',
     spv_kol: 'Beranda SPVKOL',
-    staff_kol: 'Beranda Staff KOL'
+    staff_kol: 'Beranda Staff KOL',
+    accounting: 'Beranda Accounting'
   };
 
   const currentUserPic = role === 'staff_kol' ? String(localStorage.getItem('user_pic') || '').trim() : '';
@@ -394,13 +461,17 @@
     ? (currentUserPic || storedUserName || 'Staff KOL')
     : role === 'spv_kol'
       ? 'Rayi'
-      : (storedUserName || roleDisplayNames[role] || 'Rayi (Admin)');
+      : role === 'accounting'
+        ? (storedUserName === 'Rida' ? 'Ridha Ayu' : (storedUserName || 'Ridha Ayu'))
+        : (storedUserName || roleDisplayNames[role] || 'Rayi (Admin)');
   const currentPortalLabel = portalLabels[role] || 'Beranda SPVKOL';
   const currentRoleLabel = role === 'spv_kol'
     ? 'SPV KOL'
     : role === 'staff_kol'
       ? ('Staff KOL' + (currentUserPic ? ' — PIC ' + currentUserPic : ''))
-      : 'Admin';
+      : role === 'accounting'
+        ? 'Accounting'
+        : 'Admin';
   const rawAvatar = localStorage.getItem('user_avatar');
   const currentAvatar = (rawAvatar && !rawAvatar.includes('undefined'))
     ? (rawAvatar.startsWith('http') ? rawAvatar : rootPrefix + rawAvatar.replace(/^\/+/, ''))
@@ -908,6 +979,9 @@
       initSpvTablePagination();
     } else if (role === 'staff_kol') {
       renderStaffKolNavbar();
+    } else if (role === 'accounting') {
+      renderAccountingNavbar();
+      initSpvTablePagination();
     }
 
     // 5c. Render Dedicated Consistent Footer Template
@@ -1620,6 +1694,132 @@
         </button>
 
         <!-- User Profile Pill & Dropdown -->
+        <div class="topbar-user-dropdown-wrap">
+          <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna" onclick="window.__toggleHirezyUserDropdown(event)">
+            <div class="hirezy-avatar-box">
+              <img src="${currentAvatar}" alt="${currentUserName}" class="hirezy-avatar-img" data-ceo-avatar="" onerror="this.src='${rootPrefix}media/avatar.png'" />
+            </div>
+            <div class="hirezy-user-text">
+              <span class="hirezy-user-name">${currentUserName}</span>
+              <span class="hirezy-user-role">${currentRoleLabel}</span>
+            </div>
+            <svg class="hirezy-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <div id="userMenuDropdown" class="user-menu-dropdown">
+            <div class="user-menu-dropdown__header">
+              <img src="${currentAvatar}" alt="${currentUserName}" class="user-menu-dropdown__avatar" data-ceo-avatar="" />
+              <div class="user-menu-dropdown__info">
+                <span class="user-menu-dropdown__name">${currentUserName}</span>
+                <span class="user-menu-dropdown__role">${currentRoleLabel}</span>
+              </div>
+            </div>
+            <div class="user-menu-dropdown__divider"></div>
+            <a href="${rootPrefix}BM/BM_dashboard.html" class="user-menu-dropdown__item">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Kembali</span>
+                <span class="user-menu-dropdown__desc">Buka dashboard utama</span>
+              </div>
+            </a>
+            <a href="${rootPrefix}login.html" class="user-menu-dropdown__item user-menu-dropdown__item--danger">
+              <svg class="user-menu-dropdown__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <div class="user-menu-dropdown__item-text">
+                <span class="user-menu-dropdown__title">Logout</span>
+                <span class="user-menu-dropdown__desc">Keluar dari aplikasi</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderAccountingNavbar() {
+    const accountingTitles = {
+      'accounting_dashboard.html': 'Dashboard',
+      'accounting_kalender.html': 'Kalender',
+      'accounting_kehadiran.html': 'Kehadiran',
+      'accounting_presensi_istirahat.html': 'Absensi Istirahat',
+      'accounting_presensi_lembur.html': 'Absensi Lembur',
+      'accounting_operasional_dashboard.html': 'Dashboard',
+      'accounting_kas_bank.html': 'Kas & Bank',
+      'accounting_pendapatan.html': 'Pendapatan',
+      'accounting_pengeluaran_beban.html': 'Pengeluaran & Beban',
+      'accounting_pengurangan_beban.html': 'Pengeluaran & Beban',
+      'accounting_approval_pengeluaran.html': 'Approval Pengeluaran',
+      'accounting_profit_project_brand.html': 'Profit Project & Brand',
+      'accounting_arus_kas.html': 'Arus Kas',
+      'accounting_piutang.html': 'Piutang',
+      'accounting_utang.html': 'Utang',
+      'accounting_payroll.html': 'Payroll',
+      'accounting_pajak.html': 'Pajak',
+      'accounting_daftar_aset.html': 'Daftar Aset',
+      'accounting_penyusutan_aset.html': 'Penyusutan Aset',
+      'accounting_mutasi_aset.html': 'Mutasi Aset',
+      'accounting_alokasi_aset_project.html': 'Alokasi Aset Project',
+      'accounting_laba_rugi.html': 'Laba Rugi',
+      'accounting_neraca.html': 'Neraca',
+      'accounting_rekap_divisi.html': 'Rekap Divisi',
+      'accounting_piutang_karyawan.html': 'Piutang Karyawan',
+      'accounting_budget_vs_actual.html': 'Budget vs Actual',
+      'accounting_folder.html': 'My Folders',
+      'accounting_rrk.html': 'RRK',
+      'accounting_Milestone.html': 'Milestone',
+      'accounting_tugas.html': 'Tugas',
+      'accounting_project.html': 'Projects',
+      'accounting_laporan.html': 'Laporan',
+      'accounting_pengaduan.html': 'Pengaduan',
+      'accounting_master_coa.html': 'Master COA',
+      'accounting_bank_lama.html': 'Bank Lama'
+    };
+
+    const accountingPageTitle = accountingTitles[currentFile] || (document.title ? document.title.split('|')[0].trim() : 'Dashboard');
+
+    let topbarEl = document.querySelector('header.topbar');
+    if (!topbarEl) return;
+
+    topbarEl.className = 'topbar hirezy-topbar';
+    topbarEl.innerHTML = `
+      <div class="topbar__left hirezy-topbar-left">
+        <button id="sidebarToggle" class="icon-button icon-button--menu" type="button"
+          aria-label="Buka atau tutup sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <h2 class="hirezy-page-title">${accountingPageTitle}</h2>
+      </div>
+
+      <div class="topbar__actions hirezy-topbar-right">
+        <div class="hirezy-search-box">
+          <svg class="hirezy-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="menuSearch" class="hirezy-search-input" type="search" placeholder="Cari menu atau fitur..." />
+        </div>
+
+        <button class="hirezy-icon-btn" type="button" aria-label="Pesan / Chat" title="Pesan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
+        </button>
+
+        <button class="hirezy-icon-btn" type="button" aria-label="Notifikasi" title="Notifikasi">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="hirezy-notif-dot"></span>
+        </button>
+
         <div class="topbar-user-dropdown-wrap">
           <button id="userMenuButton" class="hirezy-user-pill" type="button" aria-label="Menu Pengguna" aria-expanded="false" title="Menu Pengguna" onclick="window.__toggleHirezyUserDropdown(event)">
             <div class="hirezy-avatar-box">
