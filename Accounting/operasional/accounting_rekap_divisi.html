@@ -7,6 +7,795 @@
   <title>Rekap Divisi | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       GLOBAL TYPOGRAPHY & RESET
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body,
+    input,
+    button,
+    table,
+    select,
+    textarea {
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    /* ===== MAIN PANEL & TABLE ===== */
+    .rekap-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .rekap-panel-accent {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+    }
+
+    /* ===== TOOLBAR (Sisi Kiri: Filter, Kalender, Excel, Search - Sesuai Gambar 1) ===== */
+    .rekap-toolbar {
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-bottom: 1px dashed #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Icon Toolbar Buttons (Filter, Kalender, Excel) */
+    .btn-toolbar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.2px solid #cbd5e1;
+      background: #ffffff;
+      color: #0284c7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      padding: 0;
+    }
+
+    .btn-toolbar-icon:hover {
+      background: #f0f9ff;
+      border-color: #28a5de;
+      color: #0284c7;
+      transform: translateY(-1px);
+    }
+
+    .btn-toolbar-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2.2;
+    }
+
+    /* Official Excel Button */
+    .btn-toolbar-icon.btn-excel {
+      border-color: #cbd5e1;
+      background: #ffffff;
+      padding: 0;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover {
+      background: #f0fdf4;
+      border-color: #107c41;
+      transform: translateY(-1px);
+    }
+
+    /* Search Input Pill */
+    .rekap-search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .rekap-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      color: #64748b;
+      pointer-events: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+    }
+
+    .rekap-search-input {
+      height: 36px;
+      padding: 0 14px 0 34px;
+      background: #ffffff;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      width: 220px;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .rekap-search-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+      width: 260px;
+    }
+
+    .rekap-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* ===== FILTER FUNNEL POPOVER (100% PERSIS SCREENSHOT 1 & 2) ===== */
+    .filter-popover-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .rekap-filter-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 250px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      z-index: 200;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .rekap-filter-dropdown.is-active {
+      display: block;
+      animation: popoverFadeIn 0.15s ease-out;
+    }
+
+    @keyframes popoverFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .filter-group-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .filter-select-box {
+      position: relative;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .filter-select-input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      padding: 0 30px 0 12px;
+      font-size: 13px;
+      color: #334155;
+      background: #ffffff;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .filter-select-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .filter-select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #64748b;
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .filter-select-box.is-open .filter-select-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .filter-select-box.is-open .filter-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #0284c7;
+    }
+
+    .filter-options-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 50;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      padding: 4px 0;
+      box-sizing: border-box;
+    }
+
+    .filter-select-box.is-open .filter-options-list {
+      display: block;
+    }
+
+    .rekap-filter-item {
+      padding: 8px 12px;
+      font-size: 12.5px;
+      color: #475569;
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .rekap-filter-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .rekap-filter-item.is-selected {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .filter-actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-filter-reset {
+      flex: 1;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .btn-filter-reset:hover {
+      background: #f0f9ff;
+      border-color: #0076c5;
+    }
+
+    .btn-filter-apply {
+      flex: 1;
+      height: 38px;
+      border: none;
+      border-radius: 8px;
+      background: #28a5de;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.25);
+    }
+
+    .btn-filter-apply:hover {
+      background: #0076c5;
+    }
+
+    /* ===== DUAL MONTH CALENDAR POPOVER ===== */
+    .rekap-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 580px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      padding: 16px 18px;
+      z-index: 200;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .rekap-calendar-popover.is-active {
+      display: block;
+      animation: popoverFadeIn 0.15s ease-out;
+    }
+
+    .calendar-popover-content {
+      display: flex;
+      gap: 16px;
+    }
+
+    .calendar-presets-col {
+      width: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 12px;
+    }
+
+    .calendar-preset-btn {
+      padding: 6px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .calendar-preset-btn:hover {
+      background: #e0f2fe;
+      border-color: #28a5de;
+      color: #0284c7;
+    }
+
+    .calendar-months-col {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .month-nav-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .month-day-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+    }
+
+    .month-day {
+      font-size: 12px;
+      padding: 6px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      user-select: none;
+    }
+
+    .month-day:hover {
+      background: #f1f5f9;
+    }
+
+    .month-day.is-selected {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .month-day.in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .calendar-popover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 14px;
+      padding-top: 12px;
+    }
+
+    .calendar-range-text {
+      font-size: 12.5px;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .calendar-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-cal-cancel {
+      padding: 6px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .btn-cal-apply {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== TABLE & STICKY COLUMN ===== */
+    .rekap-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      min-height: 380px;
+    }
+
+    .rekap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .rekap-table thead th {
+      padding: 12px 14px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #f8fafc;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: none;
+    }
+
+    .rekap-table tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    .rekap-table tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .rekap-table tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    .rekap-cell-italic {
+      font-style: italic;
+    }
+
+    /* Sticky Action Column */
+    .rekap-table th.col-sticky-action,
+    .rekap-table td.col-sticky-action {
+      position: sticky;
+      right: 0;
+      background-color: #ffffff;
+      z-index: 5;
+      text-align: center;
+      width: 70px;
+      min-width: 70px;
+      max-width: 70px;
+      box-shadow: -2px 0 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .rekap-table th.col-sticky-action {
+      background-color: #f8fafc;
+      z-index: 6;
+    }
+
+    /* Action View Button (Cyan rounded-square with eye icon - Sesuai Permintaan) */
+    .btn-rekap-view {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.3);
+    }
+
+    .btn-rekap-view:hover {
+      background: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(40, 165, 222, 0.4);
+    }
+
+    .btn-rekap-view svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Badges Margin */
+    .badge-margin {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .badge-margin-positive {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-margin-negative {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    /* ==========================================================================
+       MODAL DETAIL: "Lihat Rekap Divisi" (100% PERSIS SCREENSHOT 2)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.is-active,
+    .modal-overlay.is-open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .rekap-modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 820px;
+      margin: auto;
+      overflow: visible !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      border: 1px solid #e2e8f0;
+      box-sizing: border-box;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-accent-line {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .modal-inner-padding {
+      padding: 24px 28px 28px;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .modal-title-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .modal-title-text em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .btn-modal-close-x {
+      width: 24px;
+      height: 24px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #64748b;
+      font-size: 13px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+
+    .btn-modal-close-x:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .modal-divider-dashed {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    /* 7 Fields Grid (Sesuai Screenshot 2) */
+    .rekap-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 18px;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-field.span-all {
+      grid-column: 1 / -1;
+    }
+
+    .modal-field-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .modal-field-value {
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #475569;
+      font-style: italic;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Modal Action Buttons */
+    .modal-footer-row {
+      margin-top: 56px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Button Outline Keluar (Sesuai Gambar 2) */
+    .btn-modal-outline {
+      min-width: 140px;
+      height: 38px;
+      padding: 0 24px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-modal-outline:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +803,867 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <section style="padding: 24px;">
+
+        <!-- ===== MAIN PANEL ===== -->
+        <div class="rekap-panel">
+          <div class="rekap-panel-accent"></div>
+
+          <!-- ===== TOOLBAR (PERSIS SCREENSHOT 1: FILTER, KALENDER, EXCEL, CARI) ===== -->
+          <div class="rekap-toolbar">
+            <div class="toolbar-left-group">
+              
+              <!-- 1. Tombol Filter Funnel Popover -->
+              <div class="filter-popover-wrap">
+                <button id="btnFilter" class="btn-toolbar-icon" type="button" aria-label="Filter Rekap Divisi" title="Filter Rekap Divisi">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                  </svg>
+                </button>
+
+                <!-- Popover Filter Content (100% Persis Screenshot 1 & 2) -->
+                <div id="filterDropdown" class="rekap-filter-dropdown" role="dialog" aria-modal="false">
+                  <span class="filter-group-label">Divisi</span>
+                  <div class="filter-select-box" id="boxFilterDivisi">
+                    <input type="text" class="filter-select-input" id="filterDivisi" placeholder="Pilih Divisi" autocomplete="off" />
+                    <span class="filter-select-arrow" id="arrowFilterDivisi">&#9662;</span>
+                    <div class="filter-options-list" id="listFilterDivisi"></div>
+                  </div>
+
+                  <div class="filter-actions-row">
+                    <button type="button" class="btn-filter-reset" id="btnResetFilter">Riset</button>
+                    <button type="button" class="btn-filter-apply" id="btnApplyFilter">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Tombol Kalender Popover (Dual Month Range) -->
+              <div class="filter-popover-wrap">
+                <button id="btnCalendar" class="btn-toolbar-icon" type="button" aria-label="Rentang Tanggal" title="Pilih Rentang Tanggal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </button>
+
+                <!-- Popover Dual Month Calendar -->
+                <div id="calendarDropdown" class="rekap-calendar-popover" role="dialog" aria-modal="false">
+                  <div class="calendar-popover-content">
+                    <div class="calendar-presets-col">
+                      <button type="button" class="calendar-preset-btn" data-preset="today">Hari Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-month">Bulan Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="last-month">Bulan Lalu</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-year">Tahun Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="reset">Semua Tanggal</button>
+                    </div>
+                    <div class="calendar-months-col">
+                      <div class="month-box">
+                        <div class="month-header">
+                          <button type="button" class="month-nav-btn" id="btnPrevMonth">&lt;</button>
+                          <span id="labelMonth1">Juni 2026</span>
+                          <div style="width: 24px;"></div>
+                        </div>
+                        <div class="month-grid" id="gridMonth1"></div>
+                      </div>
+                      <div class="month-box">
+                        <div class="month-header">
+                          <div style="width: 24px;"></div>
+                          <span id="labelMonth2">Juli 2026</span>
+                          <button type="button" class="month-nav-btn" id="btnNextMonth">&gt;</button>
+                        </div>
+                        <div class="month-grid" id="gridMonth2"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="calendar-popover-footer">
+                    <span class="calendar-range-text" id="calendarRangeDisplay">Semua Tanggal</span>
+                    <div class="calendar-footer-actions">
+                      <button type="button" class="btn-cal-cancel" id="btnCancelCalendar">Batal</button>
+                      <button type="button" class="btn-cal-apply" id="btnApplyCalendar">Terapkan</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Tombol Export Excel (Official Microsoft Excel Green Icon) -->
+              <button id="btnExportExcel" class="btn-toolbar-icon btn-excel" type="button" aria-label="Export Excel" title="Download Excel (.xlsx)" onclick="window.exportRekapExcel && window.exportRekapExcel()">
+                <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                  <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+
+              <!-- 4. Search Input (Pill Shape) -->
+              <div class="rekap-search-wrapper">
+                <svg class="rekap-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="rekap-search-input" id="rekapSearch" placeholder="Cari..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Container (Headers: # | Divisi | Pendapatan | Beban | Payroll | Penyusutan | Laba Sebelum Pajak | Margin | Aksi) -->
+          <div class="rekap-table-wrap">
+            <table class="rekap-table" id="rekapTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px; text-align: center;">#</th>
+                  <th>Divisi</th>
+                  <th style="text-align: right;">Pendapatan</th>
+                  <th style="text-align: right;">Beban</th>
+                  <th style="text-align: right;">Payroll</th>
+                  <th style="text-align: right;">Penyusutan</th>
+                  <th style="text-align: right;">Laba Sebelum Pajak</th>
+                  <th style="text-align: right;">Margin</th>
+                  <th class="col-sticky-action">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="rekapTableBody">
+                <!-- Diisi via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </main>
   </div>
 
+  <!-- ===== MODAL DETAIL: "Lihat Rekap Divisi" (100% PERSIS SCREENSHOT 2) ===== -->
+  <div id="rekapDetailModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="rekap-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-inner-padding">
+        
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="detailModalTitle">
+            <span>Lihat</span> <em>Rekap Divisi</em>
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseDetailX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 7 Fields Grid (Sesuai Screenshot 2) -->
+        <div class="rekap-form-grid">
+          <!-- Row 1: Divisi, Pendapatan, Beban -->
+          <div class="modal-field">
+            <span class="modal-field-label">Divisi</span>
+            <div class="modal-field-value" id="detailDivisi">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Pendapatan</span>
+            <div class="modal-field-value" id="detailPendapatan">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Beban</span>
+            <div class="modal-field-value" id="detailBeban">-</div>
+          </div>
+
+          <!-- Row 2: Payroll, Penyusutan, Laba Sebelum Pajak -->
+          <div class="modal-field">
+            <span class="modal-field-label">Payroll</span>
+            <div class="modal-field-value" id="detailPayroll">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Penyusutan</span>
+            <div class="modal-field-value" id="detailPenyusutan">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Laba Sebelum Pajak</span>
+            <div class="modal-field-value" id="detailLabaSebelumPajak">-</div>
+          </div>
+
+          <!-- Row 3: Margin (Full-Width Sesuai Gambar 2) -->
+          <div class="modal-field span-all">
+            <span class="modal-field-label">Margin</span>
+            <div class="modal-field-value" id="detailMargin">-</div>
+          </div>
+        </div>
+
+        <!-- Footer: Button "Keluar" (Sesuai Gambar 2) -->
+        <div class="modal-footer-row">
+          <button type="button" class="btn-modal-outline" id="btnKeluarDetail">Keluar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      'use strict';
+
+      /* ===== DATA MODEL REKAP DIVISI ===== */
+      const STORAGE_KEY = 'accounting_rekap_divisi_data';
+
+      // Default realistic division aggregate data (Agency persis Screenshot 2: Rp 24,354,390, Margin 100.0%)
+      const defaultRekapData = [
+        {
+          id: 'DIV-001',
+          divisi: 'Agency',
+          pendapatan: 24354390,
+          beban: 0,
+          payroll: 0,
+          penyusutan: 0,
+          labaSebelumPajak: 24354390,
+          margin: 100.0
+        },
+        {
+          id: 'DIV-002',
+          divisi: 'Media & Kreatif',
+          pendapatan: 48500000,
+          beban: 6800000,
+          payroll: 14500000,
+          penyusutan: 1250000,
+          labaSebelumPajak: 25950000,
+          margin: 53.5
+        },
+        {
+          id: 'DIV-003',
+          divisi: 'Production Studio',
+          pendapatan: 36200000,
+          beban: 8400000,
+          payroll: 11200000,
+          penyusutan: 2100000,
+          labaSebelumPajak: 14500000,
+          margin: 40.1
+        },
+        {
+          id: 'DIV-004',
+          divisi: 'Talent & KOL Management',
+          pendapatan: 52400000,
+          beban: 4900000,
+          payroll: 16800000,
+          penyusutan: 750000,
+          labaSebelumPajak: 29950000,
+          margin: 57.2
+        },
+        {
+          id: 'DIV-005',
+          divisi: 'Event Organizer',
+          pendapatan: 31800000,
+          beban: 12600000,
+          payroll: 8500000,
+          penyusutan: 950000,
+          labaSebelumPajak: 9750000,
+          margin: 30.7
+        },
+        {
+          id: 'DIV-006',
+          divisi: 'IT & Digital Marketing',
+          pendapatan: 28700000,
+          beban: 3100000,
+          payroll: 13400000,
+          penyusutan: 1850000,
+          labaSebelumPajak: 10350000,
+          margin: 36.1
+        }
+      ];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error('Gagal memuat data rekap divisi:', e);
+        }
+        return defaultRekapData;
+      }
+
+      function saveData(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.error('Gagal menyimpan data rekap divisi:', e);
+        }
+      }
+
+      let rekapData = loadData();
+
+      // State Filters
+      let filterState = {
+        search: '',
+        divisi: '',
+        marginStatus: '',
+        startDate: '',
+        endDate: ''
+      };
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('rekapTableBody');
+      const searchInput = document.getElementById('rekapSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+
+      // Modal Elements (Sesuai Gambar 2)
+      const detailModal = document.getElementById('rekapDetailModal');
+      const detailDivisi = document.getElementById('detailDivisi');
+      const detailPendapatan = document.getElementById('detailPendapatan');
+      const detailBeban = document.getElementById('detailBeban');
+      const detailPayroll = document.getElementById('detailPayroll');
+      const detailPenyusutan = document.getElementById('detailPenyusutan');
+      const detailLabaSebelumPajak = document.getElementById('detailLabaSebelumPajak');
+      const detailMargin = document.getElementById('detailMargin');
+      const btnCloseDetailX = document.getElementById('btnCloseDetailX');
+      const btnKeluarDetail = document.getElementById('btnKeluarDetail');
+
+      // Filter Funnel Popover Elements (Sesuai Screenshot 1 & 2)
+      const btnFilter = document.getElementById('btnFilter');
+      const filterDropdown = document.getElementById('filterDropdown');
+      const filterDivisi = document.getElementById('filterDivisi');
+      const boxFilterDivisi = document.getElementById('boxFilterDivisi');
+      const listFilterDivisi = document.getElementById('listFilterDivisi');
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      // Calendar Filter Elements
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const labelMonth1 = document.getElementById('labelMonth1');
+      const labelMonth2 = document.getElementById('labelMonth2');
+      const gridMonth1 = document.getElementById('gridMonth1');
+      const gridMonth2 = document.getElementById('gridMonth2');
+      const btnPrevMonth = document.getElementById('btnPrevMonth');
+      const btnNextMonth = document.getElementById('btnNextMonth');
+      const calendarRangeDisplay = document.getElementById('calendarRangeDisplay');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+
+      /* ===== FORMATTING UTILITIES ===== */
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatRupiahSpasi(num) {
+        const val = Math.round(Number(num) || 0);
+        return 'Rp ' + val.toLocaleString('id-ID');
+      }
+
+      function formatMarginPercent(num) {
+        const val = Number(num) || 0;
+        return val.toFixed(1) + '%';
+      }
+
+      function closeModals() {
+        if (detailModal) detailModal.classList.remove('is-active');
+      }
+
+      function openViewRekap(id) {
+        const item = rekapData.find(function (x) { return String(x.id) === String(id); });
+        if (!item) return;
+
+        if (detailDivisi) detailDivisi.textContent = item.divisi || '-';
+        if (detailPendapatan) detailPendapatan.textContent = formatRupiahSpasi(item.pendapatan);
+        if (detailBeban) detailBeban.textContent = item.beban ? formatRupiahSpasi(item.beban) : 'Rp. 0';
+        if (detailPayroll) detailPayroll.textContent = item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0';
+        if (detailPenyusutan) detailPenyusutan.textContent = item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0';
+        if (detailLabaSebelumPajak) detailLabaSebelumPajak.textContent = formatRupiahSpasi(item.labaSebelumPajak);
+        if (detailMargin) detailMargin.textContent = formatMarginPercent(item.margin);
+
+        if (detailModal) detailModal.classList.add('is-active');
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        return rekapData.filter(function (item) {
+          if (filterState.search) {
+            const q = filterState.search.toLowerCase();
+            const matchDiv = (item.divisi || '').toLowerCase().includes(q);
+            if (!matchDiv) return false;
+          }
+
+          if (filterState.divisi && filterState.divisi !== 'Semua Divisi') {
+            if ((item.divisi || '').trim().toLowerCase() !== filterState.divisi.toLowerCase()) return false;
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== RENDER TABLE ===== */
+      function renderTable() {
+        if (!tableBody) return;
+        const filtered = getFilteredData();
+        tableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const emptyRow = document.createElement('tr');
+          emptyRow.innerHTML = '<td colspan="9" style="text-align: center; padding: 48px 16px; color: #94a3b8; font-style: italic;">' +
+            'Tidak ada data rekap divisi yang sesuai' +
+            '</td>';
+          tableBody.appendChild(emptyRow);
+          return;
+        }
+
+        filtered.forEach(function (item, idx) {
+          const tr = document.createElement('tr');
+          const isPositive = Number(item.margin) >= 0;
+
+          tr.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-size: 13px;">' + (idx + 1) + '</td>',
+            '<td style="font-weight: 600; color: #0f172a;">' + escapeHtml(item.divisi) + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 500; color: #0284c7;">' + escapeHtml(formatRupiahSpasi(item.pendapatan)) + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.beban ? formatRupiahSpasi(item.beban) : 'Rp. 0') + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0') + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0') + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 600; color: #0f172a;">' + escapeHtml(formatRupiahSpasi(item.labaSebelumPajak)) + '</td>',
+            '<td style="text-align: right;">' +
+              '<span class="badge-margin ' + (isPositive ? 'badge-margin-positive' : 'badge-margin-negative') + '">' +
+                escapeHtml(formatMarginPercent(item.margin)) +
+              '</span>' +
+            '</td>',
+            '<td class="col-sticky-action" style="text-align: center;">' +
+              '<button type="button" class="btn-rekap-view" data-view-id="' + escapeHtml(item.id) + '" aria-label="Lihat Detail" title="Lihat Rekap Divisi">' +
+                '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+
+          tableBody.appendChild(tr);
+        });
+      }
+
+      /* ===== TABLE VIEW ACTION LISTENER ===== */
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const viewBtn = e.target.closest('[data-view-id]');
+          if (viewBtn) {
+            e.stopPropagation();
+            const id = viewBtn.getAttribute('data-view-id');
+            openViewRekap(id);
+          }
+        });
+      }
+
+      if (btnCloseDetailX) {
+        btnCloseDetailX.addEventListener('click', closeModals);
+      }
+      if (btnKeluarDetail) {
+        btnKeluarDetail.addEventListener('click', closeModals);
+      }
+
+      /* ===== SEARCH REAL-TIME ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          filterState.search = this.value.trim();
+          renderTable();
+        });
+      }
+
+      /* ===== DROPDOWN FILTER POPOVER (100% PERSIS SCREENSHOT 1 & 2) ===== */
+      const divisiOptions = [
+        'Semua Divisi',
+        'Agency',
+        'Media & Kreatif',
+        'Production Studio',
+        'Talent & KOL Management',
+        'Event Organizer',
+        'IT & Digital Marketing'
+      ];
+
+      let selectedDivisi = '';
+
+      function renderDivisiFilterList(query) {
+        if (!listFilterDivisi) return;
+        listFilterDivisi.innerHTML = '';
+        const q = (query || '').toLowerCase().trim();
+
+        const filteredOpts = divisiOptions.filter(function (opt) {
+          if (!q) return true;
+          return opt.toLowerCase().includes(q);
+        });
+
+        if (filteredOpts.length === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'rekap-filter-item';
+          empty.style.color = '#94a3b8';
+          empty.style.fontStyle = 'italic';
+          empty.textContent = 'Tidak ditemukan';
+          listFilterDivisi.appendChild(empty);
+          return;
+        }
+
+        filteredOpts.forEach(function (opt) {
+          const item = document.createElement('div');
+          item.className = 'rekap-filter-item';
+          if (selectedDivisi === opt || (!selectedDivisi && opt === 'Semua Divisi')) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = opt;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (opt === 'Semua Divisi') {
+              selectedDivisi = '';
+              filterDivisi.value = '';
+              filterDivisi.placeholder = 'Pilih Divisi';
+            } else {
+              selectedDivisi = opt;
+              filterDivisi.value = opt;
+            }
+            closeDivisiFilter();
+          });
+          listFilterDivisi.appendChild(item);
+        });
+      }
+
+      function openDivisiFilter() {
+        if (!boxFilterDivisi) return;
+        boxFilterDivisi.classList.add('is-open');
+        filterDivisi.placeholder = 'Cari Divisi';
+        renderDivisiFilterList(filterDivisi.value);
+      }
+
+      function closeDivisiFilter() {
+        if (!boxFilterDivisi) return;
+        boxFilterDivisi.classList.remove('is-open');
+        if (selectedDivisi) {
+          filterDivisi.value = selectedDivisi;
+        } else {
+          filterDivisi.value = '';
+          filterDivisi.placeholder = 'Pilih Divisi';
+        }
+      }
+
+      if (filterDivisi) {
+        filterDivisi.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = boxFilterDivisi.classList.contains('is-open');
+          if (isOpen) {
+            closeDivisiFilter();
+          } else {
+            openDivisiFilter();
+          }
+        });
+
+        filterDivisi.addEventListener('input', function () {
+          if (!boxFilterDivisi.classList.contains('is-open')) {
+            boxFilterDivisi.classList.add('is-open');
+          }
+          renderDivisiFilterList(this.value);
+        });
+      }
+
+      if (btnFilter) {
+        btnFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+          filterDropdown.classList.toggle('is-active');
+          if (!filterDropdown.classList.contains('is-active')) {
+            closeDivisiFilter();
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          selectedDivisi = '';
+          filterDivisi.value = '';
+          filterDivisi.placeholder = 'Pilih Divisi';
+          filterState.divisi = '';
+          closeDivisiFilter();
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterState.divisi = selectedDivisi || filterDivisi.value.trim();
+          if (filterState.divisi === 'Semua Divisi') filterState.divisi = '';
+          closeDivisiFilter();
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== DUAL MONTH CALENDAR PICKER ===== */
+      let calendarBaseDate = new Date(2026, 5, 1); // Juni 2026 default
+      let tempCalStart = null;
+      let tempCalEnd = null;
+
+      const monthNamesIndo = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+      function renderDualCalendar() {
+        if (!gridMonth1 || !gridMonth2) return;
+
+        const m1 = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth(), 1);
+        const m2 = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth() + 1, 1);
+
+        labelMonth1.textContent = monthNamesIndo[m1.getMonth()] + ' ' + m1.getFullYear();
+        labelMonth2.textContent = monthNamesIndo[m2.getMonth()] + ' ' + m2.getFullYear();
+
+        renderSingleMonthGrid(gridMonth1, m1);
+        renderSingleMonthGrid(gridMonth2, m2);
+        updateCalendarDisplayFooter();
+      }
+
+      function renderSingleMonthGrid(container, monthDate) {
+        container.innerHTML = '';
+        dayNames.forEach(function (d) {
+          const header = document.createElement('div');
+          header.className = 'month-day-name';
+          header.textContent = d;
+          container.appendChild(header);
+        });
+
+        const y = monthDate.getFullYear();
+        const m = monthDate.getMonth();
+        const firstDay = new Date(y, m, 1).getDay();
+        const totalDays = new Date(y, m + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+          const blank = document.createElement('div');
+          container.appendChild(blank);
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'month-day';
+          cell.textContent = d;
+
+          const dateStr = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+          if (tempCalStart && dateStr === tempCalStart) {
+            cell.classList.add('is-selected');
+          }
+          if (tempCalEnd && dateStr === tempCalEnd) {
+            cell.classList.add('is-selected');
+          }
+          if (tempCalStart && tempCalEnd && dateStr > tempCalStart && dateStr < tempCalEnd) {
+            cell.classList.add('in-range');
+          }
+
+          cell.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!tempCalStart || (tempCalStart && tempCalEnd)) {
+              tempCalStart = dateStr;
+              tempCalEnd = null;
+            } else if (tempCalStart && !tempCalEnd) {
+              if (dateStr >= tempCalStart) {
+                tempCalEnd = dateStr;
+              } else {
+                tempCalEnd = tempCalStart;
+                tempCalStart = dateStr;
+              }
+            }
+            renderDualCalendar();
+          });
+
+          container.appendChild(cell);
+        }
+      }
+
+      function updateCalendarDisplayFooter() {
+        if (!calendarRangeDisplay) return;
+        if (tempCalStart && tempCalEnd) {
+          calendarRangeDisplay.textContent = tempCalStart + ' s/d ' + tempCalEnd;
+        } else if (tempCalStart) {
+          calendarRangeDisplay.textContent = 'Mulai: ' + tempCalStart;
+        } else {
+          calendarRangeDisplay.textContent = 'Semua Tanggal';
+        }
+      }
+
+      if (btnPrevMonth) {
+        btnPrevMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarBaseDate.setMonth(calendarBaseDate.getMonth() - 1);
+          renderDualCalendar();
+        });
+      }
+
+      if (btnNextMonth) {
+        btnNextMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarBaseDate.setMonth(calendarBaseDate.getMonth() + 1);
+          renderDualCalendar();
+        });
+      }
+
+      if (btnCalendar) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          calendarDropdown.classList.toggle('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            renderDualCalendar();
+          }
+        });
+      }
+
+      document.querySelectorAll('.calendar-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const preset = this.getAttribute('data-preset');
+          const now = new Date(2026, 5, 15); // Reference context: 2026
+          const curY = now.getFullYear();
+          const curM = String(now.getMonth() + 1).padStart(2, '0');
+          const lastD = new Date(curY, now.getMonth() + 1, 0).getDate();
+
+          if (preset === 'today') {
+            const todayStr = curY + '-' + curM + '-15';
+            tempCalStart = todayStr;
+            tempCalEnd = todayStr;
+          } else if (preset === 'this-month') {
+            tempCalStart = curY + '-' + curM + '-01';
+            tempCalEnd = curY + '-' + curM + '-' + String(lastD).padStart(2, '0');
+          } else if (preset === 'last-month') {
+            const prevMonthDate = new Date(curY, now.getMonth() - 1, 1);
+            const pY = prevMonthDate.getFullYear();
+            const pM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+            const pLastD = new Date(pY, prevMonthDate.getMonth() + 1, 0).getDate();
+            tempCalStart = pY + '-' + pM + '-01';
+            tempCalEnd = pY + '-' + pM + '-' + String(pLastD).padStart(2, '0');
+          } else if (preset === 'this-year') {
+            tempCalStart = curY + '-01-01';
+            tempCalEnd = curY + '-12-31';
+          } else if (preset === 'reset') {
+            tempCalStart = null;
+            tempCalEnd = null;
+          }
+          renderDualCalendar();
+        });
+      });
+
+      if (btnCancelCalendar) {
+        btnCancelCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnApplyCalendar) {
+        btnApplyCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterState.startDate = tempCalStart;
+          filterState.endDate = tempCalEnd;
+          calendarDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== EXCEL EXPORT (ACTIVE OFFICIAL MICROSOFT EXCEL ENGINE) ===== */
+      async function exportRekapExcel() {
+        const rows = getFilteredData();
+        if (!rows || rows.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'warning', title: 'Data Kosong', text: 'Tidak ada data rekap divisi untuk diekspor.' });
+          }
+          return;
+        }
+
+        const filename = 'Laporan_Rekap_Divisi_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+        const headers = [
+          'No',
+          'Divisi',
+          'Pendapatan',
+          'Beban',
+          'Payroll',
+          'Penyusutan',
+          'Laba Sebelum Pajak',
+          'Margin (%)'
+        ];
+
+        const exportData = rows.map(function (item, idx) {
+          return [
+            idx + 1,
+            item.divisi || '-',
+            item.pendapatan || 0,
+            item.beban || 0,
+            item.payroll || 0,
+            item.penyusutan || 0,
+            item.labaSebelumPajak || 0,
+            (Number(item.margin) || 0) + '%'
+          ];
+        });
+
+        if (typeof window.exportBisaExcel === 'function') {
+          await window.exportBisaExcel({
+            title: 'LAPORAN REKAPITULASI KINERJA KEUANGAN PER DIVISI',
+            filename: filename,
+            sheetName: 'Rekap Divisi',
+            headers: headers,
+            rows: exportData
+          });
+        } else if (typeof window.exportTableToExcel === 'function') {
+          await window.exportTableToExcel('rekapTable', filename, 'LAPORAN REKAP DIVISI');
+        } else {
+          let csv = headers.join(',') + '\n';
+          exportData.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename.replace('.xlsx', '.csv'));
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+      window.exportRekapExcel = exportRekapExcel;
+
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', exportRekapExcel);
+      }
+
+      /* ===== GLOBAL CLICK LISTENER (TUTUP POPUP & MODAL) ===== */
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#filterDropdown') && !e.target.closest('#btnFilter')) {
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          closeDivisiFilter();
+        } else if (!e.target.closest('#boxFilterDivisi')) {
+          closeDivisiFilter();
+        }
+        if (!e.target.closest('#calendarDropdown') && !e.target.closest('#btnCalendar')) {
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+        if (e.target === detailModal) {
+          closeModals();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeModals();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+      });
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
 </body>
 
 </html>
