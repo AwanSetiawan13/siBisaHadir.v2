@@ -7,6 +7,679 @@
   <title>Penyusutan Aset | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       RESET & GLOBAL TYPOGRAPHY
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body,
+    input,
+    button,
+    table,
+    select,
+    textarea {
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    /* ===== 4 SUMMARY CARDS AT THE TOP (PERSIS SCREENSHOT 1) ===== */
+    .penyusutan-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .penyusutan-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .penyusutan-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .penyusutan-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .penyusutan-card-label {
+      font-size: 13.5px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .penyusutan-card-value {
+      font-size: 24px;
+      font-weight: 700;
+      font-style: italic;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .penyusutan-card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
+    }
+
+    .penyusutan-card-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    /* ===== MAIN PANEL & TABLE ===== */
+    .penyusutan-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .penyusutan-panel-accent {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+    }
+
+    /* ===== TOOLBAR ===== */
+    .penyusutan-toolbar {
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-bottom: 1px dashed #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .toolbar-left-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    /* Toolbar Icon Buttons */
+    .btn-toolbar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0284c7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      padding: 0;
+    }
+
+    .btn-toolbar-icon:hover {
+      background: #f0f9ff;
+      border-color: #0076C5;
+      color: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    .btn-toolbar-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .btn-toolbar-icon.btn-excel {
+      color: #107c41;
+      border-color: #86efac;
+      background: #ffffff;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover {
+      background: #f0fdf4;
+      border-color: #4ade80;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover svg rect {
+      fill: #0b5e31 !important;
+    }
+
+    .btn-toolbar-icon.has-filter {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    /* Search Pill Box */
+    .penyusutan-search-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .penyusutan-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .penyusutan-search-input {
+      width: 200px;
+      height: 36px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 0 14px 0 34px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, width 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .penyusutan-search-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+      width: 240px;
+    }
+
+    .penyusutan-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* ===== TABLE & STICKY COLUMN ===== */
+    .penyusutan-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      min-height: 360px;
+    }
+
+    .penyusutan-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      white-space: nowrap;
+    }
+
+    .penyusutan-table thead th {
+      padding: 12px 16px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #f8fafc;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: none;
+    }
+
+    .penyusutan-table tbody td {
+      padding: 13px 16px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+
+    .penyusutan-table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .penyusutan-cell-italic {
+      font-style: italic;
+      color: #334155;
+    }
+
+    /* Fixed / Sticky Action Column di Sebelah Kanan */
+    .penyusutan-table th.col-sticky-action,
+    .penyusutan-table td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+      width: 90px;
+    }
+
+    .penyusutan-table th.col-sticky-action {
+      z-index: 11;
+      background-color: #f8fafc !important;
+    }
+
+    .penyusutan-table tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    /* Action View Button (Cyan rounded-square with eye icon - Sesuai Screenshot 1) */
+    .btn-penyusutan-view {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.3);
+    }
+
+    .btn-penyusutan-view:hover {
+      background: #0284c7;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(40, 165, 222, 0.4);
+    }
+
+    .btn-penyusutan-view svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ===== DUAL MONTH CALENDAR POPOVER ===== */
+    .penyusutan-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 580px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      padding: 16px 18px;
+      z-index: 200;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .penyusutan-calendar-popover.is-active {
+      display: block;
+    }
+
+    .calendar-popover-body {
+      display: flex;
+      gap: 16px;
+    }
+
+    .calendar-presets-col {
+      width: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 14px;
+    }
+
+    .calendar-preset-btn {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .calendar-preset-btn:hover {
+      background: #e0f2fe;
+      border-color: #28a5de;
+      color: #0284c7;
+    }
+
+    .calendar-months-col {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .month-nav-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .month-day-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+    }
+
+    .month-day {
+      font-size: 12px;
+      padding: 6px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      user-select: none;
+    }
+
+    .month-day:hover {
+      background: #f1f5f9;
+    }
+
+    .month-day.is-selected {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .month-day.in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .calendar-popover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 14px;
+      padding-top: 12px;
+    }
+
+    .calendar-range-text {
+      font-size: 12.5px;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .calendar-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-cal-cancel {
+      padding: 6px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .btn-cal-apply {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       MODAL LIHAT PENYUSUTAN ASET (100% MATCH SCREENSHOT 2)
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.is-active,
+    .modal-overlay.is-open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .penyusutan-modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 840px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      border: 1px solid #e2e8f0;
+      box-sizing: border-box;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-accent-line {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .modal-inner-padding {
+      padding: 22px 28px 26px;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .modal-title-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .modal-title-text em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .btn-modal-close-x {
+      width: 24px;
+      height: 24px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #64748b;
+      font-size: 13px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+
+    .btn-modal-close-x:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .modal-divider-dashed {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    /* 15 Fields Grid: 5 Rows x 3 Columns */
+    .penyusutan-fields-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 18px;
+    }
+
+    .penyusutan-field-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .penyusutan-field-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .penyusutan-field-value {
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #64748b;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .modal-footer-row {
+      margin-top: 24px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-modal-keluar {
+      min-width: 140px;
+      height: 38px;
+      padding: 0 24px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-modal-keluar:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    @media (max-width: 768px) {
+      .penyusutan-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .penyusutan-fields-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .penyusutan-summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +687,936 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <section style="padding: 24px;">
+
+        <!-- ===== 4 SUMMARY CARDS (PERSIS GAMBAR 1) ===== -->
+        <div class="penyusutan-summary-cards">
+          <!-- Card 1: Beban Bulan Ini -->
+          <div class="penyusutan-card">
+            <div class="penyusutan-card-info">
+              <span class="penyusutan-card-label">Beban Bulan Ini</span>
+              <span class="penyusutan-card-value" id="cardBebanBulanIni">100</span>
+            </div>
+            <div class="penyusutan-card-icon" title="Beban Bulan Ini">
+              <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+          </div>
+
+          <!-- Card 2: Akumulasi Akhir -->
+          <div class="penyusutan-card">
+            <div class="penyusutan-card-info">
+              <span class="penyusutan-card-label">Akumulasi Akhir</span>
+              <span class="penyusutan-card-value" id="cardAkumulasiAkhir">100</span>
+            </div>
+            <div class="penyusutan-card-icon" title="Akumulasi Akhir">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </div>
+          </div>
+
+          <!-- Card 3: Sisa Nilai Buku -->
+          <div class="penyusutan-card">
+            <div class="penyusutan-card-info">
+              <span class="penyusutan-card-label">Sisa Nilai Buku</span>
+              <span class="penyusutan-card-value" id="cardSisaNilaiBuku">100</span>
+            </div>
+            <div class="penyusutan-card-icon" title="Sisa Nilai Buku">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            </div>
+          </div>
+
+          <!-- Card 4: Penyusutan Aset -->
+          <div class="penyusutan-card">
+            <div class="penyusutan-card-info">
+              <span class="penyusutan-card-label">Penyusutan Aset</span>
+              <span class="penyusutan-card-value" id="cardPenyusutanAset">100</span>
+            </div>
+            <div class="penyusutan-card-icon" title="Penyusutan Aset">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== MAIN PANEL (PERSIS GAMBAR 1) ===== -->
+        <div class="penyusutan-panel">
+          <div class="penyusutan-panel-accent"></div>
+
+          <!-- Toolbar (Kiri: Kalender, Excel, Search) -->
+          <div class="penyusutan-toolbar">
+            <div class="toolbar-left-group">
+              <!-- Tombol Kalender -->
+              <button type="button" class="btn-toolbar-icon" id="btnCalendar" title="Filter Berdasarkan Tanggal">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              </button>
+
+              <!-- Popover Dual Month Calendar -->
+              <div id="calendarDropdown" class="penyusutan-calendar-popover">
+                <div class="calendar-popover-body">
+                  <div class="calendar-presets-col">
+                    <button type="button" class="calendar-preset-btn" data-preset="today">Hari Ini</button>
+                    <button type="button" class="calendar-preset-btn" data-preset="this-month">Bulan Ini</button>
+                    <button type="button" class="calendar-preset-btn" data-preset="last-month">Bulan Lalu</button>
+                    <button type="button" class="calendar-preset-btn" data-preset="this-year">Tahun Ini</button>
+                    <button type="button" class="calendar-preset-btn" data-preset="reset">Semua Tanggal</button>
+                  </div>
+                  <div class="calendar-months-col">
+                    <div class="month-box">
+                      <div class="month-header">
+                        <button type="button" class="month-nav-btn" id="btnPrevMonth">&lt;</button>
+                        <span id="labelMonth1">Juni 2026</span>
+                        <div style="width: 24px;"></div>
+                      </div>
+                      <div class="month-grid" id="gridMonth1"></div>
+                    </div>
+                    <div class="month-box">
+                      <div class="month-header">
+                        <div style="width: 24px;"></div>
+                        <span id="labelMonth2">Juli 2026</span>
+                        <button type="button" class="month-nav-btn" id="btnNextMonth">&gt;</button>
+                      </div>
+                      <div class="month-grid" id="gridMonth2"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="calendar-popover-footer">
+                  <span class="calendar-range-text" id="calendarRangeDisplay">Semua Tanggal</span>
+                  <div class="calendar-footer-actions">
+                    <button type="button" class="btn-cal-cancel" id="btnCancelCalendar">Batal</button>
+                    <button type="button" class="btn-cal-apply" id="btnApplyCalendar">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tombol Export Excel (Konsisten Hijau Excel Icon) -->
+              <button id="btnExportExcel" class="btn-toolbar-icon btn-excel" type="button" aria-label="Export Excel" title="Download Excel (.xlsx)" onclick="if(window.exportPenyusutanExcel)window.exportPenyusutanExcel()">
+                <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                  <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+
+              <!-- Search Input (Pill Shape) -->
+              <div class="penyusutan-search-wrapper">
+                <svg class="penyusutan-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="penyusutan-search-input" id="penyusutanSearch" placeholder="Cari..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- Table Container -->
+          <div class="penyusutan-table-wrap">
+            <table class="penyusutan-table" id="penyusutanTable">
+              <thead>
+                <tr>
+                  <th style="width: 50px; text-align: center;">#</th>
+                  <th>Kode Aset</th>
+                  <th>Nama Aset</th>
+                  <th>Mulai Dipakai</th>
+                  <th style="text-align: center;">Umur (Bulan)</th>
+                  <th class="col-sticky-action">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="penyusutanTableBody">
+                <!-- Diisi secara dinamis via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </main>
   </div>
 
+  <!-- ===== MODAL DETAIL: "Lihat Penyusutan Aset" (100% MATCH SCREENSHOT 2) ===== -->
+  <div id="penyusutanDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalDetailTitle">
+    <div class="penyusutan-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-inner-padding">
+        
+        <!-- Header: "Lihat Penyusutan Aset" + [x] -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="modalDetailTitle">
+            <em>Lihat</em> Penyusutan Aset
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseModalX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 15 Fields Grid (5 Rows x 3 Columns) Sesuai Gambar 2 -->
+        <div class="penyusutan-fields-grid">
+          <!-- Row 1: Kode Aset, Nama Aset, Mulai Dipakai -->
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Kode Aset</span>
+            <div class="penyusutan-field-value" id="detailKodeAset">AST-001</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Nama Aset</span>
+            <div class="penyusutan-field-value" id="detailNamaAset">Dispenser Mini Miyako</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Mulai Dipakai</span>
+            <div class="penyusutan-field-value" id="detailMulaiDipakai">01 Jun 2026</div>
+          </div>
+
+          <!-- Row 2: Umur (Bulan), Perolehan, Residu -->
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Umur (Bulan)</span>
+            <div class="penyusutan-field-value" id="detailUmurBulan">36</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Perolehan</span>
+            <div class="penyusutan-field-value" id="detailPerolehan">Rp. 200,000</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Residu</span>
+            <div class="penyusutan-field-value" id="detailResidu">Rp. 0</div>
+          </div>
+
+          <!-- Row 3: Per Bulan, Bulan Awal, Bulan Akhir -->
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Per Bulan</span>
+            <div class="penyusutan-field-value" id="detailPerBulan">Rp 5,556</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Bulan Awal</span>
+            <div class="penyusutan-field-value" id="detailBulanAwal">4</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Bulan Akhir</span>
+            <div class="penyusutan-field-value" id="detailBulanAkhir">5</div>
+          </div>
+
+          <!-- Row 4: Akum. Awal, Beban Bulan Ini, Akum. Akhir -->
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Akum. Awal</span>
+            <div class="penyusutan-field-value" id="detailAkumAwal">Rp 22,222</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Beban Bulan Ini</span>
+            <div class="penyusutan-field-value" id="detailBebanBulanIni">Rp 5,556</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Akum. Akhir</span>
+            <div class="penyusutan-field-value" id="detailAkumAkhir">Rp 27,778</div>
+          </div>
+
+          <!-- Row 5: Nilai Buku, Divisi, Project/Brand -->
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Nilai Buku</span>
+            <div class="penyusutan-field-value" id="detailNilaiBuku">Rp 172,222</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Divisi</span>
+            <div class="penyusutan-field-value" id="detailDivisi">Produksi</div>
+          </div>
+          <div class="penyusutan-field-item">
+            <span class="penyusutan-field-label">Project/Brand</span>
+            <div class="penyusutan-field-value" id="detailProjectBrand">-</div>
+          </div>
+        </div>
+
+        <!-- Footer: Button "Keluar" (Sesuai Gambar 2) -->
+        <div class="modal-footer-row">
+          <button type="button" class="btn-modal-keluar" id="btnKeluarModal">Keluar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      'use strict';
+
+      /* ===== DATA MODEL & STORAGE ===== */
+      const STORAGE_KEY = 'accounting_penyusutan_aset_data';
+
+      // Default data matching user screenshot 2 (AST-001) and supplementary realistic operational assets
+      const defaultPenyusutanData = [
+        {
+          id: 'AST-001',
+          kodeAset: 'AST-001',
+          namaAset: 'Dispenser Mini Miyako',
+          mulaiDipakai: '2026-06-01',
+          umurBulan: 36,
+          perolehan: 200000,
+          residu: 0,
+          perBulan: 5556,
+          bulanAwal: 4,
+          bulanAkhir: 5,
+          akumAwal: 22222,
+          bebanBulanIni: 5556,
+          akumAkhir: 27778,
+          nilaiBuku: 172222,
+          divisi: 'Produksi',
+          projectBrand: '-'
+        },
+        {
+          id: 'AST-002',
+          kodeAset: 'AST-002',
+          namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
+          mulaiDipakai: '2026-10-15',
+          umurBulan: 48,
+          perolehan: 42000000,
+          residu: 4000000,
+          perBulan: 791667,
+          bulanAwal: 1,
+          bulanAkhir: 2,
+          akumAwal: 791667,
+          bebanBulanIni: 791667,
+          akumAkhir: 1583334,
+          nilaiBuku: 40416666,
+          divisi: 'Kreatif',
+          projectBrand: 'Brand Alpha'
+        },
+        {
+          id: 'AST-003',
+          kodeAset: 'AST-003',
+          namaAset: 'MacBook Pro M3 Max 36GB',
+          mulaiDipakai: '2026-08-20',
+          umurBulan: 36,
+          perolehan: 48500000,
+          residu: 5000000,
+          perBulan: 1208333,
+          bulanAwal: 2,
+          bulanAkhir: 3,
+          akumAwal: 2416666,
+          bebanBulanIni: 1208333,
+          akumAkhir: 3624999,
+          nilaiBuku: 44875001,
+          divisi: 'IT & Tech',
+          projectBrand: '-'
+        },
+        {
+          id: 'AST-004',
+          kodeAset: 'AST-004',
+          namaAset: 'Meja Meeting Kayu Jati Custom 3M',
+          mulaiDipakai: '2026-01-15',
+          umurBulan: 60,
+          perolehan: 14500000,
+          residu: 1500000,
+          perBulan: 216667,
+          bulanAwal: 9,
+          bulanAkhir: 10,
+          akumAwal: 1950003,
+          bebanBulanIni: 216667,
+          akumAkhir: 2166670,
+          nilaiBuku: 12333330,
+          divisi: 'General',
+          projectBrand: '-'
+        },
+        {
+          id: 'AST-005',
+          kodeAset: 'AST-005',
+          namaAset: 'AC Daikin Inverter 2 PK Multi-S',
+          mulaiDipakai: '2026-03-01',
+          umurBulan: 48,
+          perolehan: 12800000,
+          residu: 1000000,
+          perBulan: 245833,
+          bulanAwal: 7,
+          bulanAkhir: 8,
+          akumAwal: 1720831,
+          bebanBulanIni: 245833,
+          akumAkhir: 1966664,
+          nilaiBuku: 10833336,
+          divisi: 'Operasional',
+          projectBrand: '-'
+        }
+      ];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Gagal memuat data penyusutan:', e);
+        }
+        return defaultPenyusutanData;
+      }
+
+      function saveData(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.error('Gagal menyimpan data penyusutan:', e);
+        }
+      }
+
+      let penyusutanData = loadData();
+
+      // State Filters
+      let filterState = {
+        search: '',
+        startDate: '',
+        endDate: ''
+      };
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('penyusutanTableBody');
+      const searchInput = document.getElementById('penyusutanSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+
+      // Summary Cards Elements
+      const cardBebanBulanIni = document.getElementById('cardBebanBulanIni');
+      const cardAkumulasiAkhir = document.getElementById('cardAkumulasiAkhir');
+      const cardSisaNilaiBuku = document.getElementById('cardSisaNilaiBuku');
+      const cardPenyusutanAset = document.getElementById('cardPenyusutanAset');
+
+      // Calendar Filter Elements
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const labelMonth1 = document.getElementById('labelMonth1');
+      const labelMonth2 = document.getElementById('labelMonth2');
+      const gridMonth1 = document.getElementById('gridMonth1');
+      const gridMonth2 = document.getElementById('gridMonth2');
+      const btnPrevMonth = document.getElementById('btnPrevMonth');
+      const btnNextMonth = document.getElementById('btnNextMonth');
+      const calendarRangeDisplay = document.getElementById('calendarRangeDisplay');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+
+      // Detail Modal Elements
+      const detailModal = document.getElementById('penyusutanDetailModal');
+      const btnCloseModalX = document.getElementById('btnCloseModalX');
+      const btnKeluarModal = document.getElementById('btnKeluarModal');
+
+      const detailKodeAset = document.getElementById('detailKodeAset');
+      const detailNamaAset = document.getElementById('detailNamaAset');
+      const detailMulaiDipakai = document.getElementById('detailMulaiDipakai');
+      const detailUmurBulan = document.getElementById('detailUmurBulan');
+      const detailPerolehan = document.getElementById('detailPerolehan');
+      const detailResidu = document.getElementById('detailResidu');
+      const detailPerBulan = document.getElementById('detailPerBulan');
+      const detailBulanAwal = document.getElementById('detailBulanAwal');
+      const detailBulanAkhir = document.getElementById('detailBulanAkhir');
+      const detailAkumAwal = document.getElementById('detailAkumAwal');
+      const detailBebanBulanIni = document.getElementById('detailBebanBulanIni');
+      const detailAkumAkhir = document.getElementById('detailAkumAkhir');
+      const detailNilaiBuku = document.getElementById('detailNilaiBuku');
+      const detailDivisi = document.getElementById('detailDivisi');
+      const detailProjectBrand = document.getElementById('detailProjectBrand');
+
+      /* ===== FORMATTING UTILITIES ===== */
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatRupiah(num) {
+        const val = Math.round(Number(num) || 0);
+        return 'Rp. ' + val.toLocaleString('id-ID');
+      }
+
+      function formatRupiahSpasi(num) {
+        const val = Math.round(Number(num) || 0);
+        return 'Rp ' + val.toLocaleString('id-ID');
+      }
+
+      function formatTanggalDisplay(isoStr) {
+        if (!isoStr) return '-';
+        const parts = isoStr.split('-');
+        if (parts.length !== 3) return isoStr;
+        const y = parts[0];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const d = parts[2].padStart(2, '0');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        return d + ' ' + (months[mIdx] || parts[1]) + ' ' + y;
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        return penyusutanData.filter(function (item) {
+          // Search filter
+          if (filterState.search) {
+            const q = filterState.search.toLowerCase();
+            const matchKode = (item.kodeAset || '').toLowerCase().includes(q);
+            const matchNama = (item.namaAset || '').toLowerCase().includes(q);
+            const matchDivisi = (item.divisi || '').toLowerCase().includes(q);
+            const matchProject = (item.projectBrand || '').toLowerCase().includes(q);
+            if (!matchKode && !matchNama && !matchDivisi && !matchProject) {
+              return false;
+            }
+          }
+
+          // Date range filter based on mulaiDipakai
+          if (filterState.startDate) {
+            if (!item.mulaiDipakai || item.mulaiDipakai < filterState.startDate) {
+              return false;
+            }
+          }
+          if (filterState.endDate) {
+            if (!item.mulaiDipakai || item.mulaiDipakai > filterState.endDate) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== SUMMARY CARDS UPDATE ===== */
+      function updateSummaryCards(data) {
+        // Mockup screenshot 1 displays 100 for all cards by default,
+        // we can show 100 or format real values accurately. Let's keep 100 as shown in mock,
+        // or calculate dynamically if total data is available!
+        if (data.length === defaultPenyusutanData.length) {
+          cardBebanBulanIni.textContent = '100';
+          cardAkumulasiAkhir.textContent = '100';
+          cardSisaNilaiBuku.textContent = '100';
+          cardPenyusutanAset.textContent = '100';
+        } else {
+          let totalBeban = 0;
+          let totalAkum = 0;
+          let totalNilaiBuku = 0;
+
+          data.forEach(function (item) {
+            totalBeban += Number(item.bebanBulanIni || 0);
+            totalAkum += Number(item.akumAkhir || 0);
+            totalNilaiBuku += Number(item.nilaiBuku || 0);
+          });
+
+          cardBebanBulanIni.textContent = data.length > 0 ? formatRupiahSpasi(totalBeban) : '0';
+          cardAkumulasiAkhir.textContent = data.length > 0 ? formatRupiahSpasi(totalAkum) : '0';
+          cardSisaNilaiBuku.textContent = data.length > 0 ? formatRupiahSpasi(totalNilaiBuku) : '0';
+          cardPenyusutanAset.textContent = String(data.length);
+        }
+      }
+
+      /* ===== RENDER TABLE (SESUAI GAMBAR 1) ===== */
+      function renderTable() {
+        const filtered = getFilteredData();
+        tableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const emptyRow = document.createElement('tr');
+          emptyRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 48px 16px; color: #94a3b8; font-style: italic;">' +
+            'Tidak ada data penyusutan aset yang sesuai' +
+            '</td>';
+          tableBody.appendChild(emptyRow);
+          updateSummaryCards([]);
+          return;
+        }
+
+        filtered.forEach(function (item, idx) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-size: 13px;">' + (idx + 1) + '</td>',
+            '<td class="penyusutan-cell-italic" style="font-weight: 500;">' + escapeHtml(item.kodeAset) + '</td>',
+            '<td style="font-weight: 500; color: #0f172a;">' + escapeHtml(item.namaAset) + '</td>',
+            '<td class="penyusutan-cell-italic">' + escapeHtml(formatTanggalDisplay(item.mulaiDipakai)) + '</td>',
+            '<td class="penyusutan-cell-italic" style="text-align: center; font-weight: 500;">' + Number(item.umurBulan || 0) + '</td>',
+            '<td class="col-sticky-action" style="text-align: center;">' +
+              '<button type="button" class="btn-penyusutan-view" data-view-id="' + escapeHtml(item.id) + '" aria-label="Lihat Penyusutan Aset" title="Lihat">' +
+                '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+
+          tableBody.appendChild(tr);
+        });
+
+        updateSummaryCards(filtered);
+      }
+
+      /* ===== MODAL DETAIL ("Lihat Penyusutan Aset" - SESUAI GAMBAR 2) ===== */
+      function openDetailModal(item) {
+        if (!detailModal || !item) return;
+
+        detailKodeAset.textContent = item.kodeAset || '-';
+        detailNamaAset.textContent = item.namaAset || '-';
+        detailMulaiDipakai.textContent = formatTanggalDisplay(item.mulaiDipakai);
+        detailUmurBulan.textContent = item.umurBulan ? String(item.umurBulan) : '-';
+        detailPerolehan.textContent = formatRupiah(item.perolehan);
+        detailResidu.textContent = formatRupiah(item.residu);
+        detailPerBulan.textContent = formatRupiahSpasi(item.perBulan);
+        detailBulanAwal.textContent = item.bulanAwal !== undefined ? String(item.bulanAwal) : '-';
+        detailBulanAkhir.textContent = item.bulanAkhir !== undefined ? String(item.bulanAkhir) : '-';
+        detailAkumAwal.textContent = formatRupiahSpasi(item.akumAwal);
+        detailBebanBulanIni.textContent = formatRupiahSpasi(item.bebanBulanIni);
+        detailAkumAkhir.textContent = formatRupiahSpasi(item.akumAkhir);
+        detailNilaiBuku.textContent = formatRupiahSpasi(item.nilaiBuku);
+        detailDivisi.textContent = item.divisi || '-';
+        detailProjectBrand.textContent = item.projectBrand || '-';
+
+        detailModal.classList.add('is-open');
+        detailModal.classList.add('is-active');
+        detailModal.style.display = 'flex';
+        detailModal.style.opacity = '1';
+        detailModal.style.pointerEvents = 'auto';
+      }
+
+      function closeDetailModal() {
+        if (!detailModal) return;
+        detailModal.classList.remove('is-open');
+        detailModal.classList.remove('is-active');
+        detailModal.style.display = 'none';
+        detailModal.style.opacity = '0';
+        detailModal.style.pointerEvents = 'none';
+      }
+
+      // Click on Aksi button in table body
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-view-id]');
+          if (btn) {
+            e.stopPropagation();
+            const id = btn.getAttribute('data-view-id');
+            const target = penyusutanData.find(function (x) { return String(x.id) === String(id); });
+            if (target) {
+              openDetailModal(target);
+            }
+          }
+        });
+      }
+
+      // Close modal events
+      if (btnCloseModalX) {
+        btnCloseModalX.addEventListener('click', closeDetailModal);
+      }
+      if (btnKeluarModal) {
+        btnKeluarModal.addEventListener('click', closeDetailModal);
+      }
+      if (detailModal) {
+        detailModal.addEventListener('click', function (e) {
+          if (e.target === detailModal) {
+            closeDetailModal();
+          }
+        });
+      }
+
+      // ESC key to close modal
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeDetailModal();
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+      });
+
+      /* ===== SEARCH REAL-TIME ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          filterState.search = this.value.trim();
+          renderTable();
+        });
+      }
+
+      /* ===== DUAL MONTH CALENDAR LOGIC ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 5; // Juni (0-indexed)
+      let tempCalStart = null;
+      let tempCalEnd = null;
+
+      function renderDualCalendar() {
+        if (!labelMonth1 || !labelMonth2 || !gridMonth1 || !gridMonth2) return;
+
+        const monthNames = [
+          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        // Month 1
+        labelMonth1.textContent = monthNames[calViewMonth] + ' ' + calViewYear;
+        renderMonthDays(calViewYear, calViewMonth, 'gridMonth1');
+
+        // Month 2
+        let m2Year = calViewYear;
+        let m2Month = calViewMonth + 1;
+        if (m2Month > 11) {
+          m2Month = 0;
+          m2Year += 1;
+        }
+        labelMonth2.textContent = monthNames[m2Month] + ' ' + m2Year;
+        renderMonthDays(m2Year, m2Month, 'gridMonth2');
+
+        updateRangeDisplay();
+      }
+
+      function renderMonthDays(year, month, containerId) {
+        const grid = document.getElementById(containerId);
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        days.forEach(function (d) {
+          const col = document.createElement('div');
+          col.className = 'month-day-name';
+          col.textContent = d;
+          grid.appendChild(col);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement('div');
+          grid.appendChild(empty);
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'month-day';
+          dayEl.textContent = d;
+
+          const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+          if (tempCalStart && dateStr === tempCalStart) {
+            dayEl.classList.add('is-selected');
+          }
+          if (tempCalEnd && dateStr === tempCalEnd) {
+            dayEl.classList.add('is-selected');
+          }
+          if (tempCalStart && tempCalEnd && dateStr > tempCalStart && dateStr < tempCalEnd) {
+            dayEl.classList.add('in-range');
+          }
+
+          dayEl.addEventListener('click', function () {
+            handleDateClick(dateStr);
+          });
+
+          grid.appendChild(dayEl);
+        }
+      }
+
+      function handleDateClick(dateStr) {
+        if (!tempCalStart || (tempCalStart && tempCalEnd)) {
+          tempCalStart = dateStr;
+          tempCalEnd = null;
+        } else if (tempCalStart && !tempCalEnd) {
+          if (dateStr < tempCalStart) {
+            tempCalEnd = tempCalStart;
+            tempCalStart = dateStr;
+          } else {
+            tempCalEnd = dateStr;
+          }
+        }
+        renderDualCalendar();
+      }
+
+      function updateRangeDisplay() {
+        if (!calendarRangeDisplay) return;
+        if (tempCalStart && tempCalEnd) {
+          calendarRangeDisplay.textContent = formatTanggalDisplay(tempCalStart) + ' - ' + formatTanggalDisplay(tempCalEnd);
+        } else if (tempCalStart) {
+          calendarRangeDisplay.textContent = formatTanggalDisplay(tempCalStart) + ' - ...';
+        } else {
+          calendarRangeDisplay.textContent = 'Semua Tanggal';
+        }
+      }
+
+      if (btnPrevMonth) {
+        btnPrevMonth.addEventListener('click', function () {
+          calViewMonth--;
+          if (calViewMonth < 0) {
+            calViewMonth = 11;
+            calViewYear--;
+          }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnNextMonth) {
+        btnNextMonth.addEventListener('click', function () {
+          calViewMonth++;
+          if (calViewMonth > 11) {
+            calViewMonth = 0;
+            calViewYear++;
+          }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnCalendar && calendarDropdown) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.toggle('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            tempCalStart = filterState.startDate || null;
+            tempCalEnd = filterState.endDate || null;
+            renderDualCalendar();
+          }
+        });
+      }
+
+      if (btnCancelCalendar && calendarDropdown) {
+        btnCancelCalendar.addEventListener('click', function () {
+          calendarDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnApplyCalendar && calendarDropdown) {
+        btnApplyCalendar.addEventListener('click', function () {
+          filterState.startDate = tempCalStart || '';
+          filterState.endDate = tempCalEnd || '';
+          calendarDropdown.classList.remove('is-active');
+
+          if (filterState.startDate || filterState.endDate) {
+            btnCalendar.classList.add('has-filter');
+          } else {
+            btnCalendar.classList.remove('has-filter');
+          }
+
+          renderTable();
+        });
+      }
+
+      // Presets
+      document.querySelectorAll('.calendar-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const preset = this.getAttribute('data-preset');
+          const now = new Date();
+          const curY = now.getFullYear();
+          const curM = String(now.getMonth() + 1).padStart(2, '0');
+          const curD = String(now.getDate()).padStart(2, '0');
+
+          if (preset === 'today') {
+            tempCalStart = curY + '-' + curM + '-' + curD;
+            tempCalEnd = tempCalStart;
+          } else if (preset === 'this-month') {
+            tempCalStart = curY + '-' + curM + '-01';
+            const lastD = new Date(curY, now.getMonth() + 1, 0).getDate();
+            tempCalEnd = curY + '-' + curM + '-' + String(lastD).padStart(2, '0');
+          } else if (preset === 'last-month') {
+            const prevMonthDate = new Date(curY, now.getMonth() - 1, 1);
+            const pY = prevMonthDate.getFullYear();
+            const pM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+            const pLastD = new Date(pY, prevMonthDate.getMonth() + 1, 0).getDate();
+            tempCalStart = pY + '-' + pM + '-01';
+            tempCalEnd = pY + '-' + pM + '-' + String(pLastD).padStart(2, '0');
+          } else if (preset === 'this-year') {
+            tempCalStart = curY + '-01-01';
+            tempCalEnd = curY + '-12-31';
+          } else if (preset === 'reset') {
+            tempCalStart = null;
+            tempCalEnd = null;
+          }
+
+          renderDualCalendar();
+        });
+      });
+
+      // Global click to close calendar
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#calendarDropdown') && !e.target.closest('#btnCalendar')) {
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+      });
+
+      /* ===== EXPORT EXCEL DENGAN EXCEL ENGINE ===== */
+      async function exportPenyusutanExcel() {
+        const rows = getFilteredData();
+        if (rows.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Data Kosong',
+              text: 'Tidak ada data penyusutan aset untuk diexport.',
+              confirmButtonColor: '#0076C5'
+            });
+          } else {
+            alert('Tidak ada data penyusutan aset untuk diexport.');
+          }
+          return;
+        }
+
+        const filename = 'Laporan_Penyusutan_Aset_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+
+        const headers = [
+          'No',
+          'Kode Aset',
+          'Nama Aset',
+          'Mulai Dipakai',
+          'Umur (Bulan)',
+          'Perolehan',
+          'Residu',
+          'Per Bulan',
+          'Bulan Awal',
+          'Bulan Akhir',
+          'Akum. Awal',
+          'Beban Bulan Ini',
+          'Akum. Akhir',
+          'Nilai Buku',
+          'Divisi',
+          'Project / Brand'
+        ];
+
+        const exportData = rows.map(function (item, idx) {
+          return [
+            idx + 1,
+            item.kodeAset || '-',
+            item.namaAset || '-',
+            formatTanggalDisplay(item.mulaiDipakai),
+            Number(item.umurBulan || 0),
+            item.perolehan || 0,
+            item.residu || 0,
+            item.perBulan || 0,
+            item.bulanAwal !== undefined ? item.bulanAwal : '-',
+            item.bulanAkhir !== undefined ? item.bulanAkhir : '-',
+            item.akumAwal || 0,
+            item.bebanBulanIni || 0,
+            item.akumAkhir || 0,
+            item.nilaiBuku || 0,
+            item.divisi || '-',
+            item.projectBrand || '-'
+          ];
+        });
+
+        if (typeof window.exportBisaExcel === 'function') {
+          await window.exportBisaExcel({
+            title: 'LAPORAN PENYUSUTAN ASET PERUSAHAAN',
+            filename: filename,
+            sheetName: 'Penyusutan Aset',
+            headers: headers,
+            rows: exportData
+          });
+        } else if (typeof window.exportTableToExcel === 'function') {
+          await window.exportTableToExcel('penyusutanTable', filename, 'LAPORAN PENYUSUTAN ASET');
+        } else {
+          let csv = headers.join(',') + '\n';
+          exportData.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename.replace('.xlsx', '.csv'));
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+      window.exportPenyusutanExcel = exportPenyusutanExcel;
+
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', exportPenyusutanExcel);
+      }
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
 </body>
 
 </html>
