@@ -7,6 +7,1001 @@
   <title>Piutang Karyawan | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       GLOBAL TYPOGRAPHY & RESET
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body,
+    input,
+    button,
+    table,
+    select,
+    textarea {
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    /* ===== MAIN PANEL & TABLE ===== */
+    .piutang-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .piutang-panel-accent {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+    }
+
+    /* ===== TOOLBAR (Kiri: Filter, Kalender, Excel, Search | Kanan: Tambah - Sesuai Gambar 1) ===== */
+    .piutang-toolbar {
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-bottom: 1px dashed #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Icon Toolbar Buttons (Filter, Kalender, Excel) */
+    .btn-toolbar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.2px solid #cbd5e1;
+      background: #ffffff;
+      color: #0284c7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      padding: 0;
+    }
+
+    .btn-toolbar-icon:hover {
+      background: #f0f9ff;
+      border-color: #28a5de;
+      color: #0284c7;
+      transform: translateY(-1px);
+    }
+
+    .btn-toolbar-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2.2;
+    }
+
+    /* Official Excel Button */
+    .btn-toolbar-icon.btn-excel {
+      border-color: #cbd5e1;
+      background: #ffffff;
+      padding: 0;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover {
+      background: #f0fdf4;
+      border-color: #107c41;
+      transform: translateY(-1px);
+    }
+
+    /* Search Input Pill */
+    .piutang-search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .piutang-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      color: #64748b;
+      pointer-events: none;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+    }
+
+    .piutang-search-input {
+      height: 36px;
+      padding: 0 14px 0 34px;
+      background: #ffffff;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      width: 220px;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .piutang-search-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+      width: 260px;
+    }
+
+    .piutang-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Tombol Tambah (Sisi Kanan - Konsisten: background #28a5de, font Outfit 13px bold, + Tambah) */
+    .btn-tambah-piutang {
+      height: 36px;
+      padding: 0 18px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-tambah-piutang:hover {
+      background: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    .btn-tambah-piutang:active {
+      transform: scale(0.98);
+    }
+
+    /* ===== FILTER FUNNEL POPOVER ===== */
+    .filter-popover-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .piutang-filter-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 250px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      z-index: 200;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .piutang-filter-dropdown.is-active {
+      display: block;
+      animation: popoverFadeIn 0.15s ease-out;
+    }
+
+    @keyframes popoverFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .filter-group-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .filter-select-box {
+      position: relative;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .filter-select-input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      padding: 0 30px 0 12px;
+      font-size: 13px;
+      color: #334155;
+      background: #ffffff;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .filter-select-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .filter-select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #0284c7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .filter-select-box.is-open .filter-select-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: #28a5de;
+    }
+
+    .filter-select-box.is-open .filter-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #0076C5;
+    }
+
+    .filter-options-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 50;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      padding: 4px 0;
+      box-sizing: border-box;
+    }
+
+    .filter-select-box.is-open .filter-options-list {
+      display: block;
+    }
+
+    .piutang-filter-item {
+      padding: 8px 12px;
+      font-size: 12.5px;
+      color: #475569;
+      cursor: pointer;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .piutang-filter-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .piutang-filter-item.is-selected {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .filter-actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-filter-reset {
+      flex: 1;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-reset:hover {
+      background: #f0f9ff;
+      border-color: #0076c5;
+    }
+
+    .btn-filter-apply {
+      flex: 1;
+      height: 38px;
+      border: none;
+      border-radius: 8px;
+      background: #28a5de;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-apply:hover {
+      background: #0076c5;
+    }
+
+    /* ===== DUAL MONTH CALENDAR POPOVER ===== */
+    .piutang-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 580px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      padding: 16px 18px;
+      z-index: 200;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .piutang-calendar-popover.is-active {
+      display: block;
+      animation: popoverFadeIn 0.15s ease-out;
+    }
+
+    .calendar-popover-content {
+      display: flex;
+      gap: 16px;
+    }
+
+    .calendar-presets-col {
+      width: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 12px;
+    }
+
+    .calendar-preset-btn {
+      padding: 6px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .calendar-preset-btn:hover {
+      background: #e0f2fe;
+      border-color: #28a5de;
+      color: #0284c7;
+    }
+
+    .calendar-months-col {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .month-nav-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .month-day-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+    }
+
+    .month-day {
+      font-size: 12px;
+      padding: 6px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      user-select: none;
+    }
+
+    .month-day:hover {
+      background: #f1f5f9;
+    }
+
+    .month-day.is-selected {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .month-day.in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .calendar-popover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 14px;
+      padding-top: 12px;
+    }
+
+    .calendar-range-text {
+      font-size: 12.5px;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .calendar-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-cal-cancel {
+      padding: 6px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .btn-cal-apply {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== TABLE & STICKY COLUMN ===== */
+    .piutang-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      min-height: 380px;
+    }
+
+    .piutang-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .piutang-table thead th {
+      padding: 12px 14px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #f8fafc;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: none;
+    }
+
+    .piutang-table tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    .piutang-table tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .piutang-table tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    .piutang-cell-italic {
+      font-style: italic;
+    }
+
+    /* Sticky Action Column */
+    .piutang-table th.col-sticky-action,
+    .piutang-table td.col-sticky-action {
+      position: sticky;
+      right: 0;
+      background-color: #ffffff;
+      z-index: 5;
+      text-align: center;
+      width: 65px;
+      min-width: 65px;
+      max-width: 65px;
+      box-shadow: -2px 0 6px rgba(0, 0, 0, 0.03);
+    }
+
+    .piutang-table th.col-sticky-action {
+      background-color: #f8fafc;
+      z-index: 6;
+    }
+
+    /* Action Trigger Button (Vertical 3 Dots) */
+    .piutang-action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .piutang-action-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+      border-color: #cbd5e1;
+    }
+
+    /* Floating Action Menu Popover */
+    .piutang-action-menu {
+      position: fixed;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      z-index: 9999;
+      min-width: 140px;
+      padding: 6px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .piutang-action-menu.is-open {
+      display: flex;
+      animation: popoverFadeIn 0.12s ease-out;
+    }
+
+    .piutang-action-menu button {
+      width: 100%;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      font-weight: 500;
+      text-align: left;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .piutang-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .piutang-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #0076C5;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .piutang-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .piutang-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .piutang-action-menu button.is-danger:hover {
+      background: #fef2f2;
+    }
+
+    .piutang-action-menu .piutang-action-icon.is-danger {
+      background: #e02424;
+    }
+
+    /* Badges Status */
+    .badge-status {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .badge-aktif {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .badge-terlambat {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .badge-lunas {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    /* ==========================================================================
+       MODALS (CRUD & VIEW) - 100% PERSIS SCREENSHOT 2 & 3
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.is-active,
+    .modal-overlay.is-open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .piutang-modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 860px;
+      overflow: visible !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      border: 1px solid #e2e8f0;
+      box-sizing: border-box;
+      margin: auto;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-accent-line {
+      height: 3px;
+      background: #0076C5;
+      width: 100%;
+      border-radius: 2px;
+      margin-bottom: 20px;
+    }
+
+    .modal-inner-padding {
+      padding: 22px 28px 28px;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .modal-title-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .modal-title-text em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .btn-modal-close-x {
+      width: 24px;
+      height: 24px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #64748b;
+      font-size: 13px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+
+    .btn-modal-close-x:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .modal-divider-dashed {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    /* 19 Fields Grid: 3 Kolom x 6 Baris + 1 Baris Full-Width */
+    .piutang-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 18px;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-field.span-all {
+      grid-column: 1 / -1;
+    }
+
+    .modal-field-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .modal-field-input {
+      width: 100%;
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .modal-field-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+    }
+
+    .modal-field-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .modal-field-input[readonly] {
+      background: #f8fafc;
+      color: #475569;
+    }
+
+    .modal-field-value {
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #475569;
+      font-style: italic;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Dropdown Selection Box inside Modal (Rapi, Panah Chevron Putar Halus) */
+    .modal-select-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .modal-select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0284c7;
+      pointer-events: none;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .modal-select-wrap.is-open .modal-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #0076C5;
+    }
+
+    .modal-dropdown-options {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+      z-index: 1050;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+
+    .modal-select-wrap.is-open .modal-dropdown-options {
+      display: block;
+    }
+
+    .modal-select-wrap.is-open .modal-field-input {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.18);
+    }
+
+    .modal-opt-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.12s ease, color 0.12s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .modal-opt-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .modal-opt-item.is-selected {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    /* Modal Action Buttons */
+    .modal-footer-row {
+      margin-top: 28px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Button Outline Simpan & Keluar (Gambar 2 & 3) */
+    .btn-modal-outline {
+      min-width: 140px;
+      height: 38px;
+      padding: 0 24px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-modal-outline:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +1009,1604 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <section style="padding: 24px;">
+
+        <!-- ===== MAIN PANEL ===== -->
+        <div class="piutang-panel">
+          <div class="piutang-panel-accent"></div>
+
+          <!-- ===== TOOLBAR (100% PERSIS SCREENSHOT 1) ===== -->
+          <div class="piutang-toolbar">
+            <div class="toolbar-left-group">
+              
+              <!-- 1. Tombol Filter Funnel Popover -->
+              <div class="filter-popover-wrap">
+                <button id="btnFilter" class="btn-toolbar-icon" type="button" aria-label="Filter Piutang Karyawan" title="Filter Piutang Karyawan">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                  </svg>
+                </button>
+
+                <!-- Popover Filter Content -->
+                <div id="filterDropdown" class="piutang-filter-dropdown" role="dialog" aria-modal="false">
+                  <span class="filter-group-label">Status</span>
+                  <div class="filter-select-box" id="boxFilterStatus">
+                    <input type="text" class="filter-select-input" id="filterStatus" placeholder="Pilih Status" autocomplete="off" />
+                    <span class="filter-select-arrow" id="arrowFilterStatus">
+                      <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                    <div class="filter-options-list" id="listFilterStatus"></div>
+                  </div>
+
+                  <div class="filter-actions-row">
+                    <button type="button" class="btn-filter-reset" id="btnResetFilter">Riset</button>
+                    <button type="button" class="btn-filter-apply" id="btnApplyFilter">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Tombol Kalender Popover (Dual Month Range) -->
+              <div class="filter-popover-wrap">
+                <button id="btnCalendar" class="btn-toolbar-icon" type="button" aria-label="Rentang Tanggal" title="Pilih Rentang Tanggal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </button>
+
+                <!-- Popover Dual Month Calendar -->
+                <div id="calendarDropdown" class="piutang-calendar-popover" role="dialog" aria-modal="false">
+                  <div class="calendar-popover-content">
+                    <div class="calendar-presets-col">
+                      <button type="button" class="calendar-preset-btn" data-preset="today">Hari Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-month">Bulan Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="last-month">Bulan Lalu</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-year">Tahun Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="reset">Semua Tanggal</button>
+                    </div>
+                    <div class="calendar-months-col">
+                      <div class="month-box">
+                        <div class="month-header">
+                          <button type="button" class="month-nav-btn" id="btnPrevMonth">&lt;</button>
+                          <span id="labelMonth1">Juni 2026</span>
+                          <div style="width: 24px;"></div>
+                        </div>
+                        <div class="month-grid" id="gridMonth1"></div>
+                      </div>
+                      <div class="month-box">
+                        <div class="month-header">
+                          <div style="width: 24px;"></div>
+                          <span id="labelMonth2">Juli 2026</span>
+                          <button type="button" class="month-nav-btn" id="btnNextMonth">&gt;</button>
+                        </div>
+                        <div class="month-grid" id="gridMonth2"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="calendar-popover-footer">
+                    <span class="calendar-range-text" id="calendarRangeDisplay">Semua Tanggal</span>
+                    <div class="calendar-footer-actions">
+                      <button type="button" class="btn-cal-cancel" id="btnCancelCalendar">Batal</button>
+                      <button type="button" class="btn-cal-apply" id="btnApplyCalendar">Terapkan</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Tombol Export Excel (Official Microsoft Excel Green Icon) -->
+              <button id="btnExportExcel" class="btn-toolbar-icon btn-excel" type="button" aria-label="Export Excel" title="Download Excel (.xlsx)" onclick="window.exportPiutangKaryawanExcel && window.exportPiutangKaryawanExcel()">
+                <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                  <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+
+              <!-- 4. Search Input (Pill Shape) -->
+              <div class="piutang-search-wrapper">
+                <svg class="piutang-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="piutang-search-input" id="piutangSearch" placeholder="Cari..." />
+              </div>
+            </div>
+
+            <!-- Tombol Tambah (Sisi Kanan - Konsisten: background #28a5de, font Outfit 13px bold, + Tambah) -->
+            <button type="button" class="btn-tambah-piutang" id="btnTambahPiutang">+ Tambah</button>
+          </div>
+
+          <!-- Table Container (Headers: # | ID Pinjam | Tanggal Pinjam | NIK | Nama Karyawan | Pokok Pinjaman | Tenor(Bulan) | Status | Aksi) -->
+          <div class="piutang-table-wrap">
+            <table class="piutang-table" id="piutangTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px; text-align: center;">#</th>
+                  <th>ID Pinjam</th>
+                  <th>Tanggal Pinjam</th>
+                  <th>NIK</th>
+                  <th>Nama Karyawan</th>
+                  <th style="text-align: right;">Pokok Pinjaman</th>
+                  <th style="text-align: center;">Tenor(Bulan)</th>
+                  <th style="text-align: center;">Status</th>
+                  <th class="col-sticky-action">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="piutangTableBody">
+                <!-- Diisi via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </main>
   </div>
 
+  <!-- ===== FLOATING ACTION MENU ===== -->
+  <div id="piutangActionMenu" class="piutang-action-menu" role="menu" aria-hidden="true">
+    <button type="button" role="menuitem" data-action="view">
+      <span class="piutang-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" role="menuitem" data-action="edit">
+      <span class="piutang-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" role="menuitem" data-action="delete" class="is-danger">
+      <span class="piutang-action-icon is-danger" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <!-- ===== MODAL CRUD: "Tambah / Edit Piutang Karyawan" (100% PERSIS SCREENSHOT 2) ===== -->
+  <div id="piutangCrudModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="piutang-modal-box">
+      <div class="modal-inner-padding">
+        
+        <!-- Top Blue Accent Line (Sesuai Screenshot 2) -->
+        <div class="modal-accent-line"></div>
+
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="crudModalTitle">
+            <span id="crudActionType">Tambah</span> <em>Piutang Karyawan</em>
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseCrudX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 19 Fields Grid (Sesuai Screenshot 2) -->
+        <form id="piutangForm">
+          <input type="hidden" id="crudEditId" value="" />
+          <div class="piutang-form-grid">
+            
+            <!-- Row 1: ID Pinjaman, Tanggal Pinjam, NIK -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudIdPinjaman">ID Pinjaman</label>
+              <input type="text" id="crudIdPinjaman" class="modal-field-input" placeholder="Tambah ID Pinjam" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudTanggalPinjam">Tanggal Pinjam</label>
+              <input type="text" id="crudTanggalPinjam" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudNik">NIK</label>
+              <input type="text" id="crudNik" class="modal-field-input" placeholder="Tambah NIK" required />
+            </div>
+
+            <!-- Row 2: Nama Karyawan, Divisi, Pokok Pinjaman -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudNamaKaryawan">Nama Karyawan</label>
+              <input type="text" id="crudNamaKaryawan" class="modal-field-input" placeholder="Tambah Nama Karyawan" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudDivisi">Divisi</label>
+              <input type="text" id="crudDivisi" class="modal-field-input" placeholder="Tambah Divisi" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudPokokPinjaman">Pokok Pinjaman</label>
+              <input type="text" id="crudPokokPinjaman" class="modal-field-input" placeholder="Rp -" required />
+            </div>
+
+            <!-- Row 3: Tenor (Bulan), Cicilan/Bulan, Total Dibayar -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudTenor">Tenor (Bulan)</label>
+              <input type="number" id="crudTenor" class="modal-field-input" placeholder="Tambah Tenor" min="1" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudCicilanBulan">Cicilan/Bulan</label>
+              <input type="text" id="crudCicilanBulan" class="modal-field-input" placeholder="Rp. -" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudTotalDibayar">Total Dibayar</label>
+              <input type="text" id="crudTotalDibayar" class="modal-field-input" placeholder="Rp. -" />
+            </div>
+
+            <!-- Row 4: Sisa Piutang, Jatuh Tempo Berikutnya, Status -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudSisaPiutang">Sisa Piutang</label>
+              <input type="text" id="crudSisaPiutang" class="modal-field-input" placeholder="Rp. -" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudJatuhTempo">Jatuh Tempo Berikutnya</label>
+              <input type="text" id="crudJatuhTempo" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudStatus">Status</label>
+              <div class="modal-select-wrap" id="wrapStatusModal">
+                <input type="text" id="crudStatus" class="modal-field-input" placeholder="Status" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <span class="modal-select-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="modal-dropdown-options" id="menuStatusModal">
+                  <div class="modal-opt-item" data-value="Aktif">Aktif</div>
+                  <div class="modal-opt-item" data-value="Terlambat">Terlambat</div>
+                  <div class="modal-opt-item" data-value="Lunas">Lunas</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 5: ID Pembayaran, Tanggal Bayar, ID Pinjaman Bayar -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudIdPembayaran">ID Pembayaran</label>
+              <input type="text" id="crudIdPembayaran" class="modal-field-input" placeholder="Tambah ID Pembayaran" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudTanggalBayar">Tanggal Bayar</label>
+              <input type="text" id="crudTanggalBayar" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudIdPinjamanBayar">ID Pinjaman Bayar</label>
+              <input type="text" id="crudIdPinjamanBayar" class="modal-field-input" placeholder="Tambah ID Pinjaman" />
+            </div>
+
+            <!-- Row 6: NIK Bayar, Metode, Nominal -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudNikBayar">NIK Bayar</label>
+              <input type="text" id="crudNikBayar" class="modal-field-input" placeholder="Tambah NIK Bayar" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudMetode">Metode</label>
+              <input type="text" id="crudMetode" class="modal-field-input" placeholder="Tambah Metode" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudNominalBayar">Nominal</label>
+              <input type="text" id="crudNominalBayar" class="modal-field-input" placeholder="Rp. -" />
+            </div>
+
+            <!-- Row 7: Catatan (Full-Width) -->
+            <div class="modal-field span-all">
+              <label class="modal-field-label" for="crudCatatan">Catatan</label>
+              <input type="text" id="crudCatatan" class="modal-field-input" placeholder="Tambah Catatan" />
+            </div>
+
+          </div>
+
+          <!-- Footer: Tombol Outline Simpan (Sesuai Gambar 2) -->
+          <div class="modal-footer-row">
+            <button type="submit" class="btn-modal-outline" id="btnSimpanPiutang">Simpan</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETAIL: "Lihat Piutang Karyawan" (100% PERSIS SCREENSHOT 3) ===== -->
+  <div id="piutangDetailModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="piutang-modal-box">
+      <div class="modal-inner-padding">
+        
+        <!-- Top Blue Accent Line (Sesuai Screenshot 3) -->
+        <div class="modal-accent-line"></div>
+
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="detailModalTitle">
+            <span>Lihat</span> <em>Piutang Karyawan</em>
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseDetailX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 19 Fields Grid (Sesuai Screenshot 3) -->
+        <div class="piutang-form-grid">
+          <!-- Row 1: ID Pinjaman, Tanggal Pinjam, NIK -->
+          <div class="modal-field">
+            <span class="modal-field-label">ID Pinjaman</span>
+            <div class="modal-field-value" id="detailIdPinjaman">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Tanggal Pinjam</span>
+            <div class="modal-field-value" id="detailTanggalPinjam">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">NIK</span>
+            <div class="modal-field-value" id="detailNik">-</div>
+          </div>
+
+          <!-- Row 2: Nama Karyawan, Divisi, Pokok Pinjaman -->
+          <div class="modal-field">
+            <span class="modal-field-label">Nama Karyawan</span>
+            <div class="modal-field-value" id="detailNamaKaryawan">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Divisi</span>
+            <div class="modal-field-value" id="detailDivisi">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Pokok Pinjaman</span>
+            <div class="modal-field-value" id="detailPokokPinjaman">-</div>
+          </div>
+
+          <!-- Row 3: Tenor (Bulan), Cicilan/Bulan, Total Dibayar -->
+          <div class="modal-field">
+            <span class="modal-field-label">Tenor (Bulan)</span>
+            <div class="modal-field-value" id="detailTenor">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Cicilan/Bulan</span>
+            <div class="modal-field-value" id="detailCicilanBulan">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Total Dibayar</span>
+            <div class="modal-field-value" id="detailTotalDibayar">-</div>
+          </div>
+
+          <!-- Row 4: Sisa Piutang, Jatuh Tempo Berikutnya, Status -->
+          <div class="modal-field">
+            <span class="modal-field-label">Sisa Piutang</span>
+            <div class="modal-field-value" id="detailSisaPiutang">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Jatuh Tempo Berikutnya</span>
+            <div class="modal-field-value" id="detailJatuhTempo">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Status</span>
+            <div class="modal-field-value" id="detailStatus">-</div>
+          </div>
+
+          <!-- Row 5: ID Pembayaran, Tanggal Bayar, ID Pinjaman Bayar -->
+          <div class="modal-field">
+            <span class="modal-field-label">ID Pembayaran</span>
+            <div class="modal-field-value" id="detailIdPembayaran">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Tanggal Bayar</span>
+            <div class="modal-field-value" id="detailTanggalBayar">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">ID Pinjaman Bayar</span>
+            <div class="modal-field-value" id="detailIdPinjamanBayar">-</div>
+          </div>
+
+          <!-- Row 6: NIK Bayar, Metode, Nominal -->
+          <div class="modal-field">
+            <span class="modal-field-label">NIK Bayar</span>
+            <div class="modal-field-value" id="detailNikBayar">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Metode</span>
+            <div class="modal-field-value" id="detailMetode">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Nominal</span>
+            <div class="modal-field-value" id="detailNominalBayar">-</div>
+          </div>
+
+          <!-- Row 7: Catatan (Full-Width) -->
+          <div class="modal-field span-all">
+            <span class="modal-field-label">Catatan</span>
+            <div class="modal-field-value" id="detailCatatan">-</div>
+          </div>
+        </div>
+
+        <!-- Footer: Button "Keluar" (Sesuai Gambar 3) -->
+        <div class="modal-footer-row">
+          <button type="button" class="btn-modal-outline" id="btnKeluarDetail">Keluar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      'use strict';
+
+      /* ===== DATA MODEL PIUTANG KARYAWAN ===== */
+      const STORAGE_KEY = 'accounting_piutang_karyawan_data';
+
+      // Default data matching Screenshot 3: LOAN-2609-002 (Raka, EMP-002, Rp 5,000,000, Tenor 5, Terlambat)
+      const defaultPiutangData = [
+        {
+          id: 'PK-001',
+          idPinjaman: 'LOAN-2609-002',
+          tanggalPinjam: '2026-08-15',
+          nik: 'EMP-002',
+          namaKaryawan: 'Raka',
+          divisi: 'Marketing',
+          pokokPinjaman: 5000000,
+          tenor: 5,
+          cicilanPerBulan: 1000000,
+          totalDibayar: 1000000,
+          sisaPiutang: 4000000,
+          jatuhTempoBerikutnya: '2026-10-15',
+          status: 'Terlambat',
+          idPembayaran: 'PAY-2609-002',
+          tanggalBayar: '2026-09-03',
+          idPinjamanBayar: 'LOAN-2609-002',
+          nikBayar: 'EMP-002',
+          metode: 'Potong Gaji',
+          nominalBayar: 1000000,
+          catatan: 'Cicilan ke-1'
+        },
+        {
+          id: 'PK-002',
+          idPinjaman: 'LOAN-2609-001',
+          tanggalPinjam: '2026-07-10',
+          nik: 'EMP-001',
+          namaKaryawan: 'Ahmad Fauzi',
+          divisi: 'Production Studio',
+          pokokPinjaman: 3000000,
+          tenor: 3,
+          cicilanPerBulan: 1000000,
+          totalDibayar: 3000000,
+          sisaPiutang: 0,
+          jatuhTempoBerikutnya: '2026-10-10',
+          status: 'Lunas',
+          idPembayaran: 'PAY-2609-001',
+          tanggalBayar: '2026-10-05',
+          idPinjamanBayar: 'LOAN-2609-001',
+          nikBayar: 'EMP-001',
+          metode: 'Potong Gaji',
+          nominalBayar: 1000000,
+          catatan: 'Pelunasan cicilan ke-3'
+        },
+        {
+          id: 'PK-003',
+          idPinjaman: 'LOAN-2609-003',
+          tanggalPinjam: '2026-09-01',
+          nik: 'EMP-005',
+          namaKaryawan: 'Siti Rahma',
+          divisi: 'Agency',
+          pokokPinjaman: 6000000,
+          tenor: 6,
+          cicilanPerBulan: 1000000,
+          totalDibayar: 2000000,
+          sisaPiutang: 4000000,
+          jatuhTempoBerikutnya: '2026-11-01',
+          status: 'Aktif',
+          idPembayaran: 'PAY-2609-003',
+          tanggalBayar: '2026-10-02',
+          idPinjamanBayar: 'LOAN-2609-003',
+          nikBayar: 'EMP-005',
+          metode: 'Transfer Bank',
+          nominalBayar: 1000000,
+          catatan: 'Cicilan ke-2'
+        },
+        {
+          id: 'PK-004',
+          idPinjaman: 'LOAN-2609-004',
+          tanggalPinjam: '2026-09-20',
+          nik: 'EMP-008',
+          namaKaryawan: 'Budi Santoso',
+          divisi: 'Media & Kreatif',
+          pokokPinjaman: 4000000,
+          tenor: 4,
+          cicilanPerBulan: 1000000,
+          totalDibayar: 1000000,
+          sisaPiutang: 3000000,
+          jatuhTempoBerikutnya: '2026-11-20',
+          status: 'Aktif',
+          idPembayaran: 'PAY-2609-004',
+          tanggalBayar: '2026-10-21',
+          idPinjamanBayar: 'LOAN-2609-004',
+          nikBayar: 'EMP-008',
+          metode: 'Potong Gaji',
+          nominalBayar: 1000000,
+          catatan: 'Cicilan ke-1'
+        },
+        {
+          id: 'PK-005',
+          idPinjaman: 'LOAN-2609-005',
+          tanggalPinjam: '2026-06-15',
+          nik: 'EMP-012',
+          namaKaryawan: 'Dewi Lestari',
+          divisi: 'Talent Management',
+          pokokPinjaman: 2500000,
+          tenor: 5,
+          cicilanPerBulan: 500000,
+          totalDibayar: 2500000,
+          sisaPiutang: 0,
+          jatuhTempoBerikutnya: '2026-11-15',
+          status: 'Lunas',
+          idPembayaran: 'PAY-2609-005',
+          tanggalBayar: '2026-10-15',
+          idPinjamanBayar: 'LOAN-2609-005',
+          nikBayar: 'EMP-012',
+          metode: 'Potong Gaji',
+          nominalBayar: 500000,
+          catatan: 'Pelunasan pinjaman'
+        }
+      ];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error('Gagal memuat data piutang karyawan:', e);
+        }
+        return defaultPiutangData;
+      }
+
+      function saveData(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.error('Gagal menyimpan data piutang karyawan:', e);
+        }
+      }
+
+      let piutangData = loadData();
+
+      // State Filters
+      let filterState = {
+        search: '',
+        status: '',
+        startDate: '',
+        endDate: ''
+      };
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('piutangTableBody');
+      const searchInput = document.getElementById('piutangSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+      const btnTambahPiutang = document.getElementById('btnTambahPiutang');
+
+      // Action Menu
+      const actionMenu = document.getElementById('piutangActionMenu');
+      let currentActionId = null;
+
+      // Filter Funnel Popover Elements
+      const btnFilter = document.getElementById('btnFilter');
+      const filterDropdown = document.getElementById('filterDropdown');
+      const filterStatus = document.getElementById('filterStatus');
+      const boxFilterStatus = document.getElementById('boxFilterStatus');
+      const listFilterStatus = document.getElementById('listFilterStatus');
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      // Calendar Filter Elements
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const labelMonth1 = document.getElementById('labelMonth1');
+      const labelMonth2 = document.getElementById('labelMonth2');
+      const gridMonth1 = document.getElementById('gridMonth1');
+      const gridMonth2 = document.getElementById('gridMonth2');
+      const btnPrevMonth = document.getElementById('btnPrevMonth');
+      const btnNextMonth = document.getElementById('btnNextMonth');
+      const calendarRangeDisplay = document.getElementById('calendarRangeDisplay');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+
+      // CRUD Modal Elements (Screenshot 2)
+      const crudModal = document.getElementById('piutangCrudModal');
+      const crudForm = document.getElementById('piutangForm');
+      const crudActionType = document.getElementById('crudActionType');
+      const crudEditId = document.getElementById('crudEditId');
+      const crudIdPinjaman = document.getElementById('crudIdPinjaman');
+      const crudTanggalPinjam = document.getElementById('crudTanggalPinjam');
+      const crudNik = document.getElementById('crudNik');
+      const crudNamaKaryawan = document.getElementById('crudNamaKaryawan');
+      const crudDivisi = document.getElementById('crudDivisi');
+      const crudPokokPinjaman = document.getElementById('crudPokokPinjaman');
+      const crudTenor = document.getElementById('crudTenor');
+      const crudCicilanBulan = document.getElementById('crudCicilanBulan');
+      const crudTotalDibayar = document.getElementById('crudTotalDibayar');
+      const crudSisaPiutang = document.getElementById('crudSisaPiutang');
+      const crudJatuhTempo = document.getElementById('crudJatuhTempo');
+      const crudStatus = document.getElementById('crudStatus');
+      const wrapStatusModal = document.getElementById('wrapStatusModal');
+      const menuStatusModal = document.getElementById('menuStatusModal');
+      const crudIdPembayaran = document.getElementById('crudIdPembayaran');
+      const crudTanggalBayar = document.getElementById('crudTanggalBayar');
+      const crudIdPinjamanBayar = document.getElementById('crudIdPinjamanBayar');
+      const crudNikBayar = document.getElementById('crudNikBayar');
+      const crudMetode = document.getElementById('crudMetode');
+      const crudNominalBayar = document.getElementById('crudNominalBayar');
+      const crudCatatan = document.getElementById('crudCatatan');
+      const btnCloseCrudX = document.getElementById('btnCloseCrudX');
+
+      // Detail Modal Elements (Screenshot 3)
+      const detailModal = document.getElementById('piutangDetailModal');
+      const detailIdPinjaman = document.getElementById('detailIdPinjaman');
+      const detailTanggalPinjam = document.getElementById('detailTanggalPinjam');
+      const detailNik = document.getElementById('detailNik');
+      const detailNamaKaryawan = document.getElementById('detailNamaKaryawan');
+      const detailDivisi = document.getElementById('detailDivisi');
+      const detailPokokPinjaman = document.getElementById('detailPokokPinjaman');
+      const detailTenor = document.getElementById('detailTenor');
+      const detailCicilanBulan = document.getElementById('detailCicilanBulan');
+      const detailTotalDibayar = document.getElementById('detailTotalDibayar');
+      const detailSisaPiutang = document.getElementById('detailSisaPiutang');
+      const detailJatuhTempo = document.getElementById('detailJatuhTempo');
+      const detailStatus = document.getElementById('detailStatus');
+      const detailIdPembayaran = document.getElementById('detailIdPembayaran');
+      const detailTanggalBayar = document.getElementById('detailTanggalBayar');
+      const detailIdPinjamanBayar = document.getElementById('detailIdPinjamanBayar');
+      const detailNikBayar = document.getElementById('detailNikBayar');
+      const detailMetode = document.getElementById('detailMetode');
+      const detailNominalBayar = document.getElementById('detailNominalBayar');
+      const detailCatatan = document.getElementById('detailCatatan');
+      const btnCloseDetailX = document.getElementById('btnCloseDetailX');
+      const btnKeluarDetail = document.getElementById('btnKeluarDetail');
+
+      /* ===== FORMATTING UTILITIES ===== */
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatRupiahSpasi(num) {
+        const val = Math.round(Number(num) || 0);
+        return 'Rp ' + val.toLocaleString('id-ID');
+      }
+
+      function cleanRupiah(str) {
+        if (!str) return 0;
+        return Number(String(str).replace(/\D/g, '')) || 0;
+      }
+
+      function formatTanggalDisplay(isoStr) {
+        if (!isoStr) return '-';
+        const parts = isoStr.split('-');
+        if (parts.length !== 3) return isoStr;
+        const y = parts[0];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const d = parts[2].padStart(2, '0');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return d + ' ' + (months[mIdx] || parts[1]) + ' ' + y;
+      }
+
+      function getStatusBadge(status) {
+        const st = (status || '').toLowerCase();
+        if (st.includes('lunas')) return 'badge-lunas';
+        if (st.includes('lambat')) return 'badge-terlambat';
+        return 'badge-aktif';
+      }
+
+      function closeModals() {
+        if (crudModal) crudModal.classList.remove('is-active');
+        if (detailModal) detailModal.classList.remove('is-active');
+        if (boxFilterStatus) boxFilterStatus.classList.remove('is-open');
+        if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+      }
+
+      /* ===== MODAL STATUS CUSTOM DROPDOWN ===== */
+      if (crudStatus && wrapStatusModal && menuStatusModal) {
+        crudStatus.addEventListener('click', function (e) {
+          e.stopPropagation();
+          wrapStatusModal.classList.toggle('is-open');
+        });
+
+        menuStatusModal.querySelectorAll('.modal-opt-item').forEach(function (el) {
+          el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const val = el.getAttribute('data-value') || el.textContent.trim();
+            crudStatus.value = val;
+            menuStatusModal.querySelectorAll('.modal-opt-item').forEach(function (item) {
+              item.classList.toggle('is-selected', item === el);
+            });
+            wrapStatusModal.classList.remove('is-open');
+          });
+        });
+      }
+
+      /* ===== AUTO-CALCULATION FOR CRUD FORM ===== */
+      function autoCalculateLoan() {
+        const pokok = cleanRupiah(crudPokokPinjaman.value);
+        const tenor = parseInt(crudTenor.value, 10) || 0;
+        const totalBayar = cleanRupiah(crudTotalDibayar.value);
+
+        if (pokok > 0 && tenor > 0) {
+          const cicilan = Math.round(pokok / tenor);
+          crudCicilanBulan.value = formatRupiahSpasi(cicilan);
+        }
+
+        const sisa = Math.max(0, pokok - totalBayar);
+        crudSisaPiutang.value = formatRupiahSpasi(sisa);
+
+        if (sisa === 0 && pokok > 0) {
+          crudStatus.value = 'Lunas';
+        }
+      }
+
+      if (crudPokokPinjaman) {
+        crudPokokPinjaman.addEventListener('input', function () {
+          const num = cleanRupiah(this.value);
+          this.value = num ? formatRupiahSpasi(num) : '';
+          autoCalculateLoan();
+        });
+      }
+
+      if (crudTenor) {
+        crudTenor.addEventListener('input', autoCalculateLoan);
+      }
+
+      if (crudTotalDibayar) {
+        crudTotalDibayar.addEventListener('input', function () {
+          const num = cleanRupiah(this.value);
+          this.value = num ? formatRupiahSpasi(num) : '';
+          autoCalculateLoan();
+        });
+      }
+
+      if (crudNominalBayar) {
+        crudNominalBayar.addEventListener('input', function () {
+          const num = cleanRupiah(this.value);
+          this.value = num ? formatRupiahSpasi(num) : '';
+        });
+      }
+
+      // Sync NIK and ID Pinjaman to payment fields automatically
+      if (crudNik && crudNikBayar) {
+        crudNik.addEventListener('input', function () {
+          if (!crudNikBayar.value || crudNikBayar.dataset.auto) {
+            crudNikBayar.value = this.value;
+            crudNikBayar.dataset.auto = '1';
+          }
+        });
+      }
+
+      if (crudIdPinjaman && crudIdPinjamanBayar) {
+        crudIdPinjaman.addEventListener('input', function () {
+          if (!crudIdPinjamanBayar.value || crudIdPinjamanBayar.dataset.auto) {
+            crudIdPinjamanBayar.value = this.value;
+            crudIdPinjamanBayar.dataset.auto = '1';
+          }
+        });
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        return piutangData.filter(function (item) {
+          if (filterState.search) {
+            const q = filterState.search.toLowerCase();
+            const matchId = (item.idPinjaman || '').toLowerCase().includes(q);
+            const matchNik = (item.nik || '').toLowerCase().includes(q);
+            const matchNama = (item.namaKaryawan || '').toLowerCase().includes(q);
+            const matchDiv = (item.divisi || '').toLowerCase().includes(q);
+            if (!matchId && !matchNik && !matchNama && !matchDiv) return false;
+          }
+
+          if (filterState.status && filterState.status !== 'Semua Status') {
+            if ((item.status || '').trim().toLowerCase() !== filterState.status.toLowerCase()) return false;
+          }
+
+          if (filterState.startDate) {
+            if (!item.tanggalPinjam || item.tanggalPinjam < filterState.startDate) return false;
+          }
+          if (filterState.endDate) {
+            if (!item.tanggalPinjam || item.tanggalPinjam > filterState.endDate) return false;
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== RENDER TABLE (9 KOLOM SESUAI GAMBAR 1) ===== */
+      function renderTable() {
+        if (!tableBody) return;
+        const filtered = getFilteredData();
+        tableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const emptyRow = document.createElement('tr');
+          emptyRow.innerHTML = '<td colspan="9" style="text-align: center; padding: 48px 16px; color: #94a3b8; font-style: italic;">' +
+            'Tidak ada data piutang karyawan yang sesuai' +
+            '</td>';
+          tableBody.appendChild(emptyRow);
+          return;
+        }
+
+        filtered.forEach(function (item, idx) {
+          const tr = document.createElement('tr');
+          const badgeStatusCls = getStatusBadge(item.status);
+
+          tr.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-size: 13px;">' + (idx + 1) + '</td>',
+            '<td class="piutang-cell-italic" style="font-weight: 500; color: #0284c7;">' + escapeHtml(item.idPinjaman || '-') + '</td>',
+            '<td class="piutang-cell-italic">' + escapeHtml(formatTanggalDisplay(item.tanggalPinjam)) + '</td>',
+            '<td class="piutang-cell-italic" style="color: #64748b;">' + escapeHtml(item.nik || '-') + '</td>',
+            '<td style="font-weight: 600; color: #0f172a;">' + escapeHtml(item.namaKaryawan || '-') + '</td>',
+            '<td class="piutang-cell-italic" style="text-align: right; font-weight: 600; color: #0f172a;">' + escapeHtml(formatRupiahSpasi(item.pokokPinjaman)) + '</td>',
+            '<td style="text-align: center; font-weight: 500;">' + escapeHtml(item.tenor || 0) + '</td>',
+            '<td style="text-align: center;"><span class="badge-status ' + badgeStatusCls + '">' + escapeHtml(item.status || 'Aktif') + '</span></td>',
+            '<td class="col-sticky-action" style="text-align: center;">' +
+              '<button type="button" class="piutang-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: currentColor;">' +
+                  '<circle cx="12" cy="5" r="2"></circle>' +
+                  '<circle cx="12" cy="12" r="2"></circle>' +
+                  '<circle cx="12" cy="19" r="2"></circle>' +
+                '</svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+
+          tableBody.appendChild(tr);
+        });
+      }
+
+      /* ===== FLOATING ACTION MENU LOGIC ===== */
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = 120;
+
+        let left = rect.left - menuWidth + rect.width;
+        let top = rect.bottom + 4;
+
+        if (left < 10) left = 10;
+        if (top + menuHeight > window.innerHeight) {
+          top = rect.top - menuHeight - 4;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const actionBtn = e.target.closest('[data-action-toggle]');
+          if (actionBtn) {
+            e.stopPropagation();
+            openActionMenu(actionBtn);
+          }
+        });
+      }
+
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-action]');
+          if (!btn || !currentActionId) return;
+
+          const action = btn.getAttribute('data-action');
+          const targetItem = piutangData.find(function (x) { return String(x.id) === String(currentActionId); });
+          closeActionMenus();
+
+          if (!targetItem) return;
+
+          if (action === 'view') {
+            openViewPiutang(targetItem.id);
+          } else if (action === 'edit') {
+            openEditPiutang(targetItem.id);
+          } else if (action === 'delete') {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: 'Hapus Piutang Karyawan?',
+                html: 'Yakin ingin menghapus data pinjaman <b>' + escapeHtml(targetItem.idPinjaman) + '</b> milik <b>' + escapeHtml(targetItem.namaKaryawan) + '</b>?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+              }).then(function (result) {
+                if (result.isConfirmed) {
+                  piutangData = piutangData.filter(function (x) { return String(x.id) !== String(targetItem.id); });
+                  saveData(piutangData);
+                  renderTable();
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Terhapus',
+                    text: 'Data piutang karyawan berhasil dihapus.',
+                    timer: 1400,
+                    showConfirmButton: false
+                  });
+                }
+              });
+            }
+          }
+        });
+      }
+
+      /* ===== GENERATOR NEXT ID PINJAMAN ===== */
+      function getNextLoanId() {
+        const now = new Date();
+        const yy = String(now.getFullYear()).slice(-2);
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const prefix = 'LOAN-' + yy + mm + '-';
+
+        let maxNum = 0;
+        piutangData.forEach(function (item) {
+          if (item.idPinjaman && item.idPinjaman.startsWith(prefix)) {
+            const num = parseInt(item.idPinjaman.replace(prefix, ''), 10);
+            if (num > maxNum) maxNum = num;
+          }
+        });
+        return prefix + String(maxNum + 1).padStart(3, '0');
+      }
+
+      /* ===== FORM CRUD & DETAIL MODAL HANDLERS (GAMBAR 2 & 3) ===== */
+      function openAddPiutang() {
+        if (crudForm) crudForm.reset();
+        if (crudActionType) crudActionType.textContent = 'Tambah';
+        if (crudEditId) crudEditId.value = '';
+
+        const autoId = getNextLoanId();
+        if (crudIdPinjaman) crudIdPinjaman.value = autoId;
+        if (crudIdPinjamanBayar) crudIdPinjamanBayar.value = autoId;
+        if (crudIdPembayaran) {
+          const yy = String(new Date().getFullYear()).slice(-2);
+          const mm = String(new Date().getMonth() + 1).padStart(2, '0');
+          crudIdPembayaran.value = 'PAY-' + yy + mm + '-' + String(piutangData.length + 1).padStart(3, '0');
+        }
+
+        if (crudTanggalPinjam) {
+          crudTanggalPinjam.type = 'text';
+          crudTanggalPinjam.value = '';
+        }
+        if (crudJatuhTempo) {
+          crudJatuhTempo.type = 'text';
+          crudJatuhTempo.value = '';
+        }
+        if (crudTanggalBayar) {
+          crudTanggalBayar.type = 'text';
+          crudTanggalBayar.value = '';
+        }
+
+        if (crudStatus) crudStatus.value = 'Aktif';
+        if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        if (menuStatusModal) {
+          menuStatusModal.querySelectorAll('.modal-opt-item').forEach(function (item) {
+            item.classList.toggle('is-selected', item.getAttribute('data-value') === 'Aktif');
+          });
+        }
+        if (crudMetode) crudMetode.value = 'Potong Gaji';
+
+        if (crudModal) crudModal.classList.add('is-active');
+      }
+
+      function openEditPiutang(id) {
+        const item = piutangData.find(function (x) { return String(x.id) === String(id); });
+        if (!item) return;
+
+        if (crudActionType) crudActionType.textContent = 'Edit';
+        if (crudEditId) crudEditId.value = item.id;
+        if (crudIdPinjaman) crudIdPinjaman.value = item.idPinjaman || '';
+        if (crudTanggalPinjam) {
+          crudTanggalPinjam.type = item.tanggalPinjam ? 'date' : 'text';
+          crudTanggalPinjam.value = item.tanggalPinjam || '';
+        }
+        if (crudNik) crudNik.value = item.nik || '';
+        if (crudNamaKaryawan) crudNamaKaryawan.value = item.namaKaryawan || '';
+        if (crudDivisi) crudDivisi.value = item.divisi || '';
+        if (crudPokokPinjaman) crudPokokPinjaman.value = item.pokokPinjaman ? formatRupiahSpasi(item.pokokPinjaman) : '';
+        if (crudTenor) crudTenor.value = item.tenor || '';
+        if (crudCicilanBulan) crudCicilanBulan.value = item.cicilanPerBulan ? formatRupiahSpasi(item.cicilanPerBulan) : '';
+        if (crudTotalDibayar) crudTotalDibayar.value = item.totalDibayar ? formatRupiahSpasi(item.totalDibayar) : '';
+        if (crudSisaPiutang) crudSisaPiutang.value = item.sisaPiutang ? formatRupiahSpasi(item.sisaPiutang) : '';
+        if (crudJatuhTempo) {
+          crudJatuhTempo.type = item.jatuhTempoBerikutnya ? 'date' : 'text';
+          crudJatuhTempo.value = item.jatuhTempoBerikutnya || '';
+        }
+        const currentSt = item.status || 'Aktif';
+        if (crudStatus) crudStatus.value = currentSt;
+        if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        if (menuStatusModal) {
+          menuStatusModal.querySelectorAll('.modal-opt-item').forEach(function (optEl) {
+            optEl.classList.toggle('is-selected', optEl.getAttribute('data-value') === currentSt);
+          });
+        }
+        if (crudIdPembayaran) crudIdPembayaran.value = item.idPembayaran || '';
+        if (crudTanggalBayar) {
+          crudTanggalBayar.type = item.tanggalBayar ? 'date' : 'text';
+          crudTanggalBayar.value = item.tanggalBayar || '';
+        }
+        if (crudIdPinjamanBayar) crudIdPinjamanBayar.value = item.idPinjamanBayar || item.idPinjaman || '';
+        if (crudNikBayar) crudNikBayar.value = item.nikBayar || item.nik || '';
+        if (crudMetode) crudMetode.value = item.metode || '';
+        if (crudNominalBayar) crudNominalBayar.value = item.nominalBayar ? formatRupiahSpasi(item.nominalBayar) : '';
+        if (crudCatatan) crudCatatan.value = item.catatan || '';
+
+        if (crudModal) crudModal.classList.add('is-active');
+      }
+
+      function openViewPiutang(id) {
+        const item = piutangData.find(function (x) { return String(x.id) === String(id); });
+        if (!item) return;
+
+        if (detailIdPinjaman) detailIdPinjaman.textContent = item.idPinjaman || '-';
+        if (detailTanggalPinjam) detailTanggalPinjam.textContent = formatTanggalDisplay(item.tanggalPinjam);
+        if (detailNik) detailNik.textContent = item.nik || '-';
+        if (detailNamaKaryawan) detailNamaKaryawan.textContent = item.namaKaryawan || '-';
+        if (detailDivisi) detailDivisi.textContent = item.divisi || '-';
+        if (detailPokokPinjaman) detailPokokPinjaman.textContent = formatRupiahSpasi(item.pokokPinjaman);
+        if (detailTenor) detailTenor.textContent = item.tenor || '0';
+        if (detailCicilanBulan) detailCicilanBulan.textContent = formatRupiahSpasi(item.cicilanPerBulan);
+        if (detailTotalDibayar) detailTotalDibayar.textContent = formatRupiahSpasi(item.totalDibayar);
+        if (detailSisaPiutang) detailSisaPiutang.textContent = formatRupiahSpasi(item.sisaPiutang);
+        if (detailJatuhTempo) detailJatuhTempo.textContent = formatTanggalDisplay(item.jatuhTempoBerikutnya);
+        if (detailStatus) detailStatus.textContent = item.status || '-';
+        if (detailIdPembayaran) detailIdPembayaran.textContent = item.idPembayaran || '-';
+        if (detailTanggalBayar) detailTanggalBayar.textContent = formatTanggalDisplay(item.tanggalBayar);
+        if (detailIdPinjamanBayar) detailIdPinjamanBayar.textContent = item.idPinjamanBayar || item.idPinjaman || '-';
+        if (detailNikBayar) detailNikBayar.textContent = item.nikBayar || item.nik || '-';
+        if (detailMetode) detailMetode.textContent = item.metode || '-';
+        if (detailNominalBayar) detailNominalBayar.textContent = formatRupiahSpasi(item.nominalBayar);
+        if (detailCatatan) detailCatatan.textContent = item.catatan || '-';
+
+        if (detailModal) detailModal.classList.add('is-active');
+      }
+
+      if (btnTambahPiutang) {
+        btnTambahPiutang.addEventListener('click', openAddPiutang);
+      }
+      if (btnCloseCrudX) {
+        btnCloseCrudX.addEventListener('click', closeModals);
+      }
+      if (btnCloseDetailX) {
+        btnCloseDetailX.addEventListener('click', closeModals);
+      }
+      if (btnKeluarDetail) {
+        btnKeluarDetail.addEventListener('click', closeModals);
+      }
+
+      /* ===== FORM SUBMIT (CREATE & UPDATE) ===== */
+      if (crudForm) {
+        crudForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const editId = crudEditId ? crudEditId.value : '';
+          const idPinjamVal = (crudIdPinjaman && crudIdPinjaman.value.trim()) || getNextLoanId();
+          const tglPinjamVal = crudTanggalPinjam ? crudTanggalPinjam.value : '';
+          const nikVal = (crudNik && crudNik.value.trim()) || '';
+          const namaVal = (crudNamaKaryawan && crudNamaKaryawan.value.trim()) || '';
+          const divisiVal = (crudDivisi && crudDivisi.value.trim()) || '';
+          const pokokClean = cleanRupiah(crudPokokPinjaman ? crudPokokPinjaman.value : '');
+          const tenorVal = parseInt(crudTenor ? crudTenor.value : 0, 10) || 1;
+          const cicilanClean = cleanRupiah(crudCicilanBulan ? crudCicilanBulan.value : '') || Math.round(pokokClean / tenorVal);
+          const dibayarClean = cleanRupiah(crudTotalDibayar ? crudTotalDibayar.value : '');
+          const sisaClean = Math.max(0, pokokClean - dibayarClean);
+          const jtVal = crudJatuhTempo ? crudJatuhTempo.value : '';
+          const statusVal = crudStatus ? crudStatus.value : 'Aktif';
+          const idBayarVal = (crudIdPembayaran && crudIdPembayaran.value.trim()) || '';
+          const tglBayarVal = crudTanggalBayar ? crudTanggalBayar.value : '';
+          const idPinjamBayarVal = (crudIdPinjamanBayar && crudIdPinjamanBayar.value.trim()) || idPinjamVal;
+          const nikBayarVal = (crudNikBayar && crudNikBayar.value.trim()) || nikVal;
+          const metodeVal = (crudMetode && crudMetode.value.trim()) || '';
+          const nominalBayarClean = cleanRupiah(crudNominalBayar ? crudNominalBayar.value : '');
+          const catatanVal = (crudCatatan && crudCatatan.value.trim()) || '';
+
+          if (!namaVal) {
+            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Nama Karyawan wajib diisi!' });
+            return;
+          }
+
+          if (editId) {
+            const idx = piutangData.findIndex(function (x) { return String(x.id) === String(editId); });
+            if (idx !== -1) {
+              piutangData[idx].idPinjaman = idPinjamVal;
+              piutangData[idx].tanggalPinjam = tglPinjamVal;
+              piutangData[idx].nik = nikVal;
+              piutangData[idx].namaKaryawan = namaVal;
+              piutangData[idx].divisi = divisiVal;
+              piutangData[idx].pokokPinjaman = pokokClean;
+              piutangData[idx].tenor = tenorVal;
+              piutangData[idx].cicilanPerBulan = cicilanClean;
+              piutangData[idx].totalDibayar = dibayarClean;
+              piutangData[idx].sisaPiutang = sisaClean;
+              piutangData[idx].jatuhTempoBerikutnya = jtVal;
+              piutangData[idx].status = statusVal;
+              piutangData[idx].idPembayaran = idBayarVal;
+              piutangData[idx].tanggalBayar = tglBayarVal;
+              piutangData[idx].idPinjamanBayar = idPinjamBayarVal;
+              piutangData[idx].nikBayar = nikBayarVal;
+              piutangData[idx].metode = metodeVal;
+              piutangData[idx].nominalBayar = nominalBayarClean;
+              piutangData[idx].catatan = catatanVal;
+            }
+          } else {
+            const newRecord = {
+              id: 'PK-' + Date.now().toString().slice(-4),
+              idPinjaman: idPinjamVal,
+              tanggalPinjam: tglPinjamVal,
+              nik: nikVal,
+              namaKaryawan: namaVal,
+              divisi: divisiVal,
+              pokokPinjaman: pokokClean,
+              tenor: tenorVal,
+              cicilanPerBulan: cicilanClean,
+              totalDibayar: dibayarClean,
+              sisaPiutang: sisaClean,
+              jatuhTempoBerikutnya: jtVal,
+              status: statusVal,
+              idPembayaran: idBayarVal,
+              tanggalBayar: tglBayarVal,
+              idPinjamanBayar: idPinjamBayarVal,
+              nikBayar: nikBayarVal,
+              metode: metodeVal,
+              nominalBayar: nominalBayarClean,
+              catatan: catatanVal
+            };
+            piutangData.unshift(newRecord);
+          }
+
+          saveData(piutangData);
+          closeModals();
+          renderTable();
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil',
+              text: editId ? 'Data piutang karyawan berhasil diperbarui.' : 'Data piutang karyawan baru berhasil ditambahkan.',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+
+      /* ===== SEARCH REAL-TIME ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          filterState.search = this.value.trim();
+          renderTable();
+        });
+      }
+
+      /* ===== FILTER POPOVER: STATUS ===== */
+      const statusOptions = ['Semua Status', 'Aktif', 'Terlambat', 'Lunas'];
+      let selectedStatus = '';
+
+      function renderStatusFilterList(query) {
+        if (!listFilterStatus) return;
+        listFilterStatus.innerHTML = '';
+        const q = (query || '').toLowerCase().trim();
+
+        const filteredOpts = statusOptions.filter(function (opt) {
+          if (!q) return true;
+          return opt.toLowerCase().includes(q);
+        });
+
+        filteredOpts.forEach(function (opt) {
+          const item = document.createElement('div');
+          item.className = 'piutang-filter-item';
+          if (selectedStatus === opt || (!selectedStatus && opt === 'Semua Status')) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = opt;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (opt === 'Semua Status') {
+              selectedStatus = '';
+              filterStatus.value = '';
+              filterStatus.placeholder = 'Pilih Status';
+            } else {
+              selectedStatus = opt;
+              filterStatus.value = opt;
+            }
+            closeStatusFilter();
+          });
+          listFilterStatus.appendChild(item);
+        });
+      }
+
+      function openStatusFilter() {
+        if (!boxFilterStatus) return;
+        boxFilterStatus.classList.add('is-open');
+        filterStatus.placeholder = 'Cari Status';
+        renderStatusFilterList(filterStatus.value);
+      }
+
+      function closeStatusFilter() {
+        if (!boxFilterStatus) return;
+        boxFilterStatus.classList.remove('is-open');
+        if (selectedStatus) {
+          filterStatus.value = selectedStatus;
+        } else {
+          filterStatus.value = '';
+          filterStatus.placeholder = 'Pilih Status';
+        }
+      }
+
+      if (filterStatus) {
+        filterStatus.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = boxFilterStatus.classList.contains('is-open');
+          if (isOpen) {
+            closeStatusFilter();
+          } else {
+            openStatusFilter();
+          }
+        });
+
+        filterStatus.addEventListener('input', function () {
+          if (!boxFilterStatus.classList.contains('is-open')) {
+            boxFilterStatus.classList.add('is-open');
+          }
+          renderStatusFilterList(this.value);
+        });
+      }
+
+      if (btnFilter) {
+        btnFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+          filterDropdown.classList.toggle('is-active');
+          if (!filterDropdown.classList.contains('is-active')) {
+            closeStatusFilter();
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          selectedStatus = '';
+          filterStatus.value = '';
+          filterStatus.placeholder = 'Pilih Status';
+          filterState.status = '';
+          closeStatusFilter();
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterState.status = selectedStatus || filterStatus.value.trim();
+          if (filterState.status === 'Semua Status') filterState.status = '';
+          closeStatusFilter();
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== DUAL MONTH CALENDAR PICKER ===== */
+      let calendarBaseDate = new Date(2026, 7, 1); // Agustus 2026 default
+      let tempCalStart = null;
+      let tempCalEnd = null;
+
+      const monthNamesIndo = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+      function renderDualCalendar() {
+        if (!gridMonth1 || !gridMonth2) return;
+
+        const m1 = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth(), 1);
+        const m2 = new Date(calendarBaseDate.getFullYear(), calendarBaseDate.getMonth() + 1, 1);
+
+        labelMonth1.textContent = monthNamesIndo[m1.getMonth()] + ' ' + m1.getFullYear();
+        labelMonth2.textContent = monthNamesIndo[m2.getMonth()] + ' ' + m2.getFullYear();
+
+        renderSingleMonthGrid(gridMonth1, m1);
+        renderSingleMonthGrid(gridMonth2, m2);
+        updateCalendarDisplayFooter();
+      }
+
+      function renderSingleMonthGrid(container, monthDate) {
+        container.innerHTML = '';
+        dayNames.forEach(function (d) {
+          const header = document.createElement('div');
+          header.className = 'month-day-name';
+          header.textContent = d;
+          container.appendChild(header);
+        });
+
+        const y = monthDate.getFullYear();
+        const m = monthDate.getMonth();
+        const firstDay = new Date(y, m, 1).getDay();
+        const totalDays = new Date(y, m + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+          const blank = document.createElement('div');
+          container.appendChild(blank);
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+          const cell = document.createElement('div');
+          cell.className = 'month-day';
+          cell.textContent = d;
+
+          const dateStr = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+          if (tempCalStart && dateStr === tempCalStart) {
+            cell.classList.add('is-selected');
+          }
+          if (tempCalEnd && dateStr === tempCalEnd) {
+            cell.classList.add('is-selected');
+          }
+          if (tempCalStart && tempCalEnd && dateStr > tempCalStart && dateStr < tempCalEnd) {
+            cell.classList.add('in-range');
+          }
+
+          cell.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!tempCalStart || (tempCalStart && tempCalEnd)) {
+              tempCalStart = dateStr;
+              tempCalEnd = null;
+            } else if (tempCalStart && !tempCalEnd) {
+              if (dateStr >= tempCalStart) {
+                tempCalEnd = dateStr;
+              } else {
+                tempCalEnd = tempCalStart;
+                tempCalStart = dateStr;
+              }
+            }
+            renderDualCalendar();
+          });
+
+          container.appendChild(cell);
+        }
+      }
+
+      function updateCalendarDisplayFooter() {
+        if (!calendarRangeDisplay) return;
+        if (tempCalStart && tempCalEnd) {
+          calendarRangeDisplay.textContent = tempCalStart + ' s/d ' + tempCalEnd;
+        } else if (tempCalStart) {
+          calendarRangeDisplay.textContent = 'Mulai: ' + tempCalStart;
+        } else {
+          calendarRangeDisplay.textContent = 'Semua Tanggal';
+        }
+      }
+
+      if (btnPrevMonth) {
+        btnPrevMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarBaseDate.setMonth(calendarBaseDate.getMonth() - 1);
+          renderDualCalendar();
+        });
+      }
+
+      if (btnNextMonth) {
+        btnNextMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarBaseDate.setMonth(calendarBaseDate.getMonth() + 1);
+          renderDualCalendar();
+        });
+      }
+
+      if (btnCalendar) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          calendarDropdown.classList.toggle('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            renderDualCalendar();
+          }
+        });
+      }
+
+      document.querySelectorAll('.calendar-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const preset = this.getAttribute('data-preset');
+          const now = new Date(2026, 7, 15); // Reference: Agustus 2026
+          const curY = now.getFullYear();
+          const curM = String(now.getMonth() + 1).padStart(2, '0');
+          const lastD = new Date(curY, now.getMonth() + 1, 0).getDate();
+
+          if (preset === 'today') {
+            const todayStr = curY + '-' + curM + '-15';
+            tempCalStart = todayStr;
+            tempCalEnd = todayStr;
+          } else if (preset === 'this-month') {
+            tempCalStart = curY + '-' + curM + '-01';
+            tempCalEnd = curY + '-' + curM + '-' + String(lastD).padStart(2, '0');
+          } else if (preset === 'last-month') {
+            const prevMonthDate = new Date(curY, now.getMonth() - 1, 1);
+            const pY = prevMonthDate.getFullYear();
+            const pM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+            const pLastD = new Date(pY, prevMonthDate.getMonth() + 1, 0).getDate();
+            tempCalStart = pY + '-' + pM + '-01';
+            tempCalEnd = pY + '-' + pM + '-' + String(pLastD).padStart(2, '0');
+          } else if (preset === 'this-year') {
+            tempCalStart = curY + '-01-01';
+            tempCalEnd = curY + '-12-31';
+          } else if (preset === 'reset') {
+            tempCalStart = null;
+            tempCalEnd = null;
+          }
+          renderDualCalendar();
+        });
+      });
+
+      if (btnCancelCalendar) {
+        btnCancelCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnApplyCalendar) {
+        btnApplyCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterState.startDate = tempCalStart;
+          filterState.endDate = tempCalEnd;
+          calendarDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== EXCEL EXPORT (ACTIVE OFFICIAL MICROSOFT EXCEL ENGINE) ===== */
+      async function exportPiutangKaryawanExcel() {
+        const rows = getFilteredData();
+        if (!rows || rows.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'warning', title: 'Data Kosong', text: 'Tidak ada data piutang karyawan untuk diekspor.' });
+          }
+          return;
+        }
+
+        const filename = 'Laporan_Piutang_Karyawan_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+        const headers = [
+          'No',
+          'ID Pinjam',
+          'Tanggal Pinjam',
+          'NIK',
+          'Nama Karyawan',
+          'Pokok Pinjaman',
+          'Tenor (Bulan)',
+          'Status',
+          'Cicilan/Bulan',
+          'Total Dibayar',
+          'Sisa Piutang',
+          'Jatuh Tempo Berikutnya',
+          'Catatan'
+        ];
+
+        const exportData = rows.map(function (item, idx) {
+          return [
+            idx + 1,
+            item.idPinjaman || '-',
+            formatTanggalDisplay(item.tanggalPinjam),
+            item.nik || '-',
+            item.namaKaryawan || '-',
+            item.pokokPinjaman || 0,
+            item.tenor || 0,
+            item.status || 'Aktif',
+            item.cicilanPerBulan || 0,
+            item.totalDibayar || 0,
+            item.sisaPiutang || 0,
+            formatTanggalDisplay(item.jatuhTempoBerikutnya),
+            item.catatan || '-'
+          ];
+        });
+
+        if (typeof window.exportBisaExcel === 'function') {
+          await window.exportBisaExcel({
+            title: 'LAPORAN PIUTANG KARYAWAN PERUSAHAAN',
+            filename: filename,
+            sheetName: 'Piutang Karyawan',
+            headers: headers,
+            rows: exportData
+          });
+        } else if (typeof window.exportTableToExcel === 'function') {
+          await window.exportTableToExcel('piutangTable', filename, 'LAPORAN PIUTANG KARYAWAN');
+        } else {
+          let csv = headers.join(',') + '\n';
+          exportData.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename.replace('.xlsx', '.csv'));
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+      window.exportPiutangKaryawanExcel = exportPiutangKaryawanExcel;
+
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', exportPiutangKaryawanExcel);
+      }
+
+      /* ===== GLOBAL CLICK LISTENER (TUTUP POPUP & MENU) ===== */
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#piutangActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('#filterDropdown') && !e.target.closest('#btnFilter')) {
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          closeStatusFilter();
+        } else if (!e.target.closest('#boxFilterStatus')) {
+          closeStatusFilter();
+        }
+        if (!e.target.closest('#calendarDropdown') && !e.target.closest('#btnCalendar')) {
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+        if (!e.target.closest('#wrapStatusModal')) {
+          if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        }
+        if (e.target === crudModal || e.target === detailModal) {
+          closeModals();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeModals();
+          closeActionMenus();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
 </body>
 
 </html>
