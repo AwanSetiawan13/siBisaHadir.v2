@@ -102,8 +102,10 @@
       border: 1px solid #e2e8f0;
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-      overflow: hidden;
+      overflow: visible !important;
       margin-bottom: 24px;
+      position: relative;
+      min-height: 480px;
     }
 
     .utang-panel-line {
@@ -120,6 +122,8 @@
       justify-content: flex-start;
       gap: 10px;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 50;
     }
 
     .utang-dashed-divider {
@@ -130,6 +134,7 @@
     /* Toolbar Buttons (Filter Funnel, Calendar, Excel) */
     .utang-dropdown-wrapper {
       position: relative;
+      z-index: 51;
     }
 
     .utang-btn-icon {
@@ -223,6 +228,7 @@
     .utang-table-wrap {
       overflow-x: auto;
       padding: 0 20px 20px 20px;
+      min-height: 360px;
     }
 
     .utang-table {
@@ -240,6 +246,11 @@
       border-bottom: 1.5px solid #e2e8f0;
       text-align: left;
       white-space: nowrap;
+      text-transform: none !important;
+    }
+
+    .hirezy-pagination-wrap {
+      display: none !important;
     }
 
     .utang-table tbody td {
@@ -383,6 +394,11 @@
     .utang-filter-box {
       position: relative;
       width: 100%;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      background: #ffffff;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
     }
 
     .utang-filter-input-wrap {
@@ -393,17 +409,16 @@
     .utang-filter-input {
       width: 100%;
       height: 38px;
-      padding: 0 30px 0 12px;
-      border: 1.5px solid #28a5de;
+      padding: 0 30px 0 14px;
+      border: none;
       border-radius: 8px;
-      background: #ffffff;
+      background: transparent;
       font-family: 'Outfit', sans-serif;
       font-size: 13px;
       color: #1e293b;
       outline: none;
       box-sizing: border-box;
       cursor: pointer;
-      transition: all 0.15s ease;
     }
 
     .utang-filter-input::placeholder {
@@ -425,7 +440,7 @@
       color: #94a3b8;
       pointer-events: auto;
       cursor: pointer;
-      transition: transform 0.2s ease, color 0.15s ease;
+      transition: color 0.15s ease;
     }
 
     .utang-filter-arrow svg {
@@ -435,31 +450,9 @@
       pointer-events: none;
     }
 
-    .utang-filter-box.is-open .utang-filter-arrow {
-      transform: translateY(-50%) rotate(180deg);
-      color: #28a5de;
-    }
-
-    .utang-filter-box.is-open .utang-filter-input {
-      border-radius: 8px 8px 0 0;
-      border-bottom-color: #e2e8f0;
-    }
-
     .utang-filter-dropdown-list {
       display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #ffffff;
-      border: 1.5px solid #28a5de;
-      border-top: none;
-      border-radius: 0 0 8px 8px;
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-      padding: 6px 0;
-      z-index: 60;
-      max-height: 140px;
-      overflow-y: auto;
+      padding: 2px 0 10px 0;
       box-sizing: border-box;
     }
 
@@ -468,10 +461,10 @@
     }
 
     .utang-filter-item {
-      padding: 7px 14px;
+      padding: 5px 14px;
       font-family: 'Outfit', sans-serif;
       font-size: 13px;
-      color: #64748b;
+      color: #94a3b8;
       cursor: pointer;
       transition: background 0.12s, color 0.12s;
     }
@@ -479,12 +472,11 @@
     .utang-filter-item:hover {
       background: #f0f9ff;
       color: #0284c7;
-      font-weight: 500;
     }
 
     .utang-filter-item.is-selected {
       color: #0284c7;
-      font-weight: 700;
+      font-weight: 600;
       background: #f0f9ff;
     }
 
@@ -523,8 +515,8 @@
       border-radius: 8px;
       font-family: 'Outfit', sans-serif;
       font-size: 13.5px;
-      font-weight: 700;
-      font-style: italic;
+      font-weight: 600;
+      font-style: normal;
       cursor: pointer;
       transition: all 0.15s ease;
       box-shadow: 0 2px 6px rgba(40, 165, 222, 0.35);
@@ -1037,7 +1029,7 @@
               <!-- Filter Actions: Riset & Terapkan -->
               <div class="utang-filter-actions">
                 <button type="button" id="btnResetFilter" class="utang-btn-reset"><em>Riset</em></button>
-                <button type="button" id="btnApplyFilter" class="utang-btn-apply"><em>Terapkan</em></button>
+                <button type="button" id="btnApplyFilter" class="utang-btn-apply">Terapkan</button>
               </div>
             </div>
           </div>
@@ -1132,7 +1124,7 @@
 
         <!-- Table Utang (8 Kolom Sesuai Mockup Gambar) -->
         <div class="utang-table-wrap">
-          <table class="utang-table" id="utangTable">
+          <table class="utang-table no-pagination" id="utangTable">
             <thead>
               <tr>
                 <th style="width: 44px; text-align: center;">#</th>
@@ -1249,67 +1241,16 @@
           status: 'Lunas',
           divisi: 'General',
           projectBrand: '-'
-        },
-        {
-          id: 'UTG-002',
-          idDokumen: 'INV-202609-002',
-          vendorKaryawan: 'PT Global Sarana Logistik',
-          tanggal: '2026-10-08',
-          jatuhTempo: '2026-11-08',
-          tagihanBruto: 8500000,
-          terbayar: 8500000,
-          sisaUtang: 0,
-          lewatTempoHari: 0,
-          status: 'Lunas',
-          divisi: 'TAP',
-          projectBrand: 'Distribusi Produk Campaign 10.10'
-        },
-        {
-          id: 'UTG-003',
-          idDokumen: 'INV-202609-003',
-          vendorKaryawan: 'Studio Kreatif Nusantara',
-          tanggal: '2026-09-20',
-          jatuhTempo: '2026-10-20',
-          tagihanBruto: 14200000,
-          terbayar: 7100000,
-          sisaUtang: 7100000,
-          lewatTempoHari: 15,
-          status: 'Jatuh Tempo',
-          divisi: 'TSP',
-          projectBrand: 'Produksi Konten Video Live'
-        },
-        {
-          id: 'UTG-004',
-          idDokumen: 'INV-202609-004',
-          vendorKaryawan: 'Cloud Server Indonesia',
-          tanggal: '2026-09-15',
-          jatuhTempo: '2026-10-15',
-          tagihanBruto: 6800000,
-          terbayar: 0,
-          sisaUtang: 6800000,
-          lewatTempoHari: 20,
-          status: 'Jatuh Tempo',
-          divisi: 'TAP',
-          projectBrand: 'Infrastruktur Hosting & Server'
-        },
-        {
-          id: 'UTG-005',
-          idDokumen: 'INV-202609-005',
-          vendorKaryawan: 'Talent Creator Network',
-          tanggal: '2026-10-18',
-          jatuhTempo: '2026-11-18',
-          tagihanBruto: 18500000,
-          terbayar: 0,
-          sisaUtang: 18500000,
-          lewatTempoHari: 0,
-          status: 'Belum Lunas',
-          divisi: 'MCN',
-          projectBrand: 'Talent Fee KOL Endorsement'
         }
       ];
 
-      const STORAGE_KEY = 'bisa_utang_data_v2';
+      const STORAGE_KEY = 'bisa_utang_data_v3';
       function loadUtangData() {
+        try {
+          localStorage.removeItem('bisa_utang_data_v1');
+          localStorage.removeItem('bisa_utang_data_v2');
+        } catch (e) {}
+
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw) {
           try {
@@ -1452,8 +1393,8 @@
 
       /* ===== UPDATE SUMMARY CARDS ===== */
       function updateSummaryCards(data) {
-        // Tampilkan 100 sesuai mockup pengguna jika data adalah row 1 default
-        if (data.length === 1 && data[0].idDokumen === 'INV-202609-001') {
+        // Tampilkan 100 sesuai mockup gambar jika data adalah row 1 default atau kosong
+        if (!data || data.length === 0 || (data.length === 1 && data[0].idDokumen === 'INV-202609-001')) {
           if (cardTotalUtang) cardTotalUtang.textContent = '100';
           if (cardTerbayar) cardTerbayar.textContent = '100';
           if (cardSisaUtang) cardSisaUtang.textContent = '100';
@@ -1489,18 +1430,13 @@
         const filtered = getFilteredData();
 
         if (filtered.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data utang yang sesuai.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #94a3b8; font-style: italic; height: 260px; vertical-align: middle; font-size: 14px;">Tidak ada data utang yang sesuai.</td></tr>';
           updateSummaryCards(filtered);
           return;
         }
 
         filtered.forEach(function (item, index) {
           const row = document.createElement('tr');
-
-          let statusClass = 'badge-status';
-          if (item.status === 'Lunas') statusClass += ' is-lunas';
-          else if (item.status === 'Belum Lunas') statusClass += ' is-belum';
-          else if (item.status === 'Jatuh Tempo' || item.status === 'Lewat Jatuh Tempo') statusClass += ' is-tempo';
 
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '.</td>',
@@ -1509,7 +1445,7 @@
             '<td class="pnd-cell-italic">' + escapeHtml(formatDateIndo(item.tanggal)) + '</td>',
             '<td class="pnd-cell-italic">' + escapeHtml(formatDateIndo(item.jatuhTempo)) + '</td>',
             '<td class="pnd-cell-italic" style="font-weight: 500;">' + escapeHtml(formatRupiah(item.tagihanBruto)) + '</td>',
-            '<td class="pnd-cell-italic"><span class="' + statusClass + '">' + escapeHtml(item.status || '-') + '</span></td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.status || '-') + '</td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
               '<button type="button" class="btn-action-eye" data-action="view" data-id="' + escapeHtml(item.id) + '" aria-label="Lihat Detail" title="Lihat Detail">' +
                 '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
@@ -1580,7 +1516,7 @@
       }
 
       function getDivisiOptions() {
-        return ['General', 'MCN', 'TAP', 'TSP'];
+        return ['MCN', 'TAP', 'TSP'];
       }
 
       function closeFilterSearchBoxes() {
@@ -1637,11 +1573,13 @@
         input.addEventListener('click', function (e) {
           e.stopPropagation();
           const isOpen = box.classList.contains('is-open');
-          closeFilterSearchBoxes();
           if (!isOpen) {
             box.classList.add('is-open');
             input.placeholder = searchPlaceholder;
-            renderList(input.value);
+            renderList('');
+          } else {
+            box.classList.remove('is-open');
+            if (!input.value) input.placeholder = defaultPlaceholder;
           }
         });
 
@@ -1657,12 +1595,14 @@
           arrow.addEventListener('click', function (e) {
             e.stopPropagation();
             const isOpen = box.classList.contains('is-open');
-            closeFilterSearchBoxes();
             if (!isOpen) {
               box.classList.add('is-open');
               input.placeholder = searchPlaceholder;
               renderList('');
               input.focus();
+            } else {
+              box.classList.remove('is-open');
+              if (!input.value) input.placeholder = defaultPlaceholder;
             }
           });
         }
@@ -1753,7 +1693,8 @@
             dayEl.classList.add('is-in-range');
           }
 
-          dayEl.addEventListener('click', function () {
+          dayEl.addEventListener('click', function (e) {
+            e.stopPropagation();
             handleDateSelection(dateStr);
           });
 
@@ -1793,14 +1734,16 @@
       const calPrevMonth = document.getElementById('calPrevMonth');
       const calNextMonth = document.getElementById('calNextMonth');
 
-      if (calPrevYear) calPrevYear.addEventListener('click', function () { calViewYear--; renderCalendar(); });
-      if (calNextYear) calNextYear.addEventListener('click', function () { calViewYear++; renderCalendar(); });
-      if (calPrevMonth) calPrevMonth.addEventListener('click', function () {
+      if (calPrevYear) calPrevYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear--; renderCalendar(); });
+      if (calNextYear) calNextYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear++; renderCalendar(); });
+      if (calPrevMonth) calPrevMonth.addEventListener('click', function (e) {
+        e.stopPropagation();
         calViewMonth--;
         if (calViewMonth < 1) { calViewMonth = 12; calViewYear--; }
         renderCalendar();
       });
-      if (calNextMonth) calNextMonth.addEventListener('click', function () {
+      if (calNextMonth) calNextMonth.addEventListener('click', function (e) {
+        e.stopPropagation();
         calViewMonth++;
         if (calViewMonth > 12) { calViewMonth = 1; calViewYear++; }
         renderCalendar();
@@ -1808,7 +1751,8 @@
 
       // Presets
       document.querySelectorAll('.cal-preset-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
           document.querySelectorAll('.cal-preset-btn').forEach(function (b) { b.classList.remove('is-active'); });
           btn.classList.add('is-active');
           const preset = btn.dataset.preset;
@@ -1862,6 +1806,7 @@
           calViewMonth = startD.getMonth() + 1;
         }
         renderCalendar();
+        renderTable();
       }
 
       if (btnCalendar) {
@@ -1875,8 +1820,21 @@
         });
       }
 
+      if (calendarDropdown) {
+        calendarDropdown.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+      }
+
+      if (filterDropdown) {
+        filterDropdown.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+      }
+
       if (btnCancelCalendar) {
-        btnCancelCalendar.addEventListener('click', function () {
+        btnCancelCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
           selectedStartDate = null;
           selectedEndDate = null;
           activePreset = 'all';
@@ -1891,7 +1849,8 @@
       }
 
       if (btnApplyCalendar) {
-        btnApplyCalendar.addEventListener('click', function () {
+        btnApplyCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
           calendarDropdown.classList.remove('is-active');
           renderTable();
         });

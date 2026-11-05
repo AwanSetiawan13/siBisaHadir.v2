@@ -7,6 +7,1155 @@
   <title>Payroll | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ===== RESET & ROOT STYLING ===== */
+    body.dashboard-body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-content {
+      padding: 24px 28px;
+      max-width: 1600px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* ===== 4 SUMMARY CARDS AT THE TOP ===== */
+    .payroll-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .payroll-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .payroll-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .payroll-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .payroll-card-label {
+      font-size: 13.5px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .payroll-card-value {
+      font-size: 24px;
+      font-weight: 700;
+      font-style: italic;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .payroll-card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
+    }
+
+    .payroll-card-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    /* ===== MAIN PANEL & TABLE ===== */
+    .payroll-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+      padding: 20px;
+      overflow: visible !important;
+      margin-bottom: 24px;
+      position: relative;
+      min-height: 480px;
+    }
+
+    .payroll-panel-line {
+      height: 3.5px;
+      background: #0076C5;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .payroll-toolbar {
+      padding: 0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 50;
+    }
+
+    .payroll-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .payroll-toolbar__right {
+      display: flex;
+      align-items: center;
+    }
+
+    .payroll-dashed-divider {
+      border-bottom: 1px dashed #cbd5e1;
+      margin: 0 0 14px 0;
+    }
+
+    /* Toolbar Buttons (Filter Funnel, Calendar, Excel) */
+    .payroll-dropdown-wrapper {
+      position: relative;
+      z-index: 51;
+    }
+
+    .payroll-btn-icon {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #0076C5;
+      transition: all 0.15s ease;
+      box-sizing: border-box;
+      padding: 0;
+    }
+
+    .payroll-btn-icon:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #005a96;
+    }
+
+    .payroll-btn-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .payroll-btn-excel {
+      color: #107c41;
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .payroll-btn-excel:hover {
+      background: #dcfce7;
+      border-color: #4ade80;
+      color: #0e6b37;
+    }
+
+    /* Search Input Pill */
+    .payroll-search-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .payroll-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .payroll-search-input {
+      width: 200px;
+      height: 36px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 0 14px 0 34px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, width 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .payroll-search-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+      width: 250px;
+    }
+
+    .payroll-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Table Typography & Scrollable Wrapper (Identik Approval Pengeluaran: Tanpa Bolong di Kanan) */
+    .payroll-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 8px;
+      padding: 0 !important;
+      min-height: 360px;
+    }
+
+    .payroll-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .payroll-table thead th {
+      padding: 10px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: #1e293b;
+      background: #f8fafc !important;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: none !important;
+    }
+
+    .hirezy-pagination-wrap {
+      display: none !important;
+    }
+
+    .payroll-table tbody td {
+      padding: 11px 12px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .payroll-table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .pnd-cell-italic {
+      font-style: italic;
+      color: #334155;
+    }
+
+    /* Fixed / Sticky Action Column on the Right - EXACTLY as Approval Pengeluaran */
+    .payroll-table th.col-sticky-action,
+    .payroll-table td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .payroll-table th.col-sticky-action {
+      z-index: 11;
+      background-color: #f8fafc !important;
+    }
+
+    .payroll-table tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    /* Action Button (Circle with 3 vertical dots matching Approval Pengeluaran) */
+    .payroll-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .payroll-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .payroll-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Fixed Floating Action Menu (Konsisten Approval Pengeluaran) */
+    .payroll-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .payroll-action-menu.is-open {
+      display: block;
+    }
+
+    .payroll-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .payroll-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .payroll-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .payroll-action-menu button.is-danger:hover {
+      background: #fee2e2;
+    }
+
+    .payroll-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 26px;
+      color: #fff;
+      background: #0076C5;
+    }
+
+    .payroll-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .payroll-action-icon.is-danger {
+      background: #dc2626;
+    }
+
+    /* Badge Bukti */
+    .badge-bukti {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 4px;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 12px;
+      font-style: italic;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .badge-bukti:hover {
+      background: #bae6fd;
+    }
+
+    /* ===== FILTER POPOVER (Searchable Funnel Popover) ===== */
+    .payroll-popover {
+      position: absolute;
+      top: 44px;
+      left: 0;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      z-index: 1000;
+      display: none;
+      animation: fadeInPopover 0.18s ease-out;
+    }
+
+    @keyframes fadeInPopover {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .payroll-popover.is-active {
+      display: block;
+    }
+
+    .payroll-filter-popover {
+      width: 270px;
+      padding: 18px 18px 16px 18px;
+      box-sizing: border-box;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .payroll-filter-group {
+      margin-bottom: 16px;
+    }
+
+    .payroll-filter-label {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .payroll-filter-box {
+      position: relative;
+      width: 100%;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      background: #ffffff;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .payroll-filter-input-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .payroll-filter-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 30px 0 14px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .payroll-filter-input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .payroll-filter-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .payroll-filter-arrow svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      pointer-events: none;
+    }
+
+    .payroll-filter-dropdown-list {
+      display: none;
+      padding: 2px 0 10px 0;
+      box-sizing: border-box;
+    }
+
+    .payroll-filter-box.is-open .payroll-filter-dropdown-list {
+      display: block;
+    }
+
+    .payroll-filter-item {
+      padding: 5px 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .payroll-filter-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .payroll-filter-item.is-selected {
+      color: #0284c7;
+      font-weight: 600;
+      background: #f0f9ff;
+    }
+
+    .payroll-filter-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .payroll-btn-reset {
+      flex: 1;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      background: #f8fafc;
+      color: #0f172a;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .payroll-btn-reset:hover {
+      background: #e2e8f0;
+      border-color: #0284c7;
+    }
+
+    .payroll-btn-apply {
+      flex: 1;
+      height: 38px;
+      border: none;
+      background: #28a5de;
+      color: #ffffff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-style: normal;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(40, 165, 222, 0.35);
+    }
+
+    .payroll-btn-apply:hover {
+      background: #1995c8;
+    }
+
+    /* ===== CALENDAR DUAL-MONTH POPOVER ===== */
+    .payroll-calendar-popover {
+      width: 580px;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .cal-body {
+      display: flex;
+      gap: 16px;
+    }
+
+    .cal-sidebar {
+      width: 140px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .cal-preset-btn {
+      width: 100%;
+      text-align: left;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 0;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .cal-preset-btn:hover {
+      background: #f1f5f9;
+      color: #0076C5;
+    }
+
+    .cal-preset-btn.is-active {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 600;
+    }
+
+    .cal-months {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .cal-month-box {
+      flex: 1;
+    }
+
+    .cal-month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .cal-nav {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #64748b;
+      user-select: none;
+    }
+
+    .cal-nav:hover {
+      background: #f1f5f9;
+      color: #0076C5;
+    }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .cal-day {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #334155;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .cal-day:hover:not(.is-empty) {
+      background: #e2e8f0;
+    }
+
+    .cal-day.is-selected {
+      background: #0076C5 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .cal-day.is-in-range {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 0;
+    }
+
+    .cal-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 10px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .cal-selected-info {
+      color: #64748b;
+    }
+
+    .cal-selected-info span {
+      color: #0076C5;
+      font-weight: 600;
+    }
+
+    .cal-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .cal-btn-cancel {
+      padding: 6px 20px;
+      border: 1.5px solid #008be2;
+      background: #ffffff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-style: italic;
+      font-weight: 600;
+      color: #0f172a;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .cal-btn-cancel:hover {
+      background: #f0f9ff;
+    }
+
+    .cal-btn-apply {
+      padding: 6px 22px;
+      border: none;
+      background: #22a6dc;
+      color: #ffffff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-style: italic;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(34, 166, 220, 0.35);
+      transition: all 0.15s ease;
+    }
+
+    .cal-btn-apply:hover {
+      background: #1995c8;
+    }
+
+    /* ===== DETAIL MODAL: "Lihat Payroll" ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .modal-overlay.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .payroll-modal-box {
+      background: #ffffff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 860px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+      position: relative;
+      transform: translateY(8px);
+      transition: transform 0.2s ease;
+      overflow: hidden;
+    }
+
+    .modal-overlay.is-active .payroll-modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-accent-line {
+      height: 3.5px;
+      background: #0076C5;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .modal-header {
+      padding: 18px 28px 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 17.5px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .modal-title em {
+      font-style: italic;
+      color: #1e293b;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .modal-close {
+      width: 24px;
+      height: 24px;
+      border: 1.2px solid #94a3b8;
+      background: #ffffff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      padding: 0;
+    }
+
+    .modal-close:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+      border-color: #64748b;
+    }
+
+    .modal-dashed-divider {
+      border-bottom: 1px dashed #cbd5e1;
+      margin: 0 28px 22px 28px;
+    }
+
+    .modal-crud-grid,
+    .modal-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px 18px;
+      padding: 0 28px 24px 28px;
+      max-height: 72vh;
+      overflow-y: auto;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-field.col-span-3 {
+      grid-column: span 3;
+    }
+
+    .modal-field.col-span-4 {
+      grid-column: span 4;
+    }
+
+    .modal-field.col-span-6 {
+      grid-column: span 6;
+    }
+
+    .modal-field-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .modal-field-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #0f172a;
+      box-sizing: border-box;
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .modal-field-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .modal-field-input::placeholder {
+      font-style: italic;
+      color: #94a3b8;
+    }
+
+    .modal-field-value {
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      font-size: 13.5px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      font-style: italic;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .modal-field-file-box {
+      width: 100%;
+      height: 42px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-sizing: border-box;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .btn-choose-file-inner {
+      height: 26px;
+      padding: 0 10px;
+      border: 1.2px solid #28a5de;
+      background: #ffffff;
+      color: #0284c7;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-choose-file-inner:hover {
+      background: #f0f9ff;
+    }
+
+    .file-name-preview {
+      font-size: 12px;
+      color: #94a3b8;
+      font-style: italic;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+
+    .pnd-eye-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: #0284c7;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease, transform 0.1s ease;
+      padding: 0;
+    }
+
+    .pnd-eye-btn:hover {
+      background: #bae6fd;
+      color: #0369a1;
+      transform: scale(1.05);
+    }
+
+    .pnd-eye-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .btn-detail-lihat-foto {
+      width: 100%;
+      height: 42px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0284c7;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .btn-detail-lihat-foto:hover {
+      background: #f0f9ff;
+      border-color: #0076c5;
+    }
+
+    .btn-detail-lihat-foto em {
+      font-style: italic;
+    }
+
+    .modal-footer {
+      padding: 16px 28px 24px 28px;
+      background: #ffffff;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-modal-action,
+    .btn-modal-keluar {
+      min-width: 120px;
+      height: 38px;
+      padding: 0 28px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-modal-action:hover,
+    .btn-modal-keluar:hover {
+      background: #f0f9ff;
+      border-color: #0076c5;
+    }
+
+    .btn-tambah-payroll {
+      height: 36px;
+      padding: 0 18px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-payroll:hover {
+      background: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    .btn-tambah-payroll:active {
+      transform: scale(0.98);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .payroll-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .modal-crud-grid,
+      .modal-detail-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal-field.col-span-3,
+      .modal-field.col-span-4,
+      .modal-field.col-span-6 {
+        grid-column: span 1;
+      }
+      .payroll-calendar-popover {
+        width: 90vw;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .payroll-summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +1163,1762 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <!-- ===== 4 SUMMARY CARDS DI BAGIAN ATAS ===== -->
+      <section class="payroll-summary-cards">
+        <!-- Card 1: Beban Bruto -->
+        <div class="payroll-card">
+          <div class="payroll-card-info">
+            <span class="payroll-card-label">Beban Bruto</span>
+            <span class="payroll-card-value" id="cardBebanBruto">100</span>
+          </div>
+          <div class="payroll-card-icon" title="Beban Bruto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Take Home Pay -->
+        <div class="payroll-card">
+          <div class="payroll-card-info">
+            <span class="payroll-card-label">Take Home Pay</span>
+            <span class="payroll-card-value" id="cardTakeHomePay">100</span>
+          </div>
+          <div class="payroll-card-icon" title="Take Home Pay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+              <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+              <circle cx="18" cy="12" r="2"></circle>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Terbayar Kas -->
+        <div class="payroll-card">
+          <div class="payroll-card-info">
+            <span class="payroll-card-label">Terbayar Kas</span>
+            <span class="payroll-card-value" id="cardTerbayarKas">100</span>
+          </div>
+          <div class="payroll-card-icon" title="Terbayar Kas">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Sisa Payroll -->
+        <div class="payroll-card">
+          <div class="payroll-card-info">
+            <span class="payroll-card-label">Sisa Payroll</span>
+            <span class="payroll-card-value" id="cardSisaPayroll">100</span>
+          </div>
+          <div class="payroll-card-icon" title="Sisa Payroll">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MAIN PANEL: TOOLBAR & TABEL PAYROLL ===== -->
+      <section class="payroll-panel">
+        <!-- Top Blue Accent Line -->
+        <div class="payroll-panel-line"></div>
+
+        <!-- Toolbar: Filter, Calendar, Excel, Search (Kiri) & + Tambah (Kanan Konsisten) -->
+        <div class="payroll-toolbar">
+          <div class="payroll-toolbar__left">
+            <!-- Filter Funnel Button & Popover -->
+          <div class="payroll-dropdown-wrapper">
+            <button id="btnFilter" class="payroll-btn-icon" type="button" aria-label="Filter" title="Filter Data Payroll">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+            </button>
+
+            <!-- Filter Dropdown Popover Sesuai Desain Konsisten -->
+            <div id="filterDropdown" class="payroll-popover payroll-filter-popover">
+              <!-- Group: Divisi -->
+              <div class="payroll-filter-group">
+                <label class="payroll-filter-label" for="filterDivisi">Divisi</label>
+                <div class="payroll-filter-box" id="boxFilterDivisi">
+                  <div class="payroll-filter-input-wrap">
+                    <input type="text" id="filterDivisi" class="payroll-filter-input" placeholder="Pilih Divisi" autocomplete="off" />
+                    <span class="payroll-filter-arrow" title="Buka pilihan">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </span>
+                  </div>
+                  <div class="payroll-filter-dropdown-list" id="listFilterDivisi"></div>
+                </div>
+              </div>
+
+              <!-- Filter Actions: Riset & Terapkan -->
+              <div class="payroll-filter-actions">
+                <button type="button" id="btnResetFilter" class="payroll-btn-reset"><em>Riset</em></button>
+                <button type="button" id="btnApplyFilter" class="payroll-btn-apply">Terapkan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calendar Popover Button -->
+          <div class="payroll-dropdown-wrapper">
+            <button id="btnCalendar" class="payroll-btn-icon" type="button" aria-label="Pilih Tanggal" title="Filter Berdasarkan Periode">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+            </button>
+
+            <!-- Dual Month Calendar Popover -->
+            <div id="calendarDropdown" class="payroll-popover payroll-calendar-popover">
+              <div class="cal-body">
+                <div class="cal-sidebar">
+                  <button type="button" class="cal-preset-btn" data-preset="all">Semua Waktu</button>
+                  <button type="button" class="cal-preset-btn" data-preset="today">Hari ini</button>
+                  <button type="button" class="cal-preset-btn" data-preset="yesterday">Kemarin</button>
+                  <button type="button" class="cal-preset-btn" data-preset="last7">7 hari terakhir</button>
+                  <button type="button" class="cal-preset-btn" data-preset="last30">30 hari terakhir</button>
+                  <button type="button" class="cal-preset-btn" data-preset="last3m">3 bulan terakhir</button>
+                  <button type="button" class="cal-preset-btn" data-preset="last12m">12 bulan terakhir</button>
+                </div>
+
+                <div class="cal-months">
+                  <div class="cal-month-box">
+                    <div class="cal-month-header">
+                      <span class="cal-nav" id="calPrevYear" title="Tahun Sebelumnya">&laquo;</span>
+                      <span class="cal-month-title" id="calTitleLeft">2026 - 09</span>
+                      <span class="cal-nav" id="calPrevMonth" title="Bulan Sebelumnya">&lsaquo;</span>
+                    </div>
+                    <div class="cal-weekdays">
+                      <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                    </div>
+                    <div class="cal-days-grid" id="calGridLeft"></div>
+                  </div>
+
+                  <div class="cal-month-box">
+                    <div class="cal-month-header">
+                      <span class="cal-nav" id="calNextMonth" title="Bulan Berikutnya">&rsaquo;</span>
+                      <span class="cal-month-title" id="calTitleRight">2026 - 10</span>
+                      <span class="cal-nav" id="calNextYear" title="Tahun Berikutnya">&raquo;</span>
+                    </div>
+                    <div class="cal-weekdays">
+                      <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                    </div>
+                    <div class="cal-days-grid" id="calGridRight"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cal-footer">
+                <div class="cal-selected-info">
+                  Dipilih: <span id="calSelectedText">Semua Periode</span>
+                </div>
+                <div class="cal-footer-actions">
+                  <button type="button" id="btnCancelCalendar" class="cal-btn-cancel">Riset</button>
+                  <button type="button" id="btnApplyCalendar" class="cal-btn-apply">Terapkan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Excel Export Button -->
+          <button id="btnExportExcel" class="payroll-btn-icon payroll-btn-excel" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+            <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+              <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+              <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <!-- Search Input Pill -->
+          <div class="payroll-search-wrapper">
+            <svg class="payroll-search-icon" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="payrollSearch" placeholder="Cari...." class="payroll-search-input" />
+          </div>
+        </div>
+
+        <!-- Tambah Button (Sisi Kanan Konsisten dengan Approval Pengeluaran) -->
+        <div class="payroll-toolbar__right">
+          <button id="btnTambahPayroll" class="btn-tambah-payroll" type="button">+ Tambah</button>
+        </div>
+      </div>
+
+        <!-- Dashed Divider -->
+        <div class="payroll-dashed-divider"></div>
+
+        <!-- Table Payroll (Scroll Horizontal dengan Aksi Fixed/Sticky Sesuai Gambar Referensi) -->
+        <div class="payroll-table-wrap">
+          <table class="payroll-table no-pagination" id="payrollTable">
+            <thead>
+              <tr>
+                <th style="width: 44px; text-align: center;">#</th>
+                <th style="min-width: 110px;">Periode</th>
+                <th style="min-width: 110px;">NIK</th>
+                <th style="min-width: 160px;">Nama</th>
+                <th style="min-width: 100px;">Divisi</th>
+                <th style="min-width: 130px;">Gaji Pokok</th>
+                <th style="min-width: 130px;">Tunjangan</th>
+                <th style="min-width: 130px;">Bonus/Lembur</th>
+                <th style="min-width: 130px;">Potongan Lain</th>
+                <th style="min-width: 130px;">BPJS Karyawan</th>
+                <th style="min-width: 140px;">Take Home Pay</th>
+                <th style="min-width: 120px;">Status Lama</th>
+                <th style="min-width: 120px;">ID Pinjaman</th>
+                <th style="min-width: 130px;">Potongan Piutang</th>
+                <th style="min-width: 130px;">ID Payroll</th>
+                <th style="min-width: 160px;">Project/Brand</th>
+                <th style="min-width: 130px;">Beban Bruto</th>
+                <th style="min-width: 130px;">Terbayar Kas</th>
+                <th style="min-width: 130px;">Sisa Payroll</th>
+                <th style="min-width: 90px; text-align: center;">Bukti</th>
+                <th class="col-sticky-action" style="width: 60px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="payrollTableBody">
+              <!-- Diisi secara dinamis melalui JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Floating Action Menu (Konsisten Approval Pengeluaran, Kas & Bank, Pendapatan) -->
+      <div id="payrollActionMenu" class="payroll-action-menu" role="menu">
+        <button type="button" data-action="view">
+          <span class="payroll-action-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </span>
+          <span>Lihat</span>
+        </button>
+        <button type="button" data-action="edit">
+          <span class="payroll-action-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+          </span>
+          <span>Edit</span>
+        </button>
+        <button type="button" class="is-danger" data-action="delete">
+          <span class="payroll-action-icon is-danger">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+          </span>
+          <span>Hapus</span>
+        </button>
+      </div>
+    </main>
   </div>
 
+  <!-- ===== MODAL CRUD FORM: "Tambah / Edit Payroll" ===== -->
+  <div id="payrollCrudModal" class="modal-overlay">
+    <div class="payroll-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-header">
+        <h2 class="modal-title" id="crudModalTitle"><em>Tambah</em> Payroll</h2>
+        <button class="modal-close" type="button" id="btnCloseCrud" aria-label="Tutup">x</button>
+      </div>
+
+      <div class="modal-dashed-divider"></div>
+
+      <form id="payrollForm" onsubmit="return false;">
+        <input type="hidden" id="crudId" value="" />
+        <div class="modal-crud-grid">
+          <!-- Row 1: Periode, NIK, Nama -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudPeriode">Periode</label>
+            <input type="text" id="crudPeriode" class="modal-field-input" placeholder="Periode" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudNik">NIK</label>
+            <input type="text" id="crudNik" class="modal-field-input" placeholder="NIK" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudNama">Nama</label>
+            <input type="text" id="crudNama" class="modal-field-input" placeholder="Nama" />
+          </div>
+
+          <!-- Row 2: Divisi, Gaji Pokok, Tunjangan -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudDivisi">Divisi</label>
+            <input type="text" id="crudDivisi" class="modal-field-input" placeholder="Divisi" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudGajiPokok">Gaji Pokok</label>
+            <input type="text" id="crudGajiPokok" class="modal-field-input" placeholder="Gaji Pokok" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudTunjangan">Tunjangan</label>
+            <input type="text" id="crudTunjangan" class="modal-field-input" placeholder="Tunjangan" />
+          </div>
+
+          <!-- Row 3: Bonus/Lembur, Potongan Lain, BPJS Karyawan -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudBonusLembur">Bonus/Lembur</label>
+            <input type="text" id="crudBonusLembur" class="modal-field-input" placeholder="Bonus/Lembur" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudPotonganLain">Potongan Lain</label>
+            <input type="text" id="crudPotonganLain" class="modal-field-input" placeholder="Potongan Lain" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudBpjsKaryawan">BPJS Karyawan</label>
+            <input type="text" id="crudBpjsKaryawan" class="modal-field-input" placeholder="BPJS Karyawan" />
+          </div>
+
+          <!-- Row 4: Take Home Pay, Status Lama, ID Pinjaman -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudTakeHomePay">Take Home Pay</label>
+            <input type="text" id="crudTakeHomePay" class="modal-field-input" placeholder="Take Home Pay" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudStatusLama">Status Lama</label>
+            <input type="text" id="crudStatusLama" class="modal-field-input" placeholder="Status Lama" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudIdPinjaman">ID Pinjaman</label>
+            <input type="text" id="crudIdPinjaman" class="modal-field-input" placeholder="ID Pinjaman" />
+          </div>
+
+          <!-- Row 5: Potongan Piutang, ID Payroll, Project/Brand -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudPotonganPiutang">Potongan Piutang</label>
+            <input type="text" id="crudPotonganPiutang" class="modal-field-input" placeholder="Potongan Piutang" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudIdPayroll">ID Payroll</label>
+            <input type="text" id="crudIdPayroll" class="modal-field-input" placeholder="ID Payroll" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudProjectBrand">Project/Brand</label>
+            <input type="text" id="crudProjectBrand" class="modal-field-input" placeholder="Project/Brand" />
+          </div>
+
+          <!-- Row 6: Beban Bruto, Terbayar Kas -->
+          <div class="modal-field col-span-6">
+            <label class="modal-field-label" for="crudBebanBruto">Beban Bruto</label>
+            <input type="text" id="crudBebanBruto" class="modal-field-input" placeholder="Beban Bruto" />
+          </div>
+          <div class="modal-field col-span-6">
+            <label class="modal-field-label" for="crudTerbayarKas">Terbayar Kas</label>
+            <input type="text" id="crudTerbayarKas" class="modal-field-input" placeholder="Terbayar Kas" />
+          </div>
+
+          <!-- Row 7: Sisa Payroll, Bukti -->
+          <div class="modal-field col-span-6">
+            <label class="modal-field-label" for="crudSisaPayroll">Sisa Payroll</label>
+            <input type="text" id="crudSisaPayroll" class="modal-field-input" placeholder="Sisa Payroll" />
+          </div>
+          <div class="modal-field col-span-6">
+            <label class="modal-field-label">Bukti</label>
+            <div class="modal-field-file-box">
+              <div style="display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;">
+                <input type="file" id="crudBukti" accept="image/*,.pdf" style="display: none;" />
+                <button type="button" class="btn-choose-file-inner" id="btnTriggerChooseFile">Choose File</button>
+                <span id="crudBuktiFileName" class="file-name-preview">Tidak ada file dipilih</span>
+              </div>
+              <button type="button" id="btnPreviewBuktiForm" class="pnd-eye-btn" title="Lihat Bukti Payroll" style="display: none;">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="btnSimpanPayroll" class="btn-modal-action">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETAIL: "Lihat Payroll" ===== -->
+  <div id="payrollDetailModal" class="modal-overlay">
+    <div class="payroll-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-header">
+        <h2 class="modal-title"><em>Lihat</em> Payroll</h2>
+        <button class="modal-close" type="button" id="btnCloseDetail" aria-label="Tutup">x</button>
+      </div>
+
+      <div class="modal-dashed-divider"></div>
+
+      <div class="modal-crud-grid">
+        <!-- Row 1: Periode, NIK, Nama -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Periode</span>
+          <div class="modal-field-value" id="detailPeriode">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">NIK</span>
+          <div class="modal-field-value" id="detailNik">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Nama</span>
+          <div class="modal-field-value" id="detailNama">-</div>
+        </div>
+
+        <!-- Row 2: Divisi, Gaji Pokok, Tunjangan -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Divisi</span>
+          <div class="modal-field-value" id="detailDivisi">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Gaji Pokok</span>
+          <div class="modal-field-value" id="detailGajiPokok">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Tunjangan</span>
+          <div class="modal-field-value" id="detailTunjangan">-</div>
+        </div>
+
+        <!-- Row 3: Bonus/Lembur, Potongan Lain, BPJS Karyawan -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Bonus/Lembur</span>
+          <div class="modal-field-value" id="detailBonusLembur">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Potongan Lain</span>
+          <div class="modal-field-value" id="detailPotonganLain">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">BPJS Karyawan</span>
+          <div class="modal-field-value" id="detailBpjsKaryawan">-</div>
+        </div>
+
+        <!-- Row 4: Take Home Pay, Status Lama, ID Pinjaman -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Take Home Pay</span>
+          <div class="modal-field-value" id="detailTakeHomePay">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Status Lama</span>
+          <div class="modal-field-value" id="detailStatusLama">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">ID Pinjaman</span>
+          <div class="modal-field-value" id="detailIdPinjaman">-</div>
+        </div>
+
+        <!-- Row 5: Potongan Piutang, ID Payroll, Project/Brand -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Potongan Piutang</span>
+          <div class="modal-field-value" id="detailPotonganPiutang">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">ID Payroll</span>
+          <div class="modal-field-value" id="detailIdPayroll">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Project/Brand</span>
+          <div class="modal-field-value" id="detailProjectBrand">-</div>
+        </div>
+
+        <!-- Row 6: Beban Bruto, Terbayar Kas -->
+        <div class="modal-field col-span-6">
+          <span class="modal-field-label">Beban Bruto</span>
+          <div class="modal-field-value" id="detailBebanBruto">-</div>
+        </div>
+        <div class="modal-field col-span-6">
+          <span class="modal-field-label">Terbayar Kas</span>
+          <div class="modal-field-value" id="detailTerbayarKas">-</div>
+        </div>
+
+        <!-- Row 7: Sisa Payroll, Bukti -->
+        <div class="modal-field col-span-6">
+          <span class="modal-field-label">Sisa Payroll</span>
+          <div class="modal-field-value" id="detailSisaPayroll">-</div>
+        </div>
+        <div class="modal-field col-span-6">
+          <span class="modal-field-label">Bukti</span>
+          <button type="button" class="btn-detail-lihat-foto" id="btnDetailLihatFoto">
+            <em>Lihat Foto</em>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="btnKeluarDetail" class="btn-modal-action">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL PREVIEW FOTO BUKTI ===== -->
+  <div id="payrollPhotoModal" class="modal-overlay">
+    <div class="payroll-modal-box" style="max-width: 520px;">
+      <div class="modal-accent-line"></div>
+      <div class="modal-header">
+        <h2 class="modal-title" id="photoModalTitle"><em>Detail Bukti</em> Payroll</h2>
+        <button class="modal-close" type="button" id="btnClosePhoto" aria-label="Tutup">x</button>
+      </div>
+      <div class="modal-dashed-divider"></div>
+      <div id="payrollPhotoBody" style="padding: 0 28px 24px 28px; max-height: 70vh; overflow-y: auto;">
+        <div style="text-align: center;">
+          <img id="photoModalImg" src="../../media/logo.png" alt="Bukti Foto" style="max-width: 100%; max-height: 380px; border-radius: 8px; border: 1.5px solid #e2e8f0; object-fit: contain;" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnTutupPhoto" class="btn-modal-action">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ===== DATA SEED (Sesuai Struktur Mockup Kolom Payroll) ===== */
+      const DEFAULT_PAYROLL_DATA = [
+        {
+          id: 'PAY-001',
+          periode: '01 Okt 2026',
+          nik: 'BM-2024-001',
+          nama: 'Ahmad Fauzi',
+          divisi: 'MCN',
+          gajiPokok: 5000000,
+          tunjangan: 1000000,
+          bonusLembur: 500000,
+          potonganLain: 0,
+          bpjsKaryawan: 150000,
+          takeHomePay: 6350000,
+          statusLama: 'Tetap',
+          idPinjaman: '-',
+          potonganPiutang: 0,
+          idPayroll: 'PR-202610-001',
+          projectBrand: 'Seluruh Kreator MCN',
+          bebanBruto: 6500000,
+          terbayarKas: 6500000,
+          sisaPayroll: 0,
+          bukti: 'Lihat'
+        }
+      ];
+
+      const STORAGE_KEY = 'bisa_payroll_data_v1';
+      function loadPayrollData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          } catch (e) {
+            console.error('Error parsing stored payroll data:', e);
+          }
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PAYROLL_DATA));
+        return DEFAULT_PAYROLL_DATA;
+      }
+
+      let payrollData = loadPayrollData();
+
+      /* ===== FORMATTERS ===== */
+      function formatRupiah(num) {
+        const val = Number(num) || 0;
+        return 'Rp. ' + val.toLocaleString('en-US');
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('payrollTableBody');
+      const searchInput = document.getElementById('payrollSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+
+      // Floating Action Menu
+      const actionMenu = document.getElementById('payrollActionMenu');
+      let currentActionId = null;
+
+      // Summary Cards
+      const cardBebanBruto = document.getElementById('cardBebanBruto');
+      const cardTakeHomePay = document.getElementById('cardTakeHomePay');
+      const cardTerbayarKas = document.getElementById('cardTerbayarKas');
+      const cardSisaPayroll = document.getElementById('cardSisaPayroll');
+
+      // Filter Funnel Popover
+      const btnFilter = document.getElementById('btnFilter');
+      const filterDropdown = document.getElementById('filterDropdown');
+      const filterDivisi = document.getElementById('filterDivisi');
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      // Calendar Popover
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+      const calSelectedText = document.getElementById('calSelectedText');
+
+      let selectedStartDate = null;
+      let selectedEndDate = null;
+      let activePreset = 'all';
+
+      // CRUD & Detail Modal Elements
+      const crudModal = document.getElementById('payrollCrudModal');
+      const crudModalTitle = document.getElementById('crudModalTitle');
+      const btnCloseCrud = document.getElementById('btnCloseCrud');
+      const btnSimpanPayroll = document.getElementById('btnSimpanPayroll');
+      const btnTambahPayroll = document.getElementById('btnTambahPayroll');
+      const crudId = document.getElementById('crudId');
+
+      const crudPeriode = document.getElementById('crudPeriode');
+      const crudNik = document.getElementById('crudNik');
+      const crudNama = document.getElementById('crudNama');
+      const crudDivisi = document.getElementById('crudDivisi');
+      const crudGajiPokok = document.getElementById('crudGajiPokok');
+      const crudTunjangan = document.getElementById('crudTunjangan');
+      const crudBonusLembur = document.getElementById('crudBonusLembur');
+      const crudPotonganLain = document.getElementById('crudPotonganLain');
+      const crudBpjsKaryawan = document.getElementById('crudBpjsKaryawan');
+      const crudTakeHomePay = document.getElementById('crudTakeHomePay');
+      const crudStatusLama = document.getElementById('crudStatusLama');
+      const crudIdPinjaman = document.getElementById('crudIdPinjaman');
+      const crudPotonganPiutang = document.getElementById('crudPotonganPiutang');
+      const crudIdPayroll = document.getElementById('crudIdPayroll');
+      const crudProjectBrand = document.getElementById('crudProjectBrand');
+      const crudBebanBruto = document.getElementById('crudBebanBruto');
+      const crudTerbayarKas = document.getElementById('crudTerbayarKas');
+      const crudSisaPayroll = document.getElementById('crudSisaPayroll');
+      const crudBukti = document.getElementById('crudBukti');
+      const btnTriggerChooseFile = document.getElementById('btnTriggerChooseFile');
+      const crudBuktiFileName = document.getElementById('crudBuktiFileName');
+      const btnPreviewBuktiForm = document.getElementById('btnPreviewBuktiForm');
+
+      let tempUploadedFile = '';
+      let tempUploadedFileDataUrl = '';
+
+      // Detail Modal Elements
+      const detailModal = document.getElementById('payrollDetailModal');
+      const btnCloseDetail = document.getElementById('btnCloseDetail');
+      const btnKeluarDetail = document.getElementById('btnKeluarDetail');
+      const btnDetailLihatFoto = document.getElementById('btnDetailLihatFoto');
+
+      const detailPeriode = document.getElementById('detailPeriode');
+      const detailNik = document.getElementById('detailNik');
+      const detailNama = document.getElementById('detailNama');
+      const detailDivisi = document.getElementById('detailDivisi');
+      const detailGajiPokok = document.getElementById('detailGajiPokok');
+      const detailTunjangan = document.getElementById('detailTunjangan');
+      const detailBonusLembur = document.getElementById('detailBonusLembur');
+      const detailPotonganLain = document.getElementById('detailPotonganLain');
+      const detailBpjsKaryawan = document.getElementById('detailBpjsKaryawan');
+      const detailTakeHomePay = document.getElementById('detailTakeHomePay');
+      const detailStatusLama = document.getElementById('detailStatusLama');
+      const detailIdPinjaman = document.getElementById('detailIdPinjaman');
+      const detailPotonganPiutang = document.getElementById('detailPotonganPiutang');
+      const detailIdPayroll = document.getElementById('detailIdPayroll');
+      const detailProjectBrand = document.getElementById('detailProjectBrand');
+      const detailBebanBruto = document.getElementById('detailBebanBruto');
+      const detailTerbayarKas = document.getElementById('detailTerbayarKas');
+      const detailSisaPayroll = document.getElementById('detailSisaPayroll');
+
+      // Photo Modal Elements
+      const photoModal = document.getElementById('payrollPhotoModal');
+      const btnClosePhoto = document.getElementById('btnClosePhoto');
+      const btnTutupPhoto = document.getElementById('btnTutupPhoto');
+      const photoModalTitle = document.getElementById('photoModalTitle');
+      const payrollPhotoBody = document.getElementById('payrollPhotoBody');
+
+      let activeDetailItem = null;
+
+      /* ===== NUMBER & CALCULATION HELPERS ===== */
+      function parseNumber(val) {
+        if (!val) return 0;
+        const cleaned = String(val).replace(/[^0-9.-]/g, '');
+        return Number(cleaned) || 0;
+      }
+
+      function generateNextPayrollId() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const count = payrollData.length + 1;
+        return 'PR-' + y + m + '-' + String(count).padStart(3, '0');
+      }
+
+      function calcPayrollCrud() {
+        const gapok = parseNumber(crudGajiPokok.value);
+        const tunjangan = parseNumber(crudTunjangan.value);
+        const bonus = parseNumber(crudBonusLembur.value);
+        const potLain = parseNumber(crudPotonganLain.value);
+        const bpjs = parseNumber(crudBpjsKaryawan.value);
+        const potPiutang = parseNumber(crudPotonganPiutang.value);
+        const terbayarKas = parseNumber(crudTerbayarKas.value);
+
+        const bruto = gapok + tunjangan + bonus;
+        const thp = Math.max(0, bruto - (potLain + bpjs + potPiutang));
+        const sisa = Math.max(0, bruto - terbayarKas);
+
+        if (crudBebanBruto && !crudBebanBruto.matches(':focus')) {
+          crudBebanBruto.value = bruto > 0 ? formatRupiah(bruto) : '';
+        }
+        if (crudTakeHomePay && !crudTakeHomePay.matches(':focus')) {
+          crudTakeHomePay.value = thp > 0 ? formatRupiah(thp) : '';
+        }
+        if (crudSisaPayroll && !crudSisaPayroll.matches(':focus')) {
+          crudSisaPayroll.value = sisa > 0 ? formatRupiah(sisa) : '';
+        }
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        const query = (searchInput.value || '').trim().toLowerCase();
+        const selDivisi = (filterDivisi.value || '').trim();
+
+        return payrollData.filter(function (item) {
+          // Divisi filter
+          if (selDivisi && (item.divisi || '').toLowerCase() !== selDivisi.toLowerCase()) {
+            return false;
+          }
+
+          // Search query
+          if (query) {
+            const target = [
+              item.periode,
+              item.nik,
+              item.nama,
+              item.divisi,
+              item.statusLama,
+              item.idPinjaman,
+              item.idPayroll,
+              item.projectBrand,
+              String(item.gajiPokok),
+              String(item.takeHomePay),
+              String(item.bebanBruto)
+            ].join(' ').toLowerCase();
+            if (!target.includes(query)) return false;
+          }
+
+          // Date range filter (if selected)
+          if (selectedStartDate && selectedEndDate && item.periode) {
+            const itemDate = new Date(item.periode);
+            if (!isNaN(itemDate.getTime())) {
+              const start = new Date(selectedStartDate);
+              const end = new Date(selectedEndDate);
+              end.setHours(23, 59, 59, 999);
+              if (itemDate < start || itemDate > end) return false;
+            }
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== UPDATE SUMMARY CARDS ===== */
+      function updateSummaryCards(data) {
+        // Tampilkan nilai 100 sesuai mockup jika data bawaan / default
+        if (!data || data.length === 0 || (data.length === 1 && data[0].idPayroll === 'PR-202610-001')) {
+          if (cardBebanBruto) cardBebanBruto.textContent = '100';
+          if (cardTakeHomePay) cardTakeHomePay.textContent = '100';
+          if (cardTerbayarKas) cardTerbayarKas.textContent = '100';
+          if (cardSisaPayroll) cardSisaPayroll.textContent = '100';
+          return;
+        }
+
+        let totalBruto = 0;
+        let totalTHP = 0;
+        let totalKas = 0;
+        let totalSisa = 0;
+
+        data.forEach(function (item) {
+          totalBruto += Number(item.bebanBruto) || 0;
+          totalTHP += Number(item.takeHomePay) || 0;
+          totalKas += Number(item.terbayarKas) || 0;
+          totalSisa += Number(item.sisaPayroll) || 0;
+        });
+
+        if (cardBebanBruto) cardBebanBruto.textContent = totalBruto > 0 ? formatRupiah(totalBruto) : '100';
+        if (cardTakeHomePay) cardTakeHomePay.textContent = totalTHP > 0 ? formatRupiah(totalTHP) : '100';
+        if (cardTerbayarKas) cardTerbayarKas.textContent = totalKas > 0 ? formatRupiah(totalKas) : '100';
+        if (cardSisaPayroll) cardSisaPayroll.textContent = totalSisa > 0 ? formatRupiah(totalSisa) : '100';
+      }
+
+      /* ===== RENDER TABLE ===== */
+      function renderTable() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        const filtered = getFilteredData();
+
+        if (filtered.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="21" style="text-align: center; color: #94a3b8; font-style: italic; height: 260px; vertical-align: middle; font-size: 14px;">Tidak ada data payroll yang sesuai.</td></tr>';
+          updateSummaryCards(filtered);
+          return;
+        }
+
+        filtered.forEach(function (item, index) {
+          const row = document.createElement('tr');
+
+          row.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '.</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.periode || '-') + '</td>',
+            '<td class="pnd-cell-italic" style="font-weight: 500;">' + escapeHtml(item.nik || '-') + '</td>',
+            '<td class="pnd-cell-italic" style="font-weight: 500;">' + escapeHtml(item.nama || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.divisi || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.gajiPokok)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.tunjangan)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.bonusLembur)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.potonganLain)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.bpjsKaryawan)) + '</td>',
+            '<td class="pnd-cell-italic" style="font-weight: 600; color: #0284c7;">' + escapeHtml(formatRupiah(item.takeHomePay)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.statusLama || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.idPinjaman || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.potonganPiutang)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.idPayroll || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(item.projectBrand || '-') + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.bebanBruto)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.terbayarKas)) + '</td>',
+            '<td class="pnd-cell-italic">' + escapeHtml(formatRupiah(item.sisaPayroll)) + '</td>',
+            '<td style="text-align: center;"><span class="badge-bukti" data-action="view-bukti" data-id="' + escapeHtml(item.id) + '">' + escapeHtml(item.bukti || 'Lihat') + '</span></td>',
+            '<td class="col-sticky-action" style="text-align: center;">' +
+              '<button type="button" class="payroll-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+          tableBody.appendChild(row);
+        });
+
+        updateSummaryCards(filtered);
+      }
+
+      /* ===== FLOATING ACTION MENU HANDLERS (KONSISTEN APPROVAL PENGELUARAN) ===== */
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = 120;
+
+        let left = rect.left - menuWidth + 24;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
+      /* ===== CRUD MODAL HANDLER ===== */
+      function openCrudModal(mode, item) {
+        if (!crudModal) return;
+        closeActionMenus();
+
+        if (mode === 'create') {
+          tempUploadedFile = '';
+          tempUploadedFileDataUrl = '';
+          if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+          if (crudModalTitle) crudModalTitle.innerHTML = '<em>Tambah</em> Payroll';
+          if (crudId) crudId.value = '';
+          const today = new Date();
+          const day = String(today.getDate()).padStart(2, '0');
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+          const todayStr = day + ' ' + monthNames[today.getMonth()] + ' ' + today.getFullYear();
+
+          if (crudPeriode) crudPeriode.value = todayStr;
+          if (crudNik) crudNik.value = '';
+          if (crudNama) crudNama.value = '';
+          if (crudDivisi) crudDivisi.value = '';
+          if (crudGajiPokok) crudGajiPokok.value = '';
+          if (crudTunjangan) crudTunjangan.value = '';
+          if (crudBonusLembur) crudBonusLembur.value = '';
+          if (crudPotonganLain) crudPotonganLain.value = '';
+          if (crudBpjsKaryawan) crudBpjsKaryawan.value = '';
+          if (crudTakeHomePay) crudTakeHomePay.value = '';
+          if (crudStatusLama) crudStatusLama.value = '';
+          if (crudIdPinjaman) crudIdPinjaman.value = '';
+          if (crudPotonganPiutang) crudPotonganPiutang.value = '';
+          if (crudIdPayroll) crudIdPayroll.value = generateNextPayrollId();
+          if (crudProjectBrand) crudProjectBrand.value = '';
+          if (crudBebanBruto) crudBebanBruto.value = '';
+          if (crudTerbayarKas) crudTerbayarKas.value = '';
+          if (crudSisaPayroll) crudSisaPayroll.value = '';
+          if (crudBuktiFileName) crudBuktiFileName.textContent = 'Tidak ada file dipilih';
+          if (crudBukti) crudBukti.value = '';
+        } else if (mode === 'edit' && item) {
+          tempUploadedFile = item.buktiName || '';
+          tempUploadedFileDataUrl = item.buktiImg || '';
+          if (btnPreviewBuktiForm) {
+            btnPreviewBuktiForm.style.display = (item.buktiImg || item.buktiName || item.bukti) ? 'inline-flex' : 'none';
+          }
+          if (crudModalTitle) crudModalTitle.innerHTML = '<em>Edit</em> Payroll';
+          if (crudId) crudId.value = item.id;
+          if (crudPeriode) crudPeriode.value = item.periode || '';
+          if (crudNik) crudNik.value = item.nik || '';
+          if (crudNama) crudNama.value = item.nama || '';
+          if (crudDivisi) crudDivisi.value = item.divisi || '';
+          if (crudGajiPokok) crudGajiPokok.value = item.gajiPokok ? formatRupiah(item.gajiPokok) : '';
+          if (crudTunjangan) crudTunjangan.value = item.tunjangan ? formatRupiah(item.tunjangan) : '';
+          if (crudBonusLembur) crudBonusLembur.value = item.bonusLembur ? formatRupiah(item.bonusLembur) : '';
+          if (crudPotonganLain) crudPotonganLain.value = item.potonganLain ? formatRupiah(item.potonganLain) : '';
+          if (crudBpjsKaryawan) crudBpjsKaryawan.value = item.bpjsKaryawan ? formatRupiah(item.bpjsKaryawan) : '';
+          if (crudTakeHomePay) crudTakeHomePay.value = item.takeHomePay ? formatRupiah(item.takeHomePay) : '';
+          if (crudStatusLama) crudStatusLama.value = item.statusLama || '';
+          if (crudIdPinjaman) crudIdPinjaman.value = item.idPinjaman || '';
+          if (crudPotonganPiutang) crudPotonganPiutang.value = item.potonganPiutang ? formatRupiah(item.potonganPiutang) : '';
+          if (crudIdPayroll) crudIdPayroll.value = item.idPayroll || '';
+          if (crudProjectBrand) crudProjectBrand.value = item.projectBrand || '';
+          if (crudBebanBruto) crudBebanBruto.value = item.bebanBruto ? formatRupiah(item.bebanBruto) : '';
+          if (crudTerbayarKas) crudTerbayarKas.value = item.terbayarKas ? formatRupiah(item.terbayarKas) : '';
+          if (crudSisaPayroll) crudSisaPayroll.value = item.sisaPayroll ? formatRupiah(item.sisaPayroll) : '';
+          if (crudBuktiFileName) crudBuktiFileName.textContent = item.buktiName || (item.bukti ? item.bukti + '.png' : 'Tidak ada file dipilih');
+          if (crudBukti) crudBukti.value = '';
+        }
+
+        crudModal.classList.add('is-active');
+      }
+
+      function closeCrudModal() {
+        if (crudModal) crudModal.classList.remove('is-active');
+      }
+
+      function handleSavePayroll() {
+        const nama = (crudNama && crudNama.value ? crudNama.value.trim() : '');
+        if (!nama) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'warning', title: 'Data Belum Lengkap', text: 'Silakan isi Nama karyawan.' });
+          } else {
+            alert('Silakan isi Nama karyawan.');
+          }
+          if (crudNama) crudNama.focus();
+          return;
+        }
+
+        const id = (crudId && crudId.value) ? crudId.value : ('PAY-' + Date.now());
+        const isEdit = !!(crudId && crudId.value);
+
+        const gapok = parseNumber(crudGajiPokok ? crudGajiPokok.value : 0);
+        const tunjangan = parseNumber(crudTunjangan ? crudTunjangan.value : 0);
+        const bonus = parseNumber(crudBonusLembur ? crudBonusLembur.value : 0);
+        const potLain = parseNumber(crudPotonganLain ? crudPotonganLain.value : 0);
+        const bpjs = parseNumber(crudBpjsKaryawan ? crudBpjsKaryawan.value : 0);
+        const potPiutang = parseNumber(crudPotonganPiutang ? crudPotonganPiutang.value : 0);
+        const terbayar = parseNumber(crudTerbayarKas ? crudTerbayarKas.value : 0);
+
+        const brutoCalc = gapok + tunjangan + bonus;
+        const thpCalc = Math.max(0, brutoCalc - (potLain + bpjs + potPiutang));
+        const sisaCalc = Math.max(0, brutoCalc - terbayar);
+
+        const file = crudBukti && crudBukti.files && crudBukti.files[0];
+        let buktiUrl = tempUploadedFileDataUrl || (isEdit ? ((payrollData.find(function (x) { return x.id === id; }) || {}).buktiImg || '') : '');
+        let buktiName = tempUploadedFile || (isEdit ? ((payrollData.find(function (x) { return x.id === id; }) || {}).buktiName || 'Bukti Payroll') : 'Bukti Payroll');
+        if (!buktiUrl && file) {
+          buktiUrl = URL.createObjectURL(file);
+          buktiName = file.name;
+        }
+
+        const payload = {
+          id: id,
+          periode: (crudPeriode && crudPeriode.value.trim()) || '04 Nov 2026',
+          nik: (crudNik && crudNik.value.trim()) || '-',
+          nama: nama,
+          divisi: (crudDivisi && crudDivisi.value.trim()) || 'General',
+          gajiPokok: gapok,
+          tunjangan: tunjangan,
+          bonusLembur: bonus,
+          potonganLain: potLain,
+          bpjsKaryawan: bpjs,
+          takeHomePay: (crudTakeHomePay && crudTakeHomePay.value) ? parseNumber(crudTakeHomePay.value) : thpCalc,
+          statusLama: (crudStatusLama && crudStatusLama.value.trim()) || 'Tetap',
+          idPinjaman: (crudIdPinjaman && crudIdPinjaman.value.trim()) || '-',
+          potonganPiutang: potPiutang,
+          idPayroll: (crudIdPayroll && crudIdPayroll.value.trim()) || generateNextPayrollId(),
+          projectBrand: (crudProjectBrand && crudProjectBrand.value.trim()) || '-',
+          bebanBruto: (crudBebanBruto && crudBebanBruto.value) ? parseNumber(crudBebanBruto.value) : brutoCalc,
+          terbayarKas: terbayar,
+          sisaPayroll: (crudSisaPayroll && crudSisaPayroll.value) ? parseNumber(crudSisaPayroll.value) : sisaCalc,
+          bukti: 'Lihat',
+          buktiName: buktiName,
+          buktiImg: buktiUrl
+        };
+
+        if (isEdit) {
+          const idx = payrollData.findIndex(function (u) { return String(u.id) === String(id); });
+          if (idx !== -1) {
+            payrollData[idx] = payload;
+          } else {
+            payrollData.unshift(payload);
+          }
+        } else {
+          payrollData.unshift(payload);
+        }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payrollData));
+        renderTable();
+        closeCrudModal();
+
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: 'success',
+            title: isEdit ? 'Payroll Diperbarui!' : 'Payroll Disimpan!',
+            text: 'Data payroll berhasil ' + (isEdit ? 'diperbarui.' : 'ditambahkan.'),
+            timer: 1600,
+            showConfirmButton: false
+          });
+        }
+      }
+
+      /* Auto calculation listeners on CRUD form */
+      [crudGajiPokok, crudTunjangan, crudBonusLembur, crudPotonganLain, crudBpjsKaryawan, crudPotonganPiutang, crudTerbayarKas].forEach(function (inp) {
+        if (!inp) return;
+        inp.addEventListener('input', function () {
+          calcPayrollCrud();
+        });
+        inp.addEventListener('blur', function () {
+          const num = parseNumber(this.value);
+          this.value = num > 0 ? formatRupiah(num) : '';
+          calcPayrollCrud();
+        });
+      });
+
+      if (btnTriggerChooseFile && crudBukti) {
+        btnTriggerChooseFile.addEventListener('click', function () {
+          crudBukti.click();
+        });
+        crudBukti.addEventListener('change', function () {
+          if (this.files && this.files[0]) {
+            const f = this.files[0];
+            tempUploadedFile = f.name;
+            if (crudBuktiFileName) crudBuktiFileName.textContent = f.name;
+            if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              tempUploadedFileDataUrl = e.target.result;
+            };
+            reader.readAsDataURL(f);
+          } else {
+            tempUploadedFile = '';
+            tempUploadedFileDataUrl = '';
+            if (crudBuktiFileName) crudBuktiFileName.textContent = 'Tidak ada file dipilih';
+            if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+          }
+        });
+      }
+
+      function getCrudFormContext() {
+        return {
+          idPayroll: (crudIdPayroll && crudIdPayroll.value) ? crudIdPayroll.value.trim() : generateNextPayrollId(),
+          periode: (crudPeriode && crudPeriode.value) ? crudPeriode.value.trim() : '04 Nov 2026',
+          nik: (crudNik && crudNik.value) ? crudNik.value.trim() : '-',
+          nama: (crudNama && crudNama.value) ? crudNama.value.trim() : 'Karyawan',
+          divisi: (crudDivisi && crudDivisi.value) ? crudDivisi.value.trim() : 'General',
+          gajiPokok: parseNumber(crudGajiPokok ? crudGajiPokok.value : 0),
+          tunjangan: parseNumber(crudTunjangan ? crudTunjangan.value : 0),
+          bonusLembur: parseNumber(crudBonusLembur ? crudBonusLembur.value : 0),
+          potonganLain: parseNumber(crudPotonganLain ? crudPotonganLain.value : 0),
+          bpjsKaryawan: parseNumber(crudBpjsKaryawan ? crudBpjsKaryawan.value : 0),
+          potonganPiutang: parseNumber(crudPotonganPiutang ? crudPotonganPiutang.value : 0),
+          takeHomePay: parseNumber(crudTakeHomePay ? crudTakeHomePay.value : 0),
+          bebanBruto: parseNumber(crudBebanBruto ? crudBebanBruto.value : 0),
+          terbayarKas: parseNumber(crudTerbayarKas ? crudTerbayarKas.value : 0),
+          sisaPayroll: parseNumber(crudSisaPayroll ? crudSisaPayroll.value : 0)
+        };
+      }
+
+      if (btnPreviewBuktiForm) {
+        btnPreviewBuktiForm.addEventListener('click', function (e) {
+          e.preventDefault();
+          previewBuktiPayroll(tempUploadedFile, tempUploadedFileDataUrl, getCrudFormContext());
+        });
+      }
+
+      if (btnSimpanPayroll) {
+        btnSimpanPayroll.addEventListener('click', handleSavePayroll);
+      }
+      if (btnCloseCrud) {
+        btnCloseCrud.addEventListener('click', closeCrudModal);
+      }
+      if (crudModal) {
+        crudModal.addEventListener('click', function (e) {
+          if (e.target === crudModal) closeCrudModal();
+        });
+      }
+      if (btnTambahPayroll) {
+        btnTambahPayroll.addEventListener('click', function () {
+          openCrudModal('create');
+        });
+      }
+
+      /* ===== DETAIL MODAL HANDLER ===== */
+      function openDetailModal(item) {
+        if (!item || !detailModal) return;
+        activeDetailItem = item;
+        closeActionMenus();
+
+        if (detailPeriode) detailPeriode.textContent = item.periode || '-';
+        if (detailNik) detailNik.textContent = item.nik || '-';
+        if (detailNama) detailNama.textContent = item.nama || '-';
+        if (detailDivisi) detailDivisi.textContent = item.divisi || '-';
+        if (detailGajiPokok) detailGajiPokok.textContent = formatRupiah(item.gajiPokok);
+        if (detailTunjangan) detailTunjangan.textContent = formatRupiah(item.tunjangan);
+        if (detailBonusLembur) detailBonusLembur.textContent = formatRupiah(item.bonusLembur);
+        if (detailPotonganLain) detailPotonganLain.textContent = formatRupiah(item.potonganLain);
+        if (detailBpjsKaryawan) detailBpjsKaryawan.textContent = formatRupiah(item.bpjsKaryawan);
+        if (detailTakeHomePay) detailTakeHomePay.textContent = formatRupiah(item.takeHomePay);
+        if (detailStatusLama) detailStatusLama.textContent = item.statusLama || '-';
+        if (detailIdPinjaman) detailIdPinjaman.textContent = item.idPinjaman || '-';
+        if (detailPotonganPiutang) detailPotonganPiutang.textContent = formatRupiah(item.potonganPiutang);
+        if (detailIdPayroll) detailIdPayroll.textContent = item.idPayroll || '-';
+        if (detailProjectBrand) detailProjectBrand.textContent = item.projectBrand || '-';
+        if (detailBebanBruto) detailBebanBruto.textContent = formatRupiah(item.bebanBruto);
+        if (detailTerbayarKas) detailTerbayarKas.textContent = formatRupiah(item.terbayarKas);
+        if (detailSisaPayroll) detailSisaPayroll.textContent = formatRupiah(item.sisaPayroll);
+
+        detailModal.classList.add('is-active');
+      }
+
+      function closeDetailModal() {
+        if (detailModal) detailModal.classList.remove('is-active');
+      }
+
+      if (btnCloseDetail) btnCloseDetail.addEventListener('click', closeDetailModal);
+      if (btnKeluarDetail) btnKeluarDetail.addEventListener('click', closeDetailModal);
+
+      if (detailModal) {
+        detailModal.addEventListener('click', function (e) {
+          if (e.target === detailModal) closeDetailModal();
+        });
+      }
+
+      /* ===== DETAIL BUKTI PAYROLL MODAL HANDLER ===== */
+      function previewBuktiPayroll(fileName, dataUrl, itemContext) {
+        const name = (fileName || '').trim();
+        const ctx = itemContext || {};
+
+        let previewContent = '';
+        const isRealImage = dataUrl && (
+          dataUrl.startsWith('data:image/') ||
+          dataUrl.startsWith('blob:') ||
+          (dataUrl.startsWith('http') && !dataUrl.includes('placeholder'))
+        );
+
+        if (isRealImage) {
+          previewContent =
+            '<div style="margin: 6px 0; text-align: center; max-height: 480px; overflow-y: auto; padding: 4px; border-radius: 8px;">' +
+              '<img src="' + dataUrl + '" alt="Bukti Payroll" style="max-width: 100%; max-height: 380px; border-radius: 8px; border: 1.5px solid #cbd5e1; box-shadow: 0 4px 18px rgba(0,0,0,0.1); object-fit: contain;" />' +
+              '<div style="margin-top: 10px; font-size: 13px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">📎 ' + escapeHtml(name || 'Bukti Payroll') + '</div>' +
+            '</div>';
+        } else {
+          const idPay = ctx.idPayroll || 'PR-202610-001';
+          const per = ctx.periode || '01 Okt 2026';
+          const nik = ctx.nik && ctx.nik !== '-' ? ' (' + escapeHtml(ctx.nik) + ')' : '';
+          const emp = (ctx.nama || 'Karyawan') + nik;
+          const div = ctx.divisi || 'General';
+          const gapok = Number(ctx.gajiPokok) || 0;
+          const tunj = Number(ctx.tunjangan) || 0;
+          const bonus = Number(ctx.bonusLembur) || 0;
+          const bruto = Number(ctx.bebanBruto) || (gapok + tunj + bonus);
+          const potLain = Number(ctx.potonganLain) || 0;
+          const bpjs = Number(ctx.bpjsKaryawan) || 0;
+          const potPiutang = Number(ctx.potonganPiutang) || 0;
+          const totalPot = potLain + bpjs + potPiutang;
+          const thp = Number(ctx.takeHomePay) || Math.max(0, bruto - totalPot);
+          const terbayar = Number(ctx.terbayarKas) || 0;
+          const sisa = Number(ctx.sisaPayroll) || Math.max(0, bruto - terbayar);
+          const isLunas = sisa === 0 && terbayar > 0;
+
+          previewContent =
+            '<div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 22px 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); text-align: left; font-family: \'Outfit\', sans-serif; max-width: 440px; margin: 4px auto 0;">' +
+              '<div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px dashed #e2e8f0; padding-bottom: 14px; margin-bottom: 16px;">' +
+                '<div>' +
+                  '<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700;">SLIP GAJI & STRUK BUKTI PAYROLL</div>' +
+                  '<div style="font-size: 17px; font-weight: 800; color: #0076C5; margin-top: 2px;">' + escapeHtml(idPay) + '</div>' +
+                '</div>' +
+                '<div style="background: ' + (isLunas ? '#ecfdf5' : '#e0f2fe') + '; color: ' + (isLunas ? '#059669' : '#0284c7') + '; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">' +
+                  (isLunas ? 'LUNAS / TERBAYAR' : 'TERVERIFIKASI') +
+                '</div>' +
+              '</div>' +
+              '<div style="display: flex; flex-direction: column; gap: 9px; font-size: 13px;">' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Periode:</span><strong style="color: #1e293b;">' + escapeHtml(per) + '</strong></div>' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Karyawan:</span><strong style="color: #1e293b;">' + escapeHtml(emp) + '</strong></div>' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Divisi:</span><span style="color: #1e293b; font-weight: 600;">' + escapeHtml(div) + '</span></div>' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Gaji Pokok:</span><span style="color: #1e293b; font-weight: 600;">' + formatRupiah(gapok) + '</span></div>' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Tunjangan:</span><span style="color: #1e293b; font-weight: 600;">' + formatRupiah(tunj) + '</span></div>' +
+                '<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Bonus / Lembur:</span><span style="color: #1e293b; font-weight: 600;">' + formatRupiah(bonus) + '</span></div>' +
+                (totalPot > 0 ? ('<div style="display: flex; justify-content: space-between;"><span style="color: #64748b;">Potongan BPJS & Piutang:</span><span style="color: #ef4444; font-weight: 600;">- ' + formatRupiah(totalPot) + '</span></div>') : '') +
+                '<div style="border-top: 1.5px dashed #e2e8f0; margin-top: 6px; padding-top: 10px; display: flex; justify-content: space-between; align-items: baseline;">' +
+                  '<span style="font-size: 14px; font-weight: 700; color: #0f172a;">Take Home Pay (THP)</span>' +
+                  '<strong style="font-size: 17px; color: #0076C5; font-weight: 800;">' + formatRupiah(thp) + '</strong>' +
+                '</div>' +
+                '<div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-top: 2px;"><span style="color: #64748b;">Terbayar Kas:</span><strong style="color: #059669;">' + formatRupiah(terbayar) + '</strong></div>' +
+                '<div style="display: flex; justify-content: space-between; font-size: 12.5px;"><span style="color: #64748b;">Sisa Payroll:</span><strong style="color: ' + (sisa > 0 ? '#e11d48' : '#64748b') + ';">' + formatRupiah(sisa) + '</strong></div>' +
+              '</div>' +
+              '<div style="margin-top: 16px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 10px;">' +
+                'Terverifikasi otomatis oleh Sistem Keuangan & Payroll PT BISA MEDIA GRUP' +
+              '</div>' +
+            '</div>';
+        }
+
+        const photoBody = document.getElementById('payrollPhotoBody');
+        if (photoBody && photoModal) {
+          photoBody.innerHTML = previewContent;
+          photoModal.classList.add('is-active');
+        } else if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: '<span style="font-family: \'Outfit\', sans-serif; font-size: 17px; font-weight: 700; color: #0f172a;">Detail Bukti Payroll</span>',
+            html: previewContent,
+            showCloseButton: true,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#0076C5'
+          });
+        }
+      }
+
+      function closePhotoModal() {
+        if (photoModal) photoModal.classList.remove('is-active');
+      }
+
+      if (btnClosePhoto) btnClosePhoto.addEventListener('click', closePhotoModal);
+      if (btnTutupPhoto) btnTutupPhoto.addEventListener('click', closePhotoModal);
+      if (photoModal) {
+        photoModal.addEventListener('click', function (e) {
+          if (e.target === photoModal) closePhotoModal();
+        });
+      }
+
+      if (btnDetailLihatFoto) {
+        btnDetailLihatFoto.addEventListener('click', function () {
+          if (!activeDetailItem) return;
+          previewBuktiPayroll(activeDetailItem.buktiName, activeDetailItem.buktiImg, activeDetailItem);
+        });
+      }
+
+      // Delegate click on table action 3-dots button & bukti
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const toggle = e.target.closest('[data-action-toggle]');
+          if (toggle) {
+            e.preventDefault();
+            e.stopPropagation();
+            openActionMenu(toggle);
+            return;
+          }
+
+          const btnBukti = e.target.closest('[data-action="view-bukti"]');
+          if (btnBukti) {
+            e.preventDefault();
+            const id = btnBukti.getAttribute('data-id');
+            const target = payrollData.find(function (u) { return String(u.id) === String(id); });
+            if (target) {
+              previewBuktiPayroll(target.buktiName, target.buktiImg, target);
+            }
+          }
+        });
+      }
+
+      // Action Menu item clicks (Lihat, Edit, Hapus)
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (event) {
+          const actionButton = event.target.closest('[data-action]');
+          if (!actionButton || !currentActionId) return;
+
+          const action = actionButton.getAttribute('data-action');
+          const targetItem = payrollData.find(function (item) {
+            return String(item.id) === String(currentActionId);
+          });
+
+          closeActionMenus();
+
+          if (!targetItem) return;
+
+          if (action === 'view') {
+            openDetailModal(targetItem);
+          } else if (action === 'edit') {
+            openCrudModal('edit', targetItem);
+          } else if (action === 'delete') {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: 'Hapus Data Payroll?',
+                text: 'Data payroll ini akan dihapus secara permanen.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  payrollData = payrollData.filter(function (it) { return String(it.id) !== String(targetItem.id); });
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(payrollData));
+                  renderTable();
+                  Swal.fire('Terhapus!', 'Data payroll berhasil dihapus.', 'success');
+                }
+              });
+            } else if (confirm('Apakah Anda yakin ingin menghapus data payroll ini?')) {
+              payrollData = payrollData.filter(function (it) { return String(it.id) !== String(targetItem.id); });
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(payrollData));
+              renderTable();
+            }
+          }
+        });
+      }
+
+      /* ===== SEARCH EVENT ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          renderTable();
+        });
+      }
+
+      /* ===== FILTER FUNNEL LOGIC ===== */
+      function getDivisiOptions() {
+        const base = ['Divisi 1', 'Divisi 2', 'Divisi 3'];
+        const set = new Set(base);
+        payrollData.forEach(function (d) {
+          if (d.divisi) set.add(d.divisi);
+        });
+        return Array.from(set);
+      }
+
+      function closeFilterSearchBoxes() {
+        document.querySelectorAll('.payroll-filter-box').forEach(function (box) {
+          box.classList.remove('is-open');
+          const inp = box.querySelector('.payroll-filter-input');
+          if (inp && !inp.value) {
+            if (box.id === 'boxFilterDivisi') inp.placeholder = 'Pilih Divisi';
+          }
+        });
+      }
+
+      function initSearchableFilter(boxId, inputId, listId, defaultPlaceholder, searchPlaceholder, getOptionsFn) {
+        const box = document.getElementById(boxId);
+        const input = document.getElementById(inputId);
+        const list = document.getElementById(listId);
+        if (!box || !input || !list) return;
+
+        function renderList(query) {
+          const q = (query || '').toLowerCase().trim();
+          const options = getOptionsFn();
+          const filtered = options.filter(function (opt) {
+            return !q || String(opt).toLowerCase().includes(q);
+          });
+
+          list.innerHTML = '';
+          if (filtered.length === 0) {
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'payroll-filter-item';
+            emptyItem.style.color = '#94a3b8';
+            emptyItem.style.fontStyle = 'italic';
+            emptyItem.style.cursor = 'default';
+            emptyItem.textContent = 'Tidak ditemukan';
+            list.appendChild(emptyItem);
+            return;
+          }
+
+          filtered.forEach(function (opt) {
+            const itemDiv = document.createElement('div');
+            const isSelected = input.value.trim().toLowerCase() === String(opt).toLowerCase();
+            itemDiv.className = 'payroll-filter-item' + (isSelected ? ' is-selected' : '');
+            itemDiv.textContent = opt;
+            itemDiv.addEventListener('click', function (e) {
+              e.stopPropagation();
+              input.value = opt;
+              box.classList.remove('is-open');
+              input.placeholder = defaultPlaceholder;
+            });
+            list.appendChild(itemDiv);
+          });
+        }
+
+        input.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = box.classList.contains('is-open');
+          if (!isOpen) {
+            box.classList.add('is-open');
+            input.placeholder = searchPlaceholder;
+            renderList('');
+          } else {
+            box.classList.remove('is-open');
+            if (!input.value) input.placeholder = defaultPlaceholder;
+          }
+        });
+
+        input.addEventListener('input', function () {
+          if (!box.classList.contains('is-open')) {
+            box.classList.add('is-open');
+          }
+          renderList(input.value);
+        });
+
+        const arrow = box.querySelector('.payroll-filter-arrow');
+        if (arrow) {
+          arrow.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = box.classList.contains('is-open');
+            if (!isOpen) {
+              box.classList.add('is-open');
+              input.placeholder = searchPlaceholder;
+              renderList('');
+              input.focus();
+            } else {
+              box.classList.remove('is-open');
+              if (!input.value) input.placeholder = defaultPlaceholder;
+            }
+          });
+        }
+      }
+
+      initSearchableFilter('boxFilterDivisi', 'filterDivisi', 'listFilterDivisi', 'Pilih Divisi', 'Cari Divsi', getDivisiOptions);
+
+      if (btnFilter) {
+        btnFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+          filterDropdown.classList.toggle('is-active');
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (filterDivisi) {
+            filterDivisi.value = '';
+            filterDivisi.placeholder = 'Pilih Divisi';
+          }
+          closeFilterSearchBoxes();
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          closeFilterSearchBoxes();
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== CALENDAR POPOVER LOGIC ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 9;
+
+      function renderCalendar() {
+        renderCalendarMonth(calViewYear, calViewMonth, 'calTitleLeft', 'calGridLeft');
+        let nextYear = calViewYear;
+        let nextMonth = calViewMonth + 1;
+        if (nextMonth > 12) {
+          nextMonth = 1;
+          nextYear++;
+        }
+        renderCalendarMonth(nextYear, nextMonth, 'calTitleRight', 'calGridRight');
+        updateCalendarSelectedText();
+      }
+
+      function renderCalendarMonth(year, month, titleId, gridId) {
+        const titleEl = document.getElementById(titleId);
+        const gridEl = document.getElementById(gridId);
+        if (!titleEl || !gridEl) return;
+
+        titleEl.textContent = year + ' - ' + String(month).padStart(2, '0');
+        gridEl.innerHTML = '';
+
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        const startOffset = (firstDay + 6) % 7;
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        for (let i = 0; i < startOffset; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'cal-day is-empty';
+          gridEl.appendChild(empty);
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'cal-day';
+          dayEl.textContent = day;
+
+          const dateStr = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+          dayEl.dataset.date = dateStr;
+
+          if (selectedStartDate && dateStr === selectedStartDate) {
+            dayEl.classList.add('is-selected');
+          } else if (selectedEndDate && dateStr === selectedEndDate) {
+            dayEl.classList.add('is-selected');
+          } else if (selectedStartDate && selectedEndDate && dateStr > selectedStartDate && dateStr < selectedEndDate) {
+            dayEl.classList.add('is-in-range');
+          }
+
+          dayEl.addEventListener('click', function (e) {
+            e.stopPropagation();
+            handleDateSelection(dateStr);
+          });
+
+          gridEl.appendChild(dayEl);
+        }
+      }
+
+      function handleDateSelection(dateStr) {
+        if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+          selectedStartDate = dateStr;
+          selectedEndDate = null;
+        } else if (selectedStartDate && !selectedEndDate) {
+          if (dateStr < selectedStartDate) {
+            selectedEndDate = selectedStartDate;
+            selectedStartDate = dateStr;
+          } else {
+            selectedEndDate = dateStr;
+          }
+        }
+        renderCalendar();
+      }
+
+      function updateCalendarSelectedText() {
+        if (!calSelectedText) return;
+        if (selectedStartDate && selectedEndDate) {
+          calSelectedText.textContent = selectedStartDate + ' s/d ' + selectedEndDate;
+        } else if (selectedStartDate) {
+          calSelectedText.textContent = selectedStartDate + ' - (Pilih akhir)';
+        } else {
+          calSelectedText.textContent = 'Semua Periode';
+        }
+      }
+
+      // Calendar Navigation
+      const calPrevYear = document.getElementById('calPrevYear');
+      const calNextYear = document.getElementById('calNextYear');
+      const calPrevMonth = document.getElementById('calPrevMonth');
+      const calNextMonth = document.getElementById('calNextMonth');
+
+      if (calPrevYear) calPrevYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear--; renderCalendar(); });
+      if (calNextYear) calNextYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear++; renderCalendar(); });
+      if (calPrevMonth) calPrevMonth.addEventListener('click', function (e) {
+        e.stopPropagation();
+        calViewMonth--;
+        if (calViewMonth < 1) { calViewMonth = 12; calViewYear--; }
+        renderCalendar();
+      });
+      if (calNextMonth) calNextMonth.addEventListener('click', function (e) {
+        e.stopPropagation();
+        calViewMonth++;
+        if (calViewMonth > 12) { calViewMonth = 1; calViewYear++; }
+        renderCalendar();
+      });
+
+      // Presets
+      document.querySelectorAll('.cal-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          document.querySelectorAll('.cal-preset-btn').forEach(function (b) { b.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+          const preset = btn.dataset.preset;
+          applyPreset(preset);
+        });
+      });
+
+      function applyPreset(preset) {
+        activePreset = preset;
+        const now = new Date(2026, 9, 4);
+        const fmt = function (d) {
+          return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        };
+
+        if (preset === 'all') {
+          selectedStartDate = null;
+          selectedEndDate = null;
+        } else if (preset === 'today') {
+          selectedStartDate = fmt(now);
+          selectedEndDate = fmt(now);
+        } else if (preset === 'yesterday') {
+          const y = new Date(now);
+          y.setDate(y.getDate() - 1);
+          selectedStartDate = fmt(y);
+          selectedEndDate = fmt(y);
+        } else if (preset === 'last7') {
+          const s = new Date(now);
+          s.setDate(s.getDate() - 6);
+          selectedStartDate = fmt(s);
+          selectedEndDate = fmt(now);
+        } else if (preset === 'last30') {
+          const s = new Date(now);
+          s.setDate(s.getDate() - 29);
+          selectedStartDate = fmt(s);
+          selectedEndDate = fmt(now);
+        } else if (preset === 'last3m') {
+          const s = new Date(now);
+          s.setMonth(s.getMonth() - 3);
+          selectedStartDate = fmt(s);
+          selectedEndDate = fmt(now);
+        } else if (preset === 'last12m') {
+          const s = new Date(now);
+          s.setFullYear(s.getFullYear() - 1);
+          selectedStartDate = fmt(s);
+          selectedEndDate = fmt(now);
+        }
+
+        if (selectedStartDate) {
+          const startD = new Date(selectedStartDate);
+          calViewYear = startD.getFullYear();
+          calViewMonth = startD.getMonth() + 1;
+        }
+        renderCalendar();
+        renderTable();
+      }
+
+      if (btnCalendar) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          calendarDropdown.classList.toggle('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            renderCalendar();
+          }
+        });
+      }
+
+      if (calendarDropdown) {
+        calendarDropdown.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+      }
+
+      if (filterDropdown) {
+        filterDropdown.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+      }
+
+      if (btnCancelCalendar) {
+        btnCancelCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          selectedStartDate = null;
+          selectedEndDate = null;
+          activePreset = 'all';
+          document.querySelectorAll('.cal-preset-btn').forEach(function (b) {
+            if (b.dataset.preset === 'all') b.classList.add('is-active');
+            else b.classList.remove('is-active');
+          });
+          calendarDropdown.classList.remove('is-active');
+          renderCalendar();
+          renderTable();
+        });
+      }
+
+      if (btnApplyCalendar) {
+        btnApplyCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      // Close popovers & action menu on outer click
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#payrollActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('.payroll-dropdown-wrapper')) {
+          closeFilterSearchBoxes();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        } else if (!e.target.closest('.payroll-filter-box')) {
+          closeFilterSearchBoxes();
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+      const tableWrap = document.querySelector('.payroll-table-wrap');
+      if (tableWrap) {
+        tableWrap.addEventListener('scroll', closeActionMenus, { passive: true });
+      }
+
+      /* ===== EXCEL EXPORT (Using Universal BisaExcelEngine) ===== */
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', async function () {
+          const todayStr = new Date().toISOString().slice(0, 10);
+          const filename = 'Laporan_Payroll_' + todayStr + '.xlsx';
+          const title = 'LAPORAN PAYROLL';
+
+          if (typeof window.exportTableToExcel === 'function') {
+            await window.exportTableToExcel('payrollTable', filename, title);
+          } else if (window.BisaExcelEngine && typeof window.BisaExcelEngine.exportTableToExcel === 'function') {
+            await window.BisaExcelEngine.exportTableToExcel('payrollTable', filename, title);
+          } else {
+            // Direct CSV fallback
+            const filtered = getFilteredData();
+            let csv = 'No,Periode,NIK,Nama,Divisi,Gaji Pokok,Tunjangan,Bonus/Lembur,Potongan Lain,BPJS Karyawan,Take Home Pay,Status Lama,ID Pinjaman,Potongan Piutang,ID Payroll,Project/Brand,Beban Bruto,Terbayar Kas,Sisa Payroll\n';
+            filtered.forEach(function (row, idx) {
+              csv += [
+                idx + 1,
+                '"' + (row.periode || '').replace(/"/g, '""') + '"',
+                '"' + (row.nik || '').replace(/"/g, '""') + '"',
+                '"' + (row.nama || '').replace(/"/g, '""') + '"',
+                '"' + (row.divisi || '').replace(/"/g, '""') + '"',
+                row.gajiPokok || 0,
+                row.tunjangan || 0,
+                row.bonusLembur || 0,
+                row.potonganLain || 0,
+                row.bpjsKaryawan || 0,
+                row.takeHomePay || 0,
+                '"' + (row.statusLama || '').replace(/"/g, '""') + '"',
+                '"' + (row.idPinjaman || '').replace(/"/g, '""') + '"',
+                row.potonganPiutang || 0,
+                '"' + (row.idPayroll || '').replace(/"/g, '""') + '"',
+                '"' + (row.projectBrand || '').replace(/"/g, '""') + '"',
+                row.bebanBruto || 0,
+                row.terbayarKas || 0,
+                row.sisaPayroll || 0
+              ].join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', 'Laporan_Payroll_' + todayStr + '.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        });
+      }
+
+      /* ===== INITIALIZATION ===== */
+      renderTable();
+    })();
+  </script>
 </body>
 
 </html>
