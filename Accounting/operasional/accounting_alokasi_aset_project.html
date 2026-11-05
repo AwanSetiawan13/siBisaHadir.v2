@@ -7,6 +7,1002 @@
   <title>Alokasi Aset Project | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       GLOBAL TYPOGRAPHY & RESET
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body,
+    input,
+    button,
+    table,
+    select,
+    textarea {
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    /* ===== MAIN PANEL & TABLE ===== */
+    .alokasi-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .alokasi-panel-accent {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+    }
+
+    /* ===== TOOLBAR (Kiri: Filter, Kalender, Excel, Search | Kanan: + Tambah) ===== */
+    .alokasi-toolbar {
+      padding: 14px 18px;
+      background: #f8fafc;
+      border-bottom: 1px dashed #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      flex-wrap: wrap;
+    }
+
+    /* Toolbar Icon Buttons */
+    .btn-toolbar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0284c7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      padding: 0;
+    }
+
+    .btn-toolbar-icon:hover {
+      background: #f0f9ff;
+      border-color: #0076C5;
+      color: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    .btn-toolbar-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* Excel Icon Konsisten Resmi Hijau */
+    .btn-toolbar-icon.btn-excel {
+      color: #107c41;
+      border-color: #86efac;
+      background: #ffffff;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover {
+      background: #f0fdf4;
+      border-color: #4ade80;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover svg rect {
+      fill: #0b5e31 !important;
+    }
+
+    .btn-toolbar-icon.has-filter {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    /* Search Pill Box */
+    .alokasi-search-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .alokasi-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .alokasi-search-input {
+      width: 200px;
+      height: 36px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 0 14px 0 34px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, width 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .alokasi-search-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+      width: 240px;
+    }
+
+    .alokasi-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Tombol + Tambah (100% PERSIS KONSISTEN DAFTAR ASET & PENGELUARAN) */
+    .btn-tambah-alokasi {
+      height: 36px;
+      padding: 0 18px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-tambah-alokasi:hover {
+      background: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    .btn-tambah-alokasi:active {
+      transform: scale(0.98);
+    }
+
+    /* ===== FILTER POPOVER ===== */
+    .alokasi-filter-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 290px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      padding: 16px 18px;
+      z-index: 150;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .alokasi-filter-popover.is-active {
+      display: block;
+    }
+
+    .alokasi-filter-group {
+      margin-bottom: 14px;
+    }
+
+    .alokasi-filter-label {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .alokasi-filter-box {
+      position: relative;
+    }
+
+    .alokasi-filter-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .alokasi-filter-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 32px 0 12px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #334155;
+      background: #ffffff;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, border-radius 0.15s;
+    }
+
+    .alokasi-filter-box.is-open .alokasi-filter-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-color: #e2e8f0;
+    }
+
+    .alokasi-filter-arrow {
+      position: absolute;
+      right: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .alokasi-filter-arrow svg {
+      width: 13px;
+      height: 13px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+    }
+
+    .alokasi-filter-dropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 6px 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 160;
+      box-sizing: border-box;
+      max-height: 140px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .alokasi-filter-box.is-open .alokasi-filter-dropdown-list {
+      display: block;
+    }
+
+    .alokasi-filter-item {
+      padding: 7px 4px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.12s ease;
+    }
+
+    .alokasi-filter-item:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .alokasi-filter-item.is-selected {
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .alokasi-filter-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 6px;
+    }
+
+    .btn-filter-riset {
+      flex: 1;
+      padding: 8px 14px;
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      color: #1e293b;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-riset:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-filter-terapkan {
+      flex: 1;
+      padding: 8px 14px;
+      background: #28a5de;
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-terapkan:hover {
+      background: #0284c7;
+    }
+
+    /* ===== DUAL MONTH CALENDAR POPOVER ===== */
+    .alokasi-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 580px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      padding: 16px 18px;
+      z-index: 200;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .alokasi-calendar-popover.is-active {
+      display: block;
+    }
+
+    .calendar-popover-body {
+      display: flex;
+      gap: 16px;
+    }
+
+    .calendar-presets-col {
+      width: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 14px;
+    }
+
+    .calendar-preset-btn {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .calendar-preset-btn:hover {
+      background: #e0f2fe;
+      border-color: #28a5de;
+      color: #0284c7;
+    }
+
+    .calendar-months-col {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .month-nav-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .month-day-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+    }
+
+    .month-day {
+      font-size: 12px;
+      padding: 6px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      user-select: none;
+    }
+
+    .month-day:hover {
+      background: #f1f5f9;
+    }
+
+    .month-day.is-selected {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .month-day.in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .calendar-popover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 14px;
+      padding-top: 12px;
+    }
+
+    .calendar-range-text {
+      font-size: 12.5px;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .calendar-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-cal-cancel {
+      padding: 6px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .btn-cal-apply {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== TABLE & STICKY COLUMN ===== */
+    .alokasi-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      min-height: 380px;
+    }
+
+    .alokasi-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .alokasi-table thead th {
+      padding: 12px 14px;
+      font-weight: 600;
+      color: #1e293b;
+      background: #f8fafc;
+      border-bottom: 1.5px solid #e2e8f0;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: none;
+    }
+
+    .alokasi-table tbody td {
+      padding: 12px 14px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+
+    .alokasi-table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .alokasi-cell-italic {
+      font-style: italic;
+      color: #334155;
+    }
+
+    /* Fixed / Sticky Action Column di Sebelah Kanan */
+    .alokasi-table th.col-sticky-action,
+    .alokasi-table td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+      width: 70px;
+    }
+
+    .alokasi-table th.col-sticky-action {
+      z-index: 11;
+      background-color: #f8fafc !important;
+    }
+
+    .alokasi-table tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    /* Action Trigger Button (3 Titik Vertikal Tegak) */
+    .alokasi-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .alokasi-action-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .alokasi-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Floating Action Menu (Konsisten dengan Kas & Bank, Pengeluaran & Pajak) */
+    .alokasi-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .alokasi-action-menu.is-open {
+      display: block;
+    }
+
+    .alokasi-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      font-weight: 500;
+      text-align: left;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .alokasi-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .alokasi-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #0076C5;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alokasi-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .alokasi-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .alokasi-action-menu button.is-danger:hover {
+      background: #fef2f2;
+    }
+
+    .alokasi-action-menu .alokasi-action-icon.is-danger {
+      background: #e02424;
+    }
+
+    /* Badges Status */
+    .badge-status {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .badge-aktif {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .badge-selesai {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-perpanjang {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    /* ==========================================================================
+       MODALS (CRUD & VIEW) - PERSIS SCREENSHOT 1, 2 & 3
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.is-active,
+    .modal-overlay.is-open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .alokasi-modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 820px;
+      margin: auto;
+      overflow: visible !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      border: 1px solid #e2e8f0;
+      box-sizing: border-box;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-accent-line {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .modal-inner-padding {
+      padding: 22px 28px 26px;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .modal-title-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .modal-title-text em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .btn-modal-close-x {
+      width: 24px;
+      height: 24px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #64748b;
+      font-size: 13px;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      line-height: 1;
+    }
+
+    .btn-modal-close-x:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .modal-divider-dashed {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    /* 9 Fields Grid: 3 Rows x 3 Columns */
+    .alokasi-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 18px;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-field-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .modal-field-input {
+      width: 100%;
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .modal-field-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+    }
+
+    .modal-field-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .modal-field-input[readonly] {
+      background: #f8fafc;
+      color: #475569;
+    }
+
+    .modal-field-value {
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #475569;
+      font-style: italic;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Dropdown Selection Box inside Modal */
+    .modal-select-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .modal-select-arrow {
+      position: absolute;
+      right: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: none;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .modal-select-wrap.is-open .modal-select-arrow {
+      transform: rotate(180deg);
+      color: #0284c7;
+    }
+
+    .modal-dropdown-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+      z-index: 1000;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+
+    .modal-select-wrap.is-open .modal-dropdown-options {
+      display: block;
+    }
+
+    .modal-select-wrap.is-open .modal-field-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: #28a5de;
+    }
+
+    .modal-opt-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.12s ease, color 0.12s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-opt-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 500;
+    }
+
+    .modal-opt-item.is-selected {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    /* Modal Action Buttons */
+    .modal-footer-row {
+      margin-top: 56px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Button Outline Simpan & Keluar (Gambar 1, 2, 3) */
+    .btn-modal-outline {
+      min-width: 140px;
+      height: 38px;
+      padding: 0 24px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-modal-outline:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +1010,1413 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <section style="padding: 24px;">
+
+        <!-- ===== MAIN PANEL ===== -->
+        <div class="alokasi-panel">
+          <div class="alokasi-panel-accent"></div>
+
+          <!-- Toolbar (Kiri: Filter, Kalender, Excel, Search | Kanan: + Tambah) -->
+          <div class="alokasi-toolbar">
+            <div class="toolbar-left-group">
+              
+              <!-- 1. Tombol Filter Funnel -->
+              <div style="position: relative;">
+                <button type="button" class="btn-toolbar-icon" id="btnFilter" title="Filter Alokasi Aset">
+                  <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                </button>
+
+                <!-- Popover Filter Alokasi -->
+                <div id="filterDropdown" class="alokasi-filter-popover">
+                  <!-- Filter 1: Status -->
+                  <div class="alokasi-filter-group">
+                    <label class="alokasi-filter-label">Status</label>
+                    <div class="alokasi-filter-box" id="boxFilterStatus">
+                      <div class="alokasi-filter-input-wrap">
+                        <input type="text" class="alokasi-filter-input" id="filterStatus" placeholder="Pilih Status" readonly />
+                        <span class="alokasi-filter-arrow">
+                          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor"></path></svg>
+                        </span>
+                      </div>
+                      <div class="alokasi-filter-dropdown-list" id="listFilterStatus"></div>
+                    </div>
+                  </div>
+
+                  <!-- Filter 2: Project/Brand -->
+                  <div class="alokasi-filter-group">
+                    <label class="alokasi-filter-label">Project / Brand</label>
+                    <div class="alokasi-filter-box" id="boxFilterProject">
+                      <div class="alokasi-filter-input-wrap">
+                        <input type="text" class="alokasi-filter-input" id="filterProject" placeholder="Pilih Project/Brand" readonly />
+                        <span class="alokasi-filter-arrow">
+                          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor"></path></svg>
+                        </span>
+                      </div>
+                      <div class="alokasi-filter-dropdown-list" id="listFilterProject"></div>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons Filter -->
+                  <div class="alokasi-filter-actions">
+                    <button type="button" class="btn-filter-riset" id="btnResetFilter">Riset</button>
+                    <button type="button" class="btn-filter-terapkan" id="btnApplyFilter">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Tombol Kalender -->
+              <div style="position: relative;">
+                <button type="button" class="btn-toolbar-icon" id="btnCalendar" title="Filter Berdasarkan Tanggal">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </button>
+
+                <!-- Popover Dual Month Calendar -->
+                <div id="calendarDropdown" class="alokasi-calendar-popover">
+                  <div class="calendar-popover-body">
+                    <div class="calendar-presets-col">
+                      <button type="button" class="calendar-preset-btn" data-preset="today">Hari Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-month">Bulan Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="last-month">Bulan Lalu</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-year">Tahun Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="reset">Semua Tanggal</button>
+                    </div>
+                    <div class="calendar-months-col">
+                      <div class="month-box">
+                        <div class="month-header">
+                          <button type="button" class="month-nav-btn" id="btnPrevMonth">&lt;</button>
+                          <span id="labelMonth1">Juni 2026</span>
+                          <div style="width: 24px;"></div>
+                        </div>
+                        <div class="month-grid" id="gridMonth1"></div>
+                      </div>
+                      <div class="month-box">
+                        <div class="month-header">
+                          <div style="width: 24px;"></div>
+                          <span id="labelMonth2">Juli 2026</span>
+                          <button type="button" class="month-nav-btn" id="btnNextMonth">&gt;</button>
+                        </div>
+                        <div class="month-grid" id="gridMonth2"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="calendar-popover-footer">
+                    <span class="calendar-range-text" id="calendarRangeDisplay">Semua Tanggal</span>
+                    <div class="calendar-footer-actions">
+                      <button type="button" class="btn-cal-cancel" id="btnCancelCalendar">Batal</button>
+                      <button type="button" class="btn-cal-apply" id="btnApplyCalendar">Terapkan</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Tombol Export Excel (Official Microsoft Excel Green Icon) -->
+              <button id="btnExportExcel" class="btn-toolbar-icon btn-excel" type="button" aria-label="Export Excel" title="Download Excel (.xlsx)" onclick="window.exportAlokasiExcel && window.exportAlokasiExcel()">
+                <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                  <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+
+              <!-- 4. Search Input (Pill Shape) -->
+              <div class="alokasi-search-wrapper">
+                <svg class="alokasi-search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="alokasi-search-input" id="alokasiSearch" placeholder="Cari..." />
+              </div>
+            </div>
+
+            <!-- Tombol + Tambah (KONSISTEN DI UJUNG KANAN PERSIS DAFTAR ASET) -->
+            <button type="button" class="btn-tambah-alokasi" id="btnTambahAlokasi" onclick="window.openAddAlokasi && window.openAddAlokasi()">+ Tambah</button>
+          </div>
+
+          <!-- Table Container (11 Kolom Sesuai Gambar 2: ID Lokasi, Kode Aset, Nama Aset, Project/Brand, Tanggal Mulai, Tanggal Selesai, Beban / Bulan, Status, Keterangan, Aksi) -->
+          <div class="alokasi-table-wrap">
+            <table class="alokasi-table" id="alokasiTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px; text-align: center;">#</th>
+                  <th>ID Lokasi</th>
+                  <th>Kode Aset</th>
+                  <th>Nama Aset</th>
+                  <th>Project/Brand</th>
+                  <th>Tanggal Mulai</th>
+                  <th>Tanggal Selesai</th>
+                  <th style="text-align: right;">Beban / Bulan</th>
+                  <th style="text-align: center;">Status</th>
+                  <th>Keterangan</th>
+                  <th class="col-sticky-action">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="alokasiTableBody">
+                <!-- Diisi via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </main>
   </div>
 
+  <!-- ===== FLOATING ACTION MENU (KONSISTEN DENGAN KAS & BANK, PENGELUARAN & PAJAK) ===== -->
+  <div id="alokasiActionMenu" class="alokasi-action-menu" role="menu" aria-hidden="true">
+    <button type="button" role="menuitem" data-action="view">
+      <span class="alokasi-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" role="menuitem" data-action="edit">
+      <span class="alokasi-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" role="menuitem" data-action="delete" class="is-danger">
+      <span class="alokasi-action-icon is-danger" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <!-- ===== MODAL CRUD: "Tambah / Edit Alokasi Aset Project" (100% PERSIS SCREENSHOT 1 & 2) ===== -->
+  <div id="alokasiCrudModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="alokasi-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-inner-padding">
+        
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="crudModalTitle">
+            <span id="crudActionType">Tambah</span> <em>Alokasi Aset Project</em>
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseCrudX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 9 Fields Grid (3 Kolom x 3 Baris Sesuai Gambar 1 & 2) -->
+        <form id="alokasiForm">
+          <input type="hidden" id="crudEditId" value="" />
+          <div class="alokasi-form-grid">
+            
+            <!-- Row 1: ID Alokasi, Kode Aset, Nama Aset -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudIdAlokasi">ID Alokasi</label>
+              <input type="text" id="crudIdAlokasi" class="modal-field-input" placeholder="ALK-000" readonly style="background: #f8fafc; color: #64748b; font-style: italic;" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKodeAset">Kode Aset</label>
+              <div class="modal-select-wrap" id="wrapKodeAset">
+                <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="Pilih Kode Aset" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <span class="modal-select-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="modal-dropdown-options" id="menuKodeAset"></div>
+              </div>
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudNamaAset">Nama Aset</label>
+              <input type="text" id="crudNamaAset" class="modal-field-input" placeholder="Nama Aset" readonly style="background: #f8fafc; color: #475569;" />
+            </div>
+
+            <!-- Row 2: Project/Brand, Tanggal Mulai, Tanggal Selesai -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudProjectBrand">Project/Brand</label>
+              <input type="text" id="crudProjectBrand" class="modal-field-input" placeholder="Project/Brand" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudTanggalMulai">Tanggal Mulai</label>
+              <input type="text" id="crudTanggalMulai" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudTanggalSelesai">Tanggal Selesai</label>
+              <input type="text" id="crudTanggalSelesai" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required />
+            </div>
+
+            <!-- Row 3: Beban / Bulan, Status, Keterangan -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudBebanPerBulan">Beban / Bulan</label>
+              <input type="text" id="crudBebanPerBulan" class="modal-field-input" placeholder="Beban / Bulan" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudStatus">Status</label>
+              <div class="modal-select-wrap" id="wrapStatusModal">
+                <input type="text" id="crudStatus" class="modal-field-input" placeholder="Status" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <span class="modal-select-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="modal-dropdown-options" id="menuStatusModal">
+                  <div class="modal-opt-item" data-value="Aktif">Aktif</div>
+                  <div class="modal-opt-item" data-value="Selesai">Selesai</div>
+                  <div class="modal-opt-item" data-value="Diperpanjang">Diperpanjang</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKeterangan">Keterangan</label>
+              <input type="text" id="crudKeterangan" class="modal-field-input" placeholder="Tambah Keterangan" />
+            </div>
+
+          </div>
+
+          <!-- Footer: Tombol Outline Simpan (Sesuai Gambar 1 & 2) -->
+          <div class="modal-footer-row">
+            <button type="submit" class="btn-modal-outline" id="btnSimpanAlokasi">Simpan</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETAIL: "Lihat Alokasi Aset Project" (100% PERSIS SCREENSHOT 3) ===== -->
+  <div id="alokasiDetailModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="alokasi-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-inner-padding">
+        
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="detailModalTitle">
+            <span>Lihat</span> <em>Alokasi Aset Project</em>
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseDetailX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 9 Fields Grid (3 Kolom x 3 Baris Sesuai Gambar 3) -->
+        <div class="alokasi-form-grid">
+          <!-- Row 1: ID Alokasi, Kode Aset, Nama Aset -->
+          <div class="modal-field">
+            <span class="modal-field-label">ID Alokasi</span>
+            <div class="modal-field-value" id="detailIdAlokasi">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Kode Aset</span>
+            <div class="modal-field-value" id="detailKodeAset">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Nama Aset</span>
+            <div class="modal-field-value" id="detailNamaAset">-</div>
+          </div>
+
+          <!-- Row 2: Project/Brand, Tanggal Mulai, Tanggal Selesai -->
+          <div class="modal-field">
+            <span class="modal-field-label">Project/Brand</span>
+            <div class="modal-field-value" id="detailProjectBrand">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Tanggal Mulai</span>
+            <div class="modal-field-value" id="detailTanggalMulai">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Tanggal Selesai</span>
+            <div class="modal-field-value" id="detailTanggalSelesai">-</div>
+          </div>
+
+          <!-- Row 3: Beban / Bulan, Status, Keterangan -->
+          <div class="modal-field">
+            <span class="modal-field-label">Beban / Bulan</span>
+            <div class="modal-field-value" id="detailBebanPerBulan">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Status</span>
+            <div class="modal-field-value" id="detailStatus">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Keterangan</span>
+            <div class="modal-field-value" id="detailKeterangan">-</div>
+          </div>
+        </div>
+
+        <!-- Footer: Button "Keluar" (Sesuai Gambar 3) -->
+        <div class="modal-footer-row">
+          <button type="button" class="btn-modal-outline" id="btnKeluarDetail">Keluar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      'use strict';
+
+      /* ===== DATA MODEL & STORAGE ===== */
+      const STORAGE_KEY = 'accounting_alokasi_aset_project_data';
+
+      const defaultAlokasiData = [
+        {
+          id: 'ALC-001',
+          idLokasi: 'ALK-001',
+          kodeAset: 'AST-003',
+          namaAset: 'TV Xiaomi A Pro',
+          projectBrand: '-',
+          tanggalMulai: '2026-06-01',
+          tanggalSelesai: '2026-10-31',
+          bebanPerBulan: 192613,
+          status: 'Aktif',
+          keterangan: 'Alokasi TV Studio untuk display shoot & preview konten'
+        },
+        {
+          id: 'ALC-002',
+          idLokasi: 'ALK-002',
+          kodeAset: 'AST-002',
+          namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
+          projectBrand: 'Campaign Shopee Big Ramadan',
+          tanggalMulai: '2026-10-15',
+          tanggalSelesai: '2026-11-30',
+          bebanPerBulan: 791667,
+          status: 'Aktif',
+          keterangan: 'Alokasi kamera utama live stream & pembuatan short video brand'
+        },
+        {
+          id: 'ALC-003',
+          idLokasi: 'ALK-003',
+          kodeAset: 'AST-004',
+          namaAset: 'MacBook Pro M3 Max 36GB',
+          projectBrand: 'Brand Alpha Video Shoot',
+          tanggalMulai: '2026-09-01',
+          tanggalSelesai: '2026-12-31',
+          bebanPerBulan: 1208333,
+          status: 'Aktif',
+          keterangan: 'Workstation editing rendering video 4K harian'
+        },
+        {
+          id: 'ALC-004',
+          idLokasi: 'ALK-004',
+          kodeAset: 'AST-001',
+          namaAset: 'Dispenser Mini Miyako',
+          projectBrand: 'Event Workshop Kreator Tasikmalaya',
+          tanggalMulai: '2026-06-05',
+          tanggalSelesai: '2026-06-25',
+          bebanPerBulan: 5556,
+          status: 'Selesai',
+          keterangan: 'Penyediaan fasilitas konsumsi crew workshop'
+        },
+        {
+          id: 'ALC-005',
+          idLokasi: 'ALK-005',
+          kodeAset: 'AST-006',
+          namaAset: 'AC Daikin Inverter 2 PK Multi-S',
+          projectBrand: 'Studio Podcast Utama',
+          tanggalMulai: '2026-01-01',
+          tanggalSelesai: '2026-12-31',
+          bebanPerBulan: 158333,
+          status: 'Diperpanjang',
+          keterangan: 'Alokasi pendingin ruangan studio podcast eksklusif'
+        }
+      ];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error('Gagal memuat data alokasi:', e);
+        }
+        return defaultAlokasiData;
+      }
+
+      function saveData(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.error('Gagal menyimpan data alokasi:', e);
+        }
+      }
+
+      let alokasiData = loadData();
+
+      // State Filters
+      let filterState = {
+        search: '',
+        status: '',
+        project: '',
+        startDate: '',
+        endDate: ''
+      };
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('alokasiTableBody');
+      const searchInput = document.getElementById('alokasiSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+      const btnTambahAlokasi = document.getElementById('btnTambahAlokasi');
+
+      // Action Menu
+      const actionMenu = document.getElementById('alokasiActionMenu');
+      let currentActionId = null;
+
+      // CRUD Modal Elements (Screenshot 1 & 2)
+      const crudModal = document.getElementById('alokasiCrudModal');
+      const crudForm = document.getElementById('alokasiForm');
+      const crudActionType = document.getElementById('crudActionType');
+      const crudEditId = document.getElementById('crudEditId');
+      const crudIdAlokasi = document.getElementById('crudIdAlokasi');
+      const crudKodeAset = document.getElementById('crudKodeAset');
+      const wrapKodeAset = document.getElementById('wrapKodeAset');
+      const menuKodeAset = document.getElementById('menuKodeAset');
+      const crudNamaAset = document.getElementById('crudNamaAset');
+      const crudProjectBrand = document.getElementById('crudProjectBrand');
+      const crudTanggalMulai = document.getElementById('crudTanggalMulai');
+      const crudTanggalSelesai = document.getElementById('crudTanggalSelesai');
+      const crudBebanPerBulan = document.getElementById('crudBebanPerBulan');
+      const crudStatus = document.getElementById('crudStatus');
+      const wrapStatusModal = document.getElementById('wrapStatusModal');
+      const menuStatusModal = document.getElementById('menuStatusModal');
+      const crudKeterangan = document.getElementById('crudKeterangan');
+      const btnCloseCrudX = document.getElementById('btnCloseCrudX');
+
+      // Detail Modal Elements (Screenshot 3)
+      const detailModal = document.getElementById('alokasiDetailModal');
+      const detailIdAlokasi = document.getElementById('detailIdAlokasi');
+      const detailKodeAset = document.getElementById('detailKodeAset');
+      const detailNamaAset = document.getElementById('detailNamaAset');
+      const detailProjectBrand = document.getElementById('detailProjectBrand');
+      const detailTanggalMulai = document.getElementById('detailTanggalMulai');
+      const detailTanggalSelesai = document.getElementById('detailTanggalSelesai');
+      const detailBebanPerBulan = document.getElementById('detailBebanPerBulan');
+      const detailStatus = document.getElementById('detailStatus');
+      const detailKeterangan = document.getElementById('detailKeterangan');
+      const btnCloseDetailX = document.getElementById('btnCloseDetailX');
+      const btnKeluarDetail = document.getElementById('btnKeluarDetail');
+
+      // Filter Funnel Popover Elements
+      const btnFilter = document.getElementById('btnFilter');
+      const filterDropdown = document.getElementById('filterDropdown');
+      const filterStatus = document.getElementById('filterStatus');
+      const boxFilterStatus = document.getElementById('boxFilterStatus');
+      const listFilterStatus = document.getElementById('listFilterStatus');
+      const filterProject = document.getElementById('filterProject');
+      const boxFilterProject = document.getElementById('boxFilterProject');
+      const listFilterProject = document.getElementById('listFilterProject');
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      // Calendar Filter Elements
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const labelMonth1 = document.getElementById('labelMonth1');
+      const labelMonth2 = document.getElementById('labelMonth2');
+      const gridMonth1 = document.getElementById('gridMonth1');
+      const gridMonth2 = document.getElementById('gridMonth2');
+      const btnPrevMonth = document.getElementById('btnPrevMonth');
+      const btnNextMonth = document.getElementById('btnNextMonth');
+      const calendarRangeDisplay = document.getElementById('calendarRangeDisplay');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+
+      /* ===== FORMATTING UTILITIES ===== */
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatRupiahSpasi(num) {
+        const val = Math.round(Number(num) || 0);
+        return 'Rp ' + val.toLocaleString('id-ID');
+      }
+
+      function formatTanggalDisplay(isoStr) {
+        if (!isoStr) return '-';
+        const parts = isoStr.split('-');
+        if (parts.length !== 3) return isoStr;
+        const y = parts[0];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const d = parts[2].padStart(2, '0');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Oct', 'Nov', 'Des'];
+        return d + ' ' + (months[mIdx] || parts[1]) + ' ' + y;
+      }
+
+      function getStatusBadge(status) {
+        const st = (status || '').toLowerCase();
+        if (st.includes('aktif')) return 'badge-aktif';
+        if (st.includes('selesai')) return 'badge-selesai';
+        if (st.includes('panjang')) return 'badge-perpanjang';
+        return 'badge-aktif';
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        return alokasiData.filter(function (item) {
+          if (filterState.search) {
+            const q = filterState.search.toLowerCase();
+            const matchLoc = (item.idLokasi || '').toLowerCase().includes(q);
+            const matchKode = (item.kodeAset || '').toLowerCase().includes(q);
+            const matchNama = (item.namaAset || '').toLowerCase().includes(q);
+            const matchPrj = (item.projectBrand || '').toLowerCase().includes(q);
+            const matchKet = (item.keterangan || '').toLowerCase().includes(q);
+            if (!matchLoc && !matchKode && !matchNama && !matchPrj && !matchKet) return false;
+          }
+
+          if (filterState.status && filterState.status !== 'Semua Status') {
+            if ((item.status || '').trim() !== filterState.status) return false;
+          }
+
+          if (filterState.project && filterState.project !== 'Semua Project/Brand') {
+            if ((item.projectBrand || '').trim() !== filterState.project) return false;
+          }
+
+          if (filterState.startDate) {
+            if (!item.tanggalMulai || item.tanggalMulai < filterState.startDate) return false;
+          }
+          if (filterState.endDate) {
+            if (!item.tanggalSelesai || item.tanggalSelesai > filterState.endDate) return false;
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== RENDER TABLE (11 KOLOM SESUAI GAMBAR 2) ===== */
+      function renderTable() {
+        const filtered = getFilteredData();
+        tableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const emptyRow = document.createElement('tr');
+          emptyRow.innerHTML = '<td colspan="11" style="text-align: center; padding: 48px 16px; color: #94a3b8; font-style: italic;">' +
+            'Tidak ada data alokasi aset project yang sesuai' +
+            '</td>';
+          tableBody.appendChild(emptyRow);
+          return;
+        }
+
+        filtered.forEach(function (item, idx) {
+          const tr = document.createElement('tr');
+          const badgeStatusCls = getStatusBadge(item.status);
+
+          tr.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-size: 13px;">' + (idx + 1) + '</td>',
+            '<td class="alokasi-cell-italic" style="font-weight: 500; color: #0284c7;">' + escapeHtml(item.idLokasi || '-') + '</td>',
+            '<td class="alokasi-cell-italic" style="font-weight: 500;">' + escapeHtml(item.kodeAset) + '</td>',
+            '<td style="font-weight: 500; color: #0f172a;">' + escapeHtml(item.namaAset) + '</td>',
+            '<td style="font-weight: 600; color: #334155;">' + escapeHtml(item.projectBrand || '-') + '</td>',
+            '<td class="alokasi-cell-italic">' + escapeHtml(formatTanggalDisplay(item.tanggalMulai)) + '</td>',
+            '<td class="alokasi-cell-italic">' + escapeHtml(formatTanggalDisplay(item.tanggalSelesai)) + '</td>',
+            '<td class="alokasi-cell-italic" style="text-align: right; font-weight: 600; color: #0f172a;">' + escapeHtml(formatRupiahSpasi(item.bebanPerBulan)) + '</td>',
+            '<td style="text-align: center;"><span class="badge-status ' + badgeStatusCls + '">' + escapeHtml(item.status || 'Aktif') + '</span></td>',
+            '<td class="alokasi-cell-italic" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + escapeHtml(item.keterangan || '-') + '</td>',
+            '<td class="col-sticky-action" style="text-align: center;">' +
+              '<button type="button" class="alokasi-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: currentColor;">' +
+                  '<circle cx="12" cy="5" r="2"></circle>' +
+                  '<circle cx="12" cy="12" r="2"></circle>' +
+                  '<circle cx="12" cy="19" r="2"></circle>' +
+                '</svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+
+          tableBody.appendChild(tr);
+        });
+      }
+
+      /* ===== FLOATING ACTION MENU LOGIC ===== */
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = 120;
+
+        let left = rect.left - menuWidth + 24;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const actionBtn = e.target.closest('[data-action-toggle]');
+          if (actionBtn) {
+            e.stopPropagation();
+            openActionMenu(actionBtn);
+          }
+        });
+      }
+
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-action]');
+          if (!btn || !currentActionId) return;
+
+          const action = btn.getAttribute('data-action');
+          const targetItem = alokasiData.find(function (x) { return String(x.id) === String(currentActionId); });
+          closeActionMenus();
+
+          if (!targetItem) return;
+
+          if (action === 'view') {
+            openViewAlokasi(targetItem.id);
+          } else if (action === 'edit') {
+            openEditAlokasi(targetItem.id);
+          } else if (action === 'delete') {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: 'Hapus Alokasi Project?',
+                html: 'Yakin ingin menghapus alokasi aset <b>' + escapeHtml(targetItem.namaAset) + '</b> untuk project <b>' + escapeHtml(targetItem.projectBrand) + '</b>?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+              }).then(function (result) {
+                if (result.isConfirmed) {
+                  alokasiData = alokasiData.filter(function (x) { return String(x.id) !== String(targetItem.id); });
+                  saveData(alokasiData);
+                  renderTable();
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Terhapus',
+                    text: 'Data alokasi aset berhasil dihapus.',
+                    timer: 1400,
+                    showConfirmButton: false
+                  });
+                }
+              });
+            }
+          }
+        });
+      }
+
+      /* ===== ASSET REFERENCES & KODE ASET DROPDOWN (SESUAI GAMBAR 2) ===== */
+      function getAssetReferences() {
+        const list = [
+          { kode: 'AST-001', nama: 'Dispenser Mini Miyako', beban: 5556 },
+          { kode: 'AST-002', nama: 'Sony Alpha A7 IV + Lens 24-70mm', beban: 791667 },
+          { kode: 'AST-003', nama: 'TV Xiaomi A Pro', beban: 192613 },
+          { kode: 'AST-004', nama: 'MacBook Pro M3 Max 36GB', beban: 1208333 },
+          { kode: 'AST-005', nama: 'Meja Meeting Kayu Jati Custom 3M', beban: 216667 },
+          { kode: 'AST-006', nama: 'AC Daikin Inverter 2 PK Multi-S', beban: 158333 }
+        ];
+
+        try {
+          const rawAset = localStorage.getItem('accounting_daftar_aset_data');
+          if (rawAset) {
+            const parsedAset = JSON.parse(rawAset);
+            if (Array.isArray(parsedAset)) {
+              parsedAset.forEach(function (ast) {
+                if (ast && ast.kodeAset && !list.some(function (x) { return x.kode === ast.kodeAset; })) {
+                  list.push({
+                    kode: ast.kodeAset,
+                    nama: ast.namaAset || ast.kodeAset,
+                    beban: Number(ast.penyusutanBulan) || 0
+                  });
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        return list;
+      }
+
+      function renderKodeAsetDropdown() {
+        if (!menuKodeAset) return;
+        menuKodeAset.innerHTML = '';
+        const assets = getAssetReferences();
+
+        assets.forEach(function (ast) {
+          const item = document.createElement('div');
+          item.className = 'modal-opt-item';
+          if (crudKodeAset && crudKodeAset.value === ast.kode) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = ast.kode + ' | ' + ast.nama;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            crudKodeAset.value = ast.kode;
+            crudNamaAset.value = ast.nama;
+            if (ast.beban && !crudBebanPerBulan.value) {
+              crudBebanPerBulan.value = formatRupiahSpasi(ast.beban);
+            }
+            wrapKodeAset.classList.remove('is-open');
+          });
+          menuKodeAset.appendChild(item);
+        });
+      }
+
+      if (crudKodeAset && wrapKodeAset) {
+        crudKodeAset.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrapKodeAset.classList.contains('is-open');
+          if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+          renderKodeAsetDropdown();
+          if (isOpen) {
+            wrapKodeAset.classList.remove('is-open');
+          } else {
+            wrapKodeAset.classList.add('is-open');
+          }
+        });
+      }
+
+      if (crudStatus && wrapStatusModal && menuStatusModal) {
+        crudStatus.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrapStatusModal.classList.contains('is-open');
+          if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+          if (isOpen) {
+            wrapStatusModal.classList.remove('is-open');
+          } else {
+            wrapStatusModal.classList.add('is-open');
+          }
+        });
+
+        menuStatusModal.querySelectorAll('.modal-opt-item').forEach(function (el) {
+          el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            crudStatus.value = el.getAttribute('data-value') || el.textContent.trim();
+            wrapStatusModal.classList.remove('is-open');
+          });
+        });
+      }
+
+      if (crudBebanPerBulan) {
+        crudBebanPerBulan.addEventListener('input', function () {
+          const val = this.value.replace(/\D/g, '');
+          if (!val) {
+            this.value = '';
+          } else {
+            this.value = formatRupiahSpasi(val);
+          }
+        });
+      }
+
+      function getNextAlokasiId() {
+        let maxNum = 0;
+        alokasiData.forEach(function (item) {
+          const idStr = String(item.idLokasi || item.id || '');
+          const match = idStr.match(/(\d+)/);
+          if (match) {
+            const n = parseInt(match[1], 10);
+            if (n > maxNum) maxNum = n;
+          }
+        });
+        const next = maxNum + 1;
+        return 'ALK-' + String(next).padStart(3, '0');
+      }
+
+      function closeModals() {
+        if (crudModal) crudModal.classList.remove('is-active');
+        if (detailModal) detailModal.classList.remove('is-active');
+        if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+      }
+
+      /* ===== FORM CRUD & DETAIL MODAL HANDLERS (GAMBAR 1, 2 & 3) ===== */
+      function openAddAlokasi() {
+        if (crudForm) crudForm.reset();
+        if (crudActionType) crudActionType.textContent = 'Tambah';
+        if (crudEditId) crudEditId.value = '';
+        if (crudIdAlokasi) crudIdAlokasi.value = getNextAlokasiId();
+        if (crudKodeAset) crudKodeAset.value = '';
+        if (crudNamaAset) crudNamaAset.value = '';
+        if (crudProjectBrand) crudProjectBrand.value = '';
+        if (crudTanggalMulai) {
+          crudTanggalMulai.type = 'text';
+          crudTanggalMulai.value = '';
+        }
+        if (crudTanggalSelesai) {
+          crudTanggalSelesai.type = 'text';
+          crudTanggalSelesai.value = '';
+        }
+        if (crudBebanPerBulan) crudBebanPerBulan.value = '';
+        if (crudStatus) crudStatus.value = 'Aktif';
+        if (crudKeterangan) crudKeterangan.value = '';
+
+        if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        if (crudModal) crudModal.classList.add('is-active');
+      }
+      window.openAddAlokasi = openAddAlokasi;
+
+      function openEditAlokasi(id) {
+        const item = alokasiData.find(function (x) { return String(x.id) === String(id); });
+        if (!item) return;
+
+        if (crudActionType) crudActionType.textContent = 'Edit';
+        if (crudEditId) crudEditId.value = item.id;
+        if (crudIdAlokasi) crudIdAlokasi.value = item.idLokasi || item.id;
+        if (crudKodeAset) crudKodeAset.value = item.kodeAset || '';
+        if (crudNamaAset) crudNamaAset.value = item.namaAset || '';
+        if (crudProjectBrand) crudProjectBrand.value = item.projectBrand || '';
+        if (crudTanggalMulai) {
+          crudTanggalMulai.type = item.tanggalMulai ? 'date' : 'text';
+          crudTanggalMulai.value = item.tanggalMulai || '';
+        }
+        if (crudTanggalSelesai) {
+          crudTanggalSelesai.type = item.tanggalSelesai ? 'date' : 'text';
+          crudTanggalSelesai.value = item.tanggalSelesai || '';
+        }
+        if (crudBebanPerBulan) {
+          crudBebanPerBulan.value = item.bebanPerBulan ? formatRupiahSpasi(item.bebanPerBulan) : '';
+        }
+        if (crudStatus) crudStatus.value = item.status || 'Aktif';
+        if (crudKeterangan) crudKeterangan.value = item.keterangan || '';
+
+        if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        if (crudModal) crudModal.classList.add('is-active');
+      }
+
+      function openViewAlokasi(id) {
+        const item = alokasiData.find(function (x) { return String(x.id) === String(id); });
+        if (!item) return;
+
+        if (detailIdAlokasi) detailIdAlokasi.textContent = item.idLokasi || item.id || '-';
+        if (detailKodeAset) detailKodeAset.textContent = item.kodeAset || '-';
+        if (detailNamaAset) detailNamaAset.textContent = item.namaAset || '-';
+        if (detailProjectBrand) detailProjectBrand.textContent = item.projectBrand || '-';
+        if (detailTanggalMulai) detailTanggalMulai.textContent = formatTanggalDisplay(item.tanggalMulai);
+        if (detailTanggalSelesai) detailTanggalSelesai.textContent = formatTanggalDisplay(item.tanggalSelesai);
+        if (detailBebanPerBulan) detailBebanPerBulan.textContent = formatRupiahSpasi(item.bebanPerBulan);
+        if (detailStatus) detailStatus.textContent = item.status || '-';
+        if (detailKeterangan) detailKeterangan.textContent = item.keterangan || '-';
+
+        if (detailModal) detailModal.classList.add('is-active');
+      }
+
+      if (crudForm) {
+        crudForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const editId = crudEditId ? crudEditId.value : '';
+          const idLokasiVal = (crudIdAlokasi && crudIdAlokasi.value.trim()) || getNextAlokasiId();
+          const kodeAsetVal = (crudKodeAset && crudKodeAset.value.trim()) || '';
+          const namaAsetVal = (crudNamaAset && crudNamaAset.value.trim()) || '';
+          const projectBrandVal = (crudProjectBrand && crudProjectBrand.value.trim()) || '-';
+          const tglMulaiVal = (crudTanggalMulai && crudTanggalMulai.value) || '';
+          const tglSelesaiVal = (crudTanggalSelesai && crudTanggalSelesai.value) || '';
+          const bebanClean = crudBebanPerBulan ? (Number(String(crudBebanPerBulan.value).replace(/\D/g, '')) || 0) : 0;
+          const statusVal = (crudStatus && crudStatus.value.trim()) || 'Aktif';
+          const ketVal = (crudKeterangan && crudKeterangan.value.trim()) || '';
+
+          if (!kodeAsetVal) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Kode Aset terlebih dahulu!' });
+            }
+            return;
+          }
+
+          if (editId) {
+            const idx = alokasiData.findIndex(function (x) { return String(x.id) === String(editId); });
+            if (idx !== -1) {
+              alokasiData[idx].idLokasi = idLokasiVal;
+              alokasiData[idx].kodeAset = kodeAsetVal;
+              alokasiData[idx].namaAset = namaAsetVal;
+              alokasiData[idx].projectBrand = projectBrandVal;
+              alokasiData[idx].tanggalMulai = tglMulaiVal;
+              alokasiData[idx].tanggalSelesai = tglSelesaiVal;
+              alokasiData[idx].bebanPerBulan = bebanClean;
+              alokasiData[idx].status = statusVal;
+              alokasiData[idx].keterangan = ketVal;
+            }
+          } else {
+            const newRecord = {
+              id: 'ALC-' + Date.now().toString().slice(-4),
+              idLokasi: idLokasiVal,
+              kodeAset: kodeAsetVal,
+              namaAset: namaAsetVal,
+              projectBrand: projectBrandVal,
+              tanggalMulai: tglMulaiVal,
+              tanggalSelesai: tglSelesaiVal,
+              bebanPerBulan: bebanClean,
+              status: statusVal,
+              keterangan: ketVal
+            };
+            alokasiData.unshift(newRecord);
+          }
+
+          saveData(alokasiData);
+          closeModals();
+          renderTable();
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil',
+              text: editId ? 'Data alokasi aset berhasil diperbarui.' : 'Data alokasi aset baru berhasil ditambahkan.',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+
+      if (btnTambahAlokasi) {
+        btnTambahAlokasi.addEventListener('click', openAddAlokasi);
+      }
+      if (btnCloseCrudX) {
+        btnCloseCrudX.addEventListener('click', closeModals);
+      }
+      if (btnCloseDetailX) {
+        btnCloseDetailX.addEventListener('click', closeModals);
+      }
+      if (btnKeluarDetail) {
+        btnKeluarDetail.addEventListener('click', closeModals);
+      }
+
+      /* ===== DROPDOWN FILTER POPOVER (STATUS & PROJECT) ===== */
+      const statusOptions = ['Semua Status', 'Aktif', 'Selesai', 'Diperpanjang'];
+      const projectOptions = [
+        'Semua Project/Brand',
+        'Campaign Shopee Big Ramadan',
+        'Brand Alpha Video Shoot',
+        'Event Workshop Kreator Tasikmalaya',
+        'Studio Live Streaming Baru',
+        'Ruang Kolaborasi Talent & Brand'
+      ];
+
+      function renderFilterList(listEl, inputEl, boxEl, opts) {
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        opts.forEach(function (opt) {
+          const item = document.createElement('div');
+          item.className = 'alokasi-filter-item';
+          if (inputEl.value === opt || (!inputEl.value && opt.startsWith('Semua'))) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = opt;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            inputEl.value = opt;
+            boxEl.classList.remove('is-open');
+          });
+          listEl.appendChild(item);
+        });
+      }
+
+      function setupDropdownToggle(boxEl, listEl, inputEl, opts) {
+        if (!boxEl || !inputEl) return;
+        inputEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = boxEl.classList.contains('is-open');
+          closeAllFilterBoxes();
+          if (!isOpen) {
+            boxEl.classList.add('is-open');
+            renderFilterList(listEl, inputEl, boxEl, opts);
+          }
+        });
+      }
+
+      function closeAllFilterBoxes() {
+        if (boxFilterStatus) boxFilterStatus.classList.remove('is-open');
+        if (boxFilterProject) boxFilterProject.classList.remove('is-open');
+      }
+
+      setupDropdownToggle(boxFilterStatus, listFilterStatus, filterStatus, statusOptions);
+      setupDropdownToggle(boxFilterProject, listFilterProject, filterProject, projectOptions);
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterDropdown.classList.toggle('is-active');
+          if (filterDropdown.classList.contains('is-active')) {
+            if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+            closeAllFilterBoxes();
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function () {
+          filterStatus.value = '';
+          filterProject.value = '';
+          filterState.status = '';
+          filterState.project = '';
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          btnFilter.classList.remove('has-filter');
+          renderTable();
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function () {
+          filterState.status = filterStatus.value.trim();
+          filterState.project = filterProject.value.trim();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+
+          if (filterState.status || filterState.project) {
+            btnFilter.classList.add('has-filter');
+          } else {
+            btnFilter.classList.remove('has-filter');
+          }
+
+          renderTable();
+        });
+      }
+
+      /* ===== DUAL MONTH CALENDAR LOGIC ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 5; // Juni (0-indexed)
+      let tempCalStart = null;
+      let tempCalEnd = null;
+
+      function renderDualCalendar() {
+        if (!labelMonth1 || !labelMonth2 || !gridMonth1 || !gridMonth2) return;
+
+        const monthNames = [
+          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        labelMonth1.textContent = monthNames[calViewMonth] + ' ' + calViewYear;
+        renderMonthDays(calViewYear, calViewMonth, 'gridMonth1');
+
+        let m2Year = calViewYear;
+        let m2Month = calViewMonth + 1;
+        if (m2Month > 11) {
+          m2Month = 0;
+          m2Year += 1;
+        }
+        labelMonth2.textContent = monthNames[m2Month] + ' ' + m2Year;
+        renderMonthDays(m2Year, m2Month, 'gridMonth2');
+
+        updateRangeDisplay();
+      }
+
+      function renderMonthDays(year, month, containerId) {
+        const grid = document.getElementById(containerId);
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        days.forEach(function (d) {
+          const col = document.createElement('div');
+          col.className = 'month-day-name';
+          col.textContent = d;
+          grid.appendChild(col);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement('div');
+          grid.appendChild(empty);
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'month-day';
+          dayEl.textContent = d;
+
+          const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+          if (tempCalStart && dateStr === tempCalStart) {
+            dayEl.classList.add('is-selected');
+          }
+          if (tempCalEnd && dateStr === tempCalEnd) {
+            dayEl.classList.add('is-selected');
+          }
+          if (tempCalStart && tempCalEnd && dateStr > tempCalStart && dateStr < tempCalEnd) {
+            dayEl.classList.add('in-range');
+          }
+
+          dayEl.addEventListener('click', function () {
+            handleDateClick(dateStr);
+          });
+
+          grid.appendChild(dayEl);
+        }
+      }
+
+      function handleDateClick(dateStr) {
+        if (!tempCalStart || (tempCalStart && tempCalEnd)) {
+          tempCalStart = dateStr;
+          tempCalEnd = null;
+        } else if (tempCalStart && !tempCalEnd) {
+          if (dateStr < tempCalStart) {
+            tempCalEnd = tempCalStart;
+            tempCalStart = dateStr;
+          } else {
+            tempCalEnd = dateStr;
+          }
+        }
+        renderDualCalendar();
+      }
+
+      function updateRangeDisplay() {
+        if (!calendarRangeDisplay) return;
+        if (tempCalStart && tempCalEnd) {
+          calendarRangeDisplay.textContent = formatTanggalDisplay(tempCalStart) + ' - ' + formatTanggalDisplay(tempCalEnd);
+        } else if (tempCalStart) {
+          calendarRangeDisplay.textContent = formatTanggalDisplay(tempCalStart) + ' - ...';
+        } else {
+          calendarRangeDisplay.textContent = 'Semua Tanggal';
+        }
+      }
+
+      if (btnPrevMonth) {
+        btnPrevMonth.addEventListener('click', function () {
+          calViewMonth--;
+          if (calViewMonth < 0) {
+            calViewMonth = 11;
+            calViewYear--;
+          }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnNextMonth) {
+        btnNextMonth.addEventListener('click', function () {
+          calViewMonth++;
+          if (calViewMonth > 11) {
+            calViewMonth = 0;
+            calViewYear++;
+          }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnCalendar && calendarDropdown) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.toggle('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            if (filterDropdown) filterDropdown.classList.remove('is-active');
+            tempCalStart = filterState.startDate || null;
+            tempCalEnd = filterState.endDate || null;
+            renderDualCalendar();
+          }
+        });
+      }
+
+      if (btnCancelCalendar && calendarDropdown) {
+        btnCancelCalendar.addEventListener('click', function () {
+          calendarDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnApplyCalendar && calendarDropdown) {
+        btnApplyCalendar.addEventListener('click', function () {
+          filterState.startDate = tempCalStart || '';
+          filterState.endDate = tempCalEnd || '';
+          calendarDropdown.classList.remove('is-active');
+
+          if (filterState.startDate || filterState.endDate) {
+            btnCalendar.classList.add('has-filter');
+          } else {
+            btnCalendar.classList.remove('has-filter');
+          }
+
+          renderTable();
+        });
+      }
+
+      // Presets
+      document.querySelectorAll('.calendar-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const preset = this.getAttribute('data-preset');
+          const now = new Date();
+          const curY = now.getFullYear();
+          const curM = String(now.getMonth() + 1).padStart(2, '0');
+          const curD = String(now.getDate()).padStart(2, '0');
+
+          if (preset === 'today') {
+            tempCalStart = curY + '-' + curM + '-' + curD;
+            tempCalEnd = tempCalStart;
+          } else if (preset === 'this-month') {
+            tempCalStart = curY + '-' + curM + '-01';
+            const lastD = new Date(curY, now.getMonth() + 1, 0).getDate();
+            tempCalEnd = curY + '-' + curM + '-' + String(lastD).padStart(2, '0');
+          } else if (preset === 'last-month') {
+            const prevMonthDate = new Date(curY, now.getMonth() - 1, 1);
+            const pY = prevMonthDate.getFullYear();
+            const pM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+            const pLastD = new Date(pY, prevMonthDate.getMonth() + 1, 0).getDate();
+            tempCalStart = pY + '-' + pM + '-01';
+            tempCalEnd = pY + '-' + pM + '-' + String(pLastD).padStart(2, '0');
+          } else if (preset === 'this-year') {
+            tempCalStart = curY + '-01-01';
+            tempCalEnd = curY + '-12-31';
+          } else if (preset === 'reset') {
+            tempCalStart = null;
+            tempCalEnd = null;
+          }
+
+          renderDualCalendar();
+        });
+      });
+
+      /* ===== SEARCH REAL-TIME ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          filterState.search = this.value.trim();
+          renderTable();
+        });
+      }
+
+      /* ===== EXPORT EXCEL DENGAN EXCEL ENGINE ===== */
+      async function exportAlokasiExcel() {
+        const rows = getFilteredData();
+        if (rows.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Data Kosong',
+              text: 'Tidak ada data alokasi aset project untuk diexport.',
+              confirmButtonColor: '#0076C5'
+            });
+          } else {
+            alert('Tidak ada data alokasi aset project untuk diexport.');
+          }
+          return;
+        }
+
+        const filename = 'Laporan_Alokasi_Aset_Project_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+
+        const headers = [
+          'No',
+          'ID Lokasi',
+          'Kode Aset',
+          'Nama Aset',
+          'Project / Brand',
+          'Tanggal Mulai',
+          'Tanggal Selesai',
+          'Beban / Bulan',
+          'Status',
+          'Keterangan'
+        ];
+
+        const exportData = rows.map(function (item, idx) {
+          return [
+            idx + 1,
+            item.idLokasi || '-',
+            item.kodeAset || '-',
+            item.namaAset || '-',
+            item.projectBrand || '-',
+            formatTanggalDisplay(item.tanggalMulai),
+            formatTanggalDisplay(item.tanggalSelesai),
+            item.bebanPerBulan || 0,
+            item.status || 'Aktif',
+            item.keterangan || '-'
+          ];
+        });
+
+        if (typeof window.exportBisaExcel === 'function') {
+          await window.exportBisaExcel({
+            title: 'LAPORAN ALOKASI ASET PROJECT PERUSAHAAN',
+            filename: filename,
+            sheetName: 'Alokasi Aset',
+            headers: headers,
+            rows: exportData
+          });
+        } else if (typeof window.exportTableToExcel === 'function') {
+          await window.exportTableToExcel('alokasiTable', filename, 'LAPORAN ALOKASI ASET');
+        } else {
+          let csv = headers.join(',') + '\n';
+          exportData.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename.replace('.xlsx', '.csv'));
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+      window.exportAlokasiExcel = exportAlokasiExcel;
+
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', exportAlokasiExcel);
+      }
+
+      /* ===== GLOBAL CLICK LISTENER (TUTUP POPUP & MENU) ===== */
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#alokasiActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('#filterDropdown') && !e.target.closest('#btnFilter')) {
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          closeAllFilterBoxes();
+        }
+        if (!e.target.closest('#calendarDropdown') && !e.target.closest('#btnCalendar')) {
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+        if (!e.target.closest('#wrapKodeAset')) {
+          if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        }
+        if (!e.target.closest('#wrapStatusModal')) {
+          if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        }
+        if (e.target === crudModal || e.target === detailModal) {
+          closeModals();
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeModals();
+          closeActionMenus();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
 </body>
 
 </html>
