@@ -7,6 +7,1879 @@
   <title>Mutasi Aset | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       GLOBAL TYPOGRAPHY & RESET
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    body,
+    input,
+    button,
+    table,
+    select,
+    textarea {
+      font-family: 'Outfit', sans-serif !important;
+    }
+
+    /* ===== MAIN PANEL & TABLE ===== */
+    .mutasi-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+      padding: 20px !important;
+      margin-bottom: 24px;
+      overflow: visible !important;
+      min-height: 440px;
+      box-sizing: border-box;
+    }
+
+    .mutasi-panel-accent {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100% !important;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      margin: 0 0 16px 0 !important;
+    }
+
+    /* ===== TOOLBAR (Kiri: Filter, Kalender, Excel, Search | Kanan: + Tambah) ===== */
+    .mutasi-toolbar {
+      padding: 0 0 14px 0 !important;
+      margin: 0 0 14px 0 !important;
+      background: transparent !important;
+      border-bottom: 1px dashed #cbd5e1 !important;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 50;
+    }
+
+    .toolbar-left-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      flex-wrap: wrap;
+    }
+
+    /* Toolbar Icon Buttons */
+    .btn-toolbar-icon {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #3b82f6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .btn-toolbar-icon:hover {
+      border-color: #0284c7;
+      color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .btn-toolbar-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* Excel Icon Konsisten Resmi Hijau */
+    .btn-toolbar-icon.btn-excel {
+      color: #107c41;
+      border-color: #86efac;
+      background: #ffffff;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover {
+      background: #f0fdf4;
+      border-color: #4ade80;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover svg rect {
+      fill: #0b5e31 !important;
+    }
+
+    .btn-toolbar-icon.has-filter {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    /* Search Pill Box */
+    .mutasi-search-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .mutasi-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .mutasi-search-input {
+      width: 200px;
+      height: 36px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 0 14px 0 34px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, width 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .mutasi-search-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+      width: 240px;
+    }
+
+    .mutasi-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Tombol + Tambah (100% PERSIS KONSISTEN DAFTAR ASET & PENGELUARAN) */
+    .btn-tambah-mutasi {
+      height: 36px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-tambah-mutasi:hover {
+      background: #0284c7;
+      transform: translateY(-1px);
+    }
+
+    .btn-tambah-mutasi:active {
+      transform: scale(0.98);
+    }
+
+    /* ===== FILTER POPOVER ===== */
+    .mutasi-filter-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 290px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      padding: 16px 18px;
+      z-index: 150;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .mutasi-filter-popover.is-active {
+      display: block;
+    }
+
+    .mutasi-filter-group {
+      margin-bottom: 14px;
+    }
+
+    .mutasi-filter-label {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .mutasi-filter-box {
+      position: relative;
+    }
+
+    .mutasi-filter-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .mutasi-filter-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 32px 0 12px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #334155;
+      background: #ffffff;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, border-radius 0.15s;
+    }
+
+    .mutasi-filter-box.is-open .mutasi-filter-input {
+      border-color: #0076C5;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    .mutasi-filter-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: none;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .mutasi-filter-arrow svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+    }
+
+    .mutasi-filter-box.is-open .mutasi-filter-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #0076C5;
+    }
+
+    .mutasi-filter-dropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #0076C5;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 6px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 160;
+      box-sizing: border-box;
+      max-height: 160px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .mutasi-filter-box.is-open .mutasi-filter-dropdown-list {
+      display: block;
+    }
+
+    .mutasi-filter-item {
+      padding: 7px 4px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.12s ease;
+    }
+
+    .mutasi-filter-item:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .mutasi-filter-item.is-selected {
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .mutasi-filter-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding-top: 6px;
+    }
+
+    .btn-filter-riset {
+      flex: 1;
+      padding: 8px 14px;
+      background: #f1f5f9;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      color: #1e293b;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-riset:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-filter-terapkan {
+      flex: 1;
+      padding: 8px 14px;
+      background: #28a5de;
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-terapkan:hover {
+      background: #0284c7;
+    }
+
+    /* ===== DUAL MONTH CALENDAR POPOVER ===== */
+    .mutasi-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 580px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      padding: 16px 18px;
+      z-index: 200;
+      box-sizing: border-box;
+      display: none;
+    }
+
+    .mutasi-calendar-popover.is-active {
+      display: block;
+    }
+
+    .calendar-popover-body {
+      display: flex;
+      gap: 16px;
+    }
+
+    .calendar-presets-col {
+      width: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 14px;
+    }
+
+    .calendar-preset-btn {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .calendar-preset-btn:hover {
+      background: #e0f2fe;
+      border-color: #28a5de;
+      color: #0284c7;
+    }
+
+    .calendar-months-col {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .month-nav-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .month-day-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+    }
+
+    .month-day {
+      font-size: 12px;
+      padding: 6px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      user-select: none;
+    }
+
+    .month-day:hover {
+      background: #f1f5f9;
+    }
+
+    .month-day.is-selected {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .month-day.in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .calendar-popover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 14px;
+      padding-top: 12px;
+    }
+
+    .calendar-range-text {
+      font-size: 12.5px;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .calendar-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-cal-cancel {
+      padding: 6px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+
+    .btn-cal-apply {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== TABLE & STICKY COLUMN ===== */
+    .mutasi-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      min-height: 380px;
+    }
+
+    .mutasi-table {
+      width: 100%;
+      border-collapse: separate !important; border-spacing: 0 !important;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .mutasi-table thead th {
+      padding: 12px 14px;
+      font-weight: 600;
+      color: #0f172a !important;
+      background: #f4f4f5 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: none;
+      font-size: 13.5px;
+    }
+
+    .mutasi-table tbody td {
+      padding: 12px 14px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+    }
+
+    .mutasi-table tbody tr:hover td {
+      background-color: #f8fafc !important;
+    }
+
+    .mutasi-cell-italic {
+      font-style: italic;
+      color: #334155;
+    }
+
+    /* Fixed / Sticky Action Column di Sebelah Kanan */
+    .mutasi-table th.col-sticky-action,
+    .mutasi-table td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .mutasi-table th.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 11;
+      background-color: #f4f4f5 !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .mutasi-table tr:hover td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    /* Action Trigger Button (3 Titik Vertikal Tegak) */
+    .mutasi-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .mutasi-action-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .mutasi-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Floating Action Menu (Konsisten dengan Kas & Bank, Pengeluaran & Pajak) */
+    .mutasi-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .mutasi-action-menu.is-open {
+      display: block;
+    }
+
+    .mutasi-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      font-weight: 500;
+      text-align: left;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .mutasi-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .mutasi-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #0076C5;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mutasi-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .mutasi-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .mutasi-action-menu button.is-danger:hover {
+      background: #fef2f2;
+    }
+
+    .mutasi-action-menu .mutasi-action-icon.is-danger {
+      background: #e02424;
+    }
+
+    /* Badges */
+    .badge-mutasi {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .badge-pindah {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .badge-pinjam {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .badge-servis {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .badge-kembali {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-kondisi-baik {
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .badge-kondisi-rusak {
+      color: #dc2626;
+      font-weight: 600;
+    }
+
+    /* Button Lihat Bukti di Tabel */
+    .btn-table-bukti {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      border-radius: 6px;
+      border: 1px solid rgba(2, 132, 199, 0.4);
+      color: #0284c7;
+      background: rgba(2, 132, 199, 0.05);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-table-bukti:hover {
+      background: #e0f2fe;
+      border-color: #0284c7;
+    }
+
+    /* ==========================================================================
+       MODALS (CRUD & VIEW) - PERSIS SCREENSHOT 1, 2 & 3
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.is-active,
+    .modal-overlay.is-open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .mutasi-modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 820px;
+      margin: auto;
+      overflow: visible !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      border: 1px solid #e2e8f0;
+      box-sizing: border-box;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-accent-line {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100%;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .modal-inner-padding {
+      padding: 22px 28px 26px;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .modal-title-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .modal-title-text em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .btn-modal-close-x {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #71717a;
+      border-radius: 4px;
+      background: transparent;
+      color: #1e293b;
+      font-size: 13px;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .btn-modal-close-x:hover {
+      background: #f1f5f9;
+      border-color: #0f172a;
+    }
+
+    .modal-divider-dashed {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    /* 9 Fields Grid: 3 Rows x 3 Columns */
+    .mutasi-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 18px;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-field-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .modal-field-input {
+      width: 100%;
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .modal-field-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+    }
+
+    .modal-field-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .modal-field-value {
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #64748b;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Dropdown Selection Box inside Modal */
+    .modal-select-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .modal-select-arrow {
+      position: absolute;
+      right: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: none;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .modal-select-wrap.is-open .modal-select-arrow {
+      transform: rotate(180deg);
+      color: #0284c7;
+    }
+
+    .modal-dropdown-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+
+    .modal-select-wrap.is-open .modal-dropdown-options {
+      display: block;
+    }
+
+    .modal-select-wrap.is-open .modal-field-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: #28a5de;
+    }
+
+    .modal-opt-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.12s ease, color 0.12s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-opt-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 500;
+    }
+
+    .modal-opt-item.is-selected {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    /* File Box with Choose File and Dynamic Eye Icon */
+    .modal-field-file-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 3px 8px;
+      height: 38px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      box-sizing: border-box;
+    }
+
+    .btn-choose-file-inner {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: #0284c7;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+
+    .btn-choose-file-inner:hover {
+      background: #e0f2fe;
+    }
+
+    .pnd-eye-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: #0284c7;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+    }
+
+    .pnd-eye-btn:hover {
+      background: #bae6fd;
+    }
+
+    .pnd-eye-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Tombol Outline Lihat Foto di Modal View (Gambar 3) */
+    .btn-lihat-foto-outline {
+      width: 100%;
+      height: 38px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0284c7;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      font-style: italic;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-lihat-foto-outline:hover {
+      background: #f0f9ff;
+      border-color: #0076c5;
+    }
+
+    /* Modal Action Buttons */
+    .modal-footer-row {
+      margin-top: 56px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Button Outline Simpan & Keluar (Gambar 1, 2, 3) */
+    .btn-modal-outline {
+      height: 38px;
+      padding: 0 38px;
+      border: 1.5px solid #38bdf8;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-modal-outline:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    .btn-modal-outline:active {
+      transform: scale(0.98);
+    }
+
+    /* Image Preview Modal */
+    .bukti-modal-content {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .bukti-modal-content img {
+      max-width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .mutasi-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+    /* Table Styles - Consistent with Kas & Bank UI (Rounded Header Edges) */
+    table,
+    [class*="-table"] {
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+    }
+
+    thead th {
+      background: #f4f4f5 !important;
+      color: #0f172a !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      vertical-align: middle !important;
+    }/* Sticky Kolom Nomor (#) - Fixed di Kiri */
+    thead th:first-child,
+    tbody td:first-child {
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 10 !important;
+      background-color: #ffffff !important;
+      border-right: 1px solid #e2e8f0 !important;
+      box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+      text-align: center !important;
+      width: 48px !important;
+      min-width: 48px !important;
+      max-width: 55px !important;
+    }
+
+    thead th:first-child {
+      z-index: 12 !important;
+      background-color: #f4f4f5 !important;
+      border-top-left-radius: 8px !important;
+      border-bottom-left-radius: 8px !important;
+      border-left: 1px solid #e4e4e7 !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr:hover td:first-child {
+      background-color: #f8fafc !important;
+    }
+
+    thead th:last-child {
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+      border-right: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+    }
+
+    tbody td {
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    tbody tr:hover,
+    tbody tr:hover td {
+      background-color: #f8fafc !important;
+    }
+
+    /* Sticky Aksi Column */
+    th.col-sticky-action,
+    td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    th.col-sticky-action {
+      z-index: 11;
+      background-color: #f4f4f5 !important;
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+      border-right: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+  
+  
+  
+  /* ==========================================================================
+     UNIFIED OPERATIONAL UI/UX STANDARD (KAS & BANK SPECIFICATION)
+     ========================================================================== */
+
+  /* 1. Main Panel Container & Top Flush Accent Line */
+  .panel,
+  .campaign-panel,
+  .kb-panel,
+  .pnd-panel,
+  .aset-panel,
+  .budget-panel,
+  .mutasi-panel,
+  .alokasi-panel,
+  .penyusutan-panel,
+  .piutang-panel,
+  .utang-panel,
+  .rekap-panel,
+  .profit-panel,
+  .pajak-panel,
+  .payroll-panel {
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    padding: 20px !important;
+    position: relative !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-panel-line,
+  .pnd-panel-line,
+  .aset-panel-line,
+  .budget-panel-accent,
+  .mutasi-panel-accent,
+  .alokasi-panel-accent,
+  .penyusutan-panel-accent,
+  .piutang-panel-accent,
+  .piutang-panel-line,
+  .utang-panel-line,
+  .rekap-panel-accent,
+  .profit-panel-line,
+  .pajak-panel-line,
+  .payroll-panel-line,
+  .campaign-panel__line {
+    display: block !important;
+    height: 4px !important;
+    margin: -20px -20px 16px -20px !important;
+    border-radius: 14px 14px 0 0 !important;
+    background: #0076C5 !important;
+    width: calc(100% + 40px) !important;
+  }
+
+  /* 2. Unified Toolbar & Grouping */
+  .kb-toolbar,
+  .pnd-toolbar,
+  .aset-toolbar,
+  .budget-toolbar,
+  .mutasi-toolbar,
+  .alokasi-toolbar,
+  .penyusutan-toolbar,
+  .piutang-toolbar,
+  .utang-toolbar,
+  .rekap-toolbar,
+  .profit-toolbar,
+  .pajak-toolbar,
+  .payroll-toolbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    margin: 0 0 16px 0 !important;
+    padding: 0 0 14px 0 !important;
+    border-bottom: 1px dashed #cbd5e1 !important;
+    position: relative !important;
+    z-index: 50 !important;
+  }
+
+  /* Hide redundant divider elements */
+  .kb-dashed-divider,
+  .pnd-dashed-divider,
+  .aset-dashed-divider,
+  .pajak-dashed-divider,
+  .payroll-dashed-divider,
+  .piutang-dashed-divider,
+  .profit-dashed-divider,
+  .utang-dashed-divider {
+    display: none !important;
+  }
+
+  .toolbar-left-group,
+  .kb-toolbar__left,
+  .pnd-toolbar__left,
+  .aset-toolbar__left,
+  .pajak-toolbar__left,
+  .payroll-toolbar__left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    position: relative !important;
+  }
+
+  .toolbar-right-group,
+  .kb-toolbar__right,
+  .pnd-toolbar__right,
+  .aset-toolbar__right,
+  .pajak-toolbar__right,
+  .payroll-toolbar__right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-left: auto !important;
+  }
+
+  /* 3. Toolbar Small Action Buttons */
+  .kb-btn-icon,
+  .pnd-btn-icon,
+  .aset-btn-icon,
+  .btn-toolbar-icon,
+  .piutang-btn-icon,
+  .utang-btn-icon,
+  .profit-btn-icon,
+  .pajak-btn-icon,
+  .payroll-btn-icon {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #3b82f6 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-btn-icon:hover,
+  .pnd-btn-icon:hover,
+  .aset-btn-icon:hover,
+  .btn-toolbar-icon:hover,
+  .piutang-btn-icon:hover,
+  .utang-btn-icon:hover,
+  .profit-btn-icon:hover,
+  .pajak-btn-icon:hover,
+  .payroll-btn-icon:hover {
+    border-color: #0284c7 !important;
+    color: #0284c7 !important;
+    background: #f0f9ff !important;
+  }
+
+  .kb-btn-icon svg,
+  .pnd-btn-icon svg,
+  .aset-btn-icon svg,
+  .btn-toolbar-icon svg,
+  .piutang-btn-icon svg,
+  .utang-btn-icon svg,
+  .profit-btn-icon svg,
+  .pajak-btn-icon svg,
+  .payroll-btn-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+
+  /* Excel Button */
+  .kb-btn-excel,
+  .pnd-btn-excel,
+  .aset-btn-excel,
+  .btn-excel,
+  .piutang-btn-excel,
+  .utang-btn-excel,
+  .profit-btn-excel,
+  .pajak-btn-excel,
+  .payroll-btn-excel {
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+    color: #15803d !important;
+  }
+
+  .kb-btn-excel:hover,
+  .pnd-btn-excel:hover,
+  .aset-btn-excel:hover,
+  .btn-excel:hover,
+  .piutang-btn-excel:hover,
+  .utang-btn-excel:hover,
+  .profit-btn-excel:hover,
+  .pajak-btn-excel:hover,
+  .payroll-btn-excel:hover {
+    background: #dcfce7 !important;
+    border-color: #4ade80 !important;
+  }
+
+  .kb-btn-excel svg,
+  .pnd-btn-excel svg,
+  .aset-btn-excel svg,
+  .btn-excel svg,
+  .piutang-btn-excel svg,
+  .utang-btn-excel svg,
+  .profit-btn-excel svg,
+  .pajak-btn-excel svg,
+  .payroll-btn-excel svg {
+    stroke: none !important;
+    fill: none !important;
+  }
+
+  /* 4. Toolbar Search Pill Input */
+  .kb-search-wrap,
+  .pnd-search-wrap,
+  .budget-search-wrapper,
+  .mutasi-search-wrapper,
+  .alokasi-search-wrapper,
+  .penyusutan-search-wrapper,
+  .piutang-search-wrapper,
+  .utang-search-wrapper,
+  .rekap-search-wrapper,
+  .profit-search-wrapper,
+  .pajak-search-wrap,
+  .payroll-search-wrap,
+  .aset-search-wrapper {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    width: 200px !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-search-wrap input,
+  .pnd-search-wrap input,
+  .budget-search-input,
+  .mutasi-search-input,
+  .alokasi-search-input,
+  .penyusutan-search-input,
+  .piutang-search-input,
+  .utang-search-input,
+  .rekap-search-input,
+  .profit-search-input,
+  .pajak-search-wrap input,
+  .payroll-search-wrap input,
+  .aset-search-input {
+    width: 100% !important;
+    height: 34px !important;
+    padding: 0 14px 0 32px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13px !important;
+    color: #1e293b !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .kb-search-wrap input:focus,
+  .pnd-search-wrap input:focus,
+  .budget-search-input:focus,
+  .mutasi-search-input:focus,
+  .alokasi-search-input:focus,
+  .penyusutan-search-input:focus,
+  .piutang-search-input:focus,
+  .utang-search-input:focus,
+  .rekap-search-input:focus,
+  .profit-search-input:focus,
+  .pajak-search-wrap input:focus,
+  .payroll-search-wrap input:focus,
+  .aset-search-input:focus {
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12) !important;
+  }
+
+  .kb-search-wrap input::placeholder,
+  .pnd-search-wrap input::placeholder,
+  .budget-search-input::placeholder,
+  .mutasi-search-input::placeholder,
+  .alokasi-search-input::placeholder,
+  .penyusutan-search-input::placeholder,
+  .piutang-search-input::placeholder,
+  .utang-search-input::placeholder,
+  .rekap-search-input::placeholder,
+  .profit-search-input::placeholder,
+  .pajak-search-wrap input::placeholder,
+  .payroll-search-wrap input::placeholder,
+  .aset-search-input::placeholder {
+    color: #94a3b8 !important;
+    font-style: italic !important;
+    font-size: 13px !important;
+  }
+
+  .kb-search-wrap svg,
+  .pnd-search-wrap svg,
+  .budget-search-icon,
+  .mutasi-search-icon,
+  .alokasi-search-icon,
+  .penyusutan-search-icon,
+  .piutang-search-icon,
+  .utang-search-icon,
+  .rekap-search-icon,
+  .profit-search-icon,
+  .pajak-search-wrap svg,
+  .payroll-search-wrap svg,
+  .aset-search-icon {
+    position: absolute !important;
+    left: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 14px !important;
+    height: 14px !important;
+    color: #94a3b8 !important;
+    stroke: #94a3b8 !important;
+    stroke-width: 2 !important;
+    fill: none !important;
+    pointer-events: none !important;
+  }
+
+  /* 5. Unified + Tambah Button */
+  .btn-tambah-kb,
+  .btn-tambah-pnd,
+  .btn-tambah-aset,
+  .btn-tambah-budget,
+  .btn-tambah-mutasi,
+  .btn-tambah-alokasi,
+  .btn-tambah-piutang,
+  .btn-tambah-pajak,
+  .btn-tambah-payroll {
+    height: 36px !important;
+    padding: 0 18px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    background: #28a5de !important;
+    color: #ffffff !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13.5px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25) !important;
+    transition: background 0.15s ease, transform 0.1s ease !important;
+    white-space: nowrap !important;
+    margin-left: auto;
+  }
+
+  .btn-tambah-kb:hover,
+  .btn-tambah-pnd:hover,
+  .btn-tambah-aset:hover,
+  .btn-tambah-budget:hover,
+  .btn-tambah-mutasi:hover,
+  .btn-tambah-alokasi:hover,
+  .btn-tambah-piutang:hover,
+  .btn-tambah-pajak:hover,
+  .btn-tambah-payroll:hover {
+    background: #0284c7 !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .btn-tambah-kb:active,
+  .btn-tambah-pnd:active,
+  .btn-tambah-aset:active,
+  .btn-tambah-budget:active,
+  .btn-tambah-mutasi:active,
+  .btn-tambah-alokasi:active,
+  .btn-tambah-piutang:active,
+  .btn-tambah-pajak:active,
+  .btn-tambah-payroll:active {
+    transform: scale(0.98) !important;
+  }
+
+  /* 6. Unified Table Structure & Sticky Columns (Flush Aligned with Toolbar Above) */
+  .table-wrap,
+  .campaign-table,
+  .budget-table-wrap,
+  .alokasi-table-wrap,
+  .aset-table-wrap,
+  .mutasi-table-wrap,
+  .pajak-table-wrap,
+  .payroll-table-wrap,
+  .penyusutan-table-wrap,
+  .piutang-table-wrap,
+  .profit-table-wrap,
+  .rekap-table-wrap,
+  .utang-table-wrap {
+    overflow-x: auto !important;
+    width: 100% !important;
+    border-radius: 8px !important;
+    position: relative !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  thead th {
+    background-color: #f4f4f5 !important;
+    color: #0f172a !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    padding: 12px 14px !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Sticky Kolom Nomor (#) - Fixed di Kiri & Sejajar Presisi dengan Icon Toolbar */
+  thead th:first-child,
+  tbody td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e2e8f0 !important;
+    box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+    text-align: center !important;
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 55px !important;
+    box-sizing: border-box !important;
+  }
+
+  thead th:first-child {
+    z-index: 12 !important;
+    background-color: #f4f4f5 !important;
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+    border-left: 1px solid #e4e4e7 !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+  }
+
+  thead th:last-child {
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e4e4e7 !important;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f1f5f9 !important;
+    transition: background 0.15s ease !important;
+  }
+
+  tbody td {
+    padding: 12px 14px !important;
+    vertical-align: middle !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    font-family: 'Outfit', sans-serif !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    box-sizing: border-box !important;
+  }
+
+  tbody tr:hover,
+  tbody tr:hover td {
+    background-color: #f8fafc !important;
+  }
+
+  tbody tr:hover td:first-child {
+    background-color: #f8fafc !important;
+  }
+
+  /* Sticky Kolom Aksi - Fixed di Kanan */
+  th.col-sticky-action,
+  td.col-sticky-action,
+  th:last-child.col-sticky-action,
+  td:last-child.col-sticky-action {
+    position: sticky !important;
+    right: 0 !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    border-left: 1px solid #e2e8f0 !important;
+    box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  th.col-sticky-action,
+  th:last-child.col-sticky-action {
+    z-index: 11 !important;
+    background-color: #f4f4f5 !important;
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e4e4e7 !important;
+  }
+
+  tbody tr:hover td.col-sticky-action,
+  tbody tr:hover td:last-child.col-sticky-action {
+    background-color: #f8fafc !important;
+  }
+
+  /* 7. Unified Action Trigger Button (⋮) */
+  .kb-action-btn,
+  .pnd-action-btn,
+  .btn-action-trigger,
+  .aset-action-btn,
+  .mutasi-action-btn,
+  .alokasi-action-btn,
+  .pajak-action-btn,
+  .payroll-action-btn,
+  .piutang-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #0f172a !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .kb-action-btn:hover,
+  .pnd-action-btn:hover,
+  .btn-action-trigger:hover,
+  .aset-action-btn:hover,
+  .mutasi-action-btn:hover,
+  .alokasi-action-btn:hover,
+  .pajak-action-btn:hover,
+  .payroll-action-btn:hover,
+  .piutang-action-btn:hover {
+    background: #f1f5f9 !important;
+  }
+
+  .kb-action-btn svg,
+  .pnd-action-btn svg,
+  .btn-action-trigger svg,
+  .aset-action-btn svg,
+  .mutasi-action-btn svg,
+  .alokasi-action-btn svg,
+  .pajak-action-btn svg,
+  .payroll-action-btn svg,
+  .piutang-action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+    fill: currentColor !important;
+    pointer-events: none !important;
+  }
+
+  /* 8. Unified Floating Action Menu */
+  .kb-action-menu,
+  .pnd-action-menu,
+  .budget-action-menu,
+  .mutasi-action-menu,
+  .alokasi-action-menu,
+  .piutang-action-menu,
+  .aset-action-menu,
+  .pajak-action-menu,
+  .payroll-action-menu {
+    position: fixed !important;
+    z-index: 2147483000 !important;
+    min-width: 145px !important;
+    padding: 6px !important;
+    border: 1px solid rgba(0, 0, 0, .08) !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .14) !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-action-menu.is-open,
+  .kb-action-menu.is-active,
+  .pnd-action-menu.is-open,
+  .pnd-action-menu.is-active,
+  .budget-action-menu.is-open,
+  .budget-action-menu.is-active,
+  .mutasi-action-menu.is-open,
+  .mutasi-action-menu.is-active,
+  .alokasi-action-menu.is-open,
+  .alokasi-action-menu.is-active,
+  .piutang-action-menu.is-open,
+  .piutang-action-menu.is-active,
+  .aset-action-menu.is-open,
+  .aset-action-menu.is-active,
+  .pajak-action-menu.is-open,
+  .pajak-action-menu.is-active,
+  .payroll-action-menu.is-open,
+  .payroll-action-menu.is-active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+</style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +1887,1442 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <!-- ===== MAIN PANEL ===== -->
+      <section class="mutasi-panel">
+          <div class="mutasi-panel-accent"></div>
+
+          <!-- Toolbar (Kiri: Filter, Kalender, Excel, Search | Kanan: + Tambah) -->
+          <div class="mutasi-toolbar">
+            <div class="toolbar-left-group">
+              
+              <!-- 1. Tombol Filter Funnel -->
+              <div style="position: relative;">
+                <button type="button" class="btn-toolbar-icon" id="btnFilter" title="Filter Mutasi Aset">
+                  <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                </button>
+
+                <!-- Popover Filter Mutasi -->
+                <div id="filterDropdown" class="mutasi-filter-popover">
+                  <!-- Filter 1: Aktivitas -->
+                  <div class="mutasi-filter-group">
+                    <label class="mutasi-filter-label">Aktivitas</label>
+                    <div class="mutasi-filter-box" id="boxFilterAktivitas">
+                      <div class="mutasi-filter-input-wrap">
+                        <input type="text" class="mutasi-filter-input" id="filterAktivitas" placeholder="Pilih Aktivitas" readonly />
+                        <span class="mutasi-filter-arrow">
+                          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor"></path></svg>
+                        </span>
+                      </div>
+                      <div class="mutasi-filter-dropdown-list" id="listFilterAktivitas"></div>
+                    </div>
+                  </div>
+
+                  <!-- Filter 2: Kondisi -->
+                  <div class="mutasi-filter-group">
+                    <label class="mutasi-filter-label">Kondisi</label>
+                    <div class="mutasi-filter-box" id="boxFilterKondisi">
+                      <div class="mutasi-filter-input-wrap">
+                        <input type="text" class="mutasi-filter-input" id="filterKondisi" placeholder="Pilih Kondisi" readonly />
+                        <span class="mutasi-filter-arrow">
+                          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor"></path></svg>
+                        </span>
+                      </div>
+                      <div class="mutasi-filter-dropdown-list" id="listFilterKondisi"></div>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons Filter -->
+                  <div class="mutasi-filter-actions">
+                    <button type="button" class="btn-filter-riset" id="btnResetFilter">Riset</button>
+                    <button type="button" class="btn-filter-terapkan" id="btnApplyFilter">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Tombol Kalender -->
+              <div style="position: relative;">
+                <button type="button" class="btn-toolbar-icon" id="btnCalendar" title="Filter Berdasarkan Tanggal">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                </button>
+
+                <!-- Popover Dual Month Calendar -->
+                <div id="calendarDropdown" class="mutasi-calendar-popover">
+                  <div class="calendar-popover-body">
+                    <div class="calendar-presets-col">
+                      <button type="button" class="calendar-preset-btn" data-preset="today">Hari Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-month">Bulan Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="last-month">Bulan Lalu</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-year">Tahun Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="reset">Semua Tanggal</button>
+                    </div>
+                    <div class="calendar-months-col">
+                      <div class="month-box">
+                        <div class="month-header">
+                          <button type="button" class="month-nav-btn" id="btnPrevMonth">&lt;</button>
+                          <span id="labelMonth1">Juni 2026</span>
+                          <div style="width: 24px;"></div>
+                        </div>
+                        <div class="month-grid" id="gridMonth1"></div>
+                      </div>
+                      <div class="month-box">
+                        <div class="month-header">
+                          <div style="width: 24px;"></div>
+                          <span id="labelMonth2">Juli 2026</span>
+                          <button type="button" class="month-nav-btn" id="btnNextMonth">&gt;</button>
+                        </div>
+                        <div class="month-grid" id="gridMonth2"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="calendar-popover-footer">
+                    <span class="calendar-range-text" id="calendarRangeDisplay">Semua Tanggal</span>
+                    <div class="calendar-footer-actions">
+                      <button type="button" class="btn-cal-cancel" id="btnCancelCalendar">Batal</button>
+                      <button type="button" class="btn-cal-apply" id="btnApplyCalendar">Terapkan</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Tombol Export Excel (Official Microsoft Excel Green Icon) -->
+              <button id="btnExportExcel" class="btn-toolbar-icon btn-excel" type="button" aria-label="Export Excel" title="Download Excel (.xlsx)" onclick="window.exportMutasiExcel && window.exportMutasiExcel()">
+                <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                  <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+
+              <!-- 4. Search Input (Pill Shape) -->
+              <div class="mutasi-search-wrapper">
+                <svg class="mutasi-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="mutasi-search-input" id="mutasiSearch" placeholder="Cari..." />
+              </div>
+            </div>
+
+            <!-- Tombol + Tambah (KONSISTEN DI UJUNG KANAN PERSIS DAFTAR ASET) -->
+            <button type="button" class="btn-tambah-mutasi" id="btnTambahMutasi" onclick="window.openAddModal && window.openAddModal()">+ Tambah</button>
+          </div>
+
+          <!-- Table Container (Sesuai Gambar: Tanggal, Kode Aset, Nama Aset, Aktivitas, Dari, Ke, Kondisi, Keterangan, Bukti, Aksi) -->
+          <div class="mutasi-table-wrap">
+            <table class="mutasi-table" id="mutasiTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px; text-align: center;">#</th>
+                  <th>Tanggal</th>
+                  <th>Kode Aset</th>
+                  <th>Nama Aset</th>
+                  <th>Aktivitas</th>
+                  <th>Dari</th>
+                  <th>Ke</th>
+                  <th>Kondisi</th>
+                  <th>Keterangan</th>
+                  <th style="text-align: center;">Bukti</th>
+                  <th class="col-sticky-action">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="mutasiTableBody">
+                <!-- Diisi via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+    </main>
   </div>
 
+  <!-- ===== FLOATING ACTION MENU (KONSISTEN DENGAN KAS & BANK, PENGELUARAN & PAJAK) ===== -->
+  <div id="mutasiActionMenu" class="mutasi-action-menu" role="menu" aria-hidden="true">
+    <button type="button" role="menuitem" data-action="view">
+      <span class="mutasi-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" role="menuitem" data-action="edit">
+      <span class="mutasi-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" role="menuitem" data-action="delete" class="is-danger">
+      <span class="mutasi-action-icon is-danger" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <!-- ===== MODAL CRUD: "Tambah / Edit Mutasi Aset" (100% PERSIS SCREENSHOT 1 & 2) ===== -->
+  <div id="mutasiCrudModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="mutasi-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-inner-padding">
+        
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="crudModalTitle">
+            <em>Tambah</em> Mutasi Aset
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseCrudX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <form id="mutasiForm">
+          <input type="hidden" id="crudId" />
+
+          <!-- Grid 3 Kolom x 3 Baris (9 Fields Sesuai Gambar 1 & 2) -->
+          <div class="mutasi-form-grid">
+            
+            <!-- Row 1: Tanggal, Kode Aset, Nama Aset -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudTanggal">Tanggal</label>
+              <input type="text" id="crudTanggal" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKodeAset">Kode Aset</label>
+              <div class="modal-select-wrap" id="wrapKodeAset">
+                <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="Pilih Kode Aset" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <span class="modal-select-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="modal-dropdown-options" id="menuKodeAset"></div>
+              </div>
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudNamaAset">Nama Aset</label>
+              <input type="text" id="crudNamaAset" class="modal-field-input" placeholder="Nama Aset" readonly style="background: #f8fafc;" />
+            </div>
+
+            <!-- Row 2: Aktifitas, Dari, Ke -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudAktivitas">Aktifitas</label>
+              <input type="text" id="crudAktivitas" class="modal-field-input" placeholder="Tambah Aktivitas" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudDari">Dari</label>
+              <input type="text" id="crudDari" class="modal-field-input" placeholder="Dari" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKe">Ke</label>
+              <input type="text" id="crudKe" class="modal-field-input" placeholder="Ke" required />
+            </div>
+
+            <!-- Row 3: Kondisi, Keterangan, Bukti -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKondisi">Kondisi</label>
+              <input type="text" id="crudKondisi" class="modal-field-input" placeholder="Kondisi" required />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKeterangan">Keterangan</label>
+              <input type="text" id="crudKeterangan" class="modal-field-input" placeholder="Tambah Keterangan" />
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-field-label">Bukti</label>
+              <div class="modal-field-file-box">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                  <input type="file" id="crudBuktiFoto" accept="image/*,.pdf" style="display: none;" />
+                  <button type="button" class="btn-choose-file-inner" id="btnTriggerFile">Choose File</button>
+                  <span id="fileNameDisplay" style="font-size: 11.5px; color: #64748b; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px;">Belum ada file</span>
+                </div>
+                <button type="button" id="btnPreviewBuktiForm" class="pnd-eye-btn" title="Lihat Bukti Foto" style="display: none;">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Footer: Tombol Outline Simpan (Sesuai Gambar 1 & 2) -->
+          <div class="modal-footer-row">
+            <button type="submit" class="btn-modal-outline" id="btnSimpanMutasi">Simpan</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETAIL: "Lihat Mutasi Aset" (100% PERSIS SCREENSHOT 3) ===== -->
+  <div id="mutasiDetailModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="mutasi-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-inner-padding">
+        
+        <!-- Header -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="detailModalTitle">
+            <em>Lihat</em> Mutasi Aset
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseDetailX" aria-label="Tutup">x</button>
+        </div>
+
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 9 Fields Grid (3 Kolom x 3 Baris Sesuai Gambar 3) -->
+        <div class="mutasi-form-grid">
+          <!-- Row 1: Tanggal, Kode Aset, Nama Aset -->
+          <div class="modal-field">
+            <span class="modal-field-label">Tanggal</span>
+            <div class="modal-field-value" id="detailTanggal">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Kode Aset</span>
+            <div class="modal-field-value" id="detailKodeAset">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Nama Aset</span>
+            <div class="modal-field-value" id="detailNamaAset">-</div>
+          </div>
+
+          <!-- Row 2: Aktifitas, Dari, Ke -->
+          <div class="modal-field">
+            <span class="modal-field-label">Aktifitas</span>
+            <div class="modal-field-value" id="detailAktivitas">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Dari</span>
+            <div class="modal-field-value" id="detailDari">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Ke</span>
+            <div class="modal-field-value" id="detailKe">-</div>
+          </div>
+
+          <!-- Row 3: Kondisi, Keterangan, Bukti -->
+          <div class="modal-field">
+            <span class="modal-field-label">Kondisi</span>
+            <div class="modal-field-value" id="detailKondisi">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Keterangan</span>
+            <div class="modal-field-value" id="detailKeterangan">-</div>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field-label">Bukti</span>
+            <button type="button" class="btn-lihat-foto-outline" id="btnLihatFoto">Lihat Foto</button>
+          </div>
+        </div>
+
+        <!-- Footer: Button "Keluar" (Sesuai Gambar 3) -->
+        <div class="modal-footer-row">
+          <button type="button" class="btn-modal-outline" id="btnKeluarDetail">Keluar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL PREVIEW BUKTI / FOTO ===== -->
+  <div id="buktiPreviewModal" class="modal-overlay">
+    <div class="bukti-modal-content">
+      <h3 style="margin-top: 0; font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 12px;">Foto / Bukti Mutasi Aset</h3>
+      <img id="previewBuktiImg" src="" alt="Bukti Foto Mutasi" />
+      <div>
+        <button type="button" id="btnCloseBuktiPreview" class="btn-modal-outline" style="min-width: 100px;">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      'use strict';
+
+      /* ===== DATA MODEL & STORAGE ===== */
+      const STORAGE_KEY = 'accounting_mutasi_aset_data';
+
+      // Asset references for auto-populating Nama Aset when selecting Kode Aset
+      const assetReferences = [
+        { kode: 'AST-001', nama: 'Dispenser Mini Miyako' },
+        { kode: 'AST-002', nama: 'Sony Alpha A7 IV + Lens 24-70mm' },
+        { kode: 'AST-003', nama: 'MacBook Pro M3 Max 36GB' },
+        { kode: 'AST-004', nama: 'Meja Meeting Kayu Jati Custom 3M' },
+        { kode: 'AST-005', nama: 'AC Daikin Inverter 2 PK Multi-S' }
+      ];
+
+      const defaultMutasiData = [
+        {
+          id: 'MUT-001',
+          tanggal: '2026-06-10',
+          kodeAset: 'AST-001',
+          namaAset: 'Dispenser Mini Miyako',
+          aktivitas: 'Pindah Lokasi',
+          dari: 'Pantry',
+          ke: 'Ruang Meeting 1',
+          kondisi: 'Baik',
+          keterangan: 'Relokasi sementara acara workshop',
+          buktiFoto: '../../media/sample_struk.jpg'
+        },
+        {
+          id: 'MUT-002',
+          tanggal: '2026-10-18',
+          kodeAset: 'AST-002',
+          namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
+          aktivitas: 'Peminjaman',
+          dari: 'Studio Produksi 1',
+          ke: 'Lokasi Syuting Cisalak',
+          kondisi: 'Baik',
+          keterangan: 'Pembuatan video campaign brand',
+          buktiFoto: '../../media/sample_struk.jpg'
+        },
+        {
+          id: 'MUT-003',
+          tanggal: '2026-09-02',
+          kodeAset: 'AST-003',
+          namaAset: 'MacBook Pro M3 Max 36GB',
+          aktivitas: 'Pindah Lokasi',
+          dari: 'IT & Tech Room',
+          ke: 'Ruang Editor Video',
+          kondisi: 'Normal',
+          keterangan: 'Alokasi laptop editing performa tinggi',
+          buktiFoto: ''
+        },
+        {
+          id: 'MUT-004',
+          tanggal: '2026-04-12',
+          kodeAset: 'AST-005',
+          namaAset: 'AC Daikin Inverter 2 PK Multi-S',
+          aktivitas: 'Perbaikan / Servis',
+          dari: 'Ruang Operasional',
+          ke: 'Vendor Daikin Tasikmalaya',
+          kondisi: 'Rusak Ringan',
+          keterangan: 'Cuci AC dan ganti kapasitor berkala',
+          buktiFoto: '../../media/sample_struk.jpg'
+        },
+        {
+          id: 'MUT-005',
+          tanggal: '2026-02-05',
+          kodeAset: 'AST-004',
+          namaAset: 'Meja Meeting Kayu Jati Custom 3M',
+          aktivitas: 'Pindah Lokasi',
+          dari: 'Gudang Inventaris Lantai 1',
+          ke: 'Aula Lantai 2',
+          kondisi: 'Baik',
+          keterangan: 'Penataan ulang layout rapat besar',
+          buktiFoto: ''
+        }
+      ];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error('Gagal memuat data mutasi:', e);
+        }
+        return defaultMutasiData;
+      }
+
+      function saveData(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.error('Gagal menyimpan data mutasi:', e);
+        }
+      }
+
+      let mutasiData = loadData();
+
+      // State Filters
+      let filterState = {
+        search: '',
+        aktivitas: '',
+        kondisi: '',
+        startDate: '',
+        endDate: ''
+      };
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('mutasiTableBody');
+      const searchInput = document.getElementById('mutasiSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+      const btnTambahMutasi = document.getElementById('btnTambahMutasi');
+
+      // Action Menu
+      const actionMenu = document.getElementById('mutasiActionMenu');
+      let currentActionId = null;
+
+      // Filter Funnel Popover Elements
+      const btnFilter = document.getElementById('btnFilter');
+      const filterDropdown = document.getElementById('filterDropdown');
+      const filterAktivitas = document.getElementById('filterAktivitas');
+      const boxFilterAktivitas = document.getElementById('boxFilterAktivitas');
+      const listFilterAktivitas = document.getElementById('listFilterAktivitas');
+      const filterKondisi = document.getElementById('filterKondisi');
+      const boxFilterKondisi = document.getElementById('boxFilterKondisi');
+      const listFilterKondisi = document.getElementById('listFilterKondisi');
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      // Calendar Filter Elements
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const labelMonth1 = document.getElementById('labelMonth1');
+      const labelMonth2 = document.getElementById('labelMonth2');
+      const gridMonth1 = document.getElementById('gridMonth1');
+      const gridMonth2 = document.getElementById('gridMonth2');
+      const btnPrevMonth = document.getElementById('btnPrevMonth');
+      const btnNextMonth = document.getElementById('btnNextMonth');
+      const calendarRangeDisplay = document.getElementById('calendarRangeDisplay');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+
+      // CRUD Modal Elements
+      const crudModal = document.getElementById('mutasiCrudModal');
+      const crudForm = document.getElementById('mutasiForm');
+      const crudModalTitle = document.getElementById('crudModalTitle');
+      const btnCloseCrudX = document.getElementById('btnCloseCrudX');
+
+      const crudId = document.getElementById('crudId');
+      const crudTanggal = document.getElementById('crudTanggal');
+      const crudKodeAset = document.getElementById('crudKodeAset');
+      const wrapKodeAset = document.getElementById('wrapKodeAset');
+      const menuKodeAset = document.getElementById('menuKodeAset');
+      const crudNamaAset = document.getElementById('crudNamaAset');
+      const crudAktivitas = document.getElementById('crudAktivitas');
+      const crudDari = document.getElementById('crudDari');
+      const crudKe = document.getElementById('crudKe');
+      const crudKondisi = document.getElementById('crudKondisi');
+      const crudKeterangan = document.getElementById('crudKeterangan');
+      const crudBuktiFoto = document.getElementById('crudBuktiFoto');
+      const btnTriggerFile = document.getElementById('btnTriggerFile');
+      const fileNameDisplay = document.getElementById('fileNameDisplay');
+      const btnPreviewBuktiForm = document.getElementById('btnPreviewBuktiForm');
+
+      let currentUploadedFotoDataUrl = '';
+      let currentItemFotoUrl = '';
+
+      // Detail Modal Elements
+      const detailModal = document.getElementById('mutasiDetailModal');
+      const btnCloseDetailX = document.getElementById('btnCloseDetailX');
+      const btnKeluarDetail = document.getElementById('btnKeluarDetail');
+      const btnLihatFoto = document.getElementById('btnLihatFoto');
+
+      const detailTanggal = document.getElementById('detailTanggal');
+      const detailKodeAset = document.getElementById('detailKodeAset');
+      const detailNamaAset = document.getElementById('detailNamaAset');
+      const detailAktivitas = document.getElementById('detailAktivitas');
+      const detailDari = document.getElementById('detailDari');
+      const detailKe = document.getElementById('detailKe');
+      const detailKondisi = document.getElementById('detailKondisi');
+      const detailKeterangan = document.getElementById('detailKeterangan');
+
+      // Preview Modal Elements
+      const buktiPreviewModal = document.getElementById('buktiPreviewModal');
+      const previewBuktiImg = document.getElementById('previewBuktiImg');
+      const btnCloseBuktiPreview = document.getElementById('btnCloseBuktiPreview');
+
+      /* ===== FORMATTING UTILITIES ===== */
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatTanggalDisplay(isoStr) {
+        if (!isoStr) return '-';
+        const parts = isoStr.split('-');
+        if (parts.length !== 3) return isoStr;
+        const y = parts[0];
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const d = parts[2].padStart(2, '0');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        return d + ' ' + (months[mIdx] || parts[1]) + ' ' + y;
+      }
+
+      function getAktivitasBadge(aktivitas) {
+        const akt = (aktivitas || '').toLowerCase();
+        if (akt.includes('pindah')) return 'badge-pindah';
+        if (akt.includes('pinjam')) return 'badge-pinjam';
+        if (akt.includes('servis') || akt.includes('rusak')) return 'badge-servis';
+        if (akt.includes('kembali')) return 'badge-kembali';
+        return 'badge-pindah';
+      }
+
+      /* ===== KODE ASET DROPDOWN POPULATOR (SESUAI GAMBAR 2) ===== */
+      function getAssetReferences() {
+        const list = [
+          { kode: 'AST-001', nama: 'Dispenser Mini Miyako' },
+          { kode: 'AST-002', nama: 'Sony Alpha A7 IV + Lens 24-70mm' },
+          { kode: 'AST-003', nama: 'MacBook Pro M3 Max 36GB' },
+          { kode: 'AST-004', nama: 'Meja Meeting Kayu Jati Custom 3M' },
+          { kode: 'AST-005', nama: 'AC Daikin Inverter 2 PK Multi-S' }
+        ];
+
+        try {
+          const rawAset = localStorage.getItem('accounting_daftar_aset_data');
+          if (rawAset) {
+            const parsedAset = JSON.parse(rawAset);
+            if (Array.isArray(parsedAset)) {
+              parsedAset.forEach(function (ast) {
+                if (ast && ast.kodeAset && !list.some(function (x) { return x.kode === ast.kodeAset; })) {
+                  list.push({ kode: ast.kodeAset, nama: ast.namaAset || ast.kodeAset });
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        return list;
+      }
+
+      function renderKodeAsetDropdown() {
+        if (!menuKodeAset) return;
+        menuKodeAset.innerHTML = '';
+        const assets = getAssetReferences();
+
+        assets.forEach(function (ast) {
+          const item = document.createElement('div');
+          item.className = 'modal-opt-item';
+          if (crudKodeAset && crudKodeAset.value === ast.kode) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = ast.kode + ' | ' + ast.nama;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            crudKodeAset.value = ast.kode;
+            crudNamaAset.value = ast.nama;
+            wrapKodeAset.classList.remove('is-open');
+          });
+          menuKodeAset.appendChild(item);
+        });
+      }
+
+      renderKodeAsetDropdown();
+
+      if (wrapKodeAset) {
+        wrapKodeAset.addEventListener('click', function (e) {
+          if (!e.target.closest('.modal-opt-item')) {
+            e.stopPropagation();
+            wrapKodeAset.classList.toggle('is-open');
+            if (wrapKodeAset.classList.contains('is-open')) {
+              renderKodeAsetDropdown();
+            }
+          }
+        });
+      }
+
+      /* ===== FILE UPLOAD & EYE ICON TOGGLE ===== */
+      if (btnTriggerFile && crudBuktiFoto) {
+        btnTriggerFile.addEventListener('click', function (e) {
+          e.preventDefault();
+          crudBuktiFoto.click();
+        });
+
+        crudBuktiFoto.addEventListener('change', function () {
+          if (this.files && this.files[0]) {
+            const file = this.files[0];
+            fileNameDisplay.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              currentUploadedFotoDataUrl = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
+          } else {
+            if (!currentUploadedFotoDataUrl) {
+              fileNameDisplay.textContent = 'Belum ada file';
+              if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+            }
+          }
+        });
+      }
+
+      if (btnPreviewBuktiForm) {
+        btnPreviewBuktiForm.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const src = currentUploadedFotoDataUrl || currentItemFotoUrl || '../../media/sample_struk.jpg';
+          previewBuktiImg.src = src;
+          buktiPreviewModal.classList.add('is-open');
+          buktiPreviewModal.classList.add('is-active');
+          buktiPreviewModal.style.display = 'flex';
+          buktiPreviewModal.style.opacity = '1';
+          buktiPreviewModal.style.pointerEvents = 'auto';
+        });
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        return mutasiData.filter(function (item) {
+          if (filterState.search) {
+            const q = filterState.search.toLowerCase();
+            const matchKode = (item.kodeAset || '').toLowerCase().includes(q);
+            const matchNama = (item.namaAset || '').toLowerCase().includes(q);
+            const matchDari = (item.dari || '').toLowerCase().includes(q);
+            const matchKe = (item.ke || '').toLowerCase().includes(q);
+            const matchKet = (item.keterangan || '').toLowerCase().includes(q);
+            if (!matchKode && !matchNama && !matchDari && !matchKe && !matchKet) return false;
+          }
+
+          if (filterState.aktivitas && filterState.aktivitas !== 'Semua Aktivitas') {
+            if ((item.aktivitas || '').trim() !== filterState.aktivitas) return false;
+          }
+
+          if (filterState.kondisi && filterState.kondisi !== 'Semua Kondisi') {
+            if ((item.kondisi || '').trim() !== filterState.kondisi) return false;
+          }
+
+          if (filterState.startDate) {
+            if (!item.tanggal || item.tanggal < filterState.startDate) return false;
+          }
+          if (filterState.endDate) {
+            if (!item.tanggal || item.tanggal > filterState.endDate) return false;
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== RENDER TABLE ===== */
+      function renderTable() {
+        const filtered = getFilteredData();
+        tableBody.innerHTML = '';
+
+        if (filtered.length === 0) {
+          const emptyRow = document.createElement('tr');
+          emptyRow.innerHTML = '<td colspan="11" style="text-align: center; padding: 48px 16px; color: #94a3b8; font-style: italic;">' +
+            'Tidak ada data mutasi aset yang sesuai' +
+            '</td>';
+          tableBody.appendChild(emptyRow);
+          return;
+        }
+
+        filtered.forEach(function (item, idx) {
+          const tr = document.createElement('tr');
+          const badgeAktivitasCls = getAktivitasBadge(item.aktivitas);
+          const isRusak = (item.kondisi || '').toLowerCase().includes('rusak');
+          const kondisiCls = isRusak ? 'badge-kondisi-rusak' : 'badge-kondisi-baik';
+
+          let buktiBtn = '<span style="color: #94a3b8; font-size: 12px; font-style: italic;">-</span>';
+          if (item.buktiFoto) {
+            buktiBtn = '<button type="button" class="btn-table-bukti" data-preview-img="' + escapeHtml(item.buktiFoto) + '" title="Lihat Foto Bukti">Lihat Foto</button>';
+          }
+
+          tr.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-size: 13px;">' + (idx + 1) + '</td>',
+            '<td class="mutasi-cell-italic">' + escapeHtml(formatTanggalDisplay(item.tanggal)) + '</td>',
+            '<td class="mutasi-cell-italic" style="font-weight: 500;">' + escapeHtml(item.kodeAset) + '</td>',
+            '<td style="font-weight: 500; color: #0f172a;">' + escapeHtml(item.namaAset) + '</td>',
+            '<td><span class="badge-mutasi ' + badgeAktivitasCls + '">' + escapeHtml(item.aktivitas) + '</span></td>',
+            '<td class="mutasi-cell-italic">' + escapeHtml(item.dari || '-') + '</td>',
+            '<td class="mutasi-cell-italic">' + escapeHtml(item.ke || '-') + '</td>',
+            '<td class="' + kondisiCls + '">' + escapeHtml(item.kondisi || 'Baik') + '</td>',
+            '<td class="mutasi-cell-italic" style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + escapeHtml(item.keterangan || '-') + '</td>',
+            '<td style="text-align: center;">' + buktiBtn + '</td>',
+            '<td class="col-sticky-action" style="text-align: center;">' +
+              '<button type="button" class="mutasi-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: currentColor;">' +
+                  '<circle cx="12" cy="5" r="2"></circle>' +
+                  '<circle cx="12" cy="12" r="2"></circle>' +
+                  '<circle cx="12" cy="19" r="2"></circle>' +
+                '</svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+
+          tableBody.appendChild(tr);
+        });
+      }
+
+      /* ===== FLOATING ACTION MENU LOGIC ===== */
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = 120;
+
+        let left = rect.left - menuWidth + 24;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const actionBtn = e.target.closest('[data-action-toggle]');
+          if (actionBtn) {
+            e.stopPropagation();
+            openActionMenu(actionBtn);
+            return;
+          }
+
+          const previewBtn = e.target.closest('[data-preview-img]');
+          if (previewBtn) {
+            e.stopPropagation();
+            const src = previewBtn.getAttribute('data-preview-img') || '../../media/sample_struk.jpg';
+            previewBuktiImg.src = src;
+            buktiPreviewModal.classList.add('is-open');
+            buktiPreviewModal.classList.add('is-active');
+            buktiPreviewModal.style.display = 'flex';
+            buktiPreviewModal.style.opacity = '1';
+            buktiPreviewModal.style.pointerEvents = 'auto';
+          }
+        });
+      }
+
+      /* ===== MODAL DETAIL ("Lihat Mutasi Aset" - SESUAI GAMBAR 3) ===== */
+      function openDetailModal(item) {
+        if (!detailModal || !item) return;
+
+        currentItemFotoUrl = item.buktiFoto || '';
+
+        detailTanggal.textContent = formatTanggalDisplay(item.tanggal);
+        detailKodeAset.textContent = item.kodeAset || '-';
+        detailNamaAset.textContent = item.namaAset || '-';
+        detailAktivitas.textContent = item.aktivitas || '-';
+        detailDari.textContent = item.dari || '-';
+        detailKe.textContent = item.ke || '-';
+        detailKondisi.textContent = item.kondisi || '-';
+        detailKeterangan.textContent = item.keterangan || '-';
+
+        detailModal.classList.add('is-open');
+        detailModal.classList.add('is-active');
+        detailModal.style.display = 'flex';
+        detailModal.style.opacity = '1';
+        detailModal.style.pointerEvents = 'auto';
+      }
+
+      function closeDetailModal() {
+        if (!detailModal) return;
+        detailModal.classList.remove('is-open');
+        detailModal.classList.remove('is-active');
+        detailModal.style.display = 'none';
+        detailModal.style.opacity = '0';
+        detailModal.style.pointerEvents = 'none';
+      }
+
+      if (btnCloseDetailX) btnCloseDetailX.addEventListener('click', closeDetailModal);
+      if (btnKeluarDetail) btnKeluarDetail.addEventListener('click', closeDetailModal);
+      if (detailModal) {
+        detailModal.addEventListener('click', function (e) {
+          if (e.target === detailModal) closeDetailModal();
+        });
+      }
+
+      if (btnLihatFoto) {
+        btnLihatFoto.addEventListener('click', function () {
+          const src = currentItemFotoUrl || '../../media/sample_struk.jpg';
+          previewBuktiImg.src = src;
+          buktiPreviewModal.classList.add('is-open');
+          buktiPreviewModal.classList.add('is-active');
+          buktiPreviewModal.style.display = 'flex';
+          buktiPreviewModal.style.opacity = '1';
+          buktiPreviewModal.style.pointerEvents = 'auto';
+        });
+      }
+
+      /* ===== MODAL CRUD ("Tambah / Edit Mutasi Aset" - SESUAI GAMBAR 1 & 2) ===== */
+      function openAddModal() {
+        if (!crudModal) return;
+        if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (crudForm) crudForm.reset();
+        crudId.value = '';
+        crudModalTitle.innerHTML = '<em>Tambah</em> Mutasi Aset';
+
+        if (fileNameDisplay) fileNameDisplay.textContent = 'Belum ada file';
+        if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+        currentUploadedFotoDataUrl = '';
+        currentItemFotoUrl = '';
+
+        crudModal.classList.add('is-open');
+        crudModal.classList.add('is-active');
+        crudModal.style.display = 'flex';
+        crudModal.style.opacity = '1';
+        crudModal.style.pointerEvents = 'auto';
+      }
+      window.openAddModal = openAddModal;
+
+      function openEditModal(item) {
+        if (!crudModal || !item) return;
+        if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        crudForm.reset();
+        crudId.value = item.id;
+        crudModalTitle.innerHTML = '<em>Edit</em> Mutasi Aset';
+
+        crudTanggal.value = item.tanggal || '';
+        crudKodeAset.value = item.kodeAset || '';
+        crudNamaAset.value = item.namaAset || '';
+        crudAktivitas.value = item.aktivitas || '';
+        crudDari.value = item.dari || '';
+        crudKe.value = item.ke || '';
+        crudKondisi.value = item.kondisi || '';
+        crudKeterangan.value = item.keterangan || '';
+
+        currentItemFotoUrl = item.buktiFoto || '';
+        currentUploadedFotoDataUrl = item.buktiFoto || '';
+
+        if (item.buktiFoto) {
+          fileNameDisplay.textContent = 'Foto mutasi tersimpan';
+          btnPreviewBuktiForm.style.display = 'inline-flex';
+        } else {
+          fileNameDisplay.textContent = 'Belum ada file';
+          btnPreviewBuktiForm.style.display = 'none';
+        }
+
+        crudModal.classList.add('is-open');
+        crudModal.classList.add('is-active');
+        crudModal.style.display = 'flex';
+        crudModal.style.opacity = '1';
+        crudModal.style.pointerEvents = 'auto';
+      }
+
+      function closeCrudModal() {
+        if (!crudModal) return;
+        if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        crudModal.classList.remove('is-open');
+        crudModal.classList.remove('is-active');
+        crudModal.style.display = 'none';
+        crudModal.style.opacity = '0';
+        crudModal.style.pointerEvents = 'none';
+      }
+
+      if (btnCloseCrudX) btnCloseCrudX.addEventListener('click', closeCrudModal);
+      if (crudModal) {
+        crudModal.addEventListener('click', function (e) {
+          if (e.target === crudModal) closeCrudModal();
+        });
+      }
+
+      if (crudForm) {
+        crudForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const editId = crudId.value;
+          const newObj = {
+            id: editId || ('MUT-' + String(mutasiData.length + 1).padStart(3, '0')),
+            tanggal: crudTanggal.value || new Date().toISOString().slice(0, 10),
+            kodeAset: crudKodeAset.value.trim(),
+            namaAset: crudNamaAset.value.trim(),
+            aktivitas: crudAktivitas.value.trim(),
+            dari: crudDari.value.trim(),
+            ke: crudKe.value.trim(),
+            kondisi: crudKondisi.value.trim(),
+            keterangan: crudKeterangan.value.trim(),
+            buktiFoto: currentUploadedFotoDataUrl || currentItemFotoUrl || ''
+          };
+
+          if (editId) {
+            const idx = mutasiData.findIndex(function (x) { return String(x.id) === String(editId); });
+            if (idx !== -1) mutasiData[idx] = newObj;
+          } else {
+            mutasiData.unshift(newObj);
+          }
+
+          saveData(mutasiData);
+          closeCrudModal();
+          renderTable();
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil!',
+              text: editId ? 'Data mutasi aset berhasil diperbarui.' : 'Data mutasi aset baru berhasil disimpan.',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+
+      /* Action Menu Item Clicks */
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-action]');
+          if (!btn || !currentActionId) return;
+
+          const action = btn.getAttribute('data-action');
+          const targetItem = mutasiData.find(function (x) { return String(x.id) === String(currentActionId); });
+          closeActionMenus();
+
+          if (!targetItem) return;
+
+          if (action === 'view') {
+            openDetailModal(targetItem);
+          } else if (action === 'edit') {
+            openEditModal(targetItem);
+          } else if (action === 'delete') {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: 'Hapus Mutasi Aset?',
+                html: 'Yakin ingin menghapus riwayat mutasi aset <b>' + escapeHtml(targetItem.namaAset) + '</b> (' + escapeHtml(targetItem.kodeAset) + ')?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+              }).then(function (result) {
+                if (result.isConfirmed) {
+                  mutasiData = mutasiData.filter(function (x) { return String(x.id) !== String(targetItem.id); });
+                  saveData(mutasiData);
+                  renderTable();
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Terhapus',
+                    text: 'Data mutasi berhasil dihapus.',
+                    timer: 1400,
+                    showConfirmButton: false
+                  });
+                }
+              });
+            }
+          }
+        });
+      }
+
+      // Close modal preview
+      if (btnCloseBuktiPreview) {
+        btnCloseBuktiPreview.addEventListener('click', function () {
+          buktiPreviewModal.classList.remove('is-open');
+          buktiPreviewModal.classList.remove('is-active');
+          buktiPreviewModal.style.display = 'none';
+          buktiPreviewModal.style.opacity = '0';
+          buktiPreviewModal.style.pointerEvents = 'none';
+        });
+      }
+
+      if (buktiPreviewModal) {
+        buktiPreviewModal.addEventListener('click', function (e) {
+          if (e.target === buktiPreviewModal) {
+            btnCloseBuktiPreview.click();
+          }
+        });
+      }
+
+      /* ===== DROPDOWN FILTER POPOVER (AKTIVITAS & KONDISI) ===== */
+      const aktivitasOptions = ['Semua Aktivitas', 'Pindah Lokasi', 'Peminjaman', 'Perbaikan / Servis', 'Pengembalian', 'Pelepasan'];
+      const kondisiOptions = ['Semua Kondisi', 'Baik', 'Normal', 'Rusak Ringan', 'Rusak Berat', 'Dalam Perbaikan'];
+
+      function renderFilterList(listEl, inputEl, boxEl, opts) {
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        opts.forEach(function (opt) {
+          const item = document.createElement('div');
+          item.className = 'mutasi-filter-item';
+          if (inputEl.value === opt || (!inputEl.value && opt.startsWith('Semua'))) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = opt;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            inputEl.value = opt;
+            boxEl.classList.remove('is-open');
+          });
+          listEl.appendChild(item);
+        });
+      }
+
+      function setupDropdownToggle(boxEl, listEl, inputEl, opts) {
+        if (!boxEl || !inputEl) return;
+        inputEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = boxEl.classList.contains('is-open');
+          closeAllFilterBoxes();
+          if (!isOpen) {
+            boxEl.classList.add('is-open');
+            renderFilterList(listEl, inputEl, boxEl, opts);
+          }
+        });
+      }
+
+      function closeAllFilterBoxes() {
+        if (boxFilterAktivitas) boxFilterAktivitas.classList.remove('is-open');
+        if (boxFilterKondisi) boxFilterKondisi.classList.remove('is-open');
+      }
+
+      setupDropdownToggle(boxFilterAktivitas, listFilterAktivitas, filterAktivitas, aktivitasOptions);
+      setupDropdownToggle(boxFilterKondisi, listFilterKondisi, filterKondisi, kondisiOptions);
+
+      if (btnFilter && filterDropdown) {
+        btnFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterDropdown.classList.toggle('is-active');
+          if (filterDropdown.classList.contains('is-active')) {
+            if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+            closeAllFilterBoxes();
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function () {
+          filterAktivitas.value = '';
+          filterKondisi.value = '';
+          filterState.aktivitas = '';
+          filterState.kondisi = '';
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          btnFilter.classList.remove('has-filter');
+          renderTable();
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function () {
+          filterState.aktivitas = filterAktivitas.value.trim();
+          filterState.kondisi = filterKondisi.value.trim();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+
+          if (filterState.aktivitas || filterState.kondisi) {
+            btnFilter.classList.add('has-filter');
+          } else {
+            btnFilter.classList.remove('has-filter');
+          }
+
+          renderTable();
+        });
+      }
+
+      /* ===== DUAL MONTH CALENDAR LOGIC ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 5; // Juni (0-indexed)
+      let tempCalStart = null;
+      let tempCalEnd = null;
+
+      function renderDualCalendar() {
+        if (!labelMonth1 || !labelMonth2 || !gridMonth1 || !gridMonth2) return;
+
+        const monthNames = [
+          'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+          'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        labelMonth1.textContent = monthNames[calViewMonth] + ' ' + calViewYear;
+        renderMonthDays(calViewYear, calViewMonth, 'gridMonth1');
+
+        let m2Year = calViewYear;
+        let m2Month = calViewMonth + 1;
+        if (m2Month > 11) {
+          m2Month = 0;
+          m2Year += 1;
+        }
+        labelMonth2.textContent = monthNames[m2Month] + ' ' + m2Year;
+        renderMonthDays(m2Year, m2Month, 'gridMonth2');
+
+        updateRangeDisplay();
+      }
+
+      function renderMonthDays(year, month, containerId) {
+        const grid = document.getElementById(containerId);
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        days.forEach(function (d) {
+          const col = document.createElement('div');
+          col.className = 'month-day-name';
+          col.textContent = d;
+          grid.appendChild(col);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement('div');
+          grid.appendChild(empty);
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'month-day';
+          dayEl.textContent = d;
+
+          const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+          if (tempCalStart && dateStr === tempCalStart) {
+            dayEl.classList.add('is-selected');
+          }
+          if (tempCalEnd && dateStr === tempCalEnd) {
+            dayEl.classList.add('is-selected');
+          }
+          if (tempCalStart && tempCalEnd && dateStr > tempCalStart && dateStr < tempCalEnd) {
+            dayEl.classList.add('in-range');
+          }
+
+          dayEl.addEventListener('click', function () {
+            handleDateClick(dateStr);
+          });
+
+          grid.appendChild(dayEl);
+        }
+      }
+
+      function handleDateClick(dateStr) {
+        if (!tempCalStart || (tempCalStart && tempCalEnd)) {
+          tempCalStart = dateStr;
+          tempCalEnd = null;
+        } else if (tempCalStart && !tempCalEnd) {
+          if (dateStr < tempCalStart) {
+            tempCalEnd = tempCalStart;
+            tempCalStart = dateStr;
+          } else {
+            tempCalEnd = dateStr;
+          }
+        }
+        renderDualCalendar();
+      }
+
+      function updateRangeDisplay() {
+        if (!calendarRangeDisplay) return;
+        if (tempCalStart && tempCalEnd) {
+          calendarRangeDisplay.textContent = formatTanggalDisplay(tempCalStart) + ' - ' + formatTanggalDisplay(tempCalEnd);
+        } else if (tempCalStart) {
+          calendarRangeDisplay.textContent = formatTanggalDisplay(tempCalStart) + ' - ...';
+        } else {
+          calendarRangeDisplay.textContent = 'Semua Tanggal';
+        }
+      }
+
+      if (btnPrevMonth) {
+        btnPrevMonth.addEventListener('click', function () {
+          calViewMonth--;
+          if (calViewMonth < 0) {
+            calViewMonth = 11;
+            calViewYear--;
+          }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnNextMonth) {
+        btnNextMonth.addEventListener('click', function () {
+          calViewMonth++;
+          if (calViewMonth > 11) {
+            calViewMonth = 0;
+            calViewYear++;
+          }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnCalendar && calendarDropdown) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.toggle('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            if (filterDropdown) filterDropdown.classList.remove('is-active');
+            tempCalStart = filterState.startDate || null;
+            tempCalEnd = filterState.endDate || null;
+            renderDualCalendar();
+          }
+        });
+      }
+
+      if (btnCancelCalendar && calendarDropdown) {
+        btnCancelCalendar.addEventListener('click', function () {
+          calendarDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnApplyCalendar && calendarDropdown) {
+        btnApplyCalendar.addEventListener('click', function () {
+          filterState.startDate = tempCalStart || '';
+          filterState.endDate = tempCalEnd || '';
+          calendarDropdown.classList.remove('is-active');
+
+          if (filterState.startDate || filterState.endDate) {
+            btnCalendar.classList.add('has-filter');
+          } else {
+            btnCalendar.classList.remove('has-filter');
+          }
+
+          renderTable();
+        });
+      }
+
+      // Presets
+      document.querySelectorAll('.calendar-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const preset = this.getAttribute('data-preset');
+          const now = new Date();
+          const curY = now.getFullYear();
+          const curM = String(now.getMonth() + 1).padStart(2, '0');
+          const curD = String(now.getDate()).padStart(2, '0');
+
+          if (preset === 'today') {
+            tempCalStart = curY + '-' + curM + '-' + curD;
+            tempCalEnd = tempCalStart;
+          } else if (preset === 'this-month') {
+            tempCalStart = curY + '-' + curM + '-01';
+            const lastD = new Date(curY, now.getMonth() + 1, 0).getDate();
+            tempCalEnd = curY + '-' + curM + '-' + String(lastD).padStart(2, '0');
+          } else if (preset === 'last-month') {
+            const prevMonthDate = new Date(curY, now.getMonth() - 1, 1);
+            const pY = prevMonthDate.getFullYear();
+            const pM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+            const pLastD = new Date(pY, prevMonthDate.getMonth() + 1, 0).getDate();
+            tempCalStart = pY + '-' + pM + '-01';
+            tempCalEnd = pY + '-' + pM + '-' + String(pLastD).padStart(2, '0');
+          } else if (preset === 'this-year') {
+            tempCalStart = curY + '-01-01';
+            tempCalEnd = curY + '-12-31';
+          } else if (preset === 'reset') {
+            tempCalStart = null;
+            tempCalEnd = null;
+          }
+
+          renderDualCalendar();
+        });
+      });
+
+      /* ===== SEARCH REAL-TIME ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          filterState.search = this.value.trim();
+          renderTable();
+        });
+      }
+
+      /* ===== EXPORT EXCEL DENGAN EXCEL ENGINE ===== */
+      async function exportMutasiExcel() {
+        const rows = getFilteredData();
+        if (rows.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Data Kosong',
+              text: 'Tidak ada data mutasi aset untuk diexport.',
+              confirmButtonColor: '#0076C5'
+            });
+          } else {
+            alert('Tidak ada data mutasi aset untuk diexport.');
+          }
+          return;
+        }
+
+        const filename = 'Laporan_Mutasi_Aset_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+
+        const headers = [
+          'No',
+          'Tanggal',
+          'Kode Aset',
+          'Nama Aset',
+          'Aktivitas',
+          'Dari',
+          'Ke',
+          'Kondisi',
+          'Keterangan'
+        ];
+
+        const exportData = rows.map(function (item, idx) {
+          return [
+            idx + 1,
+            formatTanggalDisplay(item.tanggal),
+            item.kodeAset || '-',
+            item.namaAset || '-',
+            item.aktivitas || '-',
+            item.dari || '-',
+            item.ke || '-',
+            item.kondisi || '-',
+            item.keterangan || '-'
+          ];
+        });
+
+        if (typeof window.exportBisaExcel === 'function') {
+          await window.exportBisaExcel({
+            title: 'LAPORAN MUTASI ASET PERUSAHAAN',
+            filename: filename,
+            sheetName: 'Mutasi Aset',
+            headers: headers,
+            rows: exportData
+          });
+        } else if (typeof window.exportTableToExcel === 'function') {
+          await window.exportTableToExcel('mutasiTable', filename, 'LAPORAN MUTASI ASET');
+        } else {
+          let csv = headers.join(',') + '\n';
+          exportData.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename.replace('.xlsx', '.csv'));
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+      window.exportMutasiExcel = exportMutasiExcel;
+
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', exportMutasiExcel);
+      }
+
+      /* ===== GLOBAL CLICK LISTENER (TUTUP POPUP & MENU) ===== */
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#mutasiActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('#filterDropdown') && !e.target.closest('#btnFilter')) {
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          closeAllFilterBoxes();
+        }
+        if (!e.target.closest('#calendarDropdown') && !e.target.closest('#btnCalendar')) {
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+        if (!e.target.closest('#wrapKodeAset')) {
+          if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
 </body>
 
 </html>

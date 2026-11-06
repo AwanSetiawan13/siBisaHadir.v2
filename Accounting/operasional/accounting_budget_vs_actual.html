@@ -7,6 +7,1809 @@
   <title>Budget vs Actual | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+
+  <!-- Fonts & SweetAlert2 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* Global Font & Reset */
+    body {
+      font-family: 'Outfit', sans-serif;
+      color: #334155;
+      background-color: #f8fafc;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Main Container Card */
+    .budget-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+      padding: 20px !important;
+      margin-bottom: 24px;
+      overflow: visible !important;
+      min-height: 440px;
+      box-sizing: border-box;
+    }
+
+    /* Brand Top Accent Line (Persis Screenshot 1 & 2) */
+    .budget-panel-accent {
+      height: 3.5px;
+      background: #0076C5;
+      width: 100% !important;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      margin: 0 0 16px 0 !important;
+    }
+
+    /* ===== TOOLBAR (Persis Screenshot 1 & 2) ===== */
+    .budget-toolbar {
+      padding: 0 0 14px 0 !important;
+      margin: 0 0 14px 0 !important;
+      background: transparent !important;
+      border-bottom: 1px dashed #cbd5e1 !important;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 50;
+    }
+
+    .toolbar-left-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Toolbar Square Icon Buttons */
+    .btn-toolbar-icon {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #3b82f6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .btn-toolbar-icon:hover {
+      border-color: #0284c7;
+      color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .btn-toolbar-icon svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2;
+    }
+
+    /* Official Excel Icon (Green #107c41) */
+    .btn-toolbar-icon.btn-excel {
+      color: #107c41;
+      border-color: #cbd5e1;
+    }
+
+    .btn-toolbar-icon.btn-excel:hover {
+      background: #f0fdf4;
+      border-color: #107c41;
+      color: #0d6334;
+    }
+
+    /* Search Pill Input */
+    .budget-search-wrapper {
+      position: relative;
+      width: 220px;
+    }
+
+    .budget-search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #94a3b8;
+      stroke: #94a3b8;
+      stroke-width: 2;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .budget-search-input {
+      width: 100%;
+      height: 36px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 18px;
+      padding: 0 14px 0 34px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .budget-search-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+    }
+
+    .budget-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Tombol Tambah (Konsisten: background #28a5de, hover #0076C5, font Outfit 13px bold, + Tambah) */
+    .btn-tambah-budget {
+      height: 36px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+      white-space: nowrap;
+    }
+
+    .btn-tambah-budget:hover {
+      background: #0284c7;
+      transform: translateY(-1px);
+    }
+
+    .btn-tambah-budget:active {
+      transform: scale(0.98);
+    }
+
+    /* ===== FILTER FUNNEL POPOVER ===== */
+    .filter-popover-wrap {
+      position: relative;
+    }
+
+    .budget-filter-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 310px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
+      z-index: 1000;
+      padding: 16px 18px 18px;
+      display: none;
+      box-sizing: border-box;
+      animation: popoverFadeIn 0.15s ease;
+    }
+
+    .budget-filter-dropdown.is-active {
+      display: block;
+    }
+
+    @keyframes popoverFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .filter-group-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+      margin-top: 10px;
+    }
+
+    .filter-group-label:first-child {
+      margin-top: 0;
+    }
+
+    .filter-select-box {
+      position: relative;
+      width: 100%;
+    }
+
+    .filter-select-input {
+      width: 100%;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      padding: 0 30px 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #334155;
+      background: #ffffff;
+      outline: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .filter-select-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .filter-select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: #0284c7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .filter-select-box.is-open .filter-select-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-color: #28a5de;
+    }
+
+    .filter-select-box.is-open .filter-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #0076C5;
+    }
+
+    .filter-options-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+      z-index: 1050;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+
+    .filter-select-box.is-open .filter-options-list {
+      display: block;
+    }
+
+    .budget-filter-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+
+    .budget-filter-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .budget-filter-item.is-selected {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .filter-actions-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .btn-filter-reset {
+      flex: 1;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      background: #f8fafc;
+      color: #0f172a;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-reset:hover {
+      background: #e2e8f0;
+      border-color: #0284c7;
+    }
+
+    .btn-filter-apply {
+      flex: 1;
+      height: 38px;
+      border: none;
+      background: #28a5de;
+      color: #ffffff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-apply:hover {
+      background: #0284c7;
+    }
+
+    /* ===== CALENDAR RANGE POPOVER ===== */
+    .budget-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 580px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      display: none;
+      box-sizing: border-box;
+      animation: popoverFadeIn 0.15s ease;
+      overflow: hidden;
+    }
+
+    .budget-calendar-popover.is-active {
+      display: block;
+    }
+
+    .calendar-popover-content {
+      display: flex;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .calendar-presets-col {
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-right: 1px solid #e2e8f0;
+      padding-right: 14px;
+    }
+
+    .calendar-preset-btn {
+      padding: 7px 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      text-align: left;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .calendar-preset-btn:hover,
+    .calendar-preset-btn.is-active {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .calendar-months-col {
+      flex: 1;
+      display: flex;
+      gap: 14px;
+    }
+
+    .month-box {
+      flex: 1;
+    }
+
+    .month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .month-nav-btn {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .month-nav-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+      text-align: center;
+    }
+
+    .month-day-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+    }
+
+    .month-day {
+      padding: 6px 0;
+      font-size: 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      transition: all 0.1s ease;
+    }
+
+    .month-day:hover:not(.is-empty) {
+      background: #f1f5f9;
+    }
+
+    .month-day.is-empty {
+      cursor: default;
+    }
+
+    .month-day.is-in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+      border-radius: 0;
+    }
+
+    .month-day.is-start-date {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      border-radius: 4px 0 0 4px !important;
+    }
+
+    .month-day.is-end-date {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      border-radius: 0 4px 4px 0 !important;
+    }
+
+    .month-day.is-single-date {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      border-radius: 4px !important;
+    }
+
+    .calendar-popover-footer {
+      padding: 10px 16px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .calendar-range-text {
+      font-size: 12.5px;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .calendar-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-cal-cancel {
+      height: 34px;
+      padding: 0 18px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-cal-cancel:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-cal-apply {
+      height: 34px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 6px;
+      background: #1d68f2;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-cal-apply:hover {
+      background: #1558cf;
+    }
+
+    /* ===== TABLE & HORIZONTAL SCROLL & STICKY COLUMN ===== */
+    .budget-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      min-height: 420px;
+    }
+
+    .budget-table {
+      width: 100%;
+      border-collapse: separate !important; border-spacing: 0 !important;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .budget-table thead th {
+      padding: 12px 14px;
+      font-weight: 600;
+      color: #0f172a !important;
+      background: #f4f4f5 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      text-align: left;
+      font-size: 13.5px;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .budget-table tbody td {
+      padding: 12px 14px;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      transition: background 0.1s ease;
+    }
+
+    .budget-table tbody tr:hover td {
+      background-color: #f8fafc !important;
+    }
+
+    /* Sticky Action Column (Always docked at right on scroll) */
+    .col-sticky-action {
+      position: sticky;
+      right: 0;
+      background: #ffffff;
+      z-index: 10;
+      box-shadow: -4px 0 8px rgba(0, 0, 0, 0.03);
+      text-align: center !important;
+      width: 50px;
+    }
+
+    .budget-table thead th.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 11;
+      background-color: #f4f4f5 !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .budget-table tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    /* Three Dots Action Button */
+    .btn-action-trigger {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-action-trigger:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-action-trigger svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      pointer-events: none;
+    }
+
+    /* Floating Action Menu */
+    .budget-action-menu {
+      position: fixed;
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+      z-index: 2147483000 !important;
+      min-width: 145px;
+      padding: 6px;
+      display: none;
+      animation: menuFadeIn 0.12s ease-out;
+    }
+
+    .budget-action-menu.is-open,
+    .budget-action-menu.is-active {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    .budget-action-menu button {
+      width: 100%;
+      text-align: left;
+      padding: 7px 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      color: #334155;
+      background: transparent;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.1s ease;
+    }
+
+    .budget-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .budget-action-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      background: #0076C5;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .budget-action-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .budget-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .budget-action-menu button.is-danger:hover {
+      background: #fef2f2;
+    }
+
+    .budget-action-menu .budget-action-icon.is-danger {
+      background: #dc2626;
+    }
+
+    /* Badges Status Budget */
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .badge-under {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge-near {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-over {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .badge-coa-aktif {
+      background: #e0f2fe;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
+    }
+
+    .badge-coa-nonaktif {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* % Terpakai Badge */
+    .percent-badge {
+      font-weight: 600;
+      font-size: 12px;
+      display: inline-block;
+      min-width: 48px;
+      text-align: right;
+    }
+
+    .percent-safe {
+      color: #16a34a;
+    }
+
+    .percent-warning {
+      color: #d97706;
+    }
+
+    .percent-danger {
+      color: #dc2626;
+    }
+  
+    /* Table Styles - Consistent with Kas & Bank UI (Rounded Header Edges) */
+    table,
+    [class*="-table"] {
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+    }
+
+    thead th {
+      background: #f4f4f5 !important;
+      color: #0f172a !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      vertical-align: middle !important;
+    }
+
+    /* Sticky Kolom Nomor (#) - Fixed di Kiri */
+    thead th:first-child,
+    tbody td:first-child {
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 10 !important;
+      background-color: #ffffff !important;
+      border-right: 1px solid #e2e8f0 !important;
+      box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+      text-align: center !important;
+      width: 48px !important;
+      min-width: 48px !important;
+      max-width: 55px !important;
+    }
+
+    thead th:first-child {
+      z-index: 12 !important;
+      background-color: #f4f4f5 !important;
+      border-top-left-radius: 8px !important;
+      border-bottom-left-radius: 8px !important;
+      border-left: 1px solid #e4e4e7 !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr:hover td:first-child {
+      background-color: #f8fafc !important;
+    }
+
+    thead th:last-child {
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+      border-right: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+    }
+
+    tbody td {
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    tbody tr:hover,
+    tbody tr:hover td {
+      background-color: #f8fafc !important;
+    }
+
+    /* Sticky Aksi Column */
+    th.col-sticky-action,
+    td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    th.col-sticky-action {
+      z-index: 11;
+      background-color: #f4f4f5 !important;
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+      border-right: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+  
+  
+    /* ===== MODAL CRUD & DETAIL (MATCHING USER SCREENSHOTS 1, 2, 3) ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.is-active,
+    .modal-overlay.is-open {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .budget-modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 860px;
+      overflow: visible !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      border: 1px solid #e2e8f0;
+      box-sizing: border-box;
+      margin: auto;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.97) translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .modal-inner-padding {
+      padding: 20px 28px 26px;
+    }
+
+    .modal-accent-line {
+      height: 3px;
+      background: #0076C5;
+      width: 100%;
+      border-radius: 2px;
+      margin-bottom: 18px;
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .modal-title-text {
+      font-size: 17px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+    }
+
+    .modal-title-text em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .btn-modal-close-x {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #71717a;
+      border-radius: 4px;
+      background: transparent;
+      color: #1e293b;
+      font-size: 13px;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .btn-modal-close-x:hover {
+      background: #f1f5f9;
+      border-color: #0f172a;
+    }
+
+    .modal-divider-dashed {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    /* 12 Fields Grid: 3 Kolom x 4 Baris */
+    .budget-form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 18px;
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-field-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .modal-field-input {
+      width: 100%;
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-sizing: border-box;
+    }
+
+    .modal-field-input:focus {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.15);
+    }
+
+    .modal-field-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .modal-field-input[readonly] {
+      background: #f8fafc;
+      color: #475569;
+    }
+
+    .modal-field-value {
+      height: 38px;
+      border: 1.2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #475569;
+      font-style: italic;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Dropdown Selection Box inside Modal */
+    .modal-select-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .modal-select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0284c7;
+      pointer-events: none;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .modal-select-wrap.is-open .modal-select-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #0076C5;
+    }
+
+    .modal-dropdown-options {
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+      z-index: 1050;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+
+    .modal-select-wrap.is-open .modal-dropdown-options {
+      display: block;
+    }
+
+    .modal-select-wrap.is-open .modal-field-input {
+      border-color: #28a5de;
+      box-shadow: 0 0 0 3px rgba(40, 165, 222, 0.18);
+    }
+
+    .modal-opt-item {
+      padding: 8px 12px;
+      font-size: 13px;
+      color: #334155;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.12s ease, color 0.12s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-opt-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .modal-opt-item.is-selected {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    /* Modal Footer Buttons (Outlined #28a5de Sesuai Screenshot) */
+    .modal-footer-row {
+      margin-top: 26px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn-modal-outline {
+      height: 38px;
+      padding: 0 38px;
+      border: 1.5px solid #38bdf8;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-modal-outline:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    .btn-modal-outline:active {
+      transform: scale(0.98);
+    }
+
+  
+  
+  /* ==========================================================================
+     UNIFIED OPERATIONAL UI/UX STANDARD (KAS & BANK SPECIFICATION)
+     ========================================================================== */
+
+  /* 1. Main Panel Container & Top Flush Accent Line */
+  .panel,
+  .campaign-panel,
+  .kb-panel,
+  .pnd-panel,
+  .aset-panel,
+  .budget-panel,
+  .mutasi-panel,
+  .alokasi-panel,
+  .penyusutan-panel,
+  .piutang-panel,
+  .utang-panel,
+  .rekap-panel,
+  .profit-panel,
+  .pajak-panel,
+  .payroll-panel {
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    padding: 20px !important;
+    position: relative !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-panel-line,
+  .pnd-panel-line,
+  .aset-panel-line,
+  .budget-panel-accent,
+  .mutasi-panel-accent,
+  .alokasi-panel-accent,
+  .penyusutan-panel-accent,
+  .piutang-panel-accent,
+  .piutang-panel-line,
+  .utang-panel-line,
+  .rekap-panel-accent,
+  .profit-panel-line,
+  .pajak-panel-line,
+  .payroll-panel-line,
+  .campaign-panel__line {
+    display: block !important;
+    height: 4px !important;
+    margin: -20px -20px 16px -20px !important;
+    border-radius: 14px 14px 0 0 !important;
+    background: #0076C5 !important;
+    width: calc(100% + 40px) !important;
+  }
+
+  /* 2. Unified Toolbar & Grouping */
+  .kb-toolbar,
+  .pnd-toolbar,
+  .aset-toolbar,
+  .budget-toolbar,
+  .mutasi-toolbar,
+  .alokasi-toolbar,
+  .penyusutan-toolbar,
+  .piutang-toolbar,
+  .utang-toolbar,
+  .rekap-toolbar,
+  .profit-toolbar,
+  .pajak-toolbar,
+  .payroll-toolbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    margin: 0 0 16px 0 !important;
+    padding: 0 0 14px 0 !important;
+    border-bottom: 1px dashed #cbd5e1 !important;
+    position: relative !important;
+    z-index: 50 !important;
+  }
+
+  /* Hide redundant divider elements */
+  .kb-dashed-divider,
+  .pnd-dashed-divider,
+  .aset-dashed-divider,
+  .pajak-dashed-divider,
+  .payroll-dashed-divider,
+  .piutang-dashed-divider,
+  .profit-dashed-divider,
+  .utang-dashed-divider {
+    display: none !important;
+  }
+
+  .toolbar-left-group,
+  .kb-toolbar__left,
+  .pnd-toolbar__left,
+  .aset-toolbar__left,
+  .pajak-toolbar__left,
+  .payroll-toolbar__left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    position: relative !important;
+  }
+
+  .toolbar-right-group,
+  .kb-toolbar__right,
+  .pnd-toolbar__right,
+  .aset-toolbar__right,
+  .pajak-toolbar__right,
+  .payroll-toolbar__right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-left: auto !important;
+  }
+
+  /* 3. Toolbar Small Action Buttons */
+  .kb-btn-icon,
+  .pnd-btn-icon,
+  .aset-btn-icon,
+  .btn-toolbar-icon,
+  .piutang-btn-icon,
+  .utang-btn-icon,
+  .profit-btn-icon,
+  .pajak-btn-icon,
+  .payroll-btn-icon {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #3b82f6 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-btn-icon:hover,
+  .pnd-btn-icon:hover,
+  .aset-btn-icon:hover,
+  .btn-toolbar-icon:hover,
+  .piutang-btn-icon:hover,
+  .utang-btn-icon:hover,
+  .profit-btn-icon:hover,
+  .pajak-btn-icon:hover,
+  .payroll-btn-icon:hover {
+    border-color: #0284c7 !important;
+    color: #0284c7 !important;
+    background: #f0f9ff !important;
+  }
+
+  .kb-btn-icon svg,
+  .pnd-btn-icon svg,
+  .aset-btn-icon svg,
+  .btn-toolbar-icon svg,
+  .piutang-btn-icon svg,
+  .utang-btn-icon svg,
+  .profit-btn-icon svg,
+  .pajak-btn-icon svg,
+  .payroll-btn-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+
+  /* Excel Button */
+  .kb-btn-excel,
+  .pnd-btn-excel,
+  .aset-btn-excel,
+  .btn-excel,
+  .piutang-btn-excel,
+  .utang-btn-excel,
+  .profit-btn-excel,
+  .pajak-btn-excel,
+  .payroll-btn-excel {
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+    color: #15803d !important;
+  }
+
+  .kb-btn-excel:hover,
+  .pnd-btn-excel:hover,
+  .aset-btn-excel:hover,
+  .btn-excel:hover,
+  .piutang-btn-excel:hover,
+  .utang-btn-excel:hover,
+  .profit-btn-excel:hover,
+  .pajak-btn-excel:hover,
+  .payroll-btn-excel:hover {
+    background: #dcfce7 !important;
+    border-color: #4ade80 !important;
+  }
+
+  .kb-btn-excel svg,
+  .pnd-btn-excel svg,
+  .aset-btn-excel svg,
+  .btn-excel svg,
+  .piutang-btn-excel svg,
+  .utang-btn-excel svg,
+  .profit-btn-excel svg,
+  .pajak-btn-excel svg,
+  .payroll-btn-excel svg {
+    stroke: none !important;
+    fill: none !important;
+  }
+
+  /* 4. Toolbar Search Pill Input */
+  .kb-search-wrap,
+  .pnd-search-wrap,
+  .budget-search-wrapper,
+  .mutasi-search-wrapper,
+  .alokasi-search-wrapper,
+  .penyusutan-search-wrapper,
+  .piutang-search-wrapper,
+  .utang-search-wrapper,
+  .rekap-search-wrapper,
+  .profit-search-wrapper,
+  .pajak-search-wrap,
+  .payroll-search-wrap,
+  .aset-search-wrapper {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    width: 200px !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-search-wrap input,
+  .pnd-search-wrap input,
+  .budget-search-input,
+  .mutasi-search-input,
+  .alokasi-search-input,
+  .penyusutan-search-input,
+  .piutang-search-input,
+  .utang-search-input,
+  .rekap-search-input,
+  .profit-search-input,
+  .pajak-search-wrap input,
+  .payroll-search-wrap input,
+  .aset-search-input {
+    width: 100% !important;
+    height: 34px !important;
+    padding: 0 14px 0 32px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13px !important;
+    color: #1e293b !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .kb-search-wrap input:focus,
+  .pnd-search-wrap input:focus,
+  .budget-search-input:focus,
+  .mutasi-search-input:focus,
+  .alokasi-search-input:focus,
+  .penyusutan-search-input:focus,
+  .piutang-search-input:focus,
+  .utang-search-input:focus,
+  .rekap-search-input:focus,
+  .profit-search-input:focus,
+  .pajak-search-wrap input:focus,
+  .payroll-search-wrap input:focus,
+  .aset-search-input:focus {
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12) !important;
+  }
+
+  .kb-search-wrap input::placeholder,
+  .pnd-search-wrap input::placeholder,
+  .budget-search-input::placeholder,
+  .mutasi-search-input::placeholder,
+  .alokasi-search-input::placeholder,
+  .penyusutan-search-input::placeholder,
+  .piutang-search-input::placeholder,
+  .utang-search-input::placeholder,
+  .rekap-search-input::placeholder,
+  .profit-search-input::placeholder,
+  .pajak-search-wrap input::placeholder,
+  .payroll-search-wrap input::placeholder,
+  .aset-search-input::placeholder {
+    color: #94a3b8 !important;
+    font-style: italic !important;
+    font-size: 13px !important;
+  }
+
+  .kb-search-wrap svg,
+  .pnd-search-wrap svg,
+  .budget-search-icon,
+  .mutasi-search-icon,
+  .alokasi-search-icon,
+  .penyusutan-search-icon,
+  .piutang-search-icon,
+  .utang-search-icon,
+  .rekap-search-icon,
+  .profit-search-icon,
+  .pajak-search-wrap svg,
+  .payroll-search-wrap svg,
+  .aset-search-icon {
+    position: absolute !important;
+    left: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 14px !important;
+    height: 14px !important;
+    color: #94a3b8 !important;
+    stroke: #94a3b8 !important;
+    stroke-width: 2 !important;
+    fill: none !important;
+    pointer-events: none !important;
+  }
+
+  /* 5. Unified + Tambah Button */
+  .btn-tambah-kb,
+  .btn-tambah-pnd,
+  .btn-tambah-aset,
+  .btn-tambah-budget,
+  .btn-tambah-mutasi,
+  .btn-tambah-alokasi,
+  .btn-tambah-piutang,
+  .btn-tambah-pajak,
+  .btn-tambah-payroll {
+    height: 36px !important;
+    padding: 0 18px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    background: #28a5de !important;
+    color: #ffffff !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13.5px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25) !important;
+    transition: background 0.15s ease, transform 0.1s ease !important;
+    white-space: nowrap !important;
+    margin-left: auto;
+  }
+
+  .btn-tambah-kb:hover,
+  .btn-tambah-pnd:hover,
+  .btn-tambah-aset:hover,
+  .btn-tambah-budget:hover,
+  .btn-tambah-mutasi:hover,
+  .btn-tambah-alokasi:hover,
+  .btn-tambah-piutang:hover,
+  .btn-tambah-pajak:hover,
+  .btn-tambah-payroll:hover {
+    background: #0284c7 !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .btn-tambah-kb:active,
+  .btn-tambah-pnd:active,
+  .btn-tambah-aset:active,
+  .btn-tambah-budget:active,
+  .btn-tambah-mutasi:active,
+  .btn-tambah-alokasi:active,
+  .btn-tambah-piutang:active,
+  .btn-tambah-pajak:active,
+  .btn-tambah-payroll:active {
+    transform: scale(0.98) !important;
+  }
+
+  /* 6. Unified Table Structure & Sticky Columns (Flush Aligned with Toolbar Above) */
+  .table-wrap,
+  .campaign-table,
+  .budget-table-wrap,
+  .alokasi-table-wrap,
+  .aset-table-wrap,
+  .mutasi-table-wrap,
+  .pajak-table-wrap,
+  .payroll-table-wrap,
+  .penyusutan-table-wrap,
+  .piutang-table-wrap,
+  .profit-table-wrap,
+  .rekap-table-wrap,
+  .utang-table-wrap {
+    overflow-x: auto !important;
+    width: 100% !important;
+    border-radius: 8px !important;
+    position: relative !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  thead th {
+    background-color: #f4f4f5 !important;
+    color: #0f172a !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    padding: 12px 14px !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Sticky Kolom Nomor (#) - Fixed di Kiri & Sejajar Presisi dengan Icon Toolbar */
+  thead th:first-child,
+  tbody td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e2e8f0 !important;
+    box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+    text-align: center !important;
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 55px !important;
+    box-sizing: border-box !important;
+  }
+
+  thead th:first-child {
+    z-index: 12 !important;
+    background-color: #f4f4f5 !important;
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+    border-left: 1px solid #e4e4e7 !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+  }
+
+  thead th:last-child {
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e4e4e7 !important;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f1f5f9 !important;
+    transition: background 0.15s ease !important;
+  }
+
+  tbody td {
+    padding: 12px 14px !important;
+    vertical-align: middle !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    font-family: 'Outfit', sans-serif !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    box-sizing: border-box !important;
+  }
+
+  tbody tr:hover,
+  tbody tr:hover td {
+    background-color: #f8fafc !important;
+  }
+
+  tbody tr:hover td:first-child {
+    background-color: #f8fafc !important;
+  }
+
+  /* Sticky Kolom Aksi - Fixed di Kanan */
+  th.col-sticky-action,
+  td.col-sticky-action,
+  th:last-child.col-sticky-action,
+  td:last-child.col-sticky-action {
+    position: sticky !important;
+    right: 0 !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    border-left: 1px solid #e2e8f0 !important;
+    box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  th.col-sticky-action,
+  th:last-child.col-sticky-action {
+    z-index: 11 !important;
+    background-color: #f4f4f5 !important;
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e4e4e7 !important;
+  }
+
+  tbody tr:hover td.col-sticky-action,
+  tbody tr:hover td:last-child.col-sticky-action {
+    background-color: #f8fafc !important;
+  }
+
+  /* 7. Unified Action Trigger Button (⋮) */
+  .kb-action-btn,
+  .pnd-action-btn,
+  .btn-action-trigger,
+  .aset-action-btn,
+  .mutasi-action-btn,
+  .alokasi-action-btn,
+  .pajak-action-btn,
+  .payroll-action-btn,
+  .piutang-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #0f172a !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .kb-action-btn:hover,
+  .pnd-action-btn:hover,
+  .btn-action-trigger:hover,
+  .aset-action-btn:hover,
+  .mutasi-action-btn:hover,
+  .alokasi-action-btn:hover,
+  .pajak-action-btn:hover,
+  .payroll-action-btn:hover,
+  .piutang-action-btn:hover {
+    background: #f1f5f9 !important;
+  }
+
+  .kb-action-btn svg,
+  .pnd-action-btn svg,
+  .btn-action-trigger svg,
+  .aset-action-btn svg,
+  .mutasi-action-btn svg,
+  .alokasi-action-btn svg,
+  .pajak-action-btn svg,
+  .payroll-action-btn svg,
+  .piutang-action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+    fill: currentColor !important;
+    pointer-events: none !important;
+  }
+
+  /* 8. Unified Floating Action Menu */
+  .kb-action-menu,
+  .pnd-action-menu,
+  .budget-action-menu,
+  .mutasi-action-menu,
+  .alokasi-action-menu,
+  .piutang-action-menu,
+  .aset-action-menu,
+  .pajak-action-menu,
+  .payroll-action-menu {
+    position: fixed !important;
+    z-index: 2147483000 !important;
+    min-width: 145px !important;
+    padding: 6px !important;
+    border: 1px solid rgba(0, 0, 0, .08) !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .14) !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-action-menu.is-open,
+  .kb-action-menu.is-active,
+  .pnd-action-menu.is-open,
+  .pnd-action-menu.is-active,
+  .budget-action-menu.is-open,
+  .budget-action-menu.is-active,
+  .mutasi-action-menu.is-open,
+  .mutasi-action-menu.is-active,
+  .alokasi-action-menu.is-open,
+  .alokasi-action-menu.is-active,
+  .piutang-action-menu.is-open,
+  .piutang-action-menu.is-active,
+  .aset-action-menu.is-open,
+  .aset-action-menu.is-active,
+  .pajak-action-menu.is-open,
+  .pajak-action-menu.is-active,
+  .payroll-action-menu.is-open,
+  .payroll-action-menu.is-active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+</style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +1817,1530 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <!-- ===== MAIN PANEL ===== -->
+      <section class="budget-panel">
+          <div class="budget-panel-accent"></div>
+
+          <!-- ===== TOOLBAR (100% PERSIS SCREENSHOT 1 & 2) ===== -->
+          <div class="budget-toolbar">
+            <div class="toolbar-left-group">
+              
+              <!-- 1. Tombol Filter Funnel Popover -->
+              <div class="filter-popover-wrap">
+                <button id="btnFilter" class="btn-toolbar-icon" type="button" aria-label="Filter Budget vs Actual" title="Filter Budget vs Actual">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                  </svg>
+                </button>
+
+                <!-- Popover Filter Content -->
+                <div id="filterDropdown" class="budget-filter-dropdown" role="dialog" aria-modal="false">
+                  <span class="filter-group-label">Divisi</span>
+                  <div class="filter-select-box" id="boxFilterDivisi">
+                    <input type="text" class="filter-select-input" id="filterDivisi" placeholder="Pilih Divisi" autocomplete="off" />
+                    <span class="filter-select-arrow" id="arrowFilterDivisi">
+                      <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                    <div class="filter-options-list" id="listFilterDivisi"></div>
+                  </div>
+
+                  <span class="filter-group-label">Status Budget</span>
+                  <div class="filter-select-box" id="boxFilterStatus">
+                    <input type="text" class="filter-select-input" id="filterStatus" placeholder="Pilih Status" autocomplete="off" />
+                    <span class="filter-select-arrow" id="arrowFilterStatus">
+                      <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                    <div class="filter-options-list" id="listFilterStatus"></div>
+                  </div>
+
+                  <span class="filter-group-label">Kelompok COA</span>
+                  <div class="filter-select-box" id="boxFilterKelompok">
+                    <input type="text" class="filter-select-input" id="filterKelompok" placeholder="Pilih Kelompok COA" autocomplete="off" />
+                    <span class="filter-select-arrow" id="arrowFilterKelompok">
+                      <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                    <div class="filter-options-list" id="listFilterKelompok"></div>
+                  </div>
+
+                  <div class="filter-actions-row">
+                    <button type="button" class="btn-filter-reset" id="btnResetFilter">Riset</button>
+                    <button type="button" class="btn-filter-apply" id="btnApplyFilter">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Tombol Kalender Popover (Dual Month Range) -->
+              <div class="filter-popover-wrap">
+                <button id="btnCalendar" class="btn-toolbar-icon" type="button" aria-label="Rentang Tanggal" title="Pilih Rentang Tanggal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </button>
+
+                <!-- Popover Dual Month Calendar -->
+                <div id="calendarDropdown" class="budget-calendar-popover" role="dialog" aria-modal="false">
+                  <div class="calendar-popover-content">
+                    <div class="calendar-presets-col">
+                      <button type="button" class="calendar-preset-btn" data-preset="today">Hari Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-month">Bulan Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="last-month">Bulan Lalu</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="this-year">Tahun Ini</button>
+                      <button type="button" class="calendar-preset-btn" data-preset="reset">Semua Tanggal</button>
+                    </div>
+                    <div class="calendar-months-col">
+                      <div class="month-box">
+                        <div class="month-header">
+                          <button type="button" class="month-nav-btn" id="btnPrevMonth">&lt;</button>
+                          <span id="labelMonth1">September 2026</span>
+                          <div style="width: 24px;"></div>
+                        </div>
+                        <div class="month-grid" id="gridMonth1"></div>
+                      </div>
+                      <div class="month-box">
+                        <div class="month-header">
+                          <div style="width: 24px;"></div>
+                          <span id="labelMonth2">Oktober 2026</span>
+                          <button type="button" class="month-nav-btn" id="btnNextMonth">&gt;</button>
+                        </div>
+                        <div class="month-grid" id="gridMonth2"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="calendar-popover-footer">
+                    <span class="calendar-range-text" id="calendarRangeDisplay">Semua Tanggal</span>
+                    <div class="calendar-footer-actions">
+                      <button type="button" class="btn-cal-cancel" id="btnCancelCalendar">Batal</button>
+                      <button type="button" class="btn-cal-apply" id="btnApplyCalendar">Terapkan</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Tombol Export Excel (Official Microsoft Excel Green Icon) -->
+              <button id="btnExportExcel" class="btn-toolbar-icon btn-excel" type="button" aria-label="Export Excel" title="Download Excel (.xlsx)" onclick="window.exportBudgetVsActualExcel && window.exportBudgetVsActualExcel()">
+                <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                  <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                  <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                  <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+
+              <!-- 4. Search Input (Pill Shape) -->
+              <div class="budget-search-wrapper">
+                <svg class="budget-search-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" class="budget-search-input" id="budgetSearch" placeholder="Cari..." />
+              </div>
+            </div>
+
+            <!-- Tombol Tambah (Sisi Kanan - Konsisten: background #28a5de, hover #0076C5, font Outfit 13px bold, + Tambah) -->
+            <button type="button" class="btn-tambah-budget" id="btnTambahBudget">+ Tambah</button>
+          </div>
+
+          <!-- Table Container (Headers Sesuai Screenshot 2: 14 Kolom) -->
+          <div class="budget-table-wrap">
+            <table class="budget-table" id="budgetTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px; text-align: center;">#</th>
+                  <th>Periode</th>
+                  <th>Kode COA</th>
+                  <th>Nama Akun COA</th>
+                  <th>Divisi</th>
+                  <th style="text-align: right;">Budget</th>
+                  <th style="text-align: right;">Actual Beban</th>
+                  <th style="text-align: right;">Sisa Budget</th>
+                  <th style="text-align: center;">% Terpakai</th>
+                  <th style="text-align: center;">Status</th>
+                  <th>Divisi Pengecualian</th>
+                  <th>Kelompok COA</th>
+                  <th style="text-align: center;">Status COA</th>
+                  <th class="col-sticky-action">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="budgetTableBody">
+                <!-- Diisi via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+      </section>
+    </main>
   </div>
 
+  
+  <!-- ===== MODAL TAMBAH / EDIT BUDGET VS ACTUAL (PERSIS SCREENSHOT 1 & 2) ===== -->
+  <div id="budgetCrudModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="crudModalTitle">
+    <div class="budget-modal-box">
+      <div class="modal-inner-padding">
+        
+        <!-- Blue Accent Line Inset -->
+        <div class="modal-accent-line"></div>
+
+        <!-- Header: Title & Close [x] -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="crudModalTitle">
+            <em>Tambah</em> Budget vs Actual
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseCrudX" aria-label="Tutup">x</button>
+        </div>
+
+        <!-- Dashed Divider -->
+        <div class="modal-divider-dashed"></div>
+
+        <!-- Form 12 Fields Grid (3 Kolom x 4 Baris) -->
+        <form id="formBudgetCrud" autocomplete="off">
+          <div class="budget-form-grid">
+            
+            <!-- Row 1, Col 1: Periode -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudPeriode">Periode</label>
+              <input type="text" id="crudPeriode" class="modal-field-input" placeholder="Tambah Periode" required />
+            </div>
+
+            <!-- Row 1, Col 2: Kode COA (Dropdown Popover) -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKodeCOA">Kode COA</label>
+              <div class="modal-select-wrap" id="wrapCoaModal">
+                <input type="text" id="crudKodeCOA" class="modal-field-input" placeholder="Pilih COA" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <span class="modal-select-arrow">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; stroke-width: 2.2; stroke: currentColor; fill: none;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="modal-dropdown-options" id="menuCoaModal">
+                  <!-- Diisi secara dinamis via JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 1, Col 3: Nama Akun COA -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudNamaAkunCOA">Nama Akun COA</label>
+              <input type="text" id="crudNamaAkunCOA" class="modal-field-input" placeholder="Nama Akun COA" required />
+            </div>
+
+            <!-- Row 2, Col 1: Divisi -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudDivisi">Divisi</label>
+              <input type="text" id="crudDivisi" class="modal-field-input" placeholder="Divisi" required />
+            </div>
+
+            <!-- Row 2, Col 2: Budget -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudBudget">Budget</label>
+              <input type="text" id="crudBudget" class="modal-field-input" placeholder="Rp -" required />
+            </div>
+
+            <!-- Row 2, Col 3: Actual Beban -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudActualBeban">Actual Beban</label>
+              <input type="text" id="crudActualBeban" class="modal-field-input" placeholder="Rp. -" required />
+            </div>
+
+            <!-- Row 3, Col 1: Sisa Budget -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudSisaBudget">Sisa Budget</label>
+              <input type="text" id="crudSisaBudget" class="modal-field-input" placeholder="Rp. -" readonly />
+            </div>
+
+            <!-- Row 3, Col 2: % Terpakai -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudPersenTerpakai">% Terpakai</label>
+              <input type="text" id="crudPersenTerpakai" class="modal-field-input" placeholder="0%" readonly />
+            </div>
+
+            <!-- Row 3, Col 3: Status -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudStatus">Status</label>
+              <input type="text" id="crudStatus" class="modal-field-input" placeholder="Status" required />
+            </div>
+
+            <!-- Row 4, Col 1: Divisi Pengecualian -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudDivisiPengecualian">Divisi Pengecualian</label>
+              <input type="text" id="crudDivisiPengecualian" class="modal-field-input" placeholder="Divisi Pengecualian" />
+            </div>
+
+            <!-- Row 4, Col 2: Kelompok COA -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudKelompokCOA">Kelompok COA</label>
+              <input type="text" id="crudKelompokCOA" class="modal-field-input" placeholder="Kelompok COA" required />
+            </div>
+
+            <!-- Row 4, Col 3: Status COA -->
+            <div class="modal-field">
+              <label class="modal-field-label" for="crudStatusCOA">Status COA</label>
+              <input type="text" id="crudStatusCOA" class="modal-field-input" placeholder="Status COA" required />
+            </div>
+
+          </div>
+
+          <!-- Footer Action: Tombol Simpan -->
+          <div class="modal-footer-row">
+            <button type="submit" class="btn-modal-outline" id="btnSimpanBudget">Simpan</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL LIHAT DETAIL BUDGET VS ACTUAL (PERSIS SCREENSHOT 3) ===== -->
+  <div id="budgetDetailModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+    <div class="budget-modal-box">
+      <div class="modal-inner-padding">
+        
+        <!-- Blue Accent Line Inset -->
+        <div class="modal-accent-line"></div>
+
+        <!-- Header: Title & Close [x] -->
+        <div class="modal-header-row">
+          <h2 class="modal-title-text" id="detailModalTitle">
+            <em>Lihat</em> Pengurangan & Beban
+          </h2>
+          <button type="button" class="btn-modal-close-x" id="btnCloseDetailX" aria-label="Tutup">x</button>
+        </div>
+
+        <!-- Dashed Divider -->
+        <div class="modal-divider-dashed"></div>
+
+        <!-- 12 Fields Grid (Display Value Sesuai Gambar 3) -->
+        <div class="budget-form-grid">
+          
+          <!-- 1. Periode -->
+          <div class="modal-field">
+            <label class="modal-field-label">Periode</label>
+            <div class="modal-field-value" id="detailPeriode">-</div>
+          </div>
+
+          <!-- 2. Kode COA -->
+          <div class="modal-field">
+            <label class="modal-field-label">Kode COA</label>
+            <div class="modal-field-value" id="detailKodeCOA">-</div>
+          </div>
+
+          <!-- 3. Nama Akun COA -->
+          <div class="modal-field">
+            <label class="modal-field-label">Nama Akun COA</label>
+            <div class="modal-field-value" id="detailNamaAkunCOA">-</div>
+          </div>
+
+          <!-- 4. Divisi -->
+          <div class="modal-field">
+            <label class="modal-field-label">Divisi</label>
+            <div class="modal-field-value" id="detailDivisi">-</div>
+          </div>
+
+          <!-- 5. Budget -->
+          <div class="modal-field">
+            <label class="modal-field-label">Budget</label>
+            <div class="modal-field-value" id="detailBudget">-</div>
+          </div>
+
+          <!-- 6. Actual Beban -->
+          <div class="modal-field">
+            <label class="modal-field-label">Actual Beban</label>
+            <div class="modal-field-value" id="detailActualBeban">-</div>
+          </div>
+
+          <!-- 7. Sisa Budget -->
+          <div class="modal-field">
+            <label class="modal-field-label">Sisa Budget</label>
+            <div class="modal-field-value" id="detailSisaBudget">-</div>
+          </div>
+
+          <!-- 8. % Terpakai -->
+          <div class="modal-field">
+            <label class="modal-field-label">% Terpakai</label>
+            <div class="modal-field-value" id="detailPersenTerpakai">-</div>
+          </div>
+
+          <!-- 9. Status -->
+          <div class="modal-field">
+            <label class="modal-field-label">Status</label>
+            <div class="modal-field-value" id="detailStatus">-</div>
+          </div>
+
+          <!-- 10. Divisi Pengecualian -->
+          <div class="modal-field">
+            <label class="modal-field-label">Divisi Pengecualian</label>
+            <div class="modal-field-value" id="detailDivisiPengecualian">-</div>
+          </div>
+
+          <!-- 11. Kelompok COA -->
+          <div class="modal-field">
+            <label class="modal-field-label">Kelompok COA</label>
+            <div class="modal-field-value" id="detailKelompokCOA">-</div>
+          </div>
+
+          <!-- 12. Status COA -->
+          <div class="modal-field">
+            <label class="modal-field-label">Status COA</label>
+            <div class="modal-field-value" id="detailStatusCOA">-</div>
+          </div>
+
+        </div>
+
+        <!-- Footer Action: Tombol Keluar -->
+        <div class="modal-footer-row">
+          <button type="button" class="btn-modal-outline" id="btnKeluarBudgetDetail">Keluar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Action Menu (⋮ Button) -->
+  <div id="budgetActionMenu" class="budget-action-menu">
+    <button type="button" data-action="view">
+      <span class="budget-action-icon">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat Detail</span>
+    </button>
+    <button type="button" data-action="edit">
+      <span class="budget-action-icon">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" data-action="delete" class="is-danger">
+      <span class="budget-action-icon is-danger">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      'use strict';
+
+      /* ===== DATA MODEL BUDGET VS ACTUAL ===== */
+      const STORAGE_KEY = 'accounting_budget_vs_actual_data';
+
+      const defaultBudgetData = [
+        {
+          id: 1,
+          periode: 'Sep 2026',
+          kodeCOA: '5-10100',
+          namaAkunCOA: 'Beban Gaji & Upah Karyawan',
+          divisi: 'Operasional',
+          budget: 65000000,
+          actualBeban: 62000000,
+          sisaBudget: 3000000,
+          persenTerpakai: 95.38,
+          status: 'Near Budget',
+          divisiPengecualian: '-',
+          kelompokCOA: 'Beban Operasional',
+          statusCOA: 'Aktif'
+        },
+        {
+          id: 2,
+          periode: 'Sep 2026',
+          kodeCOA: '5-10200',
+          namaAkunCOA: 'Beban Pemasaran & Media Iklan',
+          divisi: 'Marketing',
+          budget: 35000000,
+          actualBeban: 28500000,
+          sisaBudget: 6500000,
+          persenTerpakai: 81.43,
+          status: 'Under Budget',
+          divisiPengecualian: '-',
+          kelompokCOA: 'Beban Pemasaran',
+          statusCOA: 'Aktif'
+        },
+        {
+          id: 3,
+          periode: 'Sep 2026',
+          kodeCOA: '5-10300',
+          namaAkunCOA: 'Beban Sewa Gedung & Kantor',
+          divisi: 'Finance',
+          budget: 20000000,
+          actualBeban: 20000000,
+          sisaBudget: 0,
+          persenTerpakai: 100.00,
+          status: 'Near Budget',
+          divisiPengecualian: '-',
+          kelompokCOA: 'Beban Umum & Administrasi',
+          statusCOA: 'Aktif'
+        },
+        {
+          id: 4,
+          periode: 'Sep 2026',
+          kodeCOA: '5-10400',
+          namaAkunCOA: 'Beban Cloud Server & SaaS IT',
+          divisi: 'IT / Tech',
+          budget: 15000000,
+          actualBeban: 16800000,
+          sisaBudget: -1800000,
+          persenTerpakai: 112.00,
+          status: 'Over Budget',
+          divisiPengecualian: 'Dev Special',
+          kelompokCOA: 'Beban Operasional',
+          statusCOA: 'Aktif'
+        },
+        {
+          id: 5,
+          periode: 'Sep 2026',
+          kodeCOA: '5-10500',
+          namaAkunCOA: 'Beban Perlengkapan & ATK Kantor',
+          divisi: 'HR / GA',
+          budget: 8000000,
+          actualBeban: 5200000,
+          sisaBudget: 2800000,
+          persenTerpakai: 65.00,
+          status: 'Under Budget',
+          divisiPengecualian: '-',
+          kelompokCOA: 'Beban Umum & Administrasi',
+          statusCOA: 'Aktif'
+        },
+        {
+          id: 6,
+          periode: 'Sep 2026',
+          kodeCOA: '5-10600',
+          namaAkunCOA: 'Beban Produksi Konten Kreatif',
+          divisi: 'Creative',
+          budget: 18000000,
+          actualBeban: 14200000,
+          sisaBudget: 3800000,
+          persenTerpakai: 78.89,
+          status: 'Under Budget',
+          divisiPengecualian: '-',
+          kelompokCOA: 'Beban Pemasaran',
+          statusCOA: 'Aktif'
+        },
+        {
+          id: 7,
+          periode: 'Sep 2026',
+          kodeCOA: '5-10700',
+          namaAkunCOA: 'Beban Listrik, Air & Utilitas',
+          divisi: 'Operasional',
+          budget: 6000000,
+          actualBeban: 6450000,
+          sisaBudget: -450000,
+          persenTerpakai: 107.50,
+          status: 'Over Budget',
+          divisiPengecualian: '-',
+          kelompokCOA: 'Beban Umum & Administrasi',
+          statusCOA: 'Aktif'
+        }
+      ];
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.error('Gagal memuat data budget vs actual:', e);
+        }
+        return defaultBudgetData;
+      }
+
+      function saveData(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.error('Gagal menyimpan data budget vs actual:', e);
+        }
+      }
+
+      let budgetData = loadData();
+
+      // Filter State
+      let filterState = {
+        search: '',
+        divisi: '',
+        status: '',
+        kelompok: '',
+        startDate: '',
+        endDate: ''
+      };
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('budgetTableBody');
+      const searchInput = document.getElementById('budgetSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+      const btnTambahBudget = document.getElementById('btnTambahBudget');
+
+      // Action Menu
+      const actionMenu = document.getElementById('budgetActionMenu');
+      let currentActionId = null;
+
+      // Filter Funnel Popover Elements
+      const btnFilter = document.getElementById('btnFilter');
+      const filterDropdown = document.getElementById('filterDropdown');
+
+      const filterDivisi = document.getElementById('filterDivisi');
+      const boxFilterDivisi = document.getElementById('boxFilterDivisi');
+      const listFilterDivisi = document.getElementById('listFilterDivisi');
+
+      const filterStatus = document.getElementById('filterStatus');
+      const boxFilterStatus = document.getElementById('boxFilterStatus');
+      const listFilterStatus = document.getElementById('listFilterStatus');
+
+      const filterKelompok = document.getElementById('filterKelompok');
+      const boxFilterKelompok = document.getElementById('boxFilterKelompok');
+      const listFilterKelompok = document.getElementById('listFilterKelompok');
+
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      // Calendar Filter Elements
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const labelMonth1 = document.getElementById('labelMonth1');
+      const labelMonth2 = document.getElementById('labelMonth2');
+      const gridMonth1 = document.getElementById('gridMonth1');
+      const gridMonth2 = document.getElementById('gridMonth2');
+      const btnPrevMonth = document.getElementById('btnPrevMonth');
+      const btnNextMonth = document.getElementById('btnNextMonth');
+      const calendarRangeDisplay = document.getElementById('calendarRangeDisplay');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+
+      /* ===== FORMATTING UTILITIES ===== */
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatRupiahSpasi(num) {
+        const val = Math.round(Number(num) || 0);
+        if (val < 0) {
+          return '-Rp ' + Math.abs(val).toLocaleString('id-ID');
+        }
+        return 'Rp ' + val.toLocaleString('id-ID');
+      }
+
+      function getStatusBadge(status) {
+        const s = (status || '').toLowerCase();
+        if (s.includes('under')) {
+          return '<span class="badge-status badge-under">Under Budget</span>';
+        }
+        if (s.includes('near') || s.includes('warning')) {
+          return '<span class="badge-status badge-near">Near Budget</span>';
+        }
+        if (s.includes('over')) {
+          return '<span class="badge-status badge-over">Over Budget</span>';
+        }
+        return '<span class="badge-status badge-under">' + escapeHtml(status) + '</span>';
+      }
+
+      function getStatusCOABadge(status) {
+        const s = (status || '').toLowerCase();
+        if (s === 'aktif') {
+          return '<span class="badge-status badge-coa-aktif">Aktif</span>';
+        }
+        return '<span class="badge-status badge-coa-nonaktif">Non-Aktif</span>';
+      }
+
+      function getPercentBadge(percent) {
+        const p = parseFloat(percent) || 0;
+        let colorClass = 'percent-safe';
+        if (p >= 100) {
+          colorClass = 'percent-danger';
+        } else if (p >= 85) {
+          colorClass = 'percent-warning';
+        }
+        return '<span class="percent-badge ' + colorClass + '">' + p.toFixed(1) + '%</span>';
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        return budgetData.filter(function (item) {
+          if (filterState.search) {
+            const q = filterState.search.toLowerCase();
+            const matchPeriode = (item.periode || '').toLowerCase().includes(q);
+            const matchKode = (item.kodeCOA || '').toLowerCase().includes(q);
+            const matchNama = (item.namaAkunCOA || '').toLowerCase().includes(q);
+            const matchDiv = (item.divisi || '').toLowerCase().includes(q);
+            const matchKel = (item.kelompokCOA || '').toLowerCase().includes(q);
+            if (!matchPeriode && !matchKode && !matchNama && !matchDiv && !matchKel) return false;
+          }
+
+          if (filterState.divisi && filterState.divisi !== 'Semua Divisi') {
+            if ((item.divisi || '').toLowerCase() !== filterState.divisi.toLowerCase()) return false;
+          }
+
+          if (filterState.status && filterState.status !== 'Semua Status') {
+            if ((item.status || '').toLowerCase() !== filterState.status.toLowerCase()) return false;
+          }
+
+          if (filterState.kelompok && filterState.kelompok !== 'Semua Kelompok') {
+            if ((item.kelompokCOA || '').toLowerCase() !== filterState.kelompok.toLowerCase()) return false;
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== RENDER TABEL (14 KOLOM SESUAI GAMBAR 2) ===== */
+      function renderTable() {
+        if (!tableBody) return;
+        const rows = getFilteredData();
+
+        if (rows.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="14" style="text-align: center; padding: 40px; color: #94a3b8; font-style: italic;">
+                Tidak ada data Budget vs Actual yang ditemukan.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        let html = '';
+        rows.forEach(function (item, idx) {
+          const sisa = Number(item.budget || 0) - Number(item.actualBeban || 0);
+          const sisaClass = sisa < 0 ? 'color: #dc2626; font-weight: 600;' : 'color: #16a34a; font-weight: 500;';
+
+          html += `
+            <tr data-id="${item.id}">
+              <td style="text-align: center; color: #94a3b8;">${idx + 1}</td>
+              <td style="font-weight: 500; color: #1e293b;">${escapeHtml(item.periode)}</td>
+              <td><span style="font-family: monospace; font-size: 12.5px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0284c7; font-weight: 600;">${escapeHtml(item.kodeCOA)}</span></td>
+              <td style="font-weight: 500; color: #0f172a;">${escapeHtml(item.namaAkunCOA)}</td>
+              <td><span style="color: #475569; font-weight: 500;">${escapeHtml(item.divisi)}</span></td>
+              <td style="text-align: right; font-weight: 600; color: #1e293b;">${formatRupiahSpasi(item.budget)}</td>
+              <td style="text-align: right; font-weight: 600; color: #475569;">${formatRupiahSpasi(item.actualBeban)}</td>
+              <td style="text-align: right; ${sisaClass}">${formatRupiahSpasi(sisa)}</td>
+              <td style="text-align: center;">${getPercentBadge(item.persenTerpakai)}</td>
+              <td style="text-align: center;">${getStatusBadge(item.status)}</td>
+              <td style="color: #64748b;">${escapeHtml(item.divisiPengecualian || '-')}</td>
+              <td><span style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 11.5px; color: #334155;">${escapeHtml(item.kelompokCOA)}</span></td>
+              <td style="text-align: center;">${getStatusCOABadge(item.statusCOA)}</td>
+              <td class="col-sticky-action">
+                <button type="button" class="btn-action-trigger" data-action-toggle="${item.id}" aria-label="Menu Aksi" title="Opsi"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg></button>
+              </td>
+            </tr>
+          `;
+        });
+
+        tableBody.innerHTML = html;
+      }
+
+      /* ===== FLOATING ACTION MENU ===== */
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+          actionMenu.classList.remove('is-active');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if ((actionMenu.classList.contains('is-open') || actionMenu.classList.contains('is-active')) && String(currentActionId) === String(id)) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+        actionMenu.classList.add('is-active');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = actionMenu.offsetWidth || 145;
+        const menuHeight = actionMenu.offsetHeight || 130;
+
+        let left = rect.left - menuWidth + 24;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener('click', function (event) {
+          const toggle = event.target.closest('[data-action-toggle]');
+          if (toggle) {
+            event.preventDefault();
+            event.stopPropagation();
+            openActionMenu(toggle);
+            return;
+          }
+        });
+      }
+
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-action]');
+          if (!btn || !currentActionId) return;
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          const action = btn.getAttribute('data-action');
+          const targetId = currentActionId;
+          const targetItem = budgetData.find(function (x) { return String(x.id) === String(targetId); });
+          closeActionMenus();
+
+          if (!targetItem) {
+            console.warn('Target item not found for id:', targetId);
+            return;
+          }
+
+          if (action === 'view') {
+            openDetailBudgetModal(targetItem);
+          } else if (action === 'edit') {
+            openEditBudgetModal(targetItem);
+          } else if (action === 'delete') {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                title: 'Hapus Data Budget?',
+                html: 'Yakin ingin menghapus budget <b>' + escapeHtml(targetItem.namaAkunCOA) + '</b> (' + escapeHtml(targetItem.divisi) + ')?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+              }).then(function (result) {
+                if (result.isConfirmed) {
+                  budgetData = budgetData.filter(function (x) { return String(x.id) !== String(targetItem.id); });
+                  saveData(budgetData);
+                  renderTable();
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Terhapus',
+                    text: 'Data budget berhasil dihapus.',
+                    timer: 1400,
+                    showConfirmButton: false
+                  });
+                }
+              });
+            }
+          }
+        });
+      }
+
+      /* ==========================================================================
+         CRUD OPERATIONS & MODALS (MATCHING USER SCREENSHOTS 1, 2, 3)
+         ========================================================================== */
+
+      // Modal Elements
+      const budgetCrudModal = document.getElementById('budgetCrudModal');
+      const budgetDetailModal = document.getElementById('budgetDetailModal');
+      const formBudgetCrud = document.getElementById('formBudgetCrud');
+      const crudModalTitle = document.getElementById('crudModalTitle');
+      const btnCloseCrudX = document.getElementById('btnCloseCrudX');
+      const btnCloseDetailX = document.getElementById('btnCloseDetailX');
+      const btnKeluarBudgetDetail = document.getElementById('btnKeluarBudgetDetail');
+
+      // Form Input Elements
+      const crudPeriode = document.getElementById('crudPeriode');
+      const crudKodeCOA = document.getElementById('crudKodeCOA');
+      const crudNamaAkunCOA = document.getElementById('crudNamaAkunCOA');
+      const crudDivisi = document.getElementById('crudDivisi');
+      const crudBudget = document.getElementById('crudBudget');
+      const crudActualBeban = document.getElementById('crudActualBeban');
+      const crudSisaBudget = document.getElementById('crudSisaBudget');
+      const crudPersenTerpakai = document.getElementById('crudPersenTerpakai');
+      const crudStatus = document.getElementById('crudStatus');
+      const crudDivisiPengecualian = document.getElementById('crudDivisiPengecualian');
+      const crudKelompokCOA = document.getElementById('crudKelompokCOA');
+      const crudStatusCOA = document.getElementById('crudStatusCOA');
+
+      // Dropdown Popover Elements for COA in Modal
+      const wrapCoaModal = document.getElementById('wrapCoaModal');
+      const menuCoaModal = document.getElementById('menuCoaModal');
+
+      // Detail Modal Display Elements
+      const detailPeriode = document.getElementById('detailPeriode');
+      const detailKodeCOA = document.getElementById('detailKodeCOA');
+      const detailNamaAkunCOA = document.getElementById('detailNamaAkunCOA');
+      const detailDivisi = document.getElementById('detailDivisi');
+      const detailBudget = document.getElementById('detailBudget');
+      const detailActualBeban = document.getElementById('detailActualBeban');
+      const detailSisaBudget = document.getElementById('detailSisaBudget');
+      const detailPersenTerpakai = document.getElementById('detailPersenTerpakai');
+      const detailStatus = document.getElementById('detailStatus');
+      const detailDivisiPengecualian = document.getElementById('detailDivisiPengecualian');
+      const detailKelompokCOA = document.getElementById('detailKelompokCOA');
+      const detailStatusCOA = document.getElementById('detailStatusCOA');
+
+      let currentEditingId = null;
+
+      // Master List of COA Items (Sesuai Gambar 2 Screenshot User)
+      const masterCOAList = [
+        { code: '5001', name: 'Beban Gaji & Upah', group: 'Beban Operasional', status: 'OK' },
+        { code: '5002', name: 'Beban Operasional Kantor', group: 'Beban Operasional', status: 'OK' },
+        { code: '5003', name: 'Beban Pemasaran & Iklan', group: 'Beban Pemasaran', status: 'OK' },
+        { code: '5004', name: 'Beban Konsumsi & Lembur', group: 'Beban Operasional', status: 'OK' },
+        { code: '5005', name: 'Beban Perjalanan Dinas', group: 'Beban Operasional', status: 'OK' },
+        { code: '5006', name: 'Beban Perlengkapan & Utilitas', group: 'Beban Operasional', status: 'OK' },
+        { code: '5007', name: 'Beban Sewa', group: 'Beban', status: 'OK' },
+        { code: '5008', name: 'Beban Pemeliharaan & Servis', group: 'Beban Operasional', status: 'OK' },
+        { code: '5009', name: 'Beban Komunikasi & Internet', group: 'Beban Operasional', status: 'OK' },
+        { code: '5010', name: 'Beban Pajak & Retribusi', group: 'Beban Umum & Administrasi', status: 'OK' },
+        { code: '5011', name: 'Beban Administrasi Bank', group: 'Beban Umum & Administrasi', status: 'OK' }
+      ];
+
+      // Render Dropdown COA List inside Modal (Gambar 2)
+      function renderCoaDropdownList() {
+        if (!menuCoaModal) return;
+        menuCoaModal.innerHTML = '';
+        masterCOAList.forEach(function (coa) {
+          const opt = document.createElement('div');
+          opt.className = 'modal-opt-item';
+          opt.setAttribute('data-code', coa.code);
+          opt.innerHTML = `
+            <span><b>${coa.code}</b> - ${coa.name}</span>
+            <span style="font-size: 11.5px; color: #64748b; font-weight: 500;">${coa.group}</span>
+          `;
+          opt.addEventListener('click', function (e) {
+            e.stopPropagation();
+            crudKodeCOA.value = coa.code;
+            crudNamaAkunCOA.value = coa.name;
+            crudKelompokCOA.value = coa.group;
+            crudStatusCOA.value = coa.status;
+            wrapCoaModal.classList.remove('is-open');
+          });
+          menuCoaModal.appendChild(opt);
+        });
+      }
+      renderCoaDropdownList();
+
+      if (wrapCoaModal && crudKodeCOA) {
+        crudKodeCOA.addEventListener('click', function (e) {
+          e.stopPropagation();
+          wrapCoaModal.classList.toggle('is-open');
+        });
+      }
+
+      // Close dropdown when clicked outside
+      document.addEventListener('click', function (e) {
+        if (wrapCoaModal && !wrapCoaModal.contains(e.target)) {
+          wrapCoaModal.classList.remove('is-open');
+        }
+      });
+
+      // Number & Currency Helpers
+      function parseNumber(val) {
+        if (!val) return 0;
+        const cleaned = String(val).replace(/[^0-9.-]/g, '');
+        return parseFloat(cleaned) || 0;
+      }
+
+      function formatRupiahInput(num) {
+        if (isNaN(num)) return 'Rp -';
+        return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+      }
+
+      // Auto Calculation of Sisa Budget & % Terpakai
+      function calculateBudgetFields() {
+        const b = parseNumber(crudBudget.value);
+        const a = parseNumber(crudActualBeban.value);
+        const sisa = b - a;
+
+        if (crudBudget.value.trim() !== '') {
+          crudSisaBudget.value = formatRupiahInput(sisa);
+        } else {
+          crudSisaBudget.value = 'Rp. -';
+        }
+
+        if (b > 0) {
+          const pct = ((a / b) * 100).toFixed(1);
+          crudPersenTerpakai.value = pct + '%';
+
+          if (!crudStatus.dataset.userEdited) {
+            if (a > b) {
+              crudStatus.value = 'Over Budget';
+            } else if (a >= b * 0.85) {
+              crudStatus.value = 'Waspada';
+            } else {
+              crudStatus.value = 'Dalam Budget';
+            }
+          }
+        } else {
+          crudPersenTerpakai.value = '0%';
+          if (!crudStatus.dataset.userEdited) {
+            crudStatus.value = 'Dalam Budget';
+          }
+        }
+      }
+
+      if (crudBudget) {
+        crudBudget.addEventListener('input', calculateBudgetFields);
+        crudBudget.addEventListener('blur', function () {
+          const val = parseNumber(this.value);
+          if (val > 0) this.value = formatRupiahInput(val);
+        });
+      }
+
+      if (crudActualBeban) {
+        crudActualBeban.addEventListener('input', calculateBudgetFields);
+        crudActualBeban.addEventListener('blur', function () {
+          const val = parseNumber(this.value);
+          if (val >= 0 && this.value.trim() !== '') this.value = formatRupiahInput(val);
+        });
+      }
+
+      if (crudStatus) {
+        crudStatus.addEventListener('input', function () {
+          this.dataset.userEdited = 'true';
+        });
+      }
+
+      // Open Modal Tambah
+      function openAddBudgetModal() {
+        currentEditingId = null;
+        if (formBudgetCrud) formBudgetCrud.reset();
+        delete crudStatus.dataset.userEdited;
+        crudModalTitle.innerHTML = '<em>Tambah</em> Budget vs Actual';
+
+        // Pre-fill default values matching Gambar 1
+        crudPeriode.value = '';
+        crudKodeCOA.value = '';
+        crudNamaAkunCOA.value = '';
+        crudDivisi.value = '';
+        crudBudget.value = '';
+        crudActualBeban.value = '';
+        crudSisaBudget.value = '';
+        crudPersenTerpakai.value = '0%';
+        crudStatus.value = '';
+        crudDivisiPengecualian.value = '';
+        crudKelompokCOA.value = '';
+        crudStatusCOA.value = '';
+
+        if (budgetCrudModal) {
+          budgetCrudModal.classList.add('is-active');
+        }
+      }
+
+      // Open Modal Edit
+      function openEditBudgetModal(item) {
+        if (!item) return;
+        currentEditingId = item.id;
+        if (formBudgetCrud) formBudgetCrud.reset();
+        crudModalTitle.innerHTML = '<em>Edit</em> Budget vs Actual';
+
+        crudPeriode.value = item.periode || '';
+        crudKodeCOA.value = item.kodeCOA || '';
+        crudNamaAkunCOA.value = item.namaAkunCOA || '';
+        crudDivisi.value = item.divisi || '';
+        crudBudget.value = formatRupiahInput(item.budget);
+        crudActualBeban.value = formatRupiahInput(item.actualBeban);
+        crudSisaBudget.value = formatRupiahInput(item.sisaBudget);
+        crudPersenTerpakai.value = (typeof item.persenTerpakai === 'number' ? item.persenTerpakai.toFixed(1) : item.persenTerpakai) + '%';
+        crudStatus.value = item.status || 'Dalam Budget';
+        crudStatus.dataset.userEdited = 'true';
+        crudDivisiPengecualian.value = item.divisiPengecualian || '-';
+        crudKelompokCOA.value = item.kelompokCOA || '';
+        crudStatusCOA.value = item.statusCOA || 'OK';
+
+        if (budgetCrudModal) {
+          budgetCrudModal.classList.add('is-active');
+        }
+      }
+
+      // Open Modal Lihat Detail (Gambar 3)
+      function openDetailBudgetModal(item) {
+        if (!item) return;
+        detailPeriode.textContent = item.periode || '-';
+        detailKodeCOA.textContent = item.kodeCOA || '-';
+        detailNamaAkunCOA.textContent = item.namaAkunCOA || '-';
+        detailDivisi.textContent = item.divisi || '-';
+        detailBudget.textContent = formatRupiahInput(item.budget);
+        detailActualBeban.textContent = formatRupiahInput(item.actualBeban);
+        detailSisaBudget.textContent = formatRupiahInput(item.sisaBudget);
+        const pctStr = (typeof item.persenTerpakai === 'number' ? item.persenTerpakai.toFixed(1) : item.persenTerpakai) + '%';
+        detailPersenTerpakai.textContent = pctStr;
+        detailStatus.textContent = item.status || 'Dalam Budget';
+        detailDivisiPengecualian.textContent = item.divisiPengecualian || '-';
+        detailKelompokCOA.textContent = item.kelompokCOA || '-';
+        detailStatusCOA.textContent = item.statusCOA || 'OK';
+
+        if (budgetDetailModal) {
+          budgetDetailModal.classList.add('is-active');
+        }
+      }
+
+      // Close Modals
+      function closeBudgetModals() {
+        if (budgetCrudModal) budgetCrudModal.classList.remove('is-active');
+        if (budgetDetailModal) budgetDetailModal.classList.remove('is-active');
+        if (wrapCoaModal) wrapCoaModal.classList.remove('is-open');
+      }
+
+      if (btnCloseCrudX) btnCloseCrudX.addEventListener('click', closeBudgetModals);
+      if (btnCloseDetailX) btnCloseDetailX.addEventListener('click', closeBudgetModals);
+      if (btnKeluarBudgetDetail) btnKeluarBudgetDetail.addEventListener('click', closeBudgetModals);
+
+      [budgetCrudModal, budgetDetailModal].forEach(function (modal) {
+        if (modal) {
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeBudgetModals();
+          });
+        }
+      });
+
+      // Submit Form Tambah / Edit
+      if (formBudgetCrud) {
+        formBudgetCrud.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const bVal = parseNumber(crudBudget.value);
+          const aVal = parseNumber(crudActualBeban.value);
+          const sisaVal = bVal - aVal;
+          const pctVal = bVal > 0 ? parseFloat(((aVal / bVal) * 100).toFixed(1)) : 0;
+
+          const recordData = {
+            periode: crudPeriode.value.trim() || 'Sep 2026',
+            kodeCOA: crudKodeCOA.value.trim() || '5007',
+            namaAkunCOA: crudNamaAkunCOA.value.trim() || 'Beban Operasional',
+            divisi: crudDivisi.value.trim() || 'General',
+            budget: bVal,
+            actualBeban: aVal,
+            sisaBudget: sisaVal,
+            persenTerpakai: pctVal,
+            status: crudStatus.value.trim() || (aVal > bVal ? 'Over Budget' : 'Dalam Budget'),
+            divisiPengecualian: crudDivisiPengecualian.value.trim() || '-',
+            kelompokCOA: crudKelompokCOA.value.trim() || 'Beban',
+            statusCOA: crudStatusCOA.value.trim() || 'OK'
+          };
+
+          if (currentEditingId) {
+            // Update Existing Item
+            const idx = budgetData.findIndex(function (x) { return String(x.id) === String(currentEditingId); });
+            if (idx !== -1) {
+              recordData.id = budgetData[idx].id;
+              budgetData[idx] = recordData;
+            }
+          } else {
+            // Add New Item
+            recordData.id = Date.now();
+            budgetData.unshift(recordData);
+          }
+
+          saveData(budgetData);
+          renderTable();
+          closeBudgetModals();
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'success',
+              title: currentEditingId ? 'Berhasil Diperbarui' : 'Berhasil Disimpan',
+              text: currentEditingId ? 'Data budget vs actual berhasil diubah.' : 'Data budget baru berhasil ditambahkan.',
+              timer: 1500,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+
+      // Connect Toolbar Button Tambah
+      if (btnTambahBudget) {
+        btnTambahBudget.addEventListener('click', function () {
+          openAddBudgetModal();
+        });
+      }
+
+
+      /* ===== REAL-TIME SEARCH ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          filterState.search = this.value.trim();
+          renderTable();
+        });
+      }
+
+      /* ===== FILTER FUNNEL DROPDOWN: DIVISI, STATUS, KELOMPOK ===== */
+      const divisiOptions = ['Semua Divisi', 'Operasional', 'Marketing', 'Finance', 'IT / Tech', 'HR / GA', 'Creative'];
+      const statusOptions = ['Semua Status', 'Under Budget', 'Near Budget', 'Over Budget'];
+      const kelompokOptions = ['Semua Kelompok', 'Beban Operasional', 'Beban Pemasaran', 'Beban Umum & Administrasi'];
+
+      function setupDropdownFilter(boxEl, inputEl, listEl, options, stateKey) {
+        if (!boxEl || !inputEl || !listEl) return;
+
+        function renderList(q) {
+          listEl.innerHTML = '';
+          const searchVal = (q || '').toLowerCase().trim();
+          const filtered = options.filter(opt => !searchVal || opt.toLowerCase().includes(searchVal));
+
+          filtered.forEach(opt => {
+            const item = document.createElement('div');
+            item.className = 'budget-filter-item';
+            if (filterState[stateKey] === opt || (!filterState[stateKey] && opt.startsWith('Semua'))) {
+              item.classList.add('is-selected');
+            }
+            item.textContent = opt;
+            item.addEventListener('click', function (e) {
+              e.stopPropagation();
+              if (opt.startsWith('Semua')) {
+                filterState[stateKey] = '';
+                inputEl.value = '';
+                inputEl.placeholder = opt;
+              } else {
+                filterState[stateKey] = opt;
+                inputEl.value = opt;
+              }
+              boxEl.classList.remove('is-open');
+            });
+            listEl.appendChild(item);
+          });
+        }
+
+        inputEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = boxEl.classList.contains('is-open');
+          // close other boxes
+          [boxFilterDivisi, boxFilterStatus, boxFilterKelompok].forEach(b => b && b !== boxEl && b.classList.remove('is-open'));
+          if (isOpen) {
+            boxEl.classList.remove('is-open');
+          } else {
+            boxEl.classList.add('is-open');
+            renderList(inputEl.value);
+          }
+        });
+
+        inputEl.addEventListener('input', function () {
+          boxEl.classList.add('is-open');
+          renderList(this.value);
+        });
+      }
+
+      setupDropdownFilter(boxFilterDivisi, filterDivisi, listFilterDivisi, divisiOptions, 'divisi');
+      setupDropdownFilter(boxFilterStatus, filterStatus, listFilterStatus, statusOptions, 'status');
+      setupDropdownFilter(boxFilterKelompok, filterKelompok, listFilterKelompok, kelompokOptions, 'kelompok');
+
+      if (btnFilter) {
+        btnFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterDropdown.classList.toggle('is-active');
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function () {
+          filterState.divisi = '';
+          filterState.status = '';
+          filterState.kelompok = '';
+          if (filterDivisi) { filterDivisi.value = ''; filterDivisi.placeholder = 'Pilih Divisi'; }
+          if (filterStatus) { filterStatus.value = ''; filterStatus.placeholder = 'Pilih Status'; }
+          if (filterKelompok) { filterKelompok.value = ''; filterKelompok.placeholder = 'Pilih Kelompok COA'; }
+          [boxFilterDivisi, boxFilterStatus, boxFilterKelompok].forEach(b => b && b.classList.remove('is-open'));
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function () {
+          [boxFilterDivisi, boxFilterStatus, boxFilterKelompok].forEach(b => b && b.classList.remove('is-open'));
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== CALENDAR FILTER (DUAL MONTH) ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 8; // Sep (0-indexed)
+      let tempCalStart = null;
+      let tempCalEnd = null;
+
+      function renderDualCalendar() {
+        if (!gridMonth1 || !gridMonth2) return;
+        const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        // Month 1
+        const y1 = calViewYear;
+        const m1 = calViewMonth;
+        labelMonth1.textContent = monthNames[m1] + ' ' + y1;
+
+        // Month 2
+        let y2 = y1;
+        let m2 = m1 + 1;
+        if (m2 > 11) { m2 = 0; y2++; }
+        labelMonth2.textContent = monthNames[m2] + ' ' + y2;
+
+        renderMonthDays(gridMonth1, y1, m1);
+        renderMonthDays(gridMonth2, y2, m2);
+        updateCalendarDisplay();
+      }
+
+      function renderMonthDays(container, year, month) {
+        container.innerHTML = '';
+        const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        dayNames.forEach(d => {
+          const el = document.createElement('div');
+          el.className = 'month-day-name';
+          el.textContent = d;
+          container.appendChild(el);
+        });
+
+        const firstDayIdx = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDayIdx; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'month-day is-empty';
+          container.appendChild(empty);
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'month-day';
+          dayEl.textContent = day;
+
+          const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+
+          if (tempCalStart && !tempCalEnd && tempCalStart === dateStr) {
+            dayEl.classList.add('is-single-date');
+          } else if (tempCalStart && tempCalEnd) {
+            if (dateStr === tempCalStart) dayEl.classList.add('is-start-date');
+            else if (dateStr === tempCalEnd) dayEl.classList.add('is-end-date');
+            else if (dateStr > tempCalStart && dateStr < tempCalEnd) dayEl.classList.add('is-in-range');
+          }
+
+          dayEl.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (!tempCalStart || (tempCalStart && tempCalEnd)) {
+              tempCalStart = dateStr;
+              tempCalEnd = null;
+            } else if (tempCalStart && !tempCalEnd) {
+              if (dateStr < tempCalStart) {
+                tempCalEnd = tempCalStart;
+                tempCalStart = dateStr;
+              } else {
+                tempCalEnd = dateStr;
+              }
+            }
+            renderDualCalendar();
+          });
+
+          container.appendChild(dayEl);
+        }
+      }
+
+      function updateCalendarDisplay() {
+        if (!calendarRangeDisplay) return;
+        if (tempCalStart && tempCalEnd) {
+          calendarRangeDisplay.textContent = tempCalStart + ' s/d ' + tempCalEnd;
+        } else if (tempCalStart) {
+          calendarRangeDisplay.textContent = 'Mulai: ' + tempCalStart;
+        } else {
+          calendarRangeDisplay.textContent = 'Semua Tanggal';
+        }
+      }
+
+      if (btnPrevMonth) {
+        btnPrevMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calViewMonth--;
+          if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnNextMonth) {
+        btnNextMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calViewMonth++;
+          if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+          renderDualCalendar();
+        });
+      }
+
+      if (btnCalendar) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.toggle('is-active');
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            renderDualCalendar();
+          }
+        });
+      }
+
+      // Presets
+      document.querySelectorAll('.calendar-preset-btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const preset = this.getAttribute('data-preset');
+          const now = new Date(2026, 8, 15);
+          const curY = now.getFullYear();
+          const curM = String(now.getMonth() + 1).padStart(2, '0');
+          const curD = String(now.getDate()).padStart(2, '0');
+
+          if (preset === 'today') {
+            tempCalStart = curY + '-' + curM + '-' + curD;
+            tempCalEnd = tempCalStart;
+          } else if (preset === 'this-month') {
+            const lastD = new Date(curY, now.getMonth() + 1, 0).getDate();
+            tempCalStart = curY + '-' + curM + '-01';
+            tempCalEnd = curY + '-' + curM + '-' + String(lastD).padStart(2, '0');
+          } else if (preset === 'last-month') {
+            const prevMonthDate = new Date(curY, now.getMonth() - 1, 1);
+            const pY = prevMonthDate.getFullYear();
+            const pM = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+            const pLastD = new Date(pY, prevMonthDate.getMonth() + 1, 0).getDate();
+            tempCalStart = pY + '-' + pM + '-01';
+            tempCalEnd = pY + '-' + pM + '-' + String(pLastD).padStart(2, '0');
+          } else if (preset === 'this-year') {
+            tempCalStart = curY + '-01-01';
+            tempCalEnd = curY + '-12-31';
+          } else if (preset === 'reset') {
+            tempCalStart = null;
+            tempCalEnd = null;
+          }
+          renderDualCalendar();
+        });
+      });
+
+      if (btnCancelCalendar) {
+        btnCancelCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calendarDropdown.classList.remove('is-active');
+        });
+      }
+
+      if (btnApplyCalendar) {
+        btnApplyCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterState.startDate = tempCalStart;
+          filterState.endDate = tempCalEnd;
+          calendarDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== EXPORT EXCEL (OFFICIAL SPREADSHEET ENGINE) ===== */
+      async function exportBudgetVsActualExcel() {
+        const rows = getFilteredData();
+        if (!rows || rows.length === 0) {
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'warning', title: 'Data Kosong', text: 'Tidak ada data Budget vs Actual untuk diekspor.' });
+          }
+          return;
+        }
+
+        const filename = 'Laporan_Budget_vs_Actual_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+        const headers = [
+          'No',
+          'Periode',
+          'Kode COA',
+          'Nama Akun COA',
+          'Divisi',
+          'Budget',
+          'Actual Beban',
+          'Sisa Budget',
+          '% Terpakai',
+          'Status',
+          'Divisi Pengecualian',
+          'Kelompok COA',
+          'Status COA'
+        ];
+
+        const exportData = rows.map(function (item, idx) {
+          const sisa = Number(item.budget || 0) - Number(item.actualBeban || 0);
+          return [
+            idx + 1,
+            item.periode || '-',
+            item.kodeCOA || '-',
+            item.namaAkunCOA || '-',
+            item.divisi || '-',
+            item.budget || 0,
+            item.actualBeban || 0,
+            sisa,
+            (item.persenTerpakai || 0) + '%',
+            item.status || 'Under Budget',
+            item.divisiPengecualian || '-',
+            item.kelompokCOA || '-',
+            item.statusCOA || 'Aktif'
+          ];
+        });
+
+        if (typeof window.exportBisaExcel === 'function') {
+          await window.exportBisaExcel({
+            title: 'LAPORAN BUDGET VS ACTUAL PERUSAHAAN',
+            filename: filename,
+            sheetName: 'Budget vs Actual',
+            headers: headers,
+            rows: exportData
+          });
+        } else if (typeof window.exportTableToExcel === 'function') {
+          await window.exportTableToExcel('budgetTable', filename, 'LAPORAN BUDGET VS ACTUAL');
+        } else {
+          let csv = headers.join(',') + '\n';
+          exportData.forEach(function (r) {
+            csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.setAttribute('href', url);
+          link.setAttribute('download', filename.replace('.xlsx', '.csv'));
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+      window.exportBudgetVsActualExcel = exportBudgetVsActualExcel;
+
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', exportBudgetVsActualExcel);
+      }
+
+      /* ===== GLOBAL CLICK LISTENER (TUTUP POPUP & MENU) ===== */
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#budgetActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('#filterDropdown') && !e.target.closest('#btnFilter')) {
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          [boxFilterDivisi, boxFilterStatus, boxFilterKelompok].forEach(b => b && b.classList.remove('is-open'));
+        }
+        if (!e.target.closest('#calendarDropdown') && !e.target.closest('#btnCalendar')) {
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeActionMenus();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
 </body>
 
 </html>

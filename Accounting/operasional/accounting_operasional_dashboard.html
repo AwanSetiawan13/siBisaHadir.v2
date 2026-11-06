@@ -7,6 +7,403 @@
   <title>Dashboard Operasional | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+  <!-- Chart.js for High-Fidelity Interactive Dashboard Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ===== RESET & ROOT STYLING ===== */
+    body.dashboard-body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-content {
+      padding: 24px 28px 48px 28px;
+      max-width: 1600px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* ===== TOP 4 SUMMARY CARDS (PERSIS GAMBAR MOCKUP) ===== */
+    .dash-summary-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .dash-summary-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .dash-summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 118, 197, 0.08);
+    }
+
+    .dash-summary-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .dash-summary-label {
+      font-size: 13.5px;
+      color: #64748b;
+      font-weight: 500;
+      letter-spacing: -0.1px;
+    }
+
+    .dash-summary-value {
+      font-size: 24px;
+      font-weight: 800;
+      font-style: italic;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+
+    .dash-summary-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 9px;
+      background: #0076C5;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dash-summary-card.card-beban {
+      border-top-color: #ef4444;
+    }
+
+    .dash-summary-icon.icon-beban {
+      background: #ef4444;
+    }
+
+    .dash-summary-card.card-laba {
+      border-top-color: #16a34a;
+    }
+
+    .dash-summary-icon.icon-laba {
+      background: #16a34a;
+    }
+
+    .dash-summary-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* ===== COMMON CARD DESIGN ===== */
+    .dash-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+    }
+
+    .dash-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .dash-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      font-style: italic;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+      letter-spacing: -0.2px;
+    }
+
+    .dash-card-divider {
+      border-bottom: 1px dotted #cbd5e1;
+      margin-bottom: 16px;
+      width: 100%;
+    }
+
+    /* Period selector dropdown in card header */
+    .dash-select-period {
+      padding: 5px 10px;
+      font-size: 12.5px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 500;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #ffffff;
+      color: #475569;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .dash-select-period:hover,
+    .dash-select-period:focus {
+      border-color: #0076C5;
+    }
+
+    /* ===== UPPER 2-COLUMN SECTION ===== */
+    .dash-upper-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+      align-items: start;
+    }
+
+    .dash-col-left,
+    .dash-col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Chart Container */
+    .dash-chart-wrap {
+      position: relative;
+      width: 100%;
+      height: 250px;
+    }
+
+    /* ===== TABLE STYLING (SESUAI MOCKUP GAMBAR) ===== */
+    .dash-table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .dash-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .dash-table thead th {
+      font-size: 13.5px;
+      font-weight: 500;
+      font-style: italic;
+      color: #0f172a;
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      white-space: nowrap;
+    }
+
+    .dash-table tbody td {
+      font-size: 13px;
+      font-weight: 500;
+      color: #334155;
+      padding: 9px 12px;
+      border-bottom: 1px solid #f8fafc;
+      vertical-align: middle;
+    }
+
+    .dash-table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .dash-table td.col-num {
+      width: 32px;
+      color: #64748b;
+    }
+
+    .dash-table td.text-right,
+    .dash-table thead th.text-right {
+      text-align: right;
+    }
+
+    .dash-table td.text-center,
+    .dash-table thead th.text-center {
+      text-align: center;
+    }
+
+    .dash-empty-cell {
+      text-align: center;
+      padding: 28px 16px;
+      color: #94a3b8;
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    /* Badges */
+    .dash-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .dash-badge-success {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .dash-badge-warning {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .dash-badge-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .dash-badge-info {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    /* ===== BEBAN OPERASIONAL DONUT & LEGEND ===== */
+    .dash-donut-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      gap: 20px;
+      padding: 10px 0;
+      flex-wrap: wrap;
+    }
+
+    .dash-donut-chart-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      flex-shrink: 0;
+    }
+
+    .dash-donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 130px;
+    }
+
+    .dash-legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      color: #334155;
+    }
+
+    .dash-legend-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dash-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dash-legend-percent {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    /* ===== PERLU DITINDAKLANJUTI LIST ===== */
+    .dash-action-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dash-action-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 4px;
+      font-size: 13px;
+      border-radius: 6px;
+      transition: background-color 0.12s ease;
+    }
+
+    .dash-action-item:hover {
+      background-color: #f8fafc;
+    }
+
+    .dash-action-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #334155;
+    }
+
+    .dash-action-index {
+      color: #64748b;
+      font-size: 12.5px;
+      min-width: 18px;
+    }
+
+    .dash-action-amount {
+      font-weight: 600;
+      color: #0f172a;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ===== LOWER SECTION (3 FULL-WIDTH TABLES) ===== */
+    .dash-lower-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+      .dash-summary-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .dash-upper-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-content {
+        padding: 16px 16px 36px 16px;
+      }
+
+      .dash-summary-row {
+        grid-template-columns: 1fr;
+      }
+
+      .dash-summary-value {
+        font-size: 21px;
+      }
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +411,833 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+    <main class="dashboard-content">
+
+      <!-- ===== 1. TOP 4 SUMMARY CARDS ===== -->
+      <section class="dash-summary-row">
+        <!-- Card 1: Total Pendapatan -->
+        <div class="dash-summary-card">
+          <div class="dash-summary-info">
+            <span class="dash-summary-label">Total Pendapatan</span>
+            <span class="dash-summary-value" id="cardTotalPendapatan">Rp. -</span>
+          </div>
+          <div class="dash-summary-icon" title="Total Pendapatan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Total Beban -->
+        <div class="dash-summary-card card-beban">
+          <div class="dash-summary-info">
+            <span class="dash-summary-label">Total Beban</span>
+            <span class="dash-summary-value" id="cardTotalBeban">Rp. -</span>
+          </div>
+          <div class="dash-summary-icon icon-beban" title="Total Beban">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Laba Bersih -->
+        <div class="dash-summary-card card-laba">
+          <div class="dash-summary-info">
+            <span class="dash-summary-label">Laba Bersih</span>
+            <span class="dash-summary-value" id="cardLabaBersih">Rp. -</span>
+          </div>
+          <div class="dash-summary-icon icon-laba" title="Laba Bersih">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Bank & Transaksi -->
+        <div class="dash-summary-card">
+          <div class="dash-summary-info">
+            <span class="dash-summary-label">Bank &amp; Transaksi</span>
+            <span class="dash-summary-value" id="cardBankTransaksi">Rp. -</span>
+          </div>
+          <div class="dash-summary-icon" title="Bank & Transaksi">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="21" x2="21" y2="21"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <polyline points="5 6 12 2 19 6"></polyline>
+              <line x1="4" y1="10" x2="4" y2="21"></line>
+              <line x1="20" y1="10" x2="20" y2="21"></line>
+              <line x1="9" y1="10" x2="9" y2="21"></line>
+              <line x1="15" y1="10" x2="15" y2="21"></line>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 2. UPPER 2-COLUMN SECTION ===== -->
+      <section class="dash-upper-grid">
+        <!-- Kolom Kiri: Trand Financial & Ringkasan Bulanan -->
+        <div class="dash-col-left">
+          <!-- Card: Trand Financial -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3 class="dash-card-title">Trand Financial</h3>
+              <select class="dash-select-period" id="selectTrendPeriod" aria-label="Pilih Periode Tren">
+                <option value="">Pilih Periode</option>
+                <option value="okt2026" selected>Oktober 2026</option>
+                <option value="sep2026">September 2026</option>
+                <option value="agu2026">Agustus 2026</option>
+              </select>
+            </div>
+            <div class="dash-card-divider"></div>
+            <div class="dash-chart-wrap">
+              <canvas id="trendFinancialChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Card: Ringkasan Bulanan -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3 class="dash-card-title">Ringkasan Bulanan</h3>
+            </div>
+            <div class="dash-card-divider"></div>
+            <div class="dash-table-container">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th style="width: 32px;">#</th>
+                    <th>Indikator</th>
+                    <th class="text-right">Bulan ini</th>
+                    <th class="text-right">Bulan Lalu</th>
+                    <th class="text-right">Perubahan</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyRingkasanBulanan">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kolom Kanan: Beban Oprasional & Perlu Ditindaklanjuti -->
+        <div class="dash-col-right">
+          <!-- Card: Beban Oprasional -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3 class="dash-card-title">Beban Oprasional</h3>
+            </div>
+            <div class="dash-card-divider"></div>
+            <div class="dash-donut-content">
+              <div class="dash-donut-chart-wrap">
+                <canvas id="bebanOperasionalDonut"></canvas>
+              </div>
+              <div class="dash-donut-legend" id="donutLegendList">
+                <div class="dash-legend-item">
+                  <span class="dash-legend-label">
+                    <span class="dash-legend-dot" style="background: #38bdf8;"></span>
+                    <span>Gaji Pokok</span>
+                  </span>
+                  <span class="dash-legend-percent" id="pctGajiPokok">0%</span>
+                </div>
+                <div class="dash-legend-item">
+                  <span class="dash-legend-label">
+                    <span class="dash-legend-dot" style="background: #eab308;"></span>
+                    <span>Oprasional</span>
+                  </span>
+                  <span class="dash-legend-percent" id="pctOperasional">0%</span>
+                </div>
+                <div class="dash-legend-item">
+                  <span class="dash-legend-label">
+                    <span class="dash-legend-dot" style="background: #ef4444;"></span>
+                    <span>Pajak</span>
+                  </span>
+                  <span class="dash-legend-percent" id="pctPajak">0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Perlu Ditindaklanjuti -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3 class="dash-card-title">Perlu Ditindaklanjuti</h3>
+            </div>
+            <div class="dash-card-divider"></div>
+            <ul class="dash-action-list" id="actionItemsList">
+              <!-- Populated by JavaScript -->
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 3. LOWER SECTION (3 FULL-WIDTH TABLES) ===== -->
+      <section class="dash-lower-stack">
+        <!-- Table 1: Kas & Bank -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">Kas &amp; Bank</h3>
+          </div>
+          <div class="dash-card-divider"></div>
+          <div class="dash-table-container">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 36px;">#</th>
+                  <th>Tanggal</th>
+                  <th>Nama Bank</th>
+                  <th>Keterangan</th>
+                  <th class="text-right">Uang Masuk</th>
+                  <th class="text-right">Uang Keluar</th>
+                  <th class="text-right">Saldo Akun</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyKasBank">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 2: Pendapatan -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">Pendapatan</h3>
+          </div>
+          <div class="dash-card-divider"></div>
+          <div class="dash-table-container">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 36px;">#</th>
+                  <th>Tanggal Pengakuan</th>
+                  <th>No. Invoice</th>
+                  <th>Customer</th>
+                  <th class="text-right">Total Tagihan</th>
+                  <th class="text-right">Sisa Piutang</th>
+                  <th class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyPendapatan">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Table 3: Pengurangan dan Beban -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">Pengurangan dan Beban</h3>
+          </div>
+          <div class="dash-card-divider"></div>
+          <div class="dash-table-container">
+            <table class="dash-table">
+              <thead>
+                <tr>
+                  <th style="width: 36px;">#</th>
+                  <th>Tanggal Pengakuan</th>
+                  <th>Vendor / Karyawan</th>
+                  <th>Keterangan</th>
+                  <th class="text-right">Tagihan Bruto</th>
+                  <th class="text-center">Status Approval</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyPenguranganBeban">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ===== DATA MODEL SESUAI SISTEM OPERASIONAL ACCOUNTING ===== */
+      const DASHBOARD_DATA = {
+        okt2026: {
+          cards: {
+            pendapatan: 850000000,
+            beban: 380400000,
+            labaBersih: 469600000,
+            bankTransaksi: 1845000000
+          },
+          trend: {
+            labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+            values: [120, 185, 210, 290]
+          },
+          bebanDonut: {
+            gajiPokok: 55,
+            operasional: 30,
+            pajak: 15
+          },
+          ringkasanBulanan: [
+            { id: 1, indikator: 'Pendapatan', ini: 850000000, lalu: 780000000, pct: '+8.9%' },
+            { id: 2, indikator: 'Total beban + pajak', ini: 380400000, lalu: 350000000, pct: '+8.6%' },
+            { id: 3, indikator: 'Laba bersih', ini: 469600000, lalu: 430000000, pct: '+9.2%' },
+            { id: 4, indikator: 'Saldo kas/bank', ini: 1845000000, lalu: 1650000000, pct: '+11.8%' },
+            { id: 5, indikator: 'Piutang usaha', ini: 1420000000, lalu: 1290000000, pct: '+10.1%' },
+            { id: 6, indikator: 'Utang vendor & reimbursement', ini: 580000000, lalu: 510000000, pct: '+13.7%' },
+            { id: 7, indikator: 'Nilai buku aset', ini: 4990000000, lalu: 5110000000, pct: '-2.3%' },
+            { id: 8, indikator: 'Arus kas bersih', ini: 195000000, lalu: 160000000, pct: '+21.8%' },
+            { id: 9, indikator: 'Laba sebelum pajak', ini: 520000000, lalu: 475000000, pct: '+9.4%' }
+          ],
+          actionItems: [
+            { id: 1, title: 'Perlu ditindaklanjuti', amount: 0 },
+            { id: 2, title: 'Payroll Dibayar tanpa kas', amount: 0 },
+            { id: 3, title: 'Beban Lunas tanpa kas', amount: 0 },
+            { id: 4, title: 'Tagihan perlu rincian', amount: 0 },
+            { id: 5, title: 'Piutang karyawan', amount: 45000000 },
+            { id: 6, title: 'Pajak belum terisi', amount: 0 },
+            { id: 7, title: 'Selisih arus kas', amount: 0 },
+            { id: 8, title: 'Selisih neraca', amount: 0 },
+            { id: 9, title: 'Laba sebelum pajak', amount: 520000000 },
+            { id: 10, title: 'COA / rekening perlu diperiksa', amount: 0 }
+          ],
+          kasBank: [
+            { id: 1, tanggal: '28/10/2026', bank: 'BCA Giro (088-291-889)', ket: 'Penerimaan Invoice INV-2026-10-001 PT Unilever', masuk: 250000000, keluar: 0, saldo: 1240000000 },
+            { id: 2, tanggal: '27/10/2026', bank: 'Mandiri Operasional', ket: 'Pembayaran Vendor Cloud Hosting & Server', masuk: 0, keluar: 45000000, saldo: 410000000 },
+            { id: 3, tanggal: '25/10/2026', bank: 'BCA Giro (088-291-889)', ket: 'Payroll Karyawan Periode Oktober 2026', masuk: 0, keluar: 220000000, saldo: 990000000 },
+            { id: 4, tanggal: '22/10/2026', bank: 'BRI Operasional', ket: 'Pelunasan Campaign Shopee 10.10', masuk: 180000000, keluar: 0, saldo: 195000000 }
+          ],
+          pendapatan: [
+            { id: 1, tanggal: '28/10/2026', invoice: 'INV-2026-10-001', customer: 'PT Unilever Indonesia Tbk', tagihan: 250000000, sisa: 0, status: 'Lunas' },
+            { id: 2, tanggal: '25/10/2026', invoice: 'INV-2026-10-002', customer: 'Shopee Indonesia', tagihan: 180000000, sisa: 0, status: 'Lunas' },
+            { id: 3, tanggal: '20/10/2026', invoice: 'INV-2026-10-003', customer: 'PT Paragon Technology (Wardah)', tagihan: 320000000, sisa: 120000000, status: 'Sebagian' },
+            { id: 4, tanggal: '15/10/2026', invoice: 'INV-2026-10-004', customer: 'Tokopedia Brand Partnership', tagihan: 100000000, sisa: 100000000, status: 'Belum Lunas' }
+          ],
+          penguranganBeban: [
+            { id: 1, tanggal: '26/10/2026', vendor: 'PT Telkom Indonesia', ket: 'Internet Dedicated Kantor & Studio', tagihan: 18500000, status: 'Disetujui' },
+            { id: 2, tanggal: '25/10/2026', vendor: 'Divisi HR & Payroll', ket: 'Gaji Pokok & Tunjangan Oktober', tagihan: 220000000, status: 'Disetujui' },
+            { id: 3, tanggal: '24/10/2026', vendor: 'Amazon Web Services', ket: 'Server Hosting & Database', tagihan: 26500000, status: 'Disetujui' },
+            { id: 4, tanggal: '21/10/2026', vendor: 'PT Sumber Alfaria Trijaya', ket: 'Pantry & ATK Kantor Pusat', tagihan: 5400000, status: 'Menunggu' }
+          ]
+        },
+        sep2026: {
+          cards: {
+            pendapatan: 780000000,
+            beban: 350000000,
+            labaBersih: 430000000,
+            bankTransaksi: 1650000000
+          },
+          trend: {
+            labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+            values: [100, 160, 220, 260]
+          },
+          bebanDonut: {
+            gajiPokok: 58,
+            operasional: 28,
+            pajak: 14
+          },
+          ringkasanBulanan: [
+            { id: 1, indikator: 'Pendapatan', ini: 780000000, lalu: 710000000, pct: '+9.8%' },
+            { id: 2, indikator: 'Total beban + pajak', ini: 350000000, lalu: 320000000, pct: '+9.3%' },
+            { id: 3, indikator: 'Laba bersih', ini: 430000000, lalu: 390000000, pct: '+10.2%' },
+            { id: 4, indikator: 'Saldo kas/bank', ini: 1650000000, lalu: 1480000000, pct: '+11.4%' },
+            { id: 5, indikator: 'Piutang usaha', ini: 1290000000, lalu: 1150000000, pct: '+12.1%' },
+            { id: 6, indikator: 'Utang vendor & reimbursement', ini: 510000000, lalu: 470000000, pct: '+8.5%' },
+            { id: 7, indikator: 'Nilai buku aset', ini: 5110000000, lalu: 5230000000, pct: '-2.2%' },
+            { id: 8, indikator: 'Arus kas bersih', ini: 160000000, lalu: 140000000, pct: '+14.2%' },
+            { id: 9, indikator: 'Laba sebelum pajak', ini: 475000000, lalu: 435000000, pct: '+9.1%' }
+          ],
+          actionItems: [
+            { id: 1, title: 'Perlu ditindaklanjuti', amount: 0 },
+            { id: 2, title: 'Payroll Dibayar tanpa kas', amount: 0 },
+            { id: 3, title: 'Beban Lunas tanpa kas', amount: 0 },
+            { id: 4, title: 'Tagihan perlu rincian', amount: 0 },
+            { id: 5, title: 'Piutang karyawan', amount: 38000000 },
+            { id: 6, title: 'Pajak belum terisi', amount: 0 },
+            { id: 7, title: 'Selisih arus kas', amount: 0 },
+            { id: 8, title: 'Selisih neraca', amount: 0 },
+            { id: 9, title: 'Laba sebelum pajak', amount: 475000000 },
+            { id: 10, title: 'COA / rekening perlu diperiksa', amount: 0 }
+          ],
+          kasBank: [
+            { id: 1, tanggal: '28/09/2026', bank: 'BCA Giro (088-291-889)', ket: 'Pelunasan Project Brand Indofood', masuk: 310000000, keluar: 0, saldo: 1120000000 },
+            { id: 2, tanggal: '25/09/2026', bank: 'BCA Giro (088-291-889)', ket: 'Payroll Karyawan Periode September', masuk: 0, keluar: 215000000, saldo: 810000000 }
+          ],
+          pendapatan: [
+            { id: 1, tanggal: '28/09/2026', invoice: 'INV-2026-09-001', customer: 'PT Indofood CBP Sukses Makmur', tagihan: 310000000, sisa: 0, status: 'Lunas' }
+          ],
+          penguranganBeban: [
+            { id: 1, tanggal: '25/09/2026', vendor: 'Divisi HR & Payroll', ket: 'Gaji Pokok & Tunjangan September', tagihan: 215000000, status: 'Disetujui' }
+          ]
+        },
+        agu2026: {
+          cards: {
+            pendapatan: 710000000,
+            beban: 320000000,
+            labaBersih: 390000000,
+            bankTransaksi: 1480000000
+          },
+          trend: {
+            labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+            values: [90, 140, 200, 240]
+          },
+          bebanDonut: {
+            gajiPokok: 60,
+            operasional: 26,
+            pajak: 14
+          },
+          ringkasanBulanan: [
+            { id: 1, indikator: 'Pendapatan', ini: 710000000, lalu: 650000000, pct: '+9.2%' },
+            { id: 2, indikator: 'Total beban + pajak', ini: 320000000, lalu: 300000000, pct: '+6.6%' },
+            { id: 3, indikator: 'Laba bersih', ini: 390000000, lalu: 350000000, pct: '+11.4%' },
+            { id: 4, indikator: 'Saldo kas/bank', ini: 1480000000, lalu: 1320000000, pct: '+12.1%' },
+            { id: 5, indikator: 'Piutang usaha', ini: 1150000000, lalu: 1020000000, pct: '+12.7%' },
+            { id: 6, indikator: 'Utang vendor & reimbursement', ini: 470000000, lalu: 430000000, pct: '+9.3%' },
+            { id: 7, indikator: 'Nilai buku aset', ini: 5230000000, lalu: 5350000000, pct: '-2.2%' },
+            { id: 8, indikator: 'Arus kas bersih', ini: 140000000, lalu: 120000000, pct: '+16.6%' },
+            { id: 9, indikator: 'Laba sebelum pajak', ini: 435000000, lalu: 390000000, pct: '+11.5%' }
+          ],
+          actionItems: [
+            { id: 1, title: 'Perlu ditindaklanjuti', amount: 0 },
+            { id: 2, title: 'Payroll Dibayar tanpa kas', amount: 0 },
+            { id: 3, title: 'Beban Lunas tanpa kas', amount: 0 },
+            { id: 4, title: 'Tagihan perlu rincian', amount: 0 },
+            { id: 5, title: 'Piutang karyawan', amount: 35000000 },
+            { id: 6, title: 'Pajak belum terisi', amount: 0 },
+            { id: 7, title: 'Selisih arus kas', amount: 0 },
+            { id: 8, title: 'Selisih neraca', amount: 0 },
+            { id: 9, title: 'Laba sebelum pajak', amount: 435000000 },
+            { id: 10, title: 'COA / rekening perlu diperiksa', amount: 0 }
+          ],
+          kasBank: [
+            { id: 1, tanggal: '28/08/2026', bank: 'BCA Giro (088-291-889)', ket: 'Pelunasan Project Brand Mayora', masuk: 290000000, keluar: 0, saldo: 1040000000 },
+            { id: 2, tanggal: '25/08/2026', bank: 'BCA Giro (088-291-889)', ket: 'Payroll Karyawan Periode Agustus', masuk: 0, keluar: 210000000, saldo: 750000000 }
+          ],
+          pendapatan: [
+            { id: 1, tanggal: '28/08/2026', invoice: 'INV-2026-08-001', customer: 'PT Mayora Indah Tbk', tagihan: 290000000, sisa: 0, status: 'Lunas' }
+          ],
+          penguranganBeban: [
+            { id: 1, tanggal: '25/08/2026', vendor: 'Divisi HR & Payroll', ket: 'Gaji Pokok & Tunjangan Agustus', tagihan: 210000000, status: 'Disetujui' }
+          ]
+        }
+      };
+
+      /* ===== HELPER FORMATTER RUPIAH ===== */
+      function formatRupiah(num) {
+        if (num === null || num === undefined || isNaN(num) || num === 0) {
+          return 'Rp. -';
+        }
+        const isNeg = num < 0;
+        const absVal = Math.abs(Math.round(num));
+        const formatted = absVal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return isNeg ? '(Rp. ' + formatted + ')' : 'Rp. ' + formatted;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      /* ===== CHART INSTANCES ===== */
+      let trendChartInstance = null;
+      let donutChartInstance = null;
+
+      /* ===== RENDER DASHBOARD ===== */
+      function renderDashboard(periodKey) {
+        const data = DASHBOARD_DATA[periodKey];
+
+        // 1. TOP SUMMARY CARDS
+        const cardTotalPendapatan = document.getElementById('cardTotalPendapatan');
+        const cardTotalBeban = document.getElementById('cardTotalBeban');
+        const cardLabaBersih = document.getElementById('cardLabaBersih');
+        const cardBankTransaksi = document.getElementById('cardBankTransaksi');
+
+        if (data && data.cards) {
+          if (cardTotalPendapatan) cardTotalPendapatan.textContent = formatRupiah(data.cards.pendapatan);
+          if (cardTotalBeban) cardTotalBeban.textContent = formatRupiah(data.cards.beban);
+          if (cardLabaBersih) cardLabaBersih.textContent = formatRupiah(data.cards.labaBersih);
+          if (cardBankTransaksi) cardBankTransaksi.textContent = formatRupiah(data.cards.bankTransaksi);
+        } else {
+          // Default mockup: Rp. -
+          if (cardTotalPendapatan) cardTotalPendapatan.textContent = 'Rp. -';
+          if (cardTotalBeban) cardTotalBeban.textContent = 'Rp. -';
+          if (cardLabaBersih) cardLabaBersih.textContent = 'Rp. -';
+          if (cardBankTransaksi) cardBankTransaksi.textContent = 'Rp. -';
+        }
+
+        // 2. TREND FINANCIAL LINE CHART (SESUAI MOCKUP GAMBAR)
+        renderTrendChart(data ? data.trend : null);
+
+        // 3. BEBAN OPERASIONAL DONUT CHART (SESUAI MOCKUP GAMBAR)
+        renderBebanDonut(data ? data.bebanDonut : null);
+
+        // 4. RINGKASAN BULANAN TABLE
+        renderRingkasanBulanan(data ? data.ringkasanBulanan : null);
+
+        // 5. PERLU DITINDAKLANJUTI LIST
+        renderActionItems(data ? data.actionItems : null);
+
+        // 6. LOWER 3 TABLES
+        renderKasBankTable(data ? data.kasBank : []);
+        renderPendapatanTable(data ? data.pendapatan : []);
+        renderPenguranganBebanTable(data ? data.penguranganBeban : []);
+      }
+
+      /* ===== 1. TREND FINANCIAL CHART ===== */
+      function renderTrendChart(trendData) {
+        const canvas = document.getElementById('trendFinancialChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        const labels = (trendData && trendData.labels) ? trendData.labels : ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
+        const values = (trendData && trendData.values) ? trendData.values : [0, 0, 0, 0];
+
+        if (trendChartInstance) {
+          trendChartInstance.destroy();
+        }
+
+        // Gradient halus untuk area fill
+        let gradient = null;
+        try {
+          gradient = ctx.createLinearGradient(0, 0, 0, 240);
+          gradient.addColorStop(0, 'rgba(0, 118, 197, 0.22)');
+          gradient.addColorStop(1, 'rgba(0, 118, 197, 0.01)');
+        } catch (e) {
+          gradient = 'rgba(0, 118, 197, 0.08)';
+        }
+
+        const hasData = values.some(v => v > 0);
+
+        trendChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Tren Finansial',
+              data: values,
+              borderColor: hasData ? '#0076C5' : '#94a3b8',
+              backgroundColor: hasData ? gradient : 'transparent',
+              borderWidth: 2.5,
+              pointBackgroundColor: '#0076C5',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: hasData ? 5 : 0,
+              pointHoverRadius: 7,
+              fill: true,
+              tension: 0.35
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                titleFont: { family: 'Outfit', size: 12 },
+                bodyFont: { family: 'Outfit', size: 12 },
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function (context) {
+                    return ' Nilai: Rp ' + context.parsed.y + ' Jt';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                border: { display: true, color: '#94a3b8' },
+                grid: {
+                  display: false,
+                  drawBorder: true,
+                  borderColor: '#94a3b8'
+                },
+                ticks: {
+                  font: { family: 'Outfit', size: 12, weight: '500' },
+                  color: '#475569'
+                }
+              },
+              y: {
+                min: 0,
+                max: 300,
+                border: { display: true, color: '#94a3b8' },
+                ticks: {
+                  stepSize: 50,
+                  font: { family: 'Outfit', size: 12, weight: '500' },
+                  color: '#475569'
+                },
+                grid: {
+                  color: '#f1f5f9',
+                  drawBorder: true,
+                  borderColor: '#94a3b8'
+                }
+              }
+            }
+          }
+        });
+      }
+
+      /* ===== 2. BEBAN OPERASIONAL DONUT CHART ===== */
+      function renderBebanDonut(donutData) {
+        const canvas = document.getElementById('bebanOperasionalDonut');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        const g = donutData ? donutData.gajiPokok : 0;
+        const o = donutData ? donutData.operasional : 0;
+        const p = donutData ? donutData.pajak : 0;
+
+        // Update Legend Texts
+        const pctGajiPokok = document.getElementById('pctGajiPokok');
+        const pctOperasional = document.getElementById('pctOperasional');
+        const pctPajak = document.getElementById('pctPajak');
+
+        if (pctGajiPokok) pctGajiPokok.textContent = g + '%';
+        if (pctOperasional) pctOperasional.textContent = o + '%';
+        if (pctPajak) pctPajak.textContent = p + '%';
+
+        if (donutChartInstance) {
+          donutChartInstance.destroy();
+        }
+
+        // Tampilkan 3 segmen warna sesuai gambar: Biru muda/Cyan, Kuning, Merah
+        const displayData = (g === 0 && o === 0 && p === 0) ? [40, 30, 30] : [g, o, p];
+
+        donutChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Gaji Pokok', 'Oprasional', 'Pajak'],
+            datasets: [{
+              data: displayData,
+              backgroundColor: ['#38bdf8', '#eab308', '#ef4444'],
+              borderWidth: 2,
+              borderColor: '#ffffff',
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '72%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                titleFont: { family: 'Outfit', size: 12 },
+                bodyFont: { family: 'Outfit', size: 12 },
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function (context) {
+                    return ' ' + context.label + ': ' + context.parsed + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      /* ===== 3. RINGKASAN BULANAN TABLE ===== */
+      function renderRingkasanBulanan(items) {
+        const tbody = document.getElementById('tbodyRingkasanBulanan');
+        if (!tbody) return;
+
+        const defaultIndicators = [
+          'Pendapatan',
+          'Total beban + pajak',
+          'Laba bersih',
+          'Saldo kas/bank',
+          'Piutang usaha',
+          'Utang vendor & reimbursement',
+          'Nilai buku aset',
+          'Arus kas bersih',
+          'Laba sebelum pajak'
+        ];
+
+        let html = '';
+        if (items && items.length > 0) {
+          items.forEach(item => {
+            html += '<tr>' +
+              '<td class="col-num">' + item.id + '.</td>' +
+              '<td>' + escapeHtml(item.indikator) + '</td>' +
+              '<td class="text-right">' + formatRupiah(item.ini) + '</td>' +
+              '<td class="text-right">' + formatRupiah(item.lalu) + '</td>' +
+              '<td class="text-right" style="color: ' + (String(item.pct).startsWith('-') ? '#ef4444' : '#16a34a') + '; font-weight: 600;">' + escapeHtml(item.pct) + '</td>' +
+              '</tr>';
+          });
+        } else {
+          // Default mockup: Rp. -
+          defaultIndicators.forEach((label, idx) => {
+            html += '<tr>' +
+              '<td class="col-num">' + (idx + 1) + '.</td>' +
+              '<td>' + escapeHtml(label) + '</td>' +
+              '<td class="text-right">Rp. -</td>' +
+              '<td class="text-right">Rp. -</td>' +
+              '<td class="text-right">Rp. -</td>' +
+              '</tr>';
+          });
+        }
+
+        tbody.innerHTML = html;
+      }
+
+      /* ===== 4. PERLU DITINDAKLANJUTI LIST ===== */
+      function renderActionItems(items) {
+        const ul = document.getElementById('actionItemsList');
+        if (!ul) return;
+
+        const defaultActions = [
+          'Perlu ditindaklanjuti',
+          'Payroll Dibayar tanpa kas',
+          'Beban Lunas tanpa kas',
+          'Tagihan perlu rincian',
+          'Piutang karyawan',
+          'Pajak belum terisi',
+          'Selisih arus kas',
+          'Selisih neraca',
+          'Laba sebelum pajak',
+          'COA / rekening perlu diperiksa'
+        ];
+
+        let html = '';
+        if (items && items.length > 0) {
+          items.forEach(item => {
+            html += '<li class="dash-action-item">' +
+              '<span class="dash-action-title">' +
+              '<span class="dash-action-index">' + item.id + '.</span>' +
+              '<span>' + escapeHtml(item.title) + '</span>' +
+              '</span>' +
+              '<span class="dash-action-amount">' + formatRupiah(item.amount) + '</span>' +
+              '</li>';
+          });
+        } else {
+          // Default mockup
+          defaultActions.forEach((title, idx) => {
+            html += '<li class="dash-action-item">' +
+              '<span class="dash-action-title">' +
+              '<span class="dash-action-index">' + (idx + 1) + '.</span>' +
+              '<span>' + escapeHtml(title) + '</span>' +
+              '</span>' +
+              '<span class="dash-action-amount">Rp. -</span>' +
+              '</li>';
+          });
+        }
+
+        ul.innerHTML = html;
+      }
+
+      /* ===== 5. KAS & BANK TABLE ===== */
+      function renderKasBankTable(rows) {
+        const tbody = document.getElementById('tbodyKasBank');
+        if (!tbody) return;
+
+        if (!rows || rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="dash-empty-cell">Belum ada mutasi kas &amp; bank pada periode ini</td></tr>';
+          return;
+        }
+
+        let html = '';
+        rows.forEach(r => {
+          html += '<tr>' +
+            '<td class="col-num">' + r.id + '.</td>' +
+            '<td>' + escapeHtml(r.tanggal) + '</td>' +
+            '<td style="font-weight: 600; color: #0076C5;">' + escapeHtml(r.bank) + '</td>' +
+            '<td>' + escapeHtml(r.ket) + '</td>' +
+            '<td class="text-right" style="color: #16a34a; font-weight: 600;">' + (r.masuk > 0 ? formatRupiah(r.masuk) : '-') + '</td>' +
+            '<td class="text-right" style="color: #ef4444; font-weight: 600;">' + (r.keluar > 0 ? formatRupiah(r.keluar) : '-') + '</td>' +
+            '<td class="text-right" style="font-weight: 700;">' + formatRupiah(r.saldo) + '</td>' +
+            '</tr>';
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      /* ===== 6. PENDAPATAN TABLE ===== */
+      function renderPendapatanTable(rows) {
+        const tbody = document.getElementById('tbodyPendapatan');
+        if (!tbody) return;
+
+        if (!rows || rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="dash-empty-cell">Belum ada data pendapatan pada periode ini</td></tr>';
+          return;
+        }
+
+        let html = '';
+        rows.forEach(r => {
+          let badgeClass = 'dash-badge-info';
+          if (r.status === 'Lunas') badgeClass = 'dash-badge-success';
+          else if (r.status === 'Sebagian') badgeClass = 'dash-badge-warning';
+          else if (r.status === 'Belum Lunas') badgeClass = 'dash-badge-danger';
+
+          html += '<tr>' +
+            '<td class="col-num">' + r.id + '.</td>' +
+            '<td>' + escapeHtml(r.tanggal) + '</td>' +
+            '<td style="font-weight: 600;">' + escapeHtml(r.invoice) + '</td>' +
+            '<td>' + escapeHtml(r.customer) + '</td>' +
+            '<td class="text-right" style="font-weight: 600;">' + formatRupiah(r.tagihan) + '</td>' +
+            '<td class="text-right" style="color: ' + (r.sisa > 0 ? '#ef4444' : '#64748b') + '; font-weight: 600;">' + (r.sisa > 0 ? formatRupiah(r.sisa) : '-') + '</td>' +
+            '<td class="text-center"><span class="dash-badge ' + badgeClass + '">' + escapeHtml(r.status) + '</span></td>' +
+            '</tr>';
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      /* ===== 7. PENGURANGAN DAN BEBAN TABLE ===== */
+      function renderPenguranganBebanTable(rows) {
+        const tbody = document.getElementById('tbodyPenguranganBeban');
+        if (!tbody) return;
+
+        if (!rows || rows.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="dash-empty-cell">Belum ada pengakuan beban pada periode ini</td></tr>';
+          return;
+        }
+
+        let html = '';
+        rows.forEach(r => {
+          let badgeClass = 'dash-badge-success';
+          if (r.status === 'Menunggu') badgeClass = 'dash-badge-warning';
+          else if (r.status === 'Ditolak') badgeClass = 'dash-badge-danger';
+
+          html += '<tr>' +
+            '<td class="col-num">' + r.id + '.</td>' +
+            '<td>' + escapeHtml(r.tanggal) + '</td>' +
+            '<td style="font-weight: 600;">' + escapeHtml(r.vendor) + '</td>' +
+            '<td>' + escapeHtml(r.ket) + '</td>' +
+            '<td class="text-right" style="font-weight: 600;">' + formatRupiah(r.tagihan) + '</td>' +
+            '<td class="text-center"><span class="dash-badge ' + badgeClass + '">' + escapeHtml(r.status) + '</span></td>' +
+            '</tr>';
+        });
+
+        tbody.innerHTML = html;
+      }
+
+      /* ===== EVENT LISTENERS ===== */
+      const selectTrendPeriod = document.getElementById('selectTrendPeriod');
+      if (selectTrendPeriod) {
+        selectTrendPeriod.addEventListener('change', function () {
+          const val = this.value;
+          renderDashboard(val);
+        });
+      }
+
+      // Inisialisasi awal (default aktif periode Oktober 2026 agar grafik langsung tampil)
+      renderDashboard('okt2026');
+
+    })();
+  </script>
 </body>
 
 </html>

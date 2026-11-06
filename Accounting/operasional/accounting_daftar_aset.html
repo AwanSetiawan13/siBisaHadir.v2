@@ -5,8 +5,2131 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daftar Aset | Bisa Media</title>
+
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Global & Vendor CSS -->
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
+  <link rel="stylesheet" href="../../assets/css/accounting.css" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       DAFTAR ASET - EXACT MATCH FOR USER MOCKUP & DESIGN SYSTEM
+       ========================================================================== */
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+
+    /* ===== MAIN PANEL ===== */
+    .aset-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+      padding: 20px;
+      overflow: visible !important;
+      margin-bottom: 24px;
+      position: relative;
+      min-height: 480px;
+    }
+
+    .aset-panel-line {
+      height: 3.5px;
+      background: #0076C5;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== TOOLBAR (Kiri: Filter, Kalender, Excel, Search | Kanan: + Tambah) ===== */
+    .aset-toolbar {
+      padding: 0;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 50;
+    }
+
+    .aset-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .aset-toolbar__right {
+      display: flex;
+      align-items: center;
+    }
+
+    .aset-dashed-divider {
+      border-bottom: 1px dashed #cbd5e1;
+      margin: 0 0 14px 0;
+    }
+
+    /* Toolbar Buttons (Filter Funnel, Calendar, Excel) */
+    .aset-dropdown-wrapper {
+      position: relative;
+      z-index: 51;
+    }
+
+    .aset-btn-icon {
+      position: relative;
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #0076C5;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.15s ease;
+      box-sizing: border-box;
+      padding: 0;
+    }
+
+    .aset-btn-icon:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .aset-btn-icon svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+    }
+
+    .aset-btn-excel {
+      color: #107c41;
+      border-color: #86efac;
+      background: #ffffff;
+    }
+
+    .aset-btn-excel:hover {
+      background: #f0fdf4;
+      border-color: #4ade80;
+    }
+
+    /* Search Input Pill */
+    .aset-search-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .aset-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .aset-search-input {
+      width: 200px;
+      height: 36px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 0 14px 0 34px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, width 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .aset-search-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+      width: 250px;
+    }
+
+    .aset-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Tombol + Tambah (Sisi Paling Kanan Konsisten Approval Pengeluaran) */
+    .btn-tambah-aset {
+      height: 36px;
+      padding: 0 18px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-aset:hover {
+      background: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    .btn-tambah-aset:active {
+      transform: scale(0.98);
+    }
+
+    /* ===== TABLE & STICKY COLUMN (Tanpa Bolong di Kanan) ===== */
+    .aset-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 8px;
+      padding: 0 !important;
+      min-height: 360px;
+    }
+
+    .aset-table {
+      width: 100%;
+      border-collapse: separate !important; border-spacing: 0 !important;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .aset-table thead th {
+      padding: 10px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: #0f172a !important;
+      background: #f4f4f5 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: none !important;
+    }
+
+    .aset-table tbody td {
+      padding: 11px 12px;
+      vertical-align: middle;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .aset-table tbody tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    .aset-cell-italic {
+      font-style: italic;
+      color: #334155;
+    }
+
+    /* Fixed / Sticky Action Column di Sebelah Kanan (Menempel Rapat Tanpa Gap) */
+    .aset-table th.col-sticky-action,
+    .aset-table td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    .aset-table th.col-sticky-action {
+      z-index: 11;
+      background-color: #f8fafc !important;
+    }
+
+    .aset-table tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    /* Action Trigger Button (3 Titik Vertikal Tegak) */
+    .aset-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .aset-action-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .aset-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Status Badge Kategori */
+    .aset-badge {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .badge-elektronik {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .badge-furniture {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .badge-kendaraan {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-lainnya {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    /* ===== FLOATING ACTION MENU ===== */
+    .aset-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .aset-action-menu.is-open {
+      display: block;
+    }
+
+    .aset-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #334155;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .aset-action-menu button:hover {
+      background: #f8fafc;
+      color: #0284c7;
+    }
+
+    .aset-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .aset-action-menu button.is-danger:hover {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .aset-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #0076C5;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .aset-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .aset-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .aset-action-menu button.is-danger:hover {
+      background: #fef2f2;
+    }
+
+    .aset-action-menu .aset-action-icon.is-danger {
+      background: #e02424;
+    }
+
+    /* ===== FILTER POPOVER ===== */
+    .aset-popover {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      z-index: 100;
+    }
+
+    .aset-popover.is-active {
+      display: block;
+    }
+
+    .aset-filter-popover {
+      width: 280px;
+      padding: 18px;
+    }
+
+    .aset-filter-group {
+      margin-bottom: 14px;
+    }
+
+    .aset-filter-label {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .aset-filter-box {
+      position: relative;
+      width: 100%;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      background: #ffffff;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .aset-filter-input-wrap {
+      position: relative;
+      width: 100%;
+      height: 38px;
+    }
+
+    .aset-filter-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 30px 0 14px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      cursor: pointer;
+    }
+
+    .aset-filter-input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .aset-filter-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: auto;
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+
+    .aset-filter-arrow svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      pointer-events: none;
+    }
+
+    .aset-filter-dropdown-list {
+      display: none;
+      padding: 2px 0 10px 0;
+      box-sizing: border-box;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    .aset-filter-box.is-open .aset-filter-dropdown-list {
+      display: block;
+    }
+
+    .aset-filter-item {
+      padding: 5px 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .aset-filter-item:hover {
+      background: #f0f9ff;
+      color: #0284c7;
+    }
+
+    .aset-filter-item.is-selected {
+      color: #0284c7;
+      font-weight: 600;
+      background: #f0f9ff;
+    }
+
+    .aset-filter-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .aset-btn-reset {
+      flex: 1;
+      height: 38px;
+      border: 1.5px solid #28a5de;
+      background: #f8fafc;
+      color: #0f172a;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .aset-btn-reset:hover {
+      background: #e2e8f0;
+      border-color: #0284c7;
+    }
+
+    .aset-btn-apply {
+      flex: 1;
+      height: 38px;
+      border: none;
+      background: #28a5de;
+      color: #ffffff;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(40, 165, 222, 0.35);
+    }
+
+    .aset-btn-apply:hover {
+      background: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    /* ===== DUAL MONTH CALENDAR POPOVER ===== */
+    .aset-calendar-popover {
+      width: 620px;
+      max-width: 90vw;
+      padding: 0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .cal-body {
+      display: flex;
+      background: #ffffff;
+    }
+
+    .cal-presets {
+      width: 140px;
+      border-right: 1px solid #f1f5f9;
+      padding: 14px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #fafafa;
+    }
+
+    .cal-preset-btn {
+      width: 100%;
+      text-align: left;
+      padding: 7px 10px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #475569;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .cal-preset-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .cal-preset-btn.is-active {
+      background: #e0f2fe;
+      color: #0284c7;
+      font-weight: 600;
+    }
+
+    .cal-months-wrap {
+      flex: 1;
+      display: flex;
+      padding: 14px;
+      gap: 16px;
+    }
+
+    .cal-month {
+      flex: 1;
+    }
+
+    .cal-month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+
+    .cal-month-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .cal-nav-btn {
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #64748b;
+      padding: 0;
+    }
+
+    .cal-nav-btn:hover {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .cal-nav-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2px;
+    }
+
+    .cal-day {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-family: 'Outfit', sans-serif;
+      color: #334155;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .cal-day:hover:not(.is-empty):not(.is-disabled) {
+      background: #f1f5f9;
+      color: #0284c7;
+    }
+
+    .cal-day.is-empty {
+      cursor: default;
+    }
+
+    .cal-day.is-selected-start,
+    .cal-day.is-selected-end {
+      background: #28a5de !important;
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    .cal-day.is-in-range {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 0;
+    }
+
+    .cal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-top: 1px solid #f1f5f9;
+      background: #ffffff;
+    }
+
+    .cal-selected-range {
+      font-size: 12px;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .cal-footer-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .cal-btn-cancel,
+    .cal-btn-apply {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .cal-btn-cancel {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+
+    .cal-btn-cancel:hover {
+      background: #f1f5f9;
+    }
+
+    .cal-btn-apply {
+      background: #28a5de;
+      border: none;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .cal-btn-apply:hover {
+      background: #0076C5;
+    }
+
+    /* ===== MODALS (CRUD) - PERSIS MODAL DAFTAR ASET USER MOCKUP ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 200000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.is-open,
+    .modal-overlay.is-active {
+      display: flex !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .aset-modal-box {
+      width: 100%;
+      max-width: 860px;
+      max-height: 94vh;
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 24px 28px 24px 28px;
+      box-sizing: border-box;
+    }
+
+    .modal-accent-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3.5px;
+      background: #0076C5;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 4px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .modal-title em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1.5px solid #64748b;
+      background: transparent;
+      color: #0f172a;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close:hover {
+      background: #f1f5f9;
+      border-color: #0f172a;
+    }
+
+    .modal-dashed-divider {
+      border-bottom: 1px dashed #cbd5e1;
+      margin-bottom: 22px;
+    }
+
+    /* Grid Form Layout: 3 Kolom Presisi */
+    .modal-crud-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px 18px;
+      margin-bottom: 26px;
+    }
+
+    .col-span-4 { grid-column: span 4; }
+    .col-span-12 { grid-column: span 12; }
+
+    @media (max-width: 820px) {
+      .col-span-4 { grid-column: span 12; }
+    }
+
+    .modal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .modal-field-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .modal-field-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 8px;
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #1e293b;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .modal-field-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .modal-field-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Field Terkalkulasi / Otomatis (Soft Grey Background Sesuai Mockup) */
+    .modal-field-input.is-calc {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    /* Field Nilai Read-Only (Modal Lihat) */
+    .modal-field-value {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #475569;
+      box-sizing: border-box;
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    /* Dropdown with Checkboxes (Kode COA & PIC Sesuai Mockup Gambar 2) */
+    .modal-dropdown-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .modal-dropdown-wrap.is-open .modal-field-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-color: #e2e8f0;
+    }
+
+    .modal-dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 8px 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+      box-sizing: border-box;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .modal-dropdown-wrap.is-open .modal-dropdown-menu {
+      display: block;
+    }
+
+    .modal-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 4px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-style: italic;
+      color: #475569;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .modal-dropdown-item:hover {
+      color: #0284c7;
+    }
+
+    .modal-dropdown-item input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      accent-color: #28a5de;
+    }
+
+    /* Upload Box & Button Sesuai Mockup Gambar 1 */
+    .modal-field-file-box {
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      border: 1.5px solid #e2e8f0;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      box-sizing: border-box;
+    }
+
+    .btn-choose-file-inner {
+      height: 26px;
+      padding: 0 12px;
+      border-radius: 4px;
+      border: 1.2px solid #38bdf8;
+      background: #f0f9ff;
+      color: #0284c7;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-choose-file-inner:hover {
+      background: #e0f2fe;
+    }
+
+    /* Tombol Lihat Foto (Sesuai Mockup Gambar 3) */
+    .btn-lihat-foto {
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0284c7;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      font-style: italic;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-lihat-foto:hover {
+      background: #f0f9ff;
+      border-color: #0076c5;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 10px;
+    }
+
+    /* Outline Button Style (Identik Sesuai Mockup Pajak & Payroll) */
+    .btn-modal-action {
+      min-width: 140px;
+      height: 42px;
+      padding: 0 24px;
+      border-radius: 8px;
+      border: 1.5px solid #28a5de;
+      background: #ffffff;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-modal-action:hover {
+      background: #f0f9ff;
+      border-color: #0284c7;
+      color: #0284c7;
+    }
+
+    /* Bukti Image Preview Modal */
+    
+    /* Custom File Box with Dynamic Eye Preview Icon */
+    .modal-field-file-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      padding: 3px 8px;
+      height: 38px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      box-sizing: border-box;
+    }
+
+    .btn-choose-file-inner {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: #0284c7;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background 0.15s ease;
+    }
+
+    .btn-choose-file-inner:hover {
+      background: #e0f2fe;
+    }
+
+    .pnd-eye-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: #0284c7;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease;
+    }
+
+    .pnd-eye-btn:hover {
+      background: #bae6fd;
+    }
+
+    .pnd-eye-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .bukti-modal-content {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .bukti-modal-content img {
+      max-width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+    }
+  
+    /* ===== FILTER POPOVER (3 FIELD: KODE COA, STATUS, KATEGORI - SESUAI GAMBAR 1 & 2) ===== */
+    .aset-filter-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 290px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+      padding: 18px 20px;
+      z-index: 100;
+      box-sizing: border-box;
+    }
+
+    .aset-filter-group {
+      margin-bottom: 14px;
+    }
+
+    .aset-filter-label {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+
+    .aset-filter-box {
+      position: relative;
+    }
+
+    .aset-filter-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .aset-filter-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 32px 0 12px;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #334155;
+      background: #ffffff;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s, border-radius 0.15s;
+    }
+
+    .aset-filter-input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .aset-filter-box.is-open .aset-filter-input {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-color: #e2e8f0;
+    }
+
+    .aset-filter-arrow {
+      position: absolute;
+      right: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .aset-filter-arrow svg {
+      width: 13px;
+      height: 13px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+    }
+
+    .aset-filter-dropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #28a5de;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      padding: 6px 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      z-index: 110;
+      box-sizing: border-box;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    .aset-filter-item {
+      padding: 7px 4px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .aset-filter-item:hover {
+      color: #0284c7;
+      background: #f8fafc;
+    }
+
+    .aset-filter-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .btn-filter-riset {
+      flex: 1;
+      padding: 8px 14px;
+      background: #f8fafc;
+      border: 1.5px solid #28a5de;
+      border-radius: 8px;
+      color: #0f172a;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-riset:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-filter-terapkan {
+      flex: 1;
+      padding: 8px 14px;
+      background: #28a5de;
+      border: none;
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      font-style: italic;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: all 0.15s ease;
+    }
+
+    .btn-filter-terapkan:hover {
+      background: #0284c7;
+    }
+
+    /* Search Input Pill */
+    .aset-search-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .aset-search-icon {
+      position: absolute;
+      left: 12px;
+      width: 15px;
+      height: 15px;
+      stroke: #94a3b8;
+      stroke-width: 2.2;
+      fill: none;
+      pointer-events: none;
+    }
+
+    .aset-search-input {
+      width: 200px;
+      height: 36px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 0 14px 0 34px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, width 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .aset-search-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+      width: 250px;
+    }
+
+    .aset-search-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Tombol + Tambah (Sisi Paling Kanan Konsisten Approval Pengeluaran) */
+    .btn-tambah-aset {
+      height: 36px;
+      padding: 0 18px;
+      background: #28a5de;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-aset:hover {
+      background: #0076C5;
+      transform: translateY(-1px);
+    }
+
+    .btn-tambah-aset:active {
+      transform: scale(0.98);
+    }
+
+    
+  
+    /* Table Styles - Consistent with Kas & Bank UI (Rounded Header Edges) */
+    table,
+    [class*="-table"] {
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+    }
+
+    thead th {
+      background: #f4f4f5 !important;
+      color: #0f172a !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      vertical-align: middle !important;
+    }/* Sticky Kolom Nomor (#) - Fixed di Kiri */
+    thead th:first-child,
+    tbody td:first-child {
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 10 !important;
+      background-color: #ffffff !important;
+      border-right: 1px solid #e2e8f0 !important;
+      box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+      text-align: center !important;
+      width: 48px !important;
+      min-width: 48px !important;
+      max-width: 55px !important;
+    }
+
+    thead th:first-child {
+      z-index: 12 !important;
+      background-color: #f4f4f5 !important;
+      border-top-left-radius: 8px !important;
+      border-bottom-left-radius: 8px !important;
+      border-left: 1px solid #e4e4e7 !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr:hover td:first-child {
+      background-color: #f8fafc !important;
+    }
+
+    thead th:last-child {
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+      border-right: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+    }
+
+    tbody td {
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    tbody tr:hover,
+    tbody tr:hover td {
+      background-color: #f8fafc !important;
+    }
+
+    /* Sticky Aksi Column */
+    th.col-sticky-action,
+    td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+    }
+
+    th.col-sticky-action {
+      z-index: 11;
+      background-color: #f4f4f5 !important;
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+      border-right: 1px solid #e4e4e7 !important;
+    }
+
+    tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+  
+  
+  
+  /* ==========================================================================
+     UNIFIED OPERATIONAL UI/UX STANDARD (KAS & BANK SPECIFICATION)
+     ========================================================================== */
+
+  /* 1. Main Panel Container & Top Flush Accent Line */
+  .panel,
+  .campaign-panel,
+  .kb-panel,
+  .pnd-panel,
+  .aset-panel,
+  .budget-panel,
+  .mutasi-panel,
+  .alokasi-panel,
+  .penyusutan-panel,
+  .piutang-panel,
+  .utang-panel,
+  .rekap-panel,
+  .profit-panel,
+  .pajak-panel,
+  .payroll-panel {
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+    padding: 20px !important;
+    position: relative !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-panel-line,
+  .pnd-panel-line,
+  .aset-panel-line,
+  .budget-panel-accent,
+  .mutasi-panel-accent,
+  .alokasi-panel-accent,
+  .penyusutan-panel-accent,
+  .piutang-panel-accent,
+  .piutang-panel-line,
+  .utang-panel-line,
+  .rekap-panel-accent,
+  .profit-panel-line,
+  .pajak-panel-line,
+  .payroll-panel-line,
+  .campaign-panel__line {
+    display: block !important;
+    height: 4px !important;
+    margin: -20px -20px 16px -20px !important;
+    border-radius: 14px 14px 0 0 !important;
+    background: #0076C5 !important;
+    width: calc(100% + 40px) !important;
+  }
+
+  /* 2. Unified Toolbar & Grouping */
+  .kb-toolbar,
+  .pnd-toolbar,
+  .aset-toolbar,
+  .budget-toolbar,
+  .mutasi-toolbar,
+  .alokasi-toolbar,
+  .penyusutan-toolbar,
+  .piutang-toolbar,
+  .utang-toolbar,
+  .rekap-toolbar,
+  .profit-toolbar,
+  .pajak-toolbar,
+  .payroll-toolbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    margin: 0 0 16px 0 !important;
+    padding: 0 0 14px 0 !important;
+    border-bottom: 1px dashed #cbd5e1 !important;
+    position: relative !important;
+    z-index: 50 !important;
+  }
+
+  /* Hide redundant divider elements */
+  .kb-dashed-divider,
+  .pnd-dashed-divider,
+  .aset-dashed-divider,
+  .pajak-dashed-divider,
+  .payroll-dashed-divider,
+  .piutang-dashed-divider,
+  .profit-dashed-divider,
+  .utang-dashed-divider {
+    display: none !important;
+  }
+
+  .toolbar-left-group,
+  .kb-toolbar__left,
+  .pnd-toolbar__left,
+  .aset-toolbar__left,
+  .pajak-toolbar__left,
+  .payroll-toolbar__left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    position: relative !important;
+  }
+
+  .toolbar-right-group,
+  .kb-toolbar__right,
+  .pnd-toolbar__right,
+  .aset-toolbar__right,
+  .pajak-toolbar__right,
+  .payroll-toolbar__right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-left: auto !important;
+  }
+
+  /* 3. Toolbar Small Action Buttons */
+  .kb-btn-icon,
+  .pnd-btn-icon,
+  .aset-btn-icon,
+  .btn-toolbar-icon,
+  .piutang-btn-icon,
+  .utang-btn-icon,
+  .profit-btn-icon,
+  .pajak-btn-icon,
+  .payroll-btn-icon {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #3b82f6 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-btn-icon:hover,
+  .pnd-btn-icon:hover,
+  .aset-btn-icon:hover,
+  .btn-toolbar-icon:hover,
+  .piutang-btn-icon:hover,
+  .utang-btn-icon:hover,
+  .profit-btn-icon:hover,
+  .pajak-btn-icon:hover,
+  .payroll-btn-icon:hover {
+    border-color: #0284c7 !important;
+    color: #0284c7 !important;
+    background: #f0f9ff !important;
+  }
+
+  .kb-btn-icon svg,
+  .pnd-btn-icon svg,
+  .aset-btn-icon svg,
+  .btn-toolbar-icon svg,
+  .piutang-btn-icon svg,
+  .utang-btn-icon svg,
+  .profit-btn-icon svg,
+  .pajak-btn-icon svg,
+  .payroll-btn-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+  }
+
+  /* Excel Button */
+  .kb-btn-excel,
+  .pnd-btn-excel,
+  .aset-btn-excel,
+  .btn-excel,
+  .piutang-btn-excel,
+  .utang-btn-excel,
+  .profit-btn-excel,
+  .pajak-btn-excel,
+  .payroll-btn-excel {
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+    color: #15803d !important;
+  }
+
+  .kb-btn-excel:hover,
+  .pnd-btn-excel:hover,
+  .aset-btn-excel:hover,
+  .btn-excel:hover,
+  .piutang-btn-excel:hover,
+  .utang-btn-excel:hover,
+  .profit-btn-excel:hover,
+  .pajak-btn-excel:hover,
+  .payroll-btn-excel:hover {
+    background: #dcfce7 !important;
+    border-color: #4ade80 !important;
+  }
+
+  .kb-btn-excel svg,
+  .pnd-btn-excel svg,
+  .aset-btn-excel svg,
+  .btn-excel svg,
+  .piutang-btn-excel svg,
+  .utang-btn-excel svg,
+  .profit-btn-excel svg,
+  .pajak-btn-excel svg,
+  .payroll-btn-excel svg {
+    stroke: none !important;
+    fill: none !important;
+  }
+
+  /* 4. Toolbar Search Pill Input */
+  .kb-search-wrap,
+  .pnd-search-wrap,
+  .budget-search-wrapper,
+  .mutasi-search-wrapper,
+  .alokasi-search-wrapper,
+  .penyusutan-search-wrapper,
+  .piutang-search-wrapper,
+  .utang-search-wrapper,
+  .rekap-search-wrapper,
+  .profit-search-wrapper,
+  .pajak-search-wrap,
+  .payroll-search-wrap,
+  .aset-search-wrapper {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    width: 200px !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-search-wrap input,
+  .pnd-search-wrap input,
+  .budget-search-input,
+  .mutasi-search-input,
+  .alokasi-search-input,
+  .penyusutan-search-input,
+  .piutang-search-input,
+  .utang-search-input,
+  .rekap-search-input,
+  .profit-search-input,
+  .pajak-search-wrap input,
+  .payroll-search-wrap input,
+  .aset-search-input {
+    width: 100% !important;
+    height: 34px !important;
+    padding: 0 14px 0 32px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13px !important;
+    color: #1e293b !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    transition: all 0.15s ease !important;
+  }
+
+  .kb-search-wrap input:focus,
+  .pnd-search-wrap input:focus,
+  .budget-search-input:focus,
+  .mutasi-search-input:focus,
+  .alokasi-search-input:focus,
+  .penyusutan-search-input:focus,
+  .piutang-search-input:focus,
+  .utang-search-input:focus,
+  .rekap-search-input:focus,
+  .profit-search-input:focus,
+  .pajak-search-wrap input:focus,
+  .payroll-search-wrap input:focus,
+  .aset-search-input:focus {
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12) !important;
+  }
+
+  .kb-search-wrap input::placeholder,
+  .pnd-search-wrap input::placeholder,
+  .budget-search-input::placeholder,
+  .mutasi-search-input::placeholder,
+  .alokasi-search-input::placeholder,
+  .penyusutan-search-input::placeholder,
+  .piutang-search-input::placeholder,
+  .utang-search-input::placeholder,
+  .rekap-search-input::placeholder,
+  .profit-search-input::placeholder,
+  .pajak-search-wrap input::placeholder,
+  .payroll-search-wrap input::placeholder,
+  .aset-search-input::placeholder {
+    color: #94a3b8 !important;
+    font-style: italic !important;
+    font-size: 13px !important;
+  }
+
+  .kb-search-wrap svg,
+  .pnd-search-wrap svg,
+  .budget-search-icon,
+  .mutasi-search-icon,
+  .alokasi-search-icon,
+  .penyusutan-search-icon,
+  .piutang-search-icon,
+  .utang-search-icon,
+  .rekap-search-icon,
+  .profit-search-icon,
+  .pajak-search-wrap svg,
+  .payroll-search-wrap svg,
+  .aset-search-icon {
+    position: absolute !important;
+    left: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 14px !important;
+    height: 14px !important;
+    color: #94a3b8 !important;
+    stroke: #94a3b8 !important;
+    stroke-width: 2 !important;
+    fill: none !important;
+    pointer-events: none !important;
+  }
+
+  /* 5. Unified + Tambah Button */
+  .btn-tambah-kb,
+  .btn-tambah-pnd,
+  .btn-tambah-aset,
+  .btn-tambah-budget,
+  .btn-tambah-mutasi,
+  .btn-tambah-alokasi,
+  .btn-tambah-piutang,
+  .btn-tambah-pajak,
+  .btn-tambah-payroll {
+    height: 36px !important;
+    padding: 0 18px !important;
+    border: none !important;
+    border-radius: 6px !important;
+    background: #28a5de !important;
+    color: #ffffff !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13.5px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25) !important;
+    transition: background 0.15s ease, transform 0.1s ease !important;
+    white-space: nowrap !important;
+    margin-left: auto;
+  }
+
+  .btn-tambah-kb:hover,
+  .btn-tambah-pnd:hover,
+  .btn-tambah-aset:hover,
+  .btn-tambah-budget:hover,
+  .btn-tambah-mutasi:hover,
+  .btn-tambah-alokasi:hover,
+  .btn-tambah-piutang:hover,
+  .btn-tambah-pajak:hover,
+  .btn-tambah-payroll:hover {
+    background: #0284c7 !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .btn-tambah-kb:active,
+  .btn-tambah-pnd:active,
+  .btn-tambah-aset:active,
+  .btn-tambah-budget:active,
+  .btn-tambah-mutasi:active,
+  .btn-tambah-alokasi:active,
+  .btn-tambah-piutang:active,
+  .btn-tambah-pajak:active,
+  .btn-tambah-payroll:active {
+    transform: scale(0.98) !important;
+  }
+
+  /* 6. Unified Table Structure & Sticky Columns (Flush Aligned with Toolbar Above) */
+  .table-wrap,
+  .campaign-table,
+  .budget-table-wrap,
+  .alokasi-table-wrap,
+  .aset-table-wrap,
+  .mutasi-table-wrap,
+  .pajak-table-wrap,
+  .payroll-table-wrap,
+  .penyusutan-table-wrap,
+  .piutang-table-wrap,
+  .profit-table-wrap,
+  .rekap-table-wrap,
+  .utang-table-wrap {
+    overflow-x: auto !important;
+    width: 100% !important;
+    border-radius: 8px !important;
+    position: relative !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  thead th {
+    background-color: #f4f4f5 !important;
+    color: #0f172a !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    padding: 12px 14px !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Sticky Kolom Nomor (#) - Fixed di Kiri & Sejajar Presisi dengan Icon Toolbar */
+  thead th:first-child,
+  tbody td:first-child {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    border-right: 1px solid #e2e8f0 !important;
+    box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+    text-align: center !important;
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 55px !important;
+    box-sizing: border-box !important;
+  }
+
+  thead th:first-child {
+    z-index: 12 !important;
+    background-color: #f4f4f5 !important;
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+    border-left: 1px solid #e4e4e7 !important;
+    border-top: 1px solid #e4e4e7 !important;
+    border-bottom: 1px solid #e4e4e7 !important;
+  }
+
+  thead th:last-child {
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e4e4e7 !important;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f1f5f9 !important;
+    transition: background 0.15s ease !important;
+  }
+
+  tbody td {
+    padding: 12px 14px !important;
+    vertical-align: middle !important;
+    color: #334155 !important;
+    font-size: 13px !important;
+    font-family: 'Outfit', sans-serif !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    box-sizing: border-box !important;
+  }
+
+  tbody tr:hover,
+  tbody tr:hover td {
+    background-color: #f8fafc !important;
+  }
+
+  tbody tr:hover td:first-child {
+    background-color: #f8fafc !important;
+  }
+
+  /* Sticky Kolom Aksi - Fixed di Kanan */
+  th.col-sticky-action,
+  td.col-sticky-action,
+  th:last-child.col-sticky-action,
+  td:last-child.col-sticky-action {
+    position: sticky !important;
+    right: 0 !important;
+    z-index: 10 !important;
+    background-color: #ffffff !important;
+    border-left: 1px solid #e2e8f0 !important;
+    box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  th.col-sticky-action,
+  th:last-child.col-sticky-action {
+    z-index: 11 !important;
+    background-color: #f4f4f5 !important;
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-right: 1px solid #e4e4e7 !important;
+  }
+
+  tbody tr:hover td.col-sticky-action,
+  tbody tr:hover td:last-child.col-sticky-action {
+    background-color: #f8fafc !important;
+  }
+
+  /* 7. Unified Action Trigger Button (⋮) */
+  .kb-action-btn,
+  .pnd-action-btn,
+  .btn-action-trigger,
+  .aset-action-btn,
+  .mutasi-action-btn,
+  .alokasi-action-btn,
+  .pajak-action-btn,
+  .payroll-action-btn,
+  .piutang-action-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #0f172a !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease !important;
+  }
+
+  .kb-action-btn:hover,
+  .pnd-action-btn:hover,
+  .btn-action-trigger:hover,
+  .aset-action-btn:hover,
+  .mutasi-action-btn:hover,
+  .alokasi-action-btn:hover,
+  .pajak-action-btn:hover,
+  .payroll-action-btn:hover,
+  .piutang-action-btn:hover {
+    background: #f1f5f9 !important;
+  }
+
+  .kb-action-btn svg,
+  .pnd-action-btn svg,
+  .btn-action-trigger svg,
+  .aset-action-btn svg,
+  .mutasi-action-btn svg,
+  .alokasi-action-btn svg,
+  .pajak-action-btn svg,
+  .payroll-action-btn svg,
+  .piutang-action-btn svg {
+    width: 18px !important;
+    height: 18px !important;
+    fill: currentColor !important;
+    pointer-events: none !important;
+  }
+
+  /* 8. Unified Floating Action Menu */
+  .kb-action-menu,
+  .pnd-action-menu,
+  .budget-action-menu,
+  .mutasi-action-menu,
+  .alokasi-action-menu,
+  .piutang-action-menu,
+  .aset-action-menu,
+  .pajak-action-menu,
+  .payroll-action-menu {
+    position: fixed !important;
+    z-index: 2147483000 !important;
+    min-width: 145px !important;
+    padding: 6px !important;
+    border: 1px solid rgba(0, 0, 0, .08) !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .14) !important;
+    box-sizing: border-box !important;
+  }
+
+  .kb-action-menu.is-open,
+  .kb-action-menu.is-active,
+  .pnd-action-menu.is-open,
+  .pnd-action-menu.is-active,
+  .budget-action-menu.is-open,
+  .budget-action-menu.is-active,
+  .mutasi-action-menu.is-open,
+  .mutasi-action-menu.is-active,
+  .alokasi-action-menu.is-open,
+  .alokasi-action-menu.is-active,
+  .piutang-action-menu.is-open,
+  .piutang-action-menu.is-active,
+  .aset-action-menu.is-open,
+  .aset-action-menu.is-active,
+  .pajak-action-menu.is-open,
+  .pajak-action-menu.is-active,
+  .payroll-action-menu.is-open,
+  .payroll-action-menu.is-active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+</style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +2137,2093 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <!-- ===== MAIN PANEL DAFTAR ASET (SESUAI MOCKUP GAMBAR USER) ===== -->
+      <section class="aset-panel">
+        <div class="aset-panel-line"></div>
+
+        <!-- Toolbar: Filter, Calendar, Excel, Search (Kiri) & + Tambah (Kanan Konsisten) -->
+        <div class="aset-toolbar">
+          <div class="aset-toolbar__left">
+            <!-- Filter Funnel Button & Popover -->
+            <div class="aset-dropdown-wrapper">
+              <button id="btnFilter" class="aset-btn-icon" type="button" aria-label="Filter" title="Filter Data Aset">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+              </button>
+
+              <!-- Filter Dropdown Popover -->
+              <div id="filterDropdown" class="aset-popover aset-filter-popover" style="display: none;">
+                <!-- Group 1: Kode COA -->
+                <div class="aset-filter-group">
+                  <label class="aset-filter-label" for="filterKodeCOA">Kode COA</label>
+                  <div class="aset-filter-box" id="boxFilterKodeCOA">
+                    <div class="aset-filter-input-wrap">
+                      <input type="text" id="filterKodeCOA" class="aset-filter-input" placeholder="Pilih Kode COA" autocomplete="off" />
+                      <span class="aset-filter-arrow" title="Buka pilihan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="aset-filter-dropdown-list" id="listFilterKodeCOA" style="display: none;"></div>
+                  </div>
+                </div>
+
+                <!-- Group 2: Status -->
+                <div class="aset-filter-group">
+                  <label class="aset-filter-label" for="filterStatus">Status</label>
+                  <div class="aset-filter-box" id="boxFilterStatus">
+                    <div class="aset-filter-input-wrap">
+                      <input type="text" id="filterStatus" class="aset-filter-input" placeholder="Pilih Status" autocomplete="off" />
+                      <span class="aset-filter-arrow" title="Buka pilihan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="aset-filter-dropdown-list" id="listFilterStatus" style="display: none;"></div>
+                  </div>
+                </div>
+
+                <!-- Group 3: Kategori -->
+                <div class="aset-filter-group">
+                  <label class="aset-filter-label" for="filterKategori">Kategori</label>
+                  <div class="aset-filter-box" id="boxFilterKategori">
+                    <div class="aset-filter-input-wrap">
+                      <input type="text" id="filterKategori" class="aset-filter-input" placeholder="Pilih Kategori" autocomplete="off" />
+                      <span class="aset-filter-arrow" title="Buka pilihan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="aset-filter-dropdown-list" id="listFilterKategori" style="display: none;"></div>
+                  </div>
+                </div>
+
+                <!-- Filter Actions: Riset & Terapkan -->
+                <div class="aset-filter-actions">
+                  <button type="button" id="btnResetFilter" class="btn-filter-riset"><em>Riset</em></button>
+                  <button type="button" id="btnApplyFilter" class="btn-filter-terapkan"><em>Terapkan</em></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calendar Popover Button -->
+            <div class="aset-dropdown-wrapper">
+              <button id="btnCalendar" class="aset-btn-icon" type="button" aria-label="Pilih Tanggal" title="Filter Berdasarkan Tanggal Beli">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </button>
+
+              <!-- Dual Month Calendar Popover (Tidak Otomatis Close Saat Klik) -->
+              <div id="calendarDropdown" class="aset-popover aset-calendar-popover">
+                <div class="cal-body">
+                  <!-- Presets Column -->
+                  <div class="cal-presets">
+                    <button type="button" class="cal-preset-btn is-active" data-preset="all">Semua Data</button>
+                    <button type="button" class="cal-preset-btn" data-preset="today">Hari Ini</button>
+                    <button type="button" class="cal-preset-btn" data-preset="last7">7 Hari Terakhir</button>
+                    <button type="button" class="cal-preset-btn" data-preset="last30">30 Hari Terakhir</button>
+                    <button type="button" class="cal-preset-btn" data-preset="thisMonth">Bulan Ini</button>
+                    <button type="button" class="cal-preset-btn" data-preset="lastMonth">Bulan Lalu</button>
+                    <button type="button" class="cal-preset-btn" data-preset="custom">Kustom</button>
+                  </div>
+
+                  <!-- 2 Month Calendars -->
+                  <div class="cal-months-wrap">
+                    <!-- Month 1 -->
+                    <div class="cal-month" id="calMonth1">
+                      <div class="cal-month-header">
+                        <button type="button" class="cal-nav-btn" id="calPrevMonth" aria-label="Bulan Sebelumnya">
+                          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <span class="cal-month-title" id="calTitle1">Oktober 2026</span>
+                        <span style="width: 26px;"></span>
+                      </div>
+                      <div class="cal-weekdays">
+                        <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+                      </div>
+                      <div class="cal-days-grid" id="calDays1"></div>
+                    </div>
+
+                    <!-- Month 2 -->
+                    <div class="cal-month" id="calMonth2">
+                      <div class="cal-month-header">
+                        <span style="width: 26px;"></span>
+                        <span class="cal-month-title" id="calTitle2">November 2026</span>
+                        <button type="button" class="cal-nav-btn" id="calNextMonth" aria-label="Bulan Berikutnya">
+                          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                      </div>
+                      <div class="cal-weekdays">
+                        <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+                      </div>
+                      <div class="cal-days-grid" id="calDays2"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cal-footer">
+                  <span class="cal-selected-range" id="calRangeDisplay">Pilih rentang tanggal beli</span>
+                  <div class="cal-footer-btns">
+                    <button type="button" class="cal-btn-cancel" id="btnCancelCalendar">Batal</button>
+                    <button type="button" class="cal-btn-apply" id="btnApplyCalendar">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Excel Export Button (Ikon Hijau Standar Sesuai Approval Pengeluaran) -->
+            <button id="btnExportExcel" class="aset-btn-icon aset-btn-excel" type="button" aria-label="Export Excel" title="Download Excel (.xlsx)">
+              <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <!-- Search Input -->
+            <div class="aset-search-wrapper">
+              <svg class="aset-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="asetSearch" class="aset-search-input" placeholder="Cari...." autocomplete="off" />
+            </div>
+          </div>
+
+          <!-- Tambah Aset Button (Sisi Kanan Konsisten dengan Approval Pengeluaran) -->
+          <div class="aset-toolbar__right">
+            <button id="btnTambahAset" class="btn-tambah-aset" type="button" onclick="openAddModal()">+ Tambah</button>
+          </div>
+        </div>
+
+        <div class="aset-dashed-divider"></div>
+
+        <!-- Table Container with Horizontal Scroll & Sticky Aksi (Tanpa Bolong di Kanan) -->
+        <div class="aset-table-wrap">
+          <table class="aset-table" id="asetTable">
+            <thead>
+              <tr>
+                <th style="width: 48px; text-align: center;">#</th>
+                <th style="min-width: 140px;">Kode Aset</th>
+                <th style="min-width: 220px;">Nama Aset</th>
+                <th style="min-width: 130px;">Tanggal Beli</th>
+                <th style="min-width: 180px;">Lokasi</th>
+                <th style="min-width: 80px; text-align: center;">Qty</th>
+                <th style="min-width: 130px;">Kategori</th>
+                <th class="col-sticky-action" style="width: 70px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="asetTableBody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
 
+  <!-- ===== FLOATING ACTION MENU ===== -->
+  <div id="asetActionMenu" class="aset-action-menu" role="menu" aria-hidden="true">
+    <button type="button" role="menuitem" data-action="view">
+      <span class="aset-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" role="menuitem" data-action="edit">
+      <span class="aset-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" role="menuitem" data-action="delete" class="is-danger">
+      <span class="aset-action-icon is-danger" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <!-- ===== MODAL CRUD: "Tambah / Edit Daftar Aset" (100% PERSIS SCREENSHOT USER) ===== -->
+  <div id="asetCrudModal" class="modal-overlay">
+    <div class="aset-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-header">
+        <h2 class="modal-title" id="crudModalTitle"><em>Tambah</em> Daftar Aset</h2>
+        <button class="modal-close" type="button" id="btnCloseCrud" aria-label="Tutup">x</button>
+      </div>
+
+      <div class="modal-dashed-divider"></div>
+
+      <form id="asetCrudForm" onsubmit="return false;">
+        <input type="hidden" id="crudId" />
+
+        <div class="modal-crud-grid">
+          <!-- Row 1: Kode Aset, Nama Aset, Tanggal Beli -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudKodeAset">Kode Aset</label>
+            <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="AST-000" required />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudNamaAset">Nama Aset</label>
+            <input type="text" id="crudNamaAset" class="modal-field-input" placeholder="Tambah Nama Aset" required />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudTanggalBeli">Tanggal Beli</label>
+            <input type="text" id="crudTanggalBeli" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required />
+          </div>
+
+          <!-- Row 2: Kode COA, Lokasi, Harga Satuan -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudKodeCOA">Kode COA</label>
+            <div class="modal-dropdown-wrap" id="wrapKodeCOA">
+              <input type="text" id="crudKodeCOA" class="modal-field-input" placeholder="Pilih Kede COA" readonly style="cursor: pointer;" />
+              <div class="modal-dropdown-menu" id="menuKodeCOA">
+                <label class="modal-dropdown-item"><input type="checkbox" value="1001 | Kas Kecil"> <span>1001 | Kas Kecil</span></label>
+                <label class="modal-dropdown-item"><input type="checkbox" value="1002 | Bank BCA"> <span>1002 | Bank BCA</span></label>
+                <label class="modal-dropdown-item"><input type="checkbox" value="1301 | Peralatan Kantor"> <span>1301 | Peralatan Kantor</span></label>
+                <label class="modal-dropdown-item"><input type="checkbox" value="1302 | Peralatan & Perlengkapan Kantor"> <span>1302 | Peralatan & Perlengkapan Kantor</span></label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudLokasi">Lokasi</label>
+            <input type="text" id="crudLokasi" class="modal-field-input" placeholder="Tambah Lokasi" required />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudHargaSatuan">Harga Satuan</label>
+            <input type="text" id="crudHargaSatuan" class="modal-field-input" placeholder="Rp. -" />
+          </div>
+
+          <!-- Row 3: Qty, Harga Perolehan, Umur (Bulan) -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudQty">Qty</label>
+            <input type="number" id="crudQty" class="modal-field-input" placeholder="0" min="1" required />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudHargaPerolehan">Harga Perolehan</label>
+            <input type="text" id="crudHargaPerolehan" class="modal-field-input is-calc" placeholder="Rp. -" readonly />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudUmurBulan">Umur (Bulan)</label>
+            <input type="number" id="crudUmurBulan" class="modal-field-input" placeholder="0" min="0" />
+          </div>
+
+          <!-- Row 4: Nilai Residu, Penyusutan/Bulan, Akumulasi -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudNilaiResidu">Nilai Residu</label>
+            <input type="text" id="crudNilaiResidu" class="modal-field-input is-calc" placeholder="Rp. -" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudPenyusutanBulan">Penyusutan/Bulan</label>
+            <input type="text" id="crudPenyusutanBulan" class="modal-field-input is-calc" placeholder="Rp. -" readonly />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudAkumulasi">Akumulasi</label>
+            <input type="text" id="crudAkumulasi" class="modal-field-input is-calc" placeholder="Rp. -" />
+          </div>
+
+          <!-- Row 5: Nilai Buku, Status, Kategori -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudNilaiBuku">Nilai Buku</label>
+            <input type="text" id="crudNilaiBuku" class="modal-field-input is-calc" placeholder="Rp. -" readonly />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudStatus">Status</label>
+            <input type="text" id="crudStatus" class="modal-field-input" placeholder="Pilih Status" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudKategori">Kategori</label>
+            <input type="text" id="crudKategori" class="modal-field-input" placeholder="Tambah Keterangan" required />
+          </div>
+
+          <!-- Row 6: Mulai di Pakai, PIC, Divisi -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudMulaiDiPakai">Mulai di Pakai</label>
+            <input type="text" id="crudMulaiDiPakai" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudPIC">PIC</label>
+            <div class="modal-dropdown-wrap" id="wrapPIC">
+              <input type="text" id="crudPIC" class="modal-field-input" placeholder="Pilih PIC" readonly style="cursor: pointer;" />
+              <div class="modal-dropdown-menu" id="menuPIC">
+                <label class="modal-dropdown-item"><input type="checkbox" value="Nama 1"> <span>Nama 1</span></label>
+                <label class="modal-dropdown-item"><input type="checkbox" value="Nama 2"> <span>Nama 2</span></label>
+                <label class="modal-dropdown-item"><input type="checkbox" value="Nama 3"> <span>Nama 3</span></label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudDivisi">Divisi</label>
+            <input type="text" id="crudDivisi" class="modal-field-input is-calc" placeholder="Divisi" />
+          </div>
+
+          <!-- Row 7: Project/Brand, Tanggal Pelepasan, Bukti/Foto -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudProjectBrand">Project/Brand</label>
+            <input type="text" id="crudProjectBrand" class="modal-field-input" placeholder="-" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudTanggalPelepasan">Tanggal Pelepasan</label>
+            <input type="text" id="crudTanggalPelepasan" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label">Bukti/Foto</label>
+            <div class="modal-field-file-box">
+              <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                <input type="file" id="crudBuktiFoto" accept="image/*,.pdf" style="display: none;" />
+                <button type="button" class="btn-choose-file-inner" id="btnTriggerFile">Choose File</button>
+                <span id="fileNameDisplay" style="font-family: 'Outfit', sans-serif; font-size: 11.5px; color: #64748b; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 130px;">Belum ada file</span>
+              </div>
+              <button type="button" id="btnPreviewBuktiForm" class="pnd-eye-btn" title="Lihat Bukti Foto" style="display: none;">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Row 8: Hasil Pelepasan, Nilai Buku Saat Lepas, Laba/Rugi Lepas -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudHasilPelepasan">Hasil Pelepasan</label>
+            <input type="text" id="crudHasilPelepasan" class="modal-field-input" placeholder="-" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudNilaiBukuSaatLepas">Nilai Buku Saat Lepas</label>
+            <input type="text" id="crudNilaiBukuSaatLepas" class="modal-field-input is-calc" placeholder="-" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudLabaRugiLepas">Laba/Rugi Lepas</label>
+            <input type="text" id="crudLabaRugiLepas" class="modal-field-input is-calc" placeholder="-" />
+          </div>
+
+          <!-- Row 9: Divisi Pengecualian, Nama Akun COA, Kelompok COA -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudDivisiPengecualian">Divisi Pengecualian</label>
+            <input type="text" id="crudDivisiPengecualian" class="modal-field-input is-calc" placeholder="Divisi Pengecualian" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudNamaAkunCOA">Nama Akun COA</label>
+            <input type="text" id="crudNamaAkunCOA" class="modal-field-input is-calc" placeholder="Nama Akun COA" />
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudKelompokCOA">Kelompok COA</label>
+            <input type="text" id="crudKelompokCOA" class="modal-field-input is-calc" placeholder="Kelompok COA" />
+          </div>
+
+          <!-- Row 10: Status COA (Full Width col-span-12) -->
+          <div class="modal-field col-span-12">
+            <label class="modal-field-label" for="crudStatusCOA">Status COA</label>
+            <input type="text" id="crudStatusCOA" class="modal-field-input is-calc" placeholder="Status COA" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="btnSimpanAset" class="btn-modal-action">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETAIL: "Lihat Daftar Aset" (100% PERSIS SCREENSHOT GAMBAR 3) ===== -->
+  <div id="asetDetailModal" class="modal-overlay">
+    <div class="aset-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-header">
+        <h2 class="modal-title"><em>Lihat</em> Daftar Aset</h2>
+        <button class="modal-close" type="button" id="btnCloseDetail" aria-label="Tutup">x</button>
+      </div>
+
+      <div class="modal-dashed-divider"></div>
+
+      <div class="modal-crud-grid">
+        <!-- Row 1: Kode Aset, Nama Aset, Tanggal Beli -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Kode Aset</span>
+          <div class="modal-field-value" id="detailKodeAset">AST-001</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Nama Aset</span>
+          <div class="modal-field-value" id="detailNamaAset">Dispenser Mini Miyako</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Tanggal Beli</span>
+          <div class="modal-field-value" id="detailTanggalBeli">05 Mei 2026</div>
+        </div>
+
+        <!-- Row 2: Kode COA, Lokasi, Harga Satuan -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Kode COA</span>
+          <div class="modal-field-value" id="detailKodeCOA">1302 | Peralatan &amp; Perlengkapan Kan...</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Lokasi</span>
+          <div class="modal-field-value" id="detailLokasi">Pantry</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Harga Satuan</span>
+          <div class="modal-field-value" id="detailHargaSatuan">Rp. 200,000</div>
+        </div>
+
+        <!-- Row 3: Qty, Harga Perolehan, Umur (Bulan) -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Qty</span>
+          <div class="modal-field-value" id="detailQty">01</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Harga Perolehan</span>
+          <div class="modal-field-value" id="detailHargaPerolehan">Rp. 200,000</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Umur (Bulan)</span>
+          <div class="modal-field-value" id="detailUmurBulan">36</div>
+        </div>
+
+        <!-- Row 4: Nilai Residu, Penyusutan/Bulan, Akumulasi -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Nilai Residu</span>
+          <div class="modal-field-value" id="detailNilaiResidu">Rp. 0</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Penyusutan/Bulan</span>
+          <div class="modal-field-value" id="detailPenyusutanBulan">Rp. 5,556</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Akumulasi</span>
+          <div class="modal-field-value" id="detailAkumulasi">Rp. 27,778</div>
+        </div>
+
+        <!-- Row 5: Nilai Buku, Status, Kategori -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Nilai Buku</span>
+          <div class="modal-field-value" id="detailNilaiBuku">Rp. 172,222</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Status</span>
+          <div class="modal-field-value" id="detailStatus">Aktif</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Kategori</span>
+          <div class="modal-field-value" id="detailKategori">Perlengkapan</div>
+        </div>
+
+        <!-- Row 6: Mulai di Pakai, PIC, Divisi -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Mulai di Pakai</span>
+          <div class="modal-field-value" id="detailMulaiDiPakai">1 Jun 2026</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">PIC</span>
+          <div class="modal-field-value" id="detailPIC">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Divisi</span>
+          <div class="modal-field-value" id="detailDivisi">Produksi</div>
+        </div>
+
+        <!-- Row 7: Project/Brand, Tanggal Pelepasan, Bukti/Foto -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Project/Brand</span>
+          <div class="modal-field-value" id="detailProjectBrand">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Tanggal Pelepasan</span>
+          <div class="modal-field-value" id="detailTanggalPelepasan">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Bukti/Foto</span>
+          <button type="button" class="btn-lihat-foto" id="btnLihatFoto">Lihat Foto</button>
+        </div>
+
+        <!-- Row 8: Hasil Pelepasan, Nilai Buku Saat Lepas, Laba/Rugi Lepas -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Hasil Pelepasan</span>
+          <div class="modal-field-value" id="detailHasilPelepasan">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Nilai Buku Saat Lepas</span>
+          <div class="modal-field-value" id="detailNilaiBukuSaatLepas">-</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Laba/Rugi Lepas</span>
+          <div class="modal-field-value" id="detailLabaRugiLepas">-</div>
+        </div>
+
+        <!-- Row 9: Divisi Pengecualian, Nama Akun COA, Kelompok COA -->
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Divisi Pengecualian</span>
+          <div class="modal-field-value" id="detailDivisiPengecualian">Produksi</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Nama Akun COA</span>
+          <div class="modal-field-value" id="detailNamaAkunCOA">Peralatan &amp; Perlengkapan Kantor</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Kelompok COA</span>
+          <div class="modal-field-value" id="detailKelompokCOA">Aset</div>
+        </div>
+
+        <!-- Row 10: Status COA (Full Width col-span-12) -->
+        <div class="modal-field col-span-12">
+          <span class="modal-field-label">Status COA</span>
+          <div class="modal-field-value" id="detailStatusCOA">Ok</div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="btnKeluarDetail" class="btn-modal-action">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL PREVIEW BUKTI/FOTO ===== -->
+  <div id="buktiPreviewModal" class="modal-overlay">
+    <div class="bukti-modal-content">
+      <h3 style="margin-top: 0; font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 12px;">Foto / Bukti Aset</h3>
+      <img id="previewBuktiImg" src="" alt="Bukti Foto Aset" />
+      <div>
+        <button type="button" id="btnCloseBuktiPreview" class="btn-modal-action" style="height: 36px; min-width: 100px;">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="../../assets/js/excel_engine.js"></script>
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ===== DATA SEED (Sesuai Contoh di Gambar 3 User) ===== */
+      const DEFAULT_ASET_DATA = [
+        {
+          id: 'AST-001',
+          kodeAset: 'AST-001',
+          namaAset: 'Dispenser Mini Miyako',
+          tanggalBeli: '2026-05-05',
+          kodeCOA: '1302 | Peralatan & Perlengkapan Kantor',
+          lokasi: 'Pantry',
+          hargaSatuan: 200000,
+          qty: 1,
+          hargaPerolehan: 200000,
+          umurBulan: 36,
+          nilaiResidu: 0,
+          penyusutanBulan: 5556,
+          akumulasi: 27778,
+          nilaiBuku: 172222,
+          status: 'Aktif',
+          kategori: 'Perlengkapan',
+          mulaiDiPakai: '2026-06-01',
+          pic: '-',
+          divisi: 'Produksi',
+          projectBrand: '-',
+          tanggalPelepasan: '',
+          buktiFoto: '../../media/sample_struk.jpg',
+          hasilPelepasan: '-',
+          nilaiBukuSaatLepas: '-',
+          labaRugiLepas: '-',
+          divisiPengecualian: 'Produksi',
+          namaAkunCOA: 'Peralatan & Perlengkapan Kantor',
+          kelompokCOA: 'Aset',
+          statusCOA: 'Ok'
+        },
+        {
+          id: 'AST-002',
+          kodeAset: 'AST-002',
+          namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
+          tanggalBeli: '2026-10-12',
+          kodeCOA: '1301 | Peralatan Kantor',
+          lokasi: 'Studio Produksi 1',
+          hargaSatuan: 42000000,
+          qty: 1,
+          hargaPerolehan: 42000000,
+          umurBulan: 48,
+          nilaiResidu: 4000000,
+          penyusutanBulan: 791667,
+          akumulasi: 791667,
+          nilaiBuku: 41208333,
+          status: 'Aktif',
+          kategori: 'Peralatan Kamera',
+          mulaiDiPakai: '2026-10-15',
+          pic: 'Nama 1',
+          divisi: 'Kreatif',
+          projectBrand: 'Bisa Media',
+          tanggalPelepasan: '',
+          buktiFoto: '',
+          hasilPelepasan: '-',
+          nilaiBukuSaatLepas: '-',
+          labaRugiLepas: '-',
+          divisiPengecualian: 'Kreatif',
+          namaAkunCOA: 'Peralatan Kantor',
+          kelompokCOA: 'Aset',
+          statusCOA: 'Ok'
+        },
+        {
+          id: 'AST-003',
+          kodeAset: 'AST-003',
+          namaAset: 'Ergonomic Office Chair Aeron',
+          tanggalBeli: '2026-09-20',
+          kodeCOA: '1301 | Peralatan Kantor',
+          lokasi: 'Ruang Direksi',
+          hargaSatuan: 18500000,
+          qty: 4,
+          hargaPerolehan: 74000000,
+          umurBulan: 60,
+          nilaiResidu: 5000000,
+          penyusutanBulan: 1150000,
+          akumulasi: 2300000,
+          nilaiBuku: 71700000,
+          status: 'Aktif',
+          kategori: 'Furniture',
+          mulaiDiPakai: '2026-09-22',
+          pic: 'Nama 3',
+          divisi: 'Direksi',
+          projectBrand: '-',
+          tanggalPelepasan: '',
+          buktiFoto: '',
+          hasilPelepasan: '-',
+          nilaiBukuSaatLepas: '-',
+          labaRugiLepas: '-',
+          divisiPengecualian: 'Direksi',
+          namaAkunCOA: 'Peralatan Kantor',
+          kelompokCOA: 'Aset',
+          statusCOA: 'Ok'
+        },
+        {
+          id: 'AST-002',
+          kodeAset: 'AST-002',
+          namaAset: 'Laptop ThinkPad T14 Gen 2',
+          tanggalBeli: '2026-03-12',
+          kodeCOA: '1301 | Peralatan Kantor',
+          lokasi: 'Ruang IT',
+          hargaSatuan: 14500000,
+          qty: 1,
+          hargaPerolehan: 14500000,
+          umurBulan: 48,
+          nilaiResidu: 1000000,
+          penyusutanBulan: 281250,
+          akumulasi: 2250000,
+          nilaiBuku: 12250000,
+          status: 'Aktif',
+          kategori: 'Elektronik',
+          mulaiDiPakai: '2026-03-15',
+          pic: 'Nama 1',
+          divisi: 'Operasional',
+          projectBrand: 'Internal',
+          tanggalPelepasan: '',
+          buktiFoto: '../../media/sample_struk.jpg',
+          hasilPelepasan: '-',
+          nilaiBukuSaatLepas: '-',
+          labaRugiLepas: '-',
+          divisiPengecualian: 'Operasional',
+          namaAkunCOA: 'Peralatan Kantor',
+          kelompokCOA: 'Aset',
+          statusCOA: 'Ok'
+        },
+        {
+          id: 'AST-003',
+          kodeAset: 'AST-003',
+          namaAset: 'Kamera Sony Alpha A7 IV',
+          tanggalBeli: '2026-02-10',
+          kodeCOA: '1301 | Peralatan Kantor',
+          lokasi: 'Studio Produksi',
+          hargaSatuan: 32000000,
+          qty: 1,
+          hargaPerolehan: 32000000,
+          umurBulan: 48,
+          nilaiResidu: 2000000,
+          penyusutanBulan: 625000,
+          akumulasi: 5625000,
+          nilaiBuku: 26375000,
+          status: 'Aktif',
+          kategori: 'Kamera & Audio',
+          mulaiDiPakai: '2026-02-15',
+          pic: 'Nama 3',
+          divisi: 'Marketing',
+          projectBrand: 'Bisa Media',
+          tanggalPelepasan: '',
+          buktiFoto: '../../media/sample_struk.jpg',
+          hasilPelepasan: '-',
+          nilaiBukuSaatLepas: '-',
+          labaRugiLepas: '-',
+          divisiPengecualian: 'Marketing',
+          namaAkunCOA: 'Peralatan Kantor',
+          kelompokCOA: 'Aset',
+          statusCOA: 'Ok'
+        }
+      ];
+
+      const STORAGE_KEY = 'bisa_accounting_daftar_aset_data_v4';
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.warn('[Daftar Aset] Gagal membaca localStorage:', e);
+        }
+        return JSON.parse(JSON.stringify(DEFAULT_ASET_DATA));
+      }
+
+      function saveData(data) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.warn('[Daftar Aset] Gagal menyimpan localStorage:', e);
+        }
+      }
+
+      let asetData = loadData();
+
+      /* ===== STATE FILTER ===== */
+      let filterState = {
+        kategori: '',
+        lokasi: '',
+        search: '',
+        startDate: null,
+        endDate: null,
+        preset: 'all'
+      };
+
+      /* ===== DOM ELEMENTS ===== */
+      const tableBody = document.getElementById('asetTableBody');
+      const searchInput = document.getElementById('asetSearch');
+      const btnExportExcel = document.getElementById('btnExportExcel');
+      const btnTambahAset = document.getElementById('btnTambahAset');
+
+      // Action Menu
+      const actionMenu = document.getElementById('asetActionMenu');
+      let currentActionId = null;
+
+      // Filter elements (Sesuai Gambar 1 & 2: Kode COA, Status, Kategori)
+      const btnFilter = document.getElementById('btnFilter');
+      const filterDropdown = document.getElementById('filterDropdown');
+      const filterKodeCOA = document.getElementById('filterKodeCOA');
+      const boxFilterKodeCOA = document.getElementById('boxFilterKodeCOA');
+      const listFilterKodeCOA = document.getElementById('listFilterKodeCOA');
+      const filterStatus = document.getElementById('filterStatus');
+      const boxFilterStatus = document.getElementById('boxFilterStatus');
+      const listFilterStatus = document.getElementById('listFilterStatus');
+      const filterKategori = document.getElementById('filterKategori');
+      const boxFilterKategori = document.getElementById('boxFilterKategori');
+      const listFilterKategori = document.getElementById('listFilterKategori');
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      // Calendar elements
+      const btnCalendar = document.getElementById('btnCalendar');
+      const calendarDropdown = document.getElementById('calendarDropdown');
+      const btnCancelCalendar = document.getElementById('btnCancelCalendar');
+      const btnApplyCalendar = document.getElementById('btnApplyCalendar');
+      const calRangeDisplay = document.getElementById('calRangeDisplay');
+
+      // Modals
+      const crudModal = document.getElementById('asetCrudModal');
+      const crudForm = document.getElementById('asetCrudForm');
+      const crudModalTitle = document.getElementById('crudModalTitle');
+      const btnCloseCrud = document.getElementById('btnCloseCrud');
+      const detailModal = document.getElementById('asetDetailModal');
+      const btnCloseDetail = document.getElementById('btnCloseDetail');
+      const btnKeluarDetail = document.getElementById('btnKeluarDetail');
+
+      // Preview Foto Modal
+      const buktiPreviewModal = document.getElementById('buktiPreviewModal');
+      const previewBuktiImg = document.getElementById('previewBuktiImg');
+      const btnCloseBuktiPreview = document.getElementById('btnCloseBuktiPreview');
+      const btnLihatFoto = document.getElementById('btnLihatFoto');
+
+      // 28 Form inputs (Row 1 - Row 10)
+      const crudId = document.getElementById('crudId');
+      const crudKodeAset = document.getElementById('crudKodeAset');
+      const crudNamaAset = document.getElementById('crudNamaAset');
+      const crudTanggalBeli = document.getElementById('crudTanggalBeli');
+      const crudKodeCOA = document.getElementById('crudKodeCOA');
+      const wrapKodeCOA = document.getElementById('wrapKodeCOA');
+      const menuKodeCOA = document.getElementById('menuKodeCOA');
+      const crudLokasi = document.getElementById('crudLokasi');
+      const crudHargaSatuan = document.getElementById('crudHargaSatuan');
+      const crudQty = document.getElementById('crudQty');
+      const crudHargaPerolehan = document.getElementById('crudHargaPerolehan');
+      const crudUmurBulan = document.getElementById('crudUmurBulan');
+      const crudNilaiResidu = document.getElementById('crudNilaiResidu');
+      const crudPenyusutanBulan = document.getElementById('crudPenyusutanBulan');
+      const crudAkumulasi = document.getElementById('crudAkumulasi');
+      const crudNilaiBuku = document.getElementById('crudNilaiBuku');
+      const crudStatus = document.getElementById('crudStatus');
+      const crudKategori = document.getElementById('crudKategori');
+      const crudMulaiDiPakai = document.getElementById('crudMulaiDiPakai');
+      const crudPIC = document.getElementById('crudPIC');
+      const wrapPIC = document.getElementById('wrapPIC');
+      const menuPIC = document.getElementById('menuPIC');
+      const crudDivisi = document.getElementById('crudDivisi');
+      const crudProjectBrand = document.getElementById('crudProjectBrand');
+      const crudTanggalPelepasan = document.getElementById('crudTanggalPelepasan');
+      const crudBuktiFoto = document.getElementById('crudBuktiFoto');
+      const btnTriggerFile = document.getElementById('btnTriggerFile');
+      const fileNameDisplay = document.getElementById('fileNameDisplay');
+      const btnPreviewBuktiForm = document.getElementById('btnPreviewBuktiForm');
+      const crudHasilPelepasan = document.getElementById('crudHasilPelepasan');
+      const crudNilaiBukuSaatLepas = document.getElementById('crudNilaiBukuSaatLepas');
+      const crudLabaRugiLepas = document.getElementById('crudLabaRugiLepas');
+      const crudDivisiPengecualian = document.getElementById('crudDivisiPengecualian');
+      const crudNamaAkunCOA = document.getElementById('crudNamaAkunCOA');
+      const crudKelompokCOA = document.getElementById('crudKelompokCOA');
+      const crudStatusCOA = document.getElementById('crudStatusCOA');
+
+      // 28 Detail fields (Modal Lihat)
+      const detailKodeAset = document.getElementById('detailKodeAset');
+      const detailNamaAset = document.getElementById('detailNamaAset');
+      const detailTanggalBeli = document.getElementById('detailTanggalBeli');
+      const detailKodeCOA = document.getElementById('detailKodeCOA');
+      const detailLokasi = document.getElementById('detailLokasi');
+      const detailHargaSatuan = document.getElementById('detailHargaSatuan');
+      const detailQty = document.getElementById('detailQty');
+      const detailHargaPerolehan = document.getElementById('detailHargaPerolehan');
+      const detailUmurBulan = document.getElementById('detailUmurBulan');
+      const detailNilaiResidu = document.getElementById('detailNilaiResidu');
+      const detailPenyusutanBulan = document.getElementById('detailPenyusutanBulan');
+      const detailAkumulasi = document.getElementById('detailAkumulasi');
+      const detailNilaiBuku = document.getElementById('detailNilaiBuku');
+      const detailStatus = document.getElementById('detailStatus');
+      const detailKategori = document.getElementById('detailKategori');
+      const detailMulaiDiPakai = document.getElementById('detailMulaiDiPakai');
+      const detailPIC = document.getElementById('detailPIC');
+      const detailDivisi = document.getElementById('detailDivisi');
+      const detailProjectBrand = document.getElementById('detailProjectBrand');
+      const detailTanggalPelepasan = document.getElementById('detailTanggalPelepasan');
+      const detailHasilPelepasan = document.getElementById('detailHasilPelepasan');
+      const detailNilaiBukuSaatLepas = document.getElementById('detailNilaiBukuSaatLepas');
+      const detailLabaRugiLepas = document.getElementById('detailLabaRugiLepas');
+      const detailDivisiPengecualian = document.getElementById('detailDivisiPengecualian');
+      const detailNamaAkunCOA = document.getElementById('detailNamaAkunCOA');
+      const detailKelompokCOA = document.getElementById('detailKelompokCOA');
+      const detailStatusCOA = document.getElementById('detailStatusCOA');
+
+      let currentUploadedFotoDataUrl = '';
+      let currentItemFotoUrl = '';
+
+      /* ===== UTILITIES ===== */
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function formatRupiah(num) {
+        if (num === null || num === undefined || isNaN(num)) return 'Rp. -';
+        return 'Rp. ' + Number(num).toLocaleString('id-ID');
+      }
+
+      function parseRupiah(str) {
+        if (!str) return 0;
+        const cleaned = String(str).replace(/[^0-9]/g, '');
+        return cleaned ? parseInt(cleaned, 10) : 0;
+      }
+
+      function formatTanggalDisplay(isoStr) {
+        if (!isoStr) return '-';
+        if (isoStr.indexOf('-') === -1) return isoStr;
+        const parts = isoStr.split('-');
+        if (parts.length !== 3) return isoStr;
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const y = parts[0];
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        return (d < 10 ? '0' + d : d) + ' ' + (months[m] || parts[1]) + ' ' + y;
+      }
+
+      function getBadgeClass(kategori) {
+        const k = (kategori || '').toLowerCase();
+        if (k.includes('elektronik') || k.includes('komputer') || k.includes('laptop')) return 'badge-elektronik';
+        if (k.includes('furniture') || k.includes('meja') || k.includes('kursi')) return 'badge-furniture';
+        if (k.includes('kendaraan') || k.includes('mobil') || k.includes('motor')) return 'badge-kendaraan';
+        return 'badge-lainnya';
+      }
+
+      
+      /* ===== FILTER OPTIONS SYNC ===== */
+      function initFilterOptions() {
+        // Divisi filter options are static and synced
+      }
+
+      /* ===== AUTO CALCULATION LOGIC ===== */
+      function recalcFields() {
+        const hargaSatuan = parseRupiah(crudHargaSatuan.value);
+        const qty = parseInt(crudQty.value, 10) || 0;
+        const hargaPerolehan = hargaSatuan * qty;
+        crudHargaPerolehan.value = hargaPerolehan > 0 ? formatRupiah(hargaPerolehan) : 'Rp. -';
+
+        const umur = parseInt(crudUmurBulan.value, 10) || 0;
+        const residu = parseRupiah(crudNilaiResidu.value);
+
+        let penyusutan = 0;
+        if (umur > 0 && hargaPerolehan > residu) {
+          penyusutan = Math.round((hargaPerolehan - residu) / umur);
+        }
+        crudPenyusutanBulan.value = penyusutan > 0 ? formatRupiah(penyusutan) : 'Rp. -';
+
+        let akumulasi = parseRupiah(crudAkumulasi.value);
+        if (akumulasi === 0 && penyusutan > 0) {
+          akumulasi = penyusutan;
+          crudAkumulasi.value = formatRupiah(akumulasi);
+        }
+
+        const nilaiBuku = Math.max(0, hargaPerolehan - akumulasi);
+        crudNilaiBuku.value = hargaPerolehan > 0 ? formatRupiah(nilaiBuku) : 'Rp. -';
+      }
+
+      if (crudHargaSatuan) {
+        crudHargaSatuan.addEventListener('input', function () {
+          const val = parseRupiah(this.value);
+          this.value = val > 0 ? formatRupiah(val) : '';
+          recalcFields();
+        });
+      }
+
+      if (crudQty) {
+        crudQty.addEventListener('input', recalcFields);
+      }
+
+      if (crudUmurBulan) {
+        crudUmurBulan.addEventListener('input', recalcFields);
+      }
+
+      if (crudNilaiResidu) {
+        crudNilaiResidu.addEventListener('input', function () {
+          const val = parseRupiah(this.value);
+          this.value = val > 0 ? formatRupiah(val) : '';
+          recalcFields();
+        });
+      }
+
+      if (crudAkumulasi) {
+        crudAkumulasi.addEventListener('input', function () {
+          const val = parseRupiah(this.value);
+          this.value = val > 0 ? formatRupiah(val) : '';
+          recalcFields();
+        });
+      }
+
+      // Sync Divisi -> Divisi Pengecualian
+      if (crudDivisi) {
+        crudDivisi.addEventListener('input', function () {
+          if (crudDivisiPengecualian) crudDivisiPengecualian.value = this.value;
+        });
+      }
+
+      /* ===== DROPDOWNS WITH CHECKBOXES (Kode COA & PIC Sesuai Gambar 2) ===== */
+      function setupCheckboxDropdown(input, wrap, menu, onSelect) {
+        if (!input || !wrap || !menu) return;
+
+        input.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrap.classList.contains('is-open');
+          closeModalDropdowns();
+          if (!isOpen) wrap.classList.add('is-open');
+        });
+
+        menu.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+
+        const cbs = menu.querySelectorAll('input[type="checkbox"]');
+        cbs.forEach(function (cb) {
+          cb.addEventListener('change', function () {
+            const selected = Array.from(cbs).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+            input.value = selected.join(', ');
+            if (onSelect) onSelect(selected);
+          });
+        });
+      }
+
+      function closeModalDropdowns() {
+        if (wrapKodeCOA) wrapKodeCOA.classList.remove('is-open');
+        if (wrapPIC) wrapPIC.classList.remove('is-open');
+      }
+
+      setupCheckboxDropdown(crudKodeCOA, wrapKodeCOA, menuKodeCOA, function (selected) {
+        if (selected.length > 0) {
+          const first = selected[0];
+          if (first.includes('1302')) {
+            crudNamaAkunCOA.value = 'Peralatan & Perlengkapan Kantor';
+            crudKelompokCOA.value = 'Aset';
+            crudStatusCOA.value = 'Ok';
+          } else if (first.includes('1301')) {
+            crudNamaAkunCOA.value = 'Peralatan Kantor';
+            crudKelompokCOA.value = 'Aset';
+            crudStatusCOA.value = 'Ok';
+          } else if (first.includes('1001') || first.includes('1002')) {
+            crudNamaAkunCOA.value = first.split('|')[1].trim();
+            crudKelompokCOA.value = 'Kas & Bank';
+            crudStatusCOA.value = 'Ok';
+          }
+        }
+      });
+
+      setupCheckboxDropdown(crudPIC, wrapPIC, menuPIC);
+
+      /* ===== FILE UPLOAD & PREVIEW BUKTI/FOTO ===== */
+      if (btnTriggerFile && crudBuktiFoto) {
+        btnTriggerFile.addEventListener('click', function (e) {
+          e.preventDefault();
+          crudBuktiFoto.click();
+        });
+
+        crudBuktiFoto.addEventListener('change', function () {
+          if (this.files && this.files[0]) {
+            const file = this.files[0];
+            fileNameDisplay.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              currentUploadedFotoDataUrl = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
+          } else {
+            if (!currentUploadedFotoDataUrl) {
+              fileNameDisplay.textContent = 'Belum ada file';
+              if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+            }
+          }
+        });
+      }
+
+      if (btnPreviewBuktiForm) {
+        btnPreviewBuktiForm.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const src = currentUploadedFotoDataUrl || currentItemFotoUrl || 'https://via.placeholder.com/600x400/e0f2fe/0369a1?text=Bukti+Foto+Aset';
+          previewBuktiImg.src = src;
+          buktiPreviewModal.classList.add('is-open');
+          buktiPreviewModal.classList.add('is-active');
+          buktiPreviewModal.style.display = 'flex';
+          buktiPreviewModal.style.opacity = '1';
+          buktiPreviewModal.style.pointerEvents = 'auto';
+        });
+      }
+
+      if (btnLihatFoto) {
+        btnLihatFoto.addEventListener('click', function () {
+          const src = currentItemFotoUrl || currentUploadedFotoDataUrl || 'https://via.placeholder.com/600x400/e0f2fe/0369a1?text=Bukti+Foto+Aset';
+          previewBuktiImg.src = src;
+          buktiPreviewModal.classList.add('is-open'); buktiPreviewModal.classList.add('is-active'); buktiPreviewModal.style.display = 'flex'; buktiPreviewModal.style.opacity = '1'; buktiPreviewModal.style.pointerEvents = 'auto';
+        });
+      }
+
+      if (btnCloseBuktiPreview) {
+        btnCloseBuktiPreview.addEventListener('click', function () {
+          buktiPreviewModal.classList.remove('is-open'); buktiPreviewModal.classList.remove('is-active'); buktiPreviewModal.style.display = 'none'; buktiPreviewModal.style.opacity = '0'; buktiPreviewModal.style.pointerEvents = 'none';
+        });
+      }
+
+      /* ===== FILTERING LOGIC ===== */
+      function getFilteredData() {
+        return asetData.filter(function (item) {
+          // Kode COA filter
+          if (filterState.kodeCOA && filterState.kodeCOA !== 'Semua Kode COA') {
+            const qCOA = filterState.kodeCOA.toLowerCase();
+            if (!(item.kodeCOA || '').toLowerCase().includes(qCOA)) return false;
+          }
+
+          // Status filter
+          if (filterState.status && filterState.status !== 'Semua Status') {
+            if ((item.status || '').toLowerCase() !== filterState.status.toLowerCase()) return false;
+          }
+
+          // Kategori filter
+          if (filterState.kategori && filterState.kategori !== 'Semua Kategori') {
+            if ((item.kategori || '').toLowerCase() !== filterState.kategori.toLowerCase()) return false;
+          }
+
+          // Date range filter
+          if (filterState.startDate && filterState.endDate) {
+            const itemDate = item.tanggalBeli ? item.tanggalBeli.substring(0, 10) : '';
+            if (itemDate && (itemDate < filterState.startDate || itemDate > filterState.endDate)) {
+              return false;
+            }
+          }
+
+          // Search query
+          if (filterState.search) {
+            const q = filterState.search.toLowerCase();
+            const matchKode = (item.kodeAset || '').toLowerCase().includes(q);
+            const matchNama = (item.namaAset || '').toLowerCase().includes(q);
+            const matchLokasi = (item.lokasi || '').toLowerCase().includes(q);
+            const matchKategori = (item.kategori || '').toLowerCase().includes(q);
+            const matchCOA = (item.kodeCOA || '').toLowerCase().includes(q);
+            if (!matchKode && !matchNama && !matchLokasi && !matchKategori && !matchCOA) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+      }
+
+      /* ===== RENDER TABLE (8 Kolom Sesuai Mockup Gambar Utama) ===== */
+      function renderTable() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        const filtered = getFilteredData();
+
+        if (filtered.length === 0) {
+          tableBody.innerHTML =
+            '<tr>' +
+            '<td colspan="8" style="height: 260px; text-align: center; color: #94a3b8; font-style: italic; vertical-align: middle;">' +
+            'Tidak ada data aset yang sesuai.' +
+            '</td>' +
+            '</tr>';
+          return;
+        }
+
+        filtered.forEach(function (item, idx) {
+          const tr = document.createElement('tr');
+          const badgeCls = getBadgeClass(item.kategori);
+
+          tr.innerHTML =
+            '<td style="text-align: center; color: #64748b; font-style: italic;">' + (idx + 1) + '.</td>' +
+            '<td class="aset-cell-italic" style="font-weight: 600; color: #0284c7;">' + escapeHtml(item.kodeAset || '-') + '</td>' +
+            '<td class="aset-cell-italic" style="font-weight: 500;">' + escapeHtml(item.namaAset || '-') + '</td>' +
+            '<td class="aset-cell-italic">' + escapeHtml(formatTanggalDisplay(item.tanggalBeli)) + '</td>' +
+            '<td class="aset-cell-italic">' + escapeHtml(item.lokasi || '-') + '</td>' +
+            '<td class="aset-cell-italic" style="text-align: center; font-weight: 600;">' + Number(item.qty || 1) + '</td>' +
+            '<td><span class="aset-badge ' + badgeCls + '">' + escapeHtml(item.kategori || '-') + '</span></td>' +
+            '<td class="col-sticky-action" style="text-align: center;">' +
+            '<button type="button" class="aset-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true" style="width: 18px; height: 18px; fill: currentColor;">' +
+            '<circle cx="12" cy="5" r="2"></circle>' +
+            '<circle cx="12" cy="12" r="2"></circle>' +
+            '<circle cx="12" cy="19" r="2"></circle>' +
+            '</svg>' +
+            '</button>' +
+            '</td>';
+
+          tableBody.appendChild(tr);
+        });
+      }
+
+      /* ===== FLOATING ACTION MENU ===== */
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = actionMenu.offsetHeight || 130;
+
+        let left = rect.left - menuWidth + rect.width;
+        let top = rect.bottom + 4;
+
+        if (left < 10) left = 10;
+        if (top + menuHeight > window.innerHeight) {
+          top = rect.top - menuHeight - 4;
+        }
+
+        actionMenu.style.left = left + 'px';
+        actionMenu.style.top = top + 'px';
+      }
+
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-action-toggle]');
+          if (btn) {
+            e.stopPropagation();
+            openActionMenu(btn);
+          }
+        });
+      }
+
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-action]');
+          if (!btn || !currentActionId) return;
+
+          const action = btn.getAttribute('data-action');
+          const targetItem = asetData.find(function (x) { return String(x.id) === String(currentActionId); });
+          closeActionMenus();
+
+          if (!targetItem) return;
+
+          if (action === 'view') {
+            openDetailModal(targetItem);
+          } else if (action === 'edit') {
+            openEditModal(targetItem);
+          } else if (action === 'delete') {
+            confirmDelete(targetItem);
+          }
+        });
+      }
+
+      /* ===== MODAL DETAIL ("Lihat Daftar Aset" Sesuai Gambar 3) ===== */
+      function openDetailModal(item) {
+        if (!detailModal || !item) return;
+
+        currentItemFotoUrl = item.buktiFoto || '';
+
+        detailKodeAset.textContent = item.kodeAset || '-';
+        detailNamaAset.textContent = item.namaAset || '-';
+        detailTanggalBeli.textContent = formatTanggalDisplay(item.tanggalBeli);
+        detailKodeCOA.textContent = item.kodeCOA || '-';
+        detailLokasi.textContent = item.lokasi || '-';
+        detailHargaSatuan.textContent = formatRupiah(item.hargaSatuan);
+        detailQty.textContent = item.qty < 10 ? '0' + item.qty : String(item.qty);
+        detailHargaPerolehan.textContent = formatRupiah(item.hargaPerolehan);
+        detailUmurBulan.textContent = item.umurBulan || '0';
+        detailNilaiResidu.textContent = formatRupiah(item.nilaiResidu);
+        detailPenyusutanBulan.textContent = formatRupiah(item.penyusutanBulan);
+        detailAkumulasi.textContent = formatRupiah(item.akumulasi);
+        detailNilaiBuku.textContent = formatRupiah(item.nilaiBuku);
+        detailStatus.textContent = item.status || 'Aktif';
+        detailKategori.textContent = item.kategori || '-';
+        detailMulaiDiPakai.textContent = formatTanggalDisplay(item.mulaiDiPakai);
+        detailPIC.textContent = item.pic || '-';
+        detailDivisi.textContent = item.divisi || '-';
+        detailProjectBrand.textContent = item.projectBrand || '-';
+        detailTanggalPelepasan.textContent = formatTanggalDisplay(item.tanggalPelepasan);
+        detailHasilPelepasan.textContent = item.hasilPelepasan || '-';
+        detailNilaiBukuSaatLepas.textContent = item.nilaiBukuSaatLepas || '-';
+        detailLabaRugiLepas.textContent = item.labaRugiLepas || '-';
+        detailDivisiPengecualian.textContent = item.divisiPengecualian || item.divisi || '-';
+        detailNamaAkunCOA.textContent = item.namaAkunCOA || '-';
+        detailKelompokCOA.textContent = item.kelompokCOA || '-';
+        detailStatusCOA.textContent = item.statusCOA || 'Ok';
+
+        detailModal.classList.add('is-open'); detailModal.classList.add('is-active'); detailModal.style.display = 'flex'; detailModal.style.opacity = '1'; detailModal.style.pointerEvents = 'auto';
+      }
+
+      function closeDetailModal() {
+        if (detailModal) { detailModal.classList.remove('is-open'); detailModal.classList.remove('is-active'); detailModal.style.display = 'none'; detailModal.style.opacity = '0'; detailModal.style.pointerEvents = 'none'; }
+      }
+
+      if (btnCloseDetail) btnCloseDetail.addEventListener('click', closeDetailModal);
+      if (btnKeluarDetail) btnKeluarDetail.addEventListener('click', closeDetailModal);
+
+      /* ===== MODAL FORM ("Tambah / Edit Daftar Aset" Sesuai Gambar 1 & 2) ===== */
+      function generateNextKodeAset() {
+        const nextNum = asetData.length + 1;
+        const seq = nextNum < 10 ? '00' + nextNum : (nextNum < 100 ? '0' + nextNum : nextNum);
+        return 'AST-' + seq;
+      }
+
+      function openAddModal() {
+        if (!crudModal) crudModal = document.getElementById('asetCrudModal');
+        if (!crudModal) return;
+        closeModalDropdowns();
+        if (crudModalTitle) crudModalTitle.innerHTML = '<em>Tambah</em> Daftar Aset';
+        if (crudForm) crudForm.reset();
+        if (crudId) crudId.value = '';
+        if (crudKodeAset) crudKodeAset.value = '';
+        if (crudNamaAset) crudNamaAset.value = '';
+        if (crudTanggalBeli) crudTanggalBeli.value = '';
+        if (crudKodeCOA) crudKodeCOA.value = '';
+        if (crudLokasi) crudLokasi.value = '';
+        if (crudHargaSatuan) crudHargaSatuan.value = '';
+        if (crudQty) crudQty.value = '';
+        if (crudHargaPerolehan) crudHargaPerolehan.value = '';
+        if (crudUmurBulan) crudUmurBulan.value = '';
+        if (crudNilaiResidu) crudNilaiResidu.value = '';
+        if (crudPenyusutanBulan) crudPenyusutanBulan.value = '';
+        if (crudAkumulasi) crudAkumulasi.value = '';
+        if (crudNilaiBuku) crudNilaiBuku.value = '';
+        if (crudStatus) crudStatus.value = '';
+        if (crudKategori) crudKategori.value = '';
+        if (crudMulaiDiPakai) crudMulaiDiPakai.value = '';
+        if (crudPIC) crudPIC.value = '';
+        if (crudDivisi) crudDivisi.value = '';
+        if (crudProjectBrand) crudProjectBrand.value = '';
+        if (crudTanggalPelepasan) crudTanggalPelepasan.value = '';
+        if (crudHasilPelepasan) crudHasilPelepasan.value = '';
+        if (crudNilaiBukuSaatLepas) crudNilaiBukuSaatLepas.value = '';
+        if (crudLabaRugiLepas) crudLabaRugiLepas.value = '';
+        if (crudDivisiPengecualian) crudDivisiPengecualian.value = '';
+        if (crudNamaAkunCOA) crudNamaAkunCOA.value = '';
+        if (crudKelompokCOA) crudKelompokCOA.value = '';
+        if (crudStatusCOA) crudStatusCOA.value = '';
+        if (fileNameDisplay) fileNameDisplay.textContent = 'Belum ada file';
+        if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+        currentUploadedFotoDataUrl = '';
+
+        // Uncheck all dropdown checkboxes
+        document.querySelectorAll('#menuKodeCOA input, #menuPIC input').forEach(function (cb) { cb.checked = false; });
+
+        crudModal.classList.add('is-open'); crudModal.classList.add('is-active'); crudModal.style.display = 'flex'; crudModal.style.opacity = '1'; crudModal.style.pointerEvents = 'auto';
+        crudModal.classList.add('is-active');
+        crudModal.style.display = 'flex';
+        crudModal.style.opacity = '1';
+        crudModal.style.pointerEvents = 'auto';
+      }
+      window.openAddModal = openAddModal;
+
+      function openEditModal(item) {
+        if (!crudModal || !item) return;
+        closeModalDropdowns();
+        crudModalTitle.innerHTML = '<em>Edit</em> Daftar Aset';
+        crudForm.reset();
+
+        crudId.value = item.id;
+        crudKodeAset.value = item.kodeAset || '';
+        crudNamaAset.value = item.namaAset || '';
+        crudTanggalBeli.value = item.tanggalBeli || '';
+        crudKodeCOA.value = item.kodeCOA || '';
+        crudLokasi.value = item.lokasi || '';
+        crudHargaSatuan.value = item.hargaSatuan ? formatRupiah(item.hargaSatuan) : '';
+        crudQty.value = item.qty || 1;
+        crudHargaPerolehan.value = item.hargaPerolehan ? formatRupiah(item.hargaPerolehan) : '';
+        crudUmurBulan.value = item.umurBulan || 0;
+        crudNilaiResidu.value = item.nilaiResidu ? formatRupiah(item.nilaiResidu) : 'Rp. 0';
+        crudPenyusutanBulan.value = item.penyusutanBulan ? formatRupiah(item.penyusutanBulan) : '';
+        crudAkumulasi.value = item.akumulasi ? formatRupiah(item.akumulasi) : '';
+        crudNilaiBuku.value = item.nilaiBuku ? formatRupiah(item.nilaiBuku) : '';
+        crudStatus.value = item.status || 'Aktif';
+        crudKategori.value = item.kategori || '';
+        crudMulaiDiPakai.value = item.mulaiDiPakai || '';
+        crudPIC.value = item.pic || '';
+        crudDivisi.value = item.divisi || '';
+        crudProjectBrand.value = item.projectBrand || '-';
+        crudTanggalPelepasan.value = item.tanggalPelepasan || '';
+        crudHasilPelepasan.value = item.hasilPelepasan || '-';
+        crudNilaiBukuSaatLepas.value = item.nilaiBukuSaatLepas || '-';
+        crudLabaRugiLepas.value = item.labaRugiLepas || '-';
+        crudDivisiPengecualian.value = item.divisiPengecualian || item.divisi || '';
+        crudNamaAkunCOA.value = item.namaAkunCOA || '';
+        crudKelompokCOA.value = item.kelompokCOA || '';
+        crudStatusCOA.value = item.statusCOA || 'Ok';
+        if (item.buktiFoto) {
+          fileNameDisplay.textContent = item.namaAset ? item.namaAset + ' - Foto' : 'Foto tersimpan';
+          if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
+        } else {
+          fileNameDisplay.textContent = 'Belum ada file';
+          if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
+        }
+        currentUploadedFotoDataUrl = item.buktiFoto || '';
+
+        // Check matching checkboxes
+        document.querySelectorAll('#menuKodeCOA input').forEach(function (cb) {
+          cb.checked = (item.kodeCOA || '').includes(cb.value);
+        });
+        document.querySelectorAll('#menuPIC input').forEach(function (cb) {
+          cb.checked = (item.pic || '').includes(cb.value);
+        });
+
+        recalcFields();
+        crudModal.classList.add('is-open');
+      }
+
+      function closeCrudModal() {
+        closeModalDropdowns();
+        if (crudModal) {
+          crudModal.classList.remove('is-open');
+          crudModal.classList.remove('is-active');
+          crudModal.style.display = 'none';
+          crudModal.style.opacity = '0';
+          crudModal.style.pointerEvents = 'none';
+        }
+      }
+
+      if (btnCloseCrud) btnCloseCrud.addEventListener('click', closeCrudModal);
+      if (btnTambahAset) btnTambahAset.addEventListener('click', openAddModal);
+
+      // Handle Submit Form
+      if (crudForm) {
+        crudForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const kode = (crudKodeAset.value || '').trim() || generateNextKodeAset();
+          const nama = (crudNamaAset.value || '').trim();
+          const tgl = (crudTanggalBeli.value || '').trim();
+          const lokasi = (crudLokasi.value || '').trim();
+          const qty = parseInt(crudQty.value, 10) || 1;
+          const kategori = (crudKategori.value || '').trim();
+
+          if (!kode || !nama || !tgl || !lokasi || !kategori) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Data Belum Lengkap',
+                text: 'Harap lengkapi semua kolom wajib (Kode Aset, Nama Aset, Tanggal Beli, Lokasi, Kategori).',
+                confirmButtonColor: '#28a5de'
+              });
+            } else {
+              alert('Harap lengkapi semua kolom wajib.');
+            }
+            return;
+          }
+
+          const hargaSatuan = parseRupiah(crudHargaSatuan.value);
+          const hargaPerolehan = parseRupiah(crudHargaPerolehan.value) || (hargaSatuan * qty);
+          const umurBulan = parseInt(crudUmurBulan.value, 10) || 0;
+          const nilaiResidu = parseRupiah(crudNilaiResidu.value);
+          const penyusutanBulan = parseRupiah(crudPenyusutanBulan.value);
+          const akumulasi = parseRupiah(crudAkumulasi.value);
+          const nilaiBuku = parseRupiah(crudNilaiBuku.value) || Math.max(0, hargaPerolehan - akumulasi);
+
+          const editId = crudId.value;
+
+          const payload = {
+            kodeAset: kode,
+            namaAset: nama,
+            tanggalBeli: tgl,
+            kodeCOA: crudKodeCOA.value || '1302 | Peralatan & Perlengkapan Kantor',
+            lokasi: lokasi,
+            hargaSatuan: hargaSatuan,
+            qty: qty,
+            hargaPerolehan: hargaPerolehan,
+            umurBulan: umurBulan,
+            nilaiResidu: nilaiResidu,
+            penyusutanBulan: penyusutanBulan,
+            akumulasi: akumulasi,
+            nilaiBuku: nilaiBuku,
+            status: crudStatus.value || 'Aktif',
+            kategori: kategori,
+            mulaiDiPakai: crudMulaiDiPakai.value || tgl,
+            pic: crudPIC.value || '-',
+            divisi: crudDivisi.value || 'Produksi',
+            projectBrand: crudProjectBrand.value || '-',
+            tanggalPelepasan: crudTanggalPelepasan.value || '',
+            buktiFoto: currentUploadedFotoDataUrl || '',
+            hasilPelepasan: crudHasilPelepasan.value || '-',
+            nilaiBukuSaatLepas: crudNilaiBukuSaatLepas.value || '-',
+            labaRugiLepas: crudLabaRugiLepas.value || '-',
+            divisiPengecualian: crudDivisiPengecualian.value || crudDivisi.value || 'Produksi',
+            namaAkunCOA: crudNamaAkunCOA.value || 'Peralatan & Perlengkapan Kantor',
+            kelompokCOA: crudKelompokCOA.value || 'Aset',
+            statusCOA: crudStatusCOA.value || 'Ok'
+          };
+
+          if (editId) {
+            const idx = asetData.findIndex(function (x) { return String(x.id) === String(editId); });
+            if (idx !== -1) {
+              payload.id = editId;
+              asetData[idx] = Object.assign({}, asetData[idx], payload);
+            }
+          } else {
+            payload.id = 'AST-' + String(Date.now());
+            asetData.unshift(payload);
+          }
+
+          saveData(asetData);
+          closeCrudModal();
+          initFilterOptions();
+          renderTable();
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'success',
+              title: editId ? 'Aset Diperbarui' : 'Aset Ditambahkan',
+              text: editId ? 'Perubahan data aset berhasil disimpan.' : 'Data aset baru berhasil ditambahkan.',
+              timer: 1600,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+
+      /* ===== DELETE CONFIRMATION ===== */
+      function confirmDelete(item) {
+        if (!item) return;
+
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'Hapus Aset?',
+            html: 'Apakah Anda yakin ingin menghapus aset <b>' + escapeHtml(item.namaAset) + '</b> (' + escapeHtml(item.kodeAset) + ')?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+          }).then(function (result) {
+            if (result.isConfirmed) {
+              asetData = asetData.filter(function (x) { return String(x.id) !== String(item.id); });
+              saveData(asetData);
+              initFilterOptions();
+              renderTable();
+
+              Swal.fire({
+                icon: 'success',
+                title: 'Terhapus',
+                text: 'Data aset berhasil dihapus.',
+                timer: 1400,
+                showConfirmButton: false
+              });
+            }
+          });
+        } else {
+          if (confirm('Hapus aset ' + item.namaAset + '?')) {
+            asetData = asetData.filter(function (x) { return String(x.id) !== String(item.id); });
+            saveData(asetData);
+            initFilterOptions();
+            renderTable();
+          }
+        }
+      }
+
+      /* ===== FILTER DROPDOWN LOGIC ===== */
+      /* ===== FILTER POPOVER LOGIC (KODE COA, STATUS, KATEGORI - SESUAI GAMBAR 1 & 2) ===== */
+
+      function getCOAOptions() {
+        return [
+          'Semua Kode COA',
+          '1001 | Kas Kecil',
+          '1002 | Bank BCA',
+          '1301 | Peralatan Kantor',
+          '1302 | Peralatan & Perlengkapan Kantor'
+        ];
+      }
+
+      function getStatusOptions() {
+        return [
+          'Semua Status',
+          'Aktif',
+          'Rusak',
+          'Dilepas',
+          'Dalam Perbaikan'
+        ];
+      }
+
+      function getKategoriOptions() {
+        return [
+          'Semua Kategori',
+          'Perlengkapan',
+          'Elektronik',
+          'Kamera & Audio',
+          'Kendaraan'
+        ];
+      }
+
+      function setupSearchableFilter(input, box, list, defaultPlaceholder, searchPlaceholder, getOptionsFn) {
+        if (!input || !box || !list) return;
+
+        function renderOptions(query) {
+          list.innerHTML = '';
+          const opts = getOptionsFn();
+          const filtered = opts.filter(function (opt) {
+            return !query || opt.toLowerCase().includes(query.toLowerCase());
+          });
+
+          if (filtered.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'aset-filter-item';
+            emptyDiv.style.color = '#94a3b8';
+            emptyDiv.style.fontStyle = 'italic';
+            emptyDiv.textContent = 'Tidak ditemukan';
+            list.appendChild(emptyDiv);
+            return;
+          }
+
+          filtered.forEach(function (opt) {
+            const div = document.createElement('div');
+            div.className = 'aset-filter-item';
+            div.textContent = opt;
+            div.addEventListener('click', function (e) {
+              e.stopPropagation();
+              if (opt.startsWith('Semua ')) {
+                input.value = '';
+              } else {
+                input.value = opt;
+              }
+              closeFilterSearchBoxes();
+              input.placeholder = defaultPlaceholder;
+            });
+            list.appendChild(div);
+          });
+        }
+
+        input.addEventListener('focus', function () {
+          closeFilterSearchBoxes();
+          input.placeholder = searchPlaceholder;
+          box.classList.add('is-open');
+          list.style.display = 'block';
+          renderOptions('');
+        });
+
+        input.addEventListener('input', function () {
+          box.classList.add('is-open');
+          list.style.display = 'block';
+          renderOptions(input.value.trim());
+        });
+
+        box.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+
+        const arrow = box.querySelector('.aset-filter-arrow');
+        if (arrow) {
+          arrow.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = box.classList.contains('is-open');
+            closeFilterSearchBoxes();
+            if (!isOpen) {
+              box.classList.add('is-open');
+              list.style.display = 'block';
+              input.placeholder = searchPlaceholder;
+              renderOptions('');
+              input.focus();
+            }
+          });
+        }
+      }
+
+      function closeFilterSearchBoxes() {
+        if (boxFilterKodeCOA) {
+          boxFilterKodeCOA.classList.remove('is-open');
+          listFilterKodeCOA.style.display = 'none';
+          if (!filterKodeCOA.value) filterKodeCOA.placeholder = 'Pilih Kode COA';
+        }
+        if (boxFilterStatus) {
+          boxFilterStatus.classList.remove('is-open');
+          listFilterStatus.style.display = 'none';
+          if (!filterStatus.value) filterStatus.placeholder = 'Pilih Status';
+        }
+        if (boxFilterKategori) {
+          boxFilterKategori.classList.remove('is-open');
+          listFilterKategori.style.display = 'none';
+          if (!filterKategori.value) filterKategori.placeholder = 'Pilih Kategori';
+        }
+      }
+
+      setupSearchableFilter(filterKodeCOA, boxFilterKodeCOA, listFilterKodeCOA, 'Pilih Kode COA', 'Cari Kode COA', getCOAOptions);
+      setupSearchableFilter(filterStatus, boxFilterStatus, listFilterStatus, 'Pilih Status', 'Cari Status', getStatusOptions);
+      setupSearchableFilter(filterKategori, boxFilterKategori, listFilterKategori, 'Pilih Kategori', 'Cari Kategori', getKategoriOptions);
+
+      if (btnFilter) {
+        btnFilter.addEventListener('click', function (e) {
+          e.stopPropagation();
+          closeActionMenus();
+          closeModalDropdowns();
+          if (calendarDropdown) {
+            calendarDropdown.classList.remove('is-active');
+            calendarDropdown.style.display = 'none';
+          }
+          const isFilterActive = filterDropdown.style.display === 'block' || filterDropdown.classList.contains('is-active');
+          if (isFilterActive) {
+            filterDropdown.style.display = 'none';
+            filterDropdown.classList.remove('is-active');
+            closeFilterSearchBoxes();
+          } else {
+            filterDropdown.style.display = 'block';
+            filterDropdown.classList.add('is-active');
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function () {
+          filterState.kodeCOA = '';
+          filterState.status = '';
+          filterState.kategori = '';
+
+          if (filterKodeCOA) {
+            filterKodeCOA.value = '';
+            filterKodeCOA.placeholder = 'Pilih Kode COA';
+          }
+          if (filterStatus) {
+            filterStatus.value = '';
+            filterStatus.placeholder = 'Pilih Status';
+          }
+          if (filterKategori) {
+            filterKategori.value = '';
+            filterKategori.placeholder = 'Pilih Kategori';
+          }
+
+          closeFilterSearchBoxes();
+          filterDropdown.style.display = 'none';
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function () {
+          filterState.kodeCOA = (filterKodeCOA ? filterKodeCOA.value : '').trim();
+          filterState.status = (filterStatus ? filterStatus.value : '').trim();
+          filterState.kategori = (filterKategori ? filterKategori.value : '').trim();
+
+          closeFilterSearchBoxes();
+          filterDropdown.style.display = 'none';
+          filterDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== CALENDAR LOGIC (Dual Month - Tidak Tutup Otomatis) ===== */
+      let calViewYear = 2026;
+      let calViewMonth = 10;
+      let tempStartDate = null;
+      let tempEndDate = null;
+
+      const MONTH_NAMES = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+
+      function renderDualCalendar() {
+        const m1 = calViewMonth;
+        const y1 = calViewYear;
+
+        let m2 = calViewMonth + 1;
+        let y2 = calViewYear;
+        if (m2 > 12) { m2 = 1; y2++; }
+
+        document.getElementById('calTitle1').textContent = MONTH_NAMES[m1 - 1] + ' ' + y1;
+        document.getElementById('calTitle2').textContent = MONTH_NAMES[m2 - 1] + ' ' + y2;
+
+        renderMonthDays(y1, m1, 'calDays1');
+        renderMonthDays(y2, m2, 'calDays2');
+        updateRangeDisplay();
+      }
+
+      function renderMonthDays(year, month, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+
+        const firstDayIdx = new Date(year, month - 1, 1).getDay();
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        for (let i = 0; i < firstDayIdx; i++) {
+          const blank = document.createElement('div');
+          blank.className = 'cal-day is-empty';
+          container.appendChild(blank);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'cal-day';
+          dayEl.textContent = d;
+
+          const mStr = month < 10 ? '0' + month : String(month);
+          const dStr = d < 10 ? '0' + d : String(d);
+          const dateStr = year + '-' + mStr + '-' + dStr;
+
+          if (tempStartDate && dateStr === tempStartDate) {
+            dayEl.classList.add('is-selected-start');
+          } else if (tempEndDate && dateStr === tempEndDate) {
+            dayEl.classList.add('is-selected-end');
+          } else if (tempStartDate && tempEndDate && dateStr > tempStartDate && dateStr < tempEndDate) {
+            dayEl.classList.add('is-in-range');
+          }
+
+          dayEl.addEventListener('click', function (e) {
+            e.stopPropagation();
+            handleDateClick(dateStr);
+          });
+
+          container.appendChild(dayEl);
+        }
+      }
+
+      function handleDateClick(dateStr) {
+        if (!tempStartDate || (tempStartDate && tempEndDate)) {
+          tempStartDate = dateStr;
+          tempEndDate = null;
+        } else if (tempStartDate && !tempEndDate) {
+          if (dateStr < tempStartDate) {
+            tempEndDate = tempStartDate;
+            tempStartDate = dateStr;
+          } else {
+            tempEndDate = dateStr;
+          }
+        }
+        renderDualCalendar();
+      }
+
+      function updateRangeDisplay() {
+        if (!calRangeDisplay) return;
+        if (tempStartDate && tempEndDate) {
+          calRangeDisplay.textContent = formatTanggalDisplay(tempStartDate) + ' - ' + formatTanggalDisplay(tempEndDate);
+        } else if (tempStartDate) {
+          calRangeDisplay.textContent = formatTanggalDisplay(tempStartDate) + ' - (Pilih tanggal akhir)';
+        } else {
+          calRangeDisplay.textContent = 'Pilih rentang tanggal beli';
+        }
+      }
+
+      const calPrevMonth = document.getElementById('calPrevMonth');
+      const calNextMonth = document.getElementById('calNextMonth');
+
+      if (calPrevMonth) {
+        calPrevMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calViewMonth--;
+          if (calViewMonth < 1) { calViewMonth = 12; calViewYear--; }
+          renderDualCalendar();
+        });
+      }
+
+      if (calNextMonth) {
+        calNextMonth.addEventListener('click', function (e) {
+          e.stopPropagation();
+          calViewMonth++;
+          if (calViewMonth > 12) { calViewMonth = 1; calViewYear++; }
+          renderDualCalendar();
+        });
+      }
+
+      document.querySelectorAll('.cal-preset-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          document.querySelectorAll('.cal-preset-btn').forEach(function (b) { b.classList.remove('is-active'); });
+          btn.classList.add('is-active');
+
+          const preset = btn.dataset.preset;
+          applyCalendarPreset(preset);
+        });
+      });
+
+      function applyCalendarPreset(preset) {
+        const now = new Date();
+        const todayStr = now.toISOString().slice(0, 10);
+
+        if (preset === 'all') {
+          tempStartDate = null;
+          tempEndDate = null;
+        } else if (preset === 'today') {
+          tempStartDate = todayStr;
+          tempEndDate = todayStr;
+        } else if (preset === 'last7') {
+          const past = new Date(now);
+          past.setDate(now.getDate() - 7);
+          tempStartDate = past.toISOString().slice(0, 10);
+          tempEndDate = todayStr;
+        } else if (preset === 'last30') {
+          const past = new Date(now);
+          past.setDate(now.getDate() - 30);
+          tempStartDate = past.toISOString().slice(0, 10);
+          tempEndDate = todayStr;
+        } else if (preset === 'thisMonth') {
+          const start = new Date(now.getFullYear(), now.getMonth(), 1);
+          const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          tempStartDate = start.toISOString().slice(0, 10);
+          tempEndDate = end.toISOString().slice(0, 10);
+        } else if (preset === 'lastMonth') {
+          const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+          const end = new Date(now.getFullYear(), now.getMonth(), 0);
+          tempStartDate = start.toISOString().slice(0, 10);
+          tempEndDate = end.toISOString().slice(0, 10);
+        }
+
+        renderDualCalendar();
+      }
+
+      if (btnCalendar) {
+        btnCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          closeActionMenus();
+          closeModalDropdowns();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          calendarDropdown.classList.toggle('is-active');
+          if (calendarDropdown.classList.contains('is-active')) {
+            tempStartDate = filterState.startDate;
+            tempEndDate = filterState.endDate;
+            renderDualCalendar();
+          }
+        });
+      }
+
+      if (btnCancelCalendar) {
+        btnCancelCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterState.startDate = null;
+          filterState.endDate = null;
+          calendarDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      if (btnApplyCalendar) {
+        btnApplyCalendar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterState.startDate = tempStartDate;
+          filterState.endDate = tempEndDate;
+          calendarDropdown.classList.remove('is-active');
+          renderTable();
+        });
+      }
+
+      /* ===== EXPORT EXCEL (Universal BisaExcel Engine) ===== */
+      if (btnExportExcel) {
+        btnExportExcel.addEventListener('click', async function () {
+          const rows = getFilteredData();
+          if (rows.length === 0) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Data Kosong',
+                text: 'Tidak ada data aset yang dapat diexport.'
+              });
+            } else {
+              alert('Tidak ada data aset yang dapat diexport.');
+            }
+            return;
+          }
+
+          const todayStr = new Date().toISOString().slice(0, 10);
+          const filename = 'Laporan_Daftar_Aset_' + todayStr + '.xlsx';
+
+          const headers = [
+            'No',
+            'Kode Aset',
+            'Nama Aset',
+            'Tanggal Beli',
+            'Kode COA',
+            'Lokasi',
+            'Harga Satuan',
+            'Qty',
+            'Harga Perolehan',
+            'Umur (Bulan)',
+            'Nilai Residu',
+            'Penyusutan/Bulan',
+            'Akumulasi',
+            'Nilai Buku',
+            'Status',
+            'Kategori',
+            'Mulai di Pakai',
+            'PIC',
+            'Divisi',
+            'Project/Brand',
+            'Tanggal Pelepasan',
+            'Hasil Pelepasan',
+            'Nilai Buku Saat Lepas',
+            'Laba/Rugi Lepas',
+            'Divisi Pengecualian',
+            'Nama Akun COA',
+            'Kelompok COA',
+            'Status COA'
+          ];
+
+          const exportData = rows.map(function (item, idx) {
+            return [
+              idx + 1,
+              item.kodeAset || '-',
+              item.namaAset || '-',
+              formatTanggalDisplay(item.tanggalBeli),
+              item.kodeCOA || '-',
+              item.lokasi || '-',
+              Number(item.hargaSatuan || 0),
+              Number(item.qty || 1),
+              Number(item.hargaPerolehan || 0),
+              Number(item.umurBulan || 0),
+              Number(item.nilaiResidu || 0),
+              Number(item.penyusutanBulan || 0),
+              Number(item.akumulasi || 0),
+              Number(item.nilaiBuku || 0),
+              item.status || 'Aktif',
+              item.kategori || '-',
+              formatTanggalDisplay(item.mulaiDiPakai),
+              item.pic || '-',
+              item.divisi || '-',
+              item.projectBrand || '-',
+              formatTanggalDisplay(item.tanggalPelepasan),
+              item.hasilPelepasan || '-',
+              item.nilaiBukuSaatLepas || '-',
+              item.labaRugiLepas || '-',
+              item.divisiPengecualian || item.divisi || '-',
+              item.namaAkunCOA || '-',
+              item.kelompokCOA || '-',
+              item.statusCOA || 'Ok'
+            ];
+          });
+
+          if (typeof window.exportBisaExcel === 'function') {
+            await window.exportBisaExcel({
+              title: 'DAFTAR ASET PERUSAHAAN',
+              filename: filename,
+              sheetName: 'Daftar Aset',
+              headers: headers,
+              rows: exportData
+            });
+          } else if (typeof window.exportTableToExcel === 'function') {
+            await window.exportTableToExcel('asetTable', filename, 'DAFTAR ASET PERUSAHAAN');
+          } else {
+            let csv = headers.join(',') + '\n';
+            exportData.forEach(function (r) {
+              csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename.replace('.xlsx', '.csv'));
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        });
+      }
+
+      /* ===== SEARCH INPUT EVENT ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          filterState.search = this.value.trim();
+          renderTable();
+        });
+      }
+
+      /* ===== GLOBAL CLICK LISTENER (TUTUP POPUPS) ===== */
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#asetActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+        if (!e.target.closest('.aset-dropdown-wrapper')) {
+          closeFilterSearchBoxes();
+          if (filterDropdown) filterDropdown.classList.remove('is-active');
+          if (calendarDropdown) calendarDropdown.classList.remove('is-active');
+        } else if (!e.target.closest('.aset-filter-box')) {
+          closeFilterSearchBoxes();
+        }
+        if (!e.target.closest('.modal-dropdown-wrap')) {
+          closeModalDropdowns();
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+      const tableWrap = document.querySelector('.aset-table-wrap');
+      if (tableWrap) {
+        tableWrap.addEventListener('scroll', closeActionMenus, { passive: true });
+      }
+
+      /* ===== INITIALIZATION ===== */
+      initFilterOptions();
+      renderTable();
+    })();
+  </script>
 </body>
 
 </html>

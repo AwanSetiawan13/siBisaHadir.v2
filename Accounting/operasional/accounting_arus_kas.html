@@ -7,6 +7,646 @@
   <title>Arus Kas | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js for High-Fidelity Interactive Dashboard Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ===== RESET & ROOT STYLING ===== */
+    body.dashboard-body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-content {
+      padding: 24px 28px 40px 28px;
+      max-width: 1600px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* ===== 4 SUMMARY CARDS DI BAGIAN ATAS ===== */
+    .ak-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .ak-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .ak-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .ak-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ak-card-label {
+      font-size: 13.5px;
+      color: #64748b;
+      font-weight: 500;
+      letter-spacing: -0.1px;
+    }
+
+    .ak-card-value {
+      font-size: 24px;
+      font-weight: 700;
+      font-style: normal;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+
+    .ak-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 9px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 118, 197, 0.28);
+    }
+
+    /* Modifiers: Hijau untuk Uang Masuk & Merah untuk Uang Keluar */
+    .ak-card--masuk {
+      border-top-color: #16a34a !important;
+    }
+
+    .ak-card-icon--masuk {
+      background: #16a34a !important;
+      box-shadow: 0 2px 8px rgba(22, 163, 74, 0.32) !important;
+    }
+
+    .ak-card--keluar {
+      border-top-color: #ef4444 !important;
+    }
+
+    .ak-card-icon--keluar {
+      background: #ef4444 !important;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.32) !important;
+    }
+
+    .ak-card-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    /* ===== 2-COLUMN DASHBOARD GRID ===== */
+    .ak-dashboard-grid {
+      display: grid;
+      grid-template-columns: 1.78fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .ak-col-left,
+    .ak-col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ===== PANEL WRAPPER ===== */
+    .ak-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+    }
+
+    .ak-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .ak-panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      letter-spacing: -0.2px;
+    }
+
+    .ak-panel-title em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .ak-dashed-divider {
+      border: none;
+      border-top: 1px dashed #cbd5e1;
+      margin: 0 0 16px 0;
+    }
+
+    /* ===== PERIOD SELECTOR DROPDOWN ===== */
+    .ak-period-select-wrap {
+      position: relative;
+    }
+
+    .ak-period-select {
+      height: 32px;
+      padding: 0 28px 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #475569;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 14px;
+      transition: all 0.15s ease;
+    }
+
+    .ak-period-select:focus {
+      border-color: #0076C5;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    /* ===== TREND CHART AREA & DETAILED CONTROLS ===== */
+    .ak-trend-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .ak-trend-controls-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .ak-view-toggles {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 2.5px;
+      gap: 2px;
+    }
+
+    .ak-view-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .ak-view-btn:hover {
+      color: #0f172a;
+    }
+
+    .ak-view-btn.is-active {
+      background: #ffffff;
+      color: #0076C5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .ak-chart-type-toggles {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 2.5px;
+      gap: 2px;
+    }
+
+    .ak-chart-type-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .ak-chart-type-btn:hover {
+      color: #0f172a;
+    }
+
+    .ak-chart-type-btn.is-active {
+      background: #ffffff;
+      color: #0076C5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .ak-chart-type-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    /* Mini KPI Row above the chart */
+    .ak-trend-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .ak-trend-kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: all 0.15s ease;
+    }
+
+    .ak-trend-kpi-card:hover {
+      border-color: #cbd5e1;
+      background: #f1f5f9;
+    }
+
+    .ak-trend-kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .ak-trend-kpi-label {
+      font-size: 11.5px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .ak-trend-kpi-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1.5px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.1px;
+    }
+
+    .ak-trend-kpi-tag.is-green {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .ak-trend-kpi-tag.is-red {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .ak-trend-kpi-tag.is-blue {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .ak-trend-kpi-val {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .ak-trend-kpi-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .ak-chart-container {
+      position: relative;
+      width: 100%;
+      height: 310px;
+    }
+
+    /* ===== RINGKASAN BULANAN TABLE ===== */
+    .ak-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .ak-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .ak-table th {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: #0f172a;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px dashed #cbd5e1;
+      white-space: nowrap;
+      background: transparent;
+    }
+
+    .ak-table th.col-num {
+      width: 40px;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .ak-table th.col-amount {
+      text-align: right;
+      width: 140px;
+    }
+
+    .ak-table td {
+      padding: 9.5px 14px;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    .ak-table td.col-num {
+      text-align: center;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .ak-table td.col-amount {
+      text-align: right;
+      font-weight: 600;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
+    .ak-table td.col-component {
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    /* Total Arus Kas Highlight Row */
+    .ak-table tr.row-total-cash td {
+      font-weight: 700 !important;
+      color: #0f172a !important;
+      background: #f8fafc;
+      border-top: 1.5px solid #cbd5e1;
+      border-bottom: 1.5px solid #cbd5e1;
+    }
+
+    .ak-table tr.row-reconciliation td {
+      color: #475569;
+    }
+
+    .ak-table tr.row-reconciliation td.col-component {
+      font-weight: 500;
+    }
+
+    .ak-val-positive {
+      color: #16a34a !important;
+    }
+
+    .ak-val-negative {
+      color: #dc2626 !important;
+    }
+
+    .ak-val-neutral {
+      color: #64748b !important;
+    }
+
+    /* ===== KOMPONEN KAS BERSIH (DONUT CHART & LEGEND) ===== */
+    .ak-donut-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 8px 10px;
+    }
+
+    .ak-donut-chart-wrap {
+      position: relative;
+      width: 155px;
+      height: 155px;
+      flex-shrink: 0;
+    }
+
+    .ak-donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-grow: 1;
+    }
+
+    .ak-legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13.5px;
+    }
+
+    .ak-legend-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ak-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .ak-legend-name {
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .ak-legend-val {
+      font-weight: 700;
+      color: #0f172a;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    /* ===== SALDO PER AKUN ===== */
+    .ak-account-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ak-account-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 8px;
+      border-radius: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .ak-account-item:hover {
+      background: #f8fafc;
+    }
+
+    .ak-account-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .ak-account-num {
+      color: #94a3b8;
+      font-size: 12.5px;
+      min-width: 16px;
+    }
+
+    .ak-account-name {
+      color: #1e293b;
+    }
+
+    .ak-account-val {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ===== STATUS REKONSILIASI ===== */
+    .ak-rekon-box {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ak-rekon-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .ak-rekon-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .ak-rekon-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .ak-rekon-val {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .ak-rekon-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 18px;
+      background: #00d084;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 700;
+      border-radius: 6px;
+      letter-spacing: 0.2px;
+      box-shadow: 0 2px 6px rgba(0, 208, 132, 0.35);
+      border: none;
+      cursor: default;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1180px) {
+      .ak-dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ak-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .ak-summary-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-content {
+        padding: 16px 14px;
+      }
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +654,1119 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <!-- ===== 4 SUMMARY CARDS DI BAGIAN ATAS ===== -->
+      <section class="ak-summary-cards">
+        <!-- Card 1: Total Uang Masuk (Warna Hijau) -->
+        <div class="ak-card ak-card--masuk">
+          <div class="ak-card-info">
+            <span class="ak-card-label">Total Uang Masuk</span>
+            <span class="ak-card-value" id="cardTotalMasuk">Rp. 000</span>
+          </div>
+          <div class="ak-card-icon ak-card-icon--masuk" title="Total Uang Masuk">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M19 12l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Total Uang Keluar (Warna Merah) -->
+        <div class="ak-card ak-card--keluar">
+          <div class="ak-card-info">
+            <span class="ak-card-label">Total Uang Keluar</span>
+            <span class="ak-card-value" id="cardTotalKeluar">Rp. 000</span>
+          </div>
+          <div class="ak-card-icon ak-card-icon--keluar" title="Total Uang Keluar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Arus Kas Bersih -->
+        <div class="ak-card">
+          <div class="ak-card-info">
+            <span class="ak-card-label">Arus Kas Bersih</span>
+            <span class="ak-card-value" id="cardArusBersih">Rp. 000</span>
+          </div>
+          <div class="ak-card-icon" title="Arus Kas Bersih">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Saldo Akhir -->
+        <div class="ak-card">
+          <div class="ak-card-info">
+            <span class="ak-card-label">Saldo Akhir</span>
+            <span class="ak-card-value" id="cardSaldoAkhir">Rp. 000</span>
+          </div>
+          <div class="ak-card-icon" title="Saldo Akhir">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 2-COLUMN DASHBOARD GRID ===== -->
+      <div class="ak-dashboard-grid">
+        <!-- ===== LEFT COLUMN ===== -->
+        <div class="ak-col-left">
+          <!-- PANEL 1: Trend Arus Financial (Detail & Interaktif) -->
+          <section class="ak-panel">
+            <div class="ak-panel-header">
+              <h2 class="ak-panel-title"><em>Trand</em> Arus Financial</h2>
+              <div class="ak-period-select-wrap">
+                <select id="periodSelector" class="ak-period-select" aria-label="Pilih Periode">
+                  <option value="okt2026">Oktober 2026</option>
+                  <option value="sep2026">September 2026</option>
+                  <option value="agu2026">Agustus 2026</option>
+                  <option value="q3_2026">Kuartal 3 (Q3) 2026</option>
+                  <option value="tahun2026">Tahun 2026 (YTD)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="ak-dashed-divider"></div>
+
+            <!-- Granularity & Chart Type Toolbar -->
+            <div class="ak-trend-toolbar">
+              <div class="ak-trend-controls-left">
+                <!-- Granularity Tabs -->
+                <div class="ak-view-toggles" id="granularityToggles">
+                  <button type="button" class="ak-view-btn" data-granularity="daily">Harian</button>
+                  <button type="button" class="ak-view-btn is-active" data-granularity="weekly">Mingguan</button>
+                  <button type="button" class="ak-view-btn" data-granularity="monthly">Bulanan</button>
+                </div>
+
+                <!-- Chart Type Tabs -->
+                <div class="ak-chart-type-toggles" id="chartTypeToggles">
+                  <button type="button" class="ak-chart-type-btn is-active" data-chart-type="line" title="Grafik Garis Area">
+                    <svg viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" /></svg>
+                    Area
+                  </button>
+                  <button type="button" class="ak-chart-type-btn" data-chart-type="bar" title="Grafik Batang">
+                    <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
+                    Batang
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3 Mini KPI Cards -->
+            <div class="ak-trend-kpi-row">
+              <div class="ak-trend-kpi-card">
+                <div class="ak-trend-kpi-header">
+                  <span class="ak-trend-kpi-label">Puncak Masuk</span>
+                  <span class="ak-trend-kpi-tag is-green" id="kpiTagMasuk">Pekan 3</span>
+                </div>
+                <div class="ak-trend-kpi-val" id="kpiValMasuk">Rp. 340 Jt</div>
+                <div class="ak-trend-kpi-sub" id="kpiSubMasuk">Tertinggi dalam periode</div>
+              </div>
+
+              <div class="ak-trend-kpi-card">
+                <div class="ak-trend-kpi-header">
+                  <span class="ak-trend-kpi-label">Puncak Keluar</span>
+                  <span class="ak-trend-kpi-tag is-red" id="kpiTagKeluar">Pekan 2</span>
+                </div>
+                <div class="ak-trend-kpi-val" id="kpiValKeluar">Rp. 220 Jt</div>
+                <div class="ak-trend-kpi-sub" id="kpiSubKeluar">Pengeluaran operasional</div>
+              </div>
+
+              <div class="ak-trend-kpi-card">
+                <div class="ak-trend-kpi-header">
+                  <span class="ak-trend-kpi-label">Rata-rata Arus Bersih</span>
+                  <span class="ak-trend-kpi-tag is-blue" id="kpiTagBersih">Net Surplus</span>
+                </div>
+                <div class="ak-trend-kpi-val" id="kpiValBersih">+Rp. 107.5 Jt</div>
+                <div class="ak-trend-kpi-sub" id="kpiSubBersih">Rata-rata per interval</div>
+              </div>
+            </div>
+
+            <!-- Interactive Canvas -->
+            <div class="ak-chart-container">
+              <canvas id="trendChart"></canvas>
+            </div>
+          </section>
+
+          <!-- PANEL 2: Ringkasan Bulanan -->
+          <section class="ak-panel">
+            <div class="ak-panel-header">
+              <h2 class="ak-panel-title"><em>Ringkasan</em> Bulanan</h2>
+            </div>
+
+            <div class="ak-dashed-divider"></div>
+
+            <div class="ak-table-wrap">
+              <table class="ak-table" id="ringkasanTable">
+                <thead>
+                  <tr>
+                    <th class="col-num">#</th>
+                    <th>Komponen</th>
+                    <th class="col-amount">Uang Masuk</th>
+                    <th class="col-amount">Uang Keluar</th>
+                    <th class="col-amount">Arus Bersih</th>
+                  </tr>
+                </thead>
+                <tbody id="ringkasanTableBody">
+                  <!-- Diisi secara dinamis melalui JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <!-- ===== RIGHT COLUMN ===== -->
+        <div class="ak-col-right">
+          <!-- PANEL 3: Komponen Kas Bersih -->
+          <section class="ak-panel">
+            <div class="ak-panel-header">
+              <h2 class="ak-panel-title"><em>Komponen</em> Kas Bersih</h2>
+            </div>
+
+            <div class="ak-dashed-divider"></div>
+
+            <div class="ak-donut-box">
+              <div class="ak-donut-chart-wrap">
+                <canvas id="donutChart"></canvas>
+              </div>
+
+              <div class="ak-donut-legend">
+                <div class="ak-legend-item">
+                  <div class="ak-legend-left">
+                    <span class="ak-legend-dot" style="background: #0ea5e9;"></span>
+                    <span class="ak-legend-name">Oprasional</span>
+                  </div>
+                  <span class="ak-legend-val" id="legendOperasional">0%</span>
+                </div>
+
+                <div class="ak-legend-item">
+                  <div class="ak-legend-left">
+                    <span class="ak-legend-dot" style="background: #facc15;"></span>
+                    <span class="ak-legend-name">Investasi</span>
+                  </div>
+                  <span class="ak-legend-val" id="legendInvestasi">0%</span>
+                </div>
+
+                <div class="ak-legend-item">
+                  <div class="ak-legend-left">
+                    <span class="ak-legend-dot" style="background: #ef4444;"></span>
+                    <span class="ak-legend-name">Pendanaan</span>
+                  </div>
+                  <span class="ak-legend-val" id="legendPendanaan">0%</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- PANEL 4: Saldo Per Akun -->
+          <section class="ak-panel">
+            <div class="ak-panel-header">
+              <h2 class="ak-panel-title"><em>Saldo</em> Per Akun</h2>
+            </div>
+
+            <div class="ak-dashed-divider"></div>
+
+            <ul class="ak-account-list" id="accountList">
+              <li class="ak-account-item">
+                <div class="ak-account-left">
+                  <span class="ak-account-num">1.</span>
+                  <span class="ak-account-name">Kas Kecil</span>
+                </div>
+                <span class="ak-account-val" id="accKasKecil">Rp. -</span>
+              </li>
+              <li class="ak-account-item">
+                <div class="ak-account-left">
+                  <span class="ak-account-num">2.</span>
+                  <span class="ak-account-name">Bank BCA | 2092026028</span>
+                </div>
+                <span class="ak-account-val" id="accBca1">Rp. -</span>
+              </li>
+              <li class="ak-account-item">
+                <div class="ak-account-left">
+                  <span class="ak-account-num">3.</span>
+                  <span class="ak-account-name">Bank BCA | 2091139784</span>
+                </div>
+                <span class="ak-account-val" id="accBca2">Rp. -</span>
+              </li>
+              <li class="ak-account-item">
+                <div class="ak-account-left">
+                  <span class="ak-account-num">4.</span>
+                  <span class="ak-account-name">SEABANK | 901631003438</span>
+                </div>
+                <span class="ak-account-val" id="accSeabank">Rp. -</span>
+              </li>
+              <li class="ak-account-item">
+                <div class="ak-account-left">
+                  <span class="ak-account-num">5.</span>
+                  <span class="ak-account-name">BNI | 2049368973</span>
+                </div>
+                <span class="ak-account-val" id="accBni">Rp. -</span>
+              </li>
+            </ul>
+          </section>
+
+          <!-- PANEL 5: Status Rekonsiliasi -->
+          <section class="ak-panel">
+            <div class="ak-panel-header">
+              <h2 class="ak-panel-title"><em>Status</em> Rekonsiliasi</h2>
+            </div>
+
+            <div class="ak-dashed-divider"></div>
+
+            <div class="ak-rekon-box">
+              <div class="ak-rekon-metric">
+                <span class="ak-rekon-label">Total Saldo</span>
+                <span class="ak-rekon-val" id="rekonTotalSaldo">Rp. -</span>
+              </div>
+
+              <div class="ak-rekon-row">
+                <div class="ak-rekon-metric">
+                  <span class="ak-rekon-label">Selisih</span>
+                  <span class="ak-rekon-val" id="rekonSelisih">Rp. -</span>
+                </div>
+
+                <button type="button" class="ak-rekon-badge" id="rekonBadge">Cocok / Balance</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
   </div>
 
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ===== PERIOD DATASET (Realistis Sesuai Standard Kas & Bank) ===== */
+      const DASHBOARD_DATA = {
+        okt2026: {
+          cards: {
+            masuk: 1250000000,
+            keluar: 820000000,
+            bersih: 430000000,
+            saldoAkhir: 965000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
+              masuk: [280, 310, 340, 320],
+              keluar: [190, 220, 210, 200],
+              bersih: [90, 90, 130, 120]
+            },
+            daily: {
+              labels: ['01 Okt', '04 Okt', '07 Okt', '10 Okt', '13 Okt', '16 Okt', '19 Okt', '22 Okt', '25 Okt', '28 Okt', '31 Okt'],
+              masuk: [38, 45, 52, 60, 48, 75, 68, 85, 72, 80, 77],
+              keluar: [25, 32, 40, 48, 35, 55, 48, 58, 45, 52, 42],
+              bersih: [13, 13, 12, 12, 13, 20, 20, 27, 27, 28, 35]
+            },
+            monthly: {
+              labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt (Bln Ini)'],
+              masuk: [990, 1050, 1020, 980, 1100, 1250],
+              keluar: [760, 810, 790, 840, 780, 820],
+              bersih: [230, 240, 230, 140, 320, 430]
+            }
+          },
+          components: {
+            operasional: { masuk: 850000000, keluar: 520000000, bersih: 330000000, pct: 76.7 },
+            investasi: { masuk: 150000000, keluar: 180000000, bersih: -30000000, pct: 7.0 },
+            pendanaan: { masuk: 250000000, keluar: 120000000, bersih: 130000000, pct: 16.3 }
+          },
+          reconciliation: {
+            saldoAwal: 535000000,
+            transferInternal: 0,
+            saldoAkhir: 965000000,
+            saldoKasBank: 965000000,
+            selisih: 0
+          },
+          accounts: {
+            kasKecil: 15000000,
+            bca1: 450000000,
+            bca2: 280000000,
+            seabank: 125000000,
+            bni: 95000000
+          }
+        },
+        sep2026: {
+          cards: {
+            masuk: 1100000000,
+            keluar: 780000000,
+            bersih: 320000000,
+            saldoAkhir: 535000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Minggu 1 (1-7 Sep)', 'Minggu 2 (8-14 Sep)', 'Minggu 3 (15-21 Sep)', 'Minggu 4 (22-30 Sep)'],
+              masuk: [250, 280, 290, 280],
+              keluar: [180, 200, 210, 190],
+              bersih: [70, 80, 80, 90]
+            },
+            daily: {
+              labels: ['01 Sep', '04 Sep', '07 Sep', '10 Sep', '13 Sep', '16 Sep', '19 Sep', '22 Sep', '25 Sep', '28 Sep', '30 Sep'],
+              masuk: [32, 40, 48, 55, 42, 65, 60, 72, 65, 70, 71],
+              keluar: [24, 30, 38, 42, 32, 48, 44, 52, 40, 46, 44],
+              bersih: [8, 10, 10, 13, 10, 17, 16, 20, 25, 24, 27]
+            },
+            monthly: {
+              labels: ['Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep'],
+              masuk: [910, 990, 1050, 1020, 980, 1100],
+              keluar: [700, 760, 810, 790, 840, 780],
+              bersih: [210, 230, 240, 230, 140, 320]
+            }
+          },
+          components: {
+            operasional: { masuk: 780000000, keluar: 490000000, bersih: 290000000, pct: 70.9 },
+            investasi: { masuk: 120000000, keluar: 160000000, bersih: -40000000, pct: 10.9 },
+            pendanaan: { masuk: 200000000, keluar: 130000000, bersih: 70000000, pct: 18.2 }
+          },
+          reconciliation: {
+            saldoAwal: 215000000,
+            transferInternal: 0,
+            saldoAkhir: 535000000,
+            saldoKasBank: 535000000,
+            selisih: 0
+          },
+          accounts: {
+            kasKecil: 12000000,
+            bca1: 240000000,
+            bca2: 150000000,
+            seabank: 75000000,
+            bni: 58000000
+          }
+        },
+        agu2026: {
+          cards: {
+            masuk: 980000000,
+            keluar: 840000000,
+            bersih: 140000000,
+            saldoAkhir: 215000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Minggu 1 (1-7 Agu)', 'Minggu 2 (8-14 Agu)', 'Minggu 3 (15-21 Agu)', 'Minggu 4 (22-31 Agu)'],
+              masuk: [220, 240, 270, 250],
+              keluar: [200, 220, 210, 210],
+              bersih: [20, 20, 60, 40]
+            },
+            daily: {
+              labels: ['01 Agu', '04 Agu', '07 Agu', '10 Agu', '13 Agu', '16 Agu', '19 Agu', '22 Agu', '25 Agu', '28 Agu', '31 Agu'],
+              masuk: [28, 35, 42, 48, 38, 55, 50, 62, 55, 60, 67],
+              keluar: [26, 32, 40, 44, 35, 50, 46, 54, 48, 52, 53],
+              bersih: [2, 3, 2, 4, 3, 5, 4, 8, 7, 8, 14]
+            },
+            monthly: {
+              labels: ['Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu'],
+              masuk: [950, 910, 990, 1050, 1020, 980],
+              keluar: [730, 700, 760, 810, 790, 840],
+              bersih: [220, 210, 230, 240, 230, 140]
+            }
+          },
+          components: {
+            operasional: { masuk: 710000000, keluar: 540000000, bersih: 170000000, pct: 72.4 },
+            investasi: { masuk: 90000000, keluar: 150000000, bersih: -60000000, pct: 9.2 },
+            pendanaan: { masuk: 180000000, keluar: 150000000, bersih: 30000000, pct: 18.4 }
+          },
+          reconciliation: {
+            saldoAwal: 75000000,
+            transferInternal: 0,
+            saldoAkhir: 215000000,
+            saldoKasBank: 215000000,
+            selisih: 0
+          },
+          accounts: {
+            kasKecil: 8000000,
+            bca1: 95000000,
+            bca2: 60000000,
+            seabank: 30000000,
+            bni: 22000000
+          }
+        },
+        q3_2026: {
+          cards: {
+            masuk: 3330000000,
+            keluar: 2440000000,
+            bersih: 890000000,
+            saldoAkhir: 965000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Juli', 'Agustus', 'September', 'Oktober (Proj)'],
+              masuk: [850, 980, 1100, 1250],
+              keluar: [720, 840, 780, 820],
+              bersih: [130, 140, 320, 430]
+            },
+            daily: {
+              labels: ['Pekan 1', 'Pekan 3', 'Pekan 5', 'Pekan 7', 'Pekan 9', 'Pekan 11', 'Pekan 13'],
+              masuk: [210, 230, 245, 260, 275, 290, 310],
+              keluar: [175, 190, 205, 215, 200, 210, 205],
+              bersih: [35, 40, 40, 45, 75, 80, 105]
+            },
+            monthly: {
+              labels: ['Q1 2026', 'Q2 2026', 'Q3 2026 (Aktual)', 'Q4 2026 (Proj)'],
+              masuk: [2800, 3100, 3330, 3500],
+              keluar: [2100, 2300, 2440, 2550],
+              bersih: [700, 800, 890, 950]
+            }
+          },
+          components: {
+            operasional: { masuk: 2340000000, keluar: 1550000000, bersih: 790000000, pct: 73.2 },
+            investasi: { masuk: 360000000, keluar: 490000000, bersih: -130000000, pct: 9.5 },
+            pendanaan: { masuk: 630000000, keluar: 400000000, bersih: 230000000, pct: 17.3 }
+          },
+          reconciliation: {
+            saldoAwal: 75000000,
+            transferInternal: 0,
+            saldoAkhir: 965000000,
+            saldoKasBank: 965000000,
+            selisih: 0
+          },
+          accounts: {
+            kasKecil: 15000000,
+            bca1: 450000000,
+            bca2: 280000000,
+            seabank: 125000000,
+            bni: 95000000
+          }
+        },
+        tahun2026: {
+          cards: {
+            masuk: 9850000000,
+            keluar: 7240000000,
+            bersih: 2610000000,
+            saldoAkhir: 965000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Q1 2026', 'Q2 2026', 'Q3 2026', 'Q4 (Mtd)'],
+              masuk: [2800, 3100, 3330, 1250],
+              keluar: [2100, 2300, 2440, 820],
+              bersih: [700, 800, 890, 430]
+            },
+            daily: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+              masuk: [820, 880, 950, 910, 990, 1050, 1020, 980, 1100, 1250],
+              keluar: [680, 710, 730, 700, 760, 810, 790, 840, 780, 820],
+              bersih: [140, 170, 220, 210, 230, 240, 230, 140, 320, 430]
+            },
+            monthly: {
+              labels: ['2023', '2024', '2025', '2026 (YTD)'],
+              masuk: [6800, 7900, 8800, 9850],
+              keluar: [5400, 6100, 6800, 7240],
+              bersih: [1400, 1800, 2000, 2610]
+            }
+          },
+          components: {
+            operasional: { masuk: 7100000000, keluar: 4800000000, bersih: 2300000000, pct: 74.0 },
+            investasi: { masuk: 1100000000, keluar: 1400000000, bersih: -300000000, pct: 9.8 },
+            pendanaan: { masuk: 1650000000, keluar: 1040000000, bersih: 610000000, pct: 16.2 }
+          },
+          reconciliation: {
+            saldoAwal: 50000000,
+            transferInternal: 0,
+            saldoAkhir: 965000000,
+            saldoKasBank: 965000000,
+            selisih: 0
+          },
+          accounts: {
+            kasKecil: 15000000,
+            bca1: 450000000,
+            bca2: 280000000,
+            seabank: 125000000,
+            bni: 95000000
+          }
+        }
+      };
+
+      /* ===== HELPER FORMATTERS ===== */
+      function formatRupiah(num) {
+        const val = Number(num) || 0;
+        return 'Rp. ' + val.toLocaleString('id-ID');
+      }
+
+      function formatArusBersih(num) {
+        const val = Number(num) || 0;
+        if (val > 0) return '+Rp. ' + val.toLocaleString('id-ID');
+        if (val < 0) return '-Rp. ' + Math.abs(val).toLocaleString('id-ID');
+        return 'Rp. 0';
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      /* ===== STATE VARIABLES ===== */
+      let currentPeriod = 'okt2026';
+      let currentGranularity = 'weekly'; // 'daily' | 'weekly' | 'monthly'
+      let currentChartType = 'line';      // 'line' | 'bar'
+      let trendChartInstance = null;
+      let donutChartInstance = null;
+
+      /* ===== RENDER FUNCTION ===== */
+      function renderDashboard() {
+        const data = DASHBOARD_DATA[currentPeriod] || DASHBOARD_DATA.okt2026;
+
+        // 1. Summary Cards
+        const cardTotalMasuk = document.getElementById('cardTotalMasuk');
+        const cardTotalKeluar = document.getElementById('cardTotalKeluar');
+        const cardArusBersih = document.getElementById('cardArusBersih');
+        const cardSaldoAkhir = document.getElementById('cardSaldoAkhir');
+
+        if (cardTotalMasuk) cardTotalMasuk.textContent = formatRupiah(data.cards.masuk);
+        if (cardTotalKeluar) cardTotalKeluar.textContent = formatRupiah(data.cards.keluar);
+        if (cardArusBersih) cardArusBersih.textContent = formatRupiah(data.cards.bersih);
+        if (cardSaldoAkhir) cardSaldoAkhir.textContent = formatRupiah(data.cards.saldoAkhir);
+
+        // 2. Trend Line / Bar Chart (Detailed Traffic)
+        const trendDataSet = (data.trend && data.trend[currentGranularity])
+          ? data.trend[currentGranularity]
+          : (data.trend.weekly || data.trend);
+        
+        updateTrendKPIs(trendDataSet);
+        renderTrendChart(trendDataSet, currentChartType);
+
+        // 3. Ringkasan Bulanan Table
+        renderRingkasanTable(data);
+
+        // 4. Donut Chart (Komponen Kas Bersih)
+        renderDonutChart(data.components);
+
+        // 5. Saldo Per Akun
+        renderAccounts(data.accounts);
+
+        // 6. Status Rekonsiliasi
+        renderReconciliation(data.reconciliation);
+      }
+
+      /* ===== UPDATE MINI KPIS FOR TREND TRAFFIC ===== */
+      function updateTrendKPIs(trendData) {
+        if (!trendData || !trendData.masuk || trendData.masuk.length === 0) return;
+
+        // 1. Puncak Masuk
+        let maxMasuk = -Infinity;
+        let maxMasukIdx = 0;
+        trendData.masuk.forEach(function (val, i) {
+          if (val > maxMasuk) {
+            maxMasuk = val;
+            maxMasukIdx = i;
+          }
+        });
+        const peakMasukLabel = trendData.labels[maxMasukIdx] || '-';
+        const kpiValMasuk = document.getElementById('kpiValMasuk');
+        const kpiTagMasuk = document.getElementById('kpiTagMasuk');
+        if (kpiValMasuk) kpiValMasuk.textContent = 'Rp. ' + maxMasuk.toLocaleString('id-ID') + ' Jt';
+        if (kpiTagMasuk) kpiTagMasuk.textContent = peakMasukLabel.split(' ')[0] || peakMasukLabel;
+
+        // 2. Puncak Keluar
+        let maxKeluar = -Infinity;
+        let maxKeluarIdx = 0;
+        trendData.keluar.forEach(function (val, i) {
+          if (val > maxKeluar) {
+            maxKeluar = val;
+            maxKeluarIdx = i;
+          }
+        });
+        const peakKeluarLabel = trendData.labels[maxKeluarIdx] || '-';
+        const kpiValKeluar = document.getElementById('kpiValKeluar');
+        const kpiTagKeluar = document.getElementById('kpiTagKeluar');
+        if (kpiValKeluar) kpiValKeluar.textContent = 'Rp. ' + maxKeluar.toLocaleString('id-ID') + ' Jt';
+        if (kpiTagKeluar) kpiTagKeluar.textContent = peakKeluarLabel.split(' ')[0] || peakKeluarLabel;
+
+        // 3. Rata-rata Arus Bersih
+        let totalBersih = 0;
+        trendData.bersih.forEach(function (val) {
+          totalBersih += val;
+        });
+        const avgBersih = Math.round((totalBersih / trendData.bersih.length) * 10) / 10;
+        const kpiValBersih = document.getElementById('kpiValBersih');
+        const kpiTagBersih = document.getElementById('kpiTagBersih');
+        if (kpiValBersih) {
+          const sign = avgBersih >= 0 ? '+' : '';
+          kpiValBersih.textContent = sign + 'Rp. ' + avgBersih.toLocaleString('id-ID') + ' Jt';
+        }
+        if (kpiTagBersih) {
+          if (avgBersih >= 0) {
+            kpiTagBersih.textContent = 'Net Surplus';
+            kpiTagBersih.className = 'ak-trend-kpi-tag is-blue';
+          } else {
+            kpiTagBersih.textContent = 'Net Defisit';
+            kpiTagBersih.className = 'ak-trend-kpi-tag is-red';
+          }
+        }
+      }
+
+      /* ===== RENDER TREND CHART (AREA / BAR) ===== */
+      function renderTrendChart(trendData, chartType) {
+        const ctx = document.getElementById('trendChart');
+        if (!ctx) return;
+
+        if (trendChartInstance) {
+          trendChartInstance.destroy();
+        }
+
+        const isBar = chartType === 'bar';
+
+        // Gradients for line
+        const gradientMasuk = ctx.getContext('2d').createLinearGradient(0, 0, 0, 270);
+        gradientMasuk.addColorStop(0, 'rgba(0, 118, 197, 0.28)');
+        gradientMasuk.addColorStop(1, 'rgba(0, 118, 197, 0.00)');
+
+        const gradientKeluar = ctx.getContext('2d').createLinearGradient(0, 0, 0, 270);
+        gradientKeluar.addColorStop(0, 'rgba(239, 68, 68, 0.22)');
+        gradientKeluar.addColorStop(1, 'rgba(239, 68, 68, 0.00)');
+
+        const gradientBersih = ctx.getContext('2d').createLinearGradient(0, 0, 0, 270);
+        gradientBersih.addColorStop(0, 'rgba(16, 185, 129, 0.18)');
+        gradientBersih.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+
+        const datasets = isBar ? [
+          {
+            label: 'Uang Masuk',
+            data: trendData.masuk,
+            backgroundColor: '#0076C5',
+            hoverBackgroundColor: '#005f9e',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
+          },
+          {
+            label: 'Uang Keluar',
+            data: trendData.keluar,
+            backgroundColor: '#ef4444',
+            hoverBackgroundColor: '#dc2626',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
+          },
+          {
+            label: 'Arus Bersih',
+            data: trendData.bersih,
+            backgroundColor: '#10b981',
+            hoverBackgroundColor: '#059669',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
+          }
+        ] : [
+          {
+            label: 'Uang Masuk',
+            data: trendData.masuk,
+            borderColor: '#0076C5',
+            backgroundColor: gradientMasuk,
+            borderWidth: 2.8,
+            tension: 0.38,
+            fill: true,
+            pointBackgroundColor: '#0076C5',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4.5,
+            pointHoverRadius: 7
+          },
+          {
+            label: 'Uang Keluar',
+            data: trendData.keluar,
+            borderColor: '#ef4444',
+            backgroundColor: gradientKeluar,
+            borderWidth: 2.8,
+            tension: 0.38,
+            fill: true,
+            pointBackgroundColor: '#ef4444',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4.5,
+            pointHoverRadius: 7
+          },
+          {
+            label: 'Arus Bersih',
+            data: trendData.bersih,
+            borderColor: '#10b981',
+            backgroundColor: gradientBersih,
+            borderWidth: 2.2,
+            borderDash: [5, 4],
+            tension: 0.38,
+            fill: false,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4.5,
+            pointHoverRadius: 6.5
+          }
+        ];
+
+        // Hitung batas nilai Y secara dinamis
+        const allValues = [].concat(trendData.masuk, trendData.keluar, trendData.bersih);
+        const maxVal = Math.max.apply(null, allValues) || 300;
+        const suggestedMax = Math.ceil((maxVal * 1.15) / 50) * 50;
+
+        trendChartInstance = new Chart(ctx, {
+          type: isBar ? 'bar' : 'line',
+          data: {
+            labels: trendData.labels,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 450,
+              easing: 'easeOutQuart'
+            },
+            interaction: {
+              mode: 'index',
+              intersect: false
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                align: 'end',
+                labels: {
+                  boxWidth: 10,
+                  boxHeight: 10,
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  font: {
+                    family: 'Outfit',
+                    size: 11.5,
+                    weight: 600
+                  },
+                  color: '#475569',
+                  padding: 14
+                }
+              },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                titleColor: '#f8fafc',
+                bodyColor: '#e2e8f0',
+                titleFont: { family: 'Outfit', size: 12.5, weight: 600 },
+                bodyFont: { family: 'Outfit', size: 12 },
+                padding: 12,
+                cornerRadius: 8,
+                boxPadding: 4,
+                borderColor: '#334155',
+                borderWidth: 1,
+                callbacks: {
+                  label: function (context) {
+                    const raw = context.parsed.y;
+                    const formatted = 'Rp. ' + raw.toLocaleString('id-ID') + ' Jt';
+                    return ' ' + context.dataset.label + ': ' + formatted;
+                  },
+                  afterBody: function (items) {
+                    if (items.length >= 2) {
+                      const m = items[0].parsed.y || 0;
+                      const k = items[1].parsed.y || 0;
+                      const diff = m - k;
+                      const sign = diff >= 0 ? '+' : '';
+                      return '\n  Selisih Net: ' + sign + 'Rp. ' + diff.toLocaleString('id-ID') + ' Jt';
+                    }
+                    return '';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: { family: 'Outfit', size: 11.5, weight: 500 },
+                  color: '#64748b'
+                }
+              },
+              y: {
+                beginAtZero: true,
+                suggestedMax: suggestedMax,
+                grid: {
+                  color: '#f1f5f9',
+                  drawBorder: false
+                },
+                ticks: {
+                  stepSize: suggestedMax > 500 ? 200 : 50,
+                  font: { family: 'Outfit', size: 11.5 },
+                  color: '#64748b',
+                  callback: function (val) {
+                    return 'Rp. ' + val + ' Jt';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      /* ===== RENDER RINGKASAN TABLE ===== */
+      function renderRingkasanTable(data) {
+        const tbody = document.getElementById('ringkasanTableBody');
+        if (!tbody) return;
+
+        const comp = data.components;
+        const totalMasuk = comp.operasional.masuk + comp.investasi.masuk + comp.pendanaan.masuk;
+        const totalKeluar = comp.operasional.keluar + comp.investasi.keluar + comp.pendanaan.keluar;
+        const totalBersih = comp.operasional.bersih + comp.investasi.bersih + comp.pendanaan.bersih;
+        const rekon = data.reconciliation;
+
+        const rows = [
+          // Activity 1: Operasional
+          {
+            num: '1',
+            name: 'Oprasional',
+            masuk: formatRupiah(comp.operasional.masuk),
+            keluar: formatRupiah(comp.operasional.keluar),
+            bersih: formatArusBersih(comp.operasional.bersih),
+            bersihClass: comp.operasional.bersih >= 0 ? 'ak-val-positive' : 'ak-val-negative'
+          },
+          // Activity 2: Investasi
+          {
+            num: '2',
+            name: 'Investasi',
+            masuk: formatRupiah(comp.investasi.masuk),
+            keluar: formatRupiah(comp.investasi.keluar),
+            bersih: formatArusBersih(comp.investasi.bersih),
+            bersihClass: comp.investasi.bersih >= 0 ? 'ak-val-positive' : 'ak-val-negative'
+          },
+          // Activity 3: Pendanaan
+          {
+            num: '3',
+            name: 'Pendanaan',
+            masuk: formatRupiah(comp.pendanaan.masuk),
+            keluar: formatRupiah(comp.pendanaan.keluar),
+            bersih: formatArusBersih(comp.pendanaan.bersih),
+            bersihClass: comp.pendanaan.bersih >= 0 ? 'ak-val-positive' : 'ak-val-negative'
+          },
+          // Total Arus Kas Highlight Row
+          {
+            isTotal: true,
+            num: '',
+            name: 'Total Arus Kas',
+            masuk: formatRupiah(totalMasuk),
+            keluar: formatRupiah(totalKeluar),
+            bersih: formatArusBersih(totalBersih),
+            bersihClass: totalBersih >= 0 ? 'ak-val-positive' : 'ak-val-negative'
+          },
+          // Reconciliation Rows
+          {
+            isRekon: true,
+            num: '',
+            name: 'Saldo Awal Priode',
+            masuk: '-',
+            keluar: '-',
+            bersih: formatRupiah(rekon.saldoAwal),
+            bersihClass: 'ak-val-neutral'
+          },
+          {
+            isRekon: true,
+            num: '',
+            name: 'Transfer internal (neto)',
+            masuk: '-',
+            keluar: '-',
+            bersih: formatRupiah(rekon.transferInternal),
+            bersihClass: 'ak-val-neutral'
+          },
+          {
+            isRekon: true,
+            num: '',
+            name: 'Saldo akhir periode',
+            masuk: '-',
+            keluar: '-',
+            bersih: formatRupiah(rekon.saldoAkhir),
+            bersihClass: 'ak-val-positive'
+          },
+          {
+            isRekon: true,
+            num: '',
+            name: 'Saldo menurut Kas & Bank',
+            masuk: '-',
+            keluar: '-',
+            bersih: formatRupiah(rekon.saldoKasBank),
+            bersihClass: 'ak-val-positive'
+          },
+          {
+            isRekon: true,
+            num: '',
+            name: 'Selisih rekonsiliasi',
+            masuk: '-',
+            keluar: '-',
+            bersih: formatRupiah(rekon.selisih),
+            bersihClass: rekon.selisih === 0 ? 'ak-val-neutral' : 'ak-val-negative'
+          }
+        ];
+
+        tbody.innerHTML = rows.map(function (r) {
+          let rowClass = '';
+          if (r.isTotal) rowClass = 'class="row-total-cash"';
+          else if (r.isRekon) rowClass = 'class="row-reconciliation"';
+
+          return [
+            '<tr ' + rowClass + '>',
+            '<td class="col-num">' + (r.num || '') + '</td>',
+            '<td class="col-component">' + escapeHtml(r.name) + '</td>',
+            '<td class="col-amount">' + escapeHtml(r.masuk) + '</td>',
+            '<td class="col-amount">' + escapeHtml(r.keluar) + '</td>',
+            '<td class="col-amount ' + (r.bersihClass || '') + '">' + escapeHtml(r.bersih) + '</td>',
+            '</tr>'
+          ].join('');
+        }).join('');
+      }
+
+      /* ===== RENDER DONUT CHART & LEGEND ===== */
+      function renderDonutChart(components) {
+        const ctx = document.getElementById('donutChart');
+        if (!ctx) return;
+
+        if (donutChartInstance) {
+          donutChartInstance.destroy();
+        }
+
+        const opVal = components.operasional.pct;
+        const invVal = components.investasi.pct;
+        const penVal = components.pendanaan.pct;
+
+        // Update Legend values
+        const legOp = document.getElementById('legendOperasional');
+        const legInv = document.getElementById('legendInvestasi');
+        const legPen = document.getElementById('legendPendanaan');
+
+        if (legOp) legOp.textContent = opVal.toFixed(0) + '%';
+        if (legInv) legInv.textContent = invVal.toFixed(0) + '%';
+        if (legPen) legPen.textContent = penVal.toFixed(0) + '%';
+
+        donutChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Oprasional', 'Investasi', 'Pendanaan'],
+            datasets: [
+              {
+                data: [opVal, invVal, penVal],
+                backgroundColor: ['#0ea5e9', '#facc15', '#ef4444'],
+                hoverBackgroundColor: ['#0284c7', '#eab308', '#dc2626'],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                titleFont: { family: 'Outfit', size: 12, weight: 600 },
+                bodyFont: { family: 'Outfit', size: 12 },
+                padding: 8,
+                cornerRadius: 6,
+                callbacks: {
+                  label: function (context) {
+                    return ' ' + context.label + ': ' + context.parsed + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      /* ===== RENDER SALDO PER AKUN ===== */
+      function renderAccounts(accounts) {
+        const accKasKecil = document.getElementById('accKasKecil');
+        const accBca1 = document.getElementById('accBca1');
+        const accBca2 = document.getElementById('accBca2');
+        const accSeabank = document.getElementById('accSeabank');
+        const accBni = document.getElementById('accBni');
+
+        if (accKasKecil) accKasKecil.textContent = formatRupiah(accounts.kasKecil);
+        if (accBca1) accBca1.textContent = formatRupiah(accounts.bca1);
+        if (accBca2) accBca2.textContent = formatRupiah(accounts.bca2);
+        if (accSeabank) accSeabank.textContent = formatRupiah(accounts.seabank);
+        if (accBni) accBni.textContent = formatRupiah(accounts.bni);
+      }
+
+      /* ===== RENDER STATUS REKONSILIASI ===== */
+      function renderReconciliation(rekon) {
+        const rekonTotalSaldo = document.getElementById('rekonTotalSaldo');
+        const rekonSelisih = document.getElementById('rekonSelisih');
+        const rekonBadge = document.getElementById('rekonBadge');
+
+        if (rekonTotalSaldo) rekonTotalSaldo.textContent = formatRupiah(rekon.saldoAkhir);
+        if (rekonSelisih) rekonSelisih.textContent = formatRupiah(rekon.selisih);
+
+        if (rekonBadge) {
+          if (rekon.selisih === 0) {
+            rekonBadge.textContent = 'Cocok / Balance';
+            rekonBadge.style.background = '#00d084';
+            rekonBadge.style.boxShadow = '0 2px 6px rgba(0, 208, 132, 0.35)';
+          } else {
+            rekonBadge.textContent = 'Tidak Balance';
+            rekonBadge.style.background = '#ef4444';
+            rekonBadge.style.boxShadow = '0 2px 6px rgba(239, 68, 68, 0.35)';
+          }
+        }
+      }
+
+      /* ===== EVENT LISTENERS ===== */
+      // 1. Period Selector Dropdown
+      const periodSelector = document.getElementById('periodSelector');
+      if (periodSelector) {
+        periodSelector.addEventListener('change', function (e) {
+          currentPeriod = e.target.value;
+          renderDashboard();
+        });
+      }
+
+      // 2. Granularity Tabs (Harian, Mingguan, Bulanan)
+      const granularityToggles = document.getElementById('granularityToggles');
+      if (granularityToggles) {
+        granularityToggles.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-granularity]');
+          if (!btn) return;
+          granularityToggles.querySelectorAll('.ak-view-btn').forEach(function (b) {
+            b.classList.remove('is-active');
+          });
+          btn.classList.add('is-active');
+          currentGranularity = btn.getAttribute('data-granularity');
+          renderDashboard();
+        });
+      }
+
+      // 3. Chart Type Tabs (Area Line vs Batang Bar)
+      const chartTypeToggles = document.getElementById('chartTypeToggles');
+      if (chartTypeToggles) {
+        chartTypeToggles.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-chart-type]');
+          if (!btn) return;
+          chartTypeToggles.querySelectorAll('.ak-chart-type-btn').forEach(function (b) {
+            b.classList.remove('is-active');
+          });
+          btn.classList.add('is-active');
+          currentChartType = btn.getAttribute('data-chart-type');
+          renderDashboard();
+        });
+      }
+
+      // Initial Render
+      renderDashboard();
+    })();
+  </script>
 </body>
 
 </html>

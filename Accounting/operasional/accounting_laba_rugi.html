@@ -7,6 +7,570 @@
   <title>Laba Rugi | Bisa Media</title>
   <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js for High-Fidelity Interactive Dashboard Charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ===== RESET & ROOT STYLING ===== */
+    body.dashboard-body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dashboard-content {
+      padding: 24px 28px 40px 28px;
+      max-width: 1600px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* ===== 4 SUMMARY CARDS DI BAGIAN ATAS ===== */
+    .lr-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .lr-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .lr-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .lr-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lr-card-label {
+      font-size: 13.5px;
+      color: #64748b;
+      font-weight: 500;
+      letter-spacing: -0.1px;
+    }
+
+    .lr-card-value {
+      font-size: 24px;
+      font-weight: 700;
+      font-style: normal;
+      color: #0f172a;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+
+    .lr-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 9px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 118, 197, 0.28);
+    }
+
+    /* Modifiers: Biru untuk Pendapatan, Merah untuk Beban, Hijau untuk Laba Bersih */
+    .lr-card--pendapatan {
+      border-top-color: #0076C5 !important;
+    }
+
+    .lr-card-icon--pendapatan {
+      background: #0076C5 !important;
+      box-shadow: 0 2px 8px rgba(0, 118, 197, 0.28) !important;
+    }
+
+    .lr-card--beban {
+      border-top-color: #ef4444 !important;
+    }
+
+    .lr-card-icon--beban {
+      background: #ef4444 !important;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.32) !important;
+    }
+
+    .lr-card--laba {
+      border-top-color: #16a34a !important;
+    }
+
+    .lr-card-icon--laba {
+      background: #16a34a !important;
+      box-shadow: 0 2px 8px rgba(22, 163, 74, 0.32) !important;
+    }
+
+    .lr-card-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: #ffffff;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    /* ===== MIDDLE 2-COLUMN GRID ===== */
+    .lr-middle-grid {
+      display: grid;
+      grid-template-columns: 1.78fr 1fr;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 22px;
+    }
+
+    /* ===== PANEL WRAPPER ===== */
+    .lr-panel {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 20px 22px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+    }
+
+    .lr-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .lr-panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      letter-spacing: -0.2px;
+    }
+
+    .lr-panel-title em {
+      font-style: italic;
+      font-weight: 700;
+    }
+
+    .lr-dashed-divider {
+      border: none;
+      border-top: 1px dashed #cbd5e1;
+      margin: 0 0 16px 0;
+    }
+
+    /* ===== PERIOD SELECTOR DROPDOWN ===== */
+    .lr-period-select-wrap {
+      position: relative;
+    }
+
+    .lr-period-select {
+      height: 32px;
+      padding: 0 28px 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #475569;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 14px;
+      transition: all 0.15s ease;
+    }
+
+    .lr-period-select:focus {
+      border-color: #0076C5;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    /* ===== TREND CONTROLS & MINI KPIS ===== */
+    .lr-trend-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .lr-trend-controls-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .lr-view-toggles {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 2.5px;
+      gap: 2px;
+    }
+
+    .lr-view-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .lr-view-btn:hover {
+      color: #0f172a;
+    }
+
+    .lr-view-btn.is-active {
+      background: #ffffff;
+      color: #0076C5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .lr-chart-type-toggles {
+      display: inline-flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 2.5px;
+      gap: 2px;
+    }
+
+    .lr-chart-type-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .lr-chart-type-btn:hover {
+      color: #0f172a;
+    }
+
+    .lr-chart-type-btn.is-active {
+      background: #ffffff;
+      color: #0076C5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .lr-chart-type-btn svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    /* Mini KPI Row above trend chart */
+    .lr-trend-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .lr-trend-kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: all 0.15s ease;
+    }
+
+    .lr-trend-kpi-card:hover {
+      border-color: #cbd5e1;
+      background: #f1f5f9;
+    }
+
+    .lr-trend-kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .lr-trend-kpi-label {
+      font-size: 11.5px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .lr-trend-kpi-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1.5px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.1px;
+    }
+
+    .lr-trend-kpi-tag.is-green {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .lr-trend-kpi-tag.is-red {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .lr-trend-kpi-tag.is-blue {
+      background: #e0f2fe;
+      color: #0284c7;
+    }
+
+    .lr-trend-kpi-val {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .lr-trend-kpi-sub {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .lr-chart-container {
+      position: relative;
+      width: 100%;
+      height: 290px;
+    }
+
+    /* ===== KOMPONEN BEBAN (DONUT CHART & LEGEND) ===== */
+    .lr-donut-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      padding: 6px 10px;
+    }
+
+    .lr-donut-chart-wrap {
+      position: relative;
+      width: 175px;
+      height: 175px;
+      flex-shrink: 0;
+    }
+
+    .lr-donut-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .lr-legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .lr-legend-item:hover {
+      background: #f8fafc;
+    }
+
+    .lr-legend-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lr-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .lr-legend-name {
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .lr-legend-val {
+      font-weight: 700;
+      color: #0f172a;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    /* ===== LABA RUGI FULL TABLE ===== */
+    .lr-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .lr-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    .lr-table th {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: #0f172a;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px dashed #cbd5e1;
+      white-space: nowrap;
+      background: transparent;
+    }
+
+    .lr-table th.col-num {
+      width: 44px;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .lr-table th.col-amount {
+      text-align: right;
+      width: 180px;
+    }
+
+    .lr-table th.col-notes {
+      width: 280px;
+      color: #64748b;
+    }
+
+    .lr-table td {
+      padding: 10px 16px;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    .lr-table td.col-num {
+      text-align: center;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .lr-table td.col-component {
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    .lr-table td.col-amount {
+      text-align: right;
+      font-weight: 600;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
+    .lr-table td.col-notes {
+      color: #64748b;
+      font-size: 12.5px;
+    }
+
+    /* Highlight Subtotal Rows (Total Beban, Laba Sebelum Pajak, Laba Bersih) */
+    .lr-table tr.row-highlight-subtotal td {
+      font-weight: 700 !important;
+      color: #0f172a !important;
+      background: #f8fafc;
+      border-top: 1.5px solid #cbd5e1;
+      border-bottom: 1.5px solid #cbd5e1;
+    }
+
+    .lr-table tr.row-highlight-final td {
+      font-weight: 700 !important;
+      color: #0284c7 !important;
+      background: #f0f9ff;
+      border-top: 2px solid #bae6fd;
+      border-bottom: 2px solid #bae6fd;
+      font-size: 14px;
+    }
+
+    .lr-table tr.row-highlight-final td.col-component {
+      color: #0369a1 !important;
+      font-weight: 700 !important;
+    }
+
+    .lr-val-positive {
+      color: #16a34a !important;
+    }
+
+    .lr-val-negative {
+      color: #dc2626 !important;
+    }
+
+    .lr-val-primary {
+      color: #0284c7 !important;
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 1180px) {
+      .lr-middle-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .lr-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .lr-summary-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-content {
+        padding: 16px 14px;
+      }
+    }
+  </style>
 </head>
 
 <body class="dashboard-body">
@@ -14,10 +578,981 @@
 
   <div class="dashboard-shell">
     <header class="topbar"></header>
-    <main class="dashboard-content"></main>
+
+    <main class="dashboard-content">
+      <!-- ===== 4 SUMMARY CARDS DI BAGIAN ATAS ===== -->
+      <section class="lr-summary-cards">
+        <!-- Card 1: Pendapatan (Warna Biru) -->
+        <div class="lr-card lr-card--pendapatan">
+          <div class="lr-card-info">
+            <span class="lr-card-label">Pendapatan</span>
+            <span class="lr-card-value" id="cardPendapatan">Rp. 000</span>
+          </div>
+          <div class="lr-card-icon lr-card-icon--pendapatan" title="Pendapatan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Total Beban (Warna Merah) -->
+        <div class="lr-card lr-card--beban">
+          <div class="lr-card-info">
+            <span class="lr-card-label">Total Beban</span>
+            <span class="lr-card-value" id="cardTotalBeban">Rp. 000</span>
+          </div>
+          <div class="lr-card-icon lr-card-icon--beban" title="Total Beban">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+              <path d="M9 14h6" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Laba Bersih (Warna Hijau) -->
+        <div class="lr-card lr-card--laba">
+          <div class="lr-card-info">
+            <span class="lr-card-label">Laba Bersih</span>
+            <span class="lr-card-value" id="cardLabaBersih">Rp. 000</span>
+          </div>
+          <div class="lr-card-icon lr-card-icon--laba" title="Laba Bersih">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 3v18h18" />
+              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Beban Oprasional (Warna Merah) -->
+        <div class="lr-card lr-card--beban">
+          <div class="lr-card-info">
+            <span class="lr-card-label">Beban Oprasional</span>
+            <span class="lr-card-value" id="cardBebanOperasional">Rp. 000</span>
+          </div>
+          <div class="lr-card-icon lr-card-icon--beban" title="Beban Oprasional">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== MIDDLE 2-COLUMN GRID ===== -->
+      <div class="lr-middle-grid">
+        <!-- PANEL 1: Trend Keuangan -->
+        <section class="lr-panel">
+          <div class="lr-panel-header">
+            <h2 class="lr-panel-title"><em>Trand</em> Keuangan</h2>
+            <div class="lr-period-select-wrap">
+              <select id="periodSelector" class="lr-period-select" aria-label="Pilih Periode">
+                <option value="okt2026">Oktober 2026</option>
+                <option value="sep2026">September 2026</option>
+                <option value="agu2026">Agustus 2026</option>
+                <option value="q3_2026">Kuartal 3 (Q3) 2026</option>
+                <option value="tahun2026">Tahun 2026 (YTD)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="lr-dashed-divider"></div>
+
+          <!-- Controls: Granularity & Chart Type -->
+          <div class="lr-trend-toolbar">
+            <div class="lr-trend-controls-left">
+              <div class="lr-view-toggles" id="granularityToggles">
+                <button type="button" class="lr-view-btn" data-granularity="daily">Harian</button>
+                <button type="button" class="lr-view-btn is-active" data-granularity="weekly">Mingguan</button>
+                <button type="button" class="lr-view-btn" data-granularity="monthly">Bulanan</button>
+              </div>
+
+              <div class="lr-chart-type-toggles" id="chartTypeToggles">
+                <button type="button" class="lr-chart-type-btn is-active" data-chart-type="line" title="Grafik Garis Area">
+                  <svg viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" /></svg>
+                  Area
+                </button>
+                <button type="button" class="lr-chart-type-btn" data-chart-type="bar" title="Grafik Batang">
+                  <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
+                  Batang
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3 Mini KPI Cards -->
+          <div class="lr-trend-kpi-row">
+            <div class="lr-trend-kpi-card">
+              <div class="lr-trend-kpi-header">
+                <span class="lr-trend-kpi-label">Puncak Pendapatan</span>
+                <span class="lr-trend-kpi-tag is-green" id="kpiTagPendapatan">Pekan 3</span>
+              </div>
+              <div class="lr-trend-kpi-val" id="kpiValPendapatan">Rp. 510 Jt</div>
+              <div class="lr-trend-kpi-sub" id="kpiSubPendapatan">Revenue tertinggi periode</div>
+            </div>
+
+            <div class="lr-trend-kpi-card">
+              <div class="lr-trend-kpi-header">
+                <span class="lr-trend-kpi-label">Puncak Beban</span>
+                <span class="lr-trend-kpi-tag is-red" id="kpiTagBeban">Pekan 2</span>
+              </div>
+              <div class="lr-trend-kpi-val" id="kpiValBeban">Rp. 310 Jt</div>
+              <div class="lr-trend-kpi-sub" id="kpiSubBeban">Beban operasional & gaji</div>
+            </div>
+
+            <div class="lr-trend-kpi-card">
+              <div class="lr-trend-kpi-header">
+                <span class="lr-trend-kpi-label">Margin Laba Rata-rata</span>
+                <span class="lr-trend-kpi-tag is-blue" id="kpiTagMargin">Stabil Sehat</span>
+              </div>
+              <div class="lr-trend-kpi-val" id="kpiValMargin">35.1%</div>
+              <div class="lr-trend-kpi-sub" id="kpiSubMargin">Rasio profitabilitas bersih</div>
+            </div>
+          </div>
+
+          <!-- Interactive Canvas -->
+          <div class="lr-chart-container">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </section>
+
+        <!-- PANEL 2: Komponen Beban -->
+        <section class="lr-panel">
+          <div class="lr-panel-header">
+            <h2 class="lr-panel-title"><em>Komponen</em> Beban</h2>
+          </div>
+
+          <div class="lr-dashed-divider"></div>
+
+          <div class="lr-donut-box">
+            <div class="lr-donut-chart-wrap">
+              <canvas id="donutChart"></canvas>
+            </div>
+
+            <div class="lr-donut-legend">
+              <div class="lr-legend-item">
+                <div class="lr-legend-left">
+                  <span class="lr-legend-dot" style="background: #0ea5e9;"></span>
+                  <span class="lr-legend-name">Beban Operasional</span>
+                </div>
+                <span class="lr-legend-val" id="legendBebanOperasional">0%</span>
+              </div>
+
+              <div class="lr-legend-item">
+                <div class="lr-legend-left">
+                  <span class="lr-legend-dot" style="background: #facc15;"></span>
+                  <span class="lr-legend-name">Beban Penyusutan</span>
+                </div>
+                <span class="lr-legend-val" id="legendBebanPenyusutan">0%</span>
+              </div>
+
+              <div class="lr-legend-item">
+                <div class="lr-legend-left">
+                  <span class="lr-legend-dot" style="background: #ef4444;"></span>
+                  <span class="lr-legend-name">Beban Payroll</span>
+                </div>
+                <span class="lr-legend-val" id="legendBebanPayroll">0%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== PANEL 3: LABA RUGI FULL TABLE ===== -->
+      <section class="lr-panel">
+        <div class="lr-panel-header">
+          <h2 class="lr-panel-title"><em>Laba</em> Rugi</h2>
+        </div>
+
+        <div class="lr-dashed-divider"></div>
+
+        <div class="lr-table-wrap">
+          <table class="lr-table" id="labaRugiTable">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th>Komponen</th>
+                <th class="col-amount">Bulan Laporan</th>
+                <th class="col-amount">Sejak Awal Pembukuan</th>
+                <th class="col-notes">Catatan</th>
+              </tr>
+            </thead>
+            <tbody id="labaRugiTableBody">
+              <!-- Diisi secara dinamis melalui JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ===== PERIOD DATASET LABA RUGI (Presisi Matematika & Realistis) ===== */
+      const LABA_RUGI_DATA = {
+        okt2026: {
+          cards: {
+            pendapatan: 1850000000,
+            totalBeban: 1120000000,
+            labaBersih: 649700000,
+            bebanOperasional: 420000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
+              pendapatan: [420, 450, 510, 470],
+              beban: [260, 310, 280, 270],
+              laba: [160, 140, 230, 200]
+            },
+            daily: {
+              labels: ['01 Okt', '04 Okt', '07 Okt', '10 Okt', '13 Okt', '16 Okt', '19 Okt', '22 Okt', '25 Okt', '28 Okt', '31 Okt'],
+              pendapatan: [55, 62, 70, 78, 65, 95, 88, 105, 92, 102, 98],
+              beban: [35, 42, 48, 55, 40, 68, 58, 65, 52, 60, 55],
+              laba: [20, 20, 22, 23, 25, 27, 30, 40, 40, 42, 43]
+            },
+            monthly: {
+              labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt (Bln Ini)'],
+              pendapatan: [1520, 1600, 1580, 1650, 1720, 1850],
+              beban: [960, 1020, 990, 1050, 1080, 1120],
+              laba: [560, 580, 590, 600, 640, 730]
+            }
+          },
+          components: {
+            operasional: { bulan: 420000000, ytd: 3360000000, pct: 37.5 },
+            payroll: { bulan: 580000000, ytd: 4640000000, pct: 51.8 },
+            penyusutan: { bulan: 120000000, ytd: 960000000, pct: 10.7 }
+          },
+          statement: {
+            pendapatan: { bulan: 1850000000, ytd: 14800000000, notes: 'Akun 4001 - Penjualan Jasa & Campaign Digital' },
+            bebanOperasional: { bulan: 420000000, ytd: 3360000000, notes: 'Akun 5001 - Utilitas, Server Cloud & Pemasaran' },
+            bebanPayroll: { bulan: 580000000, ytd: 4640000000, notes: 'Akun 5002 - Gaji Pokok & Tunjangan Karyawan' },
+            bebanPenyusutan: { bulan: 120000000, ytd: 960000000, notes: 'Akun 5003 - Penyusutan Aset Tetap & Peralatan' },
+            pelepasanAset: { bulan: 0, ytd: 45000000, notes: 'Akun 7001 - Keuntungan Penjualan Aset Bekas' },
+            pajakPenghasilan: { bulan: 80300000, ytd: 647350000, notes: 'Akun 8001 - Estimasi PPh Final & PPh Badan' }
+          }
+        },
+        sep2026: {
+          cards: {
+            pendapatan: 1720000000,
+            totalBeban: 1080000000,
+            labaBersih: 569600000,
+            bebanOperasional: 410000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Minggu 1 (1-7 Sep)', 'Minggu 2 (8-14 Sep)', 'Minggu 3 (15-21 Sep)', 'Minggu 4 (22-30 Sep)'],
+              pendapatan: [390, 420, 460, 450],
+              beban: [250, 290, 270, 270],
+              laba: [140, 130, 190, 180]
+            },
+            daily: {
+              labels: ['01 Sep', '04 Sep', '07 Sep', '10 Sep', '13 Sep', '16 Sep', '19 Sep', '22 Sep', '25 Sep', '28 Sep', '30 Sep'],
+              pendapatan: [50, 58, 65, 72, 60, 88, 80, 95, 85, 92, 90],
+              beban: [32, 38, 45, 52, 38, 62, 54, 60, 48, 55, 50],
+              laba: [18, 20, 20, 20, 22, 26, 26, 35, 37, 37, 40]
+            },
+            monthly: {
+              labels: ['Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep'],
+              pendapatan: [1480, 1520, 1600, 1580, 1650, 1720],
+              beban: [940, 960, 1020, 990, 1050, 1080],
+              laba: [540, 560, 580, 590, 600, 640]
+            }
+          },
+          components: {
+            operasional: { bulan: 410000000, ytd: 2940000000, pct: 38.0 },
+            payroll: { bulan: 550000000, ytd: 4060000000, pct: 50.9 },
+            penyusutan: { bulan: 120000000, ytd: 840000000, pct: 11.1 }
+          },
+          statement: {
+            pendapatan: { bulan: 1720000000, ytd: 12950000000, notes: 'Akun 4001 - Penjualan Jasa & Campaign Digital' },
+            bebanOperasional: { bulan: 410000000, ytd: 2940000000, notes: 'Akun 5001 - Utilitas, Server Cloud & Pemasaran' },
+            bebanPayroll: { bulan: 550000000, ytd: 4060000000, notes: 'Akun 5002 - Gaji Pokok & Tunjangan Karyawan' },
+            bebanPenyusutan: { bulan: 120000000, ytd: 840000000, notes: 'Akun 5003 - Penyusutan Aset Tetap & Peralatan' },
+            pelepasanAset: { bulan: 0, ytd: 45000000, notes: 'Akun 7001 - Keuntungan Penjualan Aset Bekas' },
+            pajakPenghasilan: { bulan: 70400000, ytd: 567050000, notes: 'Akun 8001 - Estimasi PPh Final & PPh Badan' }
+          }
+        },
+        agu2026: {
+          cards: {
+            pendapatan: 1650000000,
+            totalBeban: 1050000000,
+            labaBersih: 534000000,
+            bebanOperasional: 390000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Minggu 1 (1-7 Agu)', 'Minggu 2 (8-14 Agu)', 'Minggu 3 (15-21 Agu)', 'Minggu 4 (22-31 Agu)'],
+              pendapatan: [370, 400, 440, 440],
+              beban: [240, 280, 260, 270],
+              laba: [130, 120, 180, 170]
+            },
+            daily: {
+              labels: ['01 Agu', '04 Agu', '07 Agu', '10 Agu', '13 Agu', '16 Agu', '19 Agu', '22 Agu', '25 Agu', '28 Agu', '31 Agu'],
+              pendapatan: [48, 55, 60, 68, 58, 82, 75, 90, 80, 88, 86],
+              beban: [30, 36, 42, 48, 36, 58, 50, 56, 45, 52, 48],
+              laba: [18, 19, 18, 20, 22, 24, 25, 34, 35, 36, 38]
+            },
+            monthly: {
+              labels: ['Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu'],
+              pendapatan: [1420, 1480, 1520, 1600, 1580, 1650],
+              beban: [910, 940, 960, 1020, 990, 1050],
+              laba: [510, 540, 560, 580, 590, 600]
+            }
+          },
+          components: {
+            operasional: { bulan: 390000000, ytd: 2530000000, pct: 37.1 },
+            payroll: { bulan: 540000000, ytd: 3510000000, pct: 51.4 },
+            penyusutan: { bulan: 120000000, ytd: 720000000, pct: 11.5 }
+          },
+          statement: {
+            pendapatan: { bulan: 1650000000, ytd: 11230000000, notes: 'Akun 4001 - Penjualan Jasa & Campaign Digital' },
+            bebanOperasional: { bulan: 390000000, ytd: 2530000000, notes: 'Akun 5001 - Utilitas, Server Cloud & Pemasaran' },
+            bebanPayroll: { bulan: 540000000, ytd: 3510000000, notes: 'Akun 5002 - Gaji Pokok & Tunjangan Karyawan' },
+            bebanPenyusutan: { bulan: 120000000, ytd: 720000000, notes: 'Akun 5003 - Penyusutan Aset Tetap & Peralatan' },
+            pelepasanAset: { bulan: 0, ytd: 45000000, notes: 'Akun 7001 - Keuntungan Penjualan Aset Bekas' },
+            pajakPenghasilan: { bulan: 66000000, ytd: 496650000, notes: 'Akun 8001 - Estimasi PPh Final & PPh Badan' }
+          }
+        },
+        q3_2026: {
+          cards: {
+            pendapatan: 4950000000,
+            totalBeban: 3120000000,
+            labaBersih: 1629700000,
+            bebanOperasional: 1220000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Juli', 'Agustus', 'September', 'Oktober (Proj)'],
+              pendapatan: [1580, 1650, 1720, 1850],
+              beban: [990, 1050, 1080, 1120],
+              laba: [590, 600, 640, 730]
+            },
+            daily: {
+              labels: ['Pekan 1', 'Pekan 3', 'Pekan 5', 'Pekan 7', 'Pekan 9', 'Pekan 11', 'Pekan 13'],
+              pendapatan: [380, 410, 430, 450, 470, 490, 510],
+              beban: [240, 260, 275, 290, 270, 280, 270],
+              laba: [140, 150, 155, 160, 200, 210, 240]
+            },
+            monthly: {
+              labels: ['Q1 2026', 'Q2 2026', 'Q3 2026 (Aktual)', 'Q4 2026 (Proj)'],
+              pendapatan: [4200, 4700, 4950, 5400],
+              beban: [2700, 3000, 3120, 3300],
+              laba: [1500, 1700, 1830, 2100]
+            }
+          },
+          components: {
+            operasional: { bulan: 1220000000, ytd: 3360000000, pct: 39.1 },
+            payroll: { bulan: 1540000000, ytd: 4640000000, pct: 49.4 },
+            penyusutan: { bulan: 360000000, ytd: 960000000, pct: 11.5 }
+          },
+          statement: {
+            pendapatan: { bulan: 4950000000, ytd: 14800000000, notes: 'Akun 4001 - Penjualan Jasa & Campaign Digital' },
+            bebanOperasional: { bulan: 1220000000, ytd: 3360000000, notes: 'Akun 5001 - Utilitas, Server Cloud & Pemasaran' },
+            bebanPayroll: { bulan: 1540000000, ytd: 4640000000, notes: 'Akun 5002 - Gaji Pokok & Tunjangan Karyawan' },
+            bebanPenyusutan: { bulan: 360000000, ytd: 960000000, notes: 'Akun 5003 - Penyusutan Aset Tetap & Peralatan' },
+            pelepasanAset: { bulan: 15000000, ytd: 45000000, notes: 'Akun 7001 - Keuntungan Penjualan Aset Bekas' },
+            pajakPenghasilan: { bulan: 215300000, ytd: 647350000, notes: 'Akun 8001 - Estimasi PPh Final & PPh Badan' }
+          }
+        },
+        tahun2026: {
+          cards: {
+            pendapatan: 14800000000,
+            totalBeban: 8960000000,
+            labaBersih: 5237650000,
+            bebanOperasional: 3360000000
+          },
+          trend: {
+            weekly: {
+              labels: ['Q1 2026', 'Q2 2026', 'Q3 2026', 'Q4 (Mtd)'],
+              pendapatan: [4200, 4700, 4950, 1850],
+              beban: [2700, 3000, 3120, 1120],
+              laba: [1500, 1700, 1830, 730]
+            },
+            daily: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+              pendapatan: [1350, 1380, 1420, 1480, 1520, 1600, 1580, 1650, 1720, 1850],
+              beban: [880, 900, 910, 940, 960, 1020, 990, 1050, 1080, 1120],
+              laba: [470, 480, 510, 540, 560, 580, 590, 600, 640, 730]
+            },
+            monthly: {
+              labels: ['2023', '2024', '2025', '2026 (YTD)'],
+              pendapatan: [9800, 11500, 13200, 14800],
+              beban: [6200, 7100, 8100, 8960],
+              laba: [3600, 4400, 5100, 5840]
+            }
+          },
+          components: {
+            operasional: { bulan: 3360000000, ytd: 3360000000, pct: 37.5 },
+            payroll: { bulan: 4640000000, ytd: 4640000000, pct: 51.8 },
+            penyusutan: { bulan: 960000000, ytd: 960000000, pct: 10.7 }
+          },
+          statement: {
+            pendapatan: { bulan: 14800000000, ytd: 14800000000, notes: 'Akun 4001 - Penjualan Jasa & Campaign Digital' },
+            bebanOperasional: { bulan: 3360000000, ytd: 3360000000, notes: 'Akun 5001 - Utilitas, Server Cloud & Pemasaran' },
+            bebanPayroll: { bulan: 4640000000, ytd: 4640000000, notes: 'Akun 5002 - Gaji Pokok & Tunjangan Karyawan' },
+            bebanPenyusutan: { bulan: 960000000, ytd: 960000000, notes: 'Akun 5003 - Penyusutan Aset Tetap & Peralatan' },
+            pelepasanAset: { bulan: 45000000, ytd: 45000000, notes: 'Akun 7001 - Keuntungan Penjualan Aset Bekas' },
+            pajakPenghasilan: { bulan: 647350000, ytd: 647350000, notes: 'Akun 8001 - Estimasi PPh Final & PPh Badan' }
+          }
+        }
+      };
+
+      /* ===== HELPER FORMATTERS ===== */
+      function formatRupiah(num) {
+        const val = Number(num) || 0;
+        return 'Rp. ' + val.toLocaleString('id-ID');
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      /* ===== STATE VARIABLES ===== */
+      let currentPeriod = 'okt2026';
+      let currentGranularity = 'weekly'; // 'daily' | 'weekly' | 'monthly'
+      let currentChartType = 'line';      // 'line' | 'bar'
+      let trendChartInstance = null;
+      let donutChartInstance = null;
+
+      /* ===== RENDER FUNCTION ===== */
+      function renderDashboard() {
+        const data = LABA_RUGI_DATA[currentPeriod] || LABA_RUGI_DATA.okt2026;
+
+        // 1. Summary Cards
+        const cardPendapatan = document.getElementById('cardPendapatan');
+        const cardTotalBeban = document.getElementById('cardTotalBeban');
+        const cardLabaBersih = document.getElementById('cardLabaBersih');
+        const cardBebanOperasional = document.getElementById('cardBebanOperasional');
+
+        if (cardPendapatan) cardPendapatan.textContent = formatRupiah(data.cards.pendapatan);
+        if (cardTotalBeban) cardTotalBeban.textContent = formatRupiah(data.cards.totalBeban);
+        if (cardLabaBersih) cardLabaBersih.textContent = formatRupiah(data.cards.labaBersih);
+        if (cardBebanOperasional) cardBebanOperasional.textContent = formatRupiah(data.cards.bebanOperasional);
+
+        // 2. Trend Line / Bar Chart
+        const trendDataSet = (data.trend && data.trend[currentGranularity])
+          ? data.trend[currentGranularity]
+          : (data.trend.weekly || data.trend);
+
+        updateTrendKPIs(trendDataSet);
+        renderTrendChart(trendDataSet, currentChartType);
+
+        // 3. Komponen Beban Donut Chart
+        renderDonutChart(data.components);
+
+        // 4. Laba Rugi Full Table
+        renderLabaRugiTable(data.statement);
+      }
+
+      /* ===== UPDATE MINI KPIS FOR TREND KEUANGAN ===== */
+      function updateTrendKPIs(trendData) {
+        if (!trendData || !trendData.pendapatan || trendData.pendapatan.length === 0) return;
+
+        // 1. Puncak Pendapatan
+        let maxPendapatan = -Infinity;
+        let maxPendapatanIdx = 0;
+        trendData.pendapatan.forEach(function (val, i) {
+          if (val > maxPendapatan) {
+            maxPendapatan = val;
+            maxPendapatanIdx = i;
+          }
+        });
+        const peakPendapatanLabel = trendData.labels[maxPendapatanIdx] || '-';
+        const kpiValPendapatan = document.getElementById('kpiValPendapatan');
+        const kpiTagPendapatan = document.getElementById('kpiTagPendapatan');
+        if (kpiValPendapatan) kpiValPendapatan.textContent = 'Rp. ' + maxPendapatan.toLocaleString('id-ID') + ' Jt';
+        if (kpiTagPendapatan) kpiTagPendapatan.textContent = peakPendapatanLabel.split(' ')[0] || peakPendapatanLabel;
+
+        // 2. Puncak Beban
+        let maxBeban = -Infinity;
+        let maxBebanIdx = 0;
+        trendData.beban.forEach(function (val, i) {
+          if (val > maxBeban) {
+            maxBeban = val;
+            maxBebanIdx = i;
+          }
+        });
+        const peakBebanLabel = trendData.labels[maxBebanIdx] || '-';
+        const kpiValBeban = document.getElementById('kpiValBeban');
+        const kpiTagBeban = document.getElementById('kpiTagBeban');
+        if (kpiValBeban) kpiValBeban.textContent = 'Rp. ' + maxBeban.toLocaleString('id-ID') + ' Jt';
+        if (kpiTagBeban) kpiTagBeban.textContent = peakBebanLabel.split(' ')[0] || peakBebanLabel;
+
+        // 3. Margin Laba Rata-rata
+        let totalP = 0;
+        let totalL = 0;
+        trendData.pendapatan.forEach(function (val, i) {
+          totalP += val;
+          totalL += (trendData.laba[i] || 0);
+        });
+        const marginPct = totalP > 0 ? ((totalL / totalP) * 100).toFixed(1) : '0';
+        const kpiValMargin = document.getElementById('kpiValMargin');
+        const kpiTagMargin = document.getElementById('kpiTagMargin');
+        if (kpiValMargin) kpiValMargin.textContent = marginPct + '%';
+        if (kpiTagMargin) {
+          if (Number(marginPct) >= 20) {
+            kpiTagMargin.textContent = 'Sangat Sehat';
+            kpiTagMargin.className = 'lr-trend-kpi-tag is-green';
+          } else {
+            kpiTagMargin.textContent = 'Moderat';
+            kpiTagMargin.className = 'lr-trend-kpi-tag is-blue';
+          }
+        }
+      }
+
+      /* ===== RENDER TREND CHART (AREA / BAR) ===== */
+      function renderTrendChart(trendData, chartType) {
+        const ctx = document.getElementById('trendChart');
+        if (!ctx) return;
+
+        if (trendChartInstance) {
+          trendChartInstance.destroy();
+        }
+
+        const isBar = chartType === 'bar';
+
+        // Gradients for line
+        const gradientPendapatan = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
+        gradientPendapatan.addColorStop(0, 'rgba(0, 118, 197, 0.28)');
+        gradientPendapatan.addColorStop(1, 'rgba(0, 118, 197, 0.00)');
+
+        const gradientBeban = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
+        gradientBeban.addColorStop(0, 'rgba(239, 68, 68, 0.22)');
+        gradientBeban.addColorStop(1, 'rgba(239, 68, 68, 0.00)');
+
+        const gradientLaba = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
+        gradientLaba.addColorStop(0, 'rgba(16, 185, 129, 0.20)');
+        gradientLaba.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+
+        const datasets = isBar ? [
+          {
+            label: 'Pendapatan',
+            data: trendData.pendapatan,
+            backgroundColor: '#0076C5',
+            hoverBackgroundColor: '#005f9e',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
+          },
+          {
+            label: 'Total Beban',
+            data: trendData.beban,
+            backgroundColor: '#ef4444',
+            hoverBackgroundColor: '#dc2626',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
+          },
+          {
+            label: 'Laba Bersih',
+            data: trendData.laba,
+            backgroundColor: '#10b981',
+            hoverBackgroundColor: '#059669',
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.65,
+            categoryPercentage: 0.8
+          }
+        ] : [
+          {
+            label: 'Pendapatan',
+            data: trendData.pendapatan,
+            borderColor: '#0076C5',
+            backgroundColor: gradientPendapatan,
+            borderWidth: 2.8,
+            tension: 0.38,
+            fill: true,
+            pointBackgroundColor: '#0076C5',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4.5,
+            pointHoverRadius: 7
+          },
+          {
+            label: 'Total Beban',
+            data: trendData.beban,
+            borderColor: '#ef4444',
+            backgroundColor: gradientBeban,
+            borderWidth: 2.8,
+            tension: 0.38,
+            fill: true,
+            pointBackgroundColor: '#ef4444',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4.5,
+            pointHoverRadius: 7
+          },
+          {
+            label: 'Laba Bersih',
+            data: trendData.laba,
+            borderColor: '#10b981',
+            backgroundColor: gradientLaba,
+            borderWidth: 2.4,
+            borderDash: [5, 4],
+            tension: 0.38,
+            fill: false,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 4.5,
+            pointHoverRadius: 6.5
+          }
+        ];
+
+        const allValues = [].concat(trendData.pendapatan, trendData.beban, trendData.laba);
+        const maxVal = Math.max.apply(null, allValues) || 500;
+        const suggestedMax = Math.ceil((maxVal * 1.15) / 50) * 50;
+
+        trendChartInstance = new Chart(ctx, {
+          type: isBar ? 'bar' : 'line',
+          data: {
+            labels: trendData.labels,
+            datasets: datasets
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 450,
+              easing: 'easeOutQuart'
+            },
+            interaction: {
+              mode: 'index',
+              intersect: false
+            },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                align: 'end',
+                labels: {
+                  boxWidth: 10,
+                  boxHeight: 10,
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  font: {
+                    family: 'Outfit',
+                    size: 11.5,
+                    weight: 600
+                  },
+                  color: '#475569',
+                  padding: 14
+                }
+              },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                titleColor: '#f8fafc',
+                bodyColor: '#e2e8f0',
+                titleFont: { family: 'Outfit', size: 12.5, weight: 600 },
+                bodyFont: { family: 'Outfit', size: 12 },
+                padding: 12,
+                cornerRadius: 8,
+                boxPadding: 4,
+                borderColor: '#334155',
+                borderWidth: 1,
+                callbacks: {
+                  label: function (context) {
+                    const raw = context.parsed.y;
+                    const formatted = 'Rp. ' + raw.toLocaleString('id-ID') + ' Jt';
+                    return ' ' + context.dataset.label + ': ' + formatted;
+                  },
+                  afterBody: function (items) {
+                    if (items.length >= 2) {
+                      const p = items[0].parsed.y || 0;
+                      const b = items[1].parsed.y || 0;
+                      const diff = p - b;
+                      const sign = diff >= 0 ? '+' : '';
+                      return '\n  Laba Operasional: ' + sign + 'Rp. ' + diff.toLocaleString('id-ID') + ' Jt';
+                    }
+                    return '';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false
+                },
+                ticks: {
+                  font: { family: 'Outfit', size: 11.5, weight: 500 },
+                  color: '#64748b'
+                }
+              },
+              y: {
+                beginAtZero: true,
+                suggestedMax: suggestedMax,
+                grid: {
+                  color: '#f1f5f9',
+                  drawBorder: false
+                },
+                ticks: {
+                  stepSize: suggestedMax > 500 ? 100 : 50,
+                  font: { family: 'Outfit', size: 11.5 },
+                  color: '#64748b',
+                  callback: function (val) {
+                    return 'Rp. ' + val + ' Jt';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      /* ===== RENDER KOMPONEN BEBAN (DONUT CHART & LEGEND) ===== */
+      function renderDonutChart(components) {
+        const ctx = document.getElementById('donutChart');
+        if (!ctx) return;
+
+        if (donutChartInstance) {
+          donutChartInstance.destroy();
+        }
+
+        const opVal = components.operasional.pct;
+        const penVal = components.penyusutan.pct;
+        const payVal = components.payroll.pct;
+
+        // Update Legend Values
+        const legOp = document.getElementById('legendBebanOperasional');
+        const legPen = document.getElementById('legendBebanPenyusutan');
+        const legPay = document.getElementById('legendBebanPayroll');
+
+        if (legOp) legOp.textContent = opVal.toFixed(0) + '%';
+        if (legPen) legPen.textContent = penVal.toFixed(0) + '%';
+        if (legPay) legPay.textContent = payVal.toFixed(0) + '%';
+
+        donutChartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Beban Operasional', 'Beban Penyusutan', 'Beban Payroll'],
+            datasets: [
+              {
+                data: [opVal, penVal, payVal],
+                backgroundColor: ['#0ea5e9', '#facc15', '#ef4444'],
+                hoverBackgroundColor: ['#0284c7', '#eab308', '#dc2626'],
+                borderWidth: 2.5,
+                borderColor: '#ffffff'
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                backgroundColor: '#0f172a',
+                titleFont: { family: 'Outfit', size: 12, weight: 600 },
+                bodyFont: { family: 'Outfit', size: 12 },
+                padding: 8,
+                cornerRadius: 6,
+                callbacks: {
+                  label: function (context) {
+                    return ' ' + context.label + ': ' + context.parsed + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      /* ===== RENDER LABA RUGI FULL TABLE ===== */
+      function renderLabaRugiTable(statement) {
+        const tbody = document.getElementById('labaRugiTableBody');
+        if (!tbody) return;
+
+        const pBln = statement.pendapatan.bulan;
+        const pYtd = statement.pendapatan.ytd;
+
+        const bOpBln = statement.bebanOperasional.bulan;
+        const bOpYtd = statement.bebanOperasional.ytd;
+
+        const bPayBln = statement.bebanPayroll.bulan;
+        const bPayYtd = statement.bebanPayroll.ytd;
+
+        const bPenBln = statement.bebanPenyusutan.bulan;
+        const bPenYtd = statement.bebanPenyusutan.ytd;
+
+        const totBebanBln = bOpBln + bPayBln + bPenBln;
+        const totBebanYtd = bOpYtd + bPayYtd + bPenYtd;
+
+        const lepAsetBln = statement.pelepasanAset.bulan;
+        const lepAsetYtd = statement.pelepasanAset.ytd;
+
+        const labaKotorBln = pBln - totBebanBln + lepAsetBln;
+        const labaKotorYtd = pYtd - totBebanYtd + lepAsetYtd;
+
+        const pajakBln = statement.pajakPenghasilan.bulan;
+        const pajakYtd = statement.pajakPenghasilan.ytd;
+
+        const labaBersihBln = labaKotorBln - pajakBln;
+        const labaBersihYtd = labaKotorYtd - pajakYtd;
+
+        const rows = [
+          // 1. Pendapatan
+          {
+            num: '1',
+            name: 'Pendapatan',
+            bulan: formatRupiah(pBln),
+            ytd: formatRupiah(pYtd),
+            notes: statement.pendapatan.notes,
+            amountClass: 'lr-val-positive'
+          },
+          // 2. Beban operasional
+          {
+            num: '2',
+            name: 'Beban operasional',
+            bulan: formatRupiah(bOpBln),
+            ytd: formatRupiah(bOpYtd),
+            notes: statement.bebanOperasional.notes,
+            amountClass: ''
+          },
+          // 3. Beban payroll
+          {
+            num: '3',
+            name: 'Beban payroll',
+            bulan: formatRupiah(bPayBln),
+            ytd: formatRupiah(bPayYtd),
+            notes: statement.bebanPayroll.notes,
+            amountClass: ''
+          },
+          // 4. Beban penyusutan
+          {
+            num: '4',
+            name: 'Beban penyusutan',
+            bulan: formatRupiah(bPenBln),
+            ytd: formatRupiah(bPenYtd),
+            notes: statement.bebanPenyusutan.notes,
+            amountClass: ''
+          },
+          // 5. Total beban (Highlight Subtotal)
+          {
+            isSubtotal: true,
+            num: '',
+            name: 'Total beban',
+            bulan: formatRupiah(totBebanBln),
+            ytd: formatRupiah(totBebanYtd),
+            notes: 'Akumulasi seluruh beban periode berjalan',
+            amountClass: 'lr-val-negative'
+          },
+          // 6. Laba/rugi pelepasan aset
+          {
+            num: '5',
+            name: 'Laba/rugi pelepasan aset',
+            bulan: formatRupiah(lepAsetBln),
+            ytd: formatRupiah(lepAsetYtd),
+            notes: statement.pelepasanAset.notes,
+            amountClass: lepAsetBln > 0 ? 'lr-val-positive' : ''
+          },
+          // 7. Laba sebelum pajak (Highlight Subtotal)
+          {
+            isSubtotal: true,
+            num: '',
+            name: 'Laba sebelum pajak',
+            bulan: formatRupiah(labaKotorBln),
+            ytd: formatRupiah(labaKotorYtd),
+            notes: 'Earning Before Tax (EBT)',
+            amountClass: labaKotorBln >= 0 ? 'lr-val-positive' : 'lr-val-negative'
+          },
+          // 8. Beban pajak penghasilan
+          {
+            num: '6',
+            name: 'Beban pajak penghasilan',
+            bulan: formatRupiah(pajakBln),
+            ytd: formatRupiah(pajakYtd),
+            notes: statement.pajakPenghasilan.notes,
+            amountClass: ''
+          },
+          // 9. Laba bersih (Final Highlight)
+          {
+            isFinal: true,
+            num: '',
+            name: 'Laba bersih',
+            bulan: formatRupiah(labaBersihBln),
+            ytd: formatRupiah(labaBersihYtd),
+            notes: 'Net Income setelah beban pajak periode',
+            amountClass: 'lr-val-primary'
+          }
+        ];
+
+        tbody.innerHTML = rows.map(function (r) {
+          let rowClass = '';
+          if (r.isFinal) rowClass = 'class="row-highlight-final"';
+          else if (r.isSubtotal) rowClass = 'class="row-highlight-subtotal"';
+
+          return [
+            '<tr ' + rowClass + '>',
+            '<td class="col-num">' + (r.num || '') + '</td>',
+            '<td class="col-component">' + escapeHtml(r.name) + '</td>',
+            '<td class="col-amount ' + (r.amountClass || '') + '">' + escapeHtml(r.bulan) + '</td>',
+            '<td class="col-amount ' + (r.amountClass || '') + '">' + escapeHtml(r.ytd) + '</td>',
+            '<td class="col-notes">' + escapeHtml(r.notes || '-') + '</td>',
+            '</tr>'
+          ].join('');
+        }).join('');
+      }
+
+      /* ===== EVENT LISTENERS ===== */
+      // 1. Period Selector Dropdown
+      const periodSelector = document.getElementById('periodSelector');
+      if (periodSelector) {
+        periodSelector.addEventListener('change', function (e) {
+          currentPeriod = e.target.value;
+          renderDashboard();
+        });
+      }
+
+      // 2. Granularity Tabs (Harian, Mingguan, Bulanan)
+      const granularityToggles = document.getElementById('granularityToggles');
+      if (granularityToggles) {
+        granularityToggles.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-granularity]');
+          if (!btn) return;
+          granularityToggles.querySelectorAll('.lr-view-btn').forEach(function (b) {
+            b.classList.remove('is-active');
+          });
+          btn.classList.add('is-active');
+          currentGranularity = btn.getAttribute('data-granularity');
+          renderDashboard();
+        });
+      }
+
+      // 3. Chart Type Tabs (Area Line vs Batang Bar)
+      const chartTypeToggles = document.getElementById('chartTypeToggles');
+      if (chartTypeToggles) {
+        chartTypeToggles.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-chart-type]');
+          if (!btn) return;
+          chartTypeToggles.querySelectorAll('.lr-chart-type-btn').forEach(function (b) {
+            b.classList.remove('is-active');
+          });
+          btn.classList.add('is-active');
+          currentChartType = btn.getAttribute('data-chart-type');
+          renderDashboard();
+        });
+      }
+
+      // Initial Render
+      renderDashboard();
+    })();
+  </script>
 </body>
 
 </html>
