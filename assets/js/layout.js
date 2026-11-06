@@ -256,7 +256,7 @@
         ]
       },
       {
-        type: 'group', label: 'Opersional', icon: 'briefcase', id: 'm-acc-operasional',
+        type: 'group', label: 'Operasional', icon: 'briefcase', id: 'm-acc-operasional',
         children: [
           { label: 'Dashboard', link: 'Accounting/operasional/accounting_operasional_dashboard.html' },
           { label: 'Kas & Bank', link: 'Accounting/operasional/accounting_kas_bank.html' },
@@ -301,7 +301,8 @@
         type: 'group', label: 'Data Master', icon: 'tag', id: 'm-acc-master',
         children: [
           { label: 'Master COA', link: 'Accounting/data_master/accounting_master_coa.html' },
-          { label: 'Bank Lama', link: 'Accounting/data_master/accounting_bank_lama.html' }
+          { label: 'Bank Lama', link: 'Accounting/data_master/accounting_bank_lama.html' },
+          { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' }
         ]
       }
     ]
@@ -1779,7 +1780,8 @@
       'accounting_laporan.html': 'Laporan',
       'accounting_pengaduan.html': 'Pengaduan',
       'accounting_master_coa.html': 'Master COA',
-      'accounting_bank_lama.html': 'Bank Lama'
+      'accounting_bank_lama.html': 'Bank Lama',
+      'accounting_penanggung_jawab.html': 'Penanggung Jawab'
     };
 
     const accountingPageTitle = accountingTitles[currentFile] || (document.title ? document.title.split('|')[0].trim() : 'Dashboard');
