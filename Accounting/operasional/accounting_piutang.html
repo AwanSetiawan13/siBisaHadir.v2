@@ -1873,23 +1873,28 @@
         <!-- Dashed Divider -->
         <div class="piutang-dashed-divider"></div>
 
-        <!-- Table Piutang (8 Kolom Sesuai Mockup Gambar) -->
+        <!-- Table Piutang (11 Kolom Sesuai Spesifikasi Otomatis Tabel Pendapatan) -->
         <div class="piutang-table-wrap">
           <table class="piutang-table" id="piutangTable">
             <thead>
               <tr>
                 <th style="width: 44px; text-align: center;">#</th>
-                <th style="min-width: 170px;">No. Invoice</th>
-                <th style="min-width: 150px;">Customer</th>
-                <th style="min-width: 130px;">Tanggal</th>
-                <th style="min-width: 130px;">Jatuh Tempo</th>
-                <th style="min-width: 150px; text-align: right;">Tagihan Bruto</th>
-                <th style="min-width: 110px; text-align: center;">Status</th>
-                <th class="col-sticky-action" style="width: 70px; text-align: center;">Aksi</th>
+                <th style="white-space: nowrap;">No. Invoice</th>
+                <th style="white-space: nowrap;">Customer</th>
+                <th style="white-space: nowrap;">Tanggal</th>
+                <th style="white-space: nowrap;">Jatuh Tempo</th>
+                <th style="text-align: right; white-space: nowrap;">Tagihan Bruto</th>
+                <th style="text-align: right; white-space: nowrap;">Terbayar</th>
+                <th style="text-align: right; white-space: nowrap;">Sisa Piutang</th>
+                <th style="text-align: center; white-space: nowrap;">Lewat Tempo (Hari)</th>
+                <th style="text-align: center; white-space: nowrap;">Status</th>
+                <th style="white-space: nowrap;">Divisi</th>
+                <th style="white-space: nowrap;">Project / Brand</th>
+                <th class="col-sticky-action" style="width: 60px; text-align: center;">Aksi</th>
               </tr>
             </thead>
             <tbody id="piutangTableBody">
-              <!-- Diisi secara dinamis melalui JavaScript -->
+              <!-- Diisi secara otomatis dari Tabel Pendapatan melalui JavaScript -->
             </tbody>
           </table>
         </div>
@@ -1977,106 +1982,227 @@
     (function () {
       'use strict';
 
-      /* ===== DATA SEED (Sesuai Mockup Gambar Pengguna) ===== */
-      const DEFAULT_PIUTANG_DATA = [
-        {
-          id: 'PIU-001',
-          noInvoice: 'INV-202609-001',
-          customer: 'Tiktok',
-          tanggal: '2026-10-01',
-          jatuhTempo: '2026-09-01',
-          tagihanBruto: 748155,
-          terbayar: 748155,
-          sisaPiutang: 0,
-          lewatTempoHari: 0,
-          status: 'Lunas',
-          divisi: 'MCN',
-          projectBrand: 'Seluruh Kreator MCN'
-        },
-        {
-          id: 'PIU-002',
-          noInvoice: 'INV-202609-002',
-          customer: 'Shopee Official',
-          tanggal: '2026-10-05',
-          jatuhTempo: '2026-11-05',
-          tagihanBruto: 15500000,
-          terbayar: 15500000,
-          sisaPiutang: 0,
-          lewatTempoHari: 0,
-          status: 'Lunas',
-          divisi: 'TAP',
-          projectBrand: 'Campaign Mega Sale 10.10'
-        },
-        {
-          id: 'PIU-003',
-          noInvoice: 'INV-202609-003',
-          customer: 'Skintific Official',
-          tanggal: '2026-09-12',
-          jatuhTempo: '2026-10-12',
-          tagihanBruto: 28000000,
-          terbayar: 14000000,
-          sisaPiutang: 14000000,
-          lewatTempoHari: 23,
-          status: 'Jatuh Tempo',
-          divisi: 'TSP',
-          projectBrand: 'Product Launching Serum Glow'
-        },
-        {
-          id: 'PIU-004',
-          noInvoice: 'INV-202609-004',
-          customer: 'Somethinc Beauty',
-          tanggal: '2026-09-15',
-          jatuhTempo: '2026-10-15',
-          tagihanBruto: 18500000,
-          terbayar: 0,
-          sisaPiutang: 18500000,
-          lewatTempoHari: 20,
-          status: 'Jatuh Tempo',
-          divisi: 'TAP',
-          projectBrand: 'Brand Endorsement Retainer'
-        },
-        {
-          id: 'PIU-005',
-          noInvoice: 'INV-202609-005',
-          customer: 'Glad2Glow Store',
-          tanggal: '2026-10-20',
-          jatuhTempo: '2026-11-20',
-          tagihanBruto: 12400000,
-          terbayar: 12400000,
-          sisaPiutang: 0,
-          lewatTempoHari: 0,
-          status: 'Status',
-          divisi: 'MCN',
-          projectBrand: 'Live Streaming Package'
-        }
-      ];
+      /* ===== RELASI TABEL PIUTANG DARI TABEL PENDAPATAN =====
+       * Sesuai Lembar Spesifikasi: "Lihat (data otomatis ada)"
+       * 1. No. Invoice -> Otomatis dari Tabel Pendapatan {No. Invoice}
+       * 2. Customer -> Otomatis dari Tabel Pendapatan {Customer}
+       * 3. Tanggal -> Otomatis dari Tabel Pendapatan {Tgl Pengakuan}
+       * 4. Jatuh Tempo -> Otomatis dari Tabel Pendapatan {Jatuh Tempo}
+       * 5. Tagihan Bruto -> Otomatis dari Tabel Pendapatan {Total Tagihan}
+       * 6. Terbayar -> Otomatis dari Tabel Pendapatan {Terbayar Kas}
+       * 7. Sisa Piutang -> Otomatis dari Tabel Pendapatan {Sisa Piutang}
+       * 8. Lewat Tempo (Hari) -> Rumus: Jika Piutang belum lunas dan jatuh temponya sudah habis maka terisi otomatis Sesuai Hari Keterlambatan
+       * 9. Status -> Otomatis dari Tabel Pendapatan {Status}
+       * 10. Divisi -> Otomatis dari Tabel Pendapatan {Divisi}
+       * 11. Project / Brand -> Otomatis dari Tabel Pendapatan {Project / Brand}
+       */
 
-      const STORAGE_KEY = 'bisa_piutang_data_v4';
-      function loadPiutangData() {
-        try {
-          localStorage.removeItem('bisa_piutang_data_v1');
-          localStorage.removeItem('bisa_piutang_data_v2');
-          localStorage.removeItem('bisa_piutang_data_v3');
-        } catch (e) {}
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-          } catch (e) {
-            console.error('Error parsing stored piutang data:', e);
-          }
+      const PENDAPATAN_STORAGE_KEY = 'accounting_pendapatan_data_v1';
+      const KAS_BANK_STORAGE_KEY = 'accounting_kas_bank_v2';
+      const STORAGE_KEY = 'bisa_piutang_data_v5';
+
+      function calculateLewatTempoHari(sisaPiutang, jatuhTempoIso) {
+        const sisa = Number(sisaPiutang) || 0;
+        if (sisa <= 0) return 0;
+        if (!jatuhTempoIso || jatuhTempoIso === '-') return 0;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let jtDate;
+        const str = String(jatuhTempoIso).trim();
+        if (str.includes('-')) {
+          const parts = str.split('-');
+          jtDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        } else if (str.includes('/')) {
+          const parts = str.split('/');
+          jtDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        } else {
+          jtDate = new Date(str);
         }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PIUTANG_DATA));
-        return DEFAULT_PIUTANG_DATA;
+
+        if (isNaN(jtDate.getTime())) return 0;
+        jtDate.setHours(0, 0, 0, 0);
+
+        const diffTime = today.getTime() - jtDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
+      }
+
+      function getTerbayarKasFromKasBank(noInvoice) {
+        if (!noInvoice) return 0;
+        try {
+          const raw = localStorage.getItem(KAS_BANK_STORAGE_KEY);
+          const kbList = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(kbList)) return 0;
+          const invTarget = String(noInvoice).trim().toLowerCase();
+          const invNorm = invTarget.replace(/[\s\-_/.]/g, '');
+          let total = 0;
+          kbList.forEach(function (kb) {
+            if (!kb) return;
+            const ref = String(kb.referensi || kb.noInvoice || kb.invoice || '').trim().toLowerCase();
+            const refNorm = ref.replace(/[\s\-_/.]/g, '');
+            if (ref && (ref === invTarget || (refNorm && refNorm === invNorm))) {
+              total += Number(kb.uangMasuk || 0);
+            }
+          });
+          return total;
+        } catch (e) {
+          return 0;
+        }
+      }
+
+      function loadPiutangData() {
+        let pndList = [];
+        try {
+          const rawPnd = localStorage.getItem(PENDAPATAN_STORAGE_KEY);
+          if (rawPnd) {
+            const parsed = JSON.parse(rawPnd);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              pndList = parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Error loading pendapatan data for piutang:', e);
+        }
+
+        // Jika data pendapatan belum ada di localStorage, gunakan seed pendapatan standar yang selaras
+        if (pndList.length === 0) {
+          pndList = [
+            {
+              id: 'pnd-1',
+              idPendapatan: '7691348184035411733',
+              tanggalPengakuan: '2026-10-01',
+              customer: 'TikTok',
+              noInvoice: 'INV-202609-001',
+              kodeCoa: '4001',
+              divisi: 'MCN',
+              keterangan: 'Management Fee MCN Kreator',
+              dpp: 748155,
+              ppn: 0,
+              totalTagihan: 748155,
+              terbayarKas: 748155,
+              sisaPiutang: 0,
+              jatuhTempo: '2026-09-01',
+              hatuhTempo: '2026-09-01',
+              projectBrand: 'Seluruh Kreator MCN',
+              statusLama: 'Lunas',
+              status: 'Lunas'
+            },
+            {
+              id: 'pnd-2',
+              idPendapatan: '7691348184035411734',
+              tanggalPengakuan: '2026-09-01',
+              customer: 'Campaign Brand A',
+              noInvoice: 'INV-202609-002',
+              kodeCoa: '1002',
+              divisi: 'Operasional',
+              keterangan: 'Penerimaan Pembayaran Campaign Brand',
+              dpp: 15500000,
+              ppn: 0,
+              totalTagihan: 15500000,
+              terbayarKas: 15500000,
+              sisaPiutang: 0,
+              jatuhTempo: '2026-09-15',
+              hatuhTempo: '2026-09-15',
+              projectBrand: 'Campaign Brand A',
+              statusLama: 'Lunas',
+              status: 'Lunas'
+            },
+            {
+              id: 'pnd-3',
+              idPendapatan: '7691348184035411735',
+              tanggalPengakuan: '2026-10-15',
+              customer: 'Shopee Live Media',
+              noInvoice: 'INV-202609-003',
+              kodeCoa: '4001',
+              divisi: 'MCN',
+              keterangan: 'Jasa Live Streaming Affiliate',
+              dpp: 5000000,
+              ppn: 550000,
+              totalTagihan: 5550000,
+              terbayarKas: 0,
+              sisaPiutang: 5550000,
+              jatuhTempo: '2026-11-20',
+              hatuhTempo: '2026-11-20',
+              projectBrand: 'Shopee Affiliate Mall',
+              statusLama: 'Belum Lunas',
+              status: 'Belum Lunas'
+            },
+            {
+              id: 'pnd-4',
+              idPendapatan: '7691348184035411736',
+              tanggalPengakuan: '2026-08-10',
+              customer: 'Brand Cosmo Style',
+              noInvoice: 'INV-202609-004',
+              kodeCoa: '1002',
+              divisi: 'Operasional',
+              keterangan: 'Endorsement Agustus Cosmo',
+              dpp: 2000000,
+              ppn: 0,
+              totalTagihan: 2000000,
+              terbayarKas: 0,
+              sisaPiutang: 2000000,
+              jatuhTempo: '2026-09-01',
+              hatuhTempo: '2026-09-01',
+              projectBrand: 'Cosmo Endorse',
+              statusLama: 'Lewat Jatuh Tempo',
+              status: 'Lewat Jatuh Tempo'
+            }
+          ];
+          try {
+            localStorage.setItem(PENDAPATAN_STORAGE_KEY, JSON.stringify(pndList));
+          } catch (e) {}
+        }
+
+        // Map data pendapatan persis sesuai 11 kolom spesifikasi Piutang
+        return pndList.map(function (item, idx) {
+          const dpp = Number(item.dpp || 0);
+          const ppn = Number(item.ppn || 0);
+          const totalTagihan = item.totalTagihan !== undefined ? Number(item.totalTagihan) : (dpp + ppn);
+          
+          // Sinkronisasi realtime pelunasan dari transaksi Kas & Bank
+          const terbayarFromKb = getTerbayarKasFromKasBank(item.noInvoice);
+          const terbayarKas = Math.max(Number(item.terbayarKas || 0), terbayarFromKb);
+          const sisaPiutang = Math.max(0, totalTagihan - terbayarKas);
+          
+          const jt = item.jatuhTempo || item.hatuhTempo || '';
+          const lewatHari = calculateLewatTempoHari(sisaPiutang, jt);
+
+          let st = item.status;
+          if (sisaPiutang <= 0) {
+            st = 'Lunas';
+          } else if (lewatHari > 0) {
+            st = 'Lewat Jatuh Tempo';
+          } else {
+            st = 'Belum Lunas';
+          }
+
+          return {
+            id: item.id || ('PIU-' + String(idx + 1).padStart(3, '0')),
+            noInvoice: item.noInvoice || '-',
+            customer: item.customer || '-',
+            tanggal: item.tanggalPengakuan || '',
+            jatuhTempo: jt,
+            tagihanBruto: totalTagihan,
+            terbayar: terbayarKas,
+            sisaPiutang: sisaPiutang,
+            lewatTempoHari: lewatHari,
+            status: st,
+            divisi: item.divisi || '-',
+            projectBrand: item.projectBrand || '-'
+          };
+        });
       }
 
       let piutangData = loadPiutangData();
 
       /* ===== FORMATTERS ===== */
       function formatRupiah(num) {
-        const val = Number(num) || 0;
-        return 'Rp. ' + val.toLocaleString('en-US');
+        if (num === null || num === undefined || num === '' || isNaN(num) || Number(num) === 0) {
+          return 'Rp. 0';
+        }
+        return 'Rp ' + Number(num).toLocaleString('id-ID');
       }
 
       function formatDateIndo(dateStr) {
@@ -2155,19 +2281,18 @@
 
         return piutangData.filter(function (item) {
           // Status filter
-          if (selStatus && selStatus.toLowerCase() !== 'status') {
-            if (selStatus.toLowerCase() === 'jatuh tempo') {
-              if (item.status.toLowerCase() !== 'jatuh tempo' && item.status.toLowerCase() !== 'lewat jatuh tempo') {
-                return false;
-              }
-            } else if (item.status.toLowerCase() !== selStatus.toLowerCase()) {
-              return false;
-            }
+          if (selStatus && selStatus.toLowerCase() !== 'status' && selStatus.toLowerCase() !== 'semua') {
+            const stItem = String(item.status || '').toLowerCase();
+            const stFilter = selStatus.toLowerCase();
+            if (stFilter === 'lunas' && stItem !== 'lunas') return false;
+            if (stFilter.includes('tempo') && !stItem.includes('tempo') && Number(item.lewatTempoHari || 0) === 0) return false;
+            if (stFilter === 'belum lunas' && stItem !== 'belum lunas') return false;
           }
 
           // Divisi filter
-          if (selDivisi && (item.divisi || '').toLowerCase() !== selDivisi.toLowerCase()) {
-            return false;
+          if (selDivisi && selDivisi.toLowerCase() !== 'divisi' && selDivisi.toLowerCase() !== 'semua') {
+            const divItem = String(item.divisi || '').toLowerCase();
+            if (!divItem.includes(selDivisi.toLowerCase())) return false;
           }
 
           // Search query
@@ -2180,7 +2305,9 @@
               item.projectBrand,
               formatDateIndo(item.tanggal),
               formatDateIndo(item.jatuhTempo),
-              String(item.tagihanBruto)
+              String(item.tagihanBruto),
+              String(item.terbayar),
+              String(item.sisaPiutang)
             ].join(' ').toLowerCase();
             if (!target.includes(query)) return false;
           }
@@ -2209,7 +2336,7 @@
           totalP += Number(item.tagihanBruto) || 0;
           totalBayar += Number(item.terbayar) || 0;
           totalSisa += Number(item.sisaPiutang) || 0;
-          if (item.status === 'Lewat Jatuh Tempo' || item.status === 'Jatuh Tempo' || (Number(item.lewatTempoHari) || 0) > 0) {
+          if (item.status === 'Lewat Jatuh Tempo' || (Number(item.lewatTempoHari) || 0) > 0) {
             totalLewat += Number(item.sisaPiutang) || 0;
           }
         });
@@ -2220,15 +2347,16 @@
         if (cardLewatJatuhTempo) cardLewatJatuhTempo.textContent = formatRupiah(totalLewat);
       }
 
-      /* ===== RENDER TABLE ===== */
+      /* ===== RENDER TABLE (11 Kolom Sesuai Spesifikasi) ===== */
       function renderTable() {
         if (!tableBody) return;
         tableBody.innerHTML = '';
 
+        piutangData = loadPiutangData();
         const filtered = getFilteredData();
 
         if (filtered.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data piutang yang sesuai.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="13" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data piutang yang sesuai.</td></tr>';
           updateSummaryCards(filtered);
           return;
         }
@@ -2242,14 +2370,23 @@
           else if (item.status === 'Lewat Jatuh Tempo' || item.status === 'Jatuh Tempo') statusClass += ' is-tempo';
           else statusClass += ' is-belum';
 
+          const lewatTempoDisplay = item.lewatTempoHari > 0
+            ? '<span style="color: #dc2626; font-weight: 600;">' + item.lewatTempoHari + ' Hari</span>'
+            : '<span style="color: #64748b;">-</span>';
+
           row.innerHTML = [
-            '<td style="text-align: center; color: #64748b; font-weight: 500; font-style: normal;">' + (index + 1) + '</td>',
-            '<td style="font-weight: 600; color: #0284c7; white-space: nowrap; font-style: normal;">' + escapeHtml(item.noInvoice || '-') + '</td>',
-            '<td style="color: #1e293b; font-weight: 500; font-style: normal;">' + escapeHtml(item.customer || '-') + '</td>',
-            '<td style="color: #334155; white-space: nowrap; font-style: normal;">' + escapeHtml(formatDateIndo(item.tanggal)) + '</td>',
-            '<td style="color: #334155; white-space: nowrap; font-style: normal;">' + escapeHtml(formatDateIndo(item.jatuhTempo)) + '</td>',
-            '<td style="text-align: right; font-weight: 600; color: #1e293b; white-space: nowrap; font-style: normal;">' + escapeHtml(formatRupiah(item.tagihanBruto)) + '</td>',
-            '<td style="text-align: center; font-style: normal;"><span class="' + statusClass + '">' + escapeHtml(item.status || '-') + '</span></td>',
+            '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (index + 1) + '</td>',
+            '<td style="font-weight: 600; color: #0284c7; white-space: nowrap;">' + escapeHtml(item.noInvoice || '-') + '</td>',
+            '<td style="color: #1e293b; font-weight: 500; white-space: nowrap;">' + escapeHtml(item.customer || '-') + '</td>',
+            '<td style="color: #334155; white-space: nowrap;">' + escapeHtml(formatDateIndo(item.tanggal)) + '</td>',
+            '<td style="color: #334155; white-space: nowrap;">' + escapeHtml(formatDateIndo(item.jatuhTempo)) + '</td>',
+            '<td style="text-align: right; font-weight: 600; color: #1e293b; white-space: nowrap;">' + escapeHtml(formatRupiah(item.tagihanBruto)) + '</td>',
+            '<td style="text-align: right; font-weight: 600; color: #059669; white-space: nowrap;">' + escapeHtml(formatRupiah(item.terbayar)) + '</td>',
+            '<td style="text-align: right; font-weight: 600; color: #dc2626; white-space: nowrap;">' + escapeHtml(formatRupiah(item.sisaPiutang)) + '</td>',
+            '<td style="text-align: center; white-space: nowrap;">' + lewatTempoDisplay + '</td>',
+            '<td style="text-align: center; white-space: nowrap;"><span class="' + statusClass + '">' + escapeHtml(item.status || '-') + '</span></td>',
+            '<td style="color: #334155; white-space: nowrap;">' + escapeHtml(item.divisi || '-') + '</td>',
+            '<td style="color: #334155; white-space: nowrap;">' + escapeHtml(item.projectBrand || '-') + '</td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
               '<button type="button" class="btn-action-eye" data-action="view" data-id="' + escapeHtml(item.id) + '" aria-label="Lihat Detail" title="Lihat Detail">' +
                 '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
@@ -2273,7 +2410,7 @@
         if (detailTagihanBruto) detailTagihanBruto.textContent = formatRupiah(item.tagihanBruto);
         if (detailTerbayar) detailTerbayar.textContent = formatRupiah(item.terbayar);
         if (detailSisaPiutang) detailSisaPiutang.textContent = formatRupiah(item.sisaPiutang);
-        if (detailLewatTempoHari) detailLewatTempoHari.textContent = item.lewatTempoHari !== undefined ? String(item.lewatTempoHari) : '0';
+        if (detailLewatTempoHari) detailLewatTempoHari.textContent = item.lewatTempoHari > 0 ? (item.lewatTempoHari + ' Hari') : '0 Hari';
         if (detailStatus) detailStatus.textContent = item.status || '-';
         if (detailDivisi) detailDivisi.textContent = item.divisi || '-';
         if (detailProjectBrand) detailProjectBrand.textContent = item.projectBrand || '-';
@@ -2316,11 +2453,16 @@
 
       /* ===== FILTER FUNNEL LOGIC (Searchable Dropdown sesuai Mockup) ===== */
       function getStatusOptions() {
-        return ['Lunas', 'Jatuh Tempo', 'Status'];
+        return ['Lunas', 'Lewat Jatuh Tempo', 'Belum Lunas'];
       }
 
       function getDivisiOptions() {
-        return ['MCN', 'TAP', 'TSP'];
+        const set = new Set();
+        (piutangData || []).forEach(function (d) {
+          if (d.divisi && d.divisi !== '-') set.add(d.divisi);
+        });
+        if (set.size === 0) return ['MCN', 'TAP', 'TSP', 'Finance & Accounting', 'Operasional'];
+        return Array.from(set);
       }
 
       function closeFilterSearchBoxes() {
@@ -2662,7 +2804,7 @@
           } else {
             // Direct CSV fallback
             const filtered = getFilteredData();
-            let csv = 'No,No. Invoice,Customer,Tanggal,Jatuh Tempo,Tagihan Bruto,Status\n';
+            let csv = 'No,No. Invoice,Customer,Tanggal,Jatuh Tempo,Tagihan Bruto,Terbayar,Sisa Piutang,Lewat Tempo (Hari),Status,Divisi,Project / Brand\n';
             filtered.forEach(function (row, idx) {
               csv += [
                 idx + 1,
@@ -2671,7 +2813,12 @@
                 formatDateIndo(row.tanggal),
                 formatDateIndo(row.jatuhTempo),
                 row.tagihanBruto,
-                '"' + (row.status || '').replace(/"/g, '""') + '"'
+                row.terbayar,
+                row.sisaPiutang,
+                row.lewatTempoHari,
+                '"' + (row.status || '').replace(/"/g, '""') + '"',
+                '"' + (row.divisi || '').replace(/"/g, '""') + '"',
+                '"' + (row.projectBrand || '').replace(/"/g, '""') + '"'
               ].join(',') + '\n';
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -2684,6 +2831,25 @@
           }
         });
       }
+
+      // Realtime sync ketika data Pendapatan atau Kas & Bank di-update di tab lain / navigasi
+      window.addEventListener('storage', function (e) {
+        if (!e.key || e.key === PENDAPATAN_STORAGE_KEY || e.key === KAS_BANK_STORAGE_KEY) {
+          renderTable();
+        }
+      });
+
+      window.addEventListener('pageshow', function () {
+        renderTable();
+      });
+
+      window.addEventListener('focus', function () {
+        renderTable();
+      });
+
+      window.addEventListener('pendapatanUpdated', function () {
+        renderTable();
+      });
 
       // Initial Render
       renderTable();

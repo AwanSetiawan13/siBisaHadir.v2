@@ -359,6 +359,12 @@
       color: #b91c1c;
     }
 
+    .approval-badge.badge-neutral {
+      background-color: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
     /* Action Button (Circle) */
     .pnd-action-btn {
       width: 32px;
@@ -388,18 +394,24 @@
     /* Fixed Floating Action Menu */
     .pnd-action-menu {
       display: none;
-      position: fixed;
-      z-index: 2147483000;
-      min-width: 145px;
-      padding: 6px;
-      border: 1px solid rgba(0, 0, 0, .08);
-      border-radius: 8px;
-      background: #fff;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+      position: fixed !important;
+      z-index: 2147483647 !important;
+      min-width: 145px !important;
+      padding: 6px !important;
+      border: 1px solid rgba(0, 0, 0, .08) !important;
+      border-radius: 8px !important;
+      background: #ffffff !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14) !important;
+      box-sizing: border-box !important;
+      pointer-events: auto !important;
     }
 
-    .pnd-action-menu.is-open {
-      display: block;
+    .pnd-action-menu.is-open,
+    .pnd-action-menu.is-active {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
     }
 
     .pnd-action-menu button {
@@ -1011,6 +1023,16 @@
       background: #f8fafc;
       color: #64748b;
       font-style: italic;
+    }
+
+    .pnd-input-readonly {
+      background-color: #f1f5f9 !important;
+      color: #64748b !important;
+      border-color: #cbd5e1 !important;
+      cursor: not-allowed !important;
+      box-shadow: none !important;
+      outline: none !important;
+      user-select: none;
     }
 
     /* Datepicker Wrap with Sleek Calendar Icon */
@@ -2247,28 +2269,6 @@
         </div>
       </section>
 
-      <!-- Floating Action Menu (Konsisten Kas & Bank dan Pendapatan) -->
-      <div id="pndActionMenu" class="pnd-action-menu" role="menu">
-        <button type="button" data-action="view">
-          <span class="pnd-action-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          </span>
-          <span>Lihat</span>
-        </button>
-        <button type="button" data-action="edit">
-          <span class="pnd-action-icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
-          </span>
-          <span>Edit</span>
-        </button>
-        <button type="button" class="is-danger" data-action="delete">
-          <span class="pnd-action-icon is-danger">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
-          </span>
-          <span>Hapus</span>
-        </button>
-      </div>
-
       <!-- =====================================================================
            MODAL CRUD FORM (TAMBAH / EDIT APPROVAL PENGELUARAN)
            PERSIS 100% SESUAI REFERENSI GAMBAR 1 & 2 USER
@@ -2291,7 +2291,7 @@
               <!-- Baris 1: ID Approval, Tanggal Request, Pemohon -->
               <div class="pnd-field">
                 <label class="pnd-label" for="pndIdApproval">ID Approval</label>
-                <input type="text" id="pndIdApproval" class="pnd-input" placeholder="Tambah ID" required />
+                <input type="text" id="pndIdApproval" class="pnd-input pnd-input-readonly" placeholder="Otomatis (AI Auto Increment)" readonly tabindex="-1" required />
               </div>
               <div class="pnd-field">
                 <label class="pnd-label" for="pndTanggalRequest">Tanggal Request</label>
@@ -2334,12 +2334,16 @@
                   </button>
                   <div class="pnd-select-dropdown">
                     <label class="pnd-select-option">
+                      <input type="radio" name="optStatusManager" value="Menunggu" />
+                      <span>Menunggu</span>
+                    </label>
+                    <label class="pnd-select-option">
                       <input type="radio" name="optStatusManager" value="Disetujui" />
                       <span>Disetujui</span>
                     </label>
                     <label class="pnd-select-option">
-                      <input type="radio" name="optStatusManager" value="Tidak Setuju" />
-                      <span>Tidak Setuju</span>
+                      <input type="radio" name="optStatusManager" value="Ditolak" />
+                      <span>Ditolak</span>
                     </label>
                   </div>
                 </div>
@@ -2357,12 +2361,16 @@
                   </button>
                   <div class="pnd-select-dropdown">
                     <label class="pnd-select-option">
+                      <input type="radio" name="optStatusDirektur" value="Menunggu" />
+                      <span>Menunggu</span>
+                    </label>
+                    <label class="pnd-select-option">
                       <input type="radio" name="optStatusDirektur" value="Disetujui" />
                       <span>Disetujui</span>
                     </label>
                     <label class="pnd-select-option">
-                      <input type="radio" name="optStatusDirektur" value="Tidak Setuju" />
-                      <span>Tidak Setuju</span>
+                      <input type="radio" name="optStatusDirektur" value="Ditolak" />
+                      <span>Ditolak</span>
                     </label>
                   </div>
                 </div>
@@ -2370,7 +2378,7 @@
 
               <div class="pnd-field">
                 <label class="pnd-label" for="pndStatusFinal">Status Final</label>
-                <input type="text" id="pndStatusFinal" class="pnd-input is-muted" placeholder="Status" readonly />
+                <input type="text" id="pndStatusFinal" class="pnd-input is-muted" placeholder="Menunggu" readonly tabindex="-1" style="background-color: #f1f5f9; cursor: not-allowed;" />
               </div>
 
               <!-- Baris 4: Catatan (Span Full Width 3 Columns Sesuai Gambar 1 & 2) -->
@@ -2472,6 +2480,28 @@
     </main>
   </div>
 
+  <!-- Global Action Menu (Konsisten dengan Kas & Bank dan Pendapatan) -->
+  <div id="pndActionMenu" class="pnd-action-menu" role="menu">
+    <button type="button" data-action="view">
+      <span class="pnd-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" data-action="edit">
+      <span class="pnd-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" class="is-danger" data-action="delete">
+      <span class="pnd-action-icon is-danger">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
   <!-- Layout Script -->
   <script src="../../assets/js/layout.js?v=20261106_operasional_id"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
@@ -2481,7 +2511,7 @@
     (function () {
       'use strict';
 
-      const STORAGE_KEY = 'BISA_APPROVAL_PENGELUARAN_DATA_V3';
+      const STORAGE_KEY = 'BISA_APPROVAL_PENGELUARAN_DATA_V5';
 
       // Elements
       const tableBody = document.getElementById('pndTableBody');
@@ -2527,60 +2557,145 @@
 
       const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+      // Aturan 3 Status Approval Pengeluaran: Disetujui, Ditolak, Menunggu
+      // 1. Ditolak: Jika salah satu atau keduanya Ditolak (atau warisan Tidak Setuju / Dibatalkan) -> Status Final = Ditolak
+      // 2. Disetujui: Jika KEDUANYA Disetujui -> Status Final = Disetujui
+      // 3. Menunggu: Jika masih ada yang Menunggu / Belum dipilih -> Status Final = Menunggu
+      function computeStatusFinal(statusMgr, statusDir) {
+        const sm = String(statusMgr || '').trim().toLowerCase();
+        const sd = String(statusDir || '').trim().toLowerCase();
+
+        // 1. Ditolak jika salah satu atau keduanya ditolak
+        if (sm === 'ditolak' || sd === 'ditolak' || sm.includes('tolak') || sd.includes('tolak') || sm.includes('tidak') || sd.includes('tidak') || sm.includes('batal') || sd.includes('batal')) {
+          return 'Ditolak';
+        }
+
+        // 2. Disetujui jika KEDUANYA disetujui
+        if ((sm === 'disetujui' || sm === 'setuju') && (sd === 'disetujui' || sd === 'setuju')) {
+          return 'Disetujui';
+        }
+
+        // 3. Sisanya adalah Menunggu
+        return 'Menunggu';
+      }
+
+      function normalizeStatusName(status) {
+        const l = String(status || '').trim().toLowerCase();
+        if (l === 'ditolak' || l.includes('tolak') || l.includes('batal') || l.includes('tidak')) {
+          return 'Ditolak';
+        }
+        if (l === 'disetujui' || l.includes('setuju')) {
+          return 'Disetujui';
+        }
+        return 'Menunggu';
+      }
+
       function loadData() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          const parsed = raw ? JSON.parse(raw) : null;
-          if (Array.isArray(parsed) && parsed.length >= 3) {
-            return parsed;
+        // Seed data default yang bersih hanya 3 status: Disetujui, Ditolak, Menunggu (Real Relasional dengan Pengeluaran & Kas Bank)
+        const seedData = [
+          {
+            id: 'apr-1',
+            idApproval: 'APR-2609-001',
+            tanggalRequest: '2026-09-04',
+            pemohon: 'BCA',
+            divisi: 'General',
+            keperluan: 'Admin Bank BCA',
+            nominal: 30000,
+            statusManager: 'Disetujui',
+            statusDirektur: 'Disetujui',
+            statusFinal: 'Disetujui',
+            catatan: 'Biaya admin transfer bulanan'
+          },
+          {
+            id: 'apr-2',
+            idApproval: 'APR-2609-002',
+            tanggalRequest: '2026-09-08',
+            pemohon: 'Meta Ads',
+            divisi: 'Marketing',
+            keperluan: 'Iklan Digital Campaign Meta Ads',
+            nominal: 1665000,
+            statusManager: 'Disetujui',
+            statusDirektur: 'Disetujui',
+            statusFinal: 'Disetujui',
+            catatan: 'Campaign Facebook & Instagram Ads'
+          },
+          {
+            id: 'apr-3',
+            idApproval: 'APR-2609-003',
+            tanggalRequest: '2026-09-15',
+            pemohon: 'PT Gedung Megah',
+            divisi: 'Operasional',
+            keperluan: 'Sewa Ruang Kantor Lt. 3',
+            nominal: 4995000,
+            statusManager: 'Disetujui',
+            statusDirektur: 'Menunggu',
+            statusFinal: 'Menunggu',
+            catatan: 'Pembayaran termin 1 sewa gedung'
+          },
+          {
+            id: 'apr-4',
+            idApproval: 'APR-2609-004',
+            tanggalRequest: '2026-09-20',
+            pemohon: 'CV Berkah Office',
+            divisi: 'Operasional',
+            keperluan: 'Pengadaan Perlengkapan Kantor',
+            nominal: 450000,
+            statusManager: 'Ditolak',
+            statusDirektur: 'Ditolak',
+            statusFinal: 'Ditolak',
+            catatan: 'Pengajuan ditolak karena anggaran perlengkapan kantor Q3 sudah habis'
+          },
+          {
+            id: 'apr-5',
+            idApproval: 'APR-2609-005',
+            tanggalRequest: '2026-10-18',
+            pemohon: 'Google Cloud',
+            divisi: 'IT',
+            keperluan: 'Server & Cloud Hosting Database',
+            nominal: 943500,
+            statusManager: 'Disetujui',
+            statusDirektur: 'Disetujui',
+            statusFinal: 'Disetujui',
+            catatan: 'Langganan server cloud kuartal 4'
           }
-          // Seed data multi-baris mencakup Divisi 1 (General), Divisi 2 (Marketing), Divisi 3 (Operasional)
-          const seedData = [
-            {
-              id: 'apr-1',
-              idApproval: 'APR-2609-001',
-              tanggalRequest: '2026-01-04',
-              pemohon: 'BCA',
-              divisi: 'General',
-              keperluan: 'Admin Bank BCA',
-              nominal: 30000,
-              statusManager: 'Disetujui',
-              statusDirektur: 'Disetujui',
-              statusFinal: 'Disetujui',
-              catatan: 'Admin Bank BCA'
-            },
-            {
-              id: 'apr-2',
-              idApproval: 'APR-2609-002',
-              tanggalRequest: '2026-01-10',
-              pemohon: 'Meta Ads',
-              divisi: 'Marketing',
-              keperluan: 'Iklan Digital Campaign Meta Ads',
-              nominal: 1500000,
-              statusManager: 'Disetujui',
-              statusDirektur: 'Menunggu Review',
-              statusFinal: 'Menunggu Review',
-              catatan: 'Campaign FB Ads Q1'
-            },
-            {
-              id: 'apr-3',
-              idApproval: 'APR-2609-003',
-              tanggalRequest: '2026-01-15',
-              pemohon: 'Operasional Office',
-              divisi: 'Operasional',
-              keperluan: 'Pengadaan Perlengkapan Kantor',
-              nominal: 450000,
-              statusManager: 'Tidak Setuju',
-              statusDirektur: 'Ditolak',
-              statusFinal: 'Ditolak',
-              catatan: 'Perlu revisi anggaran alat tulis kantor'
-            }
-          ];
+        ];
+
+        try {
+          const rawV5 = localStorage.getItem(STORAGE_KEY);
+          let parsed = rawV5 ? JSON.parse(rawV5) : null;
+
+          // Periksa apakah data di browser masih versi lama (3 baris usang / APR-1 berstatus Menunggu):
+          // Jika ya, upgrade otomatis ke 5 baris lengkap yang real berelasi dengan Pengeluaran & Kas Bank
+          const needsUpgrade = !Array.isArray(parsed) || parsed.length < 5 || parsed.some(function (it) {
+            return (it.idApproval === 'APR-2609-001' && it.statusFinal !== 'Disetujui') ||
+                   (it.idApproval === 'APR-2609-002' && it.statusFinal !== 'Disetujui') ||
+                   (it.idApproval === 'APR-2609-003' && it.statusFinal !== 'Menunggu');
+          });
+
+          if (needsUpgrade) {
+            const userAdded = Array.isArray(parsed) ? parsed.filter(function (it) {
+              const checkId = it && (it.id || it.idApproval);
+              return checkId && !['apr-1', 'apr-2', 'apr-3', 'apr-4', 'apr-5', 'APR-2609-001', 'APR-2609-002', 'APR-2609-003', 'APR-2609-004', 'APR-2609-005'].includes(checkId);
+            }) : [];
+            parsed = seedData.concat(userAdded);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          }
+
+          return parsed.map(function (it, idx) {
+            const sm = normalizeStatusName(it.statusManager);
+            const sd = normalizeStatusName(it.statusDirektur);
+            const sf = computeStatusFinal(sm, sd);
+            const itemId = it.id || it.idApproval || ('apr-' + (idx + 1));
+            return Object.assign({}, it, {
+              id: itemId,
+              statusManager: sm,
+              statusDirektur: sd,
+              statusFinal: sf
+            });
+          });
+        } catch (e) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
           return seedData;
-        } catch (e) {
-          console.error('Error loading data:', e);
-          return [];
         }
       }
 
@@ -2612,25 +2727,6 @@
         return isoDateStr;
       }
 
-      function computeStatusFinal(statusMgr, statusDir) {
-        const sm = String(statusMgr || '').trim().toLowerCase();
-        const sd = String(statusDir || '').trim().toLowerCase();
-
-        if (sm.includes('tidak') || sd.includes('tidak') || sm.includes('tolak') || sd.includes('tolak')) {
-          return 'Ditolak';
-        }
-        if (sm.includes('setuju') && sd.includes('setuju')) {
-          return 'Disetujui';
-        }
-        if (sm.includes('setuju') && !sd) {
-          return 'Menunggu Review';
-        }
-        if (!sm && !sd) {
-          return 'Menunggu Review';
-        }
-        return 'Menunggu Review';
-      }
-
       function updateFormStatusFinal() {
         if (!pndStatusFinal) return;
         const sm = pndStatusManager ? pndStatusManager.value : '';
@@ -2647,21 +2743,26 @@
         let totalNominal = 0;
 
         listToCount.forEach(function (item) {
-          const st = String(item.statusFinal || item.statusManager || '').toLowerCase();
-          if (st.includes('setuju') && !st.includes('tidak')) {
-            disetujuiCount++;
-          } else if (st.includes('tolak') || st.includes('tidak')) {
+          const st = String(item.statusFinal || '').toLowerCase();
+          if (st === 'ditolak' || st.includes('tolak') || st.includes('batal') || st.includes('tidak')) {
             rejectedCount++;
+          } else if (st === 'disetujui' || st.includes('setuju')) {
+            disetujuiCount++;
           } else {
             pendingCount++;
           }
           totalNominal += Number(item.nominal || 0);
         });
 
-        document.getElementById('cardDisetujui').textContent = disetujuiCount;
-        document.getElementById('cardMenungguReview').textContent = pendingCount;
-        document.getElementById('cardDitolak').textContent = rejectedCount;
-        document.getElementById('cardTotalNominal').textContent = totalNominal > 0 ? formatRupiah(totalNominal) : 'Rp. -';
+        const cardDisetujui = document.getElementById('cardDisetujui');
+        const cardMenunggu = document.getElementById('cardMenungguReview');
+        const cardDitolak = document.getElementById('cardDitolak');
+        const cardTotal = document.getElementById('cardTotalNominal');
+
+        if (cardDisetujui) cardDisetujui.textContent = disetujuiCount;
+        if (cardMenunggu) cardMenunggu.textContent = pendingCount;
+        if (cardDitolak) cardDitolak.textContent = rejectedCount;
+        if (cardTotal) cardTotal.textContent = totalNominal > 0 ? formatRupiah(totalNominal) : 'Rp. -';
       }
 
       function updateFilterButtonState() {
@@ -2686,14 +2787,21 @@
       }
 
       function getBadgeHtml(status) {
-        const st = String(status || '-').trim();
+        let st = String(status || '-').trim();
         const lower = st.toLowerCase();
-        let badgeClass = 'badge-approved';
-        if (lower.includes('review') || lower.includes('tunggu')) {
-          badgeClass = 'badge-pending';
-        } else if (lower.includes('tolak') || lower.includes('tidak')) {
+        let badgeClass = 'badge-pending';
+
+        if (lower === 'ditolak' || lower.includes('tolak') || lower.includes('batal') || lower.includes('tidak')) {
           badgeClass = 'badge-rejected';
+          st = 'Ditolak';
+        } else if (lower === 'disetujui' || lower === 'setuju') {
+          badgeClass = 'badge-approved';
+          st = 'Disetujui';
+        } else {
+          badgeClass = 'badge-pending';
+          if (st === '-' || !st) st = 'Menunggu';
         }
+
         return '<span class="approval-badge ' + badgeClass + '">' + escapeHtml(st) + '</span>';
       }
 
@@ -2770,6 +2878,8 @@
         }
 
         filtered.forEach(function (item, index) {
+          const itemId = item.id || item.idApproval || ('apr-' + (index + 1));
+          item.id = itemId;
           const row = document.createElement('tr');
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '.</td>',
@@ -2784,7 +2894,7 @@
             '<td style="text-align: center;">' + getBadgeHtml(item.statusFinal) + '</td>',
             '<td class="pnd-cell-italic">' + escapeHtml(item.catatan || '-') + '</td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
-              '<button type="button" class="pnd-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+              '<button type="button" class="pnd-action-btn" data-action-toggle="' + escapeHtml(itemId) + '" aria-label="Menu Aksi" title="Opsi">' +
                 '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
               '</button>' +
             '</td>'
@@ -2811,9 +2921,12 @@
         closeFilterSearchBoxes();
       }
 
+      let lastActionMenuOpenedAt = 0;
+
       function closeActionMenus() {
         if (actionMenu) {
           actionMenu.classList.remove('is-open');
+          actionMenu.classList.remove('is-active');
         }
         currentActionId = null;
       }
@@ -2822,17 +2935,19 @@
         if (!actionMenu || !button) return;
         const id = button.getAttribute('data-action-toggle');
 
-        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+        if ((actionMenu.classList.contains('is-open') || actionMenu.classList.contains('is-active')) && currentActionId === id) {
           closeActionMenus();
           return;
         }
 
         currentActionId = id;
         actionMenu.classList.add('is-open');
+        actionMenu.classList.add('is-active');
+        lastActionMenuOpenedAt = Date.now();
 
         const rect = button.getBoundingClientRect();
-        const menuWidth = 145;
-        const menuHeight = 120;
+        const menuWidth = actionMenu.offsetWidth || 145;
+        const menuHeight = actionMenu.offsetHeight || 120;
 
         let left = rect.left - menuWidth + 24;
         let top = rect.bottom + 6;
@@ -2891,6 +3006,7 @@
         if (!isoOrDisplay) {
           inputEl.value = '';
           delete inputEl.dataset.iso;
+          inputEl.dispatchEvent(new Event('change'));
           return;
         }
         let iso = '';
@@ -2904,6 +3020,7 @@
         }
         inputEl.value = display;
         inputEl.dataset.iso = iso;
+        inputEl.dispatchEvent(new Event('change'));
       }
 
       function getBisaDateValue(inputEl) {
@@ -3080,65 +3197,114 @@
         });
       }
 
+      /* Helper set custom dropdown value & radio */
+      function setDropdownVal(hiddenInput, labelEl, radioName, val) {
+        if (!hiddenInput || !labelEl) return;
+        hiddenInput.value = val || '';
+        if (val) {
+          labelEl.textContent = val;
+          labelEl.classList.remove('is-placeholder');
+          const r = form ? form.querySelector('input[name="' + radioName + '"][value="' + val + '"]') : null;
+          if (r) r.checked = true;
+        } else {
+          labelEl.textContent = 'Pilih Status';
+          labelEl.classList.add('is-placeholder');
+          if (form) {
+            form.querySelectorAll('input[name="' + radioName + '"]').forEach(function (r) { r.checked = false; });
+          }
+        }
+      }
+
+      /* Generator ID Approval AI Auto-Increment */
+      function generateNextIdApproval(prefDate) {
+        let yymm = '2609';
+        const tglInput = document.getElementById('pndTanggalRequest');
+        const dateVal = prefDate || (tglInput ? getBisaDateValue(tglInput) : '');
+        if (dateVal && /^\d{4}-\d{2}/.test(dateVal)) {
+          yymm = dateVal.slice(2, 4) + dateVal.slice(5, 7);
+        } else {
+          let foundYymm = '';
+          (appData || []).forEach(function (it) {
+            if (!it || !it.idApproval) return;
+            const m = String(it.idApproval).match(/APR-(\d{4})-\d+/i);
+            if (m && !foundYymm) foundYymm = m[1];
+          });
+          if (foundYymm) yymm = foundYymm;
+        }
+
+        let maxNum = 0;
+        const prefix = 'APR-' + yymm + '-';
+
+        (appData || []).forEach(function (it) {
+          if (!it || !it.idApproval) return;
+          const str = String(it.idApproval).trim();
+          if (str.toUpperCase().startsWith(prefix.toUpperCase())) {
+            const numPart = parseInt(str.slice(prefix.length), 10);
+            if (!isNaN(numPart) && numPart > maxNum) {
+              maxNum = numPart;
+            }
+          }
+        });
+
+        const nextNum = maxNum + 1;
+        return prefix + String(nextNum).padStart(3, '0');
+      }
+
+      /* Listener Perubahan Tanggal Request untuk Auto-update ID Approval */
+      if (pndTanggalRequest) {
+        pndTanggalRequest.addEventListener('change', function () {
+          if (!pndEditId.value) {
+            const dateVal = getBisaDateValue(this);
+            pndIdApproval.value = generateNextIdApproval(dateVal);
+          }
+        });
+      }
+
       /* Open Form (Tambah / Edit) */
       function openForm(item) {
         closeActionMenus();
         closePopovers();
         form.reset();
 
+        const todayIso = new Date().toISOString().split('T')[0];
+
         if (item) {
           formModeText.textContent = 'Edit';
           pndEditId.value = item.id;
-          pndIdApproval.value = item.idApproval || '';
-          setBisaDateValue(pndTanggalRequest, item.tanggalRequest || '2026-01-04');
+          pndIdApproval.value = item.idApproval || generateNextIdApproval();
+          setBisaDateValue(pndTanggalRequest, item.tanggalRequest || todayIso);
           pndPemohon.value = item.pemohon || '';
           pndDivisi.value = item.divisi || '';
           pndKeperluan.value = item.keperluan || '';
           pndNominal.value = formatRupiah(item.nominal || 0);
 
           // Status Manager
-          const sm = item.statusManager || 'Disetujui';
-          pndStatusManager.value = sm;
-          labelStatusManager.textContent = sm;
-          labelStatusManager.classList.remove('is-placeholder');
-          const rMgr = form.querySelector('input[name="optStatusManager"][value="' + sm + '"]');
-          if (rMgr) rMgr.checked = true;
+          const sm = normalizeStatusName(item.statusManager || 'Menunggu');
+          setDropdownVal(pndStatusManager, labelStatusManager, 'optStatusManager', sm);
 
           // Status Direktur
-          const sd = item.statusDirektur || 'Disetujui';
-          pndStatusDirektur.value = sd;
-          labelStatusDirektur.textContent = sd;
-          labelStatusDirektur.classList.remove('is-placeholder');
-          const rDir = form.querySelector('input[name="optStatusDirektur"][value="' + sd + '"]');
-          if (rDir) rDir.checked = true;
+          const sd = normalizeStatusName(item.statusDirektur || 'Menunggu');
+          setDropdownVal(pndStatusDirektur, labelStatusDirektur, 'optStatusDirektur', sd);
 
           // Status Final
-          pndStatusFinal.value = item.statusFinal || computeStatusFinal(sm, sd);
+          pndStatusFinal.value = computeStatusFinal(sm, sd);
 
           pndCatatan.value = item.catatan || '';
         } else {
           formModeText.textContent = 'Tambah';
           pndEditId.value = '';
-          const nextIndex = appData.length + 1;
-          pndIdApproval.value = 'APR-2609-' + String(nextIndex).padStart(3, '0');
-          setBisaDateValue(pndTanggalRequest, '2026-01-04');
+          setBisaDateValue(pndTanggalRequest, todayIso);
+          pndIdApproval.value = generateNextIdApproval(todayIso);
           pndPemohon.value = '';
           pndDivisi.value = '';
           pndKeperluan.value = '';
           pndNominal.value = '';
 
           // Reset dropdowns to placeholder (Sesuai Gambar 1)
-          pndStatusManager.value = '';
-          labelStatusManager.textContent = 'Pilih Status';
-          labelStatusManager.classList.add('is-placeholder');
-          form.querySelectorAll('input[name="optStatusManager"]').forEach(function (r) { r.checked = false; });
+          setDropdownVal(pndStatusManager, labelStatusManager, 'optStatusManager', '');
+          setDropdownVal(pndStatusDirektur, labelStatusDirektur, 'optStatusDirektur', '');
 
-          pndStatusDirektur.value = '';
-          labelStatusDirektur.textContent = 'Pilih Status';
-          labelStatusDirektur.classList.add('is-placeholder');
-          form.querySelectorAll('input[name="optStatusDirektur"]').forEach(function (r) { r.checked = false; });
-
-          pndStatusFinal.value = '';
+          updateFormStatusFinal();
           pndCatatan.value = '';
         }
 
@@ -3150,15 +3316,19 @@
         closeActionMenus();
         closePopovers();
 
+        const sm = normalizeStatusName(item.statusManager || 'Menunggu');
+        const sd = normalizeStatusName(item.statusDirektur || 'Menunggu');
+        const sf = computeStatusFinal(sm, sd);
+
         document.getElementById('viewPndIdApproval').value = item.idApproval || '-';
         document.getElementById('viewPndTanggalRequest').value = formatTanggalDisplay(item.tanggalRequest);
         document.getElementById('viewPndPemohon').value = item.pemohon || '-';
         document.getElementById('viewPndDivisi').value = item.divisi || '-';
         document.getElementById('viewPndKeperluan').value = item.keperluan || '-';
         document.getElementById('viewPndNominal').value = formatRupiah(item.nominal || 0);
-        document.getElementById('viewPndStatusManager').value = item.statusManager || '-';
-        document.getElementById('viewPndStatusDirektur').value = item.statusDirektur || '-';
-        document.getElementById('viewPndStatusFinal').value = item.statusFinal || '-';
+        document.getElementById('viewPndStatusManager').value = sm;
+        document.getElementById('viewPndStatusDirektur').value = sd;
+        document.getElementById('viewPndStatusFinal').value = sf;
         document.getElementById('viewPndCatatan').value = item.catatan || '-';
 
         openModal(detailModal);
@@ -3169,14 +3339,14 @@
         form.addEventListener('submit', function (e) {
           e.preventDefault();
 
-          const sm = pndStatusManager.value || 'Disetujui';
-          const sd = pndStatusDirektur.value || 'Disetujui';
-          const sf = pndStatusFinal.value || computeStatusFinal(sm, sd);
+          const sm = normalizeStatusName(pndStatusManager.value || 'Menunggu');
+          const sd = normalizeStatusName(pndStatusDirektur.value || 'Menunggu');
+          const sf = computeStatusFinal(sm, sd);
 
           const editId = pndEditId.value;
           const payload = {
             idApproval: pndIdApproval.value.trim(),
-            tanggalRequest: getBisaDateValue(pndTanggalRequest) || '2026-01-04',
+            tanggalRequest: getBisaDateValue(pndTanggalRequest) || new Date().toISOString().split('T')[0],
             pemohon: pndPemohon.value.trim(),
             divisi: pndDivisi.value.trim(),
             keperluan: pndKeperluan.value.trim(),
@@ -3647,6 +3817,7 @@
             event.preventDefault();
             event.stopPropagation();
             openActionMenu(toggle);
+            return;
           }
         });
       }
@@ -3654,14 +3825,20 @@
       if (actionMenu) {
         actionMenu.addEventListener('click', function (event) {
           const actionButton = event.target.closest('[data-action]');
-          if (!actionButton || !currentActionId) return;
+          if (!actionButton) return;
 
+          event.preventDefault();
+          event.stopPropagation();
+
+          const targetId = currentActionId;
           const action = actionButton.getAttribute('data-action');
-          const targetItem = appData.find(function (item) {
-            return String(item.id) === String(currentActionId);
-          });
-
           closeActionMenus();
+
+          if (!targetId) return;
+
+          const targetItem = appData.find(function (item) {
+            return String(item.id) === String(targetId) || String(item.idApproval) === String(targetId);
+          });
 
           if (!targetItem) return;
 
@@ -3726,14 +3903,22 @@
       });
 
       document.addEventListener('click', function (e) {
+        const toggle = e.target.closest('[data-action-toggle]');
+        if (toggle) {
+          e.preventDefault();
+          e.stopPropagation();
+          openActionMenu(toggle);
+          return;
+        }
+
+        if (!e.target.closest('#pndActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
         if (!e.target.closest('.filter-dropdown-wrapper')) {
           closePopovers();
         }
         if (!e.target.closest('#boxFilterStatusApproval') && !e.target.closest('#boxFilterDivisi')) {
           closeFilterSearchBoxes();
-        }
-        if (!e.target.closest('#pndActionMenu') && !e.target.closest('[data-action-toggle]')) {
-          closeActionMenus();
         }
         if (!e.target.closest('.pnd-select-wrap')) {
           closeAllModalDropdowns();
@@ -3743,7 +3928,19 @@
         }
       });
 
-      window.addEventListener('scroll', closeActionMenus, true);
+      window.addEventListener('scroll', function () {
+        if (Date.now() - lastActionMenuOpenedAt < 250) return;
+        closeActionMenus();
+      });
+
+      const tableWrapEl = document.getElementById('pndTableWrap');
+      if (tableWrapEl) {
+        tableWrapEl.addEventListener('scroll', function () {
+          if (Date.now() - lastActionMenuOpenedAt < 250) return;
+          closeActionMenus();
+        }, { passive: true });
+      }
+
       window.addEventListener('resize', function () {
         closeActionMenus();
         closeBisaDatePicker();
@@ -3758,6 +3955,11 @@
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#039;');
       }
+
+      window.addEventListener('focus', function () {
+        appData = loadData();
+        renderTable();
+      });
 
       // Initial Render
       renderTable();
