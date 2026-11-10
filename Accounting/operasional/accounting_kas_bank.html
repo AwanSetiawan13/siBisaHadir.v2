@@ -1546,6 +1546,113 @@
       font-weight: 600;
     }
 
+    /* Dropdown Referensi Dokumen dengan Search Box */
+    .kb-select-dropdown--referensi {
+      max-height: 290px !important;
+      padding: 8px 10px !important;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      box-sizing: border-box;
+      z-index: 65;
+      min-width: 320px;
+    }
+
+    .kb-select-wrap.is-open .kb-select-dropdown--referensi {
+      display: flex !important;
+    }
+
+    .kb-select-search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding-bottom: 6px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #f1f5f9;
+      box-sizing: border-box;
+    }
+
+    .kb-select-search-input {
+      width: 100%;
+      height: 34px;
+      padding: 0 10px 0 32px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 12.5px;
+      color: #1e293b;
+      outline: none;
+      background: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .kb-select-search-input:focus {
+      background: #ffffff;
+      border-color: #0284c7;
+      box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.12);
+    }
+
+    .kb-select-search-icon {
+      position: absolute;
+      left: 10px;
+      top: 9px;
+      width: 14px;
+      height: 14px;
+      stroke: #64748b;
+      fill: none;
+      stroke-width: 2.2;
+      pointer-events: none;
+    }
+
+    .kb-select-options-list {
+      max-height: 210px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding-right: 2px;
+    }
+
+    .kb-select-options-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .kb-select-options-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .ref-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .ref-badge-income {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+
+    .ref-badge-expense {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .ref-badge-empty {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+    }
+
     /* File Upload Box (Row 6 Col 3) */
     .kb-file-box {
       width: 100%;
@@ -2781,10 +2888,27 @@
             <input type="text" id="kbSaldoAkun" class="kb-form-input kb-input-readonly" placeholder="Rp. -" readonly tabindex="-1" style="font-weight: 600; color: #0f172a;" />
           </div>
 
-          <!-- Row 4 (3 cols): Referensi Dokumen, Rekonsiliasi, Project/Brand -->
+          <!-- Row 4 (3 cols): Referensi Dokumen (Dropdown & Pencarian), Rekonsiliasi, Project/Brand -->
           <div class="kb-form-field">
-            <label class="kb-form-label" for="kbReferensi">Referensi Dokumen</label>
-            <input type="text" id="kbReferensi" class="kb-form-input" placeholder="Tambah Reverensi" />
+            <label class="kb-form-label">Referensi Dokumen</label>
+            <div class="kb-select-wrap" id="wrapReferensi">
+              <input type="hidden" id="kbReferensi" name="referensi" />
+              <div class="kb-select-btn" id="btnTriggerReferensi">
+                <span id="labelReferensi">Pilih Referensi Dokumen</span>
+                <span class="kb-select-arrow">
+                  <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+              </div>
+              <div class="kb-select-dropdown kb-select-dropdown--referensi" id="dropdownReferensi">
+                <div class="kb-select-search-box">
+                  <svg viewBox="0 0 24 24" class="kb-select-search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <input type="text" id="searchReferensiDokumen" class="kb-select-search-input" placeholder="Cari No. Invoice / ID Dokumen..." autocomplete="off" />
+                </div>
+                <div class="kb-select-options-list" id="listReferensiDokumen">
+                  <!-- Rendered dynamically via JavaScript -->
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="kb-form-field">
@@ -3139,6 +3263,13 @@
       const btnTriggerBankLama = document.getElementById('btnTriggerBankLama');
       const labelBankLama = document.getElementById('labelBankLama');
       const kbBankLama = document.getElementById('kbBankLama');
+
+      const wrapReferensi = document.getElementById('wrapReferensi');
+      const btnTriggerReferensi = document.getElementById('btnTriggerReferensi');
+      const labelReferensi = document.getElementById('labelReferensi');
+      const kbReferensi = document.getElementById('kbReferensi');
+      const searchReferensiDokumen = document.getElementById('searchReferensiDokumen');
+      const listReferensiDokumen = document.getElementById('listReferensiDokumen');
 
       const kbUangMasuk = document.getElementById('kbUangMasuk');
       const kbUangKeluar = document.getElementById('kbUangKeluar');
@@ -3820,6 +3951,7 @@
         if (wrapJenis) wrapJenis.classList.remove('is-open');
         if (wrapKodeCoa) wrapKodeCoa.classList.remove('is-open');
         if (wrapBankLama) wrapBankLama.classList.remove('is-open');
+        if (wrapReferensi) wrapReferensi.classList.remove('is-open');
         closeBisaDatePicker();
       }
 
@@ -3891,6 +4023,185 @@
             closeFormDropdowns();
           });
         });
+      }
+
+      /* ===== DYNAMIC DOKUMEN REFERENSI (Pendapatan Invoice & Pengeluaran Beban) ===== */
+      function getAllDokumenReferensiList() {
+        const result = [];
+        const seen = new Set();
+
+        // 1. Ambil No. Invoice dari Pendapatan
+        try {
+          const rawPnd = localStorage.getItem('accounting_pendapatan_data_v1');
+          let pndList = rawPnd ? JSON.parse(rawPnd) : [];
+          if (!Array.isArray(pndList) || pndList.length === 0) {
+            pndList = [
+              { noInvoice: 'INV-202609-001', customer: 'PT Alpha Digital', keterangan: 'Management Fee MCN Kreator', totalTagihan: 748155 },
+              { noInvoice: 'INV-202609-002', customer: 'Brand Hijab Cantik', keterangan: 'Penerimaan Pembayaran Campaign Brand', totalTagihan: 15500000 },
+              { noInvoice: 'INV-202609-003', customer: 'PT Kosmetik Indah', keterangan: 'Pembayaran DP 50% Product Launching Serum Glow', totalTagihan: 14000000 }
+            ];
+          }
+          pndList.forEach(function (p) {
+            const code = (p.noInvoice || '').trim();
+            if (code && !seen.has(code.toLowerCase())) {
+              seen.add(code.toLowerCase());
+              const cust = (p.customer || p.namaPelanggan || '').trim();
+              const ket = (p.keterangan || '').trim();
+              const desc = [cust, ket].filter(Boolean).join(' - ') || 'Pendapatan Invoice';
+              const nom = Number(p.totalTagihan !== undefined ? p.totalTagihan : (Number(p.dpp || 0) + Number(p.ppn || 0)));
+              result.push({
+                kode: code,
+                tipe: 'income',
+                labelTipe: 'Invoice',
+                keterangan: desc,
+                nominal: nom,
+                customerOrVendor: cust
+              });
+            }
+          });
+        } catch (e) {
+          console.warn('Error loading pendapatan list for referensi:', e);
+        }
+
+        // 2. Ambil ID Dokumen dari Pengeluaran & Beban
+        try {
+          const rawExp = localStorage.getItem('accounting_pengeluaran_beban_data_v5');
+          let expList = rawExp ? JSON.parse(rawExp) : [];
+          if (!Array.isArray(expList) || expList.length === 0) {
+            expList = [
+              { idDokumen: 'PB-2609-001', vendorKaryawan: 'BCA', keterangan: 'Admin Bank BCA', tagihanBruto: 30000 },
+              { idDokumen: 'PB-2609-002', vendorKaryawan: 'Meta Ads', keterangan: 'Iklan Digital Campaign Meta Ads', tagihanBruto: 1665000 },
+              { idDokumen: 'PB-2609-003', vendorKaryawan: 'PT Gedung Megah', keterangan: 'Sewa Ruang Kantor Lt. 3', tagihanBruto: 4995000 },
+              { idDokumen: 'PB-2609-004', vendorKaryawan: 'CV Berkah Office', keterangan: 'Pengadaan Perlengkapan Kantor', tagihanBruto: 450000 },
+              { idDokumen: 'PB-2609-005', vendorKaryawan: 'Google Cloud', keterangan: 'Server & Cloud Hosting Database', tagihanBruto: 943500 }
+            ];
+          }
+          expList.forEach(function (x) {
+            const code = (x.idDokumen || x.noDokumen || '').trim();
+            if (code && !seen.has(code.toLowerCase())) {
+              seen.add(code.toLowerCase());
+              const vendor = (x.vendorKaryawan || x.vendor || '').trim();
+              const ket = (x.keterangan || '').trim();
+              const desc = [vendor, ket].filter(Boolean).join(' - ') || 'Pengeluaran Dokumen';
+              const nom = Number(x.tagihanBruto !== undefined ? x.tagihanBruto : (Number(x.dpp || 0) + Number(x.ppn || 0)));
+              result.push({
+                kode: code,
+                tipe: 'expense',
+                labelTipe: 'Pengeluaran',
+                keterangan: desc,
+                nominal: nom,
+                customerOrVendor: vendor
+              });
+            }
+          });
+        } catch (e) {
+          console.warn('Error loading pengeluaran list for referensi:', e);
+        }
+
+        // 3. Sertakan referensi yang saat ini digunakan di Kas & Bank jika belum ada dalam list
+        if (Array.isArray(kbData)) {
+          kbData.forEach(function (item) {
+            const ref = (item.referensi || '').trim();
+            if (ref && ref !== '-' && ref !== 'Tambah Reverensi' && !seen.has(ref.toLowerCase())) {
+              seen.add(ref.toLowerCase());
+              const isInc = ref.toUpperCase().startsWith('INV');
+              result.push({
+                kode: ref,
+                tipe: isInc ? 'income' : 'expense',
+                labelTipe: isInc ? 'Invoice' : 'Dokumen',
+                keterangan: item.keterangan || (isInc ? 'Pendapatan' : 'Pengeluaran'),
+                nominal: Number(item.uangMasuk || item.uangKeluar || 0),
+                customerOrVendor: item.projectBrand || ''
+              });
+            }
+          });
+        }
+
+        return result;
+      }
+
+      function renderReferensiDropdownItems(searchKeyword) {
+        if (!listReferensiDokumen) return;
+        const allList = getAllDokumenReferensiList();
+        const keyword = String(searchKeyword || '').trim().toLowerCase();
+
+        const filtered = keyword
+          ? allList.filter(function (it) {
+              return it.kode.toLowerCase().includes(keyword) ||
+                     (it.keterangan && it.keterangan.toLowerCase().includes(keyword)) ||
+                     (it.customerOrVendor && it.customerOrVendor.toLowerCase().includes(keyword)) ||
+                     (it.labelTipe && it.labelTipe.toLowerCase().includes(keyword));
+            })
+          : allList;
+
+        const currentVal = kbReferensi ? kbReferensi.value.trim() : '';
+
+        let html = '';
+
+        // Opsi default: Tanpa Referensi
+        if (!keyword || '- tanpa referensi -'.includes(keyword) || 'none'.includes(keyword)) {
+          const isNoneChecked = !currentVal ? ' checked' : '';
+          html += '<label class="kb-select-item' + (!currentVal ? ' is-selected' : '') + '" style="padding: 5px 4px; border-radius: 6px;">' +
+            '<input type="radio" name="optReferensi" value="" data-label="Pilih Referensi Dokumen"' + isNoneChecked + ' />' +
+            '<span class="ref-badge ref-badge-empty">None</span>' +
+            '<span style="color: #64748b; font-style: italic;">- Tanpa Referensi -</span>' +
+          '</label>';
+        }
+
+        if (filtered.length === 0 && keyword) {
+          html += '<div style="padding: 12px 8px; font-size: 12.5px; color: #94a3b8; text-align: center; font-style: italic;">Tidak ada kode yang cocok dengan "' + escapeHtml(keyword) + '".</div>';
+        } else {
+          filtered.forEach(function (it) {
+            const isChecked = (it.kode === currentVal) ? ' checked' : '';
+            const isSelected = (it.kode === currentVal) ? ' is-selected' : '';
+            const badgeClass = it.tipe === 'income' ? 'ref-badge-income' : 'ref-badge-expense';
+            const badgeText = it.tipe === 'income' ? 'INV' : 'EXP';
+            html += '<label class="kb-select-item' + isSelected + '" style="display: flex; align-items: center; padding: 6px 4px; border-radius: 6px; cursor: pointer;">' +
+              '<div style="display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">' +
+                '<input type="radio" name="optReferensi" value="' + escapeHtml(it.kode) + '" data-label="' + escapeHtml(it.kode) + '" data-desc="' + escapeHtml(it.keterangan) + '"' + isChecked + ' />' +
+                '<span class="ref-badge ' + badgeClass + '">' + badgeText + '</span>' +
+                '<span style="font-weight: 600; color: #0f172a; font-size: 12.5px;">' + escapeHtml(it.kode) + '</span>' +
+                '<span style="color: #64748b; font-size: 12px; margin-left: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + escapeHtml(it.keterangan ? it.keterangan : '') + '</span>' +
+              '</div>' +
+            '</label>';
+          });
+        }
+
+        listReferensiDokumen.innerHTML = html;
+
+        listReferensiDokumen.querySelectorAll('input[name="optReferensi"]').forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            if (this.checked) {
+              const code = this.value;
+              setReferensiValue(code, code ? code : 'Pilih Referensi Dokumen');
+              closeFormDropdowns();
+            }
+          });
+        });
+      }
+
+      function setReferensiValue(val, label) {
+        const actualVal = (val || '').trim();
+        if (kbReferensi) kbReferensi.value = actualVal;
+        if (labelReferensi) {
+          labelReferensi.textContent = actualVal ? actualVal : 'Pilih Referensi Dokumen';
+        }
+        if (btnTriggerReferensi) {
+          if (actualVal) {
+            btnTriggerReferensi.classList.add('has-value');
+          } else {
+            btnTriggerReferensi.classList.remove('has-value');
+          }
+        }
+        if (listReferensiDokumen) {
+          listReferensiDokumen.querySelectorAll('input[name="optReferensi"]').forEach(function (radio) {
+            radio.checked = (radio.value === actualVal);
+            const parentLabel = radio.closest('.kb-select-item');
+            if (parentLabel) {
+              parentLabel.classList.toggle('is-selected', radio.value === actualVal);
+            }
+          });
+        }
       }
 
       function getArusKasByJenis(jenis) {
@@ -4148,6 +4459,32 @@
           closeFormDropdowns();
         });
       });
+
+      /* Dropdown Trigger & Selection: Referensi Dokumen (Pendapatan & Pengeluaran) */
+      if (btnTriggerReferensi && wrapReferensi) {
+        btnTriggerReferensi.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const willOpen = !wrapReferensi.classList.contains('is-open');
+          closeFormDropdowns();
+          if (willOpen) {
+            wrapReferensi.classList.add('is-open');
+            if (searchReferensiDokumen) searchReferensiDokumen.value = '';
+            renderReferensiDropdownItems('');
+            if (searchReferensiDokumen) {
+              setTimeout(function () { searchReferensiDokumen.focus(); }, 60);
+            }
+          }
+        });
+      }
+
+      if (searchReferensiDokumen) {
+        searchReferensiDokumen.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+        searchReferensiDokumen.addEventListener('input', function () {
+          renderReferensiDropdownItems(this.value);
+        });
+      }
 
       /* Relasi No. 8: Saldo Akun ~ Saldo Lalu + Uang Masuk - Uang Keluar {Sesuai Kode COA yang Dipilih} */
       function getSaldoLaluCoa(kodeCoa, excludeId) {
@@ -4481,7 +4818,9 @@
           document.getElementById('kbUangMasuk').value = item.uangMasuk || '';
           document.getElementById('kbUangKeluar').value = item.uangKeluar || '';
           autoCalcSaldo();
-          document.getElementById('kbReferensi').value = item.referensi || '';
+          setReferensiValue(item.referensi || '', item.referensi || 'Pilih Referensi Dokumen');
+          if (searchReferensiDokumen) searchReferensiDokumen.value = '';
+          renderReferensiDropdownItems('');
           document.getElementById('kbRekonsiliasi').value = item.rekonsiliasi || '';
           document.getElementById('kbProjectBrand').value = item.projectBrand || '';
           document.getElementById('kbDivisi').value = item.divisi || '';
@@ -4519,7 +4858,9 @@
           document.getElementById('kbUangMasuk').value = '';
           document.getElementById('kbUangKeluar').value = '';
           autoCalcSaldo();
-          document.getElementById('kbReferensi').value = '';
+          setReferensiValue('', 'Pilih Referensi Dokumen');
+          if (searchReferensiDokumen) searchReferensiDokumen.value = '';
+          renderReferensiDropdownItems('');
           document.getElementById('kbRekonsiliasi').value = '';
           document.getElementById('kbProjectBrand').value = '';
           document.getElementById('kbDivisi').value = 'Operasional';
@@ -5184,7 +5525,7 @@
         if (!event.target.closest('.filter-dropdown-wrapper')) {
           closePopovers();
         }
-        if (!event.target.closest('#wrapJenis') && !event.target.closest('#wrapKodeCoa') && !event.target.closest('#wrapBankLama') && !event.target.closest('#bisaDatePickerPopover') && !event.target.closest('.bisa-datepicker-wrap')) {
+        if (!event.target.closest('#wrapJenis') && !event.target.closest('#wrapKodeCoa') && !event.target.closest('#wrapBankLama') && !event.target.closest('#wrapReferensi') && !event.target.closest('#bisaDatePickerPopover') && !event.target.closest('.bisa-datepicker-wrap')) {
           closeFormDropdowns();
         }
       });
@@ -5209,7 +5550,7 @@
         });
       });
 
-      /* Sinkronisasi Realtime saat Master COA atau Bank Lama diubah di tab lain */
+      /* Sinkronisasi Realtime saat Master COA, Bank Lama, Pendapatan, atau Pengeluaran diubah di tab lain */
       window.addEventListener('storage', function (e) {
         if (e.key === 'accounting_master_coa_v1' || e.key === 'accounting_bank_lama_v1') {
           kbData = loadData();
@@ -5217,8 +5558,12 @@
           renderBankLamaDropdownItems();
           renderTable();
         }
+        if (e.key === 'accounting_pendapatan_data_v1' || e.key === 'accounting_pengeluaran_beban_data_v5') {
+          renderReferensiDropdownItems(searchReferensiDokumen ? searchReferensiDokumen.value : '');
+        }
       });
 
+      renderReferensiDropdownItems('');
       renderTable();
     })();
   </script>
