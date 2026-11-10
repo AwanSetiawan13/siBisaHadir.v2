@@ -22,19 +22,131 @@
     #coaTable th:nth-child(1),
     #coaTable td:nth-child(1) {
       width: 48px;
+      min-width: 48px;
+      max-width: 48px;
       text-align: center;
+      box-sizing: border-box;
     }
 
     #coaTable th:nth-child(2),
     #coaTable td:nth-child(2) {
-      min-width: 110px;
+      width: 135px;
+      min-width: 135px;
+      max-width: 135px;
       white-space: nowrap;
+      box-sizing: border-box;
     }
 
     #coaTable th:nth-child(3),
     #coaTable td:nth-child(3) {
-      min-width: 200px;
+      width: 250px;
+      min-width: 250px;
       white-space: nowrap;
+      box-sizing: border-box;
+    }
+
+    /* ===== STYLING CEKLIS FIXED / PIN KOLOM (PERSIS SEPERTI MODUL KOL) ===== */
+    .th-pin-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .pin-check-btn {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+
+    .pin-check-btn input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .pin-check-indicator {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-indicator svg {
+      width: 11px;
+      height: 11px;
+      stroke: #ffffff;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pin-check-btn:hover .pin-check-indicator {
+      border-color: #1e5a96;
+      background: #eff6ff;
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked + .pin-check-indicator {
+      background: #1e5a96;
+      border-color: #1e5a96;
+      box-shadow: 0 1px 4px rgba(30, 90, 150, 0.35);
+    }
+
+    .pin-check-btn input[type="checkbox"]:checked + .pin-check-indicator svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Fixed/Pinned Left Columns (Persis Seperti Modul KOL) */
+    #coaTable th:first-child,
+    #coaTable td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 11;
+      background: #f8fafc;
+      text-align: center;
+      min-width: 44px;
+      max-width: 48px;
+    }
+
+    #coaTable td:first-child {
+      background: #ffffff;
+    }
+
+    #coaTable tr:hover td:first-child {
+      background: #f8fafc;
+    }
+
+    #coaTable th.col-pinned-sticky {
+      position: sticky;
+      z-index: 10;
+      background: #f8fafc !important;
+    }
+
+    #coaTable td.col-pinned-sticky {
+      position: sticky;
+      z-index: 9;
+      background: #ffffff !important;
+    }
+
+    #coaTable tr:hover td.col-pinned-sticky {
+      background: #f8fafc !important;
+    }
+
+    #coaTable th.col-pinned-last,
+    #coaTable td.col-pinned-last {
+      box-shadow: 5px 0 12px rgba(0, 0, 0, 0.06) !important;
+      border-right: 1.5px solid #cbd5e1 !important;
     }
 
     #coaTable th:nth-child(4),
@@ -919,13 +1031,37 @@
             <thead>
               <tr>
                 <th>#</th>
-                <th>Kode COA</th>
-                <th>Master Akun</th>
+                <th class="th-pinnable" data-col="kode_coa" id="thHeaderKodeCoa">
+                  <div class="th-pin-wrapper">
+                    <span>Kode COA</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Kode COA agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="kode_coa" id="chkFixedKodeCoa" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
+                <th class="th-pinnable" data-col="nama_akun" id="thHeaderNamaAkun">
+                  <div class="th-pin-wrapper">
+                    <span>Nama Akun</span>
+                    <label class="pin-check-btn" title="Kunci / Pin kolom Nama Akun agar tetap terlihat saat scroll">
+                      <input type="checkbox" class="chk-pin-col" data-col="nama_akun" id="chkFixedNamaAkun" />
+                      <span class="pin-check-indicator">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </label>
+                  </div>
+                </th>
                 <th>Kelompok</th>
-                <th>Sub Kelompok</th>
-                <th>Saldo Nominal</th>
+                <th>Subkelompok</th>
+                <th>Saldo Normal</th>
                 <th>Aktif?</th>
-                <th>Devisi Defaut</th>
+                <th>Divisi Default</th>
                 <th>Nama Bank</th>
                 <th>Nomor Rekening</th>
                 <th>Atas Nama</th>
@@ -964,8 +1100,8 @@
           </div>
 
           <div class="coa-form-field">
-            <label class="coa-form-label" for="coaNama">Master Akun</label>
-            <input type="text" id="coaNama" class="coa-form-input" placeholder="Tambah Master Akun" required />
+            <label class="coa-form-label" for="coaNama">Nama Akun</label>
+            <input type="text" id="coaNama" class="coa-form-input" placeholder="Tambah Nama Akun" required />
           </div>
 
           <div class="coa-form-field">
@@ -973,6 +1109,7 @@
             <input type="text" id="coaKelompok" class="coa-form-input" placeholder="Tambah Kelompok" list="coaKelompokList" required />
             <datalist id="coaKelompokList">
               <option value="Aset"></option>
+              <option value="Liabilitas"></option>
               <option value="Kewajiban"></option>
               <option value="Ekuitas"></option>
               <option value="Pendapatan"></option>
@@ -985,15 +1122,15 @@
 
           <!-- Row 2 -->
           <div class="coa-form-field">
-            <label class="coa-form-label" for="coaSubKelompok">Sub Kelompok</label>
-            <input type="text" id="coaSubKelompok" class="coa-form-input" placeholder="Tambah Sub Kelompok" />
+            <label class="coa-form-label" for="coaSubKelompok">Subkelompok</label>
+            <input type="text" id="coaSubKelompok" class="coa-form-input" placeholder="Tambah Subkelompok" />
           </div>
 
           <div class="coa-form-field">
-            <label class="coa-form-label">Saldo Nominal</label>
+            <label class="coa-form-label">Saldo Normal</label>
             <div class="coa-custom-select-wrap" id="wrapSaldoNominal">
               <div class="coa-select-trigger" id="btnSaldoNominal" tabindex="0" role="button" aria-haspopup="listbox">
-                <span id="textSaldoNominal" class="is-placeholder">Pilih Saldo Nominal</span>
+                <span id="textSaldoNominal" class="is-placeholder">Pilih Saldo Normal</span>
               </div>
               <div class="coa-select-popover" id="popoverSaldoNominal">
                 <label class="coa-select-option">
@@ -1031,8 +1168,8 @@
 
           <!-- Row 3 -->
           <div class="coa-form-field">
-            <label class="coa-form-label" for="coaDevisDefault">Devisi Defaut</label>
-            <input type="text" id="coaDevisDefault" class="coa-form-input" placeholder="Tambah Devisi" />
+            <label class="coa-form-label" for="coaDevisDefault">Divisi Default</label>
+            <input type="text" id="coaDevisDefault" class="coa-form-input" placeholder="Tambah Divisi" />
           </div>
 
           <div class="coa-form-field">
@@ -1126,7 +1263,7 @@
 
   <div id="coaToast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+  <script src="../../assets/js/layout.js?v=20261106_operasional_id"></script>
   <script>
     (function () {
       'use strict';
@@ -1157,46 +1294,497 @@
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           const parsed = raw ? JSON.parse(raw) : [];
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed) && parsed.length >= 35 && parsed.some(function (item) { return item && item.kode === '5013'; })) {
             return parsed.filter(Boolean);
           }
-          // Default initial data for Accounting Master COA
+          // Default initial data for Accounting Master COA (35 Akun Lengkap Persis Sesuai Master COA)
           const seedData = [
             {
-              id: 'coa-1000',
-              kode: '1000',
-              nama: 'Kas Besar',
-              kelompok: 'Aset',
-              subKelompok: 'Aset Lancar',
-              saldoNormal: 'Debit',
-              aktif: 'Ya',
-              devisDefault: 'Operasional',
-              namaBank: 'BCA',
-              nomorRekening: '8830129841',
-              atasNama: 'PT Bisa Media Kreasi'
-            },
-            {
-              id: 'coa-1100',
-              kode: '1100',
-              nama: 'Bank Mandiri Utama',
+              id: 'coa-1001',
+              kode: '1001',
+              nama: 'Kas Kecil',
               kelompok: 'Aset',
               subKelompok: 'Kas & Bank',
               saldoNormal: 'Debit',
               aktif: 'Ya',
-              devisDefault: 'Semua Devisi',
-              namaBank: 'Mandiri',
-              nomorRekening: '137001928374',
-              atasNama: 'PT Bisa Media Kreasi'
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
             },
             {
-              id: 'coa-2100',
-              kode: '2100',
-              nama: 'Hutang Usaha',
-              kelompok: 'Kewajiban',
-              subKelompok: 'Kewajiban Lancar',
+              id: 'coa-1002',
+              kode: '1002',
+              nama: 'Bank BCA',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'BCA',
+              nomorRekening: '2092026028',
+              atasNama: 'PT BISA MEDIA GRUP'
+            },
+            {
+              id: 'coa-1003',
+              kode: '1003',
+              nama: 'Bank BCA',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'BCA',
+              nomorRekening: '2091139784',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'coa-1005',
+              kode: '1005',
+              nama: 'SEABANK',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'SEABANK',
+              nomorRekening: '901631003438',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'coa-1006',
+              kode: '1006',
+              nama: 'BNI',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'BNI',
+              nomorRekening: '2049368973',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'coa-1101',
+              kode: '1101',
+              nama: 'Piutang Usaha',
+              kelompok: 'Aset',
+              subKelompok: 'Piutang',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1102',
+              kode: '1102',
+              nama: 'Piutang Karyawan',
+              kelompok: 'Aset',
+              subKelompok: 'Piutang',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'HR',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1201',
+              kode: '1201',
+              nama: 'Uang Muka',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Lancar',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1301',
+              kode: '1301',
+              nama: 'Peralatan Produksi & Studio',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Tetap',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Produksi',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1302',
+              kode: '1302',
+              nama: 'Peralatan & Perlengkapan Kantor',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Tetap',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1303',
+              kode: '1303',
+              nama: 'Furniture & Mebel',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Tetap',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1391',
+              kode: '1391',
+              nama: 'Akumulasi Penyusutan',
+              kelompok: 'Aset',
+              subKelompok: 'Kontra Aset',
               saldoNormal: 'Kredit',
               aktif: 'Ya',
-              devisDefault: 'Accounting',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-2001',
+              kode: '2001',
+              nama: 'Hutang Usaha',
+              kelompok: 'Liabilitas',
+              subKelompok: 'Hutang',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Pendanaan',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-2101',
+              kode: '2101',
+              nama: 'Hutang Pajak',
+              kelompok: 'Liabilitas',
+              subKelompok: 'Pajak',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-3001',
+              kode: '3001',
+              nama: 'Modal',
+              kelompok: 'Ekuitas',
+              subKelompok: 'Modal',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Pendanaan',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-3101',
+              kode: '3101',
+              nama: 'Laba Ditahan',
+              kelompok: 'Ekuitas',
+              subKelompok: 'Laba Ditahan',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Pendanaan',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4001',
+              kode: '4001',
+              nama: 'Pendapatan MCN',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'MCN',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4002',
+              kode: '4002',
+              nama: 'Pendapatan TAP',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'TAP',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4003',
+              kode: '4003',
+              nama: 'Pendapatan TSP',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'TSP',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4004',
+              kode: '4004',
+              nama: 'Pendapatan Iklan',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'Agency',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4005',
+              kode: '4005',
+              nama: 'Pendapatan Live HUB',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'Live HUB',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4006',
+              kode: '4006',
+              nama: 'Pendapatan Event',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'Event',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5001',
+              kode: '5001',
+              nama: 'Beban Gaji',
+              kelompok: 'Beban',
+              subKelompok: 'SDM',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'HR',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5002',
+              kode: '5002',
+              nama: 'Beban Internet',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5003',
+              kode: '5003',
+              nama: 'Beban Iklan',
+              kelompok: 'Beban',
+              subKelompok: 'Marketing',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Marketing',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5004',
+              kode: '5004',
+              nama: 'Beban Pentry',
+              kelompok: 'Beban',
+              subKelompok: 'Pentry',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Pentry',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5005',
+              kode: '5005',
+              nama: 'Beban Transportasi',
+              kelompok: 'Beban',
+              subKelompok: 'Transportasi',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5006',
+              kode: '5006',
+              nama: 'Beban Makan',
+              kelompok: 'Beban',
+              subKelompok: 'Konsumsi',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5007',
+              kode: '5007',
+              nama: 'Beban Sewa',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5008',
+              kode: '5008',
+              nama: 'Beban Penyusutan',
+              kelompok: 'Beban',
+              subKelompok: 'Non-kas',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5009',
+              kode: '5009',
+              nama: 'Beban Berlangganan',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5010',
+              kode: '5010',
+              nama: 'Beban Project',
+              kelompok: 'Beban',
+              subKelompok: 'Project',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Agency',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5011',
+              kode: '5011',
+              nama: 'Transfer Internal',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5012',
+              kode: '5012',
+              nama: 'Beban Rewards',
+              kelompok: 'Beban',
+              subKelompok: 'SDM',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5013',
+              kode: '5013',
+              nama: 'Beban Admin',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
               namaBank: '-',
               nomorRekening: '-',
               atasNama: '-'
@@ -1324,8 +1912,8 @@
 
           row.innerHTML = [
             '<td>' + (index + 1) + '</td>',
-            '<td style="font-weight: 600; color: #1e293b; white-space: nowrap;">' + escapeHtml(item.kode || '-') + '</td>',
-            '<td style="font-weight: 600; color: #1e293b; white-space: nowrap;">' + escapeHtml(item.nama || '-') + '</td>',
+            '<td data-col="kode_coa" style="font-weight: 600; color: #1e293b; white-space: nowrap;">' + escapeHtml(item.kode || '-') + '</td>',
+            '<td data-col="nama_akun" style="font-weight: 600; color: #1e293b; white-space: nowrap;">' + escapeHtml(item.nama || '-') + '</td>',
             '<td>' + escapeHtml(item.kelompok || '-') + '</td>',
             '<td>' + escapeHtml(item.subKelompok || '-') + '</td>',
             '<td style="text-align: center;">' + escapeHtml(item.saldoNormal || '-') + '</td>',
@@ -1346,6 +1934,9 @@
 
           tableBody.appendChild(row);
         });
+
+        // Trigger column pin positions after render (persis seperti modul KOL)
+        updatePinnedColumns();
       }
 
       const globalActionMenu = document.getElementById('coaActionMenu');
@@ -1920,6 +2511,90 @@
         });
       });
 
+      /* ===== LOGIKA PIN / FIXED KOLOM (PERSIS SEPERTI MODUL KOL) ===== */
+      const PINNED_STORAGE_KEY = 'bisa_master_coa_pinned_cols';
+
+      function getSavedPinnedCols() {
+        try {
+          return JSON.parse(localStorage.getItem(PINNED_STORAGE_KEY)) || {
+            kode_coa: true,
+            nama_akun: true
+          };
+        } catch (e) {
+          return { kode_coa: true, nama_akun: true };
+        }
+      }
+
+      function savePinnedCols(obj) {
+        try {
+          localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(obj));
+        } catch (e) {}
+      }
+
+      function updatePinnedColumns() {
+        const table = document.getElementById('coaTable');
+        if (!table) return;
+
+        const firstCol = table.querySelector('th:first-child');
+        let currentLeft = firstCol ? firstCol.offsetWidth : 48;
+
+        const pinnableThs = Array.from(table.querySelectorAll('th.th-pinnable'));
+        let lastPinnedTh = null;
+
+        pinnableThs.forEach(th => {
+          const colName = th.getAttribute('data-col');
+          const chk = th.querySelector('.chk-pin-col');
+          const isPinned = chk && chk.checked;
+          const bodyTds = table.querySelectorAll(`tbody td[data-col="${colName}"]`);
+
+          if (isPinned) {
+            th.classList.add('col-pinned-sticky');
+            th.classList.remove('col-pinned-last');
+            th.style.left = currentLeft + 'px';
+
+            bodyTds.forEach(td => {
+              td.classList.add('col-pinned-sticky');
+              td.classList.remove('col-pinned-last');
+              td.style.left = currentLeft + 'px';
+            });
+
+            currentLeft += th.offsetWidth;
+            lastPinnedTh = { th, bodyTds };
+          } else {
+            th.classList.remove('col-pinned-sticky', 'col-pinned-last');
+            th.style.left = '';
+            bodyTds.forEach(td => {
+              td.classList.remove('col-pinned-sticky', 'col-pinned-last');
+              td.style.left = '';
+            });
+          }
+        });
+
+        if (lastPinnedTh) {
+          lastPinnedTh.th.classList.add('col-pinned-last');
+          lastPinnedTh.bodyTds.forEach(td => td.classList.add('col-pinned-last'));
+        }
+      }
+
+      function initPinnedColumns() {
+        const saved = getSavedPinnedCols();
+        document.querySelectorAll('.chk-pin-col').forEach(chk => {
+          const col = chk.getAttribute('data-col');
+          if (saved && saved[col] !== undefined) {
+            chk.checked = !!saved[col];
+          }
+          chk.addEventListener('change', () => {
+            const cur = getSavedPinnedCols();
+            cur[col] = chk.checked;
+            savePinnedCols(cur);
+            updatePinnedColumns();
+          });
+        });
+
+        window.addEventListener('resize', updatePinnedColumns);
+      }
+
+      initPinnedColumns();
       sortData();
       renderTable();
     })();

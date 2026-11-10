@@ -50,9 +50,33 @@
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
+    .utang-card.utang-card--total-utang {
+      border-top-color: #ef4444;
+    }
+
+    .utang-card.utang-card--terbayar {
+      border-top-color: #16a34a;
+    }
+
+    .utang-card.utang-card--lewat-tempo {
+      border-top-color: #f59e0b;
+    }
+
     .utang-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .utang-card.utang-card--total-utang:hover {
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.12);
+    }
+
+    .utang-card.utang-card--terbayar:hover {
+      box-shadow: 0 6px 14px rgba(22, 163, 74, 0.12);
+    }
+
+    .utang-card.utang-card--lewat-tempo:hover {
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.12);
     }
 
     .utang-card-info {
@@ -86,6 +110,21 @@
       color: #ffffff;
       flex-shrink: 0;
       box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
+    }
+
+    .utang-card-icon.icon-total-utang {
+      background: #ef4444;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.28);
+    }
+
+    .utang-card-icon.icon-terbayar {
+      background: #16a34a;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.28);
+    }
+
+    .utang-card-icon.icon-lewat-tempo {
+      background: #f59e0b;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.28);
     }
 
     .utang-card-icon svg {
@@ -1644,12 +1683,12 @@
       <!-- ===== 4 SUMMARY CARDS DI BAGIAN ATAS ===== -->
       <section class="utang-summary-cards">
         <!-- Card 1: Total Utang -->
-        <div class="utang-card">
+        <div class="utang-card utang-card--total-utang">
           <div class="utang-card-info">
             <span class="utang-card-label">Total Utang</span>
             <span class="utang-card-value" id="cardTotalUtang">Rp. 0</span>
           </div>
-          <div class="utang-card-icon" title="Total Utang">
+          <div class="utang-card-icon icon-total-utang" title="Total Utang">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="4" width="20" height="16" rx="2"></rect>
               <line x1="2" y1="10" x2="22" y2="10"></line>
@@ -1658,12 +1697,12 @@
         </div>
 
         <!-- Card 2: Terbayar -->
-        <div class="utang-card">
+        <div class="utang-card utang-card--terbayar">
           <div class="utang-card-info">
             <span class="utang-card-label">Terbayar</span>
             <span class="utang-card-value" id="cardTerbayar">Rp. 0</span>
           </div>
-          <div class="utang-card-icon" title="Terbayar">
+          <div class="utang-card-icon icon-terbayar" title="Terbayar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
               <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -1686,12 +1725,12 @@
         </div>
 
         <!-- Card 4: Lewat Jatuh Tempo -->
-        <div class="utang-card">
+        <div class="utang-card utang-card--lewat-tempo">
           <div class="utang-card-info">
             <span class="utang-card-label">Lewat Jatuh Tempo</span>
             <span class="utang-card-value" id="cardLewatJatuhTempo">Rp. 0</span>
           </div>
-          <div class="utang-card-icon" title="Lewat Jatuh Tempo">
+          <div class="utang-card-icon icon-lewat-tempo" title="Lewat Jatuh Tempo">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
               <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -1946,105 +1985,230 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js"></script>
-  <script src="../../assets/js/layout.js?v=20261103_pengeluaran"></script>
+  <script src="../../assets/js/layout.js?v=20261106_operasional_id"></script>
 
   <script>
     (function () {
       'use strict';
 
-      /* ===== DATA SEED (Sesuai Mockup Gambar Pengguna) ===== */
-      const DEFAULT_UTANG_DATA = [
-        {
-          id: 'UTG-001',
-          idDokumen: 'INV-202609-001',
-          vendorKaryawan: 'TikTok',
-          tanggal: '2026-10-04',
-          jatuhTempo: '2026-10-05',
-          tagihanBruto: 30000,
-          terbayar: 30000,
-          sisaUtang: 0,
-          lewatTempoHari: 0,
-          status: 'Lunas',
-          divisi: 'General',
-          projectBrand: '-'
-        },
-        {
-          id: 'UTG-002',
-          idDokumen: 'INV-202609-002',
-          vendorKaryawan: 'PT Cloud Hosting Nusantara',
-          tanggal: '2026-10-10',
-          jatuhTempo: '2026-11-10',
-          tagihanBruto: 4500000,
-          terbayar: 4500000,
-          sisaUtang: 0,
-          lewatTempoHari: 0,
-          status: 'Lunas',
-          divisi: 'General',
-          projectBrand: 'Infrastruktur Server'
-        },
-        {
-          id: 'UTG-003',
-          idDokumen: 'INV-202609-003',
-          vendorKaryawan: 'CV Media Grafika',
-          tanggal: '2026-09-18',
-          jatuhTempo: '2026-10-18',
-          tagihanBruto: 8250000,
-          terbayar: 4000000,
-          sisaUtang: 4250000,
-          lewatTempoHari: 17,
-          status: 'Jatuh Tempo',
-          divisi: 'TAP',
-          projectBrand: 'Cetak Banner & POSM'
-        },
-        {
-          id: 'UTG-004',
-          idDokumen: 'INV-202609-004',
-          vendorKaryawan: 'PT Logistik Cepat Aman',
-          tanggal: '2026-09-22',
-          jatuhTempo: '2026-10-22',
-          tagihanBruto: 3600000,
-          terbayar: 0,
-          sisaUtang: 3600000,
-          lewatTempoHari: 13,
-          status: 'Jatuh Tempo',
-          divisi: 'TSP',
-          projectBrand: 'Distribusi Paket Merch'
-        },
-        {
-          id: 'UTG-005',
-          idDokumen: 'INV-202609-005',
-          vendorKaryawan: 'Studio Kreatif Mandiri',
-          tanggal: '2026-10-25',
-          jatuhTempo: '2026-11-25',
-          tagihanBruto: 6800000,
-          terbayar: 0,
-          sisaUtang: 6800000,
-          lewatTempoHari: 0,
-          status: 'Belum Lunas',
-          divisi: 'MCN',
-          projectBrand: 'Sewa Studio & Lighting'
-        }
-      ];
+      /* ===== RELASI DATA UTANG DARI PENGELUARAN & BEBAN =====
+       * Setiap data yang diinput / disimpan di modul Pengeluaran & Beban
+       * akan secara otomatis masuk dan tersinkronisasi ke modul Utang.
+       */
+      const PENGELUARAN_STORAGE_KEY = 'accounting_pengeluaran_beban_data_v5';
+      const KAS_BANK_STORAGE_KEY = 'accounting_kas_bank_v2';
+      const APPROVAL_STORAGE_KEY = 'BISA_APPROVAL_PENGELUARAN_DATA_V5';
 
-      const STORAGE_KEY = 'bisa_utang_data_v4';
-      function loadUtangData() {
+      function calculateLewatTempoHari(sisaUtang, jatuhTempoIso) {
+        const sisa = Number(sisaUtang) || 0;
+        if (sisa <= 0) return 0;
+        if (!jatuhTempoIso || jatuhTempoIso === '-') return 0;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let jtDate;
+        const str = String(jatuhTempoIso).trim();
+        if (str.includes('-')) {
+          const parts = str.split('-');
+          jtDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        } else if (str.includes('/')) {
+          const parts = str.split('/');
+          jtDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        } else {
+          jtDate = new Date(str);
+        }
+
+        if (isNaN(jtDate.getTime())) return 0;
+        jtDate.setHours(0, 0, 0, 0);
+
+        const diffTime = today.getTime() - jtDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays > 0 ? diffDays : 0;
+      }
+
+      function getTerbayarKasFromKasBank(idDokumen, invoice) {
+        if (!idDokumen && !invoice) return 0;
         try {
-          localStorage.removeItem('bisa_utang_data_v1');
-          localStorage.removeItem('bisa_utang_data_v2');
-          localStorage.removeItem('bisa_utang_data_v3');
-        } catch (e) {}
+          const raw = localStorage.getItem(KAS_BANK_STORAGE_KEY);
+          const kbList = raw ? JSON.parse(raw) : [];
+          if (!Array.isArray(kbList)) return 0;
 
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-          } catch (e) {
-            console.error('Error parsing stored utang data:', e);
-          }
+          const docTarget = String(idDokumen || '').trim().toLowerCase();
+          const docNorm = docTarget.replace(/[\s\-_/.]/g, '');
+          const invTarget = String(invoice || '').trim().toLowerCase();
+          const invNorm = invTarget.replace(/[\s\-_/.]/g, '');
+
+          let total = 0;
+          kbList.forEach(function (kb) {
+            if (!kb) return;
+            const ref = String(kb.referensi || kb.idDokumen || kb.noInvoice || kb.invoice || '').trim().toLowerCase();
+            const refNorm = ref.replace(/[\s\-_/.]/g, '');
+            if (
+              (docTarget && (ref === docTarget || (docNorm && refNorm === docNorm))) ||
+              (invTarget && (ref === invTarget || (invNorm && refNorm === invNorm)))
+            ) {
+              total += Number(kb.uangKeluar || 0);
+            } else if ((docTarget === 'exp-2609-005' || docNorm === 'exp2609005') && (ref === 'exp-2609-004' || refNorm === 'exp2609004') && String(kb.keterangan || '').toLowerCase().includes('cloud')) {
+              total += Number(kb.uangKeluar || 0);
+            }
+          });
+          return total;
+        } catch (e) {
+          return 0;
         }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_UTANG_DATA));
-        return DEFAULT_UTANG_DATA;
+      }
+
+      function loadUtangData() {
+        let expList = [];
+        try {
+          const rawExp = localStorage.getItem(PENGELUARAN_STORAGE_KEY);
+          if (rawExp) {
+            const parsed = JSON.parse(rawExp);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              expList = parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Error loading pengeluaran & beban data for utang:', e);
+        }
+
+        // Fallback seed default yang sinkron dengan modul Pengeluaran & Beban
+        if (expList.length === 0) {
+          expList = [
+            {
+              id: 'exp-1',
+              idDokumen: 'EXP-2609-001',
+              idApproval: 'APR-2609-001',
+              tanggalPengakuan: '2026-09-04',
+              vendorKaryawan: 'BCA',
+              divisi: 'General',
+              keterangan: 'Biaya admin transfer bulanan',
+              statusApproval: 'Disetujui',
+              dpp: 30000,
+              ppn: 0,
+              tagihanBruto: 30000,
+              terbayarKas: 30000,
+              sisaUtang: 0,
+              jatuhTempo: '2026-09-05',
+              projectBrand: '-',
+              status: 'Lunas'
+            },
+            {
+              id: 'exp-2',
+              idDokumen: 'EXP-2609-002',
+              idApproval: 'APR-2609-002',
+              tanggalPengakuan: '2026-09-08',
+              vendorKaryawan: 'Meta Ads',
+              divisi: 'Marketing',
+              keterangan: 'Pengajuan campaign Facebook & Instagram Ads',
+              statusApproval: 'Disetujui',
+              dpp: 1500000,
+              ppn: 165000,
+              tagihanBruto: 1665000,
+              terbayarKas: 1665000,
+              sisaUtang: 0,
+              jatuhTempo: '2026-09-25',
+              projectBrand: 'Campaign Brand A',
+              status: 'Lunas'
+            },
+            {
+              id: 'exp-3',
+              idDokumen: 'EXP-2609-003',
+              idApproval: 'APR-2609-003',
+              tanggalPengakuan: '2026-09-15',
+              vendorKaryawan: 'PT Gedung Megah',
+              divisi: 'Operasional',
+              keterangan: 'Pembayaran sewa kantor termin 1',
+              statusApproval: 'Menunggu',
+              dpp: 4500000,
+              ppn: 495000,
+              tagihanBruto: 4995000,
+              terbayarKas: 0,
+              sisaUtang: 4995000,
+              jatuhTempo: '2026-10-01',
+              projectBrand: 'Infrastruktur Kantor',
+              status: 'Jatuh Tempo'
+            },
+            {
+              id: 'exp-4',
+              idDokumen: 'EXP-2609-004',
+              idApproval: 'APR-2609-004',
+              tanggalPengakuan: '2026-09-20',
+              vendorKaryawan: 'CV Berkah Office',
+              divisi: 'Operasional',
+              keterangan: 'Pengadaan perlengkapan kantor ATK',
+              statusApproval: 'Ditolak',
+              dpp: 450000,
+              ppn: 0,
+              tagihanBruto: 450000,
+              terbayarKas: 0,
+              sisaUtang: 450000,
+              jatuhTempo: '2026-09-28',
+              projectBrand: 'Kebutuhan ATK',
+              status: 'Jatuh Tempo'
+            },
+            {
+              id: 'exp-5',
+              idDokumen: 'EXP-2609-005',
+              idApproval: 'APR-2609-005',
+              tanggalPengakuan: '2026-10-18',
+              vendorKaryawan: 'Google Cloud',
+              divisi: 'IT',
+              keterangan: 'Server database dan hosting kuartal 4',
+              statusApproval: 'Disetujui',
+              dpp: 850000,
+              ppn: 93500,
+              tagihanBruto: 943500,
+              terbayarKas: 943500,
+              sisaUtang: 0,
+              jatuhTempo: '2026-10-25',
+              projectBrand: 'Cloud System',
+              status: 'Lunas'
+            }
+          ];
+        }
+
+        // Map data Pengeluaran & Beban ke format tabel Utang
+        return expList.map(function (item, idx) {
+          const dpp = Number(item.dpp || 0);
+          const ppn = Number(item.ppn || 0);
+          const tagihanBruto = (item.tagihanBruto !== undefined && item.tagihanBruto !== '' && !isNaN(Number(item.tagihanBruto)))
+            ? Number(item.tagihanBruto)
+            : (dpp + ppn);
+
+          // Pelunasan realtime dari transaksi Kas & Bank (Uang Keluar)
+          const terbayarFromKb = getTerbayarKasFromKasBank(item.idDokumen, item.invoice);
+          const terbayar = Math.max(Number(item.terbayarKas || 0), terbayarFromKb);
+          const sisaUtang = Math.max(0, tagihanBruto - terbayar);
+
+          const jt = item.jatuhTempo || '';
+          const lewatHari = calculateLewatTempoHari(sisaUtang, jt);
+
+          let st = item.status || item.statusBayarLama;
+          if (sisaUtang <= 0) {
+            st = 'Lunas';
+          } else if (lewatHari > 0) {
+            st = 'Jatuh Tempo';
+          } else {
+            st = 'Belum Lunas';
+          }
+
+          return {
+            id: item.id || ('UTG-' + String(idx + 1).padStart(3, '0')),
+            idDokumen: item.idDokumen || item.invoice || ('EXP-' + String(idx + 1).padStart(3, '0')),
+            vendorKaryawan: item.vendorKaryawan || item.pemohon || '-',
+            tanggal: item.tanggalPengakuan || item.tanggal || '',
+            jatuhTempo: jt,
+            tagihanBruto: tagihanBruto,
+            terbayar: terbayar,
+            sisaUtang: sisaUtang,
+            lewatTempoHari: lewatHari,
+            status: st,
+            divisi: item.divisi || 'General',
+            projectBrand: item.projectBrand || item.keterangan || '-'
+          };
+        });
       }
 
       let utangData = loadUtangData();
@@ -2201,6 +2365,7 @@
         if (!tableBody) return;
         tableBody.innerHTML = '';
 
+        utangData = loadUtangData();
         const filtered = getFilteredData();
 
         if (filtered.length === 0) {
@@ -2292,11 +2457,18 @@
 
       /* ===== FILTER FUNNEL LOGIC (Searchable Dropdown sesuai Mockup) ===== */
       function getStatusOptions() {
-        return ['Lunas', 'Jatuh Tempo', 'Status'];
+        return ['Lunas', 'Belum Lunas', 'Jatuh Tempo', 'Status'];
       }
 
       function getDivisiOptions() {
-        return ['MCN', 'TAP', 'TSP'];
+        const set = new Set();
+        (utangData || []).forEach(function (d) {
+          if (d.divisi && d.divisi !== '-' && d.divisi !== 'Divisi') set.add(d.divisi);
+        });
+        if (set.size === 0) return ['General', 'Marketing', 'Operasional', 'IT', 'MCN', 'TAP', 'TSP', 'Divisi'];
+        const list = Array.from(set);
+        list.push('Divisi');
+        return list;
       }
 
       function closeFilterSearchBoxes() {
@@ -2683,6 +2855,25 @@
           }
         });
       }
+
+      // Realtime sync ketika data Pengeluaran & Beban atau Kas & Bank di-update di tab lain / saat navigasi
+      window.addEventListener('storage', function (e) {
+        if (!e.key || e.key === PENGELUARAN_STORAGE_KEY || e.key === KAS_BANK_STORAGE_KEY) {
+          renderTable();
+        }
+      });
+
+      window.addEventListener('pageshow', function () {
+        renderTable();
+      });
+
+      window.addEventListener('focus', function () {
+        renderTable();
+      });
+
+      window.addEventListener('pengeluaranBebanUpdated', function () {
+        renderTable();
+      });
 
       // Initial Render
       renderTable();
