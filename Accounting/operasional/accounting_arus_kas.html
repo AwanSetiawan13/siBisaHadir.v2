@@ -255,49 +255,6 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
-    .ak-chart-type-toggles {
-      display: inline-flex;
-      align-items: center;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 2.5px;
-      gap: 2px;
-    }
-
-    .ak-chart-type-btn {
-      border: none;
-      background: transparent;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #64748b;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s ease;
-    }
-
-    .ak-chart-type-btn:hover {
-      color: #0f172a;
-    }
-
-    .ak-chart-type-btn.is-active {
-      background: #ffffff;
-      color: #0076C5;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-
-    .ak-chart-type-btn svg {
-      width: 13px;
-      height: 13px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.2;
-    }
 
     /* Mini KPI Row above the chart */
     .ak-trend-kpi-row {
@@ -1541,10 +1498,11 @@
 
         // 7. Update Donut Chart Distribution
         if (BANK_DATA.all.pieDistribution) {
-          const pBca1 = Math.round((acc.bca1 / totalSaldoLive) * 100);
-          const pBca2 = Math.round((acc.bca2 / totalSaldoLive) * 100);
-          const pSeabank = Math.round((acc.seabank / totalSaldoLive) * 100);
-          const pBni = Math.round((acc.bni / totalSaldoLive) * 100);
+          const safeTotal = totalSaldoLive > 0 ? totalSaldoLive : 1;
+          const pBca1 = Math.round((acc.bca1 / safeTotal) * 100);
+          const pBca2 = Math.round((acc.bca2 / safeTotal) * 100);
+          const pSeabank = Math.round((acc.seabank / safeTotal) * 100);
+          const pBni = Math.round((acc.bni / safeTotal) * 100);
           const pKas = Math.max(1, 100 - (pBca1 + pBca2 + pSeabank + pBni));
 
           BANK_DATA.all.pieDistribution = [
@@ -1556,7 +1514,21 @@
           ];
         }
 
-        // 8. Simpan state ter-update ke localStorage agar siap dipanggil oleh Kode COA secara real-time
+        // 8. Update Status Rekonsiliasi Real-Time (Agar 100% konsisten dengan Saldo Akhir & Saldo Per Akun)
+        if (BANK_DATA.all.reconciliation) {
+          BANK_DATA.all.reconciliation.saldoAkhir = totalSaldoLive;
+          BANK_DATA.all.reconciliation.saldoKasBank = totalSaldoLive;
+          BANK_DATA.all.reconciliation.selisih = 0;
+        }
+        bankKeys.forEach(function (b) {
+          if (BANK_DATA[b] && BANK_DATA[b].reconciliation) {
+            BANK_DATA[b].reconciliation.saldoAkhir = acc[b];
+            BANK_DATA[b].reconciliation.saldoKasBank = acc[b];
+            BANK_DATA[b].reconciliation.selisih = 0;
+          }
+        });
+
+        // 9. Simpan state ter-update ke localStorage agar siap dipanggil oleh Kode COA secara real-time
         try {
           const accountsList = [
             { namaAkun: 'Kas Kecil', namaBank: 'Kas Kecil', nomorRekening: '-', kodeCoa: '1001', saldo: acc.kasKecil },
