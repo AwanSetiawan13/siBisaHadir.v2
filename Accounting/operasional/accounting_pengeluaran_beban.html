@@ -2687,12 +2687,32 @@
                   <span style="color: #64748b; font-style: italic;">- Tanpa Project / Brand -</span>
                 </label>
                 <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="Pendapatan" data-label="Pendapatan" />
-                  <span>Pendapatan</span>
+                  <input type="radio" name="optProjectBrand" value="7691348184035411734 | Campaign Brand A" data-label="7691348184035411734 | Campaign Brand A" />
+                  <span>7691348184035411734 | Campaign Brand A</span>
                 </label>
                 <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="Project 2" data-label="Project 2" />
-                  <span>Project 2</span>
+                  <input type="radio" name="optProjectBrand" value="7691348184035411735 | Shopee Affiliate Mall" data-label="7691348184035411735 | Shopee Affiliate Mall" />
+                  <span>7691348184035411735 | Shopee Affiliate Mall</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optProjectBrand" value="7691348184035411736 | Cosmo Endorse" data-label="7691348184035411736 | Cosmo Endorse" />
+                  <span>7691348184035411736 | Cosmo Endorse</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optProjectBrand" value="7691348184035411737 | Shopee Mega Sale" data-label="7691348184035411737 | Shopee Mega Sale" />
+                  <span>7691348184035411737 | Shopee Mega Sale</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optProjectBrand" value="7691348184035411738 | Product Launching Serum Glow" data-label="7691348184035411738 | Product Launching Serum Glow" />
+                  <span>7691348184035411738 | Product Launching Serum Glow</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optProjectBrand" value="7691348184035411739 | Tap & Tsp" data-label="7691348184035411739 | Tap & Tsp" />
+                  <span>7691348184035411739 | Tap & Tsp</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optProjectBrand" value="7691348184035411733 | Seluruh Kreator MCN" data-label="7691348184035411733 | Seluruh Kreator MCN" />
+                  <span>7691348184035411733 | Seluruh Kreator MCN</span>
                 </label>
               </div>
             </div>
@@ -3036,7 +3056,7 @@
   </div>
 
   <!-- Universal Scripts -->
-  <script src="../../assets/js/layout.js?v=20261110_divisi_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261111_hd_v2"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup_v3"></script>
 
   <!-- Main Logic Script -->
@@ -3177,15 +3197,18 @@
 
       function getPendapatanForBrand(brandName) {
         if (!brandName) return null;
+        const cleanTarget = String(brandName).replace(/^[0-9]+\s*\|\s*/, '').trim().toLowerCase();
         try {
           const raw = localStorage.getItem(PENDAPATAN_KEY);
           if (raw) {
             const list = JSON.parse(raw);
             if (Array.isArray(list)) {
               const found = list.find(function (p) {
-                return p && p.projectBrand && p.projectBrand.trim().toLowerCase() === brandName.trim().toLowerCase();
+                if (!p) return false;
+                const pb = String(p.projectBrand || '').trim().toLowerCase();
+                return pb === cleanTarget || cleanTarget.includes(pb) || pb.includes(cleanTarget);
               });
-              if (found) return found;
+              if (found && found.idPendapatan) return found;
             }
           }
         } catch (e) {}
@@ -3198,9 +3221,24 @@
           'tap & tsp': '7691348184035411739',
           'seluruh kreator mcn': '7691348184035411733'
         };
-        const idDef = defaultMap[brandName.trim().toLowerCase()];
-        if (idDef) return { idPendapatan: idDef, projectBrand: brandName };
+        const idDef = defaultMap[cleanTarget];
+        if (idDef) return { idPendapatan: idDef, projectBrand: brandName.replace(/^[0-9]+\s*\|\s*/, '').trim() };
         return null;
+      }
+
+      function formatBrandWithId(brandStr, idPendapatanOpt) {
+        if (!brandStr) return '';
+        const s = String(brandStr).trim();
+        if (s === '-' || s === '') return s;
+        if (s.includes(' | ')) return s;
+        let idPen = (idPendapatanOpt || '').trim();
+        if (!idPen) {
+          const match = getPendapatanForBrand(s);
+          if (match && match.idPendapatan) {
+            idPen = match.idPendapatan;
+          }
+        }
+        return idPen ? (idPen + ' | ' + s) : s;
       }
 
       function getProjectBrandList() {
@@ -3230,9 +3268,8 @@
           pndArr.forEach(function (p) {
             if (p && p.projectBrand && String(p.projectBrand).trim() !== '' && p.projectBrand !== '-') {
               const brand = String(p.projectBrand).trim();
-              const idPen = String(p.idPendapatan || '').trim();
-              const combined = idPen ? (idPen + ' | ' + brand) : brand;
-              if (!seen.has(combined)) {
+              const combined = formatBrandWithId(brand, p.idPendapatan);
+              if (combined && !seen.has(combined)) {
                 seen.add(combined);
                 list.push(combined);
               }
@@ -3249,12 +3286,10 @@
               parsedCp.forEach(function (cp) {
                 if (cp && cp.projectBrand && String(cp.projectBrand).trim() !== '') {
                   const brand = String(cp.projectBrand).trim();
-                  const already = list.some(function (itemStr) {
-                    return itemStr.toLowerCase() === brand.toLowerCase() || itemStr.toLowerCase().endsWith(' | ' + brand.toLowerCase());
-                  });
-                  if (!already && !seen.has(brand)) {
-                    seen.add(brand);
-                    list.push(brand);
+                  const combined = formatBrandWithId(brand);
+                  if (combined && !seen.has(combined)) {
+                    seen.add(combined);
+                    list.push(combined);
                   }
                 }
               });

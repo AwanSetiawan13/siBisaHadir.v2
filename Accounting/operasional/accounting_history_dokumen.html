@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History Dokumen | Bisa Media</title>
+
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Global & Vendor CSS -->
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/accounting.css" />
+
+  <!-- Boxicons for action icons -->
+  <link href="https://cdn.jsdelivr.net/npm/sneat-bootstrap-html-admin-template-free@1.0.0/assets/vendor/fonts/boxicons.css" rel="stylesheet" />
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    /* ==========================================================================
+       HISTORY DOKUMEN - 100% KONSISTEN DENGAN MODUL OPERASIONAL & PENGELUARAN BEBAN
+       ========================================================================== */
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+
+    /* Actions style for eye/view icon (100% konsisten dengan Bisa Media) */
+    .btn-view {
+      background: rgba(41, 163, 216, 0.08);
+      border: 1px solid rgba(41, 163, 216, 0.2);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      color: #29A3D8;
+      margin: 0 auto !important;
+    }
+    .btn-view:hover {
+      background-color: #29A3D8;
+      color: #ffffff;
+      border-color: #29A3D8;
+      box-shadow: 0 2px 6px rgba(41, 163, 216, 0.25);
+    }
+    .btn-view i {
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    /* 4 Summary Cards */
+    .pnd-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .pnd-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-card.pnd-card--nominal {
+      border-top-color: #16a34a;
+    }
+
+    .pnd-card.pnd-card--rata {
+      border-top-color: #f59e0b;
+    }
+
+    .pnd-card.pnd-card--terakhir {
+      border-top-color: #8b5cf6;
+    }
+
+    .pnd-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .pnd-card.pnd-card--nominal:hover {
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.12);
+    }
+
+    .pnd-card.pnd-card--rata:hover {
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
+    }
+
+    .pnd-card.pnd-card--terakhir:hover {
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.12);
+    }
+
+    .pnd-card__info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pnd-card__label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .pnd-card__value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      font-style: italic;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .pnd-card__icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.3);
+    }
+
+    .pnd-card__icon-box.icon-nominal {
+      background: #16a34a;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+    }
+
+    .pnd-card__icon-box.icon-rata {
+      background: #f59e0b;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    }
+
+    .pnd-card__icon-box.icon-terakhir {
+      background: #8b5cf6;
+      box-shadow: 0 2px 6px rgba(139, 92, 246, 0.3);
+    }
+
+    .pnd-card__icon-box svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2;
+    }
+
+    /* Main Panel & Blue Line */
+    .panel.campaign-panel {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 22px 24px 22px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      min-height: calc(100vh - 140px);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pnd-panel-line {
+      height: 3.5px;
+      margin: 0 0 16px 0;
+      border-radius: 4px;
+      background: #0076C5;
+      width: 100%;
+    }
+
+    /* Toolbar Layout */
+    .pnd-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pnd-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pnd-toolbar__right {
+      display: flex;
+      align-items: center;
+    }
+
+    .pnd-btn-icon {
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #0076C5;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-icon.has-filter {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0284c7 !important;
+    }
+
+    .pnd-btn-icon.has-filter::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
+
+    .pnd-btn-icon:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .pnd-btn-icon svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pnd-search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .pnd-search-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 15px;
+      height: 15px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .pnd-search-wrap input {
+      height: 36px;
+      padding: 0 12px 0 32px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      width: 230px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-search-wrap input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.15);
+    }
+
+    /* Button Tambah */
+    .btn-tambah-pnd {
+      height: 36px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-pnd:hover {
+      background: #0284c7;
+    }
+
+    .btn-tambah-pnd:active {
+      transform: scale(0.98);
+    }
+
+    .pnd-dashed-divider {
+      border: none;
+      border-top: 1px dashed #cbd5e1;
+      margin: 0 0 14px 0;
+    }
+
+    /* Table Styles */
+    .table-wrap.campaign-table {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid #e4e4e7;
+      min-height: 480px;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      flex: 1;
+    }
+
+    #hdTable {
+      width: 100%;
+      min-width: 1160px;
+      table-layout: fixed;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      text-align: left;
+    }
+
+    #hdTable th,
+    #hdTable td {
+      vertical-align: middle;
+      padding: 13px 16px;
+      box-sizing: border-box;
+    }
+
+    /* Fixed Column Widths (Konsisten berapa pun data yang ada) */
+    #hdTable th:nth-child(1),
+    #hdTable td:nth-child(1) {
+      width: 50px;
+      min-width: 50px;
+      max-width: 50px;
+      text-align: center;
+    }
+
+    #hdTable th:nth-child(2),
+    #hdTable td:nth-child(2) {
+      width: 170px;
+      min-width: 170px;
+      max-width: 170px;
+    }
+
+    #hdTable th:nth-child(3),
+    #hdTable td:nth-child(3) {
+      width: 220px;
+      min-width: 220px;
+      max-width: 220px;
+    }
+
+    #hdTable th:nth-child(4),
+    #hdTable td:nth-child(4) {
+      width: 200px;
+      min-width: 200px;
+      max-width: 200px;
+    }
+
+    #hdTable th:nth-child(5),
+    #hdTable td:nth-child(5) {
+      width: 180px;
+      min-width: 180px;
+      max-width: 180px;
+      text-align: right;
+    }
+
+    #hdTable th:nth-child(6),
+    #hdTable td:nth-child(6) {
+      width: auto;
+      min-width: 270px;
+    }
+
+    #hdTable th:nth-child(7),
+    #hdTable td:nth-child(7) {
+      width: 70px;
+      min-width: 70px;
+      max-width: 70px;
+      text-align: center;
+    }
+
+    #hdTable thead th {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a !important;
+      background: #f4f4f5 !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      white-space: nowrap;
+      height: 46px;
+    }
+
+    #hdTable thead th:first-child {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-left: 1px solid #e4e4e7;
+    }
+
+    #hdTable thead th:last-child {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      border-right: 1px solid #e4e4e7;
+    }
+
+    #hdTable tbody tr {
+      height: 52px;
+      transition: background 0.15s ease;
+    }
+
+    #hdTable tbody td {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+      background: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #hdTable tbody tr:hover td {
+      background: #f8fafc;
+    }
+
+    /* Sticky Aksi Column */
+    #hdTable th.col-sticky-action,
+    #hdTable td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+      width: 70px !important;
+      min-width: 70px !important;
+      max-width: 70px !important;
+    }
+
+    #hdTable th.col-sticky-action {
+      z-index: 11;
+      background-color: #f4f4f5 !important;
+    }
+
+    #hdTable tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    .hd-cell-ref {
+      font-weight: 600;
+      color: #0284c7;
+      letter-spacing: 0.2px;
+    }
+
+    .hd-cell-nominal {
+      text-align: right;
+      font-weight: 700;
+      font-style: italic;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
+    .pnd-badge-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .pnd-badge-status.is-pendapatan {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .pnd-badge-status.is-beban {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .pnd-badge-status.is-kas {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .pnd-badge-status.is-lainnya {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    /* Action Toggle Button */
+    .pnd-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .pnd-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .pnd-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Fixed Floating Action Menu */
+    .pnd-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .pnd-action-menu.is-open {
+      display: block;
+    }
+
+    .pnd-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .pnd-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .pnd-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 26px;
+      color: #fff;
+      background: #0076C5;
+    }
+
+    .pnd-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pnd-action-menu button.is-danger {
+      color: #dc2626;
+    }
+
+    .pnd-action-menu button.is-danger:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .pnd-action-icon.icon-delete {
+      background: #ef4444;
+    }
+
+    /* Modal Form / View (Presisi 100% dengan Pengeluaran & Beban) */
+    .pnd-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .pnd-modal-overlay.is-open {
+      display: flex;
+    }
+
+    .pnd-modal-box {
+      position: relative;
+      background: #ffffff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 620px;
+      padding: 24px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      max-height: 90vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      animation: pndModalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes pndModalIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .pnd-modal-accent {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #0076C5;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .pnd-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .pnd-modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .pnd-modal-title em {
+      font-style: italic;
+      color: #0076C5;
+    }
+
+    .pnd-modal-title .title-subtitle {
+      font-size: 15px;
+      font-weight: 500;
+      color: #64748b;
+      margin-left: 6px;
+    }
+
+    .pnd-modal-close {
+      border: 0;
+      background: transparent;
+      font-size: 22px;
+      color: #94a3b8;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .pnd-modal-close:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .pnd-modal-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 0 -28px 20px -28px;
+    }
+
+    .pnd-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px 20px;
+      margin-bottom: 24px;
+    }
+
+    .pnd-form-grid .full-col {
+      grid-column: span 2;
+    }
+
+    .pnd-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .pnd-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .pnd-input {
+      height: 38px;
+      padding: 0 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.15);
+    }
+
+    .pnd-input.is-muted {
+      background: #f8fafc;
+      color: #64748b;
+      border-color: #e2e8f0;
+      cursor: not-allowed;
+    }
+
+    .pnd-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 10px;
+    }
+
+    .pnd-btn-batal {
+      height: 38px;
+      padding: 0 20px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #64748b;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-batal:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .pnd-btn-simpan {
+      height: 38px;
+      padding: 0 24px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #ffffff;
+      background: #0076C5;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
+      transition: all 0.15s ease;
+    }
+
+    .pnd-btn-simpan:hover {
+      background: #0064a7;
+      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.35);
+    }
+
+    /* Popover Filter List */
+    .pnd-filter-popover {
+      display: none;
+      position: absolute;
+      top: 42px;
+      left: 0;
+      z-index: 1000;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+      width: 240px;
+      padding: 12px;
+    }
+
+    .pnd-filter-popover.is-active {
+      display: block;
+    }
+
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar"></header>
+
+    <main class="dashboard-content">
+      <!-- ===== MAIN PANEL (Tabel History Dokumen View-Only) ===== -->
+      <section class="panel campaign-panel">
+      <div class="pnd-panel-line"></div>
+
+      <!-- Toolbar -->
+      <div class="pnd-toolbar">
+        <div class="pnd-toolbar__left">
+          <!-- Filter Button & Popover -->
+          <div class="filter-dropdown-wrapper">
+            <button id="btnFilterHd" class="pnd-btn-icon" type="button" aria-label="Filter Data" title="Filter Dokumen">
+              <svg viewBox="0 0 24 24">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+            </button>
+            <div id="filterHdDropdown" class="pnd-filter-popover">
+              <label style="font-size: 12.5px; font-weight: 600; color: #334155; margin-bottom: 6px; display: block;">Jenis Transaksi</label>
+              <select id="selFilterJenis" class="pnd-input" style="width: 100%; margin-bottom: 12px; font-size: 12.5px;">
+                <option value="">Semua Jenis Transaksi</option>
+                <option value="Pendapatan">Pendapatan</option>
+                <option value="Beban Operasional">Beban Operasional</option>
+                <option value="Beban Pemasaran">Beban Pemasaran</option>
+                <option value="Beban Server & IT">Beban Server & IT</option>
+                <option value="Kas Masuk">Kas Masuk</option>
+                <option value="Kas Keluar">Kas Keluar</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+              <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button type="button" id="btnResetFilter" style="background: transparent; border: 1px solid #cbd5e1; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer;">Reset</button>
+                <button type="button" id="btnApplyFilter" style="background: #0076C5; color: #fff; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; font-weight: 600; cursor: pointer;">Terapkan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Excel Button -->
+          <button id="btnExportHd" class="pnd-btn-icon pnd-btn-excel" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+            <svg viewBox="0 0 24 24" style="width: 17px; height: 17px;" fill="none" stroke="currentColor">
+              <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+              <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+              <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <!-- Search Input -->
+          <div class="pnd-search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="hdSearch" placeholder="Cari referensi dokumen, jenis..." autocomplete="off" />
+          </div>
+        </div>
+      </div>
+
+      <div class="pnd-dashed-divider"></div>
+
+      <!-- Table Wrapper -->
+      <div class="table-wrap campaign-table" id="hdTableWrap">
+        <table id="hdTable">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center;">#</th>
+              <th style="width: 170px;">Tanggal Dikeluarkan</th>
+              <th style="width: 220px;">Referensi Dokumen</th>
+              <th style="width: 200px;">Jenis Transaksi</th>
+              <th style="width: 180px; text-align: right;">Nominal</th>
+              <th>Keterangan</th>
+              <th class="col-sticky-action" style="width: 70px; text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="hdTableBody">
+            <!-- Rendered via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+  <!-- Modal Detail Dokumen (View Only) -->
+  <div id="hdDetailModal" class="pnd-modal-overlay">
+    <div class="pnd-modal-box">
+      <div class="pnd-modal-accent"></div>
+      <div class="pnd-modal-header">
+        <h2 class="pnd-modal-title">
+          <em>Detail</em> <span class="title-subtitle">History Dokumen</span>
+        </h2>
+        <button type="button" class="pnd-modal-close" id="btnCloseDetailModal" aria-label="Tutup">x</button>
+      </div>
+      <div class="pnd-modal-divider"></div>
+
+      <div class="pnd-form-grid">
+        <div class="pnd-field">
+          <label class="pnd-label">Referensi Dokumen</label>
+          <input type="text" id="viewHdReferensi" class="pnd-input is-muted" readonly />
+        </div>
+
+        <div class="pnd-field">
+          <label class="pnd-label">Tanggal Dikeluarkan</label>
+          <input type="text" id="viewHdTanggal" class="pnd-input is-muted" readonly />
+        </div>
+
+        <div class="pnd-field">
+          <label class="pnd-label">Jenis Transaksi</label>
+          <input type="text" id="viewHdJenis" class="pnd-input is-muted" readonly />
+        </div>
+
+        <div class="pnd-field">
+          <label class="pnd-label">Nominal</label>
+          <input type="text" id="viewHdNominal" class="pnd-input is-muted" style="font-weight: 700; color: #0284c7;" readonly />
+        </div>
+
+        <div class="pnd-field full-col">
+          <label class="pnd-label">Keterangan</label>
+          <input type="text" id="viewHdKeterangan" class="pnd-input is-muted" readonly />
+        </div>
+      </div>
+
+      <div class="pnd-modal-footer">
+        <button type="button" class="pnd-btn-batal" id="btnCloseDetailFooter">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard Topbar & Sidebar Layout Engine -->
+  <script src="../../assets/js/layout.js?v=20261111_hd_v2"></script>
+  <script src="../../assets/js/excel_engine.js?v=20261103_grup_v3"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const STORAGE_KEY = 'accounting_history_dokumen_data_v1';
+
+      // Seed data awal sebagai basis histori referensi dokumen
+      const seedData = [
+        {
+          id: 'hd-1',
+          tanggal: '2026-10-18',
+          referensi: 'EXP-2609-005',
+          jenis: 'Beban Server & IT',
+          nominal: 943500,
+          keterangan: 'Server & Cloud Hosting Database Google Cloud'
+        },
+        {
+          id: 'hd-2',
+          tanggal: '2026-10-01',
+          referensi: 'INV-202609-001',
+          jenis: 'Pendapatan',
+          nominal: 748155,
+          keterangan: 'Management Fee MCN Kreator TikTok'
+        },
+        {
+          id: 'hd-3',
+          tanggal: '2026-09-08',
+          referensi: 'EXP-2609-002',
+          jenis: 'Beban Pemasaran',
+          nominal: 1665000,
+          keterangan: 'Iklan Digital Campaign Meta Ads'
+        },
+        {
+          id: 'hd-4',
+          tanggal: '2026-09-05',
+          referensi: 'EXP-2609-001',
+          jenis: 'Beban Operasional',
+          nominal: 30000,
+          keterangan: 'Biaya admin transfer bulanan bank BCA'
+        },
+        {
+          id: 'hd-5',
+          tanggal: '2026-09-01',
+          referensi: 'INV-202609-002',
+          jenis: 'Pendapatan',
+          nominal: 15500000,
+          keterangan: 'Penerimaan Pembayaran Campaign Brand A'
+        }
+      ];
+
+      // History Dokumen hanya VIEW-ONLY: otomatis memuat dan mengagregasikan seluruh dokumen operasional
+      function loadData() {
+        const result = [];
+        const seenRef = new Set();
+
+        // 1. Ambil dari Pendapatan (accounting_pendapatan_data_v1)
+        try {
+          const rawPnd = localStorage.getItem('accounting_pendapatan_data_v1');
+          if (rawPnd) {
+            const pndList = JSON.parse(rawPnd);
+            if (Array.isArray(pndList)) {
+              pndList.forEach(function (p) {
+                if (!p) return;
+                const ref = (p.noInvoice || p.idPendapatan || '').trim();
+                if (ref && !seenRef.has(ref.toLowerCase())) {
+                  seenRef.add(ref.toLowerCase());
+                  const desc = [p.customer, p.keterangan].filter(Boolean).join(' - ') || 'Pendapatan Invoice';
+                  const nom = Number(p.totalTagihan !== undefined ? p.totalTagihan : (Number(p.dpp || 0) + Number(p.ppn || 0)));
+                  result.push({
+                    id: 'hd-pnd-' + (p.id || ref),
+                    tanggal: p.tanggalPengakuan || p.tanggal || '2026-09-01',
+                    referensi: ref,
+                    jenis: 'Pendapatan',
+                    nominal: nom,
+                    keterangan: desc
+                  });
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 2. Ambil dari Pengeluaran & Beban (accounting_pengeluaran_beban_data_v5)
+        try {
+          const rawExp = localStorage.getItem('accounting_pengeluaran_beban_data_v5');
+          if (rawExp) {
+            const expList = JSON.parse(rawExp);
+            if (Array.isArray(expList)) {
+              expList.forEach(function (x) {
+                if (!x) return;
+                const ref = (x.idDokumen || x.noDokumen || '').trim();
+                if (ref && !seenRef.has(ref.toLowerCase())) {
+                  seenRef.add(ref.toLowerCase());
+                  const desc = [x.vendorKaryawan, x.keterangan].filter(Boolean).join(' - ') || 'Pengeluaran Beban';
+                  const nom = Number(x.tagihanBruto !== undefined ? x.tagihanBruto : Number(x.dpp || 0));
+                  result.push({
+                    id: 'hd-exp-' + (x.id || ref),
+                    tanggal: x.tanggalPengeluaran || x.tanggal || '2026-09-01',
+                    referensi: ref,
+                    jenis: x.jenis || 'Beban Operasional',
+                    nominal: nom,
+                    keterangan: desc
+                  });
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 3. Ambil dari Kas & Bank (accounting_kas_bank_v2)
+        try {
+          const rawKb = localStorage.getItem('accounting_kas_bank_v2');
+          if (rawKb) {
+            const kbList = JSON.parse(rawKb);
+            if (Array.isArray(kbList)) {
+              kbList.forEach(function (k) {
+                if (!k) return;
+                const ref = (k.referensi || k.idTransaksi || '').trim();
+                if (ref && ref !== '-' && !seenRef.has(ref.toLowerCase())) {
+                  seenRef.add(ref.toLowerCase());
+                  const isInc = k.jenis === 'Pendapatan';
+                  result.push({
+                    id: 'hd-kb-' + (k.id || ref),
+                    tanggal: k.tanggal || '2026-09-01',
+                    referensi: ref,
+                    jenis: isInc ? 'Kas Masuk' : 'Kas Keluar',
+                    nominal: Number(k.uangMasuk || k.uangKeluar || k.saldoAkun || 0),
+                    keterangan: k.keterangan || (isInc ? 'Penerimaan Kas' : 'Pengeluaran Kas')
+                  });
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 4. Sertakan seedData untuk melengkapi riwayat dokumen
+        seedData.forEach(function (sd) {
+          if (sd && sd.referensi && !seenRef.has(sd.referensi.toLowerCase())) {
+            seenRef.add(sd.referensi.toLowerCase());
+            result.push(sd);
+          }
+        });
+
+        // 5. Urutkan berdasarkan tanggal terbaru di paling atas (descending)
+        result.sort(function (a, b) {
+          const da = new Date(a.tanggal || 0).getTime();
+          const db = new Date(b.tanggal || 0).getTime();
+          return db - da;
+        });
+
+        return result;
+      }
+
+      let historyData = loadData();
+
+      // Currency Formatters
+      function formatRupiah(num) {
+        if (num === null || num === undefined || num === '' || isNaN(num) || Number(num) === 0) {
+          return 'Rp. 0';
+        }
+        return 'Rp. ' + Number(num).toLocaleString('id-ID');
+      }
+
+      function formatDateIndo(dateStr) {
+        if (!dateStr) return '-';
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+          const mIdx = parseInt(parts[1], 10) - 1;
+          return parts[2] + ' ' + (months[mIdx] || parts[1]) + ' ' + parts[0];
+        }
+        return dateStr;
+      }
+
+      function escapeHtml(val) {
+        return String(val || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // Metric Cards Summary
+      function updateSummaryCards() {
+        const totalDokumenEl = document.getElementById('cardTotalDokumen');
+        if (!totalDokumenEl) return;
+        const totalNominalEl = document.getElementById('cardTotalNominal');
+        const rataNominalEl = document.getElementById('cardRataNominal');
+        const dokumenTerakhirEl = document.getElementById('cardDokumenTerakhir');
+
+        const totalDokumen = historyData.length;
+        let totalNominal = 0;
+        historyData.forEach(function (d) {
+          totalNominal += Number(d.nominal || 0);
+        });
+        const rata = totalDokumen > 0 ? Math.round(totalNominal / totalDokumen) : 0;
+
+        if (totalDokumenEl) totalDokumenEl.textContent = totalDokumen + ' Dokumen';
+        if (totalNominalEl) totalNominalEl.textContent = formatRupiah(totalNominal);
+        if (rataNominalEl) rataNominalEl.textContent = formatRupiah(rata);
+
+        if (dokumenTerakhirEl) {
+          if (historyData.length > 0) {
+            const last = historyData[0];
+            dokumenTerakhirEl.textContent = (last.referensi || '-') + ' (' + formatDateIndo(last.tanggal) + ')';
+          } else {
+            dokumenTerakhirEl.textContent = '-';
+          }
+        }
+      }
+
+      // Filter Data Helper
+      function getFilteredData() {
+        const q = (document.getElementById('hdSearch') ? document.getElementById('hdSearch').value : '').toLowerCase().trim();
+        const filterJenis = (document.getElementById('selFilterJenis') ? document.getElementById('selFilterJenis').value : '').trim();
+
+        return historyData.filter(function (it) {
+          const matchQ = !q ||
+            (it.referensi && it.referensi.toLowerCase().includes(q)) ||
+            (it.jenis && it.jenis.toLowerCase().includes(q)) ||
+            (it.keterangan && it.keterangan.toLowerCase().includes(q)) ||
+            (it.tanggal && it.tanggal.toLowerCase().includes(q));
+
+          const matchJenis = !filterJenis || (it.jenis && it.jenis.toLowerCase() === filterJenis.toLowerCase());
+          return matchQ && matchJenis;
+        });
+      }
+
+      // Render Table Data (View-Only)
+      function renderTable() {
+        const tbody = document.getElementById('hdTableBody');
+        if (!tbody) return;
+
+        const filtered = getFilteredData();
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; height: 380px; vertical-align: middle; color: #94a3b8; font-style: italic; background: #ffffff;">Tidak ada data history dokumen yang sesuai.</td></tr>';
+          updateSummaryCards();
+          return;
+        }
+
+        let html = '';
+        filtered.forEach(function (item, index) {
+          let badgeClass = 'pnd-badge-status is-lainnya';
+          const jLower = (item.jenis || '').toLowerCase();
+          if (jLower.includes('pendapatan') || jLower.includes('masuk')) badgeClass = 'pnd-badge-status is-pendapatan';
+          else if (jLower.includes('beban') || jLower.includes('keluar')) badgeClass = 'pnd-badge-status is-beban';
+          else if (jLower.includes('kas')) badgeClass = 'pnd-badge-status is-kas';
+
+          html += '<tr class="hd-table-row" data-id="' + escapeHtml(item.id) + '" style="cursor: pointer;">' +
+            '<td style="text-align: center; color: #94a3b8;">' + (index + 1) + '</td>' +
+            '<td style="font-weight: 500;">' + escapeHtml(formatDateIndo(item.tanggal)) + '</td>' +
+            '<td><span class="hd-cell-ref">' + escapeHtml(item.referensi || '-') + '</span></td>' +
+            '<td><span class="' + badgeClass + '">' + escapeHtml(item.jenis || '-') + '</span></td>' +
+            '<td class="hd-cell-nominal">' + escapeHtml(formatRupiah(item.nominal)) + '</td>' +
+            '<td style="max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + escapeHtml(item.keterangan || '') + '">' + escapeHtml(item.keterangan || '-') + '</td>' +
+            '<td class="col-sticky-action" style="text-align: center;">' +
+              '<button class="btn-view" type="button" aria-label="Lihat Detail" title="Lihat Detail Dokumen" data-id="' + escapeHtml(item.id) + '">' +
+                '<i class="bx bx-show"></i>' +
+              '</button>' +
+            '</td>' +
+          '</tr>';
+        });
+
+        tbody.innerHTML = html;
+        updateSummaryCards();
+        bindViewButtons();
+      }
+
+      function bindViewButtons() {
+        // Tombol View Detail (Icon Mata Konsisten dengan Bisa Media)
+        document.querySelectorAll('.btn-view').forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const id = this.getAttribute('data-id');
+            const item = historyData.find(function (it) { return it.id === id; });
+            if (item) openDetailModal(item);
+          });
+        });
+
+        // Klik baris tabel langsung membuka Detail Modal
+        document.querySelectorAll('.hd-table-row').forEach(function (row) {
+          row.addEventListener('click', function (e) {
+            if (e.target.closest('button')) return;
+            const id = this.getAttribute('data-id');
+            const item = historyData.find(function (it) { return it.id === id; });
+            if (item) openDetailModal(item);
+          });
+        });
+      }
+
+      // Detail Modal
+      const detailModal = document.getElementById('hdDetailModal');
+
+      function openDetailModal(item) {
+        document.getElementById('viewHdReferensi').value = item.referensi || '-';
+        document.getElementById('viewHdTanggal').value = formatDateIndo(item.tanggal);
+        document.getElementById('viewHdJenis').value = item.jenis || '-';
+        document.getElementById('viewHdNominal').value = formatRupiah(item.nominal);
+        document.getElementById('viewHdKeterangan').value = item.keterangan || '-';
+
+        if (detailModal) detailModal.classList.add('is-open');
+      }
+
+      function closeDetailModal() {
+        if (detailModal) detailModal.classList.remove('is-open');
+      }
+
+      const btnCloseDetail = document.getElementById('btnCloseDetailModal');
+      if (btnCloseDetail) btnCloseDetail.addEventListener('click', closeDetailModal);
+
+      const btnCloseDetailFooter = document.getElementById('btnCloseDetailFooter');
+      if (btnCloseDetailFooter) btnCloseDetailFooter.addEventListener('click', closeDetailModal);
+
+      // Filter Popover
+      const btnFilterHd = document.getElementById('btnFilterHd');
+      const filterHdDropdown = document.getElementById('filterHdDropdown');
+      const btnResetFilter = document.getElementById('btnResetFilter');
+      const btnApplyFilter = document.getElementById('btnApplyFilter');
+
+      if (btnFilterHd && filterHdDropdown) {
+        btnFilterHd.addEventListener('click', function (e) {
+          e.stopPropagation();
+          filterHdDropdown.classList.toggle('is-active');
+        });
+      }
+
+      if (btnApplyFilter) {
+        btnApplyFilter.addEventListener('click', function () {
+          renderTable();
+          if (filterHdDropdown) filterHdDropdown.classList.remove('is-active');
+          const sel = document.getElementById('selFilterJenis');
+          if (btnFilterHd) {
+            if (sel && sel.value) btnFilterHd.classList.add('has-filter');
+            else btnFilterHd.classList.remove('has-filter');
+          }
+        });
+      }
+
+      if (btnResetFilter) {
+        btnResetFilter.addEventListener('click', function () {
+          const sel = document.getElementById('selFilterJenis');
+          if (sel) sel.value = '';
+          if (btnFilterHd) btnFilterHd.classList.remove('has-filter');
+          renderTable();
+          if (filterHdDropdown) filterHdDropdown.classList.remove('is-active');
+        });
+      }
+
+      // Search Event
+      const inpSearch = document.getElementById('hdSearch');
+      if (inpSearch) inpSearch.addEventListener('input', renderTable);
+
+      // Export Excel (Konsisten dengan seluruh modul Bisa Media via excel_engine.js)
+      const btnExportHd = document.getElementById('btnExportHd');
+      if (btnExportHd) {
+        btnExportHd.addEventListener('click', function () {
+          const filtered = getFilteredData();
+          if (!filtered || filtered.length === 0) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Data Kosong',
+              text: 'Tidak ada data history dokumen untuk diekspor.',
+              confirmButtonColor: '#0076C5'
+            });
+            return;
+          }
+
+          const headers = [
+            'No',
+            'Tanggal Dikeluarkan',
+            'Referensi Dokumen',
+            'Jenis Transaksi',
+            'Nominal',
+            'Keterangan'
+          ];
+
+          const rows = filtered.map(function (it, idx) {
+            return [
+              idx + 1,
+              it.tanggal ? formatDateIndo(it.tanggal) : '-',
+              it.referensi || '-',
+              it.jenis || '-',
+              Number(it.nominal || 0),
+              it.keterangan || '-'
+            ];
+          });
+
+          const todayStr = new Date().toISOString().slice(0, 10);
+          const filename = 'History_Dokumen_' + todayStr + '.xlsx';
+
+          if (typeof window.exportBisaExcel === 'function') {
+            window.exportBisaExcel({
+              title: 'LAPORAN HISTORY DOKUMEN',
+              filename: filename,
+              sheetName: 'History Dokumen',
+              headers: headers,
+              rows: rows
+            });
+          } else {
+            let csv = headers.join(',') + '\n';
+            rows.forEach(function (r) {
+              csv += r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'History_Dokumen_' + todayStr + '.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        });
+      }
+
+      // Close Popups on Global Click or ESC
+      document.addEventListener('click', function (e) {
+        if (filterHdDropdown && !e.target.closest('#filterHdDropdown') && !e.target.closest('#btnFilterHd')) {
+          filterHdDropdown.classList.remove('is-active');
+        }
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeDetailModal();
+          if (filterHdDropdown) filterHdDropdown.classList.remove('is-active');
+        }
+      });
+
+      // Sinkronisasi realtime jika ada transaksi baru di modul lain
+      window.addEventListener('storage', function () {
+        historyData = loadData();
+        renderTable();
+      });
+
+      // Initial Render
+      renderTable();
+    });
+  </script>
+</body>
+
+</html>

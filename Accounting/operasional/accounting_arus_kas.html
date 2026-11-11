@@ -255,49 +255,6 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     }
 
-    .ak-chart-type-toggles {
-      display: inline-flex;
-      align-items: center;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 2.5px;
-      gap: 2px;
-    }
-
-    .ak-chart-type-btn {
-      border: none;
-      background: transparent;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #64748b;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s ease;
-    }
-
-    .ak-chart-type-btn:hover {
-      color: #0f172a;
-    }
-
-    .ak-chart-type-btn.is-active {
-      background: #ffffff;
-      color: #0076C5;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-
-    .ak-chart-type-btn svg {
-      width: 13px;
-      height: 13px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.2;
-    }
 
     /* Mini KPI Row above the chart */
     .ak-trend-kpi-row {
@@ -375,7 +332,7 @@
     .ak-chart-container {
       position: relative;
       width: 100%;
-      height: 310px;
+      height: 340px;
     }
 
     /* ===== RINGKASAN BULANAN TABLE ===== */
@@ -472,7 +429,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 20px;
+      gap: 16px;
       padding: 8px 10px;
     }
 
@@ -486,27 +443,30 @@
     .ak-donut-legend {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       flex-grow: 1;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
     .ak-legend-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      font-size: 13.5px;
+      gap: 8px;
+      font-size: 12.5px;
     }
 
     .ak-legend-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
+      min-width: 0;
     }
 
     .ak-legend-dot {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       display: inline-block;
       flex-shrink: 0;
@@ -515,12 +475,16 @@
     .ak-legend-name {
       color: #334155;
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 145px;
     }
 
     .ak-legend-val {
       font-weight: 700;
       color: #0f172a;
-      min-width: 40px;
+      min-width: 36px;
       text-align: right;
     }
 
@@ -531,20 +495,37 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .ak-account-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 6px 8px;
+      padding: 7px 10px;
       border-radius: 8px;
-      transition: background 0.15s ease;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
     }
 
     .ak-account-item:hover {
-      background: #f8fafc;
+      background: #f1f5f9;
+    }
+
+    .ak-account-item.is-selected {
+      background: #e0f2fe;
+      border-color: #bae6fd;
+    }
+
+    .ak-account-item.is-selected .ak-account-name {
+      color: #0076C5;
+      font-weight: 700;
+    }
+
+    .ak-account-item.is-selected .ak-account-val {
+      color: #0076C5;
+      font-weight: 700;
     }
 
     .ak-account-left {
@@ -722,38 +703,28 @@
             <div class="ak-panel-header">
               <h2 class="ak-panel-title"><em>Tren</em> Arus Keuangan</h2>
               <div class="ak-period-select-wrap">
-                <select id="periodSelector" class="ak-period-select" aria-label="Pilih Periode">
-                  <option value="okt2026">Oktober 2026</option>
-                  <option value="sep2026">September 2026</option>
-                  <option value="agu2026">Agustus 2026</option>
-                  <option value="q3_2026">Kuartal 3 (Q3) 2026</option>
-                  <option value="tahun2026">Tahun 2026 (YTD)</option>
+                <select id="periodSelector" class="ak-period-select" aria-label="Pilih Bank / Akun">
+                  <option value="all" selected>Semua Bank / Akun</option>
+                  <option value="bca1">Bank BCA | 2092026028</option>
+                  <option value="bca2">Bank BCA | 2091139784</option>
+                  <option value="seabank">SEABANK | 901631003438</option>
+                  <option value="bni">BNI | 2049368973</option>
+                  <option value="kasKecil">Kas Kecil</option>
                 </select>
               </div>
             </div>
 
             <div class="ak-dashed-divider"></div>
 
-            <!-- Granularity & Chart Type Toolbar -->
+            <!-- Granularity Toolbar -->
             <div class="ak-trend-toolbar">
               <div class="ak-trend-controls-left">
                 <!-- Granularity Tabs -->
                 <div class="ak-view-toggles" id="granularityToggles">
+                  <button type="button" class="ak-view-btn is-active" data-granularity="perBank">Per Akun Bank</button>
+                  <button type="button" class="ak-view-btn" data-granularity="weekly">Mingguan</button>
                   <button type="button" class="ak-view-btn" data-granularity="daily">Harian</button>
-                  <button type="button" class="ak-view-btn is-active" data-granularity="weekly">Mingguan</button>
                   <button type="button" class="ak-view-btn" data-granularity="monthly">Bulanan</button>
-                </div>
-
-                <!-- Chart Type Tabs -->
-                <div class="ak-chart-type-toggles" id="chartTypeToggles">
-                  <button type="button" class="ak-chart-type-btn is-active" data-chart-type="line" title="Grafik Garis Area">
-                    <svg viewBox="0 0 24 24"><path d="M3 3v18h18" /><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3" /></svg>
-                    Area
-                  </button>
-                  <button type="button" class="ak-chart-type-btn" data-chart-type="bar" title="Grafik Batang">
-                    <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6" /></svg>
-                    Batang
-                  </button>
                 </div>
               </div>
             </div>
@@ -823,10 +794,10 @@
 
         <!-- ===== RIGHT COLUMN ===== -->
         <div class="ak-col-right">
-          <!-- PANEL 3: Komponen Kas Bersih -->
+          <!-- PANEL 3: Komponen Kas Bersih / Distribusi Bank -->
           <section class="ak-panel">
             <div class="ak-panel-header">
-              <h2 class="ak-panel-title"><em>Komponen</em> Kas Bersih</h2>
+              <h2 class="ak-panel-title"><em id="pieTitleEm">Distribusi</em> <span id="pieTitleText">Saldo Per Bank</span></h2>
             </div>
 
             <div class="ak-dashed-divider"></div>
@@ -836,30 +807,8 @@
                 <canvas id="donutChart"></canvas>
               </div>
 
-              <div class="ak-donut-legend">
-                <div class="ak-legend-item">
-                  <div class="ak-legend-left">
-                    <span class="ak-legend-dot" style="background: #0ea5e9;"></span>
-                    <span class="ak-legend-name">Oprasional</span>
-                  </div>
-                  <span class="ak-legend-val" id="legendOperasional">0%</span>
-                </div>
-
-                <div class="ak-legend-item">
-                  <div class="ak-legend-left">
-                    <span class="ak-legend-dot" style="background: #facc15;"></span>
-                    <span class="ak-legend-name">Investasi</span>
-                  </div>
-                  <span class="ak-legend-val" id="legendInvestasi">0%</span>
-                </div>
-
-                <div class="ak-legend-item">
-                  <div class="ak-legend-left">
-                    <span class="ak-legend-dot" style="background: #ef4444;"></span>
-                    <span class="ak-legend-name">Pendanaan</span>
-                  </div>
-                  <span class="ak-legend-val" id="legendPendanaan">0%</span>
-                </div>
+              <div class="ak-donut-legend" id="donutLegendContainer">
+                <!-- Rendered dynamically by JavaScript -->
               </div>
             </div>
           </section>
@@ -873,35 +822,35 @@
             <div class="ak-dashed-divider"></div>
 
             <ul class="ak-account-list" id="accountList">
-              <li class="ak-account-item">
+              <li class="ak-account-item" data-bank="kasKecil" title="Klik untuk memfilter kas kecil">
                 <div class="ak-account-left">
                   <span class="ak-account-num">1.</span>
                   <span class="ak-account-name">Kas Kecil</span>
                 </div>
                 <span class="ak-account-val" id="accKasKecil">Rp. -</span>
               </li>
-              <li class="ak-account-item">
+              <li class="ak-account-item" data-bank="bca1" title="Klik untuk memfilter Bank BCA 2092026028">
                 <div class="ak-account-left">
                   <span class="ak-account-num">2.</span>
                   <span class="ak-account-name">Bank BCA | 2092026028</span>
                 </div>
                 <span class="ak-account-val" id="accBca1">Rp. -</span>
               </li>
-              <li class="ak-account-item">
+              <li class="ak-account-item" data-bank="bca2" title="Klik untuk memfilter Bank BCA 2091139784">
                 <div class="ak-account-left">
                   <span class="ak-account-num">3.</span>
                   <span class="ak-account-name">Bank BCA | 2091139784</span>
                 </div>
                 <span class="ak-account-val" id="accBca2">Rp. -</span>
               </li>
-              <li class="ak-account-item">
+              <li class="ak-account-item" data-bank="seabank" title="Klik untuk memfilter SEABANK 901631003438">
                 <div class="ak-account-left">
                   <span class="ak-account-num">4.</span>
                   <span class="ak-account-name">SEABANK | 901631003438</span>
                 </div>
                 <span class="ak-account-val" id="accSeabank">Rp. -</span>
               </li>
-              <li class="ak-account-item">
+              <li class="ak-account-item" data-bank="bni" title="Klik untuk memfilter BNI 2049368973">
                 <div class="ak-account-left">
                   <span class="ak-account-num">5.</span>
                   <span class="ak-account-name">BNI | 2049368973</span>
@@ -940,15 +889,17 @@
     </main>
   </div>
 
-  <script src="../../assets/js/layout.js?v=20261110_divisi_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261111_hd_v2"></script>
 
   <script>
     (function () {
       'use strict';
 
-      /* ===== PERIOD DATASET (Realistis Sesuai Standard Kas & Bank) ===== */
-      const DASHBOARD_DATA = {
-        okt2026: {
+      /* ===== BANK & ACCOUNT DATASET (Nilai Uang Detail Penuh Rupiah) ===== */
+      const BANK_DATA = {
+        all: {
+          id: 'all',
+          name: 'Semua Bank / Akun',
           cards: {
             masuk: 1250000000,
             keluar: 820000000,
@@ -956,29 +907,43 @@
             saldoAkhir: 965000000
           },
           trend: {
+            perBank: {
+              labels: ['Kas Kecil', 'Bank BCA 2092026028', 'Bank BCA 2091139784', 'SEABANK 901631003438', 'BNI 2049368973'],
+              masuk: [25000000, 580000000, 360000000, 160000000, 125000000],
+              keluar: [10000000, 130000000, 80000000, 35000000, 30000000],
+              saldo: [15000000, 450000000, 280000000, 125000000, 95000000] // Saldo per Akun detail Rupiah
+            },
             weekly: {
               labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
-              masuk: [280, 310, 340, 320],
-              keluar: [190, 220, 210, 200],
-              bersih: [90, 90, 130, 120]
+              masuk: [280000000, 310000000, 340000000, 320000000],
+              keluar: [190000000, 220000000, 210000000, 200000000],
+              saldo: [90000000, 90000000, 130000000, 120000000]
             },
             daily: {
               labels: ['01 Okt', '04 Okt', '07 Okt', '10 Okt', '13 Okt', '16 Okt', '19 Okt', '22 Okt', '25 Okt', '28 Okt', '31 Okt'],
-              masuk: [38, 45, 52, 60, 48, 75, 68, 85, 72, 80, 77],
-              keluar: [25, 32, 40, 48, 35, 55, 48, 58, 45, 52, 42],
-              bersih: [13, 13, 12, 12, 13, 20, 20, 27, 27, 28, 35]
+              masuk: [38000000, 45000000, 52000000, 60000000, 48000000, 75000000, 68000000, 85000000, 72000000, 80000000, 77000000],
+              keluar: [25000000, 32000000, 40000000, 48000000, 35000000, 55000000, 48000000, 58000000, 45000000, 52000000, 42000000],
+              saldo: [13000000, 13000000, 12000000, 12000000, 13000000, 20000000, 20000000, 27000000, 27000000, 28000000, 35000000]
             },
             monthly: {
               labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt (Bln Ini)'],
-              masuk: [990, 1050, 1020, 980, 1100, 1250],
-              keluar: [760, 810, 790, 840, 780, 820],
-              bersih: [230, 240, 230, 140, 320, 430]
+              masuk: [990000000, 1050000000, 1020000000, 980000000, 1100000000, 1250000000],
+              keluar: [760000000, 810000000, 790000000, 840000000, 780000000, 820000000],
+              saldo: [230000000, 240000000, 230000000, 140000000, 320000000, 430000000]
             }
           },
+          pieMode: 'distribution',
+          pieDistribution: [
+            { name: 'Bank BCA | 2092026028', val: 450000000, pct: 47, color: '#0ea5e9' },
+            { name: 'Bank BCA | 2091139784', val: 280000000, pct: 29, color: '#0076C5' },
+            { name: 'SEABANK | 901631003438', val: 125000000, pct: 13, color: '#f59e0b' },
+            { name: 'BNI | 2049368973', val: 95000000, pct: 10, color: '#06b6d4' },
+            { name: 'Kas Kecil', val: 15000000, pct: 2, color: '#10b981' }
+          ],
           components: {
-            operasional: { masuk: 850000000, keluar: 520000000, bersih: 330000000, pct: 76.7 },
-            investasi: { masuk: 150000000, keluar: 180000000, bersih: -30000000, pct: 7.0 },
-            pendanaan: { masuk: 250000000, keluar: 120000000, bersih: 130000000, pct: 16.3 }
+            operasional: { masuk: 850000000, keluar: 520000000, bersih: 330000000, pct: 77 },
+            investasi: { masuk: 150000000, keluar: 180000000, bersih: -30000000, pct: 7 },
+            pendanaan: { masuk: 250000000, keluar: 120000000, bersih: 130000000, pct: 16 }
           },
           reconciliation: {
             saldoAwal: 535000000,
@@ -995,192 +960,284 @@
             bni: 95000000
           }
         },
-        sep2026: {
+        bca1: {
+          id: 'bca1',
+          name: 'Bank BCA | 2092026028',
           cards: {
-            masuk: 1100000000,
-            keluar: 780000000,
-            bersih: 320000000,
-            saldoAkhir: 535000000
+            masuk: 580000000,
+            keluar: 130000000,
+            bersih: 450000000,
+            saldoAkhir: 450000000
           },
           trend: {
+            perBank: {
+              labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+              masuk: [130000000, 145000000, 160000000, 145000000],
+              keluar: [30000000, 35000000, 35000000, 30000000],
+              saldo: [100000000, 110000000, 125000000, 115000000]
+            },
             weekly: {
-              labels: ['Minggu 1 (1-7 Sep)', 'Minggu 2 (8-14 Sep)', 'Minggu 3 (15-21 Sep)', 'Minggu 4 (22-30 Sep)'],
-              masuk: [250, 280, 290, 280],
-              keluar: [180, 200, 210, 190],
-              bersih: [70, 80, 80, 90]
+              labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
+              masuk: [130000000, 145000000, 160000000, 145000000],
+              keluar: [30000000, 35000000, 35000000, 30000000],
+              saldo: [100000000, 110000000, 125000000, 115000000]
             },
             daily: {
-              labels: ['01 Sep', '04 Sep', '07 Sep', '10 Sep', '13 Sep', '16 Sep', '19 Sep', '22 Sep', '25 Sep', '28 Sep', '30 Sep'],
-              masuk: [32, 40, 48, 55, 42, 65, 60, 72, 65, 70, 71],
-              keluar: [24, 30, 38, 42, 32, 48, 44, 52, 40, 46, 44],
-              bersih: [8, 10, 10, 13, 10, 17, 16, 20, 25, 24, 27]
+              labels: ['01 Okt', '06 Okt', '11 Okt', '16 Okt', '21 Okt', '26 Okt', '31 Okt'],
+              masuk: [20000000, 24000000, 28000000, 35000000, 32000000, 38000000, 35000000],
+              keluar: [4000000, 5000000, 6000000, 8000000, 7000000, 9000000, 6000000],
+              saldo: [16000000, 19000000, 22000000, 27000000, 25000000, 29000000, 29000000]
             },
             monthly: {
-              labels: ['Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep'],
-              masuk: [910, 990, 1050, 1020, 980, 1100],
-              keluar: [700, 760, 810, 790, 840, 780],
-              bersih: [210, 230, 240, 230, 140, 320]
+              labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+              masuk: [460000000, 490000000, 480000000, 460000000, 520000000, 580000000],
+              keluar: [120000000, 125000000, 130000000, 135000000, 125000000, 130000000],
+              saldo: [340000000, 365000000, 350000000, 325000000, 395000000, 450000000]
             }
           },
+          pieMode: 'components',
           components: {
-            operasional: { masuk: 780000000, keluar: 490000000, bersih: 290000000, pct: 70.9 },
-            investasi: { masuk: 120000000, keluar: 160000000, bersih: -40000000, pct: 10.9 },
-            pendanaan: { masuk: 200000000, keluar: 130000000, bersih: 70000000, pct: 18.2 }
+            operasional: { masuk: 420000000, keluar: 90000000, bersih: 330000000, pct: 75 },
+            investasi: { masuk: 60000000, keluar: 25000000, bersih: 35000000, pct: 8 },
+            pendanaan: { masuk: 100000000, keluar: 15000000, bersih: 85000000, pct: 17 }
           },
           reconciliation: {
-            saldoAwal: 215000000,
+            saldoAwal: 240000000,
             transferInternal: 0,
-            saldoAkhir: 535000000,
-            saldoKasBank: 535000000,
+            saldoAkhir: 450000000,
+            saldoKasBank: 450000000,
             selisih: 0
           },
           accounts: {
-            kasKecil: 12000000,
-            bca1: 240000000,
-            bca2: 150000000,
-            seabank: 75000000,
-            bni: 58000000
+            kasKecil: 0,
+            bca1: 450000000,
+            bca2: 0,
+            seabank: 0,
+            bni: 0
           }
         },
-        agu2026: {
+        bca2: {
+          id: 'bca2',
+          name: 'Bank BCA | 2091139784',
           cards: {
-            masuk: 980000000,
-            keluar: 840000000,
-            bersih: 140000000,
-            saldoAkhir: 215000000
+            masuk: 360000000,
+            keluar: 80000000,
+            bersih: 280000000,
+            saldoAkhir: 280000000
           },
           trend: {
+            perBank: {
+              labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+              masuk: [80000000, 90000000, 100000000, 90000000],
+              keluar: [18000000, 22000000, 20000000, 20000000],
+              saldo: [62000000, 68000000, 80000000, 70000000]
+            },
             weekly: {
-              labels: ['Minggu 1 (1-7 Agu)', 'Minggu 2 (8-14 Agu)', 'Minggu 3 (15-21 Agu)', 'Minggu 4 (22-31 Agu)'],
-              masuk: [220, 240, 270, 250],
-              keluar: [200, 220, 210, 210],
-              bersih: [20, 20, 60, 40]
+              labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
+              masuk: [80000000, 90000000, 100000000, 90000000],
+              keluar: [18000000, 22000000, 20000000, 20000000],
+              saldo: [62000000, 68000000, 80000000, 70000000]
             },
             daily: {
-              labels: ['01 Agu', '04 Agu', '07 Agu', '10 Agu', '13 Agu', '16 Agu', '19 Agu', '22 Agu', '25 Agu', '28 Agu', '31 Agu'],
-              masuk: [28, 35, 42, 48, 38, 55, 50, 62, 55, 60, 67],
-              keluar: [26, 32, 40, 44, 35, 50, 46, 54, 48, 52, 53],
-              bersih: [2, 3, 2, 4, 3, 5, 4, 8, 7, 8, 14]
+              labels: ['01 Okt', '06 Okt', '11 Okt', '16 Okt', '21 Okt', '26 Okt', '31 Okt'],
+              masuk: [12000000, 15000000, 18000000, 22000000, 20000000, 24000000, 22000000],
+              keluar: [2000000, 3000000, 4000000, 5000000, 4000000, 6000000, 4000000],
+              saldo: [10000000, 12000000, 14000000, 17000000, 16000000, 18000000, 18000000]
             },
             monthly: {
-              labels: ['Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu'],
-              masuk: [950, 910, 990, 1050, 1020, 980],
-              keluar: [730, 700, 760, 810, 790, 840],
-              bersih: [220, 210, 230, 240, 230, 140]
+              labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+              masuk: [280000000, 300000000, 290000000, 280000000, 320000000, 360000000],
+              keluar: [70000000, 75000000, 80000000, 80000000, 75000000, 80000000],
+              saldo: [210000000, 225000000, 210000000, 200000000, 245000000, 280000000]
             }
           },
+          pieMode: 'components',
           components: {
-            operasional: { masuk: 710000000, keluar: 540000000, bersih: 170000000, pct: 72.4 },
-            investasi: { masuk: 90000000, keluar: 150000000, bersih: -60000000, pct: 9.2 },
-            pendanaan: { masuk: 180000000, keluar: 150000000, bersih: 30000000, pct: 18.4 }
+            operasional: { masuk: 250000000, keluar: 55000000, bersih: 195000000, pct: 72 },
+            investasi: { masuk: 40000000, keluar: 15000000, bersih: 25000000, pct: 10 },
+            pendanaan: { masuk: 70000000, keluar: 10000000, bersih: 60000000, pct: 18 }
+          },
+          reconciliation: {
+            saldoAwal: 150000000,
+            transferInternal: 0,
+            saldoAkhir: 280000000,
+            saldoKasBank: 280000000,
+            selisih: 0
+          },
+          accounts: {
+            kasKecil: 0,
+            bca1: 0,
+            bca2: 280000000,
+            seabank: 0,
+            bni: 0
+          }
+        },
+        seabank: {
+          id: 'seabank',
+          name: 'SEABANK | 901631003438',
+          cards: {
+            masuk: 160000000,
+            keluar: 35000000,
+            bersih: 125000000,
+            saldoAkhir: 125000000
+          },
+          trend: {
+            perBank: {
+              labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+              masuk: [35000000, 40000000, 45000000, 40000000],
+              keluar: [8000000, 9000000, 10000000, 8000000],
+              saldo: [27000000, 31000000, 35000000, 32000000]
+            },
+            weekly: {
+              labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
+              masuk: [35000000, 40000000, 45000000, 40000000],
+              keluar: [8000000, 9000000, 10000000, 8000000],
+              saldo: [27000000, 31000000, 35000000, 32000000]
+            },
+            daily: {
+              labels: ['01 Okt', '06 Okt', '11 Okt', '16 Okt', '21 Okt', '26 Okt', '31 Okt'],
+              masuk: [5000000, 6000000, 8000000, 10000000, 9000000, 11000000, 10000000],
+              keluar: [1000000, 1000000, 2000000, 2000000, 2000000, 2000000, 2000000],
+              saldo: [4000000, 5000000, 6000000, 8000000, 7000000, 9000000, 8000000]
+            },
+            monthly: {
+              labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+              masuk: [120000000, 135000000, 130000000, 125000000, 145000000, 160000000],
+              keluar: [30000000, 32000000, 35000000, 36000000, 32000000, 35000000],
+              saldo: [90000000, 103000000, 95000000, 89000000, 113000000, 125000000]
+            }
+          },
+          pieMode: 'components',
+          components: {
+            operasional: { masuk: 110000000, keluar: 25000000, bersih: 85000000, pct: 70 },
+            investasi: { masuk: 20000000, keluar: 5000000, bersih: 15000000, pct: 12 },
+            pendanaan: { masuk: 30000000, keluar: 5000000, bersih: 25000000, pct: 18 }
           },
           reconciliation: {
             saldoAwal: 75000000,
             transferInternal: 0,
-            saldoAkhir: 215000000,
-            saldoKasBank: 215000000,
+            saldoAkhir: 125000000,
+            saldoKasBank: 125000000,
             selisih: 0
           },
           accounts: {
-            kasKecil: 8000000,
-            bca1: 95000000,
-            bca2: 60000000,
-            seabank: 30000000,
-            bni: 22000000
+            kasKecil: 0,
+            bca1: 0,
+            bca2: 0,
+            seabank: 125000000,
+            bni: 0
           }
         },
-        q3_2026: {
+        bni: {
+          id: 'bni',
+          name: 'BNI | 2049368973',
           cards: {
-            masuk: 3330000000,
-            keluar: 2440000000,
-            bersih: 890000000,
-            saldoAkhir: 965000000
+            masuk: 125000000,
+            keluar: 30000000,
+            bersih: 95000000,
+            saldoAkhir: 95000000
           },
           trend: {
+            perBank: {
+              labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+              masuk: [28000000, 32000000, 35000000, 30000000],
+              keluar: [7000000, 8000000, 8000000, 7000000],
+              saldo: [21000000, 24000000, 27000000, 23000000]
+            },
             weekly: {
-              labels: ['Juli', 'Agustus', 'September', 'Oktober (Proj)'],
-              masuk: [850, 980, 1100, 1250],
-              keluar: [720, 840, 780, 820],
-              bersih: [130, 140, 320, 430]
+              labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
+              masuk: [28000000, 32000000, 35000000, 30000000],
+              keluar: [7000000, 8000000, 8000000, 7000000],
+              saldo: [21000000, 24000000, 27000000, 23000000]
             },
             daily: {
-              labels: ['Pekan 1', 'Pekan 3', 'Pekan 5', 'Pekan 7', 'Pekan 9', 'Pekan 11', 'Pekan 13'],
-              masuk: [210, 230, 245, 260, 275, 290, 310],
-              keluar: [175, 190, 205, 215, 200, 210, 205],
-              bersih: [35, 40, 40, 45, 75, 80, 105]
+              labels: ['01 Okt', '06 Okt', '11 Okt', '16 Okt', '21 Okt', '26 Okt', '31 Okt'],
+              masuk: [4000000, 5000000, 6000000, 8000000, 7000000, 9000000, 8000000],
+              keluar: [1000000, 1000000, 1000000, 2000000, 2000000, 2000000, 1000000],
+              saldo: [3000000, 4000000, 5000000, 6000000, 5000000, 7000000, 7000000]
             },
             monthly: {
-              labels: ['Q1 2026', 'Q2 2026', 'Q3 2026 (Aktual)', 'Q4 2026 (Proj)'],
-              masuk: [2800, 3100, 3330, 3500],
-              keluar: [2100, 2300, 2440, 2550],
-              bersih: [700, 800, 890, 950]
+              labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+              masuk: [95000000, 105000000, 100000000, 95000000, 110000000, 125000000],
+              keluar: [25000000, 27000000, 28000000, 30000000, 27000000, 30000000],
+              saldo: [70000000, 78000000, 72000000, 65000000, 83000000, 95000000]
             }
           },
+          pieMode: 'components',
           components: {
-            operasional: { masuk: 2340000000, keluar: 1550000000, bersih: 790000000, pct: 73.2 },
-            investasi: { masuk: 360000000, keluar: 490000000, bersih: -130000000, pct: 9.5 },
-            pendanaan: { masuk: 630000000, keluar: 400000000, bersih: 230000000, pct: 17.3 }
+            operasional: { masuk: 85000000, keluar: 20000000, bersih: 65000000, pct: 68 },
+            investasi: { masuk: 15000000, keluar: 5000000, bersih: 10000000, pct: 14 },
+            pendanaan: { masuk: 25000000, keluar: 5000000, bersih: 20000000, pct: 18 }
           },
           reconciliation: {
-            saldoAwal: 75000000,
+            saldoAwal: 58000000,
             transferInternal: 0,
-            saldoAkhir: 965000000,
-            saldoKasBank: 965000000,
+            saldoAkhir: 95000000,
+            saldoKasBank: 95000000,
+            selisih: 0
+          },
+          accounts: {
+            kasKecil: 0,
+            bca1: 0,
+            bca2: 0,
+            seabank: 0,
+            bni: 95000000
+          }
+        },
+        kasKecil: {
+          id: 'kasKecil',
+          name: 'Kas Kecil',
+          cards: {
+            masuk: 25000000,
+            keluar: 10000000,
+            bersih: 15000000,
+            saldoAkhir: 15000000
+          },
+          trend: {
+            perBank: {
+              labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+              masuk: [6000000, 7000000, 6000000, 6000000],
+              keluar: [2000000, 3000000, 3000000, 2000000],
+              saldo: [4000000, 4000000, 3000000, 4000000]
+            },
+            weekly: {
+              labels: ['Minggu 1 (1-7 Okt)', 'Minggu 2 (8-14 Okt)', 'Minggu 3 (15-21 Okt)', 'Minggu 4 (22-31 Okt)'],
+              masuk: [6000000, 7000000, 6000000, 6000000],
+              keluar: [2000000, 3000000, 3000000, 2000000],
+              saldo: [4000000, 4000000, 3000000, 4000000]
+            },
+            daily: {
+              labels: ['01 Okt', '06 Okt', '11 Okt', '16 Okt', '21 Okt', '26 Okt', '31 Okt'],
+              masuk: [1000000, 1000000, 1000000, 1500000, 1000000, 1500000, 1000000],
+              keluar: [400000, 500000, 400000, 600000, 400000, 500000, 400000],
+              saldo: [600000, 500000, 600000, 900000, 600000, 1000000, 600000]
+            },
+            monthly: {
+              labels: ['Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+              masuk: [20000000, 22000000, 21000000, 20000000, 23000000, 25000000],
+              keluar: [9000000, 10000000, 9000000, 10000000, 9000000, 10000000],
+              saldo: [11000000, 12000000, 12000000, 10000000, 14000000, 15000000]
+            }
+          },
+          pieMode: 'components',
+          components: {
+            operasional: { masuk: 20000000, keluar: 9000000, bersih: 11000000, pct: 85 },
+            investasi: { masuk: 0, keluar: 0, bersih: 0, pct: 0 },
+            pendanaan: { masuk: 5000000, keluar: 1000000, bersih: 4000000, pct: 15 }
+          },
+          reconciliation: {
+            saldoAwal: 12000000,
+            transferInternal: 0,
+            saldoAkhir: 15000000,
+            saldoKasBank: 15000000,
             selisih: 0
           },
           accounts: {
             kasKecil: 15000000,
-            bca1: 450000000,
-            bca2: 280000000,
-            seabank: 125000000,
-            bni: 95000000
-          }
-        },
-        tahun2026: {
-          cards: {
-            masuk: 9850000000,
-            keluar: 7240000000,
-            bersih: 2610000000,
-            saldoAkhir: 965000000
-          },
-          trend: {
-            weekly: {
-              labels: ['Q1 2026', 'Q2 2026', 'Q3 2026', 'Q4 (Mtd)'],
-              masuk: [2800, 3100, 3330, 1250],
-              keluar: [2100, 2300, 2440, 820],
-              bersih: [700, 800, 890, 430]
-            },
-            daily: {
-              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
-              masuk: [820, 880, 950, 910, 990, 1050, 1020, 980, 1100, 1250],
-              keluar: [680, 710, 730, 700, 760, 810, 790, 840, 780, 820],
-              bersih: [140, 170, 220, 210, 230, 240, 230, 140, 320, 430]
-            },
-            monthly: {
-              labels: ['2023', '2024', '2025', '2026 (YTD)'],
-              masuk: [6800, 7900, 8800, 9850],
-              keluar: [5400, 6100, 6800, 7240],
-              bersih: [1400, 1800, 2000, 2610]
-            }
-          },
-          components: {
-            operasional: { masuk: 7100000000, keluar: 4800000000, bersih: 2300000000, pct: 74.0 },
-            investasi: { masuk: 1100000000, keluar: 1400000000, bersih: -300000000, pct: 9.8 },
-            pendanaan: { masuk: 1650000000, keluar: 1040000000, bersih: 610000000, pct: 16.2 }
-          },
-          reconciliation: {
-            saldoAwal: 50000000,
-            transferInternal: 0,
-            saldoAkhir: 965000000,
-            saldoKasBank: 965000000,
-            selisih: 0
-          },
-          accounts: {
-            kasKecil: 15000000,
-            bca1: 450000000,
-            bca2: 280000000,
-            seabank: 125000000,
-            bni: 95000000
+            bca1: 0,
+            bca2: 0,
+            seabank: 0,
+            bni: 0
           }
         }
       };
@@ -1209,17 +1266,306 @@
       }
 
       /* ===== STATE VARIABLES ===== */
-      let currentPeriod = 'okt2026';
-      let currentGranularity = 'weekly'; // 'daily' | 'weekly' | 'monthly'
-      let currentChartType = 'line';      // 'line' | 'bar'
+      let currentBank = 'all';            // 'all' | 'bca1' | 'bca2' | 'seabank' | 'bni' | 'kasKecil'
+      let currentGranularity = 'perBank'; // 'perBank' | 'weekly' | 'daily' | 'monthly'
       let trendChartInstance = null;
       let donutChartInstance = null;
 
+      /* ===== BASELINE SALDO AWAL POKOK PER AKUN ARUS KAS ===== */
+      const BASE_ACCOUNTS = {
+        kasKecil: 15000000,    // COA 1001
+        bca1: 450000000,       // Bank BCA | 2092026028 (COA 1002)
+        bca2: 280000000,       // Bank BCA | 2091139784 (COA 1003)
+        seabank: 125000000,    // SEABANK | 901631003438 (COA 1005)
+        bni: 95000000          // BNI | 2049368973 (COA 1006)
+      };
+
+      const BASE_TREND_PER_BANK = {
+        masuk: [25000000, 580000000, 360000000, 160000000, 125000000],
+        keluar: [10000000, 130000000, 80000000, 35000000, 30000000]
+      };
+
+      const BASE_WEEKLY_ALL = {
+        masuk: [280000000, 310000000, 340000000, 320000000],
+        keluar: [190000000, 220000000, 210000000, 200000000]
+      };
+
+      const BASE_WEEKLY_BANKS = {
+        bca1: { masuk: [130000000, 145000000, 160000000, 145000000], keluar: [30000000, 35000000, 35000000, 30000000] },
+        bca2: { masuk: [80000000, 90000000, 100000000, 90000000], keluar: [18000000, 20000000, 22000000, 20000000] },
+        seabank: { masuk: [35000000, 40000000, 45000000, 40000000], keluar: [8000000, 9000000, 10000000, 8000000] },
+        bni: { masuk: [28000000, 30000000, 35000000, 32000000], keluar: [6000000, 8000000, 9000000, 7000000] },
+        kasKecil: { masuk: [5000000, 6000000, 7000000, 7000000], keluar: [2000000, 2500000, 3000000, 2500000] }
+      };
+
+      function getWeekIndex(tgl) {
+        if (!tgl) return 0;
+        const d = parseInt(tgl.split('-')[2] || '1', 10);
+        if (d <= 7) return 0;
+        if (d <= 14) return 1;
+        if (d <= 21) return 2;
+        return 3;
+      }
+
+      /* Fungsi untuk menghitung saldo mutasi uang masuk & keluar dari transaksi Kas & Bank */
+      function getLiveAccountsFromKasBank() {
+        const currentAccounts = Object.assign({}, BASE_ACCOUNTS);
+        const mutasiPerBank = {
+          kasKecil: { masuk: 0, keluar: 0 },
+          bca1: { masuk: 0, keluar: 0 },
+          bca2: { masuk: 0, keluar: 0 },
+          seabank: { masuk: 0, keluar: 0 },
+          bni: { masuk: 0, keluar: 0 }
+        };
+
+        const weeklyMutasiAll = [
+          { masuk: 0, keluar: 0 },
+          { masuk: 0, keluar: 0 },
+          { masuk: 0, keluar: 0 },
+          { masuk: 0, keluar: 0 }
+        ];
+
+        const weeklyMutasiPerBank = {
+          bca1: [{ masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }],
+          bca2: [{ masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }],
+          seabank: [{ masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }],
+          bni: [{ masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }],
+          kasKecil: [{ masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }, { masuk: 0, keluar: 0 }]
+        };
+
+        try {
+          const raw = localStorage.getItem('accounting_kas_bank_v2');
+          if (raw) {
+            const items = JSON.parse(raw);
+            if (Array.isArray(items)) {
+              items.forEach(function (it) {
+                if (!it) return;
+                const rek = String(it.nomorRekening || '').replace(/\D/g, '');
+                const coa = String(it.kodeCoa || '').trim();
+                const bank = String(it.namaBank || '').toLowerCase();
+
+                let key = null;
+                if (rek.includes('2092026028') || coa === '1002') key = 'bca1';
+                else if (rek.includes('2091139784') || coa === '1003') key = 'bca2';
+                else if (rek.includes('901631003438') || coa === '1005' || bank.includes('seabank')) key = 'seabank';
+                else if (rek.includes('2049368973') || coa === '1006' || bank.includes('bni')) key = 'bni';
+                else if (coa === '1001' || bank.includes('kas kecil')) key = 'kasKecil';
+
+                const m = Number(it.uangMasuk) || 0;
+                const k = Number(it.uangKeluar) || 0;
+                const w = getWeekIndex(it.tanggal);
+
+                weeklyMutasiAll[w].masuk += m;
+                weeklyMutasiAll[w].keluar += k;
+
+                if (key && mutasiPerBank[key]) {
+                  mutasiPerBank[key].masuk += m;
+                  mutasiPerBank[key].keluar += k;
+                }
+                if (key && weeklyMutasiPerBank[key]) {
+                  weeklyMutasiPerBank[key][w].masuk += m;
+                  weeklyMutasiPerBank[key][w].keluar += k;
+                }
+              });
+            }
+          }
+        } catch (e) {}
+
+        Object.keys(currentAccounts).forEach(function (k) {
+          if (mutasiPerBank[k]) {
+            currentAccounts[k] = BASE_ACCOUNTS[k] + mutasiPerBank[k].masuk - mutasiPerBank[k].keluar;
+          }
+        });
+
+        return {
+          accounts: currentAccounts,
+          mutasi: mutasiPerBank,
+          weeklyAll: weeklyMutasiAll,
+          weeklyPerBank: weeklyMutasiPerBank
+        };
+      }
+
+      function syncDynamicBankData() {
+        const live = getLiveAccountsFromKasBank();
+        const acc = live.accounts;
+        const mut = live.mutasi;
+        const weeklyAll = live.weeklyAll;
+        const weeklyPerBank = live.weeklyPerBank;
+
+        // 1. Update Saldo Akun di BANK_DATA.all.accounts
+        BANK_DATA.all.accounts = Object.assign({}, acc);
+
+        const totalSaldoLive = acc.kasKecil + acc.bca1 + acc.bca2 + acc.seabank + acc.bni;
+        let totalMasukKb = 0;
+        let totalKeluarKb = 0;
+        Object.keys(mut).forEach(function (k) {
+          totalMasukKb += mut[k].masuk;
+          totalKeluarKb += mut[k].keluar;
+        });
+
+        // 2. Update Card Summary
+        BANK_DATA.all.cards.saldoAkhir = totalSaldoLive;
+        BANK_DATA.all.cards.masuk = 1250000000 + totalMasukKb;
+        BANK_DATA.all.cards.keluar = 820000000 + totalKeluarKb;
+        BANK_DATA.all.cards.bersih = BANK_DATA.all.cards.masuk - BANK_DATA.all.cards.keluar;
+
+        // 3. Update data per bank spesifik (Cards)
+        if (BANK_DATA.bca1) {
+          BANK_DATA.bca1.cards.saldoAkhir = acc.bca1;
+          BANK_DATA.bca1.cards.masuk = 580000000 + mut.bca1.masuk;
+          BANK_DATA.bca1.cards.keluar = 130000000 + mut.bca1.keluar;
+          BANK_DATA.bca1.cards.bersih = BANK_DATA.bca1.cards.masuk - BANK_DATA.bca1.cards.keluar;
+        }
+        if (BANK_DATA.bca2) {
+          BANK_DATA.bca2.cards.saldoAkhir = acc.bca2;
+          BANK_DATA.bca2.cards.masuk = 360000000 + mut.bca2.masuk;
+          BANK_DATA.bca2.cards.keluar = 80000000 + mut.bca2.keluar;
+          BANK_DATA.bca2.cards.bersih = BANK_DATA.bca2.cards.masuk - BANK_DATA.bca2.cards.keluar;
+        }
+        if (BANK_DATA.seabank) {
+          BANK_DATA.seabank.cards.saldoAkhir = acc.seabank;
+          BANK_DATA.seabank.cards.masuk = 160000000 + mut.seabank.masuk;
+          BANK_DATA.seabank.cards.keluar = 35000000 + mut.seabank.keluar;
+          BANK_DATA.seabank.cards.bersih = BANK_DATA.seabank.cards.masuk - BANK_DATA.seabank.cards.keluar;
+        }
+        if (BANK_DATA.bni) {
+          BANK_DATA.bni.cards.saldoAkhir = acc.bni;
+          BANK_DATA.bni.cards.masuk = 125000000 + mut.bni.masuk;
+          BANK_DATA.bni.cards.keluar = 30000000 + mut.bni.keluar;
+          BANK_DATA.bni.cards.bersih = BANK_DATA.bni.cards.masuk - BANK_DATA.bni.cards.keluar;
+        }
+        if (BANK_DATA.kasKecil) {
+          BANK_DATA.kasKecil.cards.saldoAkhir = acc.kasKecil;
+          BANK_DATA.kasKecil.cards.masuk = 25000000 + mut.kasKecil.masuk;
+          BANK_DATA.kasKecil.cards.keluar = 10000000 + mut.kasKecil.keluar;
+          BANK_DATA.kasKecil.cards.bersih = BANK_DATA.kasKecil.cards.masuk - BANK_DATA.kasKecil.cards.keluar;
+        }
+
+        // 4. Update Trend perBank Saldo & Traffic Real-Time
+        const bankKeys = ['kasKecil', 'bca1', 'bca2', 'seabank', 'bni'];
+        if (BANK_DATA.all.trend && BANK_DATA.all.trend.perBank) {
+          BANK_DATA.all.trend.perBank.masuk = bankKeys.map(function (k, i) {
+            return BASE_TREND_PER_BANK.masuk[i] + mut[k].masuk;
+          });
+          BANK_DATA.all.trend.perBank.keluar = bankKeys.map(function (k, i) {
+            return BASE_TREND_PER_BANK.keluar[i] + mut[k].keluar;
+          });
+          BANK_DATA.all.trend.perBank.saldo = bankKeys.map(function (k) {
+            return acc[k];
+          });
+        }
+
+        // 5. Update Trend Weekly All Real-Time
+        if (BANK_DATA.all.trend && BANK_DATA.all.trend.weekly) {
+          const wMasuk = BASE_WEEKLY_ALL.masuk.map(function (v, i) {
+            return v + weeklyAll[i].masuk;
+          });
+          const wKeluar = BASE_WEEKLY_ALL.keluar.map(function (v, i) {
+            return v + weeklyAll[i].keluar;
+          });
+          BANK_DATA.all.trend.weekly.masuk = wMasuk;
+          BANK_DATA.all.trend.weekly.keluar = wKeluar;
+          BANK_DATA.all.trend.weekly.saldo = wMasuk.map(function (v, i) {
+            return v - wKeluar[i];
+          });
+        }
+
+        // 6. Update Trend Weekly per Bank Spesifik Real-Time
+        bankKeys.forEach(function (b) {
+          if (BANK_DATA[b] && BANK_DATA[b].trend && BASE_WEEKLY_BANKS[b]) {
+            const bMasuk = BASE_WEEKLY_BANKS[b].masuk.map(function (v, i) {
+              return v + (weeklyPerBank[b] ? weeklyPerBank[b][i].masuk : 0);
+            });
+            const bKeluar = BASE_WEEKLY_BANKS[b].keluar.map(function (v, i) {
+              return v + (weeklyPerBank[b] ? weeklyPerBank[b][i].keluar : 0);
+            });
+            const bSaldo = bMasuk.map(function (v, i) {
+              return v - bKeluar[i];
+            });
+
+            if (BANK_DATA[b].trend.weekly) {
+              BANK_DATA[b].trend.weekly.masuk = bMasuk;
+              BANK_DATA[b].trend.weekly.keluar = bKeluar;
+              BANK_DATA[b].trend.weekly.saldo = bSaldo;
+            }
+            if (BANK_DATA[b].trend.perBank) {
+              BANK_DATA[b].trend.perBank.masuk = bMasuk;
+              BANK_DATA[b].trend.perBank.keluar = bKeluar;
+              BANK_DATA[b].trend.perBank.saldo = bSaldo;
+            }
+          }
+        });
+
+        // 7. Update Donut Chart Distribution
+        if (BANK_DATA.all.pieDistribution) {
+          const safeTotal = totalSaldoLive > 0 ? totalSaldoLive : 1;
+          const pBca1 = Math.round((acc.bca1 / safeTotal) * 100);
+          const pBca2 = Math.round((acc.bca2 / safeTotal) * 100);
+          const pSeabank = Math.round((acc.seabank / safeTotal) * 100);
+          const pBni = Math.round((acc.bni / safeTotal) * 100);
+          const pKas = Math.max(1, 100 - (pBca1 + pBca2 + pSeabank + pBni));
+
+          BANK_DATA.all.pieDistribution = [
+            { name: 'Bank BCA | 2092026028', val: acc.bca1, pct: pBca1, color: '#0ea5e9' },
+            { name: 'Bank BCA | 2091139784', val: acc.bca2, pct: pBca2, color: '#0076C5' },
+            { name: 'SEABANK | 901631003438', val: acc.seabank, pct: pSeabank, color: '#f59e0b' },
+            { name: 'BNI | 2049368973', val: acc.bni, pct: pBni, color: '#06b6d4' },
+            { name: 'Kas Kecil', val: acc.kasKecil, pct: pKas, color: '#10b981' }
+          ];
+        }
+
+        // 8. Update Status Rekonsiliasi Real-Time (Agar 100% konsisten dengan Saldo Akhir & Saldo Per Akun)
+        if (BANK_DATA.all.reconciliation) {
+          BANK_DATA.all.reconciliation.saldoAkhir = totalSaldoLive;
+          BANK_DATA.all.reconciliation.saldoKasBank = totalSaldoLive;
+          BANK_DATA.all.reconciliation.selisih = 0;
+        }
+        bankKeys.forEach(function (b) {
+          if (BANK_DATA[b] && BANK_DATA[b].reconciliation) {
+            BANK_DATA[b].reconciliation.saldoAkhir = acc[b];
+            BANK_DATA[b].reconciliation.saldoKasBank = acc[b];
+            BANK_DATA[b].reconciliation.selisih = 0;
+          }
+        });
+
+        // 9. Simpan state ter-update ke localStorage agar siap dipanggil oleh Kode COA secara real-time
+        try {
+          const accountsList = [
+            { namaAkun: 'Kas Kecil', namaBank: 'Kas Kecil', nomorRekening: '-', kodeCoa: '1001', saldo: acc.kasKecil },
+            { namaAkun: 'Bank BCA', namaBank: 'BCA', nomorRekening: '2092026028', kodeCoa: '1002', saldo: acc.bca1 },
+            { namaAkun: 'Bank BCA', namaBank: 'BCA', nomorRekening: '2091139784', kodeCoa: '1003', saldo: acc.bca2 },
+            { namaAkun: 'SEABANK', namaBank: 'SEABANK', nomorRekening: '901631003438', kodeCoa: '1005', saldo: acc.seabank },
+            { namaAkun: 'BNI', namaBank: 'BNI', nomorRekening: '2049368973', kodeCoa: '1006', saldo: acc.bni }
+          ];
+
+          const coaMap = {
+            '1001': acc.kasKecil,
+            '1002': acc.bca1,
+            '1003': acc.bca2,
+            '1005': acc.seabank,
+            '1006': acc.bni
+          };
+
+          localStorage.setItem('accounting_arus_kas_saldo_akun_v1', JSON.stringify({
+            accountsList: accountsList,
+            coaMap: coaMap,
+            kasKecil: acc.kasKecil,
+            bca1: acc.bca1,
+            bca2: acc.bca2,
+            seabank: acc.seabank,
+            bni: acc.bni,
+            totalSaldo: totalSaldoLive,
+            updatedAt: new Date().toISOString()
+          }));
+        } catch (e) {}
+      }
+
       /* ===== RENDER FUNCTION ===== */
       function renderDashboard() {
-        const data = DASHBOARD_DATA[currentPeriod] || DASHBOARD_DATA.okt2026;
+        syncDynamicBankData();
+        const data = BANK_DATA[currentBank] || BANK_DATA.all;
 
-        // 1. Summary Cards
+        // 1. Summary Cards Atas
         const cardTotalMasuk = document.getElementById('cardTotalMasuk');
         const cardTotalKeluar = document.getElementById('cardTotalKeluar');
         const cardArusBersih = document.getElementById('cardArusBersih');
@@ -1230,29 +1576,32 @@
         if (cardArusBersih) cardArusBersih.textContent = formatRupiah(data.cards.bersih);
         if (cardSaldoAkhir) cardSaldoAkhir.textContent = formatRupiah(data.cards.saldoAkhir);
 
-        // 2. Trend Line / Bar Chart (Detailed Traffic)
-        const trendDataSet = (data.trend && data.trend[currentGranularity])
-          ? data.trend[currentGranularity]
-          : (data.trend.weekly || data.trend);
-        
-        updateTrendKPIs(trendDataSet);
-        renderTrendChart(trendDataSet, currentChartType);
+        // 2. Trend Chart (Grafik Area Detail Rupiah Penuh Sesuai Saldo Per Akun / Waktu)
+        const granKey = (currentBank !== 'all' && currentGranularity === 'perBank')
+          ? 'weekly'
+          : currentGranularity;
+        const trendDataSet = (data.trend && data.trend[granKey])
+          ? data.trend[granKey]
+          : (data.trend.perBank || data.trend.weekly);
+
+        updateTrendKPIs(trendDataSet, granKey);
+        renderTrendChart(trendDataSet, granKey);
 
         // 3. Ringkasan Bulanan Table
         renderRingkasanTable(data);
 
-        // 4. Donut Chart (Komponen Kas Bersih)
-        renderDonutChart(data.components);
+        // 4. Donut Chart (Distribusi Saldo Per Bank atau Komponen Kas)
+        renderDonutChart(data);
 
         // 5. Saldo Per Akun
-        renderAccounts(data.accounts);
+        renderAccounts(BANK_DATA.all.accounts, currentBank);
 
         // 6. Status Rekonsiliasi
         renderReconciliation(data.reconciliation);
       }
 
-      /* ===== UPDATE MINI KPIS FOR TREND TRAFFIC ===== */
-      function updateTrendKPIs(trendData) {
+      /* ===== UPDATE MINI KPIS FOR TREND TRAFFIC (Detail Rupiah) ===== */
+      function updateTrendKPIs(trendData, granKey) {
         if (!trendData || !trendData.masuk || trendData.masuk.length === 0) return;
 
         // 1. Puncak Masuk
@@ -1267,8 +1616,10 @@
         const peakMasukLabel = trendData.labels[maxMasukIdx] || '-';
         const kpiValMasuk = document.getElementById('kpiValMasuk');
         const kpiTagMasuk = document.getElementById('kpiTagMasuk');
-        if (kpiValMasuk) kpiValMasuk.textContent = 'Rp. ' + maxMasuk.toLocaleString('id-ID') + ' Jt';
-        if (kpiTagMasuk) kpiTagMasuk.textContent = peakMasukLabel.split(' ')[0] || peakMasukLabel;
+        if (kpiValMasuk) kpiValMasuk.textContent = formatRupiah(maxMasuk);
+        if (kpiTagMasuk) {
+          kpiTagMasuk.textContent = peakMasukLabel.replace('Bank ', '').split(' ')[0] || peakMasukLabel;
+        }
 
         // 2. Puncak Keluar
         let maxKeluar = -Infinity;
@@ -1282,34 +1633,52 @@
         const peakKeluarLabel = trendData.labels[maxKeluarIdx] || '-';
         const kpiValKeluar = document.getElementById('kpiValKeluar');
         const kpiTagKeluar = document.getElementById('kpiTagKeluar');
-        if (kpiValKeluar) kpiValKeluar.textContent = 'Rp. ' + maxKeluar.toLocaleString('id-ID') + ' Jt';
-        if (kpiTagKeluar) kpiTagKeluar.textContent = peakKeluarLabel.split(' ')[0] || peakKeluarLabel;
+        if (kpiValKeluar) kpiValKeluar.textContent = formatRupiah(maxKeluar);
+        if (kpiTagKeluar) {
+          kpiTagKeluar.textContent = peakKeluarLabel.replace('Bank ', '').split(' ')[0] || peakKeluarLabel;
+        }
 
-        // 3. Rata-rata Arus Bersih
-        let totalBersih = 0;
-        trendData.bersih.forEach(function (val) {
-          totalBersih += val;
-        });
-        const avgBersih = Math.round((totalBersih / trendData.bersih.length) * 10) / 10;
+        // 3. Total Saldo Kas atau Rata-rata Arus Bersih (Detail Rupiah)
         const kpiValBersih = document.getElementById('kpiValBersih');
         const kpiTagBersih = document.getElementById('kpiTagBersih');
-        if (kpiValBersih) {
-          const sign = avgBersih >= 0 ? '+' : '';
-          kpiValBersih.textContent = sign + 'Rp. ' + avgBersih.toLocaleString('id-ID') + ' Jt';
-        }
-        if (kpiTagBersih) {
-          if (avgBersih >= 0) {
-            kpiTagBersih.textContent = 'Net Surplus';
+        const kpiLabelBersih = document.querySelector('.ak-trend-kpi-card:nth-child(3) .ak-trend-kpi-label');
+        const kpiSubBersih = document.getElementById('kpiSubBersih');
+
+        if (granKey === 'perBank') {
+          if (kpiLabelBersih) kpiLabelBersih.textContent = 'Total Saldo Kas';
+          const totalSaldoLive = (BANK_DATA.all.cards && BANK_DATA.all.cards.saldoAkhir) || 965000000;
+          if (kpiValBersih) kpiValBersih.textContent = '+' + formatRupiah(totalSaldoLive);
+          if (kpiSubBersih) kpiSubBersih.textContent = 'Total 5 akun perbankan';
+          if (kpiTagBersih) {
+            kpiTagBersih.textContent = '5 Akun Aktif';
             kpiTagBersih.className = 'ak-trend-kpi-tag is-blue';
-          } else {
-            kpiTagBersih.textContent = 'Net Defisit';
-            kpiTagBersih.className = 'ak-trend-kpi-tag is-red';
+          }
+        } else {
+          if (kpiLabelBersih) kpiLabelBersih.textContent = 'Rata-rata Arus Bersih';
+          if (kpiSubBersih) kpiSubBersih.textContent = 'Rata-rata per interval';
+          let totalBersih = 0;
+          trendData.saldo.forEach(function (val) {
+            totalBersih += val;
+          });
+          const avgBersih = Math.round(totalBersih / trendData.saldo.length);
+          if (kpiValBersih) {
+            const sign = avgBersih >= 0 ? '+' : '';
+            kpiValBersih.textContent = sign + formatRupiah(avgBersih);
+          }
+          if (kpiTagBersih) {
+            if (avgBersih >= 0) {
+              kpiTagBersih.textContent = 'Net Surplus';
+              kpiTagBersih.className = 'ak-trend-kpi-tag is-blue';
+            } else {
+              kpiTagBersih.textContent = 'Net Defisit';
+              kpiTagBersih.className = 'ak-trend-kpi-tag is-red';
+            }
           }
         }
       }
 
-      /* ===== RENDER TREND CHART (AREA / BAR) ===== */
-      function renderTrendChart(trendData, chartType) {
+      /* ===== RENDER TREND CHART (AREA LINE DENGAN SKALA UANG DETAIL) ===== */
+      function renderTrendChart(trendData, granKey) {
         const ctx = document.getElementById('trendChart');
         if (!ctx) return;
 
@@ -1317,53 +1686,23 @@
           trendChartInstance.destroy();
         }
 
-        const isBar = chartType === 'bar';
+        const isPerBank = granKey === 'perBank';
+        const thirdLabel = isPerBank ? 'Saldo Akun' : 'Arus Bersih';
 
         // Gradients for line
-        const gradientMasuk = ctx.getContext('2d').createLinearGradient(0, 0, 0, 270);
+        const gradientMasuk = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
         gradientMasuk.addColorStop(0, 'rgba(0, 118, 197, 0.28)');
         gradientMasuk.addColorStop(1, 'rgba(0, 118, 197, 0.00)');
 
-        const gradientKeluar = ctx.getContext('2d').createLinearGradient(0, 0, 0, 270);
+        const gradientKeluar = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
         gradientKeluar.addColorStop(0, 'rgba(239, 68, 68, 0.22)');
         gradientKeluar.addColorStop(1, 'rgba(239, 68, 68, 0.00)');
 
-        const gradientBersih = ctx.getContext('2d').createLinearGradient(0, 0, 0, 270);
-        gradientBersih.addColorStop(0, 'rgba(16, 185, 129, 0.18)');
-        gradientBersih.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+        const gradientSaldo = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+        gradientSaldo.addColorStop(0, 'rgba(16, 185, 129, 0.22)');
+        gradientSaldo.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
 
-        const datasets = isBar ? [
-          {
-            label: 'Uang Masuk',
-            data: trendData.masuk,
-            backgroundColor: '#0076C5',
-            hoverBackgroundColor: '#005f9e',
-            borderRadius: 6,
-            borderSkipped: false,
-            barPercentage: 0.65,
-            categoryPercentage: 0.8
-          },
-          {
-            label: 'Uang Keluar',
-            data: trendData.keluar,
-            backgroundColor: '#ef4444',
-            hoverBackgroundColor: '#dc2626',
-            borderRadius: 6,
-            borderSkipped: false,
-            barPercentage: 0.65,
-            categoryPercentage: 0.8
-          },
-          {
-            label: 'Arus Bersih',
-            data: trendData.bersih,
-            backgroundColor: '#10b981',
-            hoverBackgroundColor: '#059669',
-            borderRadius: 6,
-            borderSkipped: false,
-            barPercentage: 0.65,
-            categoryPercentage: 0.8
-          }
-        ] : [
+        const datasets = [
           {
             label: 'Uang Masuk',
             data: trendData.masuk,
@@ -1375,8 +1714,8 @@
             pointBackgroundColor: '#0076C5',
             pointBorderColor: '#ffffff',
             pointBorderWidth: 2,
-            pointRadius: 4.5,
-            pointHoverRadius: 7
+            pointRadius: 5,
+            pointHoverRadius: 7.5
           },
           {
             label: 'Uang Keluar',
@@ -1389,33 +1728,43 @@
             pointBackgroundColor: '#ef4444',
             pointBorderColor: '#ffffff',
             pointBorderWidth: 2,
-            pointRadius: 4.5,
-            pointHoverRadius: 7
+            pointRadius: 5,
+            pointHoverRadius: 7.5
           },
           {
-            label: 'Arus Bersih',
-            data: trendData.bersih,
+            label: thirdLabel,
+            data: trendData.saldo,
             borderColor: '#10b981',
-            backgroundColor: gradientBersih,
-            borderWidth: 2.2,
-            borderDash: [5, 4],
+            backgroundColor: gradientSaldo,
+            borderWidth: 2.6,
+            borderDash: isPerBank ? [] : [5, 4],
             tension: 0.38,
-            fill: false,
+            fill: isPerBank ? true : false,
             pointBackgroundColor: '#10b981',
             pointBorderColor: '#ffffff',
             pointBorderWidth: 2,
-            pointRadius: 4.5,
-            pointHoverRadius: 6.5
+            pointRadius: 5,
+            pointHoverRadius: 7.5
           }
         ];
 
-        // Hitung batas nilai Y secara dinamis
-        const allValues = [].concat(trendData.masuk, trendData.keluar, trendData.bersih);
-        const maxVal = Math.max.apply(null, allValues) || 300;
-        const suggestedMax = Math.ceil((maxVal * 1.15) / 50) * 50;
+        // Hitung skala batas nilai Y secara detail presisi
+        const allValues = [].concat(trendData.masuk, trendData.keluar, trendData.saldo);
+        const maxVal = Math.max.apply(null, allValues) || 100000000;
+
+        // Step size bertahap detail agar titik-titik nilai kecil (seperti 15 Jt, 25 Jt) terbaca jelas
+        let stepSize = 50000000; // Default 50 juta
+        if (maxVal <= 15000000) stepSize = 2500000;       // 2.5 Juta
+        else if (maxVal <= 50000000) stepSize = 10000000;  // 10 Juta
+        else if (maxVal <= 150000000) stepSize = 25000000; // 25 Juta
+        else if (maxVal <= 450000000) stepSize = 50000000; // 50 Juta
+        else if (maxVal <= 700000000) stepSize = 50000000; // 50 Juta
+        else stepSize = 100000000;                         // 100 Juta
+
+        const suggestedMax = Math.ceil((maxVal * 1.08) / stepSize) * stepSize;
 
         trendChartInstance = new Chart(ctx, {
-          type: isBar ? 'bar' : 'line',
+          type: 'line',
           data: {
             labels: trendData.labels,
             datasets: datasets
@@ -1423,6 +1772,14 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+              padding: {
+                left: 6,
+                right: 14,
+                top: 8,
+                bottom: 4
+              }
+            },
             animation: {
               duration: 450,
               easing: 'easeOutQuart'
@@ -1463,17 +1820,19 @@
                 borderWidth: 1,
                 callbacks: {
                   label: function (context) {
-                    const raw = context.parsed.y;
-                    const formatted = 'Rp. ' + raw.toLocaleString('id-ID') + ' Jt';
-                    return ' ' + context.dataset.label + ': ' + formatted;
+                    const raw = context.parsed.y || 0;
+                    return ' ' + context.dataset.label + ': ' + formatRupiah(raw);
                   },
                   afterBody: function (items) {
+                    if (isPerBank) {
+                      return '';
+                    }
                     if (items.length >= 2) {
                       const m = items[0].parsed.y || 0;
                       const k = items[1].parsed.y || 0;
                       const diff = m - k;
                       const sign = diff >= 0 ? '+' : '';
-                      return '\n  Selisih Net: ' + sign + 'Rp. ' + diff.toLocaleString('id-ID') + ' Jt';
+                      return '\n  Selisih Net: ' + sign + formatRupiah(diff);
                     }
                     return '';
                   }
@@ -1487,7 +1846,14 @@
                 },
                 ticks: {
                   font: { family: 'Outfit', size: 11.5, weight: 500 },
-                  color: '#64748b'
+                  color: '#64748b',
+                  callback: function (val, index) {
+                    const lbl = this.getLabelForValue(val);
+                    if (isPerBank && lbl.length > 20) {
+                      return lbl.substring(0, 18) + '...';
+                    }
+                    return lbl;
+                  }
                 }
               },
               y: {
@@ -1498,11 +1864,13 @@
                   drawBorder: false
                 },
                 ticks: {
-                  stepSize: suggestedMax > 500 ? 200 : 50,
-                  font: { family: 'Outfit', size: 11.5 },
+                  stepSize: stepSize,
+                  font: { family: 'Outfit', size: 11, weight: 500 },
                   color: '#64748b',
+                  padding: 8,
                   callback: function (val) {
-                    return 'Rp. ' + val + ' Jt';
+                    if (val === 0) return 'Rp. 0';
+                    return formatRupiah(val);
                   }
                 }
               }
@@ -1625,37 +1993,97 @@
         }).join('');
       }
 
-      /* ===== RENDER DONUT CHART & LEGEND ===== */
-      function renderDonutChart(components) {
+      /* ===== RENDER DONUT PIE CHART & LEGEND (MENYESUAIKAN SALDO PER BANK) ===== */
+      function renderDonutChart(bankData) {
         const ctx = document.getElementById('donutChart');
+        const legendContainer = document.getElementById('donutLegendContainer');
+        const pieTitleEm = document.getElementById('pieTitleEm');
+        const pieTitleText = document.getElementById('pieTitleText');
         if (!ctx) return;
 
         if (donutChartInstance) {
           donutChartInstance.destroy();
         }
 
-        const opVal = components.operasional.pct;
-        const invVal = components.investasi.pct;
-        const penVal = components.pendanaan.pct;
+        let labels = [];
+        let dataPoints = [];
+        let bgColors = [];
+        let hoverColors = [];
 
-        // Update Legend values
-        const legOp = document.getElementById('legendOperasional');
-        const legInv = document.getElementById('legendInvestasi');
-        const legPen = document.getElementById('legendPendanaan');
+        if (bankData.pieMode === 'distribution') {
+          // Menampilkan Proporsi Saldo Per Bank
+          if (pieTitleEm) pieTitleEm.textContent = 'Distribusi';
+          if (pieTitleText) pieTitleText.textContent = 'Saldo Per Bank';
 
-        if (legOp) legOp.textContent = opVal.toFixed(0) + '%';
-        if (legInv) legInv.textContent = invVal.toFixed(0) + '%';
-        if (legPen) legPen.textContent = penVal.toFixed(0) + '%';
+          labels = bankData.pieDistribution.map(function (item) { return item.name; });
+          dataPoints = bankData.pieDistribution.map(function (item) { return item.pct; });
+          bgColors = bankData.pieDistribution.map(function (item) { return item.color; });
+          hoverColors = bgColors;
+
+          // Render Dinamis Legend Box
+          if (legendContainer) {
+            legendContainer.innerHTML = bankData.pieDistribution.map(function (item) {
+              return [
+                '<div class="ak-legend-item">',
+                '  <div class="ak-legend-left">',
+                '    <span class="ak-legend-dot" style="background: ' + item.color + ';"></span>',
+                '    <span class="ak-legend-name" title="' + escapeHtml(item.name) + '">' + escapeHtml(item.name) + '</span>',
+                '  </div>',
+                '  <span class="ak-legend-val">' + item.pct + '%</span>',
+                '</div>'
+              ].join('');
+            }).join('');
+          }
+        } else {
+          // Menampilkan Komponen Kas untuk Bank Spesifik
+          if (pieTitleEm) pieTitleEm.textContent = 'Komponen';
+          if (pieTitleText) pieTitleText.textContent = 'Kas: ' + bankData.name.split('|')[0].trim();
+
+          const opVal = bankData.components.operasional.pct;
+          const invVal = bankData.components.investasi.pct;
+          const penVal = bankData.components.pendanaan.pct;
+
+          labels = ['Oprasional', 'Investasi', 'Pendanaan'];
+          dataPoints = [opVal, invVal, penVal];
+          bgColors = ['#0ea5e9', '#facc15', '#ef4444'];
+          hoverColors = ['#0284c7', '#eab308', '#dc2626'];
+
+          if (legendContainer) {
+            legendContainer.innerHTML = [
+              '<div class="ak-legend-item">',
+              '  <div class="ak-legend-left">',
+              '    <span class="ak-legend-dot" style="background: #0ea5e9;"></span>',
+              '    <span class="ak-legend-name">Oprasional</span>',
+              '  </div>',
+              '  <span class="ak-legend-val">' + opVal + '%</span>',
+              '</div>',
+              '<div class="ak-legend-item">',
+              '  <div class="ak-legend-left">',
+              '    <span class="ak-legend-dot" style="background: #facc15;"></span>',
+              '    <span class="ak-legend-name">Investasi</span>',
+              '  </div>',
+              '  <span class="ak-legend-val">' + invVal + '%</span>',
+              '</div>',
+              '<div class="ak-legend-item">',
+              '  <div class="ak-legend-left">',
+              '    <span class="ak-legend-dot" style="background: #ef4444;"></span>',
+              '    <span class="ak-legend-name">Pendanaan</span>',
+              '  </div>',
+              '  <span class="ak-legend-val">' + penVal + '%</span>',
+              '</div>'
+            ].join('');
+          }
+        }
 
         donutChartInstance = new Chart(ctx, {
           type: 'doughnut',
           data: {
-            labels: ['Oprasional', 'Investasi', 'Pendanaan'],
+            labels: labels,
             datasets: [
               {
-                data: [opVal, invVal, penVal],
-                backgroundColor: ['#0ea5e9', '#facc15', '#ef4444'],
-                hoverBackgroundColor: ['#0284c7', '#eab308', '#dc2626'],
+                data: dataPoints,
+                backgroundColor: bgColors,
+                hoverBackgroundColor: hoverColors,
                 borderWidth: 2,
                 borderColor: '#ffffff'
               }
@@ -1673,7 +2101,7 @@
                 backgroundColor: '#0f172a',
                 titleFont: { family: 'Outfit', size: 12, weight: 600 },
                 bodyFont: { family: 'Outfit', size: 12 },
-                padding: 8,
+                padding: 10,
                 cornerRadius: 6,
                 callbacks: {
                   label: function (context) {
@@ -1687,7 +2115,7 @@
       }
 
       /* ===== RENDER SALDO PER AKUN ===== */
-      function renderAccounts(accounts) {
+      function renderAccounts(accounts, selectedBank) {
         const accKasKecil = document.getElementById('accKasKecil');
         const accBca1 = document.getElementById('accBca1');
         const accBca2 = document.getElementById('accBca2');
@@ -1699,6 +2127,17 @@
         if (accBca2) accBca2.textContent = formatRupiah(accounts.bca2);
         if (accSeabank) accSeabank.textContent = formatRupiah(accounts.seabank);
         if (accBni) accBni.textContent = formatRupiah(accounts.bni);
+
+        // Update highlight kelas .is-selected
+        const accountItems = document.querySelectorAll('.ak-account-item');
+        accountItems.forEach(function (item) {
+          const bankKey = item.getAttribute('data-bank');
+          if (bankKey && bankKey === selectedBank) {
+            item.classList.add('is-selected');
+          } else {
+            item.classList.remove('is-selected');
+          }
+        });
       }
 
       /* ===== RENDER STATUS REKONSILIASI ===== */
@@ -1724,16 +2163,36 @@
       }
 
       /* ===== EVENT LISTENERS ===== */
-      // 1. Period Selector Dropdown
+      // 1. Bank Selector Dropdown (Pojok Kanan Atas)
       const periodSelector = document.getElementById('periodSelector');
       if (periodSelector) {
         periodSelector.addEventListener('change', function (e) {
-          currentPeriod = e.target.value;
+          currentBank = e.target.value;
+          // Bila bank spesifik dipilih dan sedang di tab perBank, ubah tab ke mingguan agar langsung terlihat trennya
+          if (currentBank !== 'all' && currentGranularity === 'perBank') {
+            currentGranularity = 'weekly';
+            updateGranularityTabUI('weekly');
+          } else if (currentBank === 'all') {
+            currentGranularity = 'perBank';
+            updateGranularityTabUI('perBank');
+          }
           renderDashboard();
         });
       }
 
-      // 2. Granularity Tabs (Harian, Mingguan, Bulanan)
+      function updateGranularityTabUI(gran) {
+        const granularityToggles = document.getElementById('granularityToggles');
+        if (!granularityToggles) return;
+        granularityToggles.querySelectorAll('.ak-view-btn').forEach(function (b) {
+          if (b.getAttribute('data-granularity') === gran) {
+            b.classList.add('is-active');
+          } else {
+            b.classList.remove('is-active');
+          }
+        });
+      }
+
+      // 2. Granularity Tabs (Per Akun Bank, Mingguan, Harian, Bulanan)
       const granularityToggles = document.getElementById('granularityToggles');
       if (granularityToggles) {
         granularityToggles.addEventListener('click', function (e) {
@@ -1744,24 +2203,55 @@
           });
           btn.classList.add('is-active');
           currentGranularity = btn.getAttribute('data-granularity');
+          // Jika user mengklik 'Per Akun Bank' saat di bank spesifik, kembalikan dropdown ke 'Semua Bank'
+          if (currentGranularity === 'perBank' && currentBank !== 'all') {
+            currentBank = 'all';
+            if (periodSelector) periodSelector.value = 'all';
+          }
           renderDashboard();
         });
       }
 
-      // 3. Chart Type Tabs (Area Line vs Batang Bar)
-      const chartTypeToggles = document.getElementById('chartTypeToggles');
-      if (chartTypeToggles) {
-        chartTypeToggles.addEventListener('click', function (e) {
-          const btn = e.target.closest('[data-chart-type]');
-          if (!btn) return;
-          chartTypeToggles.querySelectorAll('.ak-chart-type-btn').forEach(function (b) {
-            b.classList.remove('is-active');
-          });
-          btn.classList.add('is-active');
-          currentChartType = btn.getAttribute('data-chart-type');
-          renderDashboard();
+      // 3. Klik List Saldo Per Akun untuk Filter Cepat
+      const accountList = document.getElementById('accountList');
+      if (accountList) {
+        accountList.addEventListener('click', function (e) {
+          const item = e.target.closest('.ak-account-item');
+          if (!item) return;
+          const bankKey = item.getAttribute('data-bank');
+          if (bankKey) {
+            if (currentBank === bankKey) {
+              currentBank = 'all';
+              currentGranularity = 'perBank';
+              if (periodSelector) periodSelector.value = 'all';
+              updateGranularityTabUI('perBank');
+            } else {
+              currentBank = bankKey;
+              currentGranularity = 'weekly';
+              if (periodSelector) periodSelector.value = bankKey;
+              updateGranularityTabUI('weekly');
+            }
+            renderDashboard();
+          }
         });
       }
+
+      // 5. Sinkronisasi Realtime saat Kas & Bank melakukan transaksi baru di tab lain
+      window.addEventListener('storage', function (e) {
+        if (e.key === 'accounting_kas_bank_v2') {
+          renderDashboard();
+        }
+      });
+
+      // Sinkronkan juga saat tab kembali aktif atau difokuskan
+      window.addEventListener('focus', function () {
+        renderDashboard();
+      });
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+          renderDashboard();
+        }
+      });
 
       // Initial Render
       renderDashboard();
