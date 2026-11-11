@@ -277,7 +277,8 @@
           { label: 'Neraca', link: 'Accounting/operasional/accounting_neraca.html' },
           { label: 'Rekap Divisi', link: 'Accounting/operasional/accounting_rekap_divisi.html' },
           { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html' },
-          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' }
+          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' },
+          { label: 'History Dokumen', link: 'Accounting/operasional/accounting_history_dokumen.html' }
         ]
       },
       {
@@ -1783,6 +1784,7 @@
       'accounting_rekap_divisi.html': 'Rekap Divisi',
       'accounting_piutang_karyawan.html': 'Piutang Karyawan',
       'accounting_budget_vs_actual.html': 'Budget vs Actual',
+      'accounting_history_dokumen.html': 'History Dokumen',
       'accounting_folder.html': 'My Folders',
       'accounting_rrk.html': 'RRK',
       'accounting_Milestone.html': 'Milestone',
