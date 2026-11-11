@@ -2469,7 +2469,7 @@
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudDivisi">Divisi</label>
-            <input type="text" id="crudDivisi" class="modal-field-input is-calc" placeholder="Divisi" />
+            <input type="text" id="crudDivisi" list="listDivisiPengecualian" class="modal-field-input is-calc" placeholder="Pilih atau ketik divisi" autocomplete="off" />
           </div>
 
           <!-- Row 7: Project/Brand, Tanggal Pelepasan, Bukti/Foto -->
@@ -2511,8 +2511,9 @@
 
           <!-- Row 9: Divisi Pengecualian, Nama Akun COA, Kelompok COA -->
           <div class="modal-field col-span-4">
-            <label class="modal-field-label" for="crudDivisiPengecualian">Divisi Pengecualian</label>
-            <input type="text" id="crudDivisiPengecualian" class="modal-field-input is-calc" placeholder="Divisi Pengecualian" />
+            <label class="modal-field-label" for="crudDivisiPengecualian">Divisi Pengecualian (Opsional)</label>
+            <input type="text" id="crudDivisiPengecualian" list="listDivisiPengecualian" class="modal-field-input is-calc" placeholder="Pilih atau ketik divisi" autocomplete="off" />
+            <datalist id="listDivisiPengecualian"></datalist>
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudNamaAkunCOA">Nama Akun COA</label>
@@ -2702,7 +2703,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js"></script>
-  <script src="../../assets/js/layout.js?v=20261106_operasional_id"></script>
+  <script src="../../assets/js/layout.js?v=20261110_divisi_v2"></script>
 
   <script>
     (function () {
@@ -2868,6 +2869,41 @@
       ];
 
       const STORAGE_KEY = 'bisa_accounting_daftar_aset_data_v4';
+      const DIVISI_KEY = 'accounting_master_divisi_v1';
+
+      function getMasterDivisiList() {
+        try {
+          const raw = localStorage.getItem(DIVISI_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const list = parsed.map(function (item) {
+                if (typeof item === 'string') return item.trim();
+                return (item.nama || item.divisi || '').trim();
+              }).filter(Boolean);
+              if (list.length > 0) return list;
+            }
+          }
+        } catch (e) {
+          console.warn('Error reading master divisi for Daftar Aset:', e);
+        }
+        if (typeof window.getAccountingDivisiList === 'function') {
+          return window.getAccountingDivisiList();
+        }
+        return [
+          'Finance & Accounting', 'MCN', 'Operasional', 'Marketing & Brand',
+          'Creative & Design', 'General Affair', 'Human Resource (HR)', 'IT & Development'
+        ];
+      }
+
+      function updateDivisiPengecualianDatalist() {
+        const datalist = document.getElementById('listDivisiPengecualian');
+        if (!datalist) return;
+        const list = getMasterDivisiList();
+        datalist.innerHTML = list.map(function (nama) {
+          return '<option value="' + String(nama).replace(/"/g, '&quot;') + '"></option>';
+        }).join('');
+      }
 
       function loadData() {
         try {
@@ -3449,6 +3485,7 @@
       function openAddModal() {
         if (!crudModal) crudModal = document.getElementById('asetCrudModal');
         if (!crudModal) return;
+        updateDivisiPengecualianDatalist();
         closeModalDropdowns();
         if (crudModalTitle) crudModalTitle.innerHTML = '<em>Tambah</em> Daftar Aset';
         if (crudForm) crudForm.reset();
@@ -3497,6 +3534,7 @@
 
       function openEditModal(item) {
         if (!crudModal || !item) return;
+        updateDivisiPengecualianDatalist();
         closeModalDropdowns();
         crudModalTitle.innerHTML = '<em>Edit</em> Daftar Aset';
         crudForm.reset();
@@ -4225,7 +4263,20 @@
         tableWrap.addEventListener('scroll', closeActionMenus, { passive: true });
       }
 
+      window.addEventListener('storage', function (e) {
+        if (!e.key || e.key === STORAGE_KEY || e.key === DIVISI_KEY) {
+          asetData = loadData();
+          updateDivisiPengecualianDatalist();
+          renderTable();
+        }
+      });
+
+      window.addEventListener('accounting_divisi_changed', function () {
+        updateDivisiPengecualianDatalist();
+      });
+
       /* ===== INITIALIZATION ===== */
+      updateDivisiPengecualianDatalist();
       initFilterOptions();
       renderTable();
     })();

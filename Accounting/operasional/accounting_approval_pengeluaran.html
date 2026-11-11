@@ -2309,8 +2309,19 @@
 
               <!-- Baris 2: Divisi, Keperluan, Nominal -->
               <div class="pnd-field">
-                <label class="pnd-label" for="pndDivisi">Divisi</label>
-                <input type="text" id="pndDivisi" class="pnd-input" placeholder="Tambah Divisi" required />
+                <label class="pnd-label">Divisi</label>
+                <div class="pnd-select-wrap" id="wrapDivisi">
+                  <input type="hidden" id="pndDivisi" value="" required />
+                  <button type="button" class="pnd-select-btn" id="btnTriggerDivisi">
+                    <span class="selected-text is-placeholder" id="labelDivisi">Pilih Divisi</span>
+                    <span class="pnd-select-arrow">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </span>
+                  </button>
+                  <div class="pnd-select-dropdown" id="dropdownDivisi">
+                    <!-- Diisi dinamis dari Master Divisi -->
+                  </div>
+                </div>
               </div>
               <div class="pnd-field">
                 <label class="pnd-label" for="pndKeperluan">Keperluan</label>
@@ -2503,7 +2514,7 @@
   </div>
 
   <!-- Layout Script -->
-  <script src="../../assets/js/layout.js?v=20261106_operasional_id"></script>
+  <script src="../../assets/js/layout.js?v=20261110_divisi_v2"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
 
   <!-- Module Implementation Script -->
@@ -3189,6 +3200,90 @@
       setupModalDropdown('wrapStatusManager', 'btnTriggerStatusManager', 'labelStatusManager', 'pndStatusManager', 'optStatusManager');
       setupModalDropdown('wrapStatusDirektur', 'btnTriggerStatusDirektur', 'labelStatusDirektur', 'pndStatusDirektur', 'optStatusDirektur');
 
+      /* ===== DYNAMIC DROPDOWN MASTER DIVISI ===== */
+      function getMasterDivisiList() {
+        try {
+          const raw = localStorage.getItem('accounting_master_divisi_v1');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const list = parsed.map(function (item) {
+                if (typeof item === 'string') return item.trim();
+                return (item.nama || item.divisi || '').trim();
+              }).filter(Boolean);
+              if (list.length > 0) return list;
+            }
+          }
+        } catch (e) {
+          console.warn('Error reading master divisi for Approval Pengeluaran:', e);
+        }
+        if (typeof window.getAccountingDivisiList === 'function') {
+          return window.getAccountingDivisiList();
+        }
+        return [
+          'Finance & Accounting', 'MCN', 'Operasional', 'Marketing & Brand',
+          'Creative & Design', 'General Affair', 'Human Resource (HR)', 'IT & Development'
+        ];
+      }
+
+      function renderDivisiDropdownItems() {
+        const dropdown = document.getElementById('dropdownDivisi');
+        if (!dropdown) return;
+        dropdown.innerHTML = '';
+        const list = getMasterDivisiList();
+        const currentVal = pndDivisi ? pndDivisi.value.trim() : '';
+
+        list.forEach(function (nama) {
+          const label = document.createElement('label');
+          label.className = 'pnd-select-option';
+          const isChecked = currentVal && currentVal.toLowerCase() === nama.toLowerCase();
+          label.innerHTML = '<input type="radio" name="optDivisi" value="' + escapeHtml(nama) + '"' + (isChecked ? ' checked' : '') + ' />' +
+            '<span>' + escapeHtml(nama) + '</span>';
+
+          label.querySelector('input').addEventListener('change', function () {
+            if (this.checked) {
+              setDivisiVal(this.value);
+              const wrap = document.getElementById('wrapDivisi');
+              if (wrap) wrap.classList.remove('is-open');
+            }
+          });
+          dropdown.appendChild(label);
+        });
+      }
+
+      function setDivisiVal(val) {
+        const label = document.getElementById('labelDivisi');
+        if (pndDivisi) pndDivisi.value = val || '';
+        if (label) {
+          if (val) {
+            label.textContent = val;
+            label.classList.remove('is-placeholder');
+          } else {
+            label.textContent = 'Pilih Divisi';
+            label.classList.add('is-placeholder');
+          }
+        }
+        if (form) {
+          form.querySelectorAll('input[name="optDivisi"]').forEach(function (r) {
+            r.checked = (r.value.toLowerCase() === String(val || '').toLowerCase());
+          });
+        }
+      }
+
+      const wrapDivisi = document.getElementById('wrapDivisi');
+      const btnTriggerDivisi = document.getElementById('btnTriggerDivisi');
+      if (wrapDivisi && btnTriggerDivisi) {
+        btnTriggerDivisi.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrapDivisi.classList.contains('is-open');
+          closeAllModalDropdowns();
+          if (!isOpen) {
+            renderDivisiDropdownItems();
+            wrapDivisi.classList.add('is-open');
+          }
+        });
+      }
+
       // Nominal Rupiah Input Formatter
       if (pndNominal) {
         pndNominal.addEventListener('input', function () {
@@ -3265,6 +3360,7 @@
         closeActionMenus();
         closePopovers();
         form.reset();
+        renderDivisiDropdownItems();
 
         const todayIso = new Date().toISOString().split('T')[0];
 
@@ -3274,7 +3370,7 @@
           pndIdApproval.value = item.idApproval || generateNextIdApproval();
           setBisaDateValue(pndTanggalRequest, item.tanggalRequest || todayIso);
           pndPemohon.value = item.pemohon || '';
-          pndDivisi.value = item.divisi || '';
+          setDivisiVal(item.divisi || '');
           pndKeperluan.value = item.keperluan || '';
           pndNominal.value = formatRupiah(item.nominal || 0);
 
@@ -3296,7 +3392,7 @@
           setBisaDateValue(pndTanggalRequest, todayIso);
           pndIdApproval.value = generateNextIdApproval(todayIso);
           pndPemohon.value = '';
-          pndDivisi.value = '';
+          setDivisiVal('');
           pndKeperluan.value = '';
           pndNominal.value = '';
 
@@ -3338,6 +3434,20 @@
       if (form) {
         form.addEventListener('submit', function (e) {
           e.preventDefault();
+
+          if (!pndDivisi.value.trim()) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Divisi Belum Dipilih',
+                text: 'Silakan pilih divisi dari dropdown data master.',
+                confirmButtonColor: '#0076C5'
+              });
+            } else {
+              alert('Silakan pilih divisi terlebih dahulu!');
+            }
+            return;
+          }
 
           const sm = normalizeStatusName(pndStatusManager.value || 'Menunggu');
           const sd = normalizeStatusName(pndStatusDirektur.value || 'Menunggu');
@@ -3385,7 +3495,8 @@
 
       /* ===== SEARCHABLE FILTER DIVISI (POPOVER SESUAI GAMBAR USER) ===== */
       function getDivisiOptions() {
-        const set = new Set(['Divisi 1', 'Divisi 2', 'Divisi 3', 'General', 'Marketing', 'Operasional', 'IT', 'BCA']);
+        const set = new Set();
+        getMasterDivisiList().forEach(function (d) { set.add(d); });
         appData.forEach(function (d) {
           if (d.divisi) set.add(d.divisi);
         });
@@ -3959,6 +4070,19 @@
       window.addEventListener('focus', function () {
         appData = loadData();
         renderTable();
+        renderDivisiDropdownItems();
+      });
+
+      window.addEventListener('storage', function (e) {
+        if (!e.key || e.key === 'accounting_master_divisi_v1' || e.key === STORAGE_KEY) {
+          appData = loadData();
+          renderTable();
+          renderDivisiDropdownItems();
+        }
+      });
+
+      window.addEventListener('accounting_divisi_changed', function () {
+        renderDivisiDropdownItems();
       });
 
       // Initial Render

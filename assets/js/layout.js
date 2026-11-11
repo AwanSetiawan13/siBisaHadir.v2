@@ -302,7 +302,10 @@
         children: [
           { label: 'Master COA', link: 'Accounting/data_master/accounting_master_coa.html' },
           { label: 'Bank Lama', link: 'Accounting/data_master/accounting_bank_lama.html' },
-          { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' }
+          { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' },
+          { label: 'Divisi', link: 'Accounting/data_master/accounting_divisi.html' },
+          { label: 'Jenis Transaksi', link: 'Accounting/data_master/accounting_jenis_transaksi.html' },
+          { label: 'Customer | Project', link: 'Accounting/data_master/accounting_customer_project.html' }
         ]
       }
     ]
@@ -885,6 +888,14 @@
       document.body.prepend(container);
     }
     container.innerHTML = sidebarDOM;
+
+    // Auto-scroll sidebar agar menu aktif langsung terlihat
+    setTimeout(function () {
+      const activeLink = container.querySelector('.app-nav-item.is-active, .app-sub-item.is-active');
+      if (activeLink) {
+        activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }, 120);
 
     // Render Lucide Icons untuk elemen menu sidebar
     if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -1781,7 +1792,10 @@
       'accounting_pengaduan.html': 'Pengaduan',
       'accounting_master_coa.html': 'Master COA',
       'accounting_bank_lama.html': 'Bank Lama',
-      'accounting_penanggung_jawab.html': 'Penanggung Jawab'
+      'accounting_penanggung_jawab.html': 'Penanggung Jawab',
+      'accounting_divisi.html': 'Divisi',
+      'accounting_jenis_transaksi.html': 'Jenis Transaksi',
+      'accounting_customer_project.html': 'Customer | Project'
     };
 
     const accountingPageTitle = accountingTitles[currentFile] || (document.title ? document.title.split('|')[0].trim() : 'Dashboard');
@@ -2577,6 +2591,119 @@
   } else {
     initAppEmptyStateSupervisor();
   }
+
+  /* ===== GLOBAL ACCOUNTING MASTER DIVISI SYNCHRONIZER ===== */
+  const ACCOUNTING_DIVISI_STORAGE_KEY = 'accounting_master_divisi_v1';
+  const DEFAULT_ACCOUNTING_DIVISI_DATA = [
+    { id: 'div-1', nama: 'Finance & Accounting' },
+    { id: 'div-2', nama: 'MCN' },
+    { id: 'div-3', nama: 'Operasional' },
+    { id: 'div-4', nama: 'Marketing & Brand' },
+    { id: 'div-5', nama: 'Creative & Design' },
+    { id: 'div-6', nama: 'General Affair' },
+    { id: 'div-7', nama: 'Human Resource (HR)' },
+    { id: 'div-8', nama: 'IT & Development' }
+  ];
+
+  function getAccountingDivisiList() {
+    try {
+      const raw = localStorage.getItem(ACCOUNTING_DIVISI_STORAGE_KEY);
+      if (!raw) {
+        localStorage.setItem(ACCOUNTING_DIVISI_STORAGE_KEY, JSON.stringify(DEFAULT_ACCOUNTING_DIVISI_DATA));
+        return DEFAULT_ACCOUNTING_DIVISI_DATA.map(function (d) { return d.nama; });
+      }
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const list = parsed.map(function (d) {
+          if (typeof d === 'string') return d.trim();
+          return (d && (d.nama || d.divisi) ? (d.nama || d.divisi) : '').trim();
+        }).filter(Boolean);
+        if (list.length > 0) return list;
+      }
+    } catch (e) {
+      console.warn('Error reading master divisi:', e);
+    }
+    return DEFAULT_ACCOUNTING_DIVISI_DATA.map(function (d) { return d.nama; });
+  }
+
+  function syncAccountingDivisiDatalists() {
+    if (!document.body) return;
+    const divisions = getAccountingDivisiList();
+
+    // 1. Datalist Global Divisi
+    let globalDatalist = document.getElementById('globalAccountingDivisiList');
+    if (!globalDatalist) {
+      globalDatalist = document.createElement('datalist');
+      globalDatalist.id = 'globalAccountingDivisiList';
+      document.body.appendChild(globalDatalist);
+    }
+
+    const optionsHtml = divisions.map(function (name) {
+      return '<option value="' + String(name).replace(/"/g, '&quot;') + '"></option>';
+    }).join('');
+
+    globalDatalist.innerHTML = optionsHtml;
+
+    // 2. Sinkronisasi datalist lokal yang sudah ada di modul
+    ['listDivisiPengecualian', 'divisiList'].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = optionsHtml;
+    });
+
+    // 3. Hubungkan ke semua input Divisi & Divisi Pengecualian di form modul
+    const divisiInputSelectors = [
+      '#pndDivisiPengecualian',
+      '#crudDivisiPengecualian',
+      '#crudDivisi',
+      '#pjDivisi',
+      '#coaDevisDefault',
+      '#kbDivisi',
+      '#pndDivisi:not([readonly])'
+    ];
+
+    divisiInputSelectors.forEach(function (sel) {
+      document.querySelectorAll(sel).forEach(function (inp) {
+        if (!inp.hasAttribute('list') || inp.getAttribute('list') === 'globalAccountingDivisiList') {
+          inp.setAttribute('list', 'globalAccountingDivisiList');
+        }
+      });
+    });
+  }
+
+  window.getAccountingDivisiList = getAccountingDivisiList;
+  window.syncAccountingDivisiDatalists = syncAccountingDivisiDatalists;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncAccountingDivisiDatalists);
+  } else {
+    syncAccountingDivisiDatalists();
+  }
+  window.addEventListener('load', syncAccountingDivisiDatalists);
+
+  window.addEventListener('storage', function (e) {
+    if (e.key === ACCOUNTING_DIVISI_STORAGE_KEY) {
+      syncAccountingDivisiDatalists();
+    }
+  });
+
+  window.addEventListener('accounting_divisi_changed', function () {
+    syncAccountingDivisiDatalists();
+  });
+
+  // Delegasi fokus otomatis untuk semua input divisi yang dinamis / baru dirender
+  document.addEventListener('focusin', function (e) {
+    const target = e.target;
+    if (target && target.tagName === 'INPUT' && !target.readOnly) {
+      const id = target.id || '';
+      const name = target.name || '';
+      const placeholder = target.placeholder || '';
+      if (id.toLowerCase().includes('divisi') || name.toLowerCase().includes('divisi') || placeholder.toLowerCase().includes('divisi')) {
+        if (!target.hasAttribute('list') || target.getAttribute('list') === 'globalAccountingDivisiList') {
+          target.setAttribute('list', 'globalAccountingDivisiList');
+        }
+      }
+    }
+  });
 
   window.bmRenderSidebar = renderAppSidebar;
   window.bmRenderSidebarEngine = renderAppSidebar;
