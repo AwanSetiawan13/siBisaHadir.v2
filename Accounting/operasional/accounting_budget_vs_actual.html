@@ -2027,7 +2027,7 @@
             <!-- Row 2, Col 1: Divisi -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudDivisi">Divisi</label>
-              <input type="text" id="crudDivisi" class="modal-field-input" placeholder="Divisi" required />
+              <input type="text" id="crudDivisi" list="listDivisiPengecualian" class="modal-field-input" placeholder="Pilih atau ketik divisi" required autocomplete="off" />
             </div>
 
             <!-- Row 2, Col 2: Budget -->
@@ -2062,8 +2062,9 @@
 
             <!-- Row 4, Col 1: Divisi Pengecualian -->
             <div class="modal-field">
-              <label class="modal-field-label" for="crudDivisiPengecualian">Divisi Pengecualian</label>
-              <input type="text" id="crudDivisiPengecualian" class="modal-field-input" placeholder="Divisi Pengecualian" />
+              <label class="modal-field-label" for="crudDivisiPengecualian">Divisi Pengecualian (Opsional)</label>
+              <input type="text" id="crudDivisiPengecualian" list="listDivisiPengecualian" class="modal-field-input" placeholder="Pilih atau ketik divisi" autocomplete="off" />
+              <datalist id="listDivisiPengecualian"></datalist>
             </div>
 
             <!-- Row 4, Col 2: Kelompok COA -->
@@ -2220,7 +2221,7 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js"></script>
-  <script src="../../assets/js/layout.js?v=20261106_operasional_id"></script>
+  <script src="../../assets/js/layout.js?v=20261110_divisi_v2"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -2228,6 +2229,41 @@
 
       /* ===== DATA MODEL BUDGET VS ACTUAL ===== */
       const STORAGE_KEY = 'accounting_budget_vs_actual_data';
+      const DIVISI_KEY = 'accounting_master_divisi_v1';
+
+      function getMasterDivisiList() {
+        try {
+          const raw = localStorage.getItem(DIVISI_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const list = parsed.map(function (item) {
+                if (typeof item === 'string') return item.trim();
+                return (item.nama || item.divisi || '').trim();
+              }).filter(Boolean);
+              if (list.length > 0) return list;
+            }
+          }
+        } catch (e) {
+          console.warn('Error reading master divisi for Budget vs Actual:', e);
+        }
+        if (typeof window.getAccountingDivisiList === 'function') {
+          return window.getAccountingDivisiList();
+        }
+        return [
+          'Finance & Accounting', 'MCN', 'Operasional', 'Marketing & Brand',
+          'Creative & Design', 'General Affair', 'Human Resource (HR)', 'IT & Development'
+        ];
+      }
+
+      function updateDivisiPengecualianDatalist() {
+        const datalist = document.getElementById('listDivisiPengecualian');
+        if (!datalist) return;
+        const list = getMasterDivisiList();
+        datalist.innerHTML = list.map(function (nama) {
+          return '<option value="' + String(nama).replace(/"/g, '&quot;') + '"></option>';
+        }).join('');
+      }
 
       const defaultBudgetData = [
         {
@@ -2791,18 +2827,18 @@
       }
 
       if (crudBudget) {
-        crudBudget.addEventListener('input', calculateBudgetFields);
-        crudBudget.addEventListener('blur', function () {
+        crudBudget.addEventListener('input', function () {
           const val = parseNumber(this.value);
-          if (val > 0) this.value = formatRupiahInput(val);
+          this.value = val > 0 ? formatRupiahInput(val) : '';
+          calculateBudgetFields();
         });
       }
 
       if (crudActualBeban) {
-        crudActualBeban.addEventListener('input', calculateBudgetFields);
-        crudActualBeban.addEventListener('blur', function () {
+        crudActualBeban.addEventListener('input', function () {
           const val = parseNumber(this.value);
-          if (val >= 0 && this.value.trim() !== '') this.value = formatRupiahInput(val);
+          this.value = val > 0 ? formatRupiahInput(val) : '';
+          calculateBudgetFields();
         });
       }
 
@@ -2814,6 +2850,7 @@
 
       // Open Modal Tambah
       function openAddBudgetModal() {
+        updateDivisiPengecualianDatalist();
         currentEditingId = null;
         if (formBudgetCrud) formBudgetCrud.reset();
         delete crudStatus.dataset.userEdited;
@@ -2841,6 +2878,7 @@
       // Open Modal Edit
       function openEditBudgetModal(item) {
         if (!item) return;
+        updateDivisiPengecualianDatalist();
         currentEditingId = item.id;
         if (formBudgetCrud) formBudgetCrud.reset();
         crudModalTitle.innerHTML = '<em>Edit</em> Budget vs Actual';
@@ -3337,7 +3375,20 @@
 
       window.addEventListener('scroll', closeActionMenus, true);
 
+      window.addEventListener('storage', function (e) {
+        if (!e.key || e.key === STORAGE_KEY || e.key === DIVISI_KEY) {
+          budgetData = loadData();
+          updateDivisiPengecualianDatalist();
+          renderTable();
+        }
+      });
+
+      window.addEventListener('accounting_divisi_changed', function () {
+        updateDivisiPengecualianDatalist();
+      });
+
       // Initial Render
+      updateDivisiPengecualianDatalist();
       renderTable();
     });
   </script>

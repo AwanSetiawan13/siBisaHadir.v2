@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Divisi | Bisa Media</title>
+  <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    #divisiTable {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    #divisiTable th,
+    #divisiTable td {
+      vertical-align: middle;
+      padding: 14px 18px;
+    }
+
+    #divisiTable th:nth-child(1),
+    #divisiTable td:nth-child(1) {
+      width: 60px;
+      text-align: center;
+    }
+
+    #divisiTable th:nth-child(2),
+    #divisiTable td:nth-child(2) {
+      min-width: 320px;
+    }
+
+    #divisiTable th:nth-child(3),
+    #divisiTable td:nth-child(3) {
+      width: 80px;
+      text-align: center;
+    }
+
+    #divisiTable thead th {
+      background: #f4f4f5;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      border-top: 1px solid #e4e4e7;
+      border-bottom: 1px solid #e4e4e7;
+    }
+
+    #divisiTable thead th:first-child {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-left: 1px solid #e4e4e7;
+    }
+
+    #divisiTable thead th:last-child {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      border-right: 1px solid #e4e4e7;
+    }
+
+    #divisiTable tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+    }
+
+    #divisiTable tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    #divisiTable tbody td {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .divisi-panel-line {
+      display: block;
+      height: 4px;
+      margin: -20px -20px 16px;
+      border-radius: 16px 16px 0 0;
+      background: var(--blue-800, #1e5a96);
+    }
+
+    /* ===== Toolbar Divisi ===== */
+    .divisi-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .divisi-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .divisi-search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 240px;
+    }
+
+    .divisi-search-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 15px;
+      height: 15px;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .divisi-search-wrap input {
+      width: 100%;
+      height: 36px;
+      padding: 0 12px 0 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .divisi-search-wrap input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .divisi-search-wrap input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .btn-tambah-divisi {
+      height: 36px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-divisi:hover {
+      background: #0284c7;
+    }
+
+    .btn-tambah-divisi:active {
+      transform: scale(0.98);
+    }
+
+    .divisi-dashed-divider {
+      border: none;
+      border-top: 1px dashed #d4d4d8;
+      margin: 0 0 16px 0;
+    }
+
+    /* Badge Divisi */
+    .divisi-name-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 13.5px;
+    }
+
+    .divisi-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      background: #f1f5f9;
+      color: #1e293b;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Action button in table */
+    .divisi-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .divisi-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .divisi-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Floating Action Menu */
+    .divisi-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .divisi-action-menu.is-open {
+      display: block;
+    }
+
+    .divisi-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .divisi-action-menu button:hover {
+      background: #f8fafc;
+      color: #0076C5;
+    }
+
+    .divisi-action-menu button.is-danger {
+      color: #ef4444;
+    }
+
+    .divisi-action-menu button.is-danger:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .divisi-action-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+    }
+
+    .divisi-action-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .divisi-action-icon.is-danger {
+      color: #ef4444;
+    }
+
+    /* Modal Form Divisi */
+    .divisi-modal-box {
+      width: 480px;
+      max-width: 95vw;
+      border-radius: 16px;
+      background: #ffffff;
+      padding: 24px 26px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+    }
+
+    .divisi-modal-accent-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      border-radius: 16px 16px 0 0;
+      background: var(--blue-800, #1e5a96);
+    }
+
+    .divisi-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .divisi-modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .divisi-modal-title em {
+      font-style: italic;
+      color: #0076C5;
+      font-weight: 700;
+    }
+
+    .divisi-modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 16px;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s ease;
+    }
+
+    .divisi-modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .divisi-modal-dashed-divider {
+      border: none;
+      border-top: 1px dashed #e2e8f0;
+      margin: 0 0 20px 0;
+    }
+
+    .divisi-form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .divisi-form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .divisi-form-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .divisi-form-input {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #1e293b;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .divisi-form-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .divisi-form-input[readonly] {
+      background: #f8fafc;
+      color: #475569;
+      cursor: default;
+    }
+
+    .divisi-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .divisi-btn-simpan {
+      height: 36px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .divisi-btn-simpan:hover {
+      background: #0284c7;
+    }
+
+    .divisi-btn-tutup {
+      height: 36px;
+      padding: 0 20px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #475569;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .divisi-btn-tutup:hover {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    .divisi-empty-cell {
+      text-align: center;
+      padding: 40px 20px !important;
+      color: #94a3b8;
+      font-size: 13.5px;
+      font-style: italic;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-overlay.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Custom Toast */
+    .divisi-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .divisi-toast.is-show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1>Divisi</h1>
+      </div>
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line divisi-panel-line"></div>
+
+        <div class="divisi-toolbar">
+          <div class="divisi-toolbar__left">
+            <div class="divisi-search-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="divisiSearch" type="search" placeholder="Cari Nama Divisi..." autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="divisi-toolbar__right">
+            <button id="btnTambahDivisi" class="btn-tambah-divisi" type="button">+ Tambah</button>
+          </div>
+        </div>
+
+        <div class="divisi-dashed-divider"></div>
+
+        <div class="table-wrap campaign-table" id="divisiTableWrap">
+          <table id="divisiTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nama Divisi</th>
+                <th style="width: 70px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="divisiTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== MODAL TAMBAH / EDIT DIVISI ===== -->
+  <div id="divisiFormModal" class="modal-overlay">
+    <div class="divisi-modal-box">
+      <div class="divisi-modal-accent-line"></div>
+
+      <div class="divisi-modal-header">
+        <h2 class="divisi-modal-title">
+          <em><span id="divisiFormActionText">Tambah</span></em> Divisi
+        </h2>
+        <button class="divisi-modal-close-btn" type="button" data-close-modal="divisiFormModal" aria-label="Tutup">x</button>
+      </div>
+      <div class="divisi-modal-dashed-divider"></div>
+
+      <form id="divisiForm" autocomplete="off">
+        <input type="hidden" id="divisiEditId" />
+
+        <div class="divisi-form-grid">
+          <div class="divisi-form-field">
+            <label class="divisi-form-label" for="divisiNama">Nama Divisi</label>
+            <input type="text" id="divisiNama" class="divisi-form-input" placeholder="Tambah Nama Divisi" required />
+          </div>
+        </div>
+
+        <div class="divisi-modal-footer">
+          <button type="submit" class="divisi-btn-simpan">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL LIHAT DIVISI ===== -->
+  <div id="divisiViewModal" class="modal-overlay">
+    <div class="divisi-modal-box">
+      <div class="divisi-modal-accent-line"></div>
+
+      <div class="divisi-modal-header">
+        <h2 class="divisi-modal-title">
+          <em>Lihat</em> Divisi
+        </h2>
+        <button class="divisi-modal-close-btn" type="button" data-close-modal="divisiViewModal" aria-label="Tutup">x</button>
+      </div>
+      <div class="divisi-modal-dashed-divider"></div>
+
+      <div class="divisi-form-grid" id="divisiViewGrid">
+        <div class="divisi-form-field">
+          <label class="divisi-form-label">Nama Divisi</label>
+          <input type="text" id="viewDivisiNama" class="divisi-form-input" readonly />
+        </div>
+      </div>
+
+      <div class="divisi-modal-footer">
+        <button type="button" class="divisi-btn-tutup" data-close-modal="divisiViewModal">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Action Menu (Fixed di luar tabel) -->
+  <div id="divisiActionMenu" class="divisi-action-menu" role="menu">
+    <button type="button" data-action="view">
+      <span class="divisi-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" data-action="edit">
+      <span class="divisi-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" class="is-danger" data-action="delete">
+      <span class="divisi-action-icon is-danger">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <script src="../../assets/js/layout.js?v=20261110_divisi_v2"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'accounting_master_divisi_v1';
+
+      const DEFAULT_DIVISI_DATA = [
+        { id: 'div-1', nama: 'Finance & Accounting' },
+        { id: 'div-2', nama: 'MCN' },
+        { id: 'div-3', nama: 'Operasional' },
+        { id: 'div-4', nama: 'Marketing & Brand' },
+        { id: 'div-5', nama: 'Creative & Design' },
+        { id: 'div-6', nama: 'General Affair' },
+        { id: 'div-7', nama: 'Human Resource (HR)' },
+        { id: 'div-8', nama: 'IT & Development' }
+      ];
+
+      let divisiData = loadData();
+      let currentActionId = null;
+
+      // DOM Elements
+      const tableBody = document.getElementById('divisiTableBody');
+      const searchInput = document.getElementById('divisiSearch');
+      const btnTambah = document.getElementById('btnTambahDivisi');
+      const formModal = document.getElementById('divisiFormModal');
+      const viewModal = document.getElementById('divisiViewModal');
+      const form = document.getElementById('divisiForm');
+      const actionMenu = document.getElementById('divisiActionMenu');
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DIVISI_DATA));
+            return DEFAULT_DIVISI_DATA.slice();
+          }
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Normalisasi objek
+            return parsed.map(function (item, idx) {
+              if (typeof item === 'string') {
+                return { id: 'div-' + (idx + 1), nama: item };
+              }
+              return {
+                id: item.id || ('div-' + (idx + 1)),
+                nama: (item.nama || item.divisi || '').trim()
+              };
+            }).filter(function (item) { return item.nama !== ''; });
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DIVISI_DATA));
+          return DEFAULT_DIVISI_DATA.slice();
+        } catch (e) {
+          console.error('Error loading divisi data:', e);
+          return DEFAULT_DIVISI_DATA.slice();
+        }
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(divisiData));
+          // Trigger events for cross-module synchronizations
+          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('accounting_divisi_changed', { detail: divisiData }));
+          if (typeof window.syncAccountingDivisiDatalists === 'function') {
+            window.syncAccountingDivisiDatalists();
+          }
+        } catch (e) {
+          console.error('Error saving divisi data:', e);
+        }
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function showToast(message, type) {
+        const existing = document.querySelector('.divisi-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'divisi-toast';
+        if (type === 'warning') toast.style.background = '#eab308';
+        if (type === 'error') toast.style.background = '#ef4444';
+
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(function () {
+          toast.classList.add('is-show');
+        });
+
+        setTimeout(function () {
+          toast.classList.remove('is-show');
+          setTimeout(function () { toast.remove(); }, 250);
+        }, 2500);
+      }
+
+      function openModal(modal) {
+        if (!modal) return;
+        closeActionMenus();
+        modal.classList.add('is-active');
+      }
+
+      function closeModal(modal) {
+        if (!modal) return;
+        modal.classList.remove('is-active');
+      }
+
+      function getFilteredData() {
+        const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        if (!query) return divisiData;
+
+        return divisiData.filter(function (item) {
+          const nama = (item.nama || '').toLowerCase();
+          return nama.includes(query);
+        });
+      }
+
+      function renderTable() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        const filtered = getFilteredData();
+        if (filtered.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="3" class="divisi-empty-cell">Tidak ada data Divisi yang sesuai.</td></tr>';
+          return;
+        }
+
+        filtered.forEach(function (item, index) {
+          const row = document.createElement('tr');
+          row.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (index + 1) + '</td>',
+            '<td><span class="divisi-pill">' + escapeHtml(item.nama || '-') + '</span></td>',
+            '<td style="text-align: center;">' +
+              '<button type="button" class="divisi-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+          tableBody.appendChild(row);
+        });
+      }
+
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 150;
+        let left = rect.right - menuWidth;
+        if (left < 10) left = 10;
+
+        actionMenu.style.top = (rect.bottom + 4) + 'px';
+        actionMenu.style.left = left + 'px';
+        actionMenu.classList.add('is-open');
+      }
+
+      function openCreateModal() {
+        form.reset();
+        document.getElementById('divisiEditId').value = '';
+        document.getElementById('divisiFormActionText').textContent = 'Tambah';
+        openModal(formModal);
+        setTimeout(function () {
+          const inputNama = document.getElementById('divisiNama');
+          if (inputNama) inputNama.focus();
+        }, 50);
+      }
+
+      function openEditModal(item) {
+        if (!item) return;
+        document.getElementById('divisiEditId').value = item.id;
+        document.getElementById('divisiNama').value = item.nama || '';
+        document.getElementById('divisiFormActionText').textContent = 'Edit';
+        openModal(formModal);
+        setTimeout(function () {
+          const inputNama = document.getElementById('divisiNama');
+          if (inputNama) inputNama.focus();
+        }, 50);
+      }
+
+      function openViewModal(item) {
+        if (!item) return;
+        document.getElementById('viewDivisiNama').value = item.nama || '-';
+        openModal(viewModal);
+      }
+
+      function handleDelete(item) {
+        if (!item) return;
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'Hapus Divisi?',
+            text: 'Divisi "' + item.nama + '" akan dihapus secara permanen.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+          }).then(function (result) {
+            if (result.isConfirmed) {
+              divisiData = divisiData.filter(function (x) { return x.id !== item.id; });
+              saveData();
+              renderTable();
+              showToast('Divisi berhasil dihapus');
+            }
+          });
+        } else if (confirm('Apakah Anda yakin ingin menghapus divisi "' + item.nama + '"?')) {
+          divisiData = divisiData.filter(function (x) { return x.id !== item.id; });
+          saveData();
+          renderTable();
+          showToast('Divisi berhasil dihapus');
+        }
+      }
+
+      // Event Listeners
+      if (btnTambah) {
+        btnTambah.addEventListener('click', openCreateModal);
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', renderTable);
+      }
+
+      if (form) {
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+
+          const editId = document.getElementById('divisiEditId').value.trim();
+          const nama = document.getElementById('divisiNama').value.trim();
+
+          if (!nama) {
+            showToast('Mohon masukkan Nama Divisi', 'warning');
+            return;
+          }
+
+          // Cek duplikasi nama
+          const duplicate = divisiData.some(function (x) {
+            return x.id !== editId && x.nama.toLowerCase() === nama.toLowerCase();
+          });
+          if (duplicate) {
+            showToast('Nama Divisi "' + nama + '" sudah ada!', 'warning');
+            return;
+          }
+
+          if (editId) {
+            const index = divisiData.findIndex(function (x) { return x.id === editId; });
+            if (index !== -1) {
+              divisiData[index] = {
+                id: editId,
+                nama: nama
+              };
+              saveData();
+              renderTable();
+              closeModal(formModal);
+              showToast('Data Divisi berhasil diperbarui');
+            }
+          } else {
+            const newItem = {
+              id: 'div-' + Date.now(),
+              nama: nama
+            };
+            divisiData.unshift(newItem);
+            saveData();
+            renderTable();
+            closeModal(formModal);
+            showToast('Divisi baru berhasil ditambahkan');
+          }
+        });
+      }
+
+      // Action menu click delegation
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (event) {
+          const btn = event.target.closest('button[data-action]');
+          if (!btn) return;
+
+          const action = btn.getAttribute('data-action');
+          const target = divisiData.find(function (x) { return x.id === currentActionId; });
+
+          closeActionMenus();
+          if (!target) return;
+
+          if (action === 'view') {
+            openViewModal(target);
+          } else if (action === 'edit') {
+            openEditModal(target);
+          } else if (action === 'delete') {
+            handleDelete(target);
+          }
+        });
+      }
+
+      // Table toggle delegation
+      if (tableBody) {
+        tableBody.addEventListener('click', function (event) {
+          const toggle = event.target.closest('[data-action-toggle]');
+          if (toggle) {
+            event.preventDefault();
+            event.stopPropagation();
+            openActionMenu(toggle);
+          }
+        });
+      }
+
+      // Close modals by close button
+      document.querySelectorAll('[data-close-modal]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          const modalId = button.getAttribute('data-close-modal');
+          const modal = document.getElementById(modalId);
+          closeModal(modal);
+        });
+      });
+
+      // Close modal by clicking overlay
+      document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (event) {
+          if (event.target === overlay) {
+            closeModal(overlay);
+          }
+        });
+      });
+
+      // Window click to close action menu
+      window.addEventListener('click', function (event) {
+        if (!event.target.closest('#divisiActionMenu') && !event.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+      });
+
+      // Window scroll/resize to close action menu
+      window.addEventListener('scroll', closeActionMenus, true);
+      window.addEventListener('resize', closeActionMenus);
+
+      // Escape key
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closeActionMenus();
+          document.querySelectorAll('.modal-overlay.is-active').forEach(closeModal);
+        }
+      });
+
+      // Sync realtime jika storage diubah dari tab/window lain
+      window.addEventListener('storage', function (e) {
+        if (e.key === STORAGE_KEY) {
+          divisiData = loadData();
+          renderTable();
+        }
+      });
+
+      // Initial render
+      renderTable();
+    })();
+  </script>
+</body>
+
+</html>
+

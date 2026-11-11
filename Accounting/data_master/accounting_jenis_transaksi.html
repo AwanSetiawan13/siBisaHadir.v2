@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jenis Transaksi | Bisa Media</title>
+  <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    #jenisTransaksiTable {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    #jenisTransaksiTable th,
+    #jenisTransaksiTable td {
+      vertical-align: middle;
+      padding: 14px 18px;
+    }
+
+    #jenisTransaksiTable th:nth-child(1),
+    #jenisTransaksiTable td:nth-child(1) {
+      width: 55px;
+      text-align: center;
+    }
+
+    #jenisTransaksiTable th:nth-child(2),
+    #jenisTransaksiTable td:nth-child(2) {
+      min-width: 250px;
+    }
+
+    #jenisTransaksiTable th:nth-child(3),
+    #jenisTransaksiTable td:nth-child(3) {
+      min-width: 220px;
+    }
+
+    #jenisTransaksiTable th:nth-child(4),
+    #jenisTransaksiTable td:nth-child(4) {
+      width: 70px;
+      text-align: center;
+    }
+
+    #jenisTransaksiTable thead th {
+      background: #f4f4f5;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      border-top: 1px solid #e4e4e7;
+      border-bottom: 1px solid #e4e4e7;
+    }
+
+    #jenisTransaksiTable thead th:first-child {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-left: 1px solid #e4e4e7;
+    }
+
+    #jenisTransaksiTable thead th:last-child {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      border-right: 1px solid #e4e4e7;
+    }
+
+    #jenisTransaksiTable tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+    }
+
+    #jenisTransaksiTable tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    #jenisTransaksiTable tbody td {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .jt-panel-line {
+      display: block;
+      height: 4px;
+      margin: -20px -20px 16px;
+      border-radius: 16px 16px 0 0;
+      background: var(--blue-800, #1e5a96);
+    }
+
+    /* ===== Toolbar ===== */
+    .jt-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .jt-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .jt-search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 250px;
+    }
+
+    .jt-search-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 15px;
+      height: 15px;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .jt-search-wrap input {
+      width: 100%;
+      height: 36px;
+      padding: 0 12px 0 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .jt-search-wrap input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .jt-search-wrap input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .btn-tambah-jt {
+      height: 36px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+    }
+
+    .btn-tambah-jt:hover {
+      background: #1e94cb;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(40, 165, 222, 0.35);
+    }
+
+    .btn-tambah-jt:active {
+      transform: translateY(0);
+    }
+
+    .jt-dashed-divider {
+      border: none;
+      border-top: 1px dashed #cbd5e1;
+      margin: 0 0 16px 0;
+    }
+
+    .jt-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Badge Arus Kas */
+    .arus-kas-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .badge-operasional {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .badge-investasi {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-pendanaan {
+      background: #ede9fe;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+    }
+
+    .badge-transfer {
+      background: #ccfbf1;
+      color: #0f766e;
+      border: 1px solid #99f6e4;
+    }
+
+    .badge-saldo-awal {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+    }
+
+    .badge-default {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+    }
+
+    .jt-empty-cell {
+      text-align: center;
+      padding: 36px 16px;
+      color: #94a3b8;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-style: italic;
+    }
+
+    .jt-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .jt-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .jt-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Floating Action Menu */
+    .jt-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .jt-action-menu.is-open {
+      display: block;
+    }
+
+    .jt-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .jt-action-menu button:hover {
+      background: #f8fafc;
+      color: #0076C5;
+    }
+
+    .jt-action-menu button.is-danger {
+      color: #ef4444;
+    }
+
+    .jt-action-menu button.is-danger:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .jt-action-icon {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+    }
+
+    .jt-action-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .jt-action-icon.is-danger {
+      color: #ef4444;
+    }
+
+    /* Modal Box */
+    .jt-modal-box {
+      width: 480px;
+      max-width: 95vw;
+      border-radius: 16px;
+      background: #ffffff;
+      padding: 24px 26px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+    }
+
+    .jt-modal-accent-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      border-radius: 16px 16px 0 0;
+      background: var(--blue-800, #1e5a96);
+    }
+
+    .jt-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .jt-modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .jt-modal-title em {
+      font-style: italic;
+      color: #0076C5;
+      font-weight: 700;
+    }
+
+    .jt-modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 16px;
+      display: grid;
+      place-items: center;
+      transition: background 0.15s ease;
+    }
+
+    .jt-modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .jt-modal-dashed-divider {
+      border: none;
+      border-top: 1px dashed #e2e8f0;
+      margin: 0 0 20px 0;
+    }
+
+    .jt-form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .jt-form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .jt-form-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .jt-form-input,
+    .jt-form-select {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .jt-form-input:focus,
+    .jt-form-select:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .jt-form-input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    .jt-form-input-readonly {
+      background: #f8fafc;
+      color: #475569;
+      border-color: #e2e8f0;
+      cursor: not-allowed;
+    }
+
+    .jt-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .jt-btn-simpan {
+      height: 40px;
+      padding: 0 24px;
+      border: none;
+      border-radius: 6px;
+      background: #0076C5;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.3);
+    }
+
+    .jt-btn-simpan:hover {
+      background: #0060a0;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.4);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-overlay.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .jt-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .jt-toast.is-show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1>Jenis Transaksi</h1>
+      </div>
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line jt-panel-line"></div>
+
+        <div class="jt-toolbar">
+          <div class="jt-toolbar__left">
+            <div class="jt-search-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="jtSearch" type="search" placeholder="Cari Jenis Transaksi..." autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="jt-toolbar__right">
+            <button id="btnTambahJt" class="btn-tambah-jt" type="button">+ Tambah</button>
+          </div>
+        </div>
+
+        <div class="jt-dashed-divider"></div>
+
+        <div class="table-wrap campaign-table" id="jtTableWrap">
+          <table id="jenisTransaksiTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Jenis Transaksi</th>
+                <th>Arus Kas</th>
+                <th style="width: 70px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="jtTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== MODAL TAMBAH / EDIT JENIS TRANSAKSI ===== -->
+  <div id="jtFormModal" class="modal-overlay">
+    <div class="jt-modal-box">
+      <div class="jt-modal-accent-line"></div>
+
+      <div class="jt-modal-header">
+        <h2 class="jt-modal-title">
+          <em><span id="jtFormActionText">Tambah</span></em> Jenis Transaksi
+        </h2>
+        <button class="jt-modal-close-btn" type="button" data-close-modal="jtFormModal" aria-label="Tutup">x</button>
+      </div>
+      <div class="jt-modal-dashed-divider"></div>
+
+      <form id="jtForm" autocomplete="off">
+        <input type="hidden" id="jtEditId" />
+
+        <div class="jt-form-grid">
+          <div class="jt-form-field">
+            <label class="jt-form-label" for="jtJenis">Jenis Transaksi</label>
+            <input type="text" id="jtJenis" class="jt-form-input" placeholder="Contoh: Pendapatan, Beban, Modal, dll" required />
+          </div>
+
+          <div class="jt-form-field">
+            <label class="jt-form-label" for="jtArusKas">Arus Kas</label>
+            <select id="jtArusKas" class="jt-form-select" required>
+              <option value="" disabled selected>- Pilih Arus Kas -</option>
+              <option value="Operasional">Operasional</option>
+              <option value="Investasi">Investasi</option>
+              <option value="Pendanaan">Pendanaan</option>
+              <option value="Transfer Internal">Transfer Internal</option>
+              <option value="Saldo Awal">Saldo Awal</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="jt-modal-footer">
+          <button type="submit" class="jt-btn-simpan">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL LIHAT JENIS TRANSAKSI ===== -->
+  <div id="jtViewModal" class="modal-overlay">
+    <div class="jt-modal-box">
+      <div class="jt-modal-accent-line"></div>
+
+      <div class="jt-modal-header">
+        <h2 class="jt-modal-title">
+          <em>Lihat</em> Jenis Transaksi
+        </h2>
+        <button class="jt-modal-close-btn" type="button" data-close-modal="jtViewModal" aria-label="Tutup">x</button>
+      </div>
+      <div class="jt-modal-dashed-divider"></div>
+
+      <div class="jt-form-grid">
+        <div class="jt-form-field">
+          <label class="jt-form-label">Jenis Transaksi</label>
+          <input type="text" id="viewJtJenis" class="jt-form-input jt-form-input-readonly" readonly />
+        </div>
+
+        <div class="jt-form-field">
+          <label class="jt-form-label">Arus Kas</label>
+          <input type="text" id="viewJtArusKas" class="jt-form-input jt-form-input-readonly" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FLOATING ACTION MENU ===== -->
+  <div id="jtActionMenu" class="jt-action-menu">
+    <button type="button" data-action="view">
+      <span class="jt-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" data-action="edit">
+      <span class="jt-action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" class="is-danger" data-action="delete">
+      <span class="jt-action-icon is-danger">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <script src="../../assets/js/layout.js?v=20261110_jenis_transaksi_v1"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'accounting_master_jenis_transaksi_v1';
+
+      const DEFAULT_JENIS_TRANSAKSI_DATA = [
+        { id: 'jt-1', jenis: 'Saldo awal', arusKas: 'Saldo Awal' },
+        { id: 'jt-2', jenis: 'Pendapatan', arusKas: 'Operasional' },
+        { id: 'jt-3', jenis: 'Beban', arusKas: 'Operasional' },
+        { id: 'jt-4', jenis: 'Pengeluaran Beban', arusKas: 'Operasional' },
+        { id: 'jt-5', jenis: 'Payroll', arusKas: 'Operasional' },
+        { id: 'jt-6', jenis: 'Pajak', arusKas: 'Operasional' },
+        { id: 'jt-7', jenis: 'Pinjaman Karyawan', arusKas: 'Operasional' },
+        { id: 'jt-8', jenis: 'Cicilan Karyawan', arusKas: 'Operasional' },
+        { id: 'jt-9', jenis: 'Pembelian Aset', arusKas: 'Investasi' },
+        { id: 'jt-10', jenis: 'Penjualan Aset', arusKas: 'Investasi' },
+        { id: 'jt-11', jenis: 'Modal', arusKas: 'Pendanaan' },
+        { id: 'jt-12', jenis: 'Pinjaman', arusKas: 'Pendanaan' },
+        { id: 'jt-13', jenis: 'Pelunasan Pinjaman', arusKas: 'Pendanaan' },
+        { id: 'jt-14', jenis: 'Transfer Internal', arusKas: 'Transfer Internal' }
+      ];
+
+      let jenisTransaksiData = loadData();
+      let currentActionId = null;
+
+      // DOM Elements
+      const tableBody = document.getElementById('jtTableBody');
+      const searchInput = document.getElementById('jtSearch');
+      const btnTambah = document.getElementById('btnTambahJt');
+      const formModal = document.getElementById('jtFormModal');
+      const viewModal = document.getElementById('jtViewModal');
+      const form = document.getElementById('jtForm');
+      const actionMenu = document.getElementById('jtActionMenu');
+
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_JENIS_TRANSAKSI_DATA));
+            return DEFAULT_JENIS_TRANSAKSI_DATA.slice();
+          }
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed.map(function (item, idx) {
+              return {
+                id: item.id || ('jt-' + (idx + 1)),
+                jenis: (item.jenis || item.nama || '').trim(),
+                arusKas: (item.arusKas || item.aruskas || 'Operasional').trim()
+              };
+            }).filter(function (item) { return item.jenis !== ''; });
+          }
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_JENIS_TRANSAKSI_DATA));
+          return DEFAULT_JENIS_TRANSAKSI_DATA.slice();
+        } catch (e) {
+          console.error('Error loading jenis transaksi data:', e);
+          return DEFAULT_JENIS_TRANSAKSI_DATA.slice();
+        }
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(jenisTransaksiData));
+          window.dispatchEvent(new Event('storage'));
+          window.dispatchEvent(new CustomEvent('accounting_jenis_transaksi_changed', { detail: jenisTransaksiData }));
+        } catch (e) {
+          console.error('Error saving jenis transaksi data:', e);
+        }
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function getArusKasBadge(arusKas) {
+        const val = String(arusKas || '').trim();
+        const lower = val.toLowerCase();
+        let cls = 'badge-default';
+
+        if (lower.includes('operasional')) cls = 'badge-operasional';
+        else if (lower.includes('investasi')) cls = 'badge-investasi';
+        else if (lower.includes('pendanaan')) cls = 'badge-pendanaan';
+        else if (lower.includes('transfer')) cls = 'badge-transfer';
+        else if (lower.includes('saldo awal')) cls = 'badge-saldo-awal';
+
+        return '<span class="arus-kas-badge ' + cls + '">' + escapeHtml(val || '-') + '</span>';
+      }
+
+      function showToast(message, type) {
+        const existing = document.querySelector('.jt-toast');
+        if (existing) existing.remove();
+
+        const toast = document.createElement('div');
+        toast.className = 'jt-toast';
+        if (type === 'warning') toast.style.background = '#eab308';
+        if (type === 'error') toast.style.background = '#ef4444';
+
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(function () {
+          toast.classList.add('is-show');
+        });
+
+        setTimeout(function () {
+          toast.classList.remove('is-show');
+          setTimeout(function () { toast.remove(); }, 250);
+        }, 2500);
+      }
+
+      function openModal(modal) {
+        if (!modal) return;
+        closeActionMenus();
+        modal.classList.add('is-active');
+      }
+
+      function closeModal(modal) {
+        if (!modal) return;
+        modal.classList.remove('is-active');
+      }
+
+      function getFilteredData() {
+        const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+        if (!query) return jenisTransaksiData;
+
+        return jenisTransaksiData.filter(function (item) {
+          const jenis = (item.jenis || '').toLowerCase();
+          const arusKas = (item.arusKas || '').toLowerCase();
+          return jenis.includes(query) || arusKas.includes(query);
+        });
+      }
+
+      function renderTable() {
+        if (!tableBody) return;
+        tableBody.innerHTML = '';
+
+        const filtered = getFilteredData();
+        if (filtered.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="4" class="jt-empty-cell">Tidak ada data Jenis Transaksi yang sesuai.</td></tr>';
+          return;
+        }
+
+        filtered.forEach(function (item, index) {
+          const row = document.createElement('tr');
+          row.innerHTML = [
+            '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (index + 1) + '</td>',
+            '<td><span class="jt-pill">' + escapeHtml(item.jenis || '-') + '</span></td>',
+            '<td>' + getArusKasBadge(item.arusKas) + '</td>',
+            '<td style="text-align: center;">' +
+              '<button type="button" class="jt-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
+              '</button>' +
+            '</td>'
+          ].join('');
+          tableBody.appendChild(row);
+        });
+      }
+
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 150;
+        let left = rect.right - menuWidth;
+        if (left < 10) left = 10;
+
+        actionMenu.style.top = (rect.bottom + 4) + 'px';
+        actionMenu.style.left = left + 'px';
+        actionMenu.classList.add('is-open');
+      }
+
+      function openCreateModal() {
+        form.reset();
+        document.getElementById('jtEditId').value = '';
+        document.getElementById('jtArusKas').selectedIndex = 0;
+        document.getElementById('jtFormActionText').textContent = 'Tambah';
+        openModal(formModal);
+        setTimeout(function () {
+          const inputJenis = document.getElementById('jtJenis');
+          if (inputJenis) inputJenis.focus();
+        }, 50);
+      }
+
+      function openEditModal(item) {
+        if (!item) return;
+        document.getElementById('jtEditId').value = item.id;
+        document.getElementById('jtJenis').value = item.jenis || '';
+        document.getElementById('jtArusKas').value = item.arusKas || 'Operasional';
+        document.getElementById('jtFormActionText').textContent = 'Edit';
+        openModal(formModal);
+        setTimeout(function () {
+          const inputJenis = document.getElementById('jtJenis');
+          if (inputJenis) inputJenis.focus();
+        }, 50);
+      }
+
+      function openViewModal(item) {
+        if (!item) return;
+        document.getElementById('viewJtJenis').value = item.jenis || '-';
+        document.getElementById('viewJtArusKas').value = item.arusKas || '-';
+        openModal(viewModal);
+      }
+
+      function handleDelete(item) {
+        if (!item) return;
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            title: 'Hapus Jenis Transaksi?',
+            text: 'Jenis Transaksi "' + item.jenis + '" (' + item.arusKas + ') akan dihapus secara permanen.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+          }).then(function (result) {
+            if (result.isConfirmed) {
+              jenisTransaksiData = jenisTransaksiData.filter(function (x) { return x.id !== item.id; });
+              saveData();
+              renderTable();
+              showToast('Jenis Transaksi berhasil dihapus');
+            }
+          });
+        } else if (confirm('Apakah Anda yakin ingin menghapus Jenis Transaksi "' + item.jenis + '"?')) {
+          jenisTransaksiData = jenisTransaksiData.filter(function (x) { return x.id !== item.id; });
+          saveData();
+          renderTable();
+          showToast('Jenis Transaksi berhasil dihapus');
+        }
+      }
+
+      // Event Listeners
+      if (btnTambah) {
+        btnTambah.addEventListener('click', openCreateModal);
+      }
+
+      if (searchInput) {
+        searchInput.addEventListener('input', renderTable);
+      }
+
+      if (form) {
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+
+          const editId = document.getElementById('jtEditId').value.trim();
+          const jenis = document.getElementById('jtJenis').value.trim();
+          const arusKas = document.getElementById('jtArusKas').value.trim();
+
+          if (!jenis) {
+            showToast('Mohon masukkan Jenis Transaksi', 'warning');
+            return;
+          }
+          if (!arusKas) {
+            showToast('Mohon pilih Arus Kas', 'warning');
+            return;
+          }
+
+          // Cek duplikasi nama Jenis Transaksi
+          const duplicate = jenisTransaksiData.some(function (x) {
+            return x.id !== editId && x.jenis.toLowerCase() === jenis.toLowerCase();
+          });
+          if (duplicate) {
+            showToast('Jenis Transaksi "' + jenis + '" sudah ada!', 'warning');
+            return;
+          }
+
+          if (editId) {
+            const index = jenisTransaksiData.findIndex(function (x) { return x.id === editId; });
+            if (index !== -1) {
+              jenisTransaksiData[index] = {
+                id: editId,
+                jenis: jenis,
+                arusKas: arusKas
+              };
+              saveData();
+              renderTable();
+              closeModal(formModal);
+              showToast('Jenis Transaksi berhasil diperbarui');
+            }
+          } else {
+            const newItem = {
+              id: 'jt-' + Date.now(),
+              jenis: jenis,
+              arusKas: arusKas
+            };
+            jenisTransaksiData.unshift(newItem);
+            saveData();
+            renderTable();
+            closeModal(formModal);
+            showToast('Jenis Transaksi berhasil ditambahkan');
+          }
+        });
+      }
+
+      // Action menu click delegation
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (event) {
+          const btn = event.target.closest('button[data-action]');
+          if (!btn) return;
+
+          const action = btn.getAttribute('data-action');
+          const target = jenisTransaksiData.find(function (x) { return x.id === currentActionId; });
+
+          closeActionMenus();
+          if (!target) return;
+
+          if (action === 'view') {
+            openViewModal(target);
+          } else if (action === 'edit') {
+            openEditModal(target);
+          } else if (action === 'delete') {
+            handleDelete(target);
+          }
+        });
+      }
+
+      // Table toggle delegation
+      if (tableBody) {
+        tableBody.addEventListener('click', function (event) {
+          const toggle = event.target.closest('[data-action-toggle]');
+          if (toggle) {
+            event.preventDefault();
+            event.stopPropagation();
+            openActionMenu(toggle);
+          }
+        });
+      }
+
+      // Close modals by close button
+      document.querySelectorAll('[data-close-modal]').forEach(function (button) {
+        button.addEventListener('click', function () {
+          const modalId = button.getAttribute('data-close-modal');
+          const modal = document.getElementById(modalId);
+          closeModal(modal);
+        });
+      });
+
+      // Close modal by clicking overlay
+      document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (event) {
+          if (event.target === overlay) {
+            closeModal(overlay);
+          }
+        });
+      });
+
+      // Window click to close action menu
+      window.addEventListener('click', function (event) {
+        if (!event.target.closest('#jtActionMenu') && !event.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+      });
+
+      // Window scroll/resize to close action menu
+      window.addEventListener('scroll', closeActionMenus, true);
+      window.addEventListener('resize', closeActionMenus);
+
+      // Escape key
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closeActionMenus();
+          document.querySelectorAll('.modal-overlay.is-active').forEach(closeModal);
+        }
+      });
+
+      // Sync realtime jika storage diubah dari tab/window lain
+      window.addEventListener('storage', function (e) {
+        if (e.key === STORAGE_KEY) {
+          jenisTransaksiData = loadData();
+          renderTable();
+        }
+      });
+
+      // Initial render
+      renderTable();
+    })();
+  </script>
+</body>
+
+</html>
+

@@ -2813,17 +2813,21 @@
           </div>
 
           <div class="pnd-field">
-            <label class="pnd-label" for="pndDivisiPengecualian">Divisi Pengecualian (Opsional)</label>
-            <input type="text" id="pndDivisiPengecualian" list="listDivisiPengecualian" class="pnd-input" placeholder="Pilih atau ketik divisi" />
-            <datalist id="listDivisiPengecualian">
-              <option value="MCN"></option>
-              <option value="Finance & Accounting"></option>
-              <option value="Operasional"></option>
-              <option value="Marketing & Brand"></option>
-              <option value="Creative & Design"></option>
-              <option value="General Affair"></option>
-              <option value="IT"></option>
-            </datalist>
+            <label class="pnd-label">Divisi Pengecualian (Opsional)</label>
+            <div class="pnd-select-wrap" id="wrapDivisiPengecualian">
+              <div class="pnd-select-btn" id="btnTriggerDivisiPengecualian">
+                <span id="labelDivisiPengecualian">Pilih atau ketik divisi</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndDivisiPengecualian" />
+              <div class="pnd-select-dropdown" id="dropdownDivisiPengecualian">
+                <!-- Diisi dinamis dari accounting_master_divisi_v1 -->
+              </div>
+            </div>
           </div>
         </div>
 
@@ -3025,7 +3029,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="../../vendor/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
-  <script src="../../assets/js/layout.js?v=20261106_operasional_id"></script>
+  <script src="../../assets/js/layout.js?v=20261110_divisi_v2"></script>
   <script>
     (function () {
       'use strict';
@@ -3035,6 +3039,7 @@
       const BANK_LAMA_KEY = 'accounting_bank_lama_v1';
       const PENANGGUNG_JAWAB_KEY = 'accounting_master_penanggung_jawab_v1';
       const KAS_BANK_KEY = 'accounting_kas_bank_v2';
+      const DIVISI_KEY = 'accounting_master_divisi_v1';
 
       const tableBody = document.getElementById('pndTableBody');
       const searchInput = document.getElementById('pndSearch');
@@ -3094,6 +3099,13 @@
       const labelStatusLama = document.getElementById('labelStatusLama');
       const pndStatusLama = document.getElementById('pndStatusLama');
       const dropdownStatusLama = document.getElementById('dropdownStatusLama');
+
+      // Dropdown Divisi Pengecualian in Form
+      const wrapDivisiPengecualian = document.getElementById('wrapDivisiPengecualian');
+      const btnTriggerDivisiPengecualian = document.getElementById('btnTriggerDivisiPengecualian');
+      const labelDivisiPengecualian = document.getElementById('labelDivisiPengecualian');
+      const pndDivisiPengecualian = document.getElementById('pndDivisiPengecualian');
+      const dropdownDivisiPengecualian = document.getElementById('dropdownDivisiPengecualian');
 
       // Auto Calc Fields in Form
       const pndDpp = document.getElementById('pndDpp');
@@ -3192,7 +3204,7 @@
           let parsed = raw ? JSON.parse(raw) : [];
           if (Array.isArray(parsed) && parsed.length > 0) return parsed.filter(Boolean);
 
-          // Seed default Kas & Bank jika belum ada di localStorage
+          // Seed default Kas & Bank jika belum ada di localStorage (sesuai persis dengan modul Kas & Bank)
           const defaultKb = [
             {
               id: 'kb-1',
@@ -3204,8 +3216,8 @@
               uangMasuk: 15500000,
               uangKeluar: 0,
               saldoAkun: 15500000,
-              referensi: 'INV-2026-001',
-              rekonsiliasi: 'Sudah Rekonsiliasi',
+              referensi: 'INV-202609-002',
+              rekonsiliasi: 'Sesuai',
               projectBrand: 'Campaign Brand A',
               divisi: 'Operasional',
               arusKas: 'Operasional',
@@ -3223,9 +3235,9 @@
               uangMasuk: 748155,
               uangKeluar: 0,
               saldoAkun: 748155,
-              referensi: 'INV-2026-002',
-              rekonsiliasi: 'Sudah Rekonsiliasi',
-              projectBrand: 'MCN Creator Growth',
+              referensi: 'INV-202609-001',
+              rekonsiliasi: 'Sesuai',
+              projectBrand: 'Seluruh Kreator MCN',
               divisi: 'MCN',
               arusKas: 'Operasional',
               namaBank: 'BCA',
@@ -3233,61 +3245,80 @@
               atasNama: 'SYAHRUL MUHARROM'
             },
             {
-              id: 'kb-2b',
-              tanggal: '2026-09-02',
-              idTransaksi: 'KB-2609-002B',
-              jenis: 'Pendapatan',
-              kodeCoa: '4001',
-              keterangan: 'Management Fee MCN',
-              uangMasuk: 748155,
-              uangKeluar: 0,
-              saldoAkun: 748155,
-              referensi: 'INV-202609-001',
-              rekonsiliasi: 'Sudah Rekonsiliasi',
-              projectBrand: 'Seluruh Kreator MCN',
-              divisi: 'MCN',
-              arusKas: 'Arus Kas Operasional (Penerimaan)',
-              namaBank: 'BCA',
-              nomorRekening: '8830129841',
-              atasNama: 'PT Bisa Media Kreasi'
-            },
-            {
               id: 'kb-3',
-              tanggal: '2026-09-04',
+              tanggal: '2026-09-05',
               idTransaksi: 'KB-2609-003',
-              jenis: 'Pengeluaran Beban',
-              kodeCoa: '1000',
-              keterangan: 'Biaya Operasional & Perlengkapan Kantor',
+              jenis: 'Beban',
+              kodeCoa: '1002',
+              keterangan: 'Admin Bank BCA',
               uangMasuk: 0,
-              uangKeluar: 2500000,
-              saldoAkun: 13000000,
-              referensi: 'KWT-2026-089',
-              rekonsiliasi: 'Sudah Rekonsiliasi',
-              projectBrand: 'Operasional Kantor',
-              divisi: 'General Affair',
-              arusKas: 'Arus Kas Operasional (Pengeluaran)',
+              uangKeluar: 30000,
+              saldoAkun: 16218155,
+              referensi: 'EXP-2609-001',
+              rekonsiliasi: 'Sesuai',
+              projectBrand: 'Shopee Mega Sale',
+              divisi: 'General',
+              arusKas: 'Operasional',
               namaBank: 'BCA',
-              nomorRekening: '8830129841',
-              atasNama: 'PT Bisa Media Kreasi'
+              nomorRekening: '2092026028',
+              atasNama: 'PT BISA MEDIA GRUP'
             },
             {
               id: 'kb-4',
-              tanggal: '2026-09-05',
+              tanggal: '2026-09-10',
               idTransaksi: 'KB-2609-004',
-              jenis: 'Pengeluaran Beban',
-              kodeCoa: '1100',
-              keterangan: 'Langganan Cloud Server & Database IT',
+              jenis: 'Beban',
+              kodeCoa: '1005',
+              keterangan: 'Iklan Digital Campaign Meta Ads',
               uangMasuk: 0,
-              uangKeluar: 250000,
-              saldoAkun: 498155,
-              referensi: 'SUB-2026-041',
-              rekonsiliasi: 'Sudah Rekonsiliasi',
-              projectBrand: 'Infrastruktur IT',
-              divisi: 'Operasional',
-              arusKas: 'Arus Kas Operasional (Pengeluaran)',
-              namaBank: 'Mandiri',
-              nomorRekening: '137001928374',
-              atasNama: 'PT Bisa Media Kreasi'
+              uangKeluar: 1665000,
+              saldoAkun: 14553155,
+              referensi: 'EXP-2609-002',
+              rekonsiliasi: 'Sesuai',
+              projectBrand: 'Shopee Mega Sale',
+              divisi: 'Marketing',
+              arusKas: 'Operasional',
+              namaBank: 'SEABANK',
+              nomorRekening: '901631003438',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'kb-5',
+              tanggal: '2026-09-12',
+              idTransaksi: 'KB-2609-005',
+              jenis: 'Pendapatan',
+              kodeCoa: '1006',
+              keterangan: 'Jasa Live Streaming Affiliate',
+              uangMasuk: 14000000,
+              uangKeluar: 0,
+              saldoAkun: 28553155,
+              referensi: 'INV-202609-003',
+              rekonsiliasi: 'Sesuai',
+              projectBrand: 'Shopee Affiliate Mall',
+              divisi: 'MCN',
+              arusKas: 'Operasional',
+              namaBank: 'BNI',
+              nomorRekening: '2049368973',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'kb-6',
+              tanggal: '2026-10-19',
+              idTransaksi: 'KB-2609-006',
+              jenis: 'Beban',
+              kodeCoa: '1002',
+              keterangan: 'Server & Cloud Hosting Database',
+              uangMasuk: 0,
+              uangKeluar: 943500,
+              saldoAkun: 27609655,
+              referensi: 'EXP-2609-005',
+              rekonsiliasi: 'Sesuai',
+              projectBrand: 'Seluruh Kreator MCN',
+              divisi: 'IT',
+              arusKas: 'Operasional',
+              namaBank: 'BCA',
+              nomorRekening: '2092026028',
+              atasNama: 'PT BISA MEDIA GRUP'
             }
           ];
           localStorage.setItem(KAS_BANK_KEY, JSON.stringify(defaultKb));
@@ -4020,12 +4051,13 @@
         });
       }
 
-      /* Custom Dropdowns (Kode COA, Akun Lama, PIC, Status Lama) Handling in Form */
+      /* Custom Dropdowns (Kode COA, Akun Lama, PIC, Status Lama, Divisi Pengecualian) Handling in Form */
       function closeFormDropdowns() {
         if (wrapKodeCoa) wrapKodeCoa.classList.remove('is-open');
         if (wrapAkunLama) wrapAkunLama.classList.remove('is-open');
         if (wrapPic) wrapPic.classList.remove('is-open');
         if (wrapStatusLama) wrapStatusLama.classList.remove('is-open');
+        if (wrapDivisiPengecualian) wrapDivisiPengecualian.classList.remove('is-open');
         closeBisaDatePicker();
       }
 
@@ -4180,6 +4212,103 @@
           });
 
           dropdownPic.appendChild(label);
+        });
+      }
+
+      /* ===== DYNAMIC DIVISI PENGECUALIAN (Mengambil dari Master Divisi) ===== */
+      function getMasterDivisiList() {
+        try {
+          const raw = localStorage.getItem(DIVISI_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const list = parsed.map(function (item) {
+                if (typeof item === 'string') return item.trim();
+                return (item.nama || item.divisi || '').trim();
+              }).filter(Boolean);
+              if (list.length > 0) return list;
+            }
+          }
+        } catch (e) {
+          console.warn('Error reading master divisi for Pendapatan:', e);
+        }
+        if (typeof window.getAccountingDivisiList === 'function') {
+          return window.getAccountingDivisiList();
+        }
+        return [
+          'Finance & Accounting', 'MCN', 'Operasional', 'Marketing & Brand',
+          'Creative & Design', 'General Affair', 'Human Resource (HR)', 'IT & Development'
+        ];
+      }
+
+      function setDivisiPengecualianValue(val) {
+        const actualVal = (val && val !== '-') ? String(val).trim() : '';
+        if (pndDivisiPengecualian) pndDivisiPengecualian.value = actualVal;
+        if (labelDivisiPengecualian) {
+          labelDivisiPengecualian.textContent = actualVal || 'Pilih atau ketik divisi';
+        }
+        if (btnTriggerDivisiPengecualian) {
+          if (actualVal) btnTriggerDivisiPengecualian.classList.add('has-value');
+          else btnTriggerDivisiPengecualian.classList.remove('has-value');
+        }
+        if (dropdownDivisiPengecualian) {
+          dropdownDivisiPengecualian.querySelectorAll('input[name="optDivisiPengecualian"]').forEach(function (radio) {
+            radio.checked = String(radio.value).trim() === actualVal;
+            const parent = radio.closest('.pnd-select-item');
+            if (parent) {
+              parent.classList.toggle('is-selected', radio.checked);
+            }
+          });
+        }
+      }
+
+      function renderDivisiPengecualianDropdownItems() {
+        if (!dropdownDivisiPengecualian) return;
+        dropdownDivisiPengecualian.innerHTML = '';
+        const list = getMasterDivisiList();
+        const currentVal = (pndDivisiPengecualian && pndDivisiPengecualian.value) ? pndDivisiPengecualian.value.trim() : '';
+
+        // Opsi default / tanpa pengecualian
+        const noneLabel = document.createElement('label');
+        noneLabel.className = 'pnd-select-item' + (!currentVal ? ' is-selected' : '');
+        noneLabel.innerHTML = [
+          '<input type="radio" name="optDivisiPengecualian" value=""' + (!currentVal ? ' checked' : '') + ' />',
+          '<span style="color: #64748b; font-style: italic;">- Tanpa Pengecualian -</span>'
+        ].join('');
+        noneLabel.querySelector('input').addEventListener('change', function () {
+          setDivisiPengecualianValue('');
+          closeFormDropdowns();
+        });
+        dropdownDivisiPengecualian.appendChild(noneLabel);
+
+        list.forEach(function (nama) {
+          const label = document.createElement('label');
+          const isChecked = String(currentVal) === String(nama);
+          label.className = 'pnd-select-item' + (isChecked ? ' is-selected' : '');
+
+          label.innerHTML = [
+            '<input type="radio" name="optDivisiPengecualian" value="' + escapeHtml(nama) + '"' + (isChecked ? ' checked' : '') + ' />',
+            '<span>' + escapeHtml(nama) + '</span>'
+          ].join('');
+
+          label.querySelector('input').addEventListener('change', function () {
+            setDivisiPengecualianValue(nama);
+            closeFormDropdowns();
+          });
+
+          dropdownDivisiPengecualian.appendChild(label);
+        });
+      }
+
+      if (btnTriggerDivisiPengecualian && wrapDivisiPengecualian) {
+        btnTriggerDivisiPengecualian.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrapDivisiPengecualian.classList.contains('is-open');
+          closeFormDropdowns();
+          if (!isOpen) {
+            renderDivisiPengecualianDropdownItems();
+            wrapDivisiPengecualian.classList.add('is-open');
+          }
         });
       }
 
@@ -4474,6 +4603,7 @@
         renderCoaDropdownItems();
         renderAkunLamaDropdownItems();
         renderPicDropdownItems();
+        renderDivisiPengecualianDropdownItems();
         updateInvoiceDatalist();
 
         tempUploadedFile = item ? (item.buktiUrl || '') : '';
@@ -4520,7 +4650,8 @@
           document.getElementById('pndNamaAkunCoa').value = item.namaAkunCoa || (coaItem ? coaItem.nama : '');
           document.getElementById('pndKelompokCoa').value = item.kelompokCoa || (coaItem ? coaItem.kelompok : '');
           document.getElementById('pndStatusCoa').value = statusCoaDefault;
-          document.getElementById('pndDivisiPengecualian').value = item.divisiPengecualian || '';
+          setDivisiPengecualianValue(item.divisiPengecualian || '');
+          renderDivisiPengecualianDropdownItems();
 
           autoCalcTagihan();
         } else {
@@ -4554,7 +4685,8 @@
           document.getElementById('pndNamaAkunCoa').value = '';
           document.getElementById('pndKelompokCoa').value = '';
           document.getElementById('pndStatusCoa').value = '';
-          document.getElementById('pndDivisiPengecualian').value = '';
+          setDivisiPengecualianValue('');
+          renderDivisiPengecualianDropdownItems();
 
           autoCalcTagihan();
         }
@@ -5131,7 +5263,7 @@
               pndData[idx] = Object.assign({}, pndData[idx], payload);
             }
           } else {
-            pndData.push(Object.assign({
+            pndData.unshift(Object.assign({
               id: 'pnd-' + Date.now()
             }, payload));
           }
@@ -5174,7 +5306,7 @@
         if (!event.target.closest('.filter-dropdown-wrapper')) {
           closePopovers();
         }
-        if (!event.target.closest('#wrapKodeCoa') && !event.target.closest('#wrapAkunLama') && !event.target.closest('#wrapPic') && !event.target.closest('#wrapStatusLama') && !event.target.closest('#bisaDatePickerPopover') && !event.target.closest('.bisa-datepicker-wrap')) {
+        if (!event.target.closest('#wrapKodeCoa') && !event.target.closest('#wrapAkunLama') && !event.target.closest('#wrapPic') && !event.target.closest('#wrapStatusLama') && !event.target.closest('#wrapDivisiPengecualian') && !event.target.closest('#bisaDatePickerPopover') && !event.target.closest('.bisa-datepicker-wrap')) {
           closeFormDropdowns();
         }
       });
@@ -5201,21 +5333,27 @@
 
       // Realtime Cross-tab Sync
       window.addEventListener('storage', function (e) {
-        if (!e.key || e.key === STORAGE_KEY || e.key === KAS_BANK_KEY || e.key === MASTER_COA_KEY || e.key === BANK_LAMA_KEY || e.key === PENANGGUNG_JAWAB_KEY) {
+        if (!e.key || e.key === STORAGE_KEY || e.key === KAS_BANK_KEY || e.key === MASTER_COA_KEY || e.key === BANK_LAMA_KEY || e.key === PENANGGUNG_JAWAB_KEY || e.key === DIVISI_KEY) {
           pndData = loadData();
           renderTable();
           updateSummaryCards();
           renderCoaDropdownItems();
           renderAkunLamaDropdownItems();
           renderPicDropdownItems();
+          renderDivisiPengecualianDropdownItems();
           updateInvoiceDatalist();
         }
+      });
+
+      window.addEventListener('accounting_divisi_changed', function () {
+        renderDivisiPengecualianDropdownItems();
       });
 
       // Render awal & inisialisasi dropdown
       renderCoaDropdownItems();
       renderAkunLamaDropdownItems();
       renderPicDropdownItems();
+      renderDivisiPengecualianDropdownItems();
       updateInvoiceDatalist();
       renderTable();
     })();
