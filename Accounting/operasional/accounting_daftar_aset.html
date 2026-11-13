@@ -940,10 +940,48 @@
       font-style: italic;
     }
 
-    /* Field Terkalkulasi / Otomatis (Soft Grey Background Sesuai Mockup) */
+    /* Field Terkalkulasi / Otomatis (Soft Grey Background, Tidak Bisa Diklik) */
     .modal-field-input.is-calc {
       background: #f1f5f9;
       color: #475569;
+      cursor: not-allowed;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .modal-field-input.is-calc:focus {
+      border-color: #cbd5e1;
+      box-shadow: none;
+    }
+
+    /* Select native dengan panah konsisten (Kategori, Status) */
+    .modal-field-input.modal-select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding-right: 36px;
+      background-color: #ffffff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+    }
+
+    .modal-field-input.modal-select.is-calc {
+      background-color: #f1f5f9;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      cursor: not-allowed;
+    }
+
+    .modal-field-input.no-arrow {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: none;
+    }
+
+    .modal-field-input:not(.is-calc):hover {
+      border-color: #cbd5e1;
     }
 
     /* Field Nilai Read-Only (Modal Lihat) */
@@ -968,6 +1006,42 @@
     .modal-dropdown-wrap {
       position: relative;
       width: 100%;
+    }
+
+    .modal-dropdown-trigger {
+      position: relative;
+      width: 100%;
+    }
+
+    .modal-dropdown-trigger .modal-field-input.has-arrow {
+      padding-right: 34px;
+    }
+
+    .modal-dropdown-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      cursor: pointer;
+      transition: transform 0.18s ease, color 0.15s ease;
+    }
+
+    .modal-dropdown-wrap.is-open .modal-dropdown-arrow {
+      transform: translateY(-50%) rotate(180deg);
+      color: #0284c7;
+    }
+
+    .modal-dropdown-arrow svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      pointer-events: none;
     }
 
     .modal-dropdown-wrap.is-open .modal-field-input {
@@ -2375,7 +2449,7 @@
           <!-- Row 1: Kode Aset, Nama Aset, Tanggal Beli -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudKodeAset">Kode Aset</label>
-            <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="AST-000" required />
+            <input type="text" id="crudKodeAset" class="modal-field-input is-calc" placeholder="Otomatis (AI Auto Increment)" readonly tabindex="-1" required />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudNamaAset">Nama Aset</label>
@@ -2386,80 +2460,105 @@
             <input type="text" id="crudTanggalBeli" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" required />
           </div>
 
-          <!-- Row 2: Kode COA, Lokasi, Harga Satuan -->
+          <!-- Row 2: Kode COA, Mulai di Pakai, Lokasi -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudKodeCOA">Kode COA</label>
             <div class="modal-dropdown-wrap" id="wrapKodeCOA">
-              <input type="text" id="crudKodeCOA" class="modal-field-input" placeholder="Pilih Kede COA" readonly style="cursor: pointer;" />
-              <div class="modal-dropdown-menu" id="menuKodeCOA">
-                <label class="modal-dropdown-item"><input type="checkbox" value="1001 | Kas Kecil"> <span>1001 | Kas Kecil</span></label>
-                <label class="modal-dropdown-item"><input type="checkbox" value="1002 | Bank BCA"> <span>1002 | Bank BCA</span></label>
-                <label class="modal-dropdown-item"><input type="checkbox" value="1301 | Peralatan Produksi & Studio"> <span>1301 | Peralatan Produksi & Studio</span></label>
-                <label class="modal-dropdown-item"><input type="checkbox" value="1302 | Peralatan & Perlengkapan Kantor"> <span>1302 | Peralatan & Perlengkapan Kantor</span></label>
-                <label class="modal-dropdown-item"><input type="checkbox" value="1303 | Furniture & Mebel"> <span>1303 | Furniture & Mebel</span></label>
+              <div class="modal-dropdown-trigger">
+                <input type="text" id="crudKodeCOA" class="modal-field-input has-arrow" placeholder="Pilih Kode COA" readonly style="cursor: pointer;" />
+                <span class="modal-dropdown-arrow" title="Pilih Kode COA" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
               </div>
+              <div class="modal-dropdown-menu" id="menuKodeCOA"></div>
             </div>
+          </div>
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudMulaiDiPakai">Mulai di Pakai</label>
+            <input type="text" id="crudMulaiDiPakai" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudLokasi">Lokasi</label>
             <input type="text" id="crudLokasi" class="modal-field-input" placeholder="Tambah Lokasi" required />
           </div>
           <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudKategori">Kategori</label>
+            <select id="crudKategori" class="modal-field-input modal-select" required>
+              <option value="">Pilih Kategori</option>
+              <option value="Furniture & Mebel">Furniture & Mebel</option>
+              <option value="Elektronik">Elektronik</option>
+              <option value="Kamera">Kamera</option>
+              <option value="Perlengkapan">Perlengkapan</option>
+              <option value="Perlengkapan Live">Perlengkapan Live</option>
+              <option value="Peralatan Jaringan">Peralatan Jaringan</option>
+              <option value="Kendaraan">Kendaraan</option>
+              <option value="Renovasi">Renovasi</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+          </div>
+
+          <!-- Row 3: Kategori, Harga Satuan, Qty -->
+          <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudHargaSatuan">Harga Satuan</label>
             <input type="text" id="crudHargaSatuan" class="modal-field-input" placeholder="Rp. -" />
           </div>
-
-          <!-- Row 3: Qty, Harga Perolehan, Umur (Bulan) -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudQty">Qty</label>
             <input type="number" id="crudQty" class="modal-field-input" placeholder="0" min="1" required />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudHargaPerolehan">Harga Perolehan</label>
-            <input type="text" id="crudHargaPerolehan" class="modal-field-input is-calc" placeholder="Rp. -" readonly />
+            <input type="text" id="crudHargaPerolehan" class="modal-field-input is-calc" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
+
+          <!-- Row 4: Harga Perolehan, Umur (Bulan), Nilai Residu -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudUmurBulan">Umur (Bulan)</label>
             <input type="number" id="crudUmurBulan" class="modal-field-input" placeholder="0" min="0" />
           </div>
-
-          <!-- Row 4: Nilai Residu, Penyusutan/Bulan, Akumulasi -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudNilaiResidu">Nilai Residu</label>
-            <input type="text" id="crudNilaiResidu" class="modal-field-input is-calc" placeholder="Rp. -" />
+            <input type="text" id="crudNilaiResidu" class="modal-field-input is-calc" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudPenyusutanBulan">Penyusutan/Bulan</label>
-            <input type="text" id="crudPenyusutanBulan" class="modal-field-input is-calc" placeholder="Rp. -" readonly />
-          </div>
-          <div class="modal-field col-span-4">
-            <label class="modal-field-label" for="crudAkumulasi">Akumulasi</label>
-            <input type="text" id="crudAkumulasi" class="modal-field-input is-calc" placeholder="Rp. -" />
+            <input type="text" id="crudPenyusutanBulan" class="modal-field-input is-calc" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
 
-          <!-- Row 5: Nilai Buku, Status, Kategori -->
+          <!-- Row 5: Penyusutan/Bulan, Akumulasi, Nilai Buku -->
+          <div class="modal-field col-span-4">
+            <label class="modal-field-label" for="crudAkumulasi">Akumulasi</label>
+            <input type="text" id="crudAkumulasi" class="modal-field-input is-calc" placeholder="Rp. -" readonly tabindex="-1" />
+          </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudNilaiBuku">Nilai Buku</label>
-            <input type="text" id="crudNilaiBuku" class="modal-field-input is-calc" placeholder="Rp. -" readonly />
+            <input type="text" id="crudNilaiBuku" class="modal-field-input is-calc" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudStatus">Status</label>
-            <input type="text" id="crudStatus" class="modal-field-input" placeholder="Pilih Status" />
-          </div>
-          <div class="modal-field col-span-4">
-            <label class="modal-field-label" for="crudKategori">Kategori</label>
-            <input type="text" id="crudKategori" class="modal-field-input" placeholder="Tambah Keterangan" required />
+            <select id="crudStatus" class="modal-field-input modal-select">
+              <option value="">Pilih Status</option>
+              <option value="Aktif">Aktif</option>
+              <option value="Dijual">Dijual</option>
+              <option value="Rusak">Rusak</option>
+              <option value="Dihapus">Dihapus</option>
+            </select>
           </div>
 
-          <!-- Row 6: Mulai di Pakai, PIC, Divisi -->
-          <div class="modal-field col-span-4">
-            <label class="modal-field-label" for="crudMulaiDiPakai">Mulai di Pakai</label>
-            <input type="text" id="crudMulaiDiPakai" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
-          </div>
+          <!-- Row 6: Status, PIC, Divisi -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudPIC">PIC</label>
             <div class="modal-dropdown-wrap" id="wrapPIC">
-              <input type="text" id="crudPIC" class="modal-field-input" placeholder="Pilih PIC" readonly style="cursor: pointer;" />
+              <div class="modal-dropdown-trigger">
+                <input type="text" id="crudPIC" class="modal-field-input has-arrow" placeholder="Pilih PIC" readonly style="cursor: pointer;" />
+                <span class="modal-dropdown-arrow" title="Pilih PIC" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
               <div class="modal-dropdown-menu" id="menuPIC">
                 <label class="modal-dropdown-item"><input type="checkbox" value="Nama 1"> <span>Nama 1</span></label>
                 <label class="modal-dropdown-item"><input type="checkbox" value="Nama 2"> <span>Nama 2</span></label>
@@ -2469,7 +2568,9 @@
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudDivisi">Divisi</label>
-            <input type="text" id="crudDivisi" list="listDivisiPengecualian" class="modal-field-input is-calc" placeholder="Pilih atau ketik divisi" autocomplete="off" />
+            <select id="crudDivisi" class="modal-field-input no-arrow is-calc" tabindex="-1">
+              <option value="">Pilih Divisi</option>
+            </select>
           </div>
 
           <!-- Row 7: Project/Brand, Tanggal Pelepasan, Bukti/Foto -->
@@ -2478,7 +2579,7 @@
             <input type="text" id="crudProjectBrand" class="modal-field-input" placeholder="-" />
           </div>
           <div class="modal-field col-span-4">
-            <label class="modal-field-label" for="crudTanggalPelepasan">Tanggal Pelepasan</label>
+            <label class="modal-field-label" for="crudTanggalPelepasan">Tanggal Pelepasan (Opsional)</label>
             <input type="text" id="crudTanggalPelepasan" class="modal-field-input" placeholder="dd/mm/yyyy" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" />
           </div>
           <div class="modal-field col-span-4">
@@ -2498,36 +2599,36 @@
           <!-- Row 8: Hasil Pelepasan, Nilai Buku Saat Lepas, Laba/Rugi Lepas -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudHasilPelepasan">Hasil Pelepasan</label>
-            <input type="text" id="crudHasilPelepasan" class="modal-field-input" placeholder="-" />
+            <input type="text" id="crudHasilPelepasan" class="modal-field-input" placeholder="Rp. -" inputmode="numeric" />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudNilaiBukuSaatLepas">Nilai Buku Saat Lepas</label>
-            <input type="text" id="crudNilaiBukuSaatLepas" class="modal-field-input is-calc" placeholder="-" />
+            <input type="text" id="crudNilaiBukuSaatLepas" class="modal-field-input is-calc" placeholder="-" readonly tabindex="-1" />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudLabaRugiLepas">Laba/Rugi Lepas</label>
-            <input type="text" id="crudLabaRugiLepas" class="modal-field-input is-calc" placeholder="-" />
+            <input type="text" id="crudLabaRugiLepas" class="modal-field-input is-calc" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
 
           <!-- Row 9: Divisi Pengecualian, Nama Akun COA, Kelompok COA -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudDivisiPengecualian">Divisi Pengecualian (Opsional)</label>
-            <input type="text" id="crudDivisiPengecualian" list="listDivisiPengecualian" class="modal-field-input is-calc" placeholder="Pilih atau ketik divisi" autocomplete="off" />
+            <input type="text" id="crudDivisiPengecualian" list="listDivisiPengecualian" class="modal-field-input" placeholder="Pilih atau ketik divisi" autocomplete="off" />
             <datalist id="listDivisiPengecualian"></datalist>
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudNamaAkunCOA">Nama Akun COA</label>
-            <input type="text" id="crudNamaAkunCOA" class="modal-field-input is-calc" placeholder="Nama Akun COA" />
+            <input type="text" id="crudNamaAkunCOA" class="modal-field-input is-calc" placeholder="Otomatis dari Kode COA" readonly tabindex="-1" />
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudKelompokCOA">Kelompok COA</label>
-            <input type="text" id="crudKelompokCOA" class="modal-field-input is-calc" placeholder="Kelompok COA" />
+            <input type="text" id="crudKelompokCOA" class="modal-field-input is-calc" placeholder="Otomatis dari Kode COA" readonly tabindex="-1" />
           </div>
 
           <!-- Row 10: Status COA (Full Width col-span-12) -->
           <div class="modal-field col-span-12">
             <label class="modal-field-label" for="crudStatusCOA">Status COA</label>
-            <input type="text" id="crudStatusCOA" class="modal-field-input is-calc" placeholder="Status COA" />
+            <input type="text" id="crudStatusCOA" class="modal-field-input is-calc" placeholder="Otomatis dari Kode COA" readonly tabindex="-1" />
           </div>
         </div>
 
@@ -2564,10 +2665,14 @@
           <div class="modal-field-value" id="detailTanggalBeli">05 Mei 2026</div>
         </div>
 
-        <!-- Row 2: Kode COA, Lokasi, Harga Satuan -->
+        <!-- Row 2: Kode COA, Mulai di Pakai, Lokasi -->
         <div class="modal-field col-span-4">
           <span class="modal-field-label">Kode COA</span>
           <div class="modal-field-value" id="detailKodeCOA">1302 | Peralatan &amp; Perlengkapan Kan...</div>
+        </div>
+        <div class="modal-field col-span-4">
+          <span class="modal-field-label">Mulai di Pakai</span>
+          <div class="modal-field-value" id="detailMulaiDiPakai">1 Jun 2026</div>
         </div>
         <div class="modal-field col-span-4">
           <span class="modal-field-label">Lokasi</span>
@@ -2578,7 +2683,7 @@
           <div class="modal-field-value" id="detailHargaSatuan">Rp. 200,000</div>
         </div>
 
-        <!-- Row 3: Qty, Harga Perolehan, Umur (Bulan) -->
+        <!-- Row 3: Harga Satuan, Qty, Harga Perolehan -->
         <div class="modal-field col-span-4">
           <span class="modal-field-label">Qty</span>
           <div class="modal-field-value" id="detailQty">01</div>
@@ -2592,7 +2697,7 @@
           <div class="modal-field-value" id="detailUmurBulan">36</div>
         </div>
 
-        <!-- Row 4: Nilai Residu, Penyusutan/Bulan, Akumulasi -->
+        <!-- Row 4: Umur (Bulan), Nilai Residu, Penyusutan/Bulan -->
         <div class="modal-field col-span-4">
           <span class="modal-field-label">Nilai Residu</span>
           <div class="modal-field-value" id="detailNilaiResidu">Rp. 0</div>
@@ -2606,7 +2711,7 @@
           <div class="modal-field-value" id="detailAkumulasi">Rp. 27,778</div>
         </div>
 
-        <!-- Row 5: Nilai Buku, Status, Kategori -->
+        <!-- Row 5: Akumulasi, Nilai Buku, Status -->
         <div class="modal-field col-span-4">
           <span class="modal-field-label">Nilai Buku</span>
           <div class="modal-field-value" id="detailNilaiBuku">Rp. 172,222</div>
@@ -2620,11 +2725,7 @@
           <div class="modal-field-value" id="detailKategori">Perlengkapan</div>
         </div>
 
-        <!-- Row 6: Mulai di Pakai, PIC, Divisi -->
-        <div class="modal-field col-span-4">
-          <span class="modal-field-label">Mulai di Pakai</span>
-          <div class="modal-field-value" id="detailMulaiDiPakai">1 Jun 2026</div>
-        </div>
+        <!-- Row 6: Kategori, PIC, Divisi -->
         <div class="modal-field col-span-4">
           <span class="modal-field-label">PIC</span>
           <div class="modal-field-value" id="detailPIC">-</div>
@@ -2870,6 +2971,83 @@
 
       const STORAGE_KEY = 'bisa_accounting_daftar_aset_data_v4';
       const DIVISI_KEY = 'accounting_master_divisi_v1';
+      const MASTER_COA_KEY = 'accounting_master_coa_v1';
+
+      const DEFAULT_MASTER_COA_LIST = [
+        { kode: '1001', nama: 'Kas Kecil', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1002', nama: 'Bank BCA', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1003', nama: 'Bank BCA', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1005', nama: 'SEABANK', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1006', nama: 'BNI', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1101', nama: 'Piutang Usaha', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1102', nama: 'Piutang Karyawan', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1201', nama: 'Uang Muka', kelompok: 'Aset', aktif: 'Ya' },
+        { kode: '1301', nama: 'Peralatan Produksi & Studio', kelompok: 'Aset', aktif: 'Ya', devisDefault: 'Produksi' },
+        { kode: '1302', nama: 'Peralatan & Perlengkapan Kantor', kelompok: 'Aset', aktif: 'Ya', devisDefault: 'General' },
+        { kode: '1303', nama: 'Furniture & Mebel', kelompok: 'Aset', aktif: 'Ya', devisDefault: 'General' },
+        { kode: '1391', nama: 'Akumulasi Penyusutan', kelompok: 'Aset', aktif: 'Ya', devisDefault: 'General' },
+        { kode: '2001', nama: 'Hutang Usaha', kelompok: 'Liabilitas', aktif: 'Ya' },
+        { kode: '2101', nama: 'Hutang Pajak', kelompok: 'Liabilitas', aktif: 'Ya' },
+        { kode: '3001', nama: 'Modal Disetor', kelompok: 'Ekuitas', aktif: 'Ya' },
+        { kode: '3101', nama: 'Laba Ditahan', kelompok: 'Ekuitas', aktif: 'Ya' },
+        { kode: '4001', nama: 'Pendapatan Project', kelompok: 'Pendapatan', aktif: 'Ya' },
+        { kode: '5001', nama: 'Beban Gaji', kelompok: 'Beban', aktif: 'Ya' },
+        { kode: '5008', nama: 'Beban Penyusutan', kelompok: 'Beban', aktif: 'Ya' },
+        { kode: '5009', nama: 'Beban Berlangganan', kelompok: 'Beban', aktif: 'Ya' }
+      ];
+
+      function getMasterCoaList() {
+        try {
+          const raw = localStorage.getItem(MASTER_COA_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed
+                .filter(function (c) { return c && (c.kode || c.kodeCoa); })
+                .map(function (c) {
+                  const kode = String(c.kode || c.kodeCoa || '').trim();
+                  const nama = String(c.nama || c.namaAkun || '').trim();
+                  const kelompok = String(c.kelompok || '').trim();
+                  const aktif = c.aktif !== undefined ? c.aktif : (c.status === 'Non-Aktif' ? 'Tidak' : 'Ya');
+                  return Object.assign({}, c, { kode: kode, nama: nama, kelompok: kelompok, aktif: aktif });
+                });
+            }
+          }
+        } catch (e) {
+          console.warn('Error reading Master COA for Daftar Aset:', e);
+        }
+        return DEFAULT_MASTER_COA_LIST.slice();
+      }
+
+      function getAsetCoaList() {
+        return getMasterCoaList().filter(function (c) {
+          return String(c.kode || '').trim().replace(/[^0-9]/g, '').startsWith('13');
+        });
+      }
+
+      function formatCoaOptionLabel(coa) {
+        if (!coa) return '';
+        const kode = String(coa.kode || '').trim();
+        const nama = String(coa.nama || '').trim();
+        return nama ? (kode + ' | ' + nama) : kode;
+      }
+
+      function findMasterCoaByValue(val) {
+        const text = String(val || '').trim();
+        if (!text) return null;
+        const codePart = text.split('|')[0].trim().toLowerCase();
+        const list = getMasterCoaList();
+        return list.find(function (c) {
+          return formatCoaOptionLabel(c).toLowerCase() === text.toLowerCase() ||
+                 String(c.kode || '').trim().toLowerCase() === codePart;
+        }) || null;
+      }
+
+      function resolveCoaStatusLabel(coa) {
+        if (!coa) return 'Aktif';
+        const isActive = String(coa.aktif || '').toLowerCase() === 'ya' || String(coa.status || '').toLowerCase() === 'aktif';
+        return isActive ? 'Aktif' : 'Non-Aktif';
+      }
 
       function getMasterDivisiList() {
         try {
@@ -2905,12 +3083,47 @@
         }).join('');
       }
 
+      function getMasterCoaDivisiList() {
+        const list = getMasterCoaList();
+        const result = [];
+        const seen = new Set();
+        list.forEach(function (coa) {
+          const val = String(coa.devisDefault || coa.divisiDefault || coa.divisi || '').trim();
+          if (!val || seen.has(val)) return;
+          seen.add(val);
+          result.push(val);
+        });
+        return result;
+      }
+
+      function populateDivisiSelect(selectedVal) {
+        const select = document.getElementById('crudDivisi');
+        if (!select) return;
+        const sources = getMasterDivisiList().concat(getMasterCoaDivisiList());
+        const current = selectedVal !== undefined
+          ? String(selectedVal || '').trim()
+          : String(select.value || '').trim();
+        const seen = new Set();
+        let html = '<option value="">Pilih Divisi</option>';
+        sources.forEach(function (nama) {
+          const val = String(nama || '').trim();
+          if (!val || seen.has(val)) return;
+          seen.add(val);
+          html += '<option value="' + escapeHtml(val) + '">' + escapeHtml(val) + '</option>';
+        });
+        if (current && !seen.has(current)) {
+          html += '<option value="' + escapeHtml(current) + '">' + escapeHtml(current) + '</option>';
+        }
+        select.innerHTML = html;
+        select.value = current;
+      }
+
       function loadData() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
+          if (raw !== null) {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            if (Array.isArray(parsed)) return parsed;
           }
         } catch (e) {
           console.warn('[Daftar Aset] Gagal membaca localStorage:', e);
@@ -2921,12 +3134,57 @@
       function saveData(data) {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          window.dispatchEvent(new Event('accounting-daftar-aset-updated'));
         } catch (e) {
           console.warn('[Daftar Aset] Gagal menyimpan localStorage:', e);
         }
       }
 
+      function normalizeAssetData(list) {
+        let changed = false;
+        const normalized = (list || []).map(function (item) {
+          if (!item) return item;
+          const hasil = hitungNilaiAset(item);
+          const next = Object.assign({}, item, {
+            hargaPerolehan: hasil.hargaPerolehan,
+            umurBulan: hasil.umurBulan,
+            nilaiResidu: hasil.nilaiResidu,
+            penyusutanBulan: hasil.penyusutanBulan,
+            akumulasi: hasil.akumulasi,
+            nilaiBuku: hasil.nilaiBuku,
+            nilaiBukuSaatLepas: hasil.nilaiBukuSaatLepas !== null
+              ? hasil.nilaiBukuSaatLepas
+              : (item.nilaiBukuSaatLepas || '-'),
+            labaRugiLepas: (function () {
+              if (hasil.nilaiBukuSaatLepas === null) return item.labaRugiLepas || '-';
+              const raw = item.hasilPelepasan;
+              const digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+              if (digits === '') return '-';
+              return parseRupiah(raw) - hasil.nilaiBukuSaatLepas;
+            })()
+          });
+          if (
+            Number(item.hargaPerolehan) !== next.hargaPerolehan ||
+            Number(item.nilaiResidu) !== next.nilaiResidu ||
+            Number(item.penyusutanBulan) !== next.penyusutanBulan ||
+            Number(item.akumulasi) !== next.akumulasi ||
+            Number(item.nilaiBuku) !== next.nilaiBuku ||
+            (hasil.nilaiBukuSaatLepas !== null && Number(item.nilaiBukuSaatLepas) !== Number(next.nilaiBukuSaatLepas)) ||
+            String(item.labaRugiLepas) !== String(next.labaRugiLepas)
+          ) {
+            changed = true;
+          }
+          return next;
+        });
+        return { data: normalized, changed: changed };
+      }
+
       let asetData = loadData();
+      (function normalizeOnLoad() {
+        const result = normalizeAssetData(asetData);
+        asetData = result.data;
+        if (result.changed) saveData(asetData);
+      })();
 
       /* ===== STATE FILTER ===== */
       let filterState = {
@@ -3068,13 +3326,57 @@
 
       function formatRupiah(num) {
         if (num === null || num === undefined || isNaN(num)) return 'Rp. -';
-        return 'Rp. ' + Number(num).toLocaleString('id-ID');
+        return 'Rp. ' + Math.round(Number(num)).toLocaleString('id-ID');
+      }
+
+      function formatRupiahSigned(num) {
+        if (num === null || num === undefined || isNaN(num)) return 'Rp. -';
+        const n = Math.round(Number(num));
+        return (n < 0 ? '-Rp. ' : 'Rp. ') + Math.abs(n).toLocaleString('id-ID');
+      }
+
+      function formatRupiahValue(raw) {
+        if (raw === null || raw === undefined) return '-';
+        const text = String(raw).trim();
+        if (!text || text === '-') return '-';
+        const digits = text.replace(/[^0-9]/g, '');
+        return digits !== '' ? formatRupiah(parseRupiah(text)) : text;
+      }
+
+      function formatRupiahTyping(rawStr) {
+        const text = String(rawStr || '');
+        const hasComma = text.indexOf(',') !== -1;
+        if (!hasComma) {
+          const digits = text.replace(/[^0-9]/g, '');
+          if (!digits) return '';
+          return 'Rp. ' + parseInt(digits, 10).toLocaleString('id-ID');
+        }
+        const parts = text.split(',');
+        const intDigits = (parts[0] || '').replace(/[^0-9]/g, '');
+        const decDigits = parts.slice(1).join('').replace(/[^0-9]/g, '').slice(0, 2);
+        const intFormatted = intDigits ? parseInt(intDigits, 10).toLocaleString('id-ID') : '0';
+        return 'Rp. ' + intFormatted + ',' + decDigits;
       }
 
       function parseRupiah(str) {
+        if (typeof str === 'number') return isNaN(str) ? 0 : str;
         if (!str) return 0;
-        const cleaned = String(str).replace(/[^0-9]/g, '');
+        const text = String(str).trim();
+        if (text.indexOf(',') !== -1) {
+          const parts = text.split(',');
+          const intDigits = (parts[0] || '').replace(/[^0-9]/g, '') || '0';
+          const decDigits = parts.slice(1).join('').replace(/[^0-9]/g, '').slice(0, 2);
+          return decDigits ? parseFloat(intDigits + '.' + decDigits) : parseInt(intDigits, 10);
+        }
+        const cleaned = text.replace(/[^0-9]/g, '');
         return cleaned ? parseInt(cleaned, 10) : 0;
+      }
+
+      function roundDiv(num, den) {
+        const d = Number(den) || 0;
+        if (!d) return 0;
+        const n = Number(num) || 0;
+        return Math.floor((2 * n + d) / (2 * d));
       }
 
       function formatTanggalDisplay(isoStr) {
@@ -3104,52 +3406,214 @@
       }
 
       /* ===== AUTO CALCULATION LOGIC ===== */
-      function recalcFields() {
+      function getResiduRateByKategori(kategori) {
+        const k = String(kategori || '').trim().toLowerCase();
+        if (!k) return null;
+        if (k.includes('kendaraan')) return 0.20;
+        if (k.includes('furniture') || k.includes('mebel')) return 0.10;
+        if (k.includes('kamera')) return 0.10;
+        if (k.includes('elektronik')) return 0.05;
+        if (k.includes('perlengkapan live')) return 0.05;
+        if (k.includes('peralatan jaringan')) return 0.05;
+        if (k.includes('perlengkapan')) return 0;
+        if (k.includes('renovasi')) return 0;
+        if (k.includes('lainnya')) return 0;
+        return 0;
+      }
+
+      function parseYearMonth(rawDate) {
+        const raw = String(rawDate || '').trim();
+        if (!raw) return null;
+        if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(raw)) {
+          const parts = raw.split('-');
+          return { year: parseInt(parts[0], 10), month: parseInt(parts[1], 10) - 1 };
+        }
+        if (/^\d{1,2}[\/-]\d{1,2}[\/-]\d{4}$/.test(raw)) {
+          const parts = raw.split(/[\/-]/);
+          return { year: parseInt(parts[2], 10), month: parseInt(parts[1], 10) - 1 };
+        }
+        return null;
+      }
+
+      function getElapsedMonths(startDateStr, maxUmur, endDateStr) {
+        const start = parseYearMonth(startDateStr);
+        if (!start) return 0;
+
+        const end = parseYearMonth(endDateStr);
+        let months;
+        if (end) {
+          // Aset dilepas: bulan Mulai di Pakai ikut dihitung, bulan pelepasan tidak
+          months = (end.year - start.year) * 12 + (end.month - start.month);
+        } else {
+          // Aset aktif: bulan Mulai di Pakai ikut dihitung; hari diabaikan agar konsisten
+          const now = new Date();
+          months = (now.getFullYear() - start.year) * 12 + (now.getMonth() - start.month) + 1;
+        }
+
+        months = Math.max(0, months);
+        if (maxUmur > 0) {
+          months = Math.min(months, maxUmur);
+        }
+        return months;
+      }
+
+      function hitungNilaiAset(item) {
+        const src = item || {};
+        const hargaSatuan = Number(src.hargaSatuan) || 0;
+        const qty = parseInt(src.qty, 10) || 0;
+        const hargaPerolehan = (hargaSatuan > 0 && qty > 0)
+          ? Math.round(hargaSatuan * qty)
+          : Math.max(0, Math.round(Number(src.hargaPerolehan) || 0));
+        const umurBulan = parseInt(src.umurBulan, 10) || 0;
+
+        const rate = getResiduRateByKategori(src.kategori);
+        const nilaiResidu = rate !== null
+          ? Math.round(hargaPerolehan * rate)
+          : Math.max(0, Math.round(Number(src.nilaiResidu) || 0));
+
+        const maxDepreciable = Math.max(0, hargaPerolehan - nilaiResidu);
+        const penyusutanBulanExact = umurBulan > 0 ? maxDepreciable / umurBulan : 0;
+        const penyusutanBulan = umurBulan > 0 ? roundDiv(maxDepreciable, umurBulan) : 0;
+
+        const startDate = String(src.mulaiDiPakai || src.tanggalBeli || '').trim();
+        const tanggalPelepasan = String(src.tanggalPelepasan || '').trim();
+        const bulanBerjalan = getElapsedMonths(startDate, umurBulan, tanggalPelepasan);
+        const akumulasi = (umurBulan > 0 && maxDepreciable > 0)
+          ? Math.min(maxDepreciable, Math.round(penyusutanBulanExact * bulanBerjalan))
+          : 0;
+        const nilaiBukuSebelumLepas = Math.max(0, hargaPerolehan - akumulasi);
+        const nilaiBuku = tanggalPelepasan ? 0 : nilaiBukuSebelumLepas;
+
+        return {
+          hargaPerolehan: hargaPerolehan,
+          umurBulan: umurBulan,
+          nilaiResidu: nilaiResidu,
+          penyusutanBulan: penyusutanBulan,
+          bulanBerjalan: bulanBerjalan,
+          akumulasi: akumulasi,
+          nilaiBuku: nilaiBuku,
+          nilaiBukuSaatLepas: tanggalPelepasan ? nilaiBukuSebelumLepas : null
+        };
+      }
+
+      function recalcFields(options) {
+        const preserveResidu = Boolean(options && options.preserveResidu);
+        const preserveAkumulasi = Boolean(options && options.preserveAkumulasi);
         const hargaSatuan = parseRupiah(crudHargaSatuan.value);
         const qty = parseInt(crudQty.value, 10) || 0;
-        const hargaPerolehan = hargaSatuan * qty;
+        const startDateVal = (crudMulaiDiPakai && crudMulaiDiPakai.value)
+          ? crudMulaiDiPakai.value
+          : (crudTanggalBeli ? crudTanggalBeli.value : '');
+
+        const hasil = hitungNilaiAset({
+          hargaSatuan: hargaSatuan,
+          qty: qty,
+          umurBulan: parseInt(crudUmurBulan.value, 10) || 0,
+          kategori: crudKategori ? crudKategori.value : '',
+          nilaiResidu: parseRupiah(crudNilaiResidu.value),
+          mulaiDiPakai: startDateVal,
+          tanggalPelepasan: crudTanggalPelepasan ? crudTanggalPelepasan.value : ''
+        });
+
+        const hargaPerolehan = hasil.hargaPerolehan;
         crudHargaPerolehan.value = hargaPerolehan > 0 ? formatRupiah(hargaPerolehan) : 'Rp. -';
 
-        const umur = parseInt(crudUmurBulan.value, 10) || 0;
-        const residu = parseRupiah(crudNilaiResidu.value);
-
-        let penyusutan = 0;
-        if (umur > 0 && hargaPerolehan > residu) {
-          penyusutan = Math.round((hargaPerolehan - residu) / umur);
-        }
-        crudPenyusutanBulan.value = penyusutan > 0 ? formatRupiah(penyusutan) : 'Rp. -';
-
-        let akumulasi = parseRupiah(crudAkumulasi.value);
-        if (akumulasi === 0 && penyusutan > 0) {
-          akumulasi = penyusutan;
-          crudAkumulasi.value = formatRupiah(akumulasi);
+        if (!preserveResidu && crudNilaiResidu) {
+          crudNilaiResidu.value = hargaPerolehan > 0 ? formatRupiah(hasil.nilaiResidu) : 'Rp. -';
         }
 
-        const nilaiBuku = Math.max(0, hargaPerolehan - akumulasi);
+        crudPenyusutanBulan.value = hasil.penyusutanBulan > 0 ? formatRupiah(hasil.penyusutanBulan) : 'Rp. -';
+
+        let akumulasi = hasil.akumulasi;
+        if (preserveAkumulasi) {
+          akumulasi = parseRupiah(crudAkumulasi.value);
+        } else if (crudAkumulasi) {
+          crudAkumulasi.value = hargaPerolehan > 0 ? formatRupiah(akumulasi) : 'Rp. -';
+        }
+
+        const nilaiBukuSebelumLepas = Math.max(0, hargaPerolehan - akumulasi);
+        const adaPelepasan = crudTanggalPelepasan && crudTanggalPelepasan.value;
+        const nilaiBuku = adaPelepasan ? 0 : nilaiBukuSebelumLepas;
         crudNilaiBuku.value = hargaPerolehan > 0 ? formatRupiah(nilaiBuku) : 'Rp. -';
+
+        if (crudNilaiBukuSaatLepas) {
+          crudNilaiBukuSaatLepas.value = (adaPelepasan && hargaPerolehan > 0)
+            ? formatRupiah(nilaiBukuSebelumLepas)
+            : '-';
+        }
+
+        if (crudLabaRugiLepas) {
+          const hasilRaw = crudHasilPelepasan ? crudHasilPelepasan.value : '';
+          const adaHasil = String(hasilRaw).replace(/[^0-9]/g, '') !== '';
+          if (adaPelepasan && hargaPerolehan > 0 && adaHasil) {
+            crudLabaRugiLepas.value = formatRupiahSigned(parseRupiah(hasilRaw) - nilaiBukuSebelumLepas);
+          } else {
+            crudLabaRugiLepas.value = '-';
+          }
+        }
       }
 
       if (crudHargaSatuan) {
         crudHargaSatuan.addEventListener('input', function () {
-          const val = parseRupiah(this.value);
-          this.value = val > 0 ? formatRupiah(val) : '';
+          this.value = formatRupiahTyping(this.value);
           recalcFields();
         });
       }
 
       if (crudQty) {
-        crudQty.addEventListener('input', recalcFields);
+        crudQty.addEventListener('input', function () {
+          recalcFields();
+        });
+      }
+
+      if (crudKategori) {
+        crudKategori.addEventListener('change', function () {
+          recalcFields();
+        });
       }
 
       if (crudUmurBulan) {
-        crudUmurBulan.addEventListener('input', recalcFields);
+        crudUmurBulan.addEventListener('input', function () {
+          recalcFields({ preserveResidu: true });
+        });
+      }
+
+      if (crudMulaiDiPakai) {
+        ['input', 'change'].forEach(function (evt) {
+          crudMulaiDiPakai.addEventListener(evt, function () {
+            recalcFields({ preserveResidu: true });
+          });
+        });
+      }
+
+      if (crudTanggalBeli) {
+        ['input', 'change'].forEach(function (evt) {
+          crudTanggalBeli.addEventListener(evt, function () {
+            recalcFields({ preserveResidu: true });
+          });
+        });
+      }
+
+      if (crudTanggalPelepasan) {
+        ['input', 'change'].forEach(function (evt) {
+          crudTanggalPelepasan.addEventListener(evt, function () {
+            recalcFields({ preserveResidu: true });
+          });
+        });
       }
 
       if (crudNilaiResidu) {
         crudNilaiResidu.addEventListener('input', function () {
           const val = parseRupiah(this.value);
           this.value = val > 0 ? formatRupiah(val) : '';
-          recalcFields();
+          recalcFields({ preserveResidu: true });
+        });
+      }
+
+      if (crudHasilPelepasan) {
+        crudHasilPelepasan.addEventListener('input', function () {
+          this.value = formatRupiahTyping(this.value);
+          recalcFields({ preserveResidu: true });
         });
       }
 
@@ -3157,39 +3621,129 @@
         crudAkumulasi.addEventListener('input', function () {
           const val = parseRupiah(this.value);
           this.value = val > 0 ? formatRupiah(val) : '';
-          recalcFields();
+          recalcFields({ preserveResidu: true, preserveAkumulasi: true });
         });
       }
 
       // Sync Divisi -> Divisi Pengecualian
       if (crudDivisi) {
-        crudDivisi.addEventListener('input', function () {
-          if (crudDivisiPengecualian) crudDivisiPengecualian.value = this.value;
+        ['input', 'change'].forEach(function (evt) {
+          crudDivisi.addEventListener(evt, function () {
+            if (crudDivisiPengecualian) crudDivisiPengecualian.value = this.value;
+          });
         });
       }
 
       /* ===== DROPDOWNS WITH CHECKBOXES (Kode COA & PIC Sesuai Gambar 2) ===== */
-      function setupCheckboxDropdown(input, wrap, menu, onSelect) {
+      function applyCoaAutoFillFields(coaValue) {
+        if (!coaValue) {
+          if (crudNamaAkunCOA) crudNamaAkunCOA.value = '';
+          if (crudKelompokCOA) crudKelompokCOA.value = '';
+          if (crudStatusCOA) crudStatusCOA.value = '';
+          return;
+        }
+        const coa = findMasterCoaByValue(coaValue);
+        if (coa) {
+          if (crudNamaAkunCOA) crudNamaAkunCOA.value = coa.nama || '';
+          if (crudKelompokCOA) crudKelompokCOA.value = coa.kelompok || '';
+          if (crudStatusCOA) crudStatusCOA.value = resolveCoaStatusLabel(coa);
+          const coaDivisi = String(coa.devisDefault || coa.divisiDefault || coa.divisi || '').trim();
+          if (coaDivisi) {
+            populateDivisiSelect(coaDivisi);
+            if (crudDivisiPengecualian) crudDivisiPengecualian.value = coaDivisi;
+          }
+        } else {
+          const parts = String(coaValue).split('|');
+          if (crudNamaAkunCOA) crudNamaAkunCOA.value = parts[1] ? parts[1].trim() : String(coaValue);
+          if (crudKelompokCOA && !crudKelompokCOA.value) crudKelompokCOA.value = 'Aset';
+          if (crudStatusCOA && !crudStatusCOA.value) crudStatusCOA.value = 'Aktif';
+        }
+      }
+
+      function renderCoaDropdownItems(selectedVal) {
+        if (!menuKodeCOA) return;
+        const currentVal = selectedVal !== undefined ? String(selectedVal || '') : (crudKodeCOA ? String(crudKodeCOA.value || '') : '');
+        const list = getAsetCoaList();
+        const options = [];
+        const seenCodes = new Set();
+
+        list.forEach(function (coa) {
+          const codeKey = String(coa.kode || '').trim().toLowerCase();
+          if (!codeKey || seenCodes.has(codeKey)) return;
+          seenCodes.add(codeKey);
+          options.push(formatCoaOptionLabel(coa));
+        });
+
+        // Pastikan nilai lama (jika ada dari item yang diedit) tetap muncul sebagai opsi
+        if (currentVal && currentVal !== '-') {
+          const curCodeKey = currentVal.split('|')[0].trim().toLowerCase();
+          if (curCodeKey && !seenCodes.has(curCodeKey)) {
+            options.unshift(currentVal);
+          }
+        }
+
+        menuKodeCOA.innerHTML = '';
+        if (options.length === 0) {
+          const emptyEl = document.createElement('div');
+          emptyEl.className = 'modal-dropdown-item';
+          emptyEl.style.color = '#94a3b8';
+          emptyEl.textContent = 'Belum ada data di Master COA';
+          menuKodeCOA.appendChild(emptyEl);
+          return;
+        }
+
+        const currentCodePart = currentVal.split('|')[0].trim().toLowerCase();
+        options.forEach(function (optLabel) {
+          const label = document.createElement('label');
+          label.className = 'modal-dropdown-item';
+          const cb = document.createElement('input');
+          cb.type = 'checkbox';
+          cb.value = optLabel;
+          const optCodePart = optLabel.split('|')[0].trim().toLowerCase();
+          cb.checked = Boolean(currentVal) && (currentVal.toLowerCase() === optLabel.toLowerCase() || (currentCodePart && currentCodePart === optCodePart));
+          const span = document.createElement('span');
+          span.textContent = optLabel;
+          label.appendChild(cb);
+          label.appendChild(span);
+          menuKodeCOA.appendChild(label);
+        });
+      }
+
+      function setupCheckboxDropdown(input, wrap, menu, onSelect, singleSelect) {
         if (!input || !wrap || !menu) return;
 
-        input.addEventListener('click', function (e) {
+        function toggleDropdown(e) {
           e.stopPropagation();
           const isOpen = wrap.classList.contains('is-open');
           closeModalDropdowns();
           if (!isOpen) wrap.classList.add('is-open');
-        });
+        }
+
+        input.addEventListener('click', toggleDropdown);
+        const arrowEl = wrap.querySelector('.modal-dropdown-arrow');
+        if (arrowEl) {
+          arrowEl.addEventListener('click', toggleDropdown);
+        }
 
         menu.addEventListener('click', function (e) {
           e.stopPropagation();
         });
 
-        const cbs = menu.querySelectorAll('input[type="checkbox"]');
-        cbs.forEach(function (cb) {
-          cb.addEventListener('change', function () {
-            const selected = Array.from(cbs).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
-            input.value = selected.join(', ');
-            if (onSelect) onSelect(selected);
-          });
+        menu.addEventListener('change', function (e) {
+          const target = e.target;
+          if (!target || target.type !== 'checkbox') return;
+          const allCbs = Array.from(menu.querySelectorAll('input[type="checkbox"]'));
+          if (singleSelect && target.checked) {
+            allCbs.forEach(function (cb) {
+              if (cb !== target) cb.checked = false;
+            });
+          }
+          const selected = allCbs.filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+          input.value = selected.join(', ');
+          if (onSelect) onSelect(selected);
+          if (singleSelect && target.checked) {
+            wrap.classList.remove('is-open');
+          }
         });
       }
 
@@ -3198,28 +3752,11 @@
         if (wrapPIC) wrapPIC.classList.remove('is-open');
       }
 
+      renderCoaDropdownItems();
+
       setupCheckboxDropdown(crudKodeCOA, wrapKodeCOA, menuKodeCOA, function (selected) {
-        if (selected.length > 0) {
-          const first = selected[0];
-          if (first.includes('1302')) {
-            crudNamaAkunCOA.value = 'Peralatan & Perlengkapan Kantor';
-            crudKelompokCOA.value = 'Aset';
-            crudStatusCOA.value = 'Ok';
-          } else if (first.includes('1301')) {
-            crudNamaAkunCOA.value = 'Peralatan Produksi & Studio';
-            crudKelompokCOA.value = 'Aset';
-            crudStatusCOA.value = 'Ok';
-          } else if (first.includes('1303')) {
-            crudNamaAkunCOA.value = 'Furniture & Mebel';
-            crudKelompokCOA.value = 'Aset';
-            crudStatusCOA.value = 'Ok';
-          } else if (first.includes('1001') || first.includes('1002')) {
-            crudNamaAkunCOA.value = first.split('|')[1].trim();
-            crudKelompokCOA.value = 'Kas & Bank';
-            crudStatusCOA.value = 'Ok';
-          }
-        }
-      });
+        applyCoaAutoFillFields(selected.length > 0 ? selected[0] : '');
+      }, true);
 
       setupCheckboxDropdown(crudPIC, wrapPIC, menuPIC);
 
@@ -3436,6 +3973,7 @@
         if (!detailModal || !item) return;
 
         currentItemFotoUrl = item.buktiFoto || '';
+        const hasilHitung = hitungNilaiAset(item);
 
         detailKodeAset.textContent = item.kodeAset || '-';
         detailNamaAset.textContent = item.namaAset || '-';
@@ -3444,12 +3982,12 @@
         detailLokasi.textContent = item.lokasi || '-';
         detailHargaSatuan.textContent = formatRupiah(item.hargaSatuan);
         detailQty.textContent = item.qty < 10 ? '0' + item.qty : String(item.qty);
-        detailHargaPerolehan.textContent = formatRupiah(item.hargaPerolehan);
-        detailUmurBulan.textContent = item.umurBulan || '0';
-        detailNilaiResidu.textContent = formatRupiah(item.nilaiResidu);
-        detailPenyusutanBulan.textContent = formatRupiah(item.penyusutanBulan);
-        detailAkumulasi.textContent = formatRupiah(item.akumulasi);
-        detailNilaiBuku.textContent = formatRupiah(item.nilaiBuku);
+        detailHargaPerolehan.textContent = formatRupiah(hasilHitung.hargaPerolehan);
+        detailUmurBulan.textContent = hasilHitung.umurBulan || '0';
+        detailNilaiResidu.textContent = formatRupiah(hasilHitung.nilaiResidu);
+        detailPenyusutanBulan.textContent = formatRupiah(hasilHitung.penyusutanBulan);
+        detailAkumulasi.textContent = formatRupiah(hasilHitung.akumulasi);
+        detailNilaiBuku.textContent = formatRupiah(hasilHitung.nilaiBuku);
         detailStatus.textContent = item.status || 'Aktif';
         detailKategori.textContent = item.kategori || '-';
         detailMulaiDiPakai.textContent = formatTanggalDisplay(item.mulaiDiPakai);
@@ -3457,9 +3995,18 @@
         detailDivisi.textContent = item.divisi || '-';
         detailProjectBrand.textContent = item.projectBrand || '-';
         detailTanggalPelepasan.textContent = formatTanggalDisplay(item.tanggalPelepasan);
-        detailHasilPelepasan.textContent = item.hasilPelepasan || '-';
-        detailNilaiBukuSaatLepas.textContent = item.nilaiBukuSaatLepas || '-';
-        detailLabaRugiLepas.textContent = item.labaRugiLepas || '-';
+        detailHasilPelepasan.textContent = formatRupiahValue(item.hasilPelepasan);
+        detailNilaiBukuSaatLepas.textContent = (hasilHitung.nilaiBukuSaatLepas !== null && hasilHitung.nilaiBukuSaatLepas !== undefined)
+          ? formatRupiah(hasilHitung.nilaiBukuSaatLepas)
+          : (typeof item.nilaiBukuSaatLepas === 'number' ? formatRupiah(item.nilaiBukuSaatLepas) : (item.nilaiBukuSaatLepas || '-'));
+        detailLabaRugiLepas.textContent = (function () {
+          const nb = hasilHitung.nilaiBukuSaatLepas;
+          if (nb === null || nb === undefined) return '-';
+          const raw = item.hasilPelepasan;
+          const digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+          if (digits === '') return '-';
+          return formatRupiahSigned(parseRupiah(raw) - nb);
+        })();
         detailDivisiPengecualian.textContent = item.divisiPengecualian || item.divisi || '-';
         detailNamaAkunCOA.textContent = item.namaAkunCOA || '-';
         detailKelompokCOA.textContent = item.kelompokCOA || '-';
@@ -3477,9 +4024,24 @@
 
       /* ===== MODAL FORM ("Tambah / Edit Daftar Aset" Sesuai Gambar 1 & 2) ===== */
       function generateNextKodeAset() {
-        const nextNum = asetData.length + 1;
-        const seq = nextNum < 10 ? '00' + nextNum : (nextNum < 100 ? '0' + nextNum : nextNum);
-        return 'AST-' + seq;
+        let maxNum = 0;
+        (asetData || []).forEach(function (item) {
+          if (!item) return;
+          const kodeStr = String(item.kodeAset || '').trim();
+          const mKode = kodeStr.match(/^AST-(\d+)$/i);
+          if (mKode) {
+            const num = parseInt(mKode[1], 10);
+            if (!isNaN(num) && num < 1000000 && num > maxNum) maxNum = num;
+            return;
+          }
+          const idStr = String(item.id || '').trim();
+          const mId = idStr.match(/^AST-(\d+)$/i);
+          if (mId) {
+            const num = parseInt(mId[1], 10);
+            if (!isNaN(num) && num < 100000 && num > maxNum) maxNum = num;
+          }
+        });
+        return 'AST-' + String(maxNum + 1).padStart(3, '0');
       }
 
       function openAddModal() {
@@ -3490,10 +4052,11 @@
         if (crudModalTitle) crudModalTitle.innerHTML = '<em>Tambah</em> Daftar Aset';
         if (crudForm) crudForm.reset();
         if (crudId) crudId.value = '';
-        if (crudKodeAset) crudKodeAset.value = '';
+        if (crudKodeAset) crudKodeAset.value = generateNextKodeAset();
         if (crudNamaAset) crudNamaAset.value = '';
         if (crudTanggalBeli) crudTanggalBeli.value = '';
         if (crudKodeCOA) crudKodeCOA.value = '';
+        renderCoaDropdownItems('');
         if (crudLokasi) crudLokasi.value = '';
         if (crudHargaSatuan) crudHargaSatuan.value = '';
         if (crudQty) crudQty.value = '';
@@ -3503,11 +4066,11 @@
         if (crudPenyusutanBulan) crudPenyusutanBulan.value = '';
         if (crudAkumulasi) crudAkumulasi.value = '';
         if (crudNilaiBuku) crudNilaiBuku.value = '';
-        if (crudStatus) crudStatus.value = '';
-        if (crudKategori) crudKategori.value = '';
+        setCrudStatusValue('');
+        setCrudKategoriValue('');
         if (crudMulaiDiPakai) crudMulaiDiPakai.value = '';
         if (crudPIC) crudPIC.value = '';
-        if (crudDivisi) crudDivisi.value = '';
+        if (crudDivisi) populateDivisiSelect('');
         if (crudProjectBrand) crudProjectBrand.value = '';
         if (crudTanggalPelepasan) crudTanggalPelepasan.value = '';
         if (crudHasilPelepasan) crudHasilPelepasan.value = '';
@@ -3544,6 +4107,7 @@
         crudNamaAset.value = item.namaAset || '';
         crudTanggalBeli.value = item.tanggalBeli || '';
         crudKodeCOA.value = item.kodeCOA || '';
+        renderCoaDropdownItems(item.kodeCOA || '');
         crudLokasi.value = item.lokasi || '';
         crudHargaSatuan.value = item.hargaSatuan ? formatRupiah(item.hargaSatuan) : '';
         crudQty.value = item.qty || 1;
@@ -3553,20 +4117,21 @@
         crudPenyusutanBulan.value = item.penyusutanBulan ? formatRupiah(item.penyusutanBulan) : '';
         crudAkumulasi.value = item.akumulasi ? formatRupiah(item.akumulasi) : '';
         crudNilaiBuku.value = item.nilaiBuku ? formatRupiah(item.nilaiBuku) : '';
-        crudStatus.value = item.status || 'Aktif';
-        crudKategori.value = item.kategori || '';
+        setCrudStatusValue(item.status || 'Aktif');
+        setCrudKategoriValue(item.kategori || '');
         crudMulaiDiPakai.value = item.mulaiDiPakai || '';
         crudPIC.value = item.pic || '';
-        crudDivisi.value = item.divisi || '';
+        populateDivisiSelect(item.divisi || '');
         crudProjectBrand.value = item.projectBrand || '-';
         crudTanggalPelepasan.value = item.tanggalPelepasan || '';
-        crudHasilPelepasan.value = item.hasilPelepasan || '-';
+        crudHasilPelepasan.value = formatRupiahValue(item.hasilPelepasan);
         crudNilaiBukuSaatLepas.value = item.nilaiBukuSaatLepas || '-';
         crudLabaRugiLepas.value = item.labaRugiLepas || '-';
         crudDivisiPengecualian.value = item.divisiPengecualian || item.divisi || '';
-        crudNamaAkunCOA.value = item.namaAkunCOA || '';
-        crudKelompokCOA.value = item.kelompokCOA || '';
-        crudStatusCOA.value = item.statusCOA || 'Ok';
+        const matchedEditCoa = findMasterCoaByValue(item.kodeCOA);
+        crudNamaAkunCOA.value = item.namaAkunCOA || (matchedEditCoa ? matchedEditCoa.nama : '');
+        crudKelompokCOA.value = item.kelompokCOA || (matchedEditCoa ? matchedEditCoa.kelompok : '');
+        crudStatusCOA.value = item.statusCOA || (matchedEditCoa ? resolveCoaStatusLabel(matchedEditCoa) : 'Aktif');
         if (item.buktiFoto) {
           fileNameDisplay.textContent = item.namaAset ? item.namaAset + ' - Foto' : 'Foto tersimpan';
           if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
@@ -3576,10 +4141,6 @@
         }
         currentUploadedFotoDataUrl = item.buktiFoto || '';
 
-        // Check matching checkboxes
-        document.querySelectorAll('#menuKodeCOA input').forEach(function (cb) {
-          cb.checked = (item.kodeCOA || '').includes(cb.value);
-        });
         document.querySelectorAll('#menuPIC input').forEach(function (cb) {
           cb.checked = (item.pic || '').includes(cb.value);
         });
@@ -3607,7 +4168,12 @@
         crudForm.addEventListener('submit', function (e) {
           e.preventDefault();
 
-          const kode = (crudKodeAset.value || '').trim() || generateNextKodeAset();
+          const editId = crudId.value;
+          const rawKode = (crudKodeAset.value || '').trim();
+          const hasCollision = !editId && rawKode && asetData.some(function (x) {
+            return String(x && x.kodeAset || '').trim().toLowerCase() === rawKode.toLowerCase();
+          });
+          const kode = (!editId && (!rawKode || hasCollision)) ? generateNextKodeAset() : (rawKode || generateNextKodeAset());
           const nama = (crudNamaAset.value || '').trim();
           const tgl = (crudTanggalBeli.value || '').trim();
           const lokasi = (crudLokasi.value || '').trim();
@@ -3629,20 +4195,34 @@
           }
 
           const hargaSatuan = parseRupiah(crudHargaSatuan.value);
-          const hargaPerolehan = parseRupiah(crudHargaPerolehan.value) || (hargaSatuan * qty);
-          const umurBulan = parseInt(crudUmurBulan.value, 10) || 0;
-          const nilaiResidu = parseRupiah(crudNilaiResidu.value);
-          const penyusutanBulan = parseRupiah(crudPenyusutanBulan.value);
-          const akumulasi = parseRupiah(crudAkumulasi.value);
-          const nilaiBuku = parseRupiah(crudNilaiBuku.value) || Math.max(0, hargaPerolehan - akumulasi);
+          const hasilHitung = hitungNilaiAset({
+            hargaSatuan: hargaSatuan,
+            qty: qty,
+            umurBulan: parseInt(crudUmurBulan.value, 10) || 0,
+            kategori: kategori,
+            nilaiResidu: parseRupiah(crudNilaiResidu.value),
+            mulaiDiPakai: crudMulaiDiPakai.value || tgl,
+            tanggalPelepasan: crudTanggalPelepasan ? crudTanggalPelepasan.value : ''
+          });
+          const hargaPerolehan = hasilHitung.hargaPerolehan;
+          const umurBulan = hasilHitung.umurBulan;
+          const nilaiResidu = hasilHitung.nilaiResidu;
+          const penyusutanBulan = hasilHitung.penyusutanBulan;
+          const akumulasi = hasilHitung.akumulasi;
+          const nilaiBuku = hasilHitung.nilaiBuku;
 
-          const editId = crudId.value;
+          const selectedCoaRaw = (crudKodeCOA.value || '').trim();
+          const matchedCoa = findMasterCoaByValue(selectedCoaRaw);
+          const finalKodeCOA = matchedCoa ? formatCoaOptionLabel(matchedCoa) : (selectedCoaRaw || '-');
+          const finalNamaAkunCOA = (crudNamaAkunCOA.value || '').trim() || (matchedCoa ? matchedCoa.nama : '-');
+          const finalKelompokCOA = (crudKelompokCOA.value || '').trim() || (matchedCoa ? matchedCoa.kelompok : 'Aset');
+          const finalStatusCOA = (crudStatusCOA.value || '').trim() || (matchedCoa ? resolveCoaStatusLabel(matchedCoa) : 'Aktif');
 
           const payload = {
             kodeAset: kode,
             namaAset: nama,
             tanggalBeli: tgl,
-            kodeCOA: crudKodeCOA.value || '1302 | Peralatan & Perlengkapan Kantor',
+            kodeCOA: finalKodeCOA,
             lokasi: lokasi,
             hargaSatuan: hargaSatuan,
             qty: qty,
@@ -3661,12 +4241,20 @@
             tanggalPelepasan: crudTanggalPelepasan.value || '',
             buktiFoto: currentUploadedFotoDataUrl || '',
             hasilPelepasan: crudHasilPelepasan.value || '-',
-            nilaiBukuSaatLepas: crudNilaiBukuSaatLepas.value || '-',
-            labaRugiLepas: crudLabaRugiLepas.value || '-',
+            nilaiBukuSaatLepas: (hasilHitung.nilaiBukuSaatLepas !== null && hasilHitung.nilaiBukuSaatLepas !== undefined)
+              ? hasilHitung.nilaiBukuSaatLepas
+              : '-',
+            labaRugiLepas: (function () {
+              const nb = hasilHitung.nilaiBukuSaatLepas;
+              const raw = crudHasilPelepasan.value;
+              const digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+              if (nb === null || nb === undefined || digits === '') return '-';
+              return parseRupiah(raw) - nb;
+            })(),
             divisiPengecualian: crudDivisiPengecualian.value || crudDivisi.value || 'Produksi',
-            namaAkunCOA: crudNamaAkunCOA.value || 'Peralatan & Perlengkapan Kantor',
-            kelompokCOA: crudKelompokCOA.value || 'Aset',
-            statusCOA: crudStatusCOA.value || 'Ok'
+            namaAkunCOA: finalNamaAkunCOA,
+            kelompokCOA: finalKelompokCOA,
+            statusCOA: finalStatusCOA
           };
 
           if (editId) {
@@ -3741,34 +4329,92 @@
       /* ===== FILTER POPOVER LOGIC (KODE COA, STATUS, KATEGORI - SESUAI GAMBAR 1 & 2) ===== */
 
       function getCOAOptions() {
-        return [
-          'Semua Kode COA',
-          '1001 | Kas Kecil',
-          '1002 | Bank BCA',
-          '1301 | Peralatan Produksi & Studio',
-          '1302 | Peralatan & Perlengkapan Kantor',
-          '1303 | Furniture & Mebel'
-        ];
+        const opts = ['Semua Kode COA'];
+        const seen = new Set();
+        getAsetCoaList().forEach(function (coa) {
+          const label = formatCoaOptionLabel(coa);
+          const key = label.toLowerCase();
+          if (label && !seen.has(key)) {
+            seen.add(key);
+            opts.push(label);
+          }
+        });
+        (asetData || []).forEach(function (item) {
+          const val = String(item && item.kodeCOA || '').trim();
+          const key = val.toLowerCase();
+          if (val && val !== '-' && !seen.has(key)) {
+            seen.add(key);
+            opts.push(val);
+          }
+        });
+        return opts;
+      }
+
+      const STATUS_ASET_OPTIONS = [
+        'Aktif',
+        'Dijual',
+        'Rusak',
+        'Dihapus'
+      ];
+
+      const KATEGORI_ASET_OPTIONS = [
+        'Furniture & Mebel',
+        'Elektronik',
+        'Kamera',
+        'Perlengkapan',
+        'Perlengkapan Live',
+        'Peralatan Jaringan',
+        'Kendaraan',
+        'Renovasi',
+        'Lainnya'
+      ];
+
+      function setCrudSelectValue(selectEl, defaultOptions, placeholder, val) {
+        if (!selectEl) return;
+        const clean = String(val || '').trim();
+        selectEl.innerHTML = '<option value="">' + placeholder + '</option>';
+        let matchedValue = '';
+        defaultOptions.forEach(function (optText) {
+          const opt = document.createElement('option');
+          opt.value = optText;
+          opt.textContent = optText;
+          if (clean && optText.toLowerCase() === clean.toLowerCase()) {
+            matchedValue = optText;
+          }
+          selectEl.appendChild(opt);
+        });
+        if (clean && !matchedValue) {
+          const extra = document.createElement('option');
+          extra.value = clean;
+          extra.textContent = clean;
+          selectEl.appendChild(extra);
+          matchedValue = clean;
+        }
+        selectEl.value = matchedValue;
+      }
+
+      function setCrudStatusValue(val) {
+        setCrudSelectValue(crudStatus, STATUS_ASET_OPTIONS, 'Pilih Status', val);
+      }
+
+      function setCrudKategoriValue(val) {
+        setCrudSelectValue(crudKategori, KATEGORI_ASET_OPTIONS, 'Pilih Kategori', val);
       }
 
       function getStatusOptions() {
-        return [
-          'Semua Status',
-          'Aktif',
-          'Rusak',
-          'Dilepas',
-          'Dalam Perbaikan'
-        ];
+        const set = new Set(['Semua Status'].concat(STATUS_ASET_OPTIONS));
+        asetData.forEach(function (item) {
+          if (item && item.status) set.add(item.status);
+        });
+        return Array.from(set);
       }
 
       function getKategoriOptions() {
-        return [
-          'Semua Kategori',
-          'Perlengkapan',
-          'Elektronik',
-          'Kamera & Audio',
-          'Kendaraan'
-        ];
+        const set = new Set(['Semua Kategori'].concat(KATEGORI_ASET_OPTIONS));
+        asetData.forEach(function (item) {
+          if (item && item.kategori) set.add(item.kategori);
+        });
+        return Array.from(set);
       }
 
       function setupSearchableFilter(input, box, list, defaultPlaceholder, searchPlaceholder, getOptionsFn) {
@@ -4173,6 +4819,7 @@
           ];
 
           const exportData = rows.map(function (item, idx) {
+            const hitung = hitungNilaiAset(item);
             return [
               idx + 1,
               item.kodeAset || '-',
@@ -4182,12 +4829,12 @@
               item.lokasi || '-',
               Number(item.hargaSatuan || 0),
               Number(item.qty || 1),
-              Number(item.hargaPerolehan || 0),
-              Number(item.umurBulan || 0),
-              Number(item.nilaiResidu || 0),
-              Number(item.penyusutanBulan || 0),
-              Number(item.akumulasi || 0),
-              Number(item.nilaiBuku || 0),
+              Number(hitung.hargaPerolehan || 0),
+              Number(hitung.umurBulan || 0),
+              Number(hitung.nilaiResidu || 0),
+              Number(hitung.penyusutanBulan || 0),
+              Number(hitung.akumulasi || 0),
+              Number(hitung.nilaiBuku || 0),
               item.status || 'Aktif',
               item.kategori || '-',
               formatTanggalDisplay(item.mulaiDiPakai),
@@ -4195,9 +4842,17 @@
               item.divisi || '-',
               item.projectBrand || '-',
               formatTanggalDisplay(item.tanggalPelepasan),
-              item.hasilPelepasan || '-',
-              item.nilaiBukuSaatLepas || '-',
-              item.labaRugiLepas || '-',
+              formatRupiahValue(item.hasilPelepasan),
+              (hitung.nilaiBukuSaatLepas !== null && hitung.nilaiBukuSaatLepas !== undefined)
+                ? Number(hitung.nilaiBukuSaatLepas)
+                : (item.nilaiBukuSaatLepas || '-'),
+              (function () {
+                const nb = hitung.nilaiBukuSaatLepas;
+                const raw = item.hasilPelepasan;
+                const digits = String(raw == null ? '' : raw).replace(/[^0-9]/g, '');
+                if (nb === null || nb === undefined || digits === '') return '-';
+                return formatRupiahSigned(parseRupiah(raw) - nb);
+              })(),
               item.divisiPengecualian || item.divisi || '-',
               item.namaAkunCOA || '-',
               item.kelompokCOA || '-',
@@ -4264,19 +4919,23 @@
       }
 
       window.addEventListener('storage', function (e) {
-        if (!e.key || e.key === STORAGE_KEY || e.key === DIVISI_KEY) {
+        if (!e.key || e.key === STORAGE_KEY || e.key === DIVISI_KEY || e.key === MASTER_COA_KEY) {
           asetData = loadData();
           updateDivisiPengecualianDatalist();
+          populateDivisiSelect();
+          renderCoaDropdownItems();
           renderTable();
         }
       });
 
       window.addEventListener('accounting_divisi_changed', function () {
         updateDivisiPengecualianDatalist();
+        populateDivisiSelect();
       });
 
       /* ===== INITIALIZATION ===== */
       updateDivisiPengecualianDatalist();
+      populateDivisiSelect();
       initFilterOptions();
       renderTable();
     })();
