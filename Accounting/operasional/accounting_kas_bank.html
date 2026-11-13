@@ -2944,38 +2944,13 @@
                 </span>
               </div>
               <div class="kb-select-dropdown" id="dropdownProjectBrand">
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="" data-label="- Tanpa Project / Brand -" />
-                  <span style="color: #64748b; font-style: italic;">- Tanpa Project / Brand -</span>
-                </label>
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411734 | Campaign Brand A" data-label="7691348184035411734 | Campaign Brand A" />
-                  <span>7691348184035411734 | Campaign Brand A</span>
-                </label>
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411735 | Shopee Affiliate Mall" data-label="7691348184035411735 | Shopee Affiliate Mall" />
-                  <span>7691348184035411735 | Shopee Affiliate Mall</span>
-                </label>
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411736 | Cosmo Endorse" data-label="7691348184035411736 | Cosmo Endorse" />
-                  <span>7691348184035411736 | Cosmo Endorse</span>
-                </label>
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411737 | Shopee Mega Sale" data-label="7691348184035411737 | Shopee Mega Sale" />
-                  <span>7691348184035411737 | Shopee Mega Sale</span>
-                </label>
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411738 | Product Launching Serum Glow" data-label="7691348184035411738 | Product Launching Serum Glow" />
-                  <span>7691348184035411738 | Product Launching Serum Glow</span>
-                </label>
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411739 | Tap & Tsp" data-label="7691348184035411739 | Tap & Tsp" />
-                  <span>7691348184035411739 | Tap & Tsp</span>
-                </label>
-                <label class="kb-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411733 | Seluruh Kreator MCN" data-label="7691348184035411733 | Seluruh Kreator MCN" />
-                  <span>7691348184035411733 | Seluruh Kreator MCN</span>
-                </label>
+                <div class="kb-select-search-box">
+                  <svg viewBox="0 0 24 24" class="kb-select-search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <input type="text" id="searchProjectBrand" class="kb-select-search-input" placeholder="Cari atau ketik Project / Brand..." autocomplete="off" />
+                </div>
+                <div class="kb-select-options-list" id="listProjectBrand">
+                  <!-- Rendered dynamically via JavaScript -->
+                </div>
               </div>
             </div>
           </div>
@@ -3344,6 +3319,8 @@
       const btnTriggerProjectBrand = document.getElementById('btnTriggerProjectBrand');
       const labelProjectBrand = document.getElementById('labelProjectBrand');
       const kbProjectBrand = document.getElementById('kbProjectBrand');
+      const searchProjectBrand = document.getElementById('searchProjectBrand');
+      const listProjectBrand = document.getElementById('listProjectBrand');
 
       const wrapDivisi = document.getElementById('wrapDivisi');
       const btnTriggerDivisi = document.getElementById('btnTriggerDivisi');
@@ -3550,8 +3527,8 @@
           let parsed = raw ? JSON.parse(raw) : [];
           const coas = getMasterCoaList();
 
-          // Jika data kosong atau data dummy versi lama (<= 1 item atau masih pakai coa 1000/1100), perbarui dengan dummy realtime COA
-          if (!Array.isArray(parsed) || parsed.length <= 1 || parsed.some(function(it) { return it && (it.kodeCoa === '1000' || it.kodeCoa === '1100'); })) {
+          // Hanya isi data awal jika key Kas & Bank benar-benar belum ada di localStorage (agar data real user tidak tertimpa dummy)
+          if (raw === null || !Array.isArray(parsed)) {
             const coa1002 = coas.find(function(c) { return String(c.kode) === '1002'; }) || {};
             const coa1003 = coas.find(function(c) { return String(c.kode) === '1003'; }) || {};
             const coa1005 = coas.find(function(c) { return String(c.kode) === '1005'; }) || {};
@@ -3745,6 +3722,7 @@
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped)); } catch (e) {}
           }
           syncArusKasSaldoStorage(mapped);
+          syncProfitProjectBrandStorage(mapped);
           return mapped;
         } catch (error) {
           return [];
@@ -3813,10 +3791,233 @@
         } catch (e) {}
       }
 
+      /* ===== SINKRONISASI RELASI PROJECT / BRAND KE MODUL PROFIT PROJECT / BRAND ===== */
+      function normalizeProjectBrandName(val) {
+        return String(val || '')
+          .replace(/^[A-Za-z0-9._-]+\s*\|\s*/, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function formatPeriodeFromDate(dateStr) {
+        if (!dateStr) return 'Periode Berjalan';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return 'Periode Berjalan';
+        const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        return bulan[d.getMonth()] + ' ' + d.getFullYear();
+      }
+
+      function getBrandNominalMapForProfit(storageKey, fallbackSeed, valueSelector) {
+        const amountMap = new Map();
+        let list = [];
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (raw !== null) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) list = parsed;
+          } else if (Array.isArray(fallbackSeed)) {
+            list = fallbackSeed;
+          }
+        } catch (e) {}
+
+        list.forEach(function (item) {
+          if (!item) return;
+          const clean = normalizeProjectBrandName(item.projectBrand);
+          if (!clean || clean === '-') return;
+          const key = clean.toLowerCase();
+          const rawVal = valueSelector(item);
+          const numVal = typeof rawVal === 'number'
+            ? (Number.isFinite(rawVal) ? rawVal : 0)
+            : (Number(String(rawVal || 0).replace(/[^\d.-]/g, '')) || 0);
+          amountMap.set(key, (amountMap.get(key) || 0) + numVal);
+        });
+        return amountMap;
+      }
+
+      function getPendapatanDppMapForProfit() {
+        return getBrandNominalMapForProfit('accounting_pendapatan_data_v1', [
+          { projectBrand: 'Seluruh Kreator MCN', dpp: 748155 },
+          { projectBrand: 'Campaign Brand A', dpp: 15500000 },
+          { projectBrand: 'Shopee Affiliate Mall', dpp: 5000000 },
+          { projectBrand: 'Cosmo Endorse', dpp: 2000000 }
+        ], function (p) { return p.dpp; });
+      }
+
+      function reconcileExpenseStorageWithApprovalForProfit() {
+        try {
+          const rawApr = localStorage.getItem('BISA_APPROVAL_PENGELUARAN_DATA_V5');
+          const rawExp = localStorage.getItem('accounting_pengeluaran_beban_data_v5');
+          if (!rawApr || !rawExp) return;
+          const aprList = JSON.parse(rawApr);
+          const expList = JSON.parse(rawExp);
+          if (!Array.isArray(aprList) || !Array.isArray(expList) || expList.length === 0) return;
+
+          const aprMap = new Map();
+          aprList.forEach(function (a) {
+            if (a && a.idApproval) aprMap.set(String(a.idApproval).trim().toLowerCase(), a);
+          });
+
+          let changed = false;
+          expList.forEach(function (item) {
+            if (!item || !item.idApproval) return;
+            const apr = aprMap.get(String(item.idApproval).trim().toLowerCase());
+            if (!apr || apr.nominal === undefined || apr.nominal === null || apr.nominal === '') return;
+
+            const nextNom = Number(apr.nominal) || 0;
+            const oldNom = item.syncedApprovalNominal !== undefined
+              ? (Number(item.syncedApprovalNominal) || 0)
+              : (Number(item.tagihanBruto) || 0);
+
+            if (nextNom !== oldNom) {
+              const oldDpp = Number(item.dpp) || 0;
+              const oldPpn = Number(item.ppn) || 0;
+              const oldBeban = item.bebanDiAkui !== undefined && item.bebanDiAkui !== null && item.bebanDiAkui !== ''
+                ? (Number(item.bebanDiAkui) || 0)
+                : oldDpp;
+
+              let nextDpp = oldDpp;
+              let nextPpn = oldPpn;
+              let nextBeban = oldBeban;
+
+              if (oldNom > 0 && oldDpp > 0 && oldPpn > 0 && Math.abs((oldDpp + oldPpn) - oldNom) <= 1) {
+                nextDpp = Math.round(nextNom * (oldDpp / oldNom));
+                nextPpn = nextNom - nextDpp;
+              } else if (oldDpp === oldNom) {
+                nextDpp = nextNom;
+                if (oldPpn > 0 && oldNom > 0) nextPpn = Math.round(oldPpn * (nextNom / oldNom));
+              } else if (oldDpp > 0 && oldNom > 0) {
+                nextDpp = Math.round(nextNom * (oldDpp / oldNom));
+                if (oldPpn > 0) nextPpn = Math.round(oldPpn * (nextNom / oldNom));
+              }
+
+              if (oldBeban === oldNom) {
+                nextBeban = nextNom;
+              } else if (oldBeban === oldDpp && oldDpp > 0) {
+                nextBeban = nextDpp;
+              } else if (oldBeban > 0 && oldNom > 0) {
+                nextBeban = Math.round(nextNom * (oldBeban / oldNom));
+              }
+
+              item.dpp = nextDpp;
+              item.ppn = nextPpn;
+              item.bebanDiAkui = nextBeban;
+              item.tagihanBruto = nextNom;
+              item.sisaUtang = Math.max(0, nextNom - (Number(item.terbayarKas) || 0));
+              changed = true;
+            }
+            if (item.syncedApprovalNominal !== nextNom) {
+              item.syncedApprovalNominal = nextNom;
+              changed = true;
+            }
+          });
+
+          if (changed) {
+            localStorage.setItem('accounting_pengeluaran_beban_data_v5', JSON.stringify(expList));
+          }
+        } catch (e) {}
+      }
+
+      function getBebanDiakuiMapForProfit() {
+        reconcileExpenseStorageWithApprovalForProfit();
+        return getBrandNominalMapForProfit('accounting_pengeluaran_beban_data_v5', [
+          { projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 30000, dpp: 30000 },
+          { projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 1500000, dpp: 1500000 },
+          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 4500000, dpp: 4500000 },
+          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 450000, dpp: 450000 },
+          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 850000, dpp: 850000 }
+        ], function (b) {
+          return b.bebanDiAkui !== undefined && b.bebanDiAkui !== null && b.bebanDiAkui !== '' ? b.bebanDiAkui : b.dpp;
+        });
+      }
+
+      function syncProfitProjectBrandStorage(customData) {
+        const sourceData = Array.isArray(customData) ? customData : (Array.isArray(kbData) ? kbData : []);
+        const aggMap = new Map();
+        const dppMap = getPendapatanDppMapForProfit();
+        const bebanMap = getBebanDiakuiMapForProfit();
+
+        // Ambil daftar Project / Brand dari transaksi Kas & Bank (tanpa nominal Kas & Bank),
+        // isi kolom Pendapatan dari total DPP modul Pendapatan & kolom Beban dari total Beban Diakui modul Pengeluaran & Beban.
+        sourceData.forEach(function (it) {
+          if (!it) return;
+          const rawPb = String(it.projectBrand || '').trim();
+          const cleanPb = normalizeProjectBrandName(rawPb);
+          if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+
+          const key = cleanPb.toLowerCase();
+          if (!aggMap.has(key)) {
+            aggMap.set(key, {
+              projectBrand: cleanPb,
+              rawProjectBrand: rawPb,
+              tanggal: it.tanggal || '',
+              jenisSet: new Set(),
+              txIds: []
+            });
+          }
+
+          const entry = aggMap.get(key);
+          if (rawPb.includes(' | ') && !entry.rawProjectBrand.includes(' | ')) {
+            entry.rawProjectBrand = rawPb;
+          }
+          if (it.tanggal && (!entry.tanggal || String(it.tanggal) > String(entry.tanggal))) {
+            entry.tanggal = it.tanggal;
+          }
+          if (it.jenis && String(it.jenis).trim()) {
+            entry.jenisSet.add(String(it.jenis).trim());
+          }
+          if (it.idTransaksi) entry.txIds.push(it.idTransaksi);
+        });
+
+        const relBrands = [];
+        let relIdx = 1;
+        aggMap.forEach(function (entry, key) {
+          const jenisLabel = entry.jenisSet.size > 0 ? ': ' + Array.from(entry.jenisSet).join(', ') : '';
+          const pendapatanDpp = dppMap.get(key) || 0;
+          const beban = bebanMap.get(key) || 0;
+          const payroll = 0;
+          const penyusutan = 0;
+          const laba = pendapatanDpp - (beban + payroll + penyusutan);
+          const rawMargin = pendapatanDpp > 0 ? Number(((laba / pendapatanDpp) * 100).toFixed(1)) : 0;
+          const margin = Math.abs(rawMargin) < 0.05 ? 0 : rawMargin;
+          relBrands.push({
+            id: 'PRF-KB-' + String(relIdx++).padStart(3, '0'),
+            projectBrand: entry.projectBrand,
+            rawProjectBrand: entry.rawProjectBrand,
+            pendapatan: pendapatanDpp,
+            beban: beban,
+            payroll: payroll,
+            penyusutan: penyusutan,
+            labaSebelumPajak: laba,
+            margin: margin,
+            tanggal: entry.tanggal || new Date().toISOString().split('T')[0],
+            periode: formatPeriodeFromDate(entry.tanggal),
+            keterangan: 'Relasi Project/Brand dari modul Kas & Bank (' + entry.txIds.length + ' transaksi' + jenisLabel + ')',
+            txCount: entry.txIds.length,
+            source: 'kas_bank'
+          });
+        });
+
+        try {
+          localStorage.setItem('accounting_kas_bank_profit_rel_v1', JSON.stringify({
+            brands: relBrands,
+            updatedAt: new Date().toISOString()
+          }));
+        } catch (e) {}
+
+        // Sinkronkan daftar Project/Brand realtime langsung ke storage Profit Project / Brand
+        try {
+          localStorage.setItem('bisa_profit_project_brand_data', JSON.stringify(relBrands));
+          try {
+            window.dispatchEvent(new CustomEvent('accounting_profit_project_brand_changed'));
+          } catch (evErr) {}
+        } catch (e) {}
+      }
+
       function saveData() {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(kbData));
           syncArusKasSaldoStorage(kbData);
+          syncProfitProjectBrandStorage(kbData);
         } catch (error) {
           showToast('Gagal menyimpan data Kas & Bank', 'error');
         }
@@ -4461,6 +4662,20 @@
       function getProjectBrandList() {
         const list = [];
         const seen = new Set();
+        const seenClean = new Set();
+
+        function pushUniqueBrand(rawVal) {
+          if (!rawVal) return;
+          const strVal = String(rawVal).trim();
+          const clean = normalizeProjectBrandName(strVal);
+          if (!clean || clean === '-' || clean.toLowerCase() === '- tanpa project / brand -') return;
+          const key = clean.toLowerCase();
+          if (!seen.has(strVal) && !seenClean.has(key)) {
+            seen.add(strVal);
+            seenClean.add(key);
+            list.push(strVal);
+          }
+        }
 
         // 1. Ambil dari Modul Pendapatan (Format: ID Pendapatan | Project/Brand)
         try {
@@ -4469,10 +4684,7 @@
             if (p && p.projectBrand && String(p.projectBrand).trim() !== '' && p.projectBrand !== '-') {
               const brand = String(p.projectBrand).trim();
               const combined = formatBrandWithId(brand, p.idPendapatan);
-              if (combined && !seen.has(combined)) {
-                seen.add(combined);
-                list.push(combined);
-              }
+              pushUniqueBrand(combined);
             }
           });
         } catch (e) {}
@@ -4487,10 +4699,7 @@
                 if (cp && cp.projectBrand && String(cp.projectBrand).trim() !== '') {
                   const rawBrand = String(cp.projectBrand).trim();
                   const combined = formatBrandWithId(rawBrand);
-                  if (combined && !seen.has(combined)) {
-                    seen.add(combined);
-                    list.push(combined);
-                  }
+                  pushUniqueBrand(combined);
                 }
               });
             }
@@ -4508,40 +4717,81 @@
             '7691348184035411739 | Tap & Tsp',
             '7691348184035411733 | Seluruh Kreator MCN'
           ];
-          defaultList.forEach(function (it) {
-            if (!seen.has(it)) {
-              seen.add(it);
-              list.push(it);
-            }
-          });
+          defaultList.forEach(pushUniqueBrand);
         }
+
+        // 4. Sertakan Project/Brand yang sudah tersimpan di transaksi Kas & Bank (termasuk custom input)
+        try {
+          if (Array.isArray(kbData)) {
+            kbData.forEach(function (tx) {
+              if (tx && tx.projectBrand) pushUniqueBrand(tx.projectBrand);
+            });
+          }
+        } catch (e) {}
 
         return list;
       }
 
-      function renderProjectBrandDropdownItems() {
-        const dropdown = document.getElementById('dropdownProjectBrand');
-        if (!dropdown) return;
+      function renderProjectBrandDropdownItems(searchKeyword) {
+        const container = document.getElementById('listProjectBrand') || document.getElementById('dropdownProjectBrand');
+        if (!container) return;
         const list = getProjectBrandList();
         const curVal = kbProjectBrand ? kbProjectBrand.value.trim() : '';
+        const rawSearch = String(searchKeyword || '').trim();
+        const cleanSearch = normalizeProjectBrandName(rawSearch);
+        const q = cleanSearch.toLowerCase();
 
-        let html = '<label class="kb-select-item' + (!curVal ? ' is-selected' : '') + '">' +
-          '<input type="radio" name="optProjectBrand" value="" data-label="- Tanpa Project / Brand -"' + (!curVal ? ' checked' : '') + ' />' +
-          '<span style="color: #64748b; font-style: italic;">- Tanpa Project / Brand -</span>' +
-        '</label>';
+        const filteredList = q
+          ? list.filter(function (name) {
+              return String(name).toLowerCase().includes(rawSearch.toLowerCase()) || normalizeProjectBrandName(name).toLowerCase().includes(q);
+            })
+          : list;
 
-        list.forEach(function (name) {
-          const isChecked = (name === curVal) ? ' checked' : '';
-          const isSelected = (name === curVal) ? ' is-selected' : '';
+        const hasExactMatch = !q || list.some(function (name) {
+          return String(name).toLowerCase() === rawSearch.toLowerCase() || normalizeProjectBrandName(name).toLowerCase() === q;
+        });
+
+        let html = '';
+
+        if (rawSearch && !hasExactMatch) {
+          html += '<button type="button" id="btnUseCustomProjectBrand" class="kb-select-item" style="width: 100%; border: none; border-bottom: 1px solid #e2e8f0; background: #eff6ff; color: #1d4ed8; font-weight: 600; text-align: left; cursor: pointer;">' +
+            '<span>+ Gunakan &amp; Tambah: &ldquo;' + escapeHtml(rawSearch) + '&rdquo;</span>' +
+          '</button>';
+        }
+
+        if (!q) {
+          html += '<label class="kb-select-item' + (!curVal ? ' is-selected' : '') + '">' +
+            '<input type="radio" name="optProjectBrand" value="" data-label="- Tanpa Project / Brand -"' + (!curVal ? ' checked' : '') + ' />' +
+            '<span style="color: #64748b; font-style: italic;">- Tanpa Project / Brand -</span>' +
+          '</label>';
+        }
+
+        filteredList.forEach(function (name) {
+          const isChecked = (name === curVal || (curVal && normalizeProjectBrandName(name).toLowerCase() === normalizeProjectBrandName(curVal).toLowerCase())) ? ' checked' : '';
+          const isSelected = isChecked ? ' is-selected' : '';
           html += '<label class="kb-select-item' + isSelected + '">' +
             '<input type="radio" name="optProjectBrand" value="' + escapeHtml(name) + '" data-label="' + escapeHtml(name) + '"' + isChecked + ' />' +
             '<span>' + escapeHtml(name) + '</span>' +
           '</label>';
         });
 
-        dropdown.innerHTML = html;
+        if (filteredList.length === 0 && !rawSearch) {
+          html += '<div style="padding: 10px 12px; font-size: 12px; color: #94a3b8; text-align: center;">Belum ada daftar Project / Brand</div>';
+        }
 
-        dropdown.querySelectorAll('input[name="optProjectBrand"]').forEach(function (radio) {
+        container.innerHTML = html;
+
+        const btnCustom = document.getElementById('btnUseCustomProjectBrand');
+        if (btnCustom) {
+          btnCustom.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            setProjectBrandValue(rawSearch, rawSearch);
+            closeFormDropdowns();
+          });
+        }
+
+        container.querySelectorAll('input[name="optProjectBrand"]').forEach(function (radio) {
           radio.addEventListener('change', function () {
             setProjectBrandValue(this.value, this.getAttribute('data-label'));
             closeFormDropdowns();
@@ -4551,9 +4801,17 @@
 
       function setProjectBrandValue(val, label) {
         let actualVal = (val || '').trim();
-        if (actualVal && !actualVal.includes(' | ')) {
-          const formatted = formatBrandWithId(actualVal);
-          if (formatted) actualVal = formatted;
+        if (actualVal) {
+          const cleanKey = normalizeProjectBrandName(actualVal).toLowerCase();
+          const existingMatch = getProjectBrandList().find(function (itemName) {
+            return normalizeProjectBrandName(itemName).toLowerCase() === cleanKey;
+          });
+          if (existingMatch) {
+            actualVal = existingMatch;
+          } else if (!actualVal.includes(' | ')) {
+            const formatted = formatBrandWithId(actualVal);
+            if (formatted) actualVal = formatted;
+          }
         }
         if (kbProjectBrand) kbProjectBrand.value = actualVal;
         if (labelProjectBrand) {
@@ -5147,7 +5405,38 @@
           e.stopPropagation();
           const willOpen = !wrapProjectBrand.classList.contains('is-open');
           closeFormDropdowns();
-          if (willOpen) wrapProjectBrand.classList.add('is-open');
+          if (willOpen) {
+            wrapProjectBrand.classList.add('is-open');
+            if (searchProjectBrand) searchProjectBrand.value = '';
+            renderProjectBrandDropdownItems('');
+            if (searchProjectBrand) {
+              setTimeout(function () { searchProjectBrand.focus(); }, 60);
+            }
+          }
+        });
+      }
+
+      if (searchProjectBrand) {
+        searchProjectBrand.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+        searchProjectBrand.addEventListener('input', function () {
+          renderProjectBrandDropdownItems(this.value);
+        });
+        searchProjectBrand.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const customBtn = document.getElementById('btnUseCustomProjectBrand');
+            if (customBtn) {
+              customBtn.click();
+            } else if (listProjectBrand) {
+              const firstRadio = listProjectBrand.querySelector('input[name="optProjectBrand"]');
+              if (firstRadio) {
+                setProjectBrandValue(firstRadio.value, firstRadio.getAttribute('data-label'));
+                closeFormDropdowns();
+              }
+            }
+          }
         });
       }
 
@@ -5679,7 +5968,8 @@
           setRekonsiliasiValue(item.rekonsiliasi || '', item.rekonsiliasi || 'Pilih Rekonsiliasi');
           const pbVal = item.projectBrand || '';
           setProjectBrandValue(pbVal, pbVal || 'Pilih Project / Brand');
-          renderProjectBrandDropdownItems();
+          if (searchProjectBrand) searchProjectBrand.value = '';
+          renderProjectBrandDropdownItems('');
           setDivisiValue(item.divisi || '', item.divisi || 'Pilih Divisi');
           renderDivisiDropdownItems();
           
@@ -5721,7 +6011,8 @@
           renderReferensiDropdownItems('');
           setRekonsiliasiValue('', 'Pilih Rekonsiliasi');
           setProjectBrandValue('', 'Pilih Project / Brand');
-          renderProjectBrandDropdownItems();
+          if (searchProjectBrand) searchProjectBrand.value = '';
+          renderProjectBrandDropdownItems('');
           setDivisiValue('', 'Pilih Divisi');
           renderDivisiDropdownItems();
           document.getElementById('kbArusKas').value = '';
@@ -6300,6 +6591,15 @@
             jenisValue = inpJenis.value.trim();
           }
 
+          let submittedProjectBrand = document.getElementById('kbProjectBrand').value.trim();
+          if (submittedProjectBrand) {
+            const cleanSubKey = normalizeProjectBrandName(submittedProjectBrand).toLowerCase();
+            const existingPbMatch = getProjectBrandList().find(function (itemName) {
+              return normalizeProjectBrandName(itemName).toLowerCase() === cleanSubKey;
+            });
+            if (existingPbMatch) submittedProjectBrand = existingPbMatch;
+          }
+
           const payload = {
             tanggal: getBisaDateValue(document.getElementById('kbTanggal')),
             idTransaksi: document.getElementById('kbIdTransaksi').value.trim(),
@@ -6311,7 +6611,7 @@
             saldoAkun: sAkun,
             referensi: document.getElementById('kbReferensi').value.trim(),
             rekonsiliasi: document.getElementById('kbRekonsiliasi').value.trim(),
-            projectBrand: document.getElementById('kbProjectBrand').value.trim(),
+            projectBrand: submittedProjectBrand,
             divisi: document.getElementById('kbDivisi').value.trim(),
             arusKas: document.getElementById('kbArusKas').value.trim(),
             namaBank: document.getElementById('kbNamaBank').value.trim(),
@@ -6419,10 +6719,15 @@
           autoCalcSaldo();
           renderTable();
         }
-        if (e.key === 'accounting_pendapatan_data_v1' || e.key === 'accounting_pengeluaran_beban_data_v5') {
+        if (e.key === 'accounting_pendapatan_data_v1' || e.key === 'accounting_pengeluaran_beban_data_v5' || e.key === 'BISA_APPROVAL_PENGELUARAN_DATA_V5') {
           kbData = loadData();
           renderReferensiDropdownItems(searchReferensiDokumen ? searchReferensiDokumen.value : '');
-          renderProjectBrandDropdownItems();
+          renderProjectBrandDropdownItems(searchProjectBrand ? searchProjectBrand.value : '');
+          renderTable();
+        }
+        if (e.key === 'accounting_kas_bank_v2') {
+          kbData = loadData();
+          renderProjectBrandDropdownItems(searchProjectBrand ? searchProjectBrand.value : '');
           renderTable();
         }
         if (e.key === 'accounting_master_divisi_v1') {

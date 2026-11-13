@@ -1118,23 +1118,45 @@
 
     .modal-dropdown-options {
       position: absolute;
-      top: calc(100% + 2px);
+      top: calc(100% + 4px);
       left: 0;
-      right: 0;
+      min-width: 100%;
+      width: 390px;
+      max-width: calc(100vw - 48px);
       background: #ffffff;
       border: 1.5px solid #28a5de;
-      border-radius: 8px;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+      border-radius: 10px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
       z-index: 1050;
-      max-height: 200px;
+      max-height: 256px;
       overflow-y: auto;
       display: none;
       padding: 6px;
       box-sizing: border-box;
     }
 
+    .modal-dropdown-options::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .modal-dropdown-options::-webkit-scrollbar-track {
+      background: #f8fafc;
+      border-radius: 999px;
+    }
+
+    .modal-dropdown-options::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+
+    .modal-dropdown-options::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
     .modal-select-wrap.is-open .modal-dropdown-options {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
     }
 
     .modal-select-wrap.is-open .modal-field-input {
@@ -1143,27 +1165,86 @@
     }
 
     .modal-opt-item {
-      padding: 8px 12px;
+      padding: 8px 10px;
       font-size: 13px;
       color: #334155;
       cursor: pointer;
-      border-radius: 6px;
+      border-radius: 7px;
       transition: background 0.12s ease, color 0.12s ease;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-opt-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .modal-opt-code {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 7px;
+      border-radius: 5px;
+      background: #eff6ff;
+      color: #0284c7;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+
+    .modal-opt-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #1e293b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .modal-opt-group {
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748b;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .modal-opt-item:hover {
       background: #f0f9ff;
+    }
+
+    .modal-opt-item:hover .modal-opt-name {
       color: #0284c7;
       font-weight: 600;
     }
 
     .modal-opt-item.is-selected {
       background: #e0f2fe;
-      color: #0284c7;
+    }
+
+    .modal-opt-item.is-selected .modal-opt-code {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .modal-opt-item.is-selected .modal-opt-name {
+      color: #0369a1;
       font-weight: 600;
+    }
+
+    .modal-opt-item.is-selected .modal-opt-group {
+      background: #bae6fd;
+      color: #0369a1;
     }
 
     /* Modal Footer Buttons (Outlined #28a5de Sesuai Screenshot) */
@@ -2745,14 +2826,20 @@
       // Render Dropdown COA List inside Modal (Gambar 2)
       function renderCoaDropdownList() {
         if (!menuCoaModal) return;
+        const activeCode = (crudKodeCOA && crudKodeCOA.value) ? crudKodeCOA.value.trim() : '';
         menuCoaModal.innerHTML = '';
         masterCOAList.forEach(function (coa) {
           const opt = document.createElement('div');
-          opt.className = 'modal-opt-item';
+          const isSelected = activeCode === coa.code;
+          opt.className = 'modal-opt-item' + (isSelected ? ' is-selected' : '');
           opt.setAttribute('data-code', coa.code);
+          opt.setAttribute('title', coa.code + ' - ' + coa.name + ' (' + coa.group + ')');
           opt.innerHTML = `
-            <span><b>${coa.code}</b> - ${coa.name}</span>
-            <span style="font-size: 11.5px; color: #64748b; font-weight: 500;">${coa.group}</span>
+            <span class="modal-opt-main">
+              <span class="modal-opt-code">${coa.code}</span>
+              <span class="modal-opt-name">${coa.name}</span>
+            </span>
+            <span class="modal-opt-group">${coa.group}</span>
           `;
           opt.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -2760,6 +2847,7 @@
             crudNamaAkunCOA.value = coa.name;
             crudKelompokCOA.value = coa.group;
             crudStatusCOA.value = coa.status;
+            renderCoaDropdownList();
             wrapCoaModal.classList.remove('is-open');
           });
           menuCoaModal.appendChild(opt);
@@ -2770,6 +2858,7 @@
       if (wrapCoaModal && crudKodeCOA) {
         crudKodeCOA.addEventListener('click', function (e) {
           e.stopPropagation();
+          renderCoaDropdownList();
           wrapCoaModal.classList.toggle('is-open');
         });
       }

@@ -1435,7 +1435,7 @@
           <div class="penyusutan-card penyusutan-card--beban">
             <div class="penyusutan-card-info">
               <span class="penyusutan-card-label">Beban Bulan Ini</span>
-              <span class="penyusutan-card-value" id="cardBebanBulanIni">100</span>
+              <span class="penyusutan-card-value" id="cardBebanBulanIni">Rp 0</span>
             </div>
             <div class="penyusutan-card-icon icon-beban" title="Beban Bulan Ini">
               <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -1446,7 +1446,7 @@
           <div class="penyusutan-card">
             <div class="penyusutan-card-info">
               <span class="penyusutan-card-label">Akumulasi Akhir</span>
-              <span class="penyusutan-card-value" id="cardAkumulasiAkhir">100</span>
+              <span class="penyusutan-card-value" id="cardAkumulasiAkhir">Rp 0</span>
             </div>
             <div class="penyusutan-card-icon" title="Akumulasi Akhir">
               <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
@@ -1457,7 +1457,7 @@
           <div class="penyusutan-card">
             <div class="penyusutan-card-info">
               <span class="penyusutan-card-label">Sisa Nilai Buku</span>
-              <span class="penyusutan-card-value" id="cardSisaNilaiBuku">100</span>
+              <span class="penyusutan-card-value" id="cardSisaNilaiBuku">Rp 0</span>
             </div>
             <div class="penyusutan-card-icon" title="Sisa Nilai Buku">
               <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
@@ -1468,7 +1468,7 @@
           <div class="penyusutan-card">
             <div class="penyusutan-card-info">
               <span class="penyusutan-card-label">Penyusutan Aset</span>
-              <span class="penyusutan-card-value" id="cardPenyusutanAset">100</span>
+              <span class="penyusutan-card-value" id="cardPenyusutanAset">0</span>
             </div>
             <div class="penyusutan-card-icon" title="Penyusutan Aset">
               <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
@@ -1795,7 +1795,203 @@
         }
       }
 
-      let penyusutanData = loadData();
+      const DAFTAR_ASET_KEYS = ['bisa_accounting_daftar_aset_data_v4', 'accounting_daftar_aset_data'];
+
+      function getDaftarAsetList() {
+        for (let i = 0; i < DAFTAR_ASET_KEYS.length; i++) {
+          try {
+            const raw = localStorage.getItem(DAFTAR_ASET_KEYS[i]);
+            if (raw === null || raw === undefined) continue;
+            // Key ada di localStorage (bisa '[]' jika semua dihapus)
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed; // bisa kosong = semua dihapus
+          } catch (e) {
+            console.warn('[Penyusutan Aset] Gagal membaca Daftar Aset:', e);
+          }
+        }
+        return null; // null = key belum pernah ada
+      }
+
+      function roundDiv(num, den) {
+        const d = Number(den) || 0;
+        if (!d) return 0;
+        const n = Number(num) || 0;
+        return Math.floor((2 * n + d) / (2 * d));
+      }
+
+      function parseYearMonth(rawDate) {
+        const raw = String(rawDate || '').trim();
+        if (!raw) return null;
+        if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(raw)) {
+          const parts = raw.split('-');
+          return { year: parseInt(parts[0], 10), month: parseInt(parts[1], 10) - 1 };
+        }
+        if (/^\d{1,2}[\/-]\d{1,2}[\/-]\d{4}$/.test(raw)) {
+          const parts = raw.split(/[\/-]/);
+          return { year: parseInt(parts[2], 10), month: parseInt(parts[1], 10) - 1 };
+        }
+        return null;
+      }
+
+      function getElapsedMonths(startDateStr, maxUmur, endDateStr) {
+        const start = parseYearMonth(startDateStr);
+        if (!start) return 0;
+
+        const end = parseYearMonth(endDateStr);
+        let months;
+        if (end) {
+          months = (end.year - start.year) * 12 + (end.month - start.month);
+        } else {
+          const now = new Date();
+          months = (now.getFullYear() - start.year) * 12 + (now.getMonth() - start.month) + 1;
+        }
+
+        months = Math.max(0, months);
+        if (maxUmur > 0) {
+          months = Math.min(months, maxUmur);
+        }
+        return months;
+      }
+
+      function getResiduRateByKategori(kategori) {
+        const k = String(kategori || '').trim().toLowerCase();
+        if (!k) return null;
+        if (k.includes('kendaraan')) return 0.20;
+        if (k.includes('furniture') || k.includes('mebel')) return 0.10;
+        if (k.includes('kamera')) return 0.10;
+        if (k.includes('elektronik')) return 0.05;
+        if (k.includes('perlengkapan live')) return 0.05;
+        if (k.includes('peralatan jaringan')) return 0.05;
+        if (k.includes('perlengkapan')) return 0;
+        if (k.includes('renovasi')) return 0;
+        if (k.includes('lainnya')) return 0;
+        return 0;
+      }
+
+      function computePenyusutanFromAset(ast) {
+        const hargaSatuan = Number(ast.hargaSatuan) || 0;
+        const qty = parseInt(ast.qty, 10) || 0;
+        const hargaPerolehan = (hargaSatuan > 0 && qty > 0)
+          ? Math.round(hargaSatuan * qty)
+          : Math.max(0, Math.round(Number(ast.hargaPerolehan) || 0));
+        const umurBulan = parseInt(ast.umurBulan, 10) || 0;
+
+        const rate = getResiduRateByKategori(ast.kategori);
+        const nilaiResidu = rate !== null
+          ? Math.round(hargaPerolehan * rate)
+          : Math.max(0, Math.round(Number(ast.nilaiResidu) || 0));
+
+        const maxDepreciable = Math.max(0, hargaPerolehan - nilaiResidu);
+        const penyusutanBulanExact = umurBulan > 0 ? maxDepreciable / umurBulan : 0;
+        const penyusutanBulan = umurBulan > 0 ? roundDiv(maxDepreciable, umurBulan) : 0;
+
+        const startDate = String(ast.mulaiDiPakai || ast.tanggalBeli || '').trim();
+        const tanggalPelepasan = String(ast.tanggalPelepasan || '').trim();
+        const bulanBerjalan = getElapsedMonths(startDate, umurBulan, tanggalPelepasan);
+        const akumulasi = (umurBulan > 0 && maxDepreciable > 0)
+          ? Math.min(maxDepreciable, Math.round(penyusutanBulanExact * bulanBerjalan))
+          : 0;
+        const nilaiBukuSebelumLepas = Math.max(0, hargaPerolehan - akumulasi);
+        const nilaiBuku = tanggalPelepasan ? 0 : nilaiBukuSebelumLepas;
+
+        return {
+          hargaPerolehan: hargaPerolehan,
+          umurBulan: umurBulan,
+          nilaiResidu: nilaiResidu,
+          penyusutanBulan: penyusutanBulan,
+          akumulasi: akumulasi,
+          nilaiBuku: nilaiBuku,
+          nilaiBukuSaatLepas: tanggalPelepasan ? nilaiBukuSebelumLepas : null
+        };
+      }
+
+      function syncPenyusutanFromDaftarAset() {
+        const asetList = getDaftarAsetList();
+        if (asetList === null) return null; // key belum ada, caller pakai fallback
+        if (asetList.length === 0) return []; // semua dihapus, tampilkan kosong
+
+        const storedList = loadData();
+        const storedByKode = {};
+        (Array.isArray(storedList) ? storedList : []).forEach(function (row) {
+          if (row && row.kodeAset) storedByKode[String(row.kodeAset)] = row;
+        });
+
+        return asetList.map(function (ast) {
+          if (!ast) return null;
+          const kode = String(ast.kodeAset || '').trim();
+          const prev = storedByKode[kode] || {};
+          const calc = computePenyusutanFromAset(ast);
+
+          // === Hitung Bulan Awal, Bulan Akhir, Akum, Beban ===
+          const startDateStr = ast.mulaiDiPakai || ast.tanggalBeli || '';
+          const startParsed = parseYearMonth(startDateStr);
+          const now = new Date();
+          const currentYM = now.getFullYear() * 12 + now.getMonth();
+
+          let bulanAwal = 0;
+          let bulanAkhir = 0;
+          let bebanBulanIni = 0;
+
+          if (startParsed) {
+            const startYM = startParsed.year * 12 + startParsed.month;
+            if (startYM <= currentYM) {
+              // Bulan Awal = jumlah bulan dari Mulai Dipakai s/d akhir bulan lalu
+              bulanAwal = currentYM - startYM;
+              if (calc.umurBulan > 0) bulanAwal = Math.min(bulanAwal, calc.umurBulan);
+
+              // Bulan Akhir = Bulan Awal + 1 (tidak melebihi umur)
+              bulanAkhir = bulanAwal + 1;
+              if (calc.umurBulan > 0) bulanAkhir = Math.min(bulanAkhir, calc.umurBulan);
+
+              // Beban Bulan Ini = Per Bulan (jika masih ada sisa penyusutan)
+              bebanBulanIni = (bulanAkhir > bulanAwal) ? calc.penyusutanBulan : 0;
+            }
+          }
+
+          // Akumulasi Awal = Per Bulan × Bulan Awal
+          const akumAwal = calc.penyusutanBulan * bulanAwal;
+          // Akumulasi Akhir = Akumulasi Awal + Beban Bulan Ini
+          const akumAkhir = akumAwal + bebanBulanIni;
+
+          return {
+            id: ast.id || kode,
+            kodeAset: kode,
+            namaAset: ast.namaAset || '-',
+            mulaiDipakai: startDateStr,
+            umurBulan: calc.umurBulan,
+            perolehan: calc.hargaPerolehan,
+            residu: calc.nilaiResidu,
+            perBulan: calc.penyusutanBulan,
+            nilaiBuku: calc.nilaiBuku,
+            divisi: ast.divisi || '-',
+            bulanAwal: bulanAwal,
+            bulanAkhir: bulanAkhir,
+            akumAwal: akumAwal,
+            bebanBulanIni: bebanBulanIni,
+            akumAkhir: akumAkhir,
+            projectBrand: ast.projectBrand || prev.projectBrand || '-'
+          };
+        }).filter(Boolean);
+      }
+
+      let penyusutanData = syncPenyusutanFromDaftarAset();
+      if (penyusutanData === null) penyusutanData = loadData();
+
+      function refreshPenyusutanData() {
+        penyusutanData = syncPenyusutanFromDaftarAset();
+        if (penyusutanData === null) penyusutanData = loadData();
+        renderTable();
+      }
+
+      window.addEventListener('storage', function (e) {
+        if (!e.key || DAFTAR_ASET_KEYS.indexOf(e.key) !== -1) refreshPenyusutanData();
+      });
+      window.addEventListener('focus', refreshPenyusutanData);
+      window.addEventListener('pageshow', refreshPenyusutanData);
+      window.addEventListener('accounting-daftar-aset-updated', refreshPenyusutanData);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) refreshPenyusutanData();
+      });
 
       // State Filters
       let filterState = {
@@ -1914,30 +2110,20 @@
 
       /* ===== SUMMARY CARDS UPDATE ===== */
       function updateSummaryCards(data) {
-        // Mockup screenshot 1 displays 100 for all cards by default,
-        // we can show 100 or format real values accurately. Let's keep 100 as shown in mock,
-        // or calculate dynamically if total data is available!
-        if (data.length === defaultPenyusutanData.length) {
-          cardBebanBulanIni.textContent = '100';
-          cardAkumulasiAkhir.textContent = '100';
-          cardSisaNilaiBuku.textContent = '100';
-          cardPenyusutanAset.textContent = '100';
-        } else {
-          let totalBeban = 0;
-          let totalAkum = 0;
-          let totalNilaiBuku = 0;
+        let totalBeban = 0;
+        let totalAkum = 0;
+        let totalNilaiBuku = 0;
 
-          data.forEach(function (item) {
-            totalBeban += Number(item.bebanBulanIni || 0);
-            totalAkum += Number(item.akumAkhir || 0);
-            totalNilaiBuku += Number(item.nilaiBuku || 0);
-          });
+        data.forEach(function (item) {
+          totalBeban += Number(item.bebanBulanIni || 0);
+          totalAkum += Number(item.akumAkhir || 0);
+          totalNilaiBuku += Number(item.nilaiBuku || 0);
+        });
 
-          cardBebanBulanIni.textContent = data.length > 0 ? formatRupiahSpasi(totalBeban) : '0';
-          cardAkumulasiAkhir.textContent = data.length > 0 ? formatRupiahSpasi(totalAkum) : '0';
-          cardSisaNilaiBuku.textContent = data.length > 0 ? formatRupiahSpasi(totalNilaiBuku) : '0';
-          cardPenyusutanAset.textContent = String(data.length);
-        }
+        cardBebanBulanIni.textContent = formatRupiahSpasi(totalBeban);
+        cardAkumulasiAkhir.textContent = formatRupiahSpasi(totalAkum);
+        cardSisaNilaiBuku.textContent = formatRupiahSpasi(totalNilaiBuku);
+        cardPenyusutanAset.textContent = String(data.length);
       }
 
       /* ===== RENDER TABLE (SESUAI GAMBAR 1) ===== */

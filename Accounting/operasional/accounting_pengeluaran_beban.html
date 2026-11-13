@@ -3082,12 +3082,13 @@
 
         try {
           const raw = localStorage.getItem(APPROVAL_KEY);
-          if (raw) {
+          if (raw !== null) {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length >= 5) {
-              const apr1 = parsed.find(function (a) { return a.idApproval === 'APR-2609-001'; });
-              // Jika data sudah minimal 5 dan APR-001 berstatus Disetujui (bukan stale Menunggu dari sesi lama)
-              if (apr1 && (apr1.statusFinal === 'Disetujui' || apr1.statusManager === 'Disetujui')) {
+            if (Array.isArray(parsed)) {
+              const staleApr1 = parsed.find(function (a) {
+                return a && a.idApproval === 'APR-2609-001' && a.statusFinal !== 'Disetujui' && a.statusManager !== 'Disetujui';
+              });
+              if (!staleApr1) {
                 return parsed.map(function (it, idx) {
                   const sm = String(it.statusManager || '').trim().toLowerCase();
                   const sd = String(it.statusDirektur || '').trim().toLowerCase();
@@ -3107,7 +3108,7 @@
               }
             }
           }
-          // Jika localStorage masih data versi 3 baris lama yang usang, otomatis segarkan ke 5 data relasional real
+          // Hanya segarkan bila Approval belum pernah ada atau masih memakai seed stale APR-2609-001
           localStorage.setItem(APPROVAL_KEY, JSON.stringify(canonicalApprovals));
         } catch (e) {}
 
@@ -3448,11 +3449,51 @@
             if (apr.keperluan && (!item.keterangan || item.keterangan === '-')) {
               item.keterangan = apr.keperluan;
             }
-            // Kolom 11: Tagihan Bruto -> Otomatis dari Tabel Approval Pengeluaran {Nominal}
+            // Kolom 11: Tagihan Bruto + penyesuaian DPP/Beban Diakui jika nominal Approval berubah
             if (apr.nominal !== undefined && apr.nominal !== null && apr.nominal !== '') {
+              const nextNom = Number(apr.nominal) || 0;
+              const oldNom = item.syncedApprovalNominal !== undefined
+                ? (Number(item.syncedApprovalNominal) || 0)
+                : (Number(item.tagihanBruto) || 0);
+
               if (item.tagihanBruto === undefined || item.tagihanBruto === null || item.tagihanBruto === 0) {
-                item.tagihanBruto = Number(apr.nominal);
+                item.tagihanBruto = nextNom;
+              } else if (nextNom !== oldNom) {
+                const oldDpp = Number(item.dpp) || 0;
+                const oldPpn = Number(item.ppn) || 0;
+                const oldBeban = item.bebanDiAkui !== undefined && item.bebanDiAkui !== null && item.bebanDiAkui !== ''
+                  ? (Number(item.bebanDiAkui) || 0)
+                  : oldDpp;
+
+                let nextDpp = oldDpp;
+                let nextPpn = oldPpn;
+                let nextBeban = oldBeban;
+
+                if (oldNom > 0 && oldDpp > 0 && oldPpn > 0 && Math.abs((oldDpp + oldPpn) - oldNom) <= 1) {
+                  nextDpp = Math.round(nextNom * (oldDpp / oldNom));
+                  nextPpn = nextNom - nextDpp;
+                } else if (oldDpp === oldNom) {
+                  nextDpp = nextNom;
+                  if (oldPpn > 0 && oldNom > 0) nextPpn = Math.round(oldPpn * (nextNom / oldNom));
+                } else if (oldDpp > 0 && oldNom > 0) {
+                  nextDpp = Math.round(nextNom * (oldDpp / oldNom));
+                  if (oldPpn > 0) nextPpn = Math.round(oldPpn * (nextNom / oldNom));
+                }
+
+                if (oldBeban === oldNom) {
+                  nextBeban = nextNom;
+                } else if (oldBeban === oldDpp && oldDpp > 0) {
+                  nextBeban = nextDpp;
+                } else if (oldBeban > 0 && oldNom > 0) {
+                  nextBeban = Math.round(nextNom * (oldBeban / oldNom));
+                }
+
+                item.dpp = nextDpp;
+                item.ppn = nextPpn;
+                item.bebanDiAkui = nextBeban;
+                item.tagihanBruto = nextNom;
               }
+              item.syncedApprovalNominal = nextNom;
             }
           }
         }
@@ -3745,10 +3786,17 @@
 
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          let parsed = raw ? JSON.parse(raw) : null;
+          if (raw === null) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
+            return seedData.map(function (item) {
+              return syncItemWithApproval(item);
+            });
+          }
 
-          // Deteksi apakah data dummy lama perlu di-upgrade ke 5 data relasional lengkap
-          const needsUpgrade = !Array.isArray(parsed) || parsed.length < 5 || parsed.some(function (it) {
+          let parsed = JSON.parse(raw);
+
+          // Upgrade hanya jika format bukan array atau masih memakai seed lama yang korup
+          const needsUpgrade = !Array.isArray(parsed) || parsed.some(function (it) {
             return (it.idDokumen === 'EXP-2609-004' && it.idApproval === 'APR-2609-005') || !it.idApproval ||
                    (it.idDokumen === 'EXP-2609-001' && it.statusApproval === 'Menunggu') ||
                    (it.idDokumen === 'EXP-2609-002' && it.statusApproval === 'Ditolak');
@@ -3775,9 +3823,14 @@
           }
 
           // Sinkronisasi dinamis seluruh item dengan Approval Pengeluaran dan Kas & Bank
-          return parsed.map(function (item) {
+          const beforeJson = JSON.stringify(parsed);
+          const syncedList = parsed.map(function (item) {
             return syncItemWithApproval(item);
           });
+          if (JSON.stringify(syncedList) !== beforeJson) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(syncedList));
+          }
+          return syncedList;
         } catch (e) {
           return seedData.map(function (item) {
             return syncItemWithApproval(item);
@@ -5011,6 +5064,11 @@
         const terbayarKas = getTerbayarKasForDoc(docIdVal);
         const sisaUtang = Math.max(0, tagihanBruto - terbayarKas);
 
+        const matchedApproval = getApprovalForId(idApprovalVal);
+        const syncedApprovalNominal = matchedApproval && matchedApproval.nominal !== undefined && matchedApproval.nominal !== ''
+          ? (Number(matchedApproval.nominal) || 0)
+          : tagihanBruto;
+
         const record = {
           id: editId || ('exp-' + Date.now()),
           idDokumen: pndIdDokumen.value.trim(),
@@ -5024,6 +5082,7 @@
           dpp: dppVal,
           ppn: ppnVal,
           tagihanBruto: tagihanBruto,
+          syncedApprovalNominal: syncedApprovalNominal,
           statusBayarLama: pndStatusBayarLama.value.trim(),
           tanggalBayarLama: pndTanggalBayarLama.value.trim(),
           akunLama: pndAkunLama.value.trim(),

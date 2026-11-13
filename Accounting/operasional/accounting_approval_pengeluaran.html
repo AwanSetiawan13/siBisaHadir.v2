@@ -2673,11 +2673,15 @@
 
         try {
           const rawV5 = localStorage.getItem(STORAGE_KEY);
-          let parsed = rawV5 ? JSON.parse(rawV5) : null;
+          if (rawV5 === null) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
+            return seedData;
+          }
 
-          // Periksa apakah data di browser masih versi lama (3 baris usang / APR-1 berstatus Menunggu):
-          // Jika ya, upgrade otomatis ke 5 baris lengkap yang real berelasi dengan Pengeluaran & Kas Bank
-          const needsUpgrade = !Array.isArray(parsed) || parsed.length < 5 || parsed.some(function (it) {
+          let parsed = JSON.parse(rawV5);
+
+          // Upgrade hanya jika format bukan array atau masih memakai status lama yang korup
+          const needsUpgrade = !Array.isArray(parsed) || parsed.some(function (it) {
             return (it.idApproval === 'APR-2609-001' && it.statusFinal !== 'Disetujui') ||
                    (it.idApproval === 'APR-2609-002' && it.statusFinal !== 'Disetujui') ||
                    (it.idApproval === 'APR-2609-003' && it.statusFinal !== 'Menunggu');
@@ -2710,9 +2714,139 @@
         }
       }
 
-      function saveData() {
+      function applyApprovalNominalChange(expItem, newNominal, oldNominalRef) {
+        const oldNom = Number(oldNominalRef) || 0;
+        const nextNom = Number(newNominal) || 0;
+        if (nextNom === oldNom && expItem.syncedApprovalNominal === nextNom) return false;
+
+        if (nextNom !== oldNom) {
+          const oldDpp = Number(expItem.dpp) || 0;
+          const oldPpn = Number(expItem.ppn) || 0;
+          const oldBeban = expItem.bebanDiAkui !== undefined && expItem.bebanDiAkui !== null && expItem.bebanDiAkui !== ''
+            ? (Number(expItem.bebanDiAkui) || 0)
+            : oldDpp;
+
+          let nextDpp = oldDpp;
+          let nextPpn = oldPpn;
+          let nextBeban = oldBeban;
+
+          if (oldNom > 0 && oldDpp > 0 && oldPpn > 0 && Math.abs((oldDpp + oldPpn) - oldNom) <= 1) {
+            nextDpp = Math.round(nextNom * (oldDpp / oldNom));
+            nextPpn = nextNom - nextDpp;
+          } else if (oldDpp === oldNom) {
+            nextDpp = nextNom;
+            if (oldPpn > 0 && oldNom > 0) nextPpn = Math.round(oldPpn * (nextNom / oldNom));
+          } else if (oldDpp > 0 && oldNom > 0) {
+            nextDpp = Math.round(nextNom * (oldDpp / oldNom));
+            if (oldPpn > 0) nextPpn = Math.round(oldPpn * (nextNom / oldNom));
+          }
+
+          if (oldBeban === oldNom) {
+            nextBeban = nextNom;
+          } else if (oldBeban === oldDpp && oldDpp > 0) {
+            nextBeban = nextDpp;
+          } else if (oldBeban > 0 && oldNom > 0) {
+            nextBeban = Math.round(nextNom * (oldBeban / oldNom));
+          }
+
+          expItem.dpp = nextDpp;
+          expItem.ppn = nextPpn;
+          expItem.bebanDiAkui = nextBeban;
+          expItem.tagihanBruto = nextNom;
+          const terbayar = Number(expItem.terbayarKas) || 0;
+          expItem.sisaUtang = Math.max(0, nextNom - terbayar);
+        }
+
+        expItem.syncedApprovalNominal = nextNom;
+        return true;
+      }
+
+      function syncApprovalToPengeluaranAndProfit(prevSnapshotMap) {
+        const EXPENSE_KEY = 'accounting_pengeluaran_beban_data_v5';
+        try {
+          const rawExp = localStorage.getItem(EXPENSE_KEY);
+          if (!rawExp) return;
+          const expList = JSON.parse(rawExp);
+          if (!Array.isArray(expList) || expList.length === 0) return;
+
+          const aprMap = new Map();
+          (appData || []).forEach(function (a) {
+            if (a && a.idApproval) aprMap.set(String(a.idApproval).trim().toLowerCase(), a);
+          });
+
+          let changed = false;
+          expList.forEach(function (expItem) {
+            if (!expItem || !expItem.idApproval) return;
+            const key = String(expItem.idApproval).trim().toLowerCase();
+            const apr = aprMap.get(key);
+            if (!apr) return;
+
+            const prevApr = prevSnapshotMap ? prevSnapshotMap.get(key) : null;
+            if (apr.statusFinal && expItem.statusApproval !== apr.statusFinal) {
+              expItem.statusApproval = apr.statusFinal;
+              changed = true;
+            }
+            if (apr.tanggalRequest && (!expItem.tanggalPengakuan || expItem.tanggalPengakuan === '-' || (prevApr && expItem.tanggalPengakuan === prevApr.tanggalRequest))) {
+              if (expItem.tanggalPengakuan !== apr.tanggalRequest) {
+                expItem.tanggalPengakuan = apr.tanggalRequest;
+                changed = true;
+              }
+            }
+            if (apr.pemohon && (!expItem.vendorKaryawan || expItem.vendorKaryawan === '-' || (prevApr && expItem.vendorKaryawan === prevApr.pemohon))) {
+              if (expItem.vendorKaryawan !== apr.pemohon) {
+                expItem.vendorKaryawan = apr.pemohon;
+                changed = true;
+              }
+            }
+            if (apr.divisi && (!expItem.divisi || expItem.divisi === '-' || (prevApr && expItem.divisi === prevApr.divisi))) {
+              if (expItem.divisi !== apr.divisi) {
+                expItem.divisi = apr.divisi;
+                changed = true;
+              }
+            }
+            if (apr.keperluan && (!expItem.keterangan || expItem.keterangan === '-' || (prevApr && expItem.keterangan === prevApr.keperluan))) {
+              if (expItem.keterangan !== apr.keperluan) {
+                expItem.keterangan = apr.keperluan;
+                changed = true;
+              }
+            }
+
+            if (apr.nominal !== undefined && apr.nominal !== null && apr.nominal !== '') {
+              const oldRef = expItem.syncedApprovalNominal !== undefined
+                ? Number(expItem.syncedApprovalNominal)
+                : (prevApr ? Number(prevApr.nominal) : Number(expItem.tagihanBruto || 0));
+              if (applyApprovalNominalChange(expItem, Number(apr.nominal), oldRef)) {
+                changed = true;
+              }
+            }
+
+            if (expItem.statusApproval === 'Ditolak') {
+              expItem.statusBayarLama = 'Ditolak';
+            } else if (expItem.statusApproval === 'Menunggu') {
+              expItem.statusBayarLama = 'Menunggu Approval';
+            } else if (expItem.statusApproval === 'Disetujui') {
+              const brutoNow = Number(expItem.tagihanBruto || 0);
+              const sisaNow = Math.max(0, brutoNow - (Number(expItem.terbayarKas) || 0));
+              expItem.sisaUtang = sisaNow;
+              expItem.statusBayarLama = sisaNow === 0 && brutoNow > 0 ? 'Lunas' : 'Menunggu Approval';
+            }
+          });
+
+          if (changed) {
+            localStorage.setItem(EXPENSE_KEY, JSON.stringify(expList));
+            try {
+              window.dispatchEvent(new CustomEvent('pengeluaranBebanUpdated', { detail: expList }));
+            } catch (evErr) {}
+          }
+        } catch (e) {
+          console.error('Error syncing approval to pengeluaran:', e);
+        }
+      }
+
+      function saveData(prevSnapshotMap) {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+          syncApprovalToPengeluaranAndProfit(prevSnapshotMap);
         } catch (e) {
           console.error('Error saving data:', e);
         }
@@ -3467,6 +3601,13 @@
             catatan: pndCatatan.value.trim() || '-'
           };
 
+          const prevSnapshotMap = new Map();
+          (appData || []).forEach(function (d) {
+            if (d && d.idApproval) {
+              prevSnapshotMap.set(String(d.idApproval).trim().toLowerCase(), Object.assign({}, d));
+            }
+          });
+
           if (editId) {
             const index = appData.findIndex(function (d) { return String(d.id) === String(editId); });
             if (index !== -1) {
@@ -3477,7 +3618,7 @@
             appData.unshift(payload);
           }
 
-          saveData();
+          saveData(prevSnapshotMap);
           renderTable();
           closeModal(formModal);
 

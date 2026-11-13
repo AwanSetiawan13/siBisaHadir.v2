@@ -2707,6 +2707,135 @@
     }
   });
 
+  // Validasi global untuk seluruh form yang memiliki field wajib (required):
+  // Mengganti tooltip bawaan browser dengan alert "Data Belum Lengkap" yang seragam di semua modul.
+  (function initGlobalRequiredFormValidation() {
+    function getFieldLabel(el) {
+      if (!el) return '';
+      if (el.id) {
+        const lbl = document.querySelector('label[for="' + el.id + '"]');
+        if (lbl && lbl.textContent) return lbl.textContent.replace(/\*/g, '').trim();
+      }
+      const fieldWrap = el.closest ? el.closest('.modal-field, .kb-form-group, .form-group, .field-group') : null;
+      if (fieldWrap) {
+        const lbl = fieldWrap.querySelector('label, .modal-field-label');
+        if (lbl && lbl.textContent) return lbl.textContent.replace(/\*/g, '').trim();
+      }
+      if (el.getAttribute && el.getAttribute('aria-label')) return el.getAttribute('aria-label').trim();
+      if (el.placeholder) return String(el.placeholder).trim();
+      return el.name || el.id || 'Kolom';
+    }
+
+    function isFieldVisible(el) {
+      if (!el || el.disabled || el.type === 'hidden') return false;
+      if (typeof window.getComputedStyle === 'function') {
+        let cur = el;
+        while (cur && cur.nodeType === 1) {
+          const st = window.getComputedStyle(cur);
+          if (st.display === 'none' || st.visibility === 'hidden') return false;
+          cur = cur.parentElement;
+        }
+      }
+      return true;
+    }
+
+    function isFieldEmpty(el) {
+      const tag = (el.tagName || '').toUpperCase();
+      const type = (el.type || '').toLowerCase();
+      if (type === 'checkbox') return !el.checked;
+      if (type === 'radio') {
+        const form = el.form || document;
+        const name = el.name;
+        if (!name) return !el.checked;
+        return !form.querySelector('input[type="radio"][name="' + name + '"]:checked');
+      }
+      if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') {
+        return String(el.value || '').trim() === '';
+      }
+      return false;
+    }
+
+    function disableNativeValidation(form) {
+      if (form && !form.noValidate && !form.hasAttribute('data-use-native-validation')) {
+        form.noValidate = true;
+      }
+    }
+
+    function scanForms() {
+      document.querySelectorAll('form').forEach(disableNativeValidation);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scanForms);
+    } else {
+      scanForms();
+    }
+    window.addEventListener('load', scanForms);
+
+    document.addEventListener('click', function (e) {
+      const btn = e.target && e.target.closest ? e.target.closest('button, input[type="submit"]') : null;
+      if (!btn) return;
+      const form = btn.form || (btn.closest ? btn.closest('form') : null);
+      if (form && (btn.type === 'submit' || !btn.getAttribute('type'))) {
+        disableNativeValidation(form);
+      }
+    }, true);
+
+    document.addEventListener('submit', function (e) {
+      const form = e.target;
+      if (!form || form.tagName !== 'FORM' || form.hasAttribute('data-skip-required-alert')) return;
+      disableNativeValidation(form);
+
+      const requiredFields = Array.from(form.querySelectorAll('[required]')).filter(isFieldVisible);
+      if (requiredFields.length === 0) return;
+
+      const missingLabels = [];
+      let firstEmpty = null;
+      const seenRadio = new Set();
+
+      requiredFields.forEach(function (el) {
+        if ((el.type || '').toLowerCase() === 'radio' && el.name) {
+          if (seenRadio.has(el.name)) return;
+          seenRadio.add(el.name);
+        }
+        if (isFieldEmpty(el)) {
+          if (!firstEmpty) firstEmpty = el;
+          const label = getFieldLabel(el);
+          if (label && missingLabels.indexOf(label) === -1) {
+            missingLabels.push(label);
+          }
+        }
+      });
+
+      if (firstEmpty) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const message = missingLabels.length > 0
+          ? 'Data belum lengkap. Kolom berikut wajib diisi: ' + missingLabels.slice(0, 6).join(', ') + (missingLabels.length > 6 ? ', dan lainnya.' : '.')
+          : 'Data belum lengkap. Harap lengkapi semua kolom yang wajib diisi.';
+
+        if (typeof window.Swal !== 'undefined') {
+          window.Swal.fire({
+            icon: 'warning',
+            title: 'Data Belum Lengkap',
+            text: message,
+            confirmButtonColor: '#28a5de'
+          }).then(function () {
+            if (firstEmpty && !firstEmpty.readOnly && typeof firstEmpty.focus === 'function') {
+              firstEmpty.focus();
+            }
+          });
+        } else {
+          window.alert(message);
+          if (firstEmpty && !firstEmpty.readOnly && typeof firstEmpty.focus === 'function') {
+            firstEmpty.focus();
+          }
+        }
+      }
+    }, true);
+  })();
+
   window.bmRenderSidebar = renderAppSidebar;
   window.bmRenderSidebarEngine = renderAppSidebar;
   window.renderAppFooter = renderAppFooter;

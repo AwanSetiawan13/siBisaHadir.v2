@@ -1885,7 +1885,7 @@
         <div class="payroll-card">
           <div class="payroll-card-info">
             <span class="payroll-card-label">Beban Bruto</span>
-            <span class="payroll-card-value" id="cardBebanBruto">100</span>
+            <span class="payroll-card-value" id="cardBebanBruto">Rp. 0</span>
           </div>
           <div class="payroll-card-icon" title="Beban Bruto">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1899,7 +1899,7 @@
         <div class="payroll-card">
           <div class="payroll-card-info">
             <span class="payroll-card-label">Take Home Pay</span>
-            <span class="payroll-card-value" id="cardTakeHomePay">100</span>
+            <span class="payroll-card-value" id="cardTakeHomePay">Rp. 0</span>
           </div>
           <div class="payroll-card-icon" title="Take Home Pay">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1914,7 +1914,7 @@
         <div class="payroll-card">
           <div class="payroll-card-info">
             <span class="payroll-card-label">Terbayar Kas</span>
-            <span class="payroll-card-value" id="cardTerbayarKas">100</span>
+            <span class="payroll-card-value" id="cardTerbayarKas">Rp. 0</span>
           </div>
           <div class="payroll-card-icon" title="Terbayar Kas">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1928,7 +1928,7 @@
         <div class="payroll-card">
           <div class="payroll-card-info">
             <span class="payroll-card-label">Sisa Payroll</span>
-            <span class="payroll-card-value" id="cardSisaPayroll">100</span>
+            <span class="payroll-card-value" id="cardSisaPayroll">Rp. 0</span>
           </div>
           <div class="payroll-card-icon" title="Sisa Payroll">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2120,7 +2120,9 @@
           <!-- Row 2: Divisi, Gaji Pokok, Tunjangan -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudDivisi">Divisi</label>
-            <input type="text" id="crudDivisi" class="modal-field-input" placeholder="Divisi" />
+            <select id="crudDivisi" class="modal-field-input" style="cursor: pointer;">
+              <option value="">Pilih Divisi</option>
+            </select>
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudGajiPokok">Gaji Pokok</label>
@@ -2528,8 +2530,9 @@
 
       /* ===== FORMATTERS ===== */
       function formatRupiah(num) {
-        const val = Number(num) || 0;
-        return 'Rp. ' + val.toLocaleString('id-ID');
+        const val = Math.round(Number(num) || 0);
+        const absFormatted = Math.abs(val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return (val < 0 ? '-Rp. ' : 'Rp. ') + absFormatted;
       }
 
       function escapeHtml(str) {
@@ -2645,9 +2648,14 @@
 
       /* ===== NUMBER & CALCULATION HELPERS ===== */
       function parseNumber(val) {
+        if (typeof val === 'number') return Number.isFinite(val) ? Math.round(val) : 0;
         if (!val) return 0;
-        const cleaned = String(val).replace(/[^0-9.-]/g, '');
-        return Number(cleaned) || 0;
+        const str = String(val).trim();
+        const isNeg = str.startsWith('-');
+        const digits = str.replace(/[^0-9]/g, '');
+        if (!digits) return 0;
+        const num = parseInt(digits, 10) || 0;
+        return isNeg ? -num : num;
       }
 
       function generateNextPayrollId() {
@@ -2658,27 +2666,32 @@
         return 'PR-' + y + m + '-' + String(count).padStart(3, '0');
       }
 
+      function isElementFocused(el) {
+        return typeof document !== 'undefined' && document.activeElement === el;
+      }
+
       function calcPayrollCrud() {
-        const gapok = parseNumber(crudGajiPokok.value);
-        const tunjangan = parseNumber(crudTunjangan.value);
-        const bonus = parseNumber(crudBonusLembur.value);
-        const potLain = parseNumber(crudPotonganLain.value);
-        const bpjs = parseNumber(crudBpjsKaryawan.value);
-        const potPiutang = parseNumber(crudPotonganPiutang.value);
-        const terbayarKas = parseNumber(crudTerbayarKas.value);
+        const gapok = parseNumber(crudGajiPokok ? crudGajiPokok.value : 0);
+        const tunjangan = parseNumber(crudTunjangan ? crudTunjangan.value : 0);
+        const bonus = parseNumber(crudBonusLembur ? crudBonusLembur.value : 0);
+        const potLain = parseNumber(crudPotonganLain ? crudPotonganLain.value : 0);
+        const bpjs = parseNumber(crudBpjsKaryawan ? crudBpjsKaryawan.value : 0);
+        const potPiutang = parseNumber(crudPotonganPiutang ? crudPotonganPiutang.value : 0);
+        const terbayarKas = parseNumber(crudTerbayarKas ? crudTerbayarKas.value : 0);
 
         const bruto = gapok + tunjangan + bonus;
         const thp = Math.max(0, bruto - (potLain + bpjs + potPiutang));
         const sisa = Math.max(0, bruto - terbayarKas);
+        const hasAnyInput = !!(gapok || tunjangan || bonus || potLain || bpjs || potPiutang || terbayarKas);
 
-        if (crudBebanBruto && !crudBebanBruto.matches(':focus')) {
-          crudBebanBruto.value = bruto > 0 ? formatRupiah(bruto) : '';
+        if (crudBebanBruto && !isElementFocused(crudBebanBruto)) {
+          crudBebanBruto.value = (bruto > 0 || hasAnyInput) ? formatRupiah(bruto) : '';
         }
-        if (crudTakeHomePay && !crudTakeHomePay.matches(':focus')) {
-          crudTakeHomePay.value = thp > 0 ? formatRupiah(thp) : '';
+        if (crudTakeHomePay && !isElementFocused(crudTakeHomePay)) {
+          crudTakeHomePay.value = (thp > 0 || hasAnyInput) ? formatRupiah(thp) : '';
         }
-        if (crudSisaPayroll && !crudSisaPayroll.matches(':focus')) {
-          crudSisaPayroll.value = sisa > 0 ? formatRupiah(sisa) : '';
+        if (crudSisaPayroll && !isElementFocused(crudSisaPayroll)) {
+          crudSisaPayroll.value = (sisa > 0 || hasAnyInput) ? formatRupiah(sisa) : '';
         }
       }
 
@@ -2735,31 +2748,23 @@
 
       /* ===== UPDATE SUMMARY CARDS ===== */
       function updateSummaryCards(data) {
-        // Tampilkan nilai 100 sesuai mockup jika data bawaan / default
-        if (!data || data.length === 0 || (data.length === 1 && data[0].idPayroll === 'PR-202610-001')) {
-          if (cardBebanBruto) cardBebanBruto.textContent = '100';
-          if (cardTakeHomePay) cardTakeHomePay.textContent = '100';
-          if (cardTerbayarKas) cardTerbayarKas.textContent = '100';
-          if (cardSisaPayroll) cardSisaPayroll.textContent = '100';
-          return;
-        }
-
+        const list = Array.isArray(data) ? data : [];
         let totalBruto = 0;
         let totalTHP = 0;
         let totalKas = 0;
         let totalSisa = 0;
 
-        data.forEach(function (item) {
+        list.forEach(function (item) {
           totalBruto += Number(item.bebanBruto) || 0;
           totalTHP += Number(item.takeHomePay) || 0;
           totalKas += Number(item.terbayarKas) || 0;
           totalSisa += Number(item.sisaPayroll) || 0;
         });
 
-        if (cardBebanBruto) cardBebanBruto.textContent = totalBruto > 0 ? formatRupiah(totalBruto) : '100';
-        if (cardTakeHomePay) cardTakeHomePay.textContent = totalTHP > 0 ? formatRupiah(totalTHP) : '100';
-        if (cardTerbayarKas) cardTerbayarKas.textContent = totalKas > 0 ? formatRupiah(totalKas) : '100';
-        if (cardSisaPayroll) cardSisaPayroll.textContent = totalSisa > 0 ? formatRupiah(totalSisa) : '100';
+        if (cardBebanBruto) cardBebanBruto.textContent = formatRupiah(totalBruto);
+        if (cardTakeHomePay) cardTakeHomePay.textContent = formatRupiah(totalTHP);
+        if (cardTerbayarKas) cardTerbayarKas.textContent = formatRupiah(totalKas);
+        if (cardSisaPayroll) cardSisaPayroll.textContent = formatRupiah(totalSisa);
       }
 
       /* ===== RENDER TABLE ===== */
@@ -2870,7 +2875,7 @@
           if (crudPeriode) crudPeriode.value = todayStr;
           if (crudNik) crudNik.value = '';
           if (crudNama) crudNama.value = '';
-          if (crudDivisi) crudDivisi.value = '';
+          populateCrudDivisiDropdown('');
           if (crudGajiPokok) crudGajiPokok.value = '';
           if (crudTunjangan) crudTunjangan.value = '';
           if (crudBonusLembur) crudBonusLembur.value = '';
@@ -2905,7 +2910,7 @@
           if (crudPeriode) crudPeriode.value = formatBulanTahunOnly(item.periode || '');
           if (crudNik) crudNik.value = item.nik || '';
           if (crudNama) crudNama.value = item.nama || '';
-          if (crudDivisi) crudDivisi.value = item.divisi || '';
+          populateCrudDivisiDropdown(item.divisi || '');
           if (crudGajiPokok) crudGajiPokok.value = item.gajiPokok ? formatRupiah(item.gajiPokok) : '';
           if (crudTunjangan) crudTunjangan.value = item.tunjangan ? formatRupiah(item.tunjangan) : '';
           if (crudBonusLembur) crudBonusLembur.value = item.bonusLembur ? formatRupiah(item.bonusLembur) : '';
@@ -3030,15 +3035,42 @@
       }
 
       /* Auto calculation listeners on CRUD form */
+      function formatRupiahInputLive(inp) {
+        const raw = String(inp.value || '').trim();
+        if (!raw) {
+          inp.value = '';
+          return;
+        }
+        const digits = raw.replace(/[^0-9]/g, '');
+        if (!digits) {
+          inp.value = raw.startsWith('-') ? '-' : '';
+          return;
+        }
+        const num = parseInt(digits, 10);
+        inp.value = formatRupiah(raw.startsWith('-') ? -num : num);
+      }
+
       [crudGajiPokok, crudTunjangan, crudBonusLembur, crudPotonganLain, crudBpjsKaryawan, crudPotonganPiutang, crudTerbayarKas].forEach(function (inp) {
         if (!inp) return;
         inp.addEventListener('input', function () {
+          formatRupiahInputLive(this);
           calcPayrollCrud();
         });
         inp.addEventListener('blur', function () {
           const num = parseNumber(this.value);
-          this.value = num > 0 ? formatRupiah(num) : '';
+          this.value = num !== 0 ? formatRupiah(num) : '';
           calcPayrollCrud();
+        });
+      });
+
+      [crudTakeHomePay, crudBebanBruto, crudSisaPayroll].forEach(function (inp) {
+        if (!inp) return;
+        inp.addEventListener('input', function () {
+          formatRupiahInputLive(this);
+        });
+        inp.addEventListener('blur', function () {
+          const num = parseNumber(this.value);
+          this.value = formatRupiah(num);
         });
       });
 
@@ -3415,11 +3447,109 @@
         });
       }
 
-      /* ===== FILTER FUNNEL LOGIC ===== */
+      /* ===== DATA MASTER DIVISI & FILTER FUNNEL LOGIC ===== */
+      const MASTER_DIVISI_STORAGE_KEY = 'accounting_master_divisi_v1';
+      const DEFAULT_MASTER_DIVISI = [
+        'Finance & Accounting',
+        'MCN',
+        'Operasional',
+        'Marketing & Brand',
+        'Creative & Design',
+        'General Affair',
+        'Human Resource (HR)',
+        'IT & Development'
+      ];
+
+      function getMasterDivisiList() {
+        const list = [];
+        const seen = new Set();
+        function pushUnique(name) {
+          const clean = String(name || '').trim();
+          if (!clean) return;
+          const key = clean.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            list.push(clean);
+          }
+        }
+
+        let loadedFromStorage = false;
+        try {
+          const raw = localStorage.getItem(MASTER_DIVISI_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              parsed.forEach(function (item) {
+                if (typeof item === 'string') {
+                  pushUnique(item);
+                } else if (item && typeof item === 'object') {
+                  pushUnique(item.nama || item.divisi || '');
+                }
+              });
+              loadedFromStorage = list.length > 0;
+            }
+          }
+        } catch (e) {
+          console.error('Gagal membaca Data Master Divisi:', e);
+        }
+
+        if (!loadedFromStorage) {
+          const fallback = (typeof window.getAccountingDivisiList === 'function')
+            ? window.getAccountingDivisiList()
+            : DEFAULT_MASTER_DIVISI;
+          (fallback || DEFAULT_MASTER_DIVISI).forEach(pushUnique);
+        }
+
+        return list;
+      }
+
+      function populateCrudDivisiDropdown(selectedValue) {
+        if (!crudDivisi) return;
+        const selected = String(selectedValue || '').trim();
+        const options = getMasterDivisiList();
+
+        crudDivisi.innerHTML = '';
+        const placeholderOpt = document.createElement('option');
+        placeholderOpt.value = '';
+        placeholderOpt.textContent = 'Pilih Divisi';
+        crudDivisi.appendChild(placeholderOpt);
+
+        let foundSelected = false;
+        options.forEach(function (divName) {
+          const opt = document.createElement('option');
+          opt.value = divName;
+          opt.textContent = divName;
+          if (selected && divName.toLowerCase() === selected.toLowerCase()) {
+            opt.selected = true;
+            foundSelected = true;
+          }
+          crudDivisi.appendChild(opt);
+        });
+
+        if (selected && !foundSelected) {
+          const extraOpt = document.createElement('option');
+          extraOpt.value = selected;
+          extraOpt.textContent = selected;
+          extraOpt.selected = true;
+          crudDivisi.appendChild(extraOpt);
+        }
+
+        if (!selected) {
+          crudDivisi.value = '';
+        }
+      }
+
+      populateCrudDivisiDropdown('');
+
+      window.addEventListener('storage', function (e) {
+        if (e && e.key === MASTER_DIVISI_STORAGE_KEY) {
+          const currentVal = crudDivisi ? crudDivisi.value : '';
+          populateCrudDivisiDropdown(currentVal);
+        }
+      });
+
       function getDivisiOptions() {
-        const base = (typeof window.getAccountingDivisiList === 'function')
-          ? window.getAccountingDivisiList()
-          : ['Finance & Accounting', 'MCN', 'Operasional', 'Marketing & Brand', 'Creative & Design', 'General Affair', 'Human Resource (HR)', 'IT & Development'];
+        const base = getMasterDivisiList();
         const set = new Set(base);
         payrollData.forEach(function (d) {
           if (d.divisi) set.add(d.divisi);
