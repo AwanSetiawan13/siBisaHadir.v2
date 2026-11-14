@@ -277,8 +277,8 @@
           { label: 'Neraca', link: 'Accounting/operasional/accounting_neraca.html' },
           { label: 'Rekap Divisi', link: 'Accounting/operasional/accounting_rekap_divisi.html' },
           { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html' },
-          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' },
-          { label: 'History Dokumen', link: 'Accounting/operasional/accounting_history_dokumen.html' }
+          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' }
+          // { label: 'History Dokumen', link: 'Accounting/operasional/accounting_history_dokumen.html' } /* Dihapus sementara */
         ]
       },
       {
@@ -1039,7 +1039,7 @@
       const tables = document.querySelectorAll('.dashboard-shell table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard):not(.mini-table):not(.no-pagination), main table:not(.db-calendar-table):not(.db-topk-table):not(#tableLeaderboard):not(.mini-table):not(.no-pagination)');
       tables.forEach(table => {
         if (table.closest('.analytics-card') || table.classList.contains('mini-table') || table.classList.contains('no-pagination')) return;
-        const scrollWrap = table.closest('.table-wrap') || table.closest('.table-responsive') || table.closest('.campaign-scroll-table-wrap');
+        const scrollWrap = table.closest('.table-wrap') || table.closest('.table-responsive') || table.closest('.campaign-scroll-table-wrap') || table.closest('[class*="-table-wrap"]');
         const parent = scrollWrap || table.parentElement;
 
         if (!parent) return;
