@@ -749,6 +749,21 @@
       color: #15803d;
     }
 
+    .badge-beli {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-jual {
+      background: #f3e8ff;
+      color: #7e22ce;
+    }
+
+    .badge-hapus {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
     .badge-kondisi-baik {
       color: #15803d;
       font-weight: 600;
@@ -1300,6 +1315,9 @@
     position: relative !important;
     overflow: visible !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 520px !important;
   }
 
   .kb-panel-line,
@@ -1674,6 +1692,8 @@
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
+    flex: 1 1 auto !important;
+    min-height: 380px !important;
   }
 
   table {
@@ -1879,6 +1899,29 @@
     opacity: 1 !important;
     pointer-events: auto !important;
   }
+
+  /* 7. Bar Pagination Hirezy / SPVKOL Konsisten Tetap Berada di Paling Bawah */
+  .hirezy-pagination-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    margin-top: auto !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
+    margin-bottom: -20px !important;
+    width: calc(100% + 40px) !important;
+    padding: 14px 20px !important;
+    background: #ffffff !important;
+    border-top: 1px solid #f1f5f9 !important;
+    border-radius: 0 0 14px 14px !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 15 !important;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.03) !important;
+    box-sizing: border-box !important;
+  }
 </style>
 </head>
 
@@ -2010,7 +2053,7 @@
           </div>
 
           <!-- Table Container (Sesuai Gambar: Tanggal, Kode Aset, Nama Aset, Aktivitas, Dari, Ke, Kondisi, Keterangan, Bukti, Aksi) -->
-          <div class="mutasi-table-wrap">
+          <div class="mutasi-table-wrap table-wrap">
             <table class="mutasi-table" id="mutasiTable">
               <thead>
                 <tr>
@@ -2089,7 +2132,7 @@
             <div class="modal-field">
               <label class="modal-field-label" for="crudKodeAset">Kode Aset</label>
               <div class="modal-select-wrap" id="wrapKodeAset">
-                <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="Pilih Kode Aset" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="Pilih Kode Aset" style="cursor: pointer; padding-right: 32px;" required autocomplete="off" />
                 <span class="modal-select-arrow" aria-hidden="true">
                   <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </span>
@@ -2105,7 +2148,13 @@
             <!-- Row 2: Aktifitas, Dari, Ke -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudAktivitas">Aktifitas</label>
-              <input type="text" id="crudAktivitas" class="modal-field-input" placeholder="Tambah Aktivitas" required />
+              <div class="modal-select-wrap" id="wrapAktivitas">
+                <input type="text" id="crudAktivitas" class="modal-field-input" placeholder="Pilih Aktivitas" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <span class="modal-select-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="modal-dropdown-options" id="menuAktivitas"></div>
+              </div>
             </div>
 
             <div class="modal-field">
@@ -2247,9 +2296,24 @@
 
       /* ===== DATA MODEL & STORAGE ===== */
       const STORAGE_KEY = 'accounting_mutasi_aset_data';
+      const DAFTAR_ASET_KEYS = ['bisa_accounting_daftar_aset_data_v4', 'accounting_daftar_aset_data'];
 
-      // Asset references for auto-populating Nama Aset when selecting Kode Aset
-      const assetReferences = [
+      function getDaftarAsetList() {
+        for (let i = 0; i < DAFTAR_ASET_KEYS.length; i++) {
+          try {
+            const raw = localStorage.getItem(DAFTAR_ASET_KEYS[i]);
+            if (raw === null || raw === undefined) continue;
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+          } catch (e) {
+            console.warn('[Mutasi Aset] Gagal membaca Daftar Aset:', e);
+          }
+        }
+        return null;
+      }
+
+      // Default Asset references fallback jika Daftar Aset belum ada
+      const defaultAssetReferences = [
         { kode: 'AST-001', nama: 'Dispenser Mini Miyako' },
         { kode: 'AST-002', nama: 'Sony Alpha A7 IV + Lens 24-70mm' },
         { kode: 'AST-003', nama: 'MacBook Pro M3 Max 36GB' },
@@ -2257,87 +2321,66 @@
         { kode: 'AST-005', nama: 'AC Daikin Inverter 2 PK Multi-S' }
       ];
 
-      const defaultMutasiData = [
-        {
-          id: 'MUT-001',
-          tanggal: '2026-06-10',
-          kodeAset: 'AST-001',
-          namaAset: 'Dispenser Mini Miyako',
-          aktivitas: 'Pindah Lokasi',
-          dari: 'Pantry',
-          ke: 'Ruang Meeting 1',
-          kondisi: 'Baik',
-          keterangan: 'Relokasi sementara acara workshop',
-          buktiFoto: '../../media/sample_struk.jpg'
-        },
-        {
-          id: 'MUT-002',
-          tanggal: '2026-10-18',
-          kodeAset: 'AST-002',
-          namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
-          aktivitas: 'Peminjaman',
-          dari: 'Studio Produksi 1',
-          ke: 'Lokasi Syuting Cisalak',
-          kondisi: 'Baik',
-          keterangan: 'Pembuatan video campaign brand',
-          buktiFoto: '../../media/sample_struk.jpg'
-        },
-        {
-          id: 'MUT-003',
-          tanggal: '2026-09-02',
-          kodeAset: 'AST-003',
-          namaAset: 'MacBook Pro M3 Max 36GB',
-          aktivitas: 'Pindah Lokasi',
-          dari: 'IT & Tech Room',
-          ke: 'Ruang Editor Video',
-          kondisi: 'Normal',
-          keterangan: 'Alokasi laptop editing performa tinggi',
-          buktiFoto: ''
-        },
-        {
-          id: 'MUT-004',
-          tanggal: '2026-04-12',
-          kodeAset: 'AST-005',
-          namaAset: 'AC Daikin Inverter 2 PK Multi-S',
-          aktivitas: 'Perbaikan / Servis',
-          dari: 'Ruang Operasional',
-          ke: 'Vendor Daikin Tasikmalaya',
-          kondisi: 'Rusak Ringan',
-          keterangan: 'Cuci AC dan ganti kapasitor berkala',
-          buktiFoto: '../../media/sample_struk.jpg'
-        },
-        {
-          id: 'MUT-005',
-          tanggal: '2026-02-05',
-          kodeAset: 'AST-004',
-          namaAset: 'Meja Meeting Kayu Jati Custom 3M',
-          aktivitas: 'Pindah Lokasi',
-          dari: 'Gudang Inventaris Lantai 1',
-          ke: 'Aula Lantai 2',
-          kondisi: 'Baik',
-          keterangan: 'Penataan ulang layout rapat besar',
-          buktiFoto: ''
-        }
-      ];
+      function isDefaultMockItem(item) {
+        if (!item || !item.id) return false;
+        const mockIds = ['MUT-001', 'MUT-002', 'MUT-003', 'MUT-004', 'MUT-005'];
+        return mockIds.indexOf(item.id) !== -1 &&
+          (item.keterangan === 'Relokasi sementara acara workshop' ||
+           item.keterangan === 'Pembuatan video campaign brand' ||
+           item.keterangan === 'Alokasi laptop editing performa tinggi' ||
+           item.keterangan === 'Cuci AC dan ganti kapasitor berkala' ||
+           item.keterangan === 'Penataan ulang layout rapat besar');
+      }
 
       function loadData() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
+          const hasCleaned = localStorage.getItem('accounting_mutasi_aset_clean_v1');
+          if (raw !== null && raw !== undefined) {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            if (Array.isArray(parsed)) {
+              if (!hasCleaned) {
+                // Pembersihan data dummy bawaan hanya dilakukan 1x di awal
+                const cleaned = parsed.filter(function (x) { return !isDefaultMockItem(x); });
+                localStorage.setItem('accounting_mutasi_aset_clean_v1', 'true');
+                saveData(cleaned);
+                return cleaned;
+              }
+              return parsed;
+            }
+          } else {
+            localStorage.setItem('accounting_mutasi_aset_clean_v1', 'true');
+            saveData([]);
+            return [];
           }
         } catch (e) {
           console.error('Gagal memuat data mutasi:', e);
         }
-        return defaultMutasiData;
+        return [];
       }
 
       function saveData(data) {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data || []));
+          return true;
         } catch (e) {
-          console.error('Gagal menyimpan data mutasi:', e);
+          console.error('Gagal menyimpan data mutasi ke localStorage:', e);
+          // Jika kuota localStorage terlampaui (misal file foto terlalu besar), fallback simpan tanpa foto besar
+          if (e && (e.name === 'QuotaExceededError' || e.code === 22)) {
+            try {
+              const fallbackData = (data || []).map(function (item) {
+                if (item.buktiFoto && item.buktiFoto.length > 50000) {
+                  return Object.assign({}, item, { buktiFoto: '' });
+                }
+                return item;
+              });
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(fallbackData));
+              return true;
+            } catch (e2) {
+              console.error('Fallback penyimpanan juga gagal:', e2);
+            }
+          }
+          return false;
         }
       }
 
@@ -2400,6 +2443,8 @@
       const menuKodeAset = document.getElementById('menuKodeAset');
       const crudNamaAset = document.getElementById('crudNamaAset');
       const crudAktivitas = document.getElementById('crudAktivitas');
+      const wrapAktivitas = document.getElementById('wrapAktivitas');
+      const menuAktivitas = document.getElementById('menuAktivitas');
       const crudDari = document.getElementById('crudDari');
       const crudKe = document.getElementById('crudKe');
       const crudKondisi = document.getElementById('crudKondisi');
@@ -2456,49 +2501,76 @@
 
       function getAktivitasBadge(aktivitas) {
         const akt = (aktivitas || '').toLowerCase();
+        if (akt.includes('beli') || akt.includes('pembelian')) return 'badge-beli';
+        if (akt.includes('jual') || akt.includes('dijual')) return 'badge-jual';
+        if (akt.includes('hapus') || akt.includes('dihapus')) return 'badge-hapus';
         if (akt.includes('pindah')) return 'badge-pindah';
         if (akt.includes('pinjam')) return 'badge-pinjam';
-        if (akt.includes('servis') || akt.includes('rusak')) return 'badge-servis';
+        if (akt.includes('servis') || akt.includes('service') || akt.includes('rusak')) return 'badge-servis';
         if (akt.includes('kembali')) return 'badge-kembali';
         return 'badge-pindah';
       }
 
       /* ===== KODE ASET DROPDOWN POPULATOR (SESUAI GAMBAR 2) ===== */
       function getAssetReferences() {
-        const list = [
-          { kode: 'AST-001', nama: 'Dispenser Mini Miyako' },
-          { kode: 'AST-002', nama: 'Sony Alpha A7 IV + Lens 24-70mm' },
-          { kode: 'AST-003', nama: 'MacBook Pro M3 Max 36GB' },
-          { kode: 'AST-004', nama: 'Meja Meeting Kayu Jati Custom 3M' },
-          { kode: 'AST-005', nama: 'AC Daikin Inverter 2 PK Multi-S' }
-        ];
-
-        try {
-          const rawAset = localStorage.getItem('accounting_daftar_aset_data');
-          if (rawAset) {
-            const parsedAset = JSON.parse(rawAset);
-            if (Array.isArray(parsedAset)) {
-              parsedAset.forEach(function (ast) {
-                if (ast && ast.kodeAset && !list.some(function (x) { return x.kode === ast.kodeAset; })) {
-                  list.push({ kode: ast.kodeAset, nama: ast.namaAset || ast.kodeAset });
-                }
+        const asetList = getDaftarAsetList();
+        if (asetList !== null) {
+          const list = [];
+          const seen = new Set();
+          asetList.forEach(function (ast) {
+            if (!ast) return;
+            const kode = String(ast.kodeAset || '').trim();
+            const nama = String(ast.namaAset || '').trim();
+            if (kode && !seen.has(kode)) {
+              seen.add(kode);
+              list.push({
+                kode: kode,
+                nama: nama || kode,
+                lokasi: ast.lokasi || ''
               });
             }
-          }
-        } catch (e) {}
-
-        return list;
+          });
+          return list;
+        }
+        return defaultAssetReferences.slice();
       }
 
-      function renderKodeAsetDropdown() {
+      function findAssetByKode(kode) {
+        if (!kode) return null;
+        const normalized = String(kode).trim().toLowerCase();
+        const assets = getAssetReferences();
+        return assets.find(function (x) {
+          return String(x.kode || '').trim().toLowerCase() === normalized;
+        }) || null;
+      }
+
+      function renderKodeAsetDropdown(filterText) {
         if (!menuKodeAset) return;
         menuKodeAset.innerHTML = '';
         const assets = getAssetReferences();
+        const q = String(filterText !== undefined ? filterText : (crudKodeAset ? crudKodeAset.value : '')).trim().toLowerCase();
 
-        assets.forEach(function (ast) {
+        const filtered = q
+          ? assets.filter(function (ast) {
+              return String(ast.kode).toLowerCase().includes(q) || String(ast.nama).toLowerCase().includes(q);
+            })
+          : assets;
+
+        if (filtered.length === 0) {
+          const emptyItem = document.createElement('div');
+          emptyItem.className = 'modal-opt-item';
+          emptyItem.style.color = '#94a3b8';
+          emptyItem.style.fontStyle = 'italic';
+          emptyItem.style.cursor = 'default';
+          emptyItem.textContent = assets.length === 0 ? 'Daftar Aset kosong' : 'Tidak ada aset yang cocok';
+          menuKodeAset.appendChild(emptyItem);
+          return;
+        }
+
+        filtered.forEach(function (ast) {
           const item = document.createElement('div');
           item.className = 'modal-opt-item';
-          if (crudKodeAset && crudKodeAset.value === ast.kode) {
+          if (crudKodeAset && crudKodeAset.value.trim() === ast.kode) {
             item.classList.add('is-selected');
           }
           item.textContent = ast.kode + ' | ' + ast.nama;
@@ -2512,15 +2584,118 @@
         });
       }
 
-      renderKodeAsetDropdown();
+      renderKodeAsetDropdown('');
+
+      if (crudKodeAset) {
+        crudKodeAset.addEventListener('input', function () {
+          const val = this.value.trim();
+          const match = findAssetByKode(val);
+          if (match) {
+            crudNamaAset.value = match.nama;
+          } else {
+            crudNamaAset.value = '';
+          }
+          if (wrapKodeAset) wrapKodeAset.classList.add('is-open');
+          renderKodeAsetDropdown(this.value);
+        });
+
+        crudKodeAset.addEventListener('focus', function () {
+          if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
+          if (wrapKodeAset) wrapKodeAset.classList.add('is-open');
+          renderKodeAsetDropdown(this.value);
+        });
+
+        crudKodeAset.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
+          if (wrapKodeAset) wrapKodeAset.classList.add('is-open');
+          renderKodeAsetDropdown(this.value);
+        });
+      }
 
       if (wrapKodeAset) {
         wrapKodeAset.addEventListener('click', function (e) {
-          if (!e.target.closest('.modal-opt-item')) {
+          if (!e.target.closest('.modal-opt-item') && !e.target.closest('#crudKodeAset')) {
             e.stopPropagation();
+            if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
             wrapKodeAset.classList.toggle('is-open');
             if (wrapKodeAset.classList.contains('is-open')) {
-              renderKodeAsetDropdown();
+              renderKodeAsetDropdown(crudKodeAset ? crudKodeAset.value : '');
+            }
+          }
+        });
+      }
+
+      /* Listener perubahan Daftar Aset untuk auto-refresh dropdown & auto-fill */
+      function refreshAssetReferences() {
+        renderKodeAsetDropdown(crudKodeAset ? crudKodeAset.value : '');
+        if (crudKodeAset && crudKodeAset.value) {
+          const match = findAssetByKode(crudKodeAset.value);
+          if (match) crudNamaAset.value = match.nama;
+        }
+      }
+
+      window.addEventListener('storage', function (e) {
+        if (e.key === STORAGE_KEY) {
+          mutasiData = loadData();
+          renderTable();
+        }
+        if (!e.key || DAFTAR_ASET_KEYS.indexOf(e.key) !== -1) {
+          refreshAssetReferences();
+        }
+      });
+      window.addEventListener('focus', function () {
+        refreshAssetReferences();
+      });
+      window.addEventListener('pageshow', function () {
+        mutasiData = loadData();
+        renderTable();
+        refreshAssetReferences();
+      });
+      window.addEventListener('accounting-daftar-aset-updated', refreshAssetReferences);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) refreshAssetReferences();
+      });
+
+      /* ===== AKTIVITAS DROPDOWN POPULATOR (CRUD MODAL) ===== */
+      const CRUD_AKTIVITAS_OPTIONS = [
+        'Pembelian',
+        'Pindah PIC',
+        'Pindah Lokasi',
+        'Service',
+        'Dijual',
+        'Dihapus'
+      ];
+
+      function renderAktivitasDropdown() {
+        if (!menuAktivitas) return;
+        menuAktivitas.innerHTML = '';
+        CRUD_AKTIVITAS_OPTIONS.forEach(function (opt) {
+          const item = document.createElement('div');
+          item.className = 'modal-opt-item';
+          if (crudAktivitas && crudAktivitas.value.trim().toLowerCase() === opt.toLowerCase()) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = opt;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (crudAktivitas) crudAktivitas.value = opt;
+            if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
+          });
+          menuAktivitas.appendChild(item);
+        });
+      }
+
+      renderAktivitasDropdown();
+
+      if (wrapAktivitas) {
+        wrapAktivitas.addEventListener('click', function (e) {
+          if (!e.target.closest('.modal-opt-item')) {
+            e.stopPropagation();
+            if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+            wrapAktivitas.classList.toggle('is-open');
+            if (wrapAktivitas.classList.contains('is-open')) {
+              renderAktivitasDropdown();
             }
           }
         });
@@ -2539,7 +2714,33 @@
             fileNameDisplay.textContent = file.name;
             const reader = new FileReader();
             reader.onload = function (e) {
-              currentUploadedFotoDataUrl = e.target.result;
+              const result = e.target.result;
+              if (file.type && file.type.startsWith('image/')) {
+                const img = new Image();
+                img.onload = function () {
+                  const maxDim = 800;
+                  let w = img.width;
+                  let h = img.height;
+                  if (w > maxDim || h > maxDim) {
+                    if (w > h) {
+                      h = Math.round((h * maxDim) / w);
+                      w = maxDim;
+                    } else {
+                      w = Math.round((w * maxDim) / h);
+                      h = maxDim;
+                    }
+                  }
+                  const canvas = document.createElement('canvas');
+                  canvas.width = w;
+                  canvas.height = h;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, w, h);
+                  currentUploadedFotoDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                };
+                img.src = result;
+              } else {
+                currentUploadedFotoDataUrl = result;
+              }
             };
             reader.readAsDataURL(file);
             if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
@@ -2604,9 +2805,12 @@
         tableBody.innerHTML = '';
 
         if (filtered.length === 0) {
+          const emptyMsg = mutasiData.length === 0
+            ? 'Belum ada data mutasi aset. Klik "+ Tambah" untuk menambahkan.'
+            : 'Tidak ada data mutasi aset yang sesuai';
           const emptyRow = document.createElement('tr');
           emptyRow.innerHTML = '<td colspan="11" style="text-align: center; padding: 48px 16px; color: #94a3b8; font-style: italic;">' +
-            'Tidak ada data mutasi aset yang sesuai' +
+            emptyMsg +
             '</td>';
           tableBody.appendChild(emptyRow);
           return;
@@ -2766,9 +2970,15 @@
       function openAddModal() {
         if (!crudModal) return;
         if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
         if (crudForm) crudForm.reset();
         crudId.value = '';
+        if (crudKodeAset) crudKodeAset.value = '';
+        if (crudNamaAset) crudNamaAset.value = '';
+        if (crudAktivitas) crudAktivitas.value = '';
         crudModalTitle.innerHTML = '<em>Tambah</em> Mutasi Aset';
+        renderKodeAsetDropdown('');
+        renderAktivitasDropdown();
 
         if (fileNameDisplay) fileNameDisplay.textContent = 'Belum ada file';
         if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
@@ -2786,14 +2996,20 @@
       function openEditModal(item) {
         if (!crudModal || !item) return;
         if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
         crudForm.reset();
         crudId.value = item.id;
         crudModalTitle.innerHTML = '<em>Edit</em> Mutasi Aset';
 
         crudTanggal.value = item.tanggal || '';
         crudKodeAset.value = item.kodeAset || '';
-        crudNamaAset.value = item.namaAset || '';
+        const match = findAssetByKode(item.kodeAset);
+        crudNamaAset.value = match ? match.nama : (item.namaAset || '');
+        renderKodeAsetDropdown('');
+
         crudAktivitas.value = item.aktivitas || '';
+        renderAktivitasDropdown();
+
         crudDari.value = item.dari || '';
         crudKe.value = item.ke || '';
         crudKondisi.value = item.kondisi || '';
@@ -2820,6 +3036,7 @@
       function closeCrudModal() {
         if (!crudModal) return;
         if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
         crudModal.classList.remove('is-open');
         crudModal.classList.remove('is-active');
         crudModal.style.display = 'none';
@@ -2838,13 +3055,63 @@
         crudForm.addEventListener('submit', function (e) {
           e.preventDefault();
 
+          const kodeAsetVal = (crudKodeAset && crudKodeAset.value.trim()) || '';
+          if (!kodeAsetVal) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                text: 'Pilih Kode Aset terlebih dahulu!',
+                confirmButtonColor: '#0076C5'
+              });
+            } else {
+              alert('Pilih Kode Aset terlebih dahulu!');
+            }
+            if (crudKodeAset) crudKodeAset.focus();
+            return;
+          }
+
+          let namaAsetVal = (crudNamaAset && crudNamaAset.value.trim()) || '';
+          if (!namaAsetVal) {
+            const match = findAssetByKode(kodeAsetVal);
+            if (match) {
+              namaAsetVal = match.nama;
+              if (crudNamaAset) crudNamaAset.value = match.nama;
+            }
+          }
+
+          const aktivitasVal = (crudAktivitas && crudAktivitas.value.trim()) || '';
+          if (!aktivitasVal) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian',
+                text: 'Pilih Aktivitas terlebih dahulu!',
+                confirmButtonColor: '#0076C5'
+              });
+            } else {
+              alert('Pilih Aktivitas terlebih dahulu!');
+            }
+            if (wrapAktivitas) wrapAktivitas.click();
+            return;
+          }
+
+          function generateNextMutasiId() {
+            const existingNums = mutasiData.map(function (x) {
+              const m = String(x.id || '').match(/MUT-(\d+)/);
+              return m ? parseInt(m[1], 10) : 0;
+            });
+            const maxNum = existingNums.length > 0 ? Math.max.apply(null, existingNums) : 0;
+            return 'MUT-' + String(maxNum + 1).padStart(3, '0');
+          }
+
           const editId = crudId.value;
           const newObj = {
-            id: editId || ('MUT-' + String(mutasiData.length + 1).padStart(3, '0')),
+            id: editId || generateNextMutasiId(),
             tanggal: crudTanggal.value || new Date().toISOString().slice(0, 10),
-            kodeAset: crudKodeAset.value.trim(),
-            namaAset: crudNamaAset.value.trim(),
-            aktivitas: crudAktivitas.value.trim(),
+            kodeAset: kodeAsetVal,
+            namaAset: namaAsetVal,
+            aktivitas: aktivitasVal,
             dari: crudDari.value.trim(),
             ke: crudKe.value.trim(),
             kondisi: crudKondisi.value.trim(),
@@ -2941,7 +3208,7 @@
       }
 
       /* ===== DROPDOWN FILTER POPOVER (AKTIVITAS & KONDISI) ===== */
-      const aktivitasOptions = ['Semua Aktivitas', 'Pindah Lokasi', 'Peminjaman', 'Perbaikan / Servis', 'Pengembalian', 'Pelepasan'];
+      const aktivitasOptions = ['Semua Aktivitas', 'Pembelian', 'Pindah PIC', 'Pindah Lokasi', 'Service', 'Dijual', 'Dihapus'];
       const kondisiOptions = ['Semua Kondisi', 'Baik', 'Normal', 'Rusak Ringan', 'Rusak Berat', 'Dalam Perbaikan'];
 
       function renderFilterList(listEl, inputEl, boxEl, opts) {
@@ -3314,6 +3581,9 @@
         }
         if (!e.target.closest('#wrapKodeAset')) {
           if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        }
+        if (!e.target.closest('#wrapAktivitas')) {
+          if (wrapAktivitas) wrapAktivitas.classList.remove('is-open');
         }
       });
 

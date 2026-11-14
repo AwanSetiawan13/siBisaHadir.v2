@@ -623,6 +623,12 @@
       color: #b91c1c;
     }
 
+    .badge-margin-na {
+      background: #f1f5f9;
+      color: #64748b;
+      font-weight: 500;
+    }
+
     /* ==========================================================================
        MODAL DETAIL: "Lihat Rekap Divisi" (100% PERSIS SCREENSHOT 2)
        ========================================================================== */
@@ -1721,95 +1727,1136 @@
     document.addEventListener('DOMContentLoaded', function () {
       'use strict';
 
-      /* ===== DATA MODEL REKAP DIVISI ===== */
+      /* ===== STORAGE KEYS & CROSS-MODULE RELATION ===== */
       const STORAGE_KEY = 'accounting_rekap_divisi_data';
+      const MASTER_COA_KEY = 'accounting_master_coa_v1';
+      const MASTER_DIVISI_KEY = 'accounting_master_divisi_v1';
+      const PENDAPATAN_KEY = 'accounting_pendapatan_data_v1';
+      const PENDAPATAN_FALLBACK_KEY = 'accounting_pendapatan_data';
+      const PENGELUARAN_KEY = 'accounting_pengeluaran_beban_data_v5';
+      const PENGELUARAN_FALLBACK_KEY = 'accounting_pengeluaran_beban_data';
+      const PAYROLL_KEY = 'bisa_payroll_data_v1';
+      const PAYROLL_FALLBACK_KEY = 'accounting_payroll_data_v1';
+      const PAYROLL_LEGACY_KEY = 'accounting_payroll_data';
+      const PENYUSUTAN_KEY = 'accounting_penyusutan_aset_data';
+      const DAFTAR_ASET_KEY = 'bisa_accounting_daftar_aset_data_v4';
 
-      // Default realistic division aggregate data (Agency persis Screenshot 2: Rp 24,354,390, Margin 100.0%)
-      const defaultRekapData = [
+      /* ===== FALLBACK SEED DATA DARI MODUL TERKAIT ===== */
+      const DEFAULT_MASTER_COA_LIST = [
+            {
+              id: 'coa-1001',
+              kode: '1001',
+              nama: 'Kas Kecil',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1002',
+              kode: '1002',
+              nama: 'Bank BCA',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'BCA',
+              nomorRekening: '2092026028',
+              atasNama: 'PT BISA MEDIA GRUP'
+            },
+            {
+              id: 'coa-1003',
+              kode: '1003',
+              nama: 'Bank BCA',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'BCA',
+              nomorRekening: '2091139784',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'coa-1005',
+              kode: '1005',
+              nama: 'SEABANK',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'SEABANK',
+              nomorRekening: '901631003438',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'coa-1006',
+              kode: '1006',
+              nama: 'BNI',
+              kelompok: 'Aset',
+              subKelompok: 'Kas & Bank',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: 'BNI',
+              nomorRekening: '2049368973',
+              atasNama: 'SYAHRUL MUHARROM'
+            },
+            {
+              id: 'coa-1101',
+              kode: '1101',
+              nama: 'Piutang Usaha',
+              kelompok: 'Aset',
+              subKelompok: 'Piutang',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1102',
+              kode: '1102',
+              nama: 'Piutang Karyawan',
+              kelompok: 'Aset',
+              subKelompok: 'Piutang',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'HR',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1201',
+              kode: '1201',
+              nama: 'Uang Muka',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Lancar',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1301',
+              kode: '1301',
+              nama: 'Peralatan Produksi & Studio',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Tetap',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Produksi',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1302',
+              kode: '1302',
+              nama: 'Peralatan & Perlengkapan Kantor',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Tetap',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1303',
+              kode: '1303',
+              nama: 'Furniture & Mebel',
+              kelompok: 'Aset',
+              subKelompok: 'Aset Tetap',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-1391',
+              kode: '1391',
+              nama: 'Akumulasi Penyusutan',
+              kelompok: 'Aset',
+              subKelompok: 'Kontra Aset',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-2001',
+              kode: '2001',
+              nama: 'Hutang Usaha',
+              kelompok: 'Liabilitas',
+              subKelompok: 'Hutang',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Pendanaan',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-2101',
+              kode: '2101',
+              nama: 'Hutang Pajak',
+              kelompok: 'Liabilitas',
+              subKelompok: 'Pajak',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-3001',
+              kode: '3001',
+              nama: 'Modal',
+              kelompok: 'Ekuitas',
+              subKelompok: 'Modal',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Pendanaan',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-3101',
+              kode: '3101',
+              nama: 'Laba Ditahan',
+              kelompok: 'Ekuitas',
+              subKelompok: 'Laba Ditahan',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Pendanaan',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4001',
+              kode: '4001',
+              nama: 'Pendapatan MCN',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'MCN',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4002',
+              kode: '4002',
+              nama: 'Pendapatan TAP',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'TAP',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4003',
+              kode: '4003',
+              nama: 'Pendapatan TSP',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'TSP',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4004',
+              kode: '4004',
+              nama: 'Pendapatan Iklan',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'Agency',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4005',
+              kode: '4005',
+              nama: 'Pendapatan Live HUB',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'Live HUB',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-4006',
+              kode: '4006',
+              nama: 'Pendapatan Event',
+              kelompok: 'Pendapatan',
+              subKelompok: 'Revenue',
+              saldoNormal: 'Kredit',
+              aktif: 'Ya',
+              devisDefault: 'Event',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5001',
+              kode: '5001',
+              nama: 'Beban Gaji',
+              kelompok: 'Beban',
+              subKelompok: 'SDM',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'HR',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5002',
+              kode: '5002',
+              nama: 'Beban Internet',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5003',
+              kode: '5003',
+              nama: 'Beban Iklan',
+              kelompok: 'Beban',
+              subKelompok: 'Marketing',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Marketing',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5004',
+              kode: '5004',
+              nama: 'Beban Pentry',
+              kelompok: 'Beban',
+              subKelompok: 'Pentry',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Pentry',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5005',
+              kode: '5005',
+              nama: 'Beban Transportasi',
+              kelompok: 'Beban',
+              subKelompok: 'Transportasi',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5006',
+              kode: '5006',
+              nama: 'Beban Makan',
+              kelompok: 'Beban',
+              subKelompok: 'Konsumsi',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5007',
+              kode: '5007',
+              nama: 'Beban Sewa',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5008',
+              kode: '5008',
+              nama: 'Beban Penyusutan',
+              kelompok: 'Beban',
+              subKelompok: 'Non-kas',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Investasi',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5009',
+              kode: '5009',
+              nama: 'Beban Berlangganan',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5010',
+              kode: '5010',
+              nama: 'Beban Project',
+              kelompok: 'Beban',
+              subKelompok: 'Project',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'Agency',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5011',
+              kode: '5011',
+              nama: 'Transfer Internal',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5012',
+              kode: '5012',
+              nama: 'Beban Rewards',
+              kelompok: 'Beban',
+              subKelompok: 'SDM',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            },
+            {
+              id: 'coa-5013',
+              kode: '5013',
+              nama: 'Beban Admin',
+              kelompok: 'Beban',
+              subKelompok: 'Operasional',
+              saldoNormal: 'Debit',
+              aktif: 'Ya',
+              devisDefault: 'General',
+              arusKas: 'Arus Kas Operasional',
+              namaBank: '-',
+              nomorRekening: '-',
+              atasNama: '-'
+            }
+          ];
+      const DEFAULT_PENDAPATAN_LIST = [
+            {
+              id: 'pnd-1',
+              idPendapatan: '7691348184035411733',
+              tanggalPengakuan: '2026-10-01',
+              customer: 'TikTok',
+              noInvoice: 'INV-202609-001',
+              kodeCoa: '4001',
+              divisi: 'MCN',
+              keterangan: 'Management Fee MCN Kreator',
+              dpp: 748155,
+              ppn: 0,
+              totalTagihan: 748155,
+              terbayarKas: 748155,
+              sisaPiutang: 0,
+              jatuhTempo: '2026-09-01',
+              hatuhTempo: '2026-09-01',
+              projectBrand: 'Seluruh Kreator MCN',
+              statusLama: 'Lunas',
+              tanggalBayarLama: '2026-09-01',
+              akunLama: 'Bank BCA',
+              pic: 'Ridha',
+              buktiUrl: 'detail_tracking_jualan.png',
+              buktiDataUrl: '',
+              status: 'Lunas',
+              namaAkunCoa: 'Pendapatan MCN',
+              kelompokCoa: 'Pendapatan',
+              statusCoa: 'Ok',
+              divisiPengecualian: '-'
+            },
+            {
+              id: 'pnd-2',
+              idPendapatan: '7691348184035411734',
+              tanggalPengakuan: '2026-09-01',
+              customer: 'Campaign Brand A',
+              noInvoice: 'INV-202609-002',
+              kodeCoa: '1002',
+              divisi: 'Operasional',
+              keterangan: 'Penerimaan Pembayaran Campaign Brand',
+              dpp: 15500000,
+              ppn: 0,
+              totalTagihan: 15500000,
+              terbayarKas: 15500000,
+              sisaPiutang: 0,
+              jatuhTempo: '2026-09-15',
+              hatuhTempo: '2026-09-15',
+              projectBrand: 'Campaign Brand A',
+              statusLama: 'Lunas',
+              tanggalBayarLama: '2026-09-01',
+              akunLama: 'Bank BCA',
+              pic: 'Ahmad Fauzi',
+              buktiUrl: 'detail_tracking_jualan.png',
+              buktiDataUrl: '',
+              status: 'Lunas',
+              namaAkunCoa: 'Bank BCA',
+              kelompokCoa: 'Aset',
+              statusCoa: 'Ok',
+              divisiPengecualian: '-'
+            },
+            {
+              id: 'pnd-3',
+              idPendapatan: '7691348184035411735',
+              tanggalPengakuan: '2026-10-15',
+              customer: 'Shopee Live Media',
+              noInvoice: 'INV-202609-003',
+              kodeCoa: '4001',
+              divisi: 'MCN',
+              keterangan: 'Jasa Live Streaming Affiliate',
+              dpp: 5000000,
+              ppn: 550000,
+              totalTagihan: 5550000,
+              terbayarKas: 0,
+              sisaPiutang: 5550000,
+              jatuhTempo: '2026-11-20',
+              hatuhTempo: '2026-11-20',
+              projectBrand: 'Shopee Affiliate Mall',
+              statusLama: 'Belum Lunas',
+              tanggalBayarLama: '',
+              akunLama: 'Bank Mandiri',
+              pic: 'Ridha',
+              buktiUrl: 'detail_tracking_jualan.png',
+              buktiDataUrl: '',
+              status: 'Belum Lunas',
+              namaAkunCoa: 'Pendapatan MCN',
+              kelompokCoa: 'Pendapatan',
+              statusCoa: 'Ok',
+              divisiPengecualian: '-'
+            },
+            {
+              id: 'pnd-4',
+              idPendapatan: '7691348184035411736',
+              tanggalPengakuan: '2026-08-10',
+              customer: 'Brand Cosmo Style',
+              noInvoice: 'INV-202609-004',
+              kodeCoa: '1002',
+              divisi: 'Operasional',
+              keterangan: 'Endorsement Agustus Cosmo',
+              dpp: 2000000,
+              ppn: 0,
+              totalTagihan: 2000000,
+              terbayarKas: 0,
+              sisaPiutang: 2000000,
+              jatuhTempo: '2026-09-01',
+              hatuhTempo: '2026-09-01',
+              projectBrand: 'Cosmo Endorse',
+              statusLama: 'Lewat Jatuh Tempo',
+              tanggalBayarLama: '',
+              akunLama: 'BCA (Bank Central Asia)',
+              pic: 'Siti Rahma',
+              buktiUrl: 'detail_tracking_jualan.png',
+              buktiDataUrl: '',
+              status: 'Lewat Jatuh Tempo',
+              namaAkunCoa: 'Bank BCA',
+              kelompokCoa: 'Aset',
+              statusCoa: 'Ok',
+              divisiPengecualian: '-'
+            }
+          ];
+      const DEFAULT_PENGELUARAN_LIST = [
+          {
+            id: 'exp-1',
+            idDokumen: 'EXP-2609-001',
+            idApproval: 'APR-2609-001',
+            tanggalPengakuan: '2026-09-04',
+            vendorKaryawan: 'BCA',
+            divisi: 'General',
+            keterangan: 'Admin Bank BCA',
+            statusApproval: 'Disetujui',
+            kodeCoa: '5009',
+            namaAkunCoa: 'Beban Administrasi Bank',
+            kelompokCoa: 'Beban Operasional',
+            statusCoa: 'Aktif',
+            dpp: 30000,
+            ppn: 0,
+            tagihanBruto: 30000,
+            statusBayarLama: 'Lunas',
+            tanggalBayarLama: '2026-09-05',
+            akunLama: 'BCA (Bank Central Asia)',
+            projectBrand: '7691348184035411735 | Shopee Mega Sale',
+            jenis: 'Beban',
+            bebanDiAkui: 30000,
+            terbayarKas: 30000,
+            sisaUtang: 0,
+            jatuhTempo: '2026-09-05',
+            buktiUrl: 'detail_tracking_jualan.png',
+            buktiDataUrl: '',
+            invoice: '',
+            catatan: 'Biaya admin transfer bulanan',
+            divisiPengecualian: ''
+          },
+          {
+            id: 'exp-2',
+            idDokumen: 'EXP-2609-002',
+            idApproval: 'APR-2609-002',
+            tanggalPengakuan: '2026-09-08',
+            vendorKaryawan: 'Meta Ads',
+            divisi: 'Marketing',
+            keterangan: 'Iklan Digital Campaign Meta Ads',
+            statusApproval: 'Disetujui',
+            kodeCoa: '5001',
+            namaAkunCoa: 'Beban Pemasaran & Iklan',
+            kelompokCoa: 'Beban Pemasaran',
+            statusCoa: 'Aktif',
+            dpp: 1500000,
+            ppn: 165000,
+            tagihanBruto: 1665000,
+            statusBayarLama: 'Lunas',
+            tanggalBayarLama: '2026-09-10',
+            akunLama: 'Bank Mandiri',
+            projectBrand: '7691348184035411735 | Shopee Mega Sale',
+            jenis: 'Beban',
+            bebanDiAkui: 1500000,
+            terbayarKas: 1665000,
+            sisaUtang: 0,
+            jatuhTempo: '2026-09-25',
+            buktiUrl: 'detail_tracking_jualan.png',
+            buktiDataUrl: '',
+            invoice: 'INV-FB-202610',
+            catatan: 'Pengajuan campaign Facebook & Instagram Ads',
+            divisiPengecualian: ''
+          },
+          {
+            id: 'exp-3',
+            idDokumen: 'EXP-2609-003',
+            idApproval: 'APR-2609-003',
+            tanggalPengakuan: '2026-09-15',
+            vendorKaryawan: 'PT Gedung Megah',
+            divisi: 'Operasional',
+            keterangan: 'Sewa Ruang Kantor Lt. 3',
+            statusApproval: 'Menunggu',
+            kodeCoa: '5002',
+            namaAkunCoa: 'Beban Sewa Gedung',
+            kelompokCoa: 'Beban Operasional',
+            statusCoa: 'Aktif',
+            dpp: 4500000,
+            ppn: 495000,
+            tagihanBruto: 4995000,
+            statusBayarLama: 'Menunggu Approval',
+            tanggalBayarLama: '2026-09-18',
+            akunLama: 'BCA (Bank Central Asia)',
+            projectBrand: '7691348184035411733 | Seluruh Kreator MCN',
+            jenis: 'Beban',
+            bebanDiAkui: 4500000,
+            terbayarKas: 0,
+            sisaUtang: 4995000,
+            jatuhTempo: '2026-09-30',
+            buktiUrl: 'detail_tracking_jualan.png',
+            buktiDataUrl: '',
+            invoice: 'INV-SEWA-10',
+            catatan: 'Pembayaran termin 1 sewa gedung',
+            divisiPengecualian: ''
+          },
+          {
+            id: 'exp-4',
+            idDokumen: 'EXP-2609-004',
+            idApproval: 'APR-2609-004',
+            tanggalPengakuan: '2026-09-20',
+            vendorKaryawan: 'CV Berkah Office',
+            divisi: 'Operasional',
+            keterangan: 'Pengadaan Perlengkapan Kantor',
+            statusApproval: 'Ditolak',
+            kodeCoa: '5009',
+            namaAkunCoa: 'Beban Administrasi Kantor',
+            kelompokCoa: 'Beban Operasional',
+            statusCoa: 'Aktif',
+            dpp: 450000,
+            ppn: 0,
+            tagihanBruto: 450000,
+            statusBayarLama: 'Ditolak',
+            tanggalBayarLama: '2026-09-21',
+            akunLama: 'BCA (Bank Central Asia)',
+            projectBrand: '7691348184035411733 | Seluruh Kreator MCN',
+            jenis: 'Beban',
+            bebanDiAkui: 450000,
+            terbayarKas: 0,
+            sisaUtang: 450000,
+            jatuhTempo: '2026-09-28',
+            buktiUrl: 'detail_tracking_jualan.png',
+            buktiDataUrl: '',
+            invoice: 'INV-BO-099',
+            catatan: 'Pengadaan perlengkapan kantor (Ditolak)',
+            divisiPengecualian: ''
+          },
+          {
+            id: 'exp-5',
+            idDokumen: 'EXP-2609-005',
+            idApproval: 'APR-2609-005',
+            tanggalPengakuan: '2026-10-18',
+            vendorKaryawan: 'Google Cloud',
+            divisi: 'IT',
+            keterangan: 'Server & Cloud Hosting Database',
+            statusApproval: 'Disetujui',
+            kodeCoa: '5010',
+            namaAkunCoa: 'Beban Server & IT',
+            kelompokCoa: 'Beban Operasional',
+            statusCoa: 'Aktif',
+            dpp: 850000,
+            ppn: 93500,
+            tagihanBruto: 943500,
+            statusBayarLama: 'Lunas',
+            tanggalBayarLama: '2026-10-19',
+            akunLama: 'BCA (Bank Central Asia)',
+            projectBrand: '7691348184035411733 | Seluruh Kreator MCN',
+            jenis: 'Beban',
+            bebanDiAkui: 850000,
+            terbayarKas: 943500,
+            sisaUtang: 0,
+            jatuhTempo: '2026-10-25',
+            buktiUrl: 'detail_tracking_jualan.png',
+            buktiDataUrl: '',
+            invoice: 'INV-GCP-8831',
+            catatan: 'Langganan server cloud kuartal 4',
+            divisiPengecualian: ''
+          }
+        ];
+      const DEFAULT_PAYROLL_LIST = [];
+      const DEFAULT_PENYUSUTAN_LIST = [
         {
-          id: 'DIV-001',
-          divisi: 'Agency',
-          pendapatan: 24354390,
-          beban: 0,
-          payroll: 0,
-          penyusutan: 0,
-          labaSebelumPajak: 24354390,
-          margin: 100.0
+          id: 'AST-001',
+          kodeAset: 'AST-001',
+          namaAset: 'Dispenser Mini Miyako',
+          mulaiDipakai: '2026-06-01',
+          umurBulan: 36,
+          perolehan: 200000,
+          residu: 0,
+          perBulan: 5556,
+          bulanAwal: 4,
+          bulanAkhir: 5,
+          akumAwal: 22222,
+          bebanBulanIni: 5556,
+          akumAkhir: 27778,
+          nilaiBuku: 172222,
+          divisi: 'Produksi',
+          projectBrand: '-'
         },
         {
-          id: 'DIV-002',
-          divisi: 'Media & Kreatif',
-          pendapatan: 48500000,
-          beban: 6800000,
-          payroll: 14500000,
-          penyusutan: 1250000,
-          labaSebelumPajak: 25950000,
-          margin: 53.5
+          id: 'AST-002',
+          kodeAset: 'AST-002',
+          namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
+          mulaiDipakai: '2026-10-15',
+          umurBulan: 48,
+          perolehan: 42000000,
+          residu: 4000000,
+          perBulan: 791667,
+          bulanAwal: 1,
+          bulanAkhir: 2,
+          akumAwal: 791667,
+          bebanBulanIni: 791667,
+          akumAkhir: 1583334,
+          nilaiBuku: 40416666,
+          divisi: 'Kreatif',
+          projectBrand: 'Brand Alpha'
         },
         {
-          id: 'DIV-003',
-          divisi: 'Production Studio',
-          pendapatan: 36200000,
-          beban: 8400000,
-          payroll: 11200000,
-          penyusutan: 2100000,
-          labaSebelumPajak: 14500000,
-          margin: 40.1
+          id: 'AST-003',
+          kodeAset: 'AST-003',
+          namaAset: 'MacBook Pro M3 Max 36GB',
+          mulaiDipakai: '2026-08-20',
+          umurBulan: 36,
+          perolehan: 48500000,
+          residu: 5000000,
+          perBulan: 1208333,
+          bulanAwal: 2,
+          bulanAkhir: 3,
+          akumAwal: 2416666,
+          bebanBulanIni: 1208333,
+          akumAkhir: 3624999,
+          nilaiBuku: 44875001,
+          divisi: 'IT & Tech',
+          projectBrand: '-'
         },
         {
-          id: 'DIV-004',
-          divisi: 'Talent & KOL Management',
-          pendapatan: 52400000,
-          beban: 4900000,
-          payroll: 16800000,
-          penyusutan: 750000,
-          labaSebelumPajak: 29950000,
-          margin: 57.2
+          id: 'AST-004',
+          kodeAset: 'AST-004',
+          namaAset: 'Meja Meeting Kayu Jati Custom 3M',
+          mulaiDipakai: '2026-01-15',
+          umurBulan: 60,
+          perolehan: 14500000,
+          residu: 1500000,
+          perBulan: 216667,
+          bulanAwal: 9,
+          bulanAkhir: 10,
+          akumAwal: 1950003,
+          bebanBulanIni: 216667,
+          akumAkhir: 2166670,
+          nilaiBuku: 12333330,
+          divisi: 'General',
+          projectBrand: '-'
         },
         {
-          id: 'DIV-005',
-          divisi: 'Event Organizer',
-          pendapatan: 31800000,
-          beban: 12600000,
-          payroll: 8500000,
-          penyusutan: 950000,
-          labaSebelumPajak: 9750000,
-          margin: 30.7
-        },
-        {
-          id: 'DIV-006',
-          divisi: 'IT & Digital Marketing',
-          pendapatan: 28700000,
-          beban: 3100000,
-          payroll: 13400000,
-          penyusutan: 1850000,
-          labaSebelumPajak: 10350000,
-          margin: 36.1
+          id: 'AST-005',
+          kodeAset: 'AST-005',
+          namaAset: 'AC Daikin Inverter 2 PK Multi-S',
+          mulaiDipakai: '2026-03-01',
+          umurBulan: 48,
+          perolehan: 12800000,
+          residu: 1000000,
+          perBulan: 245833,
+          bulanAwal: 7,
+          bulanAkhir: 8,
+          akumAwal: 1720831,
+          bebanBulanIni: 245833,
+          akumAkhir: 1966664,
+          nilaiBuku: 10833336,
+          divisi: 'Operasional',
+          projectBrand: '-'
         }
       ];
 
-      function loadData() {
+      /* ===== SAFE LOCALSTORAGE READER ===== */
+      function getStoredList(primaryKey, fallbackKey, defaultData, thirdKey) {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          const keys = [primaryKey, fallbackKey, thirdKey].filter(Boolean);
+          for (let i = 0; i < keys.length; i++) {
+            const raw = localStorage.getItem(keys[i]);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+          }
+          // Jika ada array kosong di primaryKey dan fallback juga kosong, kembalikan array kosong dari primaryKey
+          if (primaryKey) {
+            const rawPri = localStorage.getItem(primaryKey);
+            if (rawPri) {
+              const parsedPri = JSON.parse(rawPri);
+              if (Array.isArray(parsedPri)) return parsedPri;
+            }
           }
         } catch (e) {
-          console.error('Gagal memuat data rekap divisi:', e);
+          console.warn('[Rekap Divisi] Gagal membaca storage:', e);
         }
-        return defaultRekapData;
+        return Array.isArray(defaultData) ? defaultData.slice() : [];
       }
 
-      function saveData(data) {
+      /* ===== DAFTAR 41 DIVISI DEFAULT SESUAI MASTER COA (KOLOM Q) ===== */
+      const DEFAULT_MASTER_DIVISI_LIST = [
+        'Accounting', 'Agency', 'CEO Office', 'Clining Service', 'COO Office',
+        'Event', 'General', 'Head Of Finance', 'Head Of Human Resource', 'Head Of IT',
+        'Head Of Marketing', 'HR', 'Live HUB', 'Manager Operation', 'Manager TAP',
+        'Manager TSP', 'Marketing', 'MCN', 'Pentry', 'Probability', 'Produksi',
+        'SPV Account Management', 'SPV Advertiser', 'SPV Content Management', 'SPV Creative',
+        'SPV IT Programer', 'SPV KOL Management', 'SPV Live Management', 'SPV Marketing',
+        'Staf Account Management', 'Staf Administrasi Umum', 'Staf Advertiser',
+        'Staf Content Management', 'Staf Creative', 'Staf Information Technology',
+        'Staf KOL Management', 'Staf Live Management', 'Staf Marketing Communication',
+        'Staf Public Relation', 'TAP', 'TSP'
+      ];
+
+      /* ===== EKSTRAKSI DIVISI DARI MASTER COA (DIVISI DEFAULT) ===== */
+      function getMasterCoaContext() {
+        const coaList = getStoredList(MASTER_COA_KEY, null, DEFAULT_MASTER_COA_LIST);
+        const coaMap = {};
+        const divSet = new Set();
+        const divisions = [];
+
+        // 1. Ambil daftar divisi dari Master Divisi / Master COA
+        let masterDivList = [];
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        } catch (e) {
-          console.error('Gagal menyimpan data rekap divisi:', e);
+          const raw = localStorage.getItem(MASTER_DIVISI_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              masterDivList = parsed.map(function (d) {
+                if (typeof d === 'string') return d.trim();
+                return (d.nama || d.divisi || '').trim();
+              }).filter(Boolean);
+            }
+          }
+        } catch (e) {}
+
+        if (!masterDivList || masterDivList.length === 0) {
+          masterDivList = DEFAULT_MASTER_DIVISI_LIST.slice();
+        } else {
+          // Pastikan semua 41 divisi default tersedia tanpa duplikasi
+          DEFAULT_MASTER_DIVISI_LIST.forEach(function (def) {
+            if (!masterDivList.some(function (m) { return m.toLowerCase() === def.toLowerCase(); })) {
+              masterDivList.push(def);
+            }
+          });
         }
+
+        masterDivList.forEach(function (d) {
+          if (d && !divSet.has(d.toLowerCase())) {
+            divSet.add(d.toLowerCase());
+            divisions.push(d);
+          }
+        });
+
+        // 2. Petakan kode COA ke Divisi Default dari Master COA
+        (Array.isArray(coaList) ? coaList : []).forEach(function (c) {
+          if (!c) return;
+          const kode = String(c.kode || '').trim();
+          const devis = String(c.devisDefault || c.divisiDefault || c.divisi || '').trim();
+          if (kode && devis) {
+            coaMap[kode] = devis;
+          }
+          if (devis && !divSet.has(devis.toLowerCase())) {
+            divSet.add(devis.toLowerCase());
+            divisions.push(devis);
+          }
+        });
+
+        return {
+          coaList: coaList,
+          coaMap: coaMap,
+          divisions: divisions
+        };
       }
 
-      let rekapData = loadData();
+      /* ===== PENCOCOKAN DIVISI & RELASI KODE COA ===== */
+      function isAliasMatch(a, b) {
+        if (!a || !b) return false;
+        const x = a.toLowerCase();
+        const y = b.toLowerCase();
+        if (x === y) return true;
+        // Penanganan penamaan alias/singkatan divisi umum
+        if ((x === 'hr' && (y === 'human resource' || y === 'human resource (hr)' || y === 'head of human resource')) ||
+            (y === 'hr' && (x === 'human resource' || x === 'human resource (hr)' || x === 'head of human resource'))) {
+          return true;
+        }
+        return false;
+      }
+
+      function isItemMatchDivisi(targetDiv, item, coaMap) {
+        if (!targetDiv || !item) return false;
+        const t = String(targetDiv).trim();
+
+        // 1. Cek Divisi Pengecualian (jika ada pada transaksi)
+        if (item.divisiPengecualian && item.divisiPengecualian !== '-' && String(item.divisiPengecualian).trim()) {
+          const exc = String(item.divisiPengecualian).trim();
+          if (exc.toLowerCase() === t.toLowerCase() || isAliasMatch(exc, t)) {
+            return true;
+          }
+        }
+
+        // 2. Cek Divisi dari transaksi
+        if (item.divisi && String(item.divisi).trim() && String(item.divisi).trim() !== '-') {
+          const d = String(item.divisi).trim();
+          if (d.toLowerCase() === t.toLowerCase() || isAliasMatch(d, t)) {
+            return true;
+          }
+        }
+
+        // 3. Cek Divisi Default dari Kode COA (Master COA)
+        if (item.kodeCoa && coaMap) {
+          const coaDiv = String(coaMap[String(item.kodeCoa).trim()] || '').trim();
+          if (coaDiv && (coaDiv.toLowerCase() === t.toLowerCase() || isAliasMatch(coaDiv, t))) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      function isDateInRange(dateStr, startStr, endStr) {
+        if (!startStr && !endStr) return true;
+        if (!dateStr) return true;
+        const d = String(dateStr).trim().substring(0, 10);
+        if (startStr && d < startStr) return false;
+        if (endStr && d > endStr) return false;
+        return true;
+      }
+
+      /* ===== PERHITUNGAN AGREGASI REKAP DIVISI SESUAI SPESIFIKASI =====
+         1. Divisi: Auto Fill dari Master COA ( Divisi Default )
+         2. Pendapatan: Auto Fill dari Pendapatan ( DPP ) => {yang Divisi nya sama}
+         3. Beban: Auto Fill dari Pengeluaran & Beban ( Beban Diakui ) => {yang Divisi nya sama}
+         4. Payroll: Auto Fill dari Payroll ( Beban Bruto ) => {yang Divisi nya sama}
+         5. Penyusutan: Auto Fill dari Penyusutan Aset => {yang Divisi nya sama}
+         6. Laba Sebelum Pajak: Pendapatan - Beban - Payroll - Penyusutan
+         7. Margin: Sebelum Pajak ÷ Pendapatan // Format persen (%). Kalau pendapatan 0 => "n.a."
+      ================================================================ */
+      function computeRekapData() {
+        const coaCtx = getMasterCoaContext();
+        const coaMap = coaCtx.coaMap;
+        const divisions = coaCtx.divisions.slice();
+
+        const pndList = getStoredList(PENDAPATAN_KEY, PENDAPATAN_FALLBACK_KEY, DEFAULT_PENDAPATAN_LIST);
+        const expList = getStoredList(PENGELUARAN_KEY, PENGELUARAN_FALLBACK_KEY, DEFAULT_PENGELUARAN_LIST);
+        const payList = getStoredList(PAYROLL_KEY, PAYROLL_FALLBACK_KEY, DEFAULT_PAYROLL_LIST, PAYROLL_LEGACY_KEY);
+        const astList = getStoredList(PENYUSUTAN_KEY, DAFTAR_ASET_KEY, DEFAULT_PENYUSUTAN_LIST);
+
+        // Kumpulkan divisi dari transaksi yang mungkin belum terdaftar di Master COA
+        const divSet = new Set(divisions.map(function (d) { return d.toLowerCase(); }));
+        [pndList, expList, payList, astList].forEach(function (list) {
+          (Array.isArray(list) ? list : []).forEach(function (it) {
+            if (!it) return;
+            const d = String(it.divisi || (it.kodeCoa && coaMap[it.kodeCoa]) || '').trim();
+            if (d && !divSet.has(d.toLowerCase())) {
+              divSet.add(d.toLowerCase());
+              divisions.push(d);
+            }
+          });
+        });
+
+        // Hitung agregasi per divisi
+        const aggregated = divisions.map(function (divName, idx) {
+          // 1. Pendapatan (DPP)
+          let pendapatan = 0;
+          pndList.forEach(function (p) {
+            if (!p) return;
+            if (isDateInRange(p.tanggalPengakuan, filterState.startDate, filterState.endDate)) {
+              if (isItemMatchDivisi(divName, p, coaMap)) {
+                pendapatan += Number(p.dpp) || 0;
+              }
+            }
+          });
+
+          // 2. Beban (Beban Diakui)
+          let beban = 0;
+          expList.forEach(function (e) {
+            if (!e) return;
+            if (isDateInRange(e.tanggalPengakuan, filterState.startDate, filterState.endDate)) {
+              if (isItemMatchDivisi(divName, e, coaMap)) {
+                beban += Number(e.bebanDiAkui !== undefined ? e.bebanDiAkui : (e.bebanDiakui !== undefined ? e.bebanDiakui : (e.dpp || 0))) || 0;
+              }
+            }
+          });
+
+          // 3. Payroll (Beban Bruto)
+          let payroll = 0;
+          payList.forEach(function (py) {
+            if (!py) return;
+            if (isItemMatchDivisi(divName, py, coaMap)) {
+              payroll += Number(py.bebanBruto !== undefined ? py.bebanBruto : (py.totalGajiBruto !== undefined ? py.totalGajiBruto : (py.gajiBruto || 0))) || 0;
+            }
+          });
+
+          // 4. Penyusutan (Beban Bulan Ini / Penyusutan Bulan)
+          let penyusutan = 0;
+          astList.forEach(function (ast) {
+            if (!ast) return;
+            if (isItemMatchDivisi(divName, ast, coaMap)) {
+              penyusutan += Number(ast.bebanBulanIni !== undefined ? ast.bebanBulanIni : (ast.penyusutanBulan !== undefined ? ast.penyusutanBulan : (ast.perBulan || 0))) || 0;
+            }
+          });
+
+          // 5. Laba Sebelum Pajak: Pendapatan - Beban - Payroll - Penyusutan
+          const labaSebelumPajak = pendapatan - beban - payroll - penyusutan;
+
+          // 6. Margin: Sebelum Pajak ÷ Pendapatan // Format persen (%). Kalau pendapatan 0 => "n.a."
+          let margin = 'n.a.';
+          if (pendapatan !== 0) {
+            margin = Number(((labaSebelumPajak / pendapatan) * 100).toFixed(1));
+          }
+
+          return {
+            id: 'DIV-' + String(idx + 1).padStart(3, '0'),
+            divisi: divName,
+            pendapatan: pendapatan,
+            beban: beban,
+            payroll: payroll,
+            penyusutan: penyusutan,
+            labaSebelumPajak: labaSebelumPajak,
+            margin: margin
+          };
+        });
+
+        return {
+          data: aggregated,
+          divisions: divisions
+        };
+      }
 
       // State Filters
       let filterState = {
@@ -1820,12 +2867,30 @@
         endDate: ''
       };
 
+      // Komputasi data awal
+      let rekapResult = computeRekapData();
+      let rekapData = rekapResult.data;
+      let divisiOptions = ['Semua Divisi'].concat(rekapResult.divisions);
+
+      function refreshRekapData() {
+        rekapResult = computeRekapData();
+        rekapData = rekapResult.data;
+        divisiOptions = ['Semua Divisi'].concat(rekapResult.divisions);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(rekapData));
+        } catch (e) {
+          console.warn('[Rekap Divisi] Gagal cache data:', e);
+        }
+        renderDivisiFilterList(filterDivisi ? filterDivisi.value : '');
+        renderTable();
+      }
+
       /* ===== DOM ELEMENTS ===== */
       const tableBody = document.getElementById('rekapTableBody');
       const searchInput = document.getElementById('rekapSearch');
       const btnExportExcel = document.getElementById('btnExportExcel');
 
-      // Modal Elements (Sesuai Gambar 2)
+      // Modal Elements (Sesuai Gambar)
       const detailModal = document.getElementById('rekapDetailModal');
       const detailDivisi = document.getElementById('detailDivisi');
       const detailPendapatan = document.getElementById('detailPendapatan');
@@ -1837,7 +2902,7 @@
       const btnCloseDetailX = document.getElementById('btnCloseDetailX');
       const btnKeluarDetail = document.getElementById('btnKeluarDetail');
 
-      // Filter Funnel Popover Elements (Sesuai Screenshot 1 & 2)
+      // Filter Funnel Popover Elements
       const btnFilter = document.getElementById('btnFilter');
       const filterDropdown = document.getElementById('filterDropdown');
       const filterDivisi = document.getElementById('filterDivisi');
@@ -1876,7 +2941,10 @@
       }
 
       function formatMarginPercent(num) {
-        const val = Number(num) || 0;
+        if (num === 'n.a.' || num === null || num === undefined || isNaN(num)) {
+          return 'n.a.';
+        }
+        const val = Number(num);
         return val.toFixed(1) + '%';
       }
 
@@ -1894,7 +2962,9 @@
         if (detailPayroll) detailPayroll.textContent = item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0';
         if (detailPenyusutan) detailPenyusutan.textContent = item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0';
         if (detailLabaSebelumPajak) detailLabaSebelumPajak.textContent = formatRupiahSpasi(item.labaSebelumPajak);
-        if (detailMargin) detailMargin.textContent = formatMarginPercent(item.margin);
+        if (detailMargin) {
+          detailMargin.textContent = (item.pendapatan === 0 || item.margin === 'n.a.') ? 'n.a.' : formatMarginPercent(item.margin);
+        }
 
         if (detailModal) detailModal.classList.add('is-active');
       }
@@ -1933,7 +3003,15 @@
 
         filtered.forEach(function (item, idx) {
           const tr = document.createElement('tr');
-          const isPositive = Number(item.margin) >= 0;
+
+          let marginBadge = '';
+          if (item.margin === 'n.a.' || item.pendapatan === 0) {
+            marginBadge = '<span class="badge-margin badge-margin-na">n.a.</span>';
+          } else if (Number(item.margin) >= 0) {
+            marginBadge = '<span class="badge-margin badge-margin-positive">' + escapeHtml(formatMarginPercent(item.margin)) + '</span>';
+          } else {
+            marginBadge = '<span class="badge-margin badge-margin-negative">' + escapeHtml(formatMarginPercent(item.margin)) + '</span>';
+          }
 
           tr.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-size: 13px;">' + (idx + 1) + '</td>',
@@ -1943,11 +3021,7 @@
             '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0') + '</td>',
             '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0') + '</td>',
             '<td class="rekap-cell-italic" style="text-align: right; font-weight: 600; color: #0f172a;">' + escapeHtml(formatRupiahSpasi(item.labaSebelumPajak)) + '</td>',
-            '<td style="text-align: right;">' +
-              '<span class="badge-margin ' + (isPositive ? 'badge-margin-positive' : 'badge-margin-negative') + '">' +
-                escapeHtml(formatMarginPercent(item.margin)) +
-              '</span>' +
-            '</td>',
+            '<td style="text-align: right;">' + marginBadge + '</td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
               '<button type="button" class="btn-rekap-view" data-view-id="' + escapeHtml(item.id) + '" aria-label="Lihat Detail" title="Lihat Rekap Divisi">' +
                 '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
@@ -1986,17 +3060,7 @@
         });
       }
 
-      /* ===== DROPDOWN FILTER POPOVER (100% PERSIS SCREENSHOT 1 & 2) ===== */
-      const divisiOptions = [
-        'Semua Divisi',
-        'Agency',
-        'Media & Kreatif',
-        'Production Studio',
-        'Talent & KOL Management',
-        'Event Organizer',
-        'IT & Digital Marketing'
-      ];
-
+      /* ===== DROPDOWN FILTER POPOVER (SINKRON DARI MASTER COA) ===== */
       let selectedDivisi = '';
 
       function renderDivisiFilterList(query) {
@@ -2115,7 +3179,7 @@
       }
 
       /* ===== DUAL MONTH CALENDAR PICKER ===== */
-      let calendarBaseDate = new Date(2026, 5, 1); // Juni 2026 default
+      let calendarBaseDate = new Date(2026, 5, 1);
       let tempCalStart = null;
       let tempCalEnd = null;
 
@@ -2237,7 +3301,7 @@
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
           const preset = this.getAttribute('data-preset');
-          const now = new Date(2026, 5, 15); // Reference context: 2026
+          const now = new Date(2026, 5, 15);
           const curY = now.getFullYear();
           const curM = String(now.getMonth() + 1).padStart(2, '0');
           const lastD = new Date(curY, now.getMonth() + 1, 0).getDate();
@@ -2280,7 +3344,7 @@
           filterState.startDate = tempCalStart;
           filterState.endDate = tempCalEnd;
           calendarDropdown.classList.remove('is-active');
-          renderTable();
+          refreshRekapData();
         });
       }
 
@@ -2315,7 +3379,7 @@
             item.payroll || 0,
             item.penyusutan || 0,
             item.labaSebelumPajak || 0,
-            (Number(item.margin) || 0) + '%'
+            (item.margin === 'n.a.' || item.pendapatan === 0) ? 'n.a.' : formatMarginPercent(item.margin)
           ];
         });
 
@@ -2374,8 +3438,35 @@
         }
       });
 
+      /* ===== AUTO REAL-TIME UPDATE EVENT LISTENERS ===== */
+      window.addEventListener('storage', function (e) {
+        if (!e.key || [
+          MASTER_COA_KEY,
+          MASTER_DIVISI_KEY,
+          PENDAPATAN_KEY,
+          PENDAPATAN_FALLBACK_KEY,
+          PENGELUARAN_KEY,
+          PENGELUARAN_FALLBACK_KEY,
+          PAYROLL_KEY,
+          PAYROLL_FALLBACK_KEY,
+          PAYROLL_LEGACY_KEY,
+          PENYUSUTAN_KEY,
+          DAFTAR_ASET_KEY
+        ].indexOf(e.key) !== -1) {
+          refreshRekapData();
+        }
+      });
+
+      window.addEventListener('payroll_data_changed', refreshRekapData);
+      window.addEventListener('focus', refreshRekapData);
+      window.addEventListener('pageshow', refreshRekapData);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) refreshRekapData();
+      });
+      window.addEventListener('accounting-rekap-sync', refreshRekapData);
+
       // Initial Render
-      renderTable();
+      refreshRekapData();
     });
   </script>
 </body>

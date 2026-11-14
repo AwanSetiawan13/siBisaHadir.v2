@@ -39,8 +39,10 @@
       padding: 20px !important;
       margin-bottom: 24px;
       overflow: visible !important;
-      min-height: 440px;
+      min-height: 520px;
       box-sizing: border-box;
+      display: flex !important;
+      flex-direction: column !important;
     }
 
     .piutang-panel-accent {
@@ -1143,6 +1145,9 @@
     position: relative !important;
     overflow: visible !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 520px !important;
   }
 
   .kb-panel-line,
@@ -1517,6 +1522,8 @@
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
+    flex: 1 1 auto !important;
+    min-height: 380px !important;
   }
 
   table {
@@ -1722,6 +1729,29 @@
     opacity: 1 !important;
     pointer-events: auto !important;
   }
+
+  /* 7. Bar Pagination Hirezy / SPVKOL Konsisten Tetap Berada di Paling Bawah */
+  .hirezy-pagination-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    margin-top: auto !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
+    margin-bottom: -20px !important;
+    width: calc(100% + 40px) !important;
+    padding: 14px 20px !important;
+    background: #ffffff !important;
+    border-top: 1px solid #f1f5f9 !important;
+    border-radius: 0 0 14px 14px !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 15 !important;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.03) !important;
+    box-sizing: border-box !important;
+  }
 </style>
 </head>
 
@@ -1840,7 +1870,7 @@
           </div>
 
           <!-- Table Container (Headers: # | ID Pinjam | Tanggal Pinjam | NIK | Nama Karyawan | Pokok Pinjaman | Tenor(Bulan) | Status | Aksi) -->
-          <div class="piutang-table-wrap">
+          <div class="piutang-table-wrap table-wrap">
             <table class="piutang-table" id="piutangTable">
               <thead>
                 <tr>
@@ -1912,7 +1942,7 @@
             <!-- Row 1: ID Pinjaman, Tanggal Pinjam, NIK -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudIdPinjaman">ID Pinjaman</label>
-              <input type="text" id="crudIdPinjaman" class="modal-field-input" placeholder="Tambah ID Pinjam" required />
+              <input type="text" id="crudIdPinjaman" class="modal-field-input" placeholder="Otomatis (AI)" readonly style="background: #f8fafc; color: #64748b; font-style: italic;" />
             </div>
 
             <div class="modal-field">
@@ -1986,7 +2016,7 @@
             <!-- Row 5: ID Pembayaran, Tanggal Bayar, ID Pinjaman Bayar -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudIdPembayaran">ID Pembayaran</label>
-              <input type="text" id="crudIdPembayaran" class="modal-field-input" placeholder="Tambah ID Pembayaran" />
+              <input type="text" id="crudIdPembayaran" class="modal-field-input" placeholder="Otomatis (AI)" readonly style="background: #f8fafc; color: #64748b; font-style: italic;" />
             </div>
 
             <div class="modal-field">
@@ -1996,7 +2026,7 @@
 
             <div class="modal-field">
               <label class="modal-field-label" for="crudIdPinjamanBayar">ID Pinjaman Bayar</label>
-              <input type="text" id="crudIdPinjamanBayar" class="modal-field-input" placeholder="Tambah ID Pinjaman" />
+              <input type="text" id="crudIdPinjamanBayar" class="modal-field-input" placeholder="Otomatis (AI)" readonly style="background: #f8fafc; color: #64748b; font-style: italic;" />
             </div>
 
             <!-- Row 6: NIK Bayar, Metode, Nominal -->
@@ -2686,7 +2716,7 @@
         });
       }
 
-      /* ===== GENERATOR NEXT ID PINJAMAN ===== */
+      /* ===== GENERATOR NEXT ID PINJAMAN & PEMBAYARAN (AI AUTO-INCREMENT) ===== */
       function getNextLoanId() {
         const now = new Date();
         const yy = String(now.getFullYear()).slice(-2);
@@ -2695,9 +2725,39 @@
 
         let maxNum = 0;
         piutangData.forEach(function (item) {
-          if (item.idPinjaman && item.idPinjaman.startsWith(prefix)) {
-            const num = parseInt(item.idPinjaman.replace(prefix, ''), 10);
-            if (num > maxNum) maxNum = num;
+          const str = String(item.idPinjaman || item.id || '');
+          if (str.startsWith(prefix)) {
+            const num = parseInt(str.replace(prefix, ''), 10);
+            if (!isNaN(num) && num > maxNum) maxNum = num;
+          } else {
+            const match = str.match(/(\d+)$/);
+            if (match) {
+              const num = parseInt(match[1], 10);
+              if (!isNaN(num) && num > maxNum) maxNum = num;
+            }
+          }
+        });
+        return prefix + String(maxNum + 1).padStart(3, '0');
+      }
+
+      function getNextPaymentId() {
+        const now = new Date();
+        const yy = String(now.getFullYear()).slice(-2);
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const prefix = 'PAY-' + yy + mm + '-';
+
+        let maxNum = 0;
+        piutangData.forEach(function (item) {
+          const str = String(item.idPembayaran || '');
+          if (str.startsWith(prefix)) {
+            const num = parseInt(str.replace(prefix, ''), 10);
+            if (!isNaN(num) && num > maxNum) maxNum = num;
+          } else {
+            const match = str.match(/(\d+)$/);
+            if (match) {
+              const num = parseInt(match[1], 10);
+              if (!isNaN(num) && num > maxNum) maxNum = num;
+            }
           }
         });
         return prefix + String(maxNum + 1).padStart(3, '0');
@@ -2710,13 +2770,10 @@
         if (crudEditId) crudEditId.value = '';
 
         const autoId = getNextLoanId();
+        const autoPayId = getNextPaymentId();
         if (crudIdPinjaman) crudIdPinjaman.value = autoId;
         if (crudIdPinjamanBayar) crudIdPinjamanBayar.value = autoId;
-        if (crudIdPembayaran) {
-          const yy = String(new Date().getFullYear()).slice(-2);
-          const mm = String(new Date().getMonth() + 1).padStart(2, '0');
-          crudIdPembayaran.value = 'PAY-' + yy + mm + '-' + String(piutangData.length + 1).padStart(3, '0');
-        }
+        if (crudIdPembayaran) crudIdPembayaran.value = autoPayId;
 
         if (crudTanggalPinjam) {
           crudTanggalPinjam.type = 'text';
@@ -2846,7 +2903,7 @@
           const sisaClean = Math.max(0, pokokClean - dibayarClean);
           const jtVal = crudJatuhTempo ? crudJatuhTempo.value : '';
           const statusVal = crudStatus ? crudStatus.value : 'Aktif';
-          const idBayarVal = (crudIdPembayaran && crudIdPembayaran.value.trim()) || '';
+          const idBayarVal = (crudIdPembayaran && crudIdPembayaran.value.trim()) || getNextPaymentId();
           const tglBayarVal = crudTanggalBayar ? crudTanggalBayar.value : '';
           const idPinjamBayarVal = (crudIdPinjamanBayar && crudIdPinjamanBayar.value.trim()) || idPinjamVal;
           const nikBayarVal = (crudNikBayar && crudNikBayar.value.trim()) || nikVal;
@@ -2883,8 +2940,9 @@
               piutangData[idx].catatan = catatanVal;
             }
           } else {
+            const nextSeq = parseInt(idPinjamVal.replace(/\D/g, ''), 10) || (piutangData.length + 1);
             const newRecord = {
-              id: 'PK-' + Date.now().toString().slice(-4),
+              id: 'PK-' + String(nextSeq).padStart(3, '0'),
               idPinjaman: idPinjamVal,
               tanggalPinjam: tglPinjamVal,
               nik: nikVal,

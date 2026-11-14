@@ -39,8 +39,10 @@
       padding: 20px !important;
       margin-bottom: 24px;
       overflow: visible !important;
-      min-height: 440px;
+      min-height: 520px;
       box-sizing: border-box;
+      display: flex !important;
+      flex-direction: column !important;
     }
 
     .alokasi-panel-accent {
@@ -927,25 +929,43 @@
     /* Dropdown Selection Box inside Modal */
     .modal-select-wrap {
       position: relative;
-      display: flex;
-      align-items: center;
       width: 100%;
     }
 
     .modal-select-arrow {
       position: absolute;
-      right: 12px;
-      display: inline-flex;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      display: flex;
       align-items: center;
       justify-content: center;
       color: #94a3b8;
       pointer-events: none;
-      transition: transform 0.2s ease, color 0.2s ease;
+      transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), color 0.18s ease;
+      transform-origin: center center;
+    }
+
+    .modal-select-wrap:hover .modal-select-arrow {
+      color: #475569;
     }
 
     .modal-select-wrap.is-open .modal-select-arrow {
-      transform: rotate(180deg);
+      transform: translateY(-50%) rotate(180deg);
       color: #0284c7;
+    }
+
+    .modal-select-arrow svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      display: block;
     }
 
     .modal-dropdown-options {
@@ -1159,6 +1179,9 @@
     position: relative !important;
     overflow: visible !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 520px !important;
   }
 
   .kb-panel-line,
@@ -1533,6 +1556,8 @@
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
+    flex: 1 1 auto !important;
+    min-height: 380px !important;
   }
 
   table {
@@ -1738,6 +1763,29 @@
     opacity: 1 !important;
     pointer-events: auto !important;
   }
+
+  /* 7. Bar Pagination Hirezy / SPVKOL Konsisten Tetap Berada di Paling Bawah */
+  .hirezy-pagination-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    margin-top: auto !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
+    margin-bottom: -20px !important;
+    width: calc(100% + 40px) !important;
+    padding: 14px 20px !important;
+    background: #ffffff !important;
+    border-top: 1px solid #f1f5f9 !important;
+    border-radius: 0 0 14px 14px !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 15 !important;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.03) !important;
+    box-sizing: border-box !important;
+  }
 </style>
 </head>
 
@@ -1869,7 +1917,7 @@
           </div>
 
           <!-- Table Container (11 Kolom Sesuai Gambar 2: ID Lokasi, Kode Aset, Nama Aset, Project/Brand, Tanggal Mulai, Tanggal Selesai, Beban / Bulan, Status, Keterangan, Aksi) -->
-          <div class="alokasi-table-wrap">
+          <div class="alokasi-table-wrap table-wrap">
             <table class="alokasi-table" id="alokasiTable">
               <thead>
                 <tr>
@@ -1941,13 +1989,13 @@
             <!-- Row 1: ID Alokasi, Kode Aset, Nama Aset -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudIdAlokasi">ID Alokasi</label>
-              <input type="text" id="crudIdAlokasi" class="modal-field-input" placeholder="ALK-000" readonly style="background: #f8fafc; color: #64748b; font-style: italic;" />
+              <input type="text" id="crudIdAlokasi" class="modal-field-input" placeholder="Otomatis (AI)" readonly style="background: #f8fafc; color: #64748b; font-style: italic;" />
             </div>
 
             <div class="modal-field">
               <label class="modal-field-label" for="crudKodeAset">Kode Aset</label>
               <div class="modal-select-wrap" id="wrapKodeAset">
-                <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="Pilih Kode Aset" readonly style="cursor: pointer; padding-right: 32px;" required />
+                <input type="text" id="crudKodeAset" class="modal-field-input" placeholder="Pilih Kode Aset" style="cursor: pointer; padding-right: 32px;" required autocomplete="off" />
                 <span class="modal-select-arrow" aria-hidden="true">
                   <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </span>
@@ -1963,7 +2011,13 @@
             <!-- Row 2: Project/Brand, Tanggal Mulai, Tanggal Selesai -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudProjectBrand">Project/Brand</label>
-              <input type="text" id="crudProjectBrand" class="modal-field-input" placeholder="Project/Brand" required />
+              <div class="modal-select-wrap" id="wrapProjectBrand">
+                <input type="text" id="crudProjectBrand" class="modal-field-input" placeholder="Pilih / Cari Project/Brand" style="cursor: pointer; padding-right: 32px;" required autocomplete="off" />
+                <span class="modal-select-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </span>
+                <div class="modal-dropdown-options" id="menuProjectBrand"></div>
+              </div>
             </div>
 
             <div class="modal-field">
@@ -2095,6 +2149,72 @@
 
       /* ===== DATA MODEL & STORAGE ===== */
       const STORAGE_KEY = 'accounting_alokasi_aset_project_data';
+      const DAFTAR_ASET_KEYS = ['bisa_accounting_daftar_aset_data_v4', 'accounting_daftar_aset_data'];
+      const PENDAPATAN_KEYS = ['accounting_pendapatan_data_v1', 'accounting_pendapatan_data'];
+
+      const defaultProjectBrandOptions = [
+        'Seluruh Kreator MCN',
+        'Campaign Brand A',
+        'Shopee Mega Sale',
+        'Shopee Affiliate Mall',
+        'Brand Alpha Video Shoot',
+        'Campaign Shopee Big Ramadan',
+        'Event Workshop Kreator Tasikmalaya',
+        'Studio Live Streaming Baru',
+        'Ruang Kolaborasi Talent & Brand'
+      ];
+
+      function getProjectBrandFromPendapatan() {
+        const uniqueProjects = [];
+        const seen = new Set();
+
+        for (let i = 0; i < PENDAPATAN_KEYS.length; i++) {
+          try {
+            const raw = localStorage.getItem(PENDAPATAN_KEYS[i]);
+            if (!raw) continue;
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              parsed.forEach(function (it) {
+                if (!it) return;
+                const p = String(it.projectBrand || it.project || it.brand || '').trim();
+                if (p && p !== '-' && !seen.has(p)) {
+                  seen.add(p);
+                  uniqueProjects.push(p);
+                }
+              });
+              if (uniqueProjects.length > 0) break;
+            }
+          } catch (e) {
+            console.warn('[Alokasi Aset] Gagal membaca data Pendapatan:', e);
+          }
+        }
+
+        // Jika data di modul Pendapatan belum ada, fallback ke opsi bawaan modul pendapatan & alokasi
+        if (uniqueProjects.length === 0) {
+          defaultProjectBrandOptions.forEach(function (p) {
+            if (!seen.has(p)) {
+              seen.add(p);
+              uniqueProjects.push(p);
+            }
+          });
+        }
+
+        return uniqueProjects;
+      }
+
+      function getDaftarAsetList() {
+        for (let i = 0; i < DAFTAR_ASET_KEYS.length; i++) {
+          try {
+            const raw = localStorage.getItem(DAFTAR_ASET_KEYS[i]);
+            if (raw === null || raw === undefined) continue;
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+          } catch (e) {
+            console.warn('[Alokasi Aset] Gagal membaca Daftar Aset:', e);
+          }
+        }
+        return null;
+      }
 
       const defaultAlokasiData = [
         {
@@ -2159,24 +2279,61 @@
         }
       ];
 
+      function isDefaultMockItem(item) {
+        if (!item || !item.id) return false;
+        const mockIds = ['ALC-001', 'ALC-002', 'ALC-003', 'ALC-004', 'ALC-005'];
+        const mockLocations = ['ALK-001', 'ALK-002', 'ALK-003', 'ALK-004', 'ALK-005'];
+        const isIdMatch = mockIds.indexOf(item.id) !== -1 || mockLocations.indexOf(item.idLokasi) !== -1;
+        return isIdMatch && (
+          item.keterangan === 'Alokasi TV Studio untuk display shoot & preview konten' ||
+          item.keterangan === 'Alokasi kamera utama live stream & pembuatan short video brand' ||
+          item.keterangan === 'Workstation editing rendering video 4K harian' ||
+          item.keterangan === 'Penyediaan fasilitas konsumsi crew workshop' ||
+          item.keterangan === 'Alokasi pendingin ruangan studio podcast eksklusif'
+        );
+      }
+
       function loadData() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
+          const hasCleaned = localStorage.getItem('accounting_alokasi_aset_project_clean_v1');
+          if (raw !== null && raw !== undefined) {
             const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            if (Array.isArray(parsed)) {
+              if (!hasCleaned) {
+                // Pembersihan data dummy bawaan hanya dilakukan 1x di awal agar siap untuk input data real bertahap
+                const cleaned = parsed.filter(function (x) { return !isDefaultMockItem(x); });
+                try { localStorage.setItem('accounting_alokasi_aset_project_clean_v1', 'true'); } catch (e) {}
+                saveData(cleaned);
+                return cleaned;
+              }
+              return parsed;
+            }
+          } else {
+            try { localStorage.setItem('accounting_alokasi_aset_project_clean_v1', 'true'); } catch (e) {}
+            saveData([]);
+            return [];
           }
         } catch (e) {
           console.error('Gagal memuat data alokasi:', e);
         }
-        return defaultAlokasiData;
+        return [];
       }
 
       function saveData(data) {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          return true;
         } catch (e) {
           console.error('Gagal menyimpan data alokasi:', e);
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              icon: 'error',
+              title: 'Penyimpanan Gagal',
+              text: 'Memori browser (localStorage) penuh atau tidak dapat diakses. Mohon periksa penyimpanan browser Anda.'
+            });
+          }
+          return false;
         }
       }
 
@@ -2212,6 +2369,8 @@
       const menuKodeAset = document.getElementById('menuKodeAset');
       const crudNamaAset = document.getElementById('crudNamaAset');
       const crudProjectBrand = document.getElementById('crudProjectBrand');
+      const wrapProjectBrand = document.getElementById('wrapProjectBrand');
+      const menuProjectBrand = document.getElementById('menuProjectBrand');
       const crudTanggalMulai = document.getElementById('crudTanggalMulai');
       const crudTanggalSelesai = document.getElementById('crudTanggalSelesai');
       const crudBebanPerBulan = document.getElementById('crudBebanPerBulan');
@@ -2466,46 +2625,89 @@
       }
 
       /* ===== ASSET REFERENCES & KODE ASET DROPDOWN (SESUAI GAMBAR 2) ===== */
-      function getAssetReferences() {
-        const list = [
-          { kode: 'AST-001', nama: 'Dispenser Mini Miyako', beban: 5556 },
-          { kode: 'AST-002', nama: 'Sony Alpha A7 IV + Lens 24-70mm', beban: 791667 },
-          { kode: 'AST-003', nama: 'TV Xiaomi A Pro', beban: 192613 },
-          { kode: 'AST-004', nama: 'MacBook Pro M3 Max 36GB', beban: 1208333 },
-          { kode: 'AST-005', nama: 'Meja Meeting Kayu Jati Custom 3M', beban: 216667 },
-          { kode: 'AST-006', nama: 'AC Daikin Inverter 2 PK Multi-S', beban: 158333 }
-        ];
+      const defaultAssetReferences = [
+        { kode: 'AST-001', nama: 'Dispenser Mini Miyako', beban: 5556 },
+        { kode: 'AST-002', nama: 'Sony Alpha A7 IV + Lens 24-70mm', beban: 791667 },
+        { kode: 'AST-003', nama: 'TV Xiaomi A Pro', beban: 192613 },
+        { kode: 'AST-004', nama: 'MacBook Pro M3 Max 36GB', beban: 1208333 },
+        { kode: 'AST-005', nama: 'Meja Meeting Kayu Jati Custom 3M', beban: 216667 },
+        { kode: 'AST-006', nama: 'AC Daikin Inverter 2 PK Multi-S', beban: 158333 }
+      ];
 
-        try {
-          const rawAset = localStorage.getItem('accounting_daftar_aset_data');
-          if (rawAset) {
-            const parsedAset = JSON.parse(rawAset);
-            if (Array.isArray(parsedAset)) {
-              parsedAset.forEach(function (ast) {
-                if (ast && ast.kodeAset && !list.some(function (x) { return x.kode === ast.kodeAset; })) {
-                  list.push({
-                    kode: ast.kodeAset,
-                    nama: ast.namaAset || ast.kodeAset,
-                    beban: Number(ast.penyusutanBulan) || 0
-                  });
-                }
-              });
-            }
-          }
-        } catch (e) {}
-
-        return list;
+      function calculateBebanPerBulan(ast) {
+        if (ast.penyusutanBulan !== undefined && ast.penyusutanBulan !== null && !isNaN(Number(ast.penyusutanBulan))) {
+          return Number(ast.penyusutanBulan);
+        }
+        const hargaSatuan = Number(ast.hargaSatuan) || 0;
+        const qty = parseInt(ast.qty, 10) || 0;
+        const hargaPerolehan = (hargaSatuan > 0 && qty > 0)
+          ? Math.round(hargaSatuan * qty)
+          : Math.max(0, Math.round(Number(ast.hargaPerolehan) || 0));
+        const umurBulan = parseInt(ast.umurBulan, 10) || 0;
+        const nilaiResidu = Number(ast.nilaiResidu) || 0;
+        const maxDepreciable = Math.max(0, hargaPerolehan - nilaiResidu);
+        return umurBulan > 0 ? Math.round(maxDepreciable / umurBulan) : 0;
       }
 
-      function renderKodeAsetDropdown() {
+      function getAssetReferences() {
+        const asetList = getDaftarAsetList();
+        if (asetList !== null) {
+          const list = [];
+          const seen = new Set();
+          asetList.forEach(function (ast) {
+            if (!ast) return;
+            const kode = String(ast.kodeAset || '').trim();
+            const nama = String(ast.namaAset || '').trim();
+            if (kode && !seen.has(kode)) {
+              seen.add(kode);
+              list.push({
+                kode: kode,
+                nama: nama || kode,
+                beban: calculateBebanPerBulan(ast)
+              });
+            }
+          });
+          return list;
+        }
+        return defaultAssetReferences.slice();
+      }
+
+      function findAssetByKode(kode) {
+        if (!kode) return null;
+        const normalized = String(kode).trim().toLowerCase();
+        const assets = getAssetReferences();
+        return assets.find(function (x) {
+          return String(x.kode || '').trim().toLowerCase() === normalized;
+        }) || null;
+      }
+
+      function renderKodeAsetDropdown(filterText) {
         if (!menuKodeAset) return;
         menuKodeAset.innerHTML = '';
         const assets = getAssetReferences();
+        const q = String(filterText !== undefined ? filterText : (crudKodeAset ? crudKodeAset.value : '')).trim().toLowerCase();
 
-        assets.forEach(function (ast) {
+        const filtered = q
+          ? assets.filter(function (ast) {
+              return String(ast.kode).toLowerCase().includes(q) || String(ast.nama).toLowerCase().includes(q);
+            })
+          : assets;
+
+        if (filtered.length === 0) {
+          const emptyItem = document.createElement('div');
+          emptyItem.className = 'modal-opt-item';
+          emptyItem.style.color = '#94a3b8';
+          emptyItem.style.fontStyle = 'italic';
+          emptyItem.style.cursor = 'default';
+          emptyItem.textContent = assets.length === 0 ? 'Daftar Aset kosong' : 'Tidak ada aset yang cocok';
+          menuKodeAset.appendChild(emptyItem);
+          return;
+        }
+
+        filtered.forEach(function (ast) {
           const item = document.createElement('div');
           item.className = 'modal-opt-item';
-          if (crudKodeAset && crudKodeAset.value === ast.kode) {
+          if (crudKodeAset && crudKodeAset.value.trim() === ast.kode) {
             item.classList.add('is-selected');
           }
           item.textContent = ast.kode + ' | ' + ast.nama;
@@ -2513,34 +2715,188 @@
             e.stopPropagation();
             crudKodeAset.value = ast.kode;
             crudNamaAset.value = ast.nama;
-            if (ast.beban && !crudBebanPerBulan.value) {
-              crudBebanPerBulan.value = formatRupiahSpasi(ast.beban);
-            }
+            crudBebanPerBulan.value = formatRupiahSpasi(ast.beban || 0);
             wrapKodeAset.classList.remove('is-open');
           });
           menuKodeAset.appendChild(item);
         });
       }
 
-      if (crudKodeAset && wrapKodeAset) {
+      renderKodeAsetDropdown('');
+
+      if (crudKodeAset) {
+        crudKodeAset.addEventListener('input', function () {
+          const val = this.value.trim();
+          const match = findAssetByKode(val);
+          if (match) {
+            crudNamaAset.value = match.nama;
+            crudBebanPerBulan.value = formatRupiahSpasi(match.beban || 0);
+          } else {
+            crudNamaAset.value = '';
+          }
+          if (wrapKodeAset) wrapKodeAset.classList.add('is-open');
+          renderKodeAsetDropdown(this.value);
+        });
+
+        crudKodeAset.addEventListener('focus', function () {
+          if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+          if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
+          if (wrapKodeAset) wrapKodeAset.classList.add('is-open');
+          renderKodeAsetDropdown(this.value);
+        });
+
         crudKodeAset.addEventListener('click', function (e) {
           e.stopPropagation();
-          const isOpen = wrapKodeAset.classList.contains('is-open');
           if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
-          renderKodeAsetDropdown();
-          if (isOpen) {
-            wrapKodeAset.classList.remove('is-open');
-          } else {
-            wrapKodeAset.classList.add('is-open');
+          if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
+          if (wrapKodeAset) wrapKodeAset.classList.add('is-open');
+          renderKodeAsetDropdown(this.value);
+        });
+      }
+
+      if (wrapKodeAset) {
+        wrapKodeAset.addEventListener('click', function (e) {
+          if (!e.target.closest('.modal-opt-item') && !e.target.closest('#crudKodeAset')) {
+            e.stopPropagation();
+            if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+            if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
+            wrapKodeAset.classList.toggle('is-open');
+            if (wrapKodeAset.classList.contains('is-open')) {
+              renderKodeAsetDropdown(crudKodeAset ? crudKodeAset.value : '');
+            }
           }
         });
       }
+
+      /* ===== PROJECT / BRAND DROPDOWN DARI MODUL PENDAPATAN ===== */
+      function renderProjectBrandDropdown(filterText) {
+        if (!menuProjectBrand) return;
+        menuProjectBrand.innerHTML = '';
+        const list = getProjectBrandFromPendapatan();
+        const currentVal = (crudProjectBrand ? crudProjectBrand.value : '').trim().toLowerCase();
+        const q = String(filterText !== undefined ? filterText : (crudProjectBrand ? crudProjectBrand.value : '')).trim().toLowerCase();
+
+        const filtered = q
+          ? list.filter(function (name) {
+              return name.toLowerCase().includes(q);
+            })
+          : list;
+
+        if (filtered.length === 0) {
+          const emptyItem = document.createElement('div');
+          emptyItem.className = 'modal-opt-item';
+          emptyItem.style.color = '#94a3b8';
+          emptyItem.style.fontStyle = 'italic';
+          emptyItem.style.cursor = 'default';
+          emptyItem.textContent = list.length === 0 ? 'Data Project/Brand kosong' : 'Tidak ada project yang cocok';
+          menuProjectBrand.appendChild(emptyItem);
+          return;
+        }
+
+        filtered.forEach(function (name) {
+          const item = document.createElement('div');
+          item.className = 'modal-opt-item';
+          if (currentVal && currentVal === name.toLowerCase()) {
+            item.classList.add('is-selected');
+          }
+          item.textContent = name;
+          item.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (crudProjectBrand) crudProjectBrand.value = name;
+            if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
+          });
+          menuProjectBrand.appendChild(item);
+        });
+      }
+
+      renderProjectBrandDropdown('');
+
+      if (crudProjectBrand) {
+        crudProjectBrand.addEventListener('input', function () {
+          if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+          if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+          if (wrapProjectBrand) wrapProjectBrand.classList.add('is-open');
+          renderProjectBrandDropdown(this.value);
+        });
+
+        crudProjectBrand.addEventListener('focus', function () {
+          if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+          if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+          if (wrapProjectBrand) wrapProjectBrand.classList.add('is-open');
+          renderProjectBrandDropdown(this.value);
+        });
+
+        crudProjectBrand.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+          if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+          if (wrapProjectBrand) wrapProjectBrand.classList.add('is-open');
+          renderProjectBrandDropdown(this.value);
+        });
+      }
+
+      if (wrapProjectBrand) {
+        wrapProjectBrand.addEventListener('click', function (e) {
+          if (!e.target.closest('.modal-opt-item') && !e.target.closest('#crudProjectBrand')) {
+            e.stopPropagation();
+            if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+            if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+            wrapProjectBrand.classList.toggle('is-open');
+            if (wrapProjectBrand.classList.contains('is-open')) {
+              renderProjectBrandDropdown(crudProjectBrand ? crudProjectBrand.value : '');
+            }
+          }
+        });
+      }
+
+      /* Listener perubahan Daftar Aset & Pendapatan untuk auto-refresh dropdown & auto-fill */
+      function refreshAssetReferences() {
+        renderKodeAsetDropdown(crudKodeAset ? crudKodeAset.value : '');
+        renderProjectBrandDropdown(crudProjectBrand ? crudProjectBrand.value : '');
+        if (crudKodeAset && crudKodeAset.value) {
+          const match = findAssetByKode(crudKodeAset.value);
+          if (match) {
+            if (crudNamaAset) crudNamaAset.value = match.nama;
+            if (crudBebanPerBulan && !crudBebanPerBulan.value) {
+              crudBebanPerBulan.value = formatRupiahSpasi(match.beban || 0);
+            }
+          }
+        }
+      }
+
+      window.addEventListener('storage', function (e) {
+        if (e.key === STORAGE_KEY) {
+          alokasiData = loadData();
+          renderTable();
+        }
+        if (!e.key || DAFTAR_ASET_KEYS.indexOf(e.key) !== -1 || PENDAPATAN_KEYS.indexOf(e.key) !== -1) {
+          refreshAssetReferences();
+        }
+      });
+      window.addEventListener('focus', function () {
+        refreshAssetReferences();
+      });
+      window.addEventListener('pageshow', function () {
+        alokasiData = loadData();
+        renderTable();
+        refreshAssetReferences();
+      });
+      window.addEventListener('accounting-daftar-aset-updated', refreshAssetReferences);
+      window.addEventListener('accounting-pendapatan-updated', refreshAssetReferences);
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+          alokasiData = loadData();
+          renderTable();
+          refreshAssetReferences();
+        }
+      });
 
       if (crudStatus && wrapStatusModal && menuStatusModal) {
         crudStatus.addEventListener('click', function (e) {
           e.stopPropagation();
           const isOpen = wrapStatusModal.classList.contains('is-open');
           if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+          if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
           if (isOpen) {
             wrapStatusModal.classList.remove('is-open');
           } else {
@@ -2586,6 +2942,7 @@
         if (crudModal) crudModal.classList.remove('is-active');
         if (detailModal) detailModal.classList.remove('is-active');
         if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
         if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
       }
 
@@ -2611,7 +2968,10 @@
         if (crudKeterangan) crudKeterangan.value = '';
 
         if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
         if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        renderKodeAsetDropdown('');
+        renderProjectBrandDropdown('');
         if (crudModal) crudModal.classList.add('is-active');
       }
       window.openAddAlokasi = openAddAlokasi;
@@ -2624,7 +2984,19 @@
         if (crudEditId) crudEditId.value = item.id;
         if (crudIdAlokasi) crudIdAlokasi.value = item.idLokasi || item.id;
         if (crudKodeAset) crudKodeAset.value = item.kodeAset || '';
-        if (crudNamaAset) crudNamaAset.value = item.namaAset || '';
+
+        // Auto-fill nama aset dan beban/bulan sesuai kode aset di Daftar Aset
+        const refAset = findAssetByKode(item.kodeAset);
+        if (crudNamaAset) {
+          crudNamaAset.value = refAset ? refAset.nama : (item.namaAset || '');
+        }
+        if (crudBebanPerBulan) {
+          const bebanVal = (item.bebanPerBulan !== undefined && item.bebanPerBulan !== null && item.bebanPerBulan !== '')
+            ? item.bebanPerBulan
+            : (refAset ? refAset.beban : 0);
+          crudBebanPerBulan.value = formatRupiahSpasi(bebanVal);
+        }
+
         if (crudProjectBrand) crudProjectBrand.value = item.projectBrand || '';
         if (crudTanggalMulai) {
           crudTanggalMulai.type = item.tanggalMulai ? 'date' : 'text';
@@ -2634,14 +3006,14 @@
           crudTanggalSelesai.type = item.tanggalSelesai ? 'date' : 'text';
           crudTanggalSelesai.value = item.tanggalSelesai || '';
         }
-        if (crudBebanPerBulan) {
-          crudBebanPerBulan.value = item.bebanPerBulan ? formatRupiahSpasi(item.bebanPerBulan) : '';
-        }
         if (crudStatus) crudStatus.value = item.status || 'Aktif';
         if (crudKeterangan) crudKeterangan.value = item.keterangan || '';
 
         if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
         if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');
+        renderKodeAsetDropdown('');
+        renderProjectBrandDropdown('');
         if (crudModal) crudModal.classList.add('is-active');
       }
 
@@ -2668,20 +3040,36 @@
 
           const editId = crudEditId ? crudEditId.value : '';
           const idLokasiVal = (crudIdAlokasi && crudIdAlokasi.value.trim()) || getNextAlokasiId();
-          const kodeAsetVal = (crudKodeAset && crudKodeAset.value.trim()) || '';
-          const namaAsetVal = (crudNamaAset && crudNamaAset.value.trim()) || '';
+          let kodeAsetVal = (crudKodeAset && crudKodeAset.value.trim()) || '';
+          let namaAsetVal = (crudNamaAset && crudNamaAset.value.trim()) || '';
           const projectBrandVal = (crudProjectBrand && crudProjectBrand.value.trim()) || '-';
           const tglMulaiVal = (crudTanggalMulai && crudTanggalMulai.value) || '';
           const tglSelesaiVal = (crudTanggalSelesai && crudTanggalSelesai.value) || '';
-          const bebanClean = crudBebanPerBulan ? (Number(String(crudBebanPerBulan.value).replace(/\D/g, '')) || 0) : 0;
+          let bebanClean = crudBebanPerBulan ? (Number(String(crudBebanPerBulan.value).replace(/\D/g, '')) || 0) : 0;
           const statusVal = (crudStatus && crudStatus.value.trim()) || 'Aktif';
           const ketVal = (crudKeterangan && crudKeterangan.value.trim()) || '';
 
           if (!kodeAsetVal) {
             if (typeof Swal !== 'undefined') {
-              Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Kode Aset terlebih dahulu!' });
+              Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Kode Aset terlebih dahulu!', confirmButtonColor: '#0076C5' });
+            } else {
+              alert('Pilih Kode Aset terlebih dahulu!');
             }
+            if (crudKodeAset) crudKodeAset.focus();
             return;
+          }
+
+          // Sinkronisasi auto-fill jika belum terisi
+          const match = findAssetByKode(kodeAsetVal);
+          if (match) {
+            if (!namaAsetVal) {
+              namaAsetVal = match.nama;
+              if (crudNamaAset) crudNamaAset.value = match.nama;
+            }
+            if (!bebanClean && match.beban) {
+              bebanClean = match.beban;
+              if (crudBebanPerBulan) crudBebanPerBulan.value = formatRupiahSpasi(match.beban);
+            }
           }
 
           if (editId) {
@@ -2698,8 +3086,9 @@
               alokasiData[idx].keterangan = ketVal;
             }
           } else {
+            const nextNum = parseInt(idLokasiVal.replace(/\D/g, ''), 10) || (alokasiData.length + 1);
             const newRecord = {
-              id: 'ALC-' + Date.now().toString().slice(-4),
+              id: 'ALC-' + String(nextNum).padStart(3, '0'),
               idLokasi: idLokasiVal,
               kodeAset: kodeAsetVal,
               namaAset: namaAsetVal,
@@ -2744,14 +3133,15 @@
 
       /* ===== DROPDOWN FILTER POPOVER (STATUS & PROJECT) ===== */
       const statusOptions = ['Semua Status', 'Aktif', 'Selesai', 'Diperpanjang'];
-      const projectOptions = [
-        'Semua Project/Brand',
-        'Campaign Shopee Big Ramadan',
-        'Brand Alpha Video Shoot',
-        'Event Workshop Kreator Tasikmalaya',
-        'Studio Live Streaming Baru',
-        'Ruang Kolaborasi Talent & Brand'
-      ];
+
+      function getProjectBrandOptionsForFilter() {
+        const list = ['Semua Project/Brand'];
+        const projects = getProjectBrandFromPendapatan();
+        projects.forEach(function (p) {
+          if (!list.includes(p)) list.push(p);
+        });
+        return list;
+      }
 
       function renderFilterList(listEl, inputEl, boxEl, opts) {
         if (!listEl) return;
@@ -2772,7 +3162,7 @@
         });
       }
 
-      function setupDropdownToggle(boxEl, listEl, inputEl, opts) {
+      function setupDropdownToggle(boxEl, listEl, inputEl, getOpts) {
         if (!boxEl || !inputEl) return;
         inputEl.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -2780,6 +3170,7 @@
           closeAllFilterBoxes();
           if (!isOpen) {
             boxEl.classList.add('is-open');
+            const opts = typeof getOpts === 'function' ? getOpts() : getOpts;
             renderFilterList(listEl, inputEl, boxEl, opts);
           }
         });
@@ -2791,7 +3182,7 @@
       }
 
       setupDropdownToggle(boxFilterStatus, listFilterStatus, filterStatus, statusOptions);
-      setupDropdownToggle(boxFilterProject, listFilterProject, filterProject, projectOptions);
+      setupDropdownToggle(boxFilterProject, listFilterProject, filterProject, getProjectBrandOptionsForFilter);
 
       if (btnFilter && filterDropdown) {
         btnFilter.addEventListener('click', function (e) {
@@ -3125,6 +3516,9 @@
         }
         if (!e.target.closest('#wrapKodeAset')) {
           if (wrapKodeAset) wrapKodeAset.classList.remove('is-open');
+        }
+        if (!e.target.closest('#wrapProjectBrand')) {
+          if (wrapProjectBrand) wrapProjectBrand.classList.remove('is-open');
         }
         if (!e.target.closest('#wrapStatusModal')) {
           if (wrapStatusModal) wrapStatusModal.classList.remove('is-open');

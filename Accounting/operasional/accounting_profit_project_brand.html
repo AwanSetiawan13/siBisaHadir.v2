@@ -1722,6 +1722,8 @@
       const PENDAPATAN_STORAGE_KEY = 'accounting_pendapatan_data_v1';
       const BEBAN_STORAGE_KEY = 'accounting_pengeluaran_beban_data_v5';
       const APPROVAL_STORAGE_KEY = 'BISA_APPROVAL_PENGELUARAN_DATA_V5';
+      const PAYROLL_STORAGE_KEY = 'bisa_payroll_data_v1';
+      const PAYROLL_FALLBACK_KEY = 'accounting_payroll_data_v1';
 
       function normalizeProjectBrandName(val) {
         return String(val || '')
@@ -1877,6 +1879,39 @@
         }, 'Pengeluaran & Beban');
       }
 
+      function getPayrollBebanBrutoMapByBrand() {
+        const resultMap = new Map();
+        let list = [];
+        try {
+          const raw1 = localStorage.getItem(PAYROLL_STORAGE_KEY);
+          if (raw1) {
+            const parsed1 = JSON.parse(raw1);
+            if (Array.isArray(parsed1) && parsed1.length > 0) list = parsed1;
+          }
+        } catch (e1) {}
+
+        if (list.length === 0) {
+          try {
+            const raw2 = localStorage.getItem(PAYROLL_FALLBACK_KEY);
+            if (raw2) {
+              const parsed2 = JSON.parse(raw2);
+              if (Array.isArray(parsed2) && parsed2.length > 0) list = parsed2;
+            }
+          } catch (e2) {}
+        }
+
+        list.forEach(function (item) {
+          if (!item) return;
+          const cleanPb = normalizeProjectBrandName(item.projectBrand);
+          if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+          const key = cleanPb.toLowerCase();
+          const val = parseNumericNominal(item.bebanBruto !== undefined ? item.bebanBruto : (item.totalGajiBruto || item.gajiBruto || 0));
+          resultMap.set(key, (resultMap.get(key) || 0) + val);
+        });
+
+        return resultMap;
+      }
+
       function calculateMarginPercent(labaSebelumPajak, pendapatan) {
         const rev = Number(pendapatan) || 0;
         const laba = Number(labaSebelumPajak) || 0;
@@ -1893,9 +1928,9 @@
 
       function createProfitBrandRow(opts) {
         const key = String(opts.projectBrand || '').toLowerCase();
-        const pendapatanDpp = opts.dppMap.get(key) || 0;
-        const beban = opts.bebanMap.get(key) || 0;
-        const payroll = 0;
+        const pendapatanDpp = opts.dppMap ? (opts.dppMap.get(key) || 0) : 0;
+        const beban = opts.bebanMap ? (opts.bebanMap.get(key) || 0) : 0;
+        const payroll = opts.payrollMap ? (opts.payrollMap.get(key) || 0) : 0;
         const penyusutan = 0;
         const laba = pendapatanDpp - (beban + payroll + penyusutan);
         const margin = calculateMarginPercent(laba, pendapatanDpp);
@@ -1913,22 +1948,24 @@
           periode: opts.periode || formatPeriodeFromDate(opts.tanggal),
           keterangan: opts.keterangan,
           txCount: opts.txCount || 0,
-          source: 'kas_bank'
+          source: opts.source || 'kas_bank'
         };
       }
 
       function buildRealtimeProfitFromKasBank() {
         const dppMap = getPendapatanDppMapByBrand();
         const bebanMap = getPengeluaranBebanDiakuiMapByBrand();
+        const payrollMap = getPayrollBebanBrutoMapByBrand();
+
+        const aggMap = new Map();
 
         // 1. Utamakan membaca langsung dari transaksi Kas & Bank (hanya kolom projectBrand yang diambil)
-        //    Kolom Pendapatan mengambil jumlah DPP dari modul Pendapatan; kolom Beban mengambil jumlah Beban Diakui dari modul Pengeluaran & Beban.
+        //    Kolom Pendapatan mengambil jumlah DPP dari modul Pendapatan; kolom Beban mengambil jumlah Beban Diakui dari modul Pengeluaran & Beban; kolom Payroll mengambil Beban Bruto dari Payroll.
         try {
           const rawKb = localStorage.getItem(KB_STORAGE_KEY);
           if (rawKb !== null) {
             const parsedKb = JSON.parse(rawKb);
             if (Array.isArray(parsedKb)) {
-              const aggMap = new Map();
               parsedKb.forEach(function (it) {
                 if (!it) return;
                 const rawPb = String(it.projectBrand || '').trim();
@@ -1958,69 +1995,92 @@
                 }
                 if (it.idTransaksi) entry.txIds.push(it.idTransaksi);
               });
-
-              const list = [];
-              let idx = 1;
-              aggMap.forEach(function (entry) {
-                const jenisLabel = entry.jenisSet.size > 0 ? ': ' + Array.from(entry.jenisSet).join(', ') : '';
-                list.push(createProfitBrandRow({
-                  id: 'PRF-KB-' + String(idx++).padStart(3, '0'),
-                  projectBrand: entry.projectBrand,
-                  rawProjectBrand: entry.rawProjectBrand,
-                  dppMap: dppMap,
-                  bebanMap: bebanMap,
-                  tanggal: entry.tanggal,
-                  periode: formatPeriodeFromDate(entry.tanggal),
-                  keterangan: 'Relasi Project/Brand dari modul Kas & Bank (' + entry.txIds.length + ' transaksi' + jenisLabel + ')',
-                  txCount: entry.txIds.length
-                }));
-              });
-
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-              } catch (e) {}
-              return list;
             }
           }
         } catch (e) {
           console.error('Error reading Kas & Bank data:', e);
         }
 
-        // 2. Fallback snapshot relasi Kas & Bank jika key utama belum ada
+        // 2. Kumpulkan project/brand dari modul Payroll agar otomatis muncul di Profit Project/Brand
         try {
-          const rawRel = localStorage.getItem(KB_PROFIT_REL_KEY);
-          if (rawRel) {
-            const parsedRel = JSON.parse(rawRel);
-            if (parsedRel && Array.isArray(parsedRel.brands)) {
-              const normalized = parsedRel.brands.map(function (b, idx) {
-                const cleanPb = normalizeProjectBrandName(b.projectBrand || b.rawProjectBrand);
-                if (!cleanPb) return null;
-                return createProfitBrandRow({
-                  id: b.id || ('PRF-KB-' + String(idx + 1).padStart(3, '0')),
-                  projectBrand: cleanPb,
-                  rawProjectBrand: b.rawProjectBrand || b.projectBrand || cleanPb,
-                  dppMap: dppMap,
-                  bebanMap: bebanMap,
-                  tanggal: b.tanggal,
-                  periode: b.periode || formatPeriodeFromDate(b.tanggal),
-                  keterangan: b.keterangan || 'Relasi Project/Brand dari modul Kas & Bank',
-                  txCount: b.txCount || 0
-                });
-              }).filter(Boolean);
+          const rawPay = localStorage.getItem(PAYROLL_STORAGE_KEY) || localStorage.getItem(PAYROLL_FALLBACK_KEY);
+          if (rawPay) {
+            const parsedPay = JSON.parse(rawPay);
+            if (Array.isArray(parsedPay)) {
+              parsedPay.forEach(function (py) {
+                if (!py) return;
+                const rawPb = String(py.projectBrand || '').trim();
+                const cleanPb = normalizeProjectBrandName(rawPb);
+                if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
 
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-              } catch (e) {}
-              return normalized;
+                const key = cleanPb.toLowerCase();
+                if (!aggMap.has(key)) {
+                  aggMap.set(key, {
+                    projectBrand: cleanPb,
+                    rawProjectBrand: rawPb,
+                    tanggal: new Date().toISOString().split('T')[0],
+                    jenisSet: new Set(['Payroll']),
+                    txIds: []
+                  });
+                } else {
+                  aggMap.get(key).jenisSet.add('Payroll');
+                }
+              });
             }
           }
-        } catch (e) {}
+        } catch (ePay) {
+          console.error('Error reading Payroll brands:', ePay);
+        }
 
-        // 3. Jika Kas & Bank belum pernah menyimpan transaksi sama sekali, tampilkan kosong (tanpa data dummy)
+        // 3. Fallback snapshot relasi Kas & Bank jika key utama belum ada
+        if (aggMap.size === 0) {
+          try {
+            const rawRel = localStorage.getItem(KB_PROFIT_REL_KEY);
+            if (rawRel) {
+              const parsedRel = JSON.parse(rawRel);
+              if (parsedRel && Array.isArray(parsedRel.brands)) {
+                parsedRel.brands.forEach(function (b) {
+                  const cleanPb = normalizeProjectBrandName(b.projectBrand || b.rawProjectBrand);
+                  if (!cleanPb) return;
+                  const key = cleanPb.toLowerCase();
+                  if (!aggMap.has(key)) {
+                    aggMap.set(key, {
+                      projectBrand: cleanPb,
+                      rawProjectBrand: b.rawProjectBrand || b.projectBrand || cleanPb,
+                      tanggal: b.tanggal || new Date().toISOString().split('T')[0],
+                      jenisSet: new Set(['Relasi Kas & Bank']),
+                      txIds: []
+                    });
+                  }
+                });
+              }
+            }
+          } catch (eRel) {}
+        }
+
+        const list = [];
+        let idx = 1;
+        aggMap.forEach(function (entry) {
+          const jenisLabel = entry.jenisSet.size > 0 ? ': ' + Array.from(entry.jenisSet).join(', ') : '';
+          const txDesc = entry.txIds.length > 0 ? (' (' + entry.txIds.length + ' transaksi' + jenisLabel + ')') : (jenisLabel ? (' (' + Array.from(entry.jenisSet).join(', ') + ')') : '');
+          list.push(createProfitBrandRow({
+            id: 'PRF-KB-' + String(idx++).padStart(3, '0'),
+            projectBrand: entry.projectBrand,
+            rawProjectBrand: entry.rawProjectBrand,
+            dppMap: dppMap,
+            bebanMap: bebanMap,
+            payrollMap: payrollMap,
+            tanggal: entry.tanggal || new Date().toISOString().split('T')[0],
+            periode: formatPeriodeFromDate(entry.tanggal),
+            keterangan: 'Relasi Project/Brand' + txDesc,
+            txCount: entry.txIds.length
+          }));
+        });
+
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
         } catch (e) {}
-        return [];
+        return list;
       }
 
       function loadProfitData() {
@@ -2492,7 +2552,7 @@
       }
 
       window.addEventListener('storage', function (e) {
-        if (e.key === STORAGE_KEY || e.key === KB_STORAGE_KEY || e.key === KB_PROFIT_REL_KEY || e.key === PENDAPATAN_STORAGE_KEY || e.key === BEBAN_STORAGE_KEY || e.key === APPROVAL_STORAGE_KEY) {
+        if (e.key === STORAGE_KEY || e.key === KB_STORAGE_KEY || e.key === KB_PROFIT_REL_KEY || e.key === PENDAPATAN_STORAGE_KEY || e.key === BEBAN_STORAGE_KEY || e.key === APPROVAL_STORAGE_KEY || e.key === PAYROLL_STORAGE_KEY || e.key === PAYROLL_FALLBACK_KEY) {
           refreshProfitFromStorage();
         }
       });
@@ -2500,6 +2560,7 @@
       window.addEventListener('accounting_profit_project_brand_changed', refreshProfitFromStorage);
       window.addEventListener('pendapatanUpdated', refreshProfitFromStorage);
       window.addEventListener('pengeluaranBebanUpdated', refreshProfitFromStorage);
+      window.addEventListener('payroll_data_changed', refreshProfitFromStorage);
       window.addEventListener('focus', refreshProfitFromStorage);
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) refreshProfitFromStorage();

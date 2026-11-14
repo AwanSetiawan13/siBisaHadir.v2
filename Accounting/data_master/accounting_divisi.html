@@ -645,15 +645,199 @@
       const STORAGE_KEY = 'accounting_master_divisi_v1';
 
       const DEFAULT_DIVISI_DATA = [
-        { id: 'div-1', nama: 'Finance & Accounting' },
-        { id: 'div-2', nama: 'MCN' },
-        { id: 'div-3', nama: 'Operasional' },
-        { id: 'div-4', nama: 'Marketing & Brand' },
-        { id: 'div-5', nama: 'Creative & Design' },
-        { id: 'div-6', nama: 'General Affair' },
-        { id: 'div-7', nama: 'Human Resource (HR)' },
-        { id: 'div-8', nama: 'IT & Development' }
-      ];
+        {
+                "id": "div-1",
+                "nama": "Accounting"
+        },
+        {
+                "id": "div-2",
+                "nama": "Agency"
+        },
+        {
+                "id": "div-3",
+                "nama": "CEO Office"
+        },
+        {
+                "id": "div-4",
+                "nama": "Clining Service"
+        },
+        {
+                "id": "div-5",
+                "nama": "COO Office"
+        },
+        {
+                "id": "div-6",
+                "nama": "Event"
+        },
+        {
+                "id": "div-7",
+                "nama": "General"
+        },
+        {
+                "id": "div-8",
+                "nama": "Head Of Finance"
+        },
+        {
+                "id": "div-9",
+                "nama": "Head Of Human Resource"
+        },
+        {
+                "id": "div-10",
+                "nama": "Head Of IT"
+        },
+        {
+                "id": "div-11",
+                "nama": "Head Of Marketing"
+        },
+        {
+                "id": "div-12",
+                "nama": "HR"
+        },
+        {
+                "id": "div-13",
+                "nama": "Live HUB"
+        },
+        {
+                "id": "div-14",
+                "nama": "Manager Operation"
+        },
+        {
+                "id": "div-15",
+                "nama": "Manager TAP"
+        },
+        {
+                "id": "div-16",
+                "nama": "Manager TSP"
+        },
+        {
+                "id": "div-17",
+                "nama": "Marketing"
+        },
+        {
+                "id": "div-18",
+                "nama": "MCN"
+        },
+        {
+                "id": "div-19",
+                "nama": "Pentry"
+        },
+        {
+                "id": "div-20",
+                "nama": "Probability"
+        },
+        {
+                "id": "div-21",
+                "nama": "Produksi"
+        },
+        {
+                "id": "div-22",
+                "nama": "SPV Account Management"
+        },
+        {
+                "id": "div-23",
+                "nama": "SPV Advertiser"
+        },
+        {
+                "id": "div-24",
+                "nama": "SPV Content Management"
+        },
+        {
+                "id": "div-25",
+                "nama": "SPV Creative"
+        },
+        {
+                "id": "div-26",
+                "nama": "SPV IT Programer"
+        },
+        {
+                "id": "div-27",
+                "nama": "SPV KOL Management"
+        },
+        {
+                "id": "div-28",
+                "nama": "SPV Live Management"
+        },
+        {
+                "id": "div-29",
+                "nama": "SPV Marketing"
+        },
+        {
+                "id": "div-30",
+                "nama": "Staf Account Management"
+        },
+        {
+                "id": "div-31",
+                "nama": "Staf Administrasi Umum"
+        },
+        {
+                "id": "div-32",
+                "nama": "Staf Advertiser"
+        },
+        {
+                "id": "div-33",
+                "nama": "Staf Content Management"
+        },
+        {
+                "id": "div-34",
+                "nama": "Staf Creative"
+        },
+        {
+                "id": "div-35",
+                "nama": "Staf Information Technology"
+        },
+        {
+                "id": "div-36",
+                "nama": "Staf KOL Management"
+        },
+        {
+                "id": "div-37",
+                "nama": "Staf Live Management"
+        },
+        {
+                "id": "div-38",
+                "nama": "Staf Marketing Communication"
+        },
+        {
+                "id": "div-39",
+                "nama": "Staf Public Relation"
+        },
+        {
+                "id": "div-40",
+                "nama": "TAP"
+        },
+        {
+                "id": "div-41",
+                "nama": "TSP"
+        },
+        {
+                "id": "div-42",
+                "nama": "Finance & Accounting"
+        },
+        {
+                "id": "div-43",
+                "nama": "Operasional"
+        },
+        {
+                "id": "div-44",
+                "nama": "Marketing & Brand"
+        },
+        {
+                "id": "div-45",
+                "nama": "Creative & Design"
+        },
+        {
+                "id": "div-46",
+                "nama": "General Affair"
+        },
+        {
+                "id": "div-47",
+                "nama": "Human Resource (HR)"
+        },
+        {
+                "id": "div-48",
+                "nama": "IT & Development"
+        }
+]
 
       let divisiData = loadData();
       let currentActionId = null;
@@ -670,25 +854,61 @@
       function loadData() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DIVISI_DATA));
-            return DEFAULT_DIVISI_DATA.slice();
+          let currentList = [];
+
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              currentList = parsed.map(function (item, idx) {
+                if (typeof item === 'string') {
+                  return { id: 'div-' + (idx + 1), nama: item.trim() };
+                }
+                return {
+                  id: item.id || ('div-' + (idx + 1)),
+                  nama: (item.nama || item.divisi || '').trim()
+                };
+              }).filter(function (item) { return item.nama !== ''; });
+            }
           }
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            // Normalisasi objek
-            return parsed.map(function (item, idx) {
-              if (typeof item === 'string') {
-                return { id: 'div-' + (idx + 1), nama: item };
-              }
-              return {
-                id: item.id || ('div-' + (idx + 1)),
-                nama: (item.nama || item.divisi || '').trim()
-              };
-            }).filter(function (item) { return item.nama !== ''; });
+
+          // Cek dan tambahkan divisi dari DEFAULT_DIVISI_DATA jika belum ada (tanpa duplikasi)
+          const existingNames = new Set(currentList.map(function (it) {
+            return (it.nama || '').toLowerCase().trim();
+          }));
+
+          let maxIdNum = currentList.reduce(function (max, it) {
+            const match = String(it.id || '').match(/div-(\d+)/);
+            if (match) {
+              const num = parseInt(match[1], 10);
+              return Math.max(max, isNaN(num) ? 0 : num);
+            }
+            return max;
+          }, 0);
+
+          let hasNew = false;
+          DEFAULT_DIVISI_DATA.forEach(function (def) {
+            const defName = (def.nama || '').trim();
+            if (defName && !existingNames.has(defName.toLowerCase())) {
+              maxIdNum++;
+              currentList.push({
+                id: 'div-' + maxIdNum,
+                nama: defName
+              });
+              existingNames.add(defName.toLowerCase());
+              hasNew = true;
+            }
+          });
+
+          if (currentList.length === 0) {
+            currentList = DEFAULT_DIVISI_DATA.slice();
+            hasNew = true;
           }
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_DIVISI_DATA));
-          return DEFAULT_DIVISI_DATA.slice();
+
+          if (hasNew || !raw) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentList));
+          }
+
+          return currentList;
         } catch (e) {
           console.error('Error loading divisi data:', e);
           return DEFAULT_DIVISI_DATA.slice();
@@ -894,7 +1114,7 @@
 
           // Cek duplikasi nama
           const duplicate = divisiData.some(function (x) {
-            return x.id !== editId && x.nama.toLowerCase() === nama.toLowerCase();
+            return x.id !== editId && x.nama.toLowerCase().trim() === nama.toLowerCase().trim();
           });
           if (duplicate) {
             showToast('Nama Divisi "' + nama + '" sudah ada!', 'warning');

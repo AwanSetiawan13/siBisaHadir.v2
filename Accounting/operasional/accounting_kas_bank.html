@@ -4018,6 +4018,9 @@
           localStorage.setItem(STORAGE_KEY, JSON.stringify(kbData));
           syncArusKasSaldoStorage(kbData);
           syncProfitProjectBrandStorage(kbData);
+          try {
+            window.dispatchEvent(new CustomEvent('accounting_kas_bank_changed'));
+          } catch (e) {}
         } catch (error) {
           showToast('Gagal menyimpan data Kas & Bank', 'error');
         }
@@ -4903,7 +4906,36 @@
           console.warn('Error loading pengeluaran list for referensi:', e);
         }
 
-        // 3. Sertakan referensi yang saat ini digunakan di Kas & Bank jika belum ada dalam list
+        // 3. Ambil ID Payroll dari modul Payroll secara realtime
+        try {
+          const rawPay = localStorage.getItem('bisa_payroll_data_v1') || localStorage.getItem('accounting_payroll_data_v1');
+          const payList = rawPay ? JSON.parse(rawPay) : [];
+          if (Array.isArray(payList)) {
+            payList.forEach(function (p) {
+              const code = (p.idPayroll || '').trim();
+              if (code && !seen.has(code.toLowerCase())) {
+                seen.add(code.toLowerCase());
+                const emp = (p.nama || 'Karyawan').trim();
+                const desc = 'Payroll: ' + emp + (p.periode ? ' (' + p.periode + ')' : '');
+                const nom = Number(p.takeHomePay || 0);
+                result.push({
+                  kode: code,
+                  tipe: 'expense',
+                  labelTipe: 'Payroll',
+                  keterangan: desc,
+                  nominal: nom,
+                  customerOrVendor: emp,
+                  projectBrand: (p.projectBrand && p.projectBrand !== '-') ? String(p.projectBrand).trim() : '',
+                  divisi: (p.divisi && p.divisi !== '-') ? String(p.divisi).trim() : ''
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Error loading payroll list for referensi:', e);
+        }
+
+        // 4. Sertakan referensi yang saat ini digunakan di Kas & Bank jika belum ada dalam list
         if (Array.isArray(kbData)) {
           kbData.forEach(function (item) {
             const ref = (item.referensi || '').trim();
