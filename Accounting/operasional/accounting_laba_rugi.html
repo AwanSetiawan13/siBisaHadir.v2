@@ -1017,6 +1017,721 @@
           .replace(/'/g, '&#039;');
       }
 
+      function toIsoDate(dateStr) {
+        if (!dateStr || dateStr === '-') return '';
+        if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+        if (typeof dateStr === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+          const parts = dateStr.split('/');
+          return parts[2] + '-' + parts[1] + '-' + parts[0];
+        }
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return y + '-' + m + '-' + day;
+        }
+        return '';
+      }
+
+      /* ===== INTEGRASI MODUL PENDAPATAN ===== */
+      const PENDAPATAN_STORAGE_KEY = 'accounting_pendapatan_data_v1';
+
+      function getPendapatanList() {
+        try {
+          const raw = localStorage.getItem(PENDAPATAN_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Gagal membaca data modul pendapatan:', e);
+        }
+        // Fallback seed data pendapatan yang sinkron persis dengan modul pendapatan
+        return [
+          {
+            id: 'pnd-1',
+            idPendapatan: '7691348184035411733',
+            tanggalPengakuan: '2026-10-01',
+            customer: 'TikTok',
+            noInvoice: 'INV-202609-001',
+            kodeCoa: '4001',
+            divisi: 'MCN',
+            keterangan: 'Management Fee MCN Kreator',
+            dpp: 748155,
+            ppn: 0
+          },
+          {
+            id: 'pnd-2',
+            idPendapatan: '7691348184035411734',
+            tanggalPengakuan: '2026-09-01',
+            customer: 'Campaign Brand A',
+            noInvoice: 'INV-202609-002',
+            kodeCoa: '1002',
+            divisi: 'Operasional',
+            keterangan: 'Penerimaan Pembayaran Campaign Brand',
+            dpp: 15500000,
+            ppn: 0
+          },
+          {
+            id: 'pnd-3',
+            idPendapatan: '7691348184035411736',
+            tanggalPengakuan: '2026-10-15',
+            customer: 'Shopee Live Media',
+            noInvoice: 'INV-202609-003',
+            kodeCoa: '4001',
+            divisi: 'MCN',
+            keterangan: 'Jasa Live Streaming Affiliate',
+            dpp: 5000000,
+            ppn: 550000
+          },
+          {
+            id: 'pnd-4',
+            idPendapatan: '7691348184035411737',
+            tanggalPengakuan: '2026-08-10',
+            customer: 'Brand Cosmo Style',
+            noInvoice: 'INV-202609-004',
+            kodeCoa: '1002',
+            divisi: 'Operasional',
+            keterangan: 'Endorsement Agustus Cosmo',
+            dpp: 2000000,
+            ppn: 0
+          },
+          {
+            id: 'pnd-5',
+            idPendapatan: '7691348184035411735',
+            tanggalPengakuan: '2026-09-12',
+            customer: 'Shopee Live Media',
+            noInvoice: 'INV-202609-005',
+            kodeCoa: '4001',
+            divisi: 'MCN',
+            keterangan: 'Shopee Mega Sale Campaign',
+            dpp: 8000000,
+            ppn: 0
+          },
+          {
+            id: 'pnd-6',
+            idPendapatan: '7691348184035411738',
+            tanggalPengakuan: '2026-09-20',
+            customer: 'Serum Glow Indonesia',
+            noInvoice: 'INV-202609-006',
+            kodeCoa: '1002',
+            divisi: 'Operasional',
+            keterangan: 'Product Launching Serum Glow',
+            dpp: 12000000,
+            ppn: 0
+          },
+          {
+            id: 'pnd-7',
+            idPendapatan: '7691348184035411739',
+            tanggalPengakuan: '2026-10-05',
+            customer: 'Tap & Tsp Agency',
+            noInvoice: 'INV-202609-007',
+            kodeCoa: '1002',
+            divisi: 'Operasional',
+            keterangan: 'Management Fee Project',
+            dpp: 4500000,
+            ppn: 0
+          }
+        ];
+      }
+
+      function getPeriodMonthPrefixes(periodKey) {
+        if (periodKey === 'okt2026') return ['2026-10'];
+        if (periodKey === 'sep2026') return ['2026-09'];
+        if (periodKey === 'agu2026') return ['2026-08'];
+        if (periodKey === 'q3_2026') return ['2026-07', '2026-08', '2026-09'];
+        if (periodKey === 'tahun2026') return ['2026'];
+        return ['2026-10'];
+      }
+
+      // Rumus Pendapatan:
+      // 1. Laporan Bulanan: Total DPP khusus transaksi di bulan ini saja atau perbulan pada modul pendapatan
+      // 2. Sejak Awal Pembukaan: Total seluruh DPP dari awal mula pembukaan sampai sekarang pada modul pendapatan
+      // 3. Catatan: Pendapatan seluruh PPN
+      function getPendapatanMetrics(periodKey) {
+        const list = getPendapatanList();
+        const prefixes = getPeriodMonthPrefixes(periodKey);
+
+        let totalDppBulan = 0;
+        let totalDppSejakAwal = 0;
+        let totalPpnSejakAwal = 0;
+
+        list.forEach(function (item) {
+          if (!item) return;
+          const dpp = Number(item.dpp) || 0;
+          const ppn = Number(item.ppn) || 0;
+
+          // Sejak Awal Pembukaan: akumulasi seluruh DPP dari awal pembukaan sampai sekarang
+          totalDppSejakAwal += dpp;
+          totalPpnSejakAwal += ppn;
+
+          // Laporan Bulanan: total DPP khusus transaksi di bulan ini saja / perbulan
+          const rawDate = item.tanggalPengakuan || item.tanggal || item.jatuhTempo || '';
+          const iso = toIsoDate(rawDate);
+
+          const matchesPeriod = prefixes.some(function (p) {
+            return iso.startsWith(p);
+          });
+
+          if (matchesPeriod) {
+            totalDppBulan += dpp;
+          }
+        });
+
+        return {
+          totalDppBulan: totalDppBulan,
+          totalDppSejakAwal: totalDppSejakAwal,
+          totalPpnSejakAwal: totalPpnSejakAwal,
+          notes: 'Pendapatan seluruh PPN',
+          notesTitle: 'Total seluruh PPN: ' + formatRupiah(totalPpnSejakAwal)
+        };
+      }
+
+      /* ===== INTEGRASI MODUL PENGELUARAN & BEBAN UNTUK BEBAN OPERASIONAL ===== */
+      const PENGELUARAN_STORAGE_KEY = 'accounting_pengeluaran_beban_data_v5';
+      const PENGELUARAN_FALLBACK_KEY = 'accounting_pengeluaran_beban_data';
+
+      function getPengeluaranBebanList() {
+        try {
+          const raw = localStorage.getItem(PENGELUARAN_STORAGE_KEY) || localStorage.getItem(PENGELUARAN_FALLBACK_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Gagal membaca data modul pengeluaran & beban:', e);
+        }
+        // Fallback seed data pengeluaran & beban yang sinkron persis dengan modul pengeluaran & beban
+        return [
+          {
+            id: 'exp-1',
+            idDokumen: 'EXP-2609-001',
+            tanggalPengakuan: '2026-09-04',
+            vendorKaryawan: 'BCA',
+            keterangan: 'Admin Bank BCA',
+            kodeCoa: '5009',
+            namaAkunCoa: 'Beban Administrasi Bank',
+            bebanDiAkui: 30000
+          },
+          {
+            id: 'exp-2',
+            idDokumen: 'EXP-2609-002',
+            tanggalPengakuan: '2026-09-08',
+            vendorKaryawan: 'Meta Ads',
+            keterangan: 'Iklan Digital Campaign Meta Ads',
+            kodeCoa: '5001',
+            namaAkunCoa: 'Beban Pemasaran & Iklan',
+            bebanDiAkui: 1500000
+          },
+          {
+            id: 'exp-3',
+            idDokumen: 'EXP-2609-003',
+            tanggalPengakuan: '2026-09-15',
+            vendorKaryawan: 'PT Gedung Megah',
+            keterangan: 'Sewa Ruang Kantor Lt. 3',
+            kodeCoa: '5002',
+            namaAkunCoa: 'Beban Sewa Gedung',
+            bebanDiAkui: 4500000
+          },
+          {
+            id: 'exp-4',
+            idDokumen: 'EXP-2609-004',
+            tanggalPengakuan: '2026-09-20',
+            vendorKaryawan: 'CV Berkah Office',
+            keterangan: 'Pengadaan Perlengkapan Kantor',
+            kodeCoa: '5009',
+            namaAkunCoa: 'Beban Administrasi Kantor',
+            bebanDiAkui: 450000
+          },
+          {
+            id: 'exp-5',
+            idDokumen: 'EXP-2609-005',
+            tanggalPengakuan: '2026-10-18',
+            vendorKaryawan: 'Google Cloud',
+            keterangan: 'Server & Cloud Hosting Database',
+            kodeCoa: '5010',
+            namaAkunCoa: 'Beban Server & IT',
+            bebanDiAkui: 850000
+          }
+        ];
+      }
+
+      // Rumus Beban Operasional:
+      // 1. Bulan Laporan: Total Beban Diakui khusus transaksi di bulan ini saja atau perbulan pada modul Pengeluaran & Beban
+      // 2. Sejak Awal Pembukaan: Total seluruh beban yang diakui dari awal mula pembukaan sampai sekarang pada modul Pengeluaran & Beban
+      // 3. Catatan: Termasuk reimbursement tagihan tanggal rincian belum termasuk beban
+      function getBebanOperasionalMetrics(periodKey) {
+        const list = getPengeluaranBebanList();
+        const prefixes = getPeriodMonthPrefixes(periodKey);
+
+        let totalBebanDiakuiBulan = 0;
+        let totalBebanDiakuiSejakAwal = 0;
+
+        list.forEach(function (item) {
+          if (!item) return;
+          const beban = Number(item.bebanDiAkui) || 0;
+
+          // Sejak Awal Pembukaan: akumulasi seluruh beban yang diakui dari awal pembukaan sampai sekarang
+          totalBebanDiakuiSejakAwal += beban;
+
+          // Bulan Laporan: total beban diakui khusus transaksi di bulan ini saja / perbulan
+          const rawDate = item.tanggalPengakuan || item.tanggalBayarLama || item.jatuhTempo || '';
+          const iso = toIsoDate(rawDate);
+
+          const matchesPeriod = prefixes.some(function (p) {
+            return iso.startsWith(p);
+          });
+
+          if (matchesPeriod) {
+            totalBebanDiakuiBulan += beban;
+          }
+        });
+
+        return {
+          totalBebanDiakuiBulan: totalBebanDiakuiBulan,
+          totalBebanDiakuiSejakAwal: totalBebanDiakuiSejakAwal,
+          notes: 'Termasuk reimbursement tagihan tanggal rincian belum termasuk beban'
+        };
+      }
+
+      /* ===== INTEGRASI MODUL PAYROLL UNTUK BEBAN PAYROLL ===== */
+      const PAYROLL_STORAGE_KEY = 'bisa_payroll_data_v1';
+      const PAYROLL_FALLBACK_KEY = 'accounting_payroll_data_v1';
+
+      const MONTH_NAMES_INDO = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      const MONTH_SHORT_INDO = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+        'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+      ];
+
+      function parsePayrollPeriodToYm(val) {
+        if (!val) return '';
+        const str = String(val).trim();
+        for (let i = 0; i < MONTH_NAMES_INDO.length; i++) {
+          const mName = MONTH_NAMES_INDO[i];
+          const mShort = MONTH_SHORT_INDO[i];
+          const regex = new RegExp('(?:^|\\b)(?:\\d{1,2}\\s+)?(?:' + mName + '|' + mShort + ')\\s+(\\d{4})\\b', 'i');
+          const match = str.match(regex);
+          if (match) {
+            const y = match[1];
+            const m = String(i + 1).padStart(2, '0');
+            return y + '-' + m;
+          }
+        }
+        const isoMatch = str.match(/^(\d{4})[-/](\d{1,2})/);
+        if (isoMatch) {
+          return isoMatch[1] + '-' + String(isoMatch[2]).padStart(2, '0');
+        }
+        const dmyMatch = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+        if (dmyMatch) {
+          return dmyMatch[3] + '-' + String(dmyMatch[2]).padStart(2, '0');
+        }
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        }
+        return '';
+      }
+
+      function getPayrollList() {
+        try {
+          const raw = localStorage.getItem(PAYROLL_STORAGE_KEY) || localStorage.getItem(PAYROLL_FALLBACK_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Gagal membaca data modul payroll:', e);
+        }
+        // Fallback seed data persis modul payroll
+        return [
+          {
+            id: 'PAY-001',
+            idKaryawan: 'KRY-001',
+            periode: 'Oktober 2026',
+            nik: 'BM-2024-001',
+            nama: 'Ahmad Fauzi',
+            divisi: 'MCN',
+            gajiPokok: 5000000,
+            tunjangan: 1000000,
+            bonusLembur: 500000,
+            bebanBruto: 6500000
+          },
+          {
+            id: 'PAY-002',
+            idKaryawan: 'KRY-002',
+            periode: 'Oktober 2026',
+            nik: 'BM-2024-002',
+            nama: 'Raka Wijaya',
+            divisi: 'Marketing & Brand',
+            gajiPokok: 4500000,
+            tunjangan: 750000,
+            bonusLembur: 250000,
+            bebanBruto: 5500000
+          }
+        ];
+      }
+
+      // Rumus Beban Payroll:
+      // 1. Bulan Laporan: Total Beban Bruto khusus transaksi pada bulan ini saja / perbulan pada modul Payroll
+      // 2. Sejak Awal Pembukaan: Total seluruh beban bruto yang diakui dari mulai awal pembukaan sampai sekarang pada modul Payroll
+      // 3. Catatan: gaji, tunjangan, bonus, potongan, bukan pengurangan beban gaji
+      function getBebanPayrollMetrics(periodKey) {
+        const list = getPayrollList();
+        const prefixes = getPeriodMonthPrefixes(periodKey);
+
+        let totalBebanBrutoBulan = 0;
+        let totalBebanBrutoSejakAwal = 0;
+
+        list.forEach(function (item) {
+          if (!item) return;
+          const bruto = Number(item.bebanBruto) || 0;
+
+          // Sejak Awal Pembukaan: akumulasi seluruh beban bruto dari awal pembukaan sampai sekarang
+          totalBebanBrutoSejakAwal += bruto;
+
+          // Bulan Laporan: total beban bruto khusus transaksi pada bulan ini saja / perbulan
+          const ym = parsePayrollPeriodToYm(item.periode || item.tanggal || '');
+
+          const matchesPeriod = prefixes.some(function (p) {
+            return ym ? ym.startsWith(p) : false;
+          });
+
+          if (matchesPeriod) {
+            totalBebanBrutoBulan += bruto;
+          }
+        });
+
+        return {
+          totalBebanBrutoBulan: totalBebanBrutoBulan,
+          totalBebanBrutoSejakAwal: totalBebanBrutoSejakAwal,
+          notes: 'gaji, tunjangan, bonus, potongan, bukan pengurangan beban gaji'
+        };
+      }
+
+      /* ===== INTEGRASI MODUL PENYUSUTAN ASET UNTUK BEBAN PENYUSUTAN ===== */
+      const PENYUSUTAN_STORAGE_KEY = 'accounting_penyusutan_aset_data';
+
+      function getPenyusutanList() {
+        try {
+          const raw = localStorage.getItem(PENYUSUTAN_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Gagal membaca data modul penyusutan aset:', e);
+        }
+        // Fallback seed data persis modul penyusutan aset
+        return [
+          {
+            id: 'AST-001',
+            kodeAset: 'AST-001',
+            namaAset: 'Dispenser Mini Miyako',
+            mulaiDipakai: '2026-06-01',
+            akumAkhir: 27778
+          },
+          {
+            id: 'AST-002',
+            kodeAset: 'AST-002',
+            namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
+            mulaiDipakai: '2026-10-15',
+            akumAkhir: 1583334
+          },
+          {
+            id: 'AST-003',
+            kodeAset: 'AST-003',
+            namaAset: 'MacBook Pro M3 Max 36GB',
+            mulaiDipakai: '2026-08-20',
+            akumAkhir: 3624999
+          },
+          {
+            id: 'AST-004',
+            kodeAset: 'AST-004',
+            namaAset: 'Meja Meeting Kayu Jati Custom 3M',
+            mulaiDipakai: '2026-01-15',
+            akumAkhir: 2166670
+          },
+          {
+            id: 'AST-005',
+            kodeAset: 'AST-005',
+            namaAset: 'AC Daikin Inverter 2 PK Multi-S',
+            mulaiDipakai: '2026-03-01',
+            akumAkhir: 1966664
+          }
+        ];
+      }
+
+      // Rumus Beban Penyusutan:
+      // 1. Bulan Laporan: Total Akum Akhir khusus transaksi di bulan ini saja / perbulan pada modul Penyusutan Aset
+      // 2. Sejak Awal Pembukaan: Total seluruh akum akhir diakui dari awal mula pembukaan sampai sekarang pada modul Penyusutan Aset
+      // 3. Catatan: 1 bulan penuh sejak bulan mulai dipakai
+      function getBebanPenyusutanMetrics(periodKey) {
+        const list = getPenyusutanList();
+        const prefixes = getPeriodMonthPrefixes(periodKey);
+
+        let totalAkumAkhirBulan = 0;
+        let totalAkumAkhirSejakAwal = 0;
+
+        list.forEach(function (item) {
+          if (!item) return;
+          const akum = Number(item.akumAkhir) || 0;
+
+          // Sejak Awal Pembukaan: akumulasi seluruh akum akhir dari awal mula pembukaan sampai sekarang
+          totalAkumAkhirSejakAwal += akum;
+
+          // Bulan Laporan: total akum akhir khusus transaksi di bulan ini saja / perbulan
+          const rawDate = item.mulaiDipakai || item.tanggal || '';
+          const iso = toIsoDate(rawDate);
+
+          const matchesPeriod = prefixes.some(function (p) {
+            return iso.startsWith(p);
+          });
+
+          if (matchesPeriod) {
+            totalAkumAkhirBulan += akum;
+          }
+        });
+
+        return {
+          totalAkumAkhirBulan: totalAkumAkhirBulan,
+          totalAkumAkhirSejakAwal: totalAkumAkhirSejakAwal,
+          notes: '1 bulan penuh sejak bulan mulai dipakai'
+        };
+      }
+
+      /* ===== INTEGRASI MODUL DAFTAR ASET UNTUK LABA/RUGI PELEPASAN ASET ===== */
+      const DAFTAR_ASET_STORAGE_KEYS = [
+        'bisa_accounting_daftar_aset_data_v4',
+        'accounting_daftar_aset_data'
+      ];
+
+      function parseMoneyValue(val) {
+        if (typeof val === 'number') return isNaN(val) ? 0 : val;
+        if (!val || val === '-') return 0;
+        const str = String(val).trim();
+        const isNeg = str.includes('-');
+        const clean = str.replace(/[^0-9]/g, '');
+        if (!clean) return 0;
+        const num = Number(clean);
+        return isNeg ? -num : num;
+      }
+
+      function getElapsedMonthsLepas(startDateStr, maxUmur, endDateStr) {
+        if (!startDateStr) return 0;
+        const startIso = toIsoDate(startDateStr);
+        if (!startIso) return 0;
+        const startY = parseInt(startIso.slice(0, 4), 10);
+        const startM = parseInt(startIso.slice(5, 7), 10);
+
+        let months = 0;
+        if (endDateStr) {
+          const endIso = toIsoDate(endDateStr);
+          if (endIso) {
+            const endY = parseInt(endIso.slice(0, 4), 10);
+            const endM = parseInt(endIso.slice(5, 7), 10);
+            months = (endY - startY) * 12 + (endM - startM);
+          }
+        } else {
+          const now = new Date();
+          months = (now.getFullYear() - startY) * 12 + (now.getMonth() + 1 - startM);
+        }
+        months = Math.max(0, months);
+        if (maxUmur > 0) {
+          months = Math.min(months, maxUmur);
+        }
+        return months;
+      }
+
+      function hitungNilaiBukuLepas(item) {
+        if (item.nilaiBukuSaatLepas !== undefined && item.nilaiBukuSaatLepas !== null && item.nilaiBukuSaatLepas !== '-') {
+          return parseMoneyValue(item.nilaiBukuSaatLepas);
+        }
+        const hargaSatuan = Number(item.hargaSatuan) || 0;
+        const qty = parseInt(item.qty, 10) || 0;
+        const hargaPerolehan = (hargaSatuan > 0 && qty > 0)
+          ? Math.round(hargaSatuan * qty)
+          : Math.max(0, Math.round(Number(item.hargaPerolehan) || 0));
+        const umurBulan = parseInt(item.umurBulan, 10) || 0;
+        const nilaiResidu = Math.max(0, Math.round(Number(item.nilaiResidu) || 0));
+        const maxDepreciable = Math.max(0, hargaPerolehan - nilaiResidu);
+        const penyusutanBulanExact = umurBulan > 0 ? maxDepreciable / umurBulan : 0;
+        const startDate = String(item.mulaiDiPakai || item.tanggalBeli || '').trim();
+        const tglLepas = String(item.tanggalPelepasan || '').trim();
+        const bulanBerjalan = getElapsedMonthsLepas(startDate, umurBulan, tglLepas);
+        const akumulasi = (umurBulan > 0 && maxDepreciable > 0)
+          ? Math.min(maxDepreciable, Math.round(penyusutanBulanExact * bulanBerjalan))
+          : 0;
+        return Math.max(0, hargaPerolehan - akumulasi);
+      }
+
+      function getDaftarAsetList() {
+        for (let i = 0; i < DAFTAR_ASET_STORAGE_KEYS.length; i++) {
+          try {
+            const raw = localStorage.getItem(DAFTAR_ASET_STORAGE_KEYS[i]);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                return parsed;
+              }
+            }
+          } catch (e) {
+            console.error('Gagal membaca data modul daftar aset:', e);
+          }
+        }
+        // Fallback seed data aset
+        return [
+          {
+            id: 'AST-001',
+            kodeAset: 'AST-001',
+            namaAset: 'Kursi Kerja Ergonomis',
+            tanggalBeli: '2026-05-10',
+            mulaiDiPakai: '2026-06-01',
+            hargaPerolehan: 200000,
+            tanggalPelepasan: '',
+            hasilPelepasan: '-',
+            nilaiBukuSaatLepas: '-'
+          },
+          {
+            id: 'AST-002',
+            kodeAset: 'AST-002',
+            namaAset: 'Sony Alpha A7 IV + Lens 24-70mm',
+            tanggalBeli: '2026-10-12',
+            mulaiDiPakai: '2026-10-15',
+            hargaPerolehan: 42000000,
+            tanggalPelepasan: '',
+            hasilPelepasan: '-',
+            nilaiBukuSaatLepas: '-'
+          },
+          {
+            id: 'AST-003',
+            kodeAset: 'AST-003',
+            namaAset: 'Ergonomic Office Chair Aeron',
+            tanggalBeli: '2026-09-20',
+            mulaiDiPakai: '2026-09-22',
+            hargaPerolehan: 74000000,
+            tanggalPelepasan: '',
+            hasilPelepasan: '-',
+            nilaiBukuSaatLepas: '-'
+          },
+          {
+            id: 'AST-004',
+            kodeAset: 'AST-004',
+            namaAset: 'Laptop ThinkPad T14 Gen 2',
+            tanggalBeli: '2026-03-12',
+            mulaiDiPakai: '2026-03-15',
+            hargaPerolehan: 14500000,
+            tanggalPelepasan: '',
+            hasilPelepasan: '-',
+            nilaiBukuSaatLepas: '-'
+          },
+          {
+            id: 'AST-005',
+            kodeAset: 'AST-005',
+            namaAset: 'Kamera Sony Alpha A7 IV',
+            tanggalBeli: '2026-02-10',
+            mulaiDiPakai: '2026-02-15',
+            hargaPerolehan: 32000000,
+            tanggalPelepasan: '',
+            hasilPelepasan: '-',
+            nilaiBukuSaatLepas: '-'
+          },
+          {
+            id: 'AST-006',
+            kodeAset: 'AST-006',
+            namaAset: 'MacBook Pro 15 inch (2022)',
+            tanggalBeli: '2024-01-10',
+            mulaiDiPakai: '2024-01-15',
+            hargaPerolehan: 35000000,
+            tanggalPelepasan: '2026-07-20',
+            hasilPelepasan: 25000000,
+            nilaiBukuSaatLepas: 10000000,
+            labaRugiLepas: 15000000
+          },
+          {
+            id: 'AST-007',
+            kodeAset: 'AST-007',
+            namaAset: 'Kendaraan Operasional Grand Max',
+            tanggalBeli: '2023-05-10',
+            mulaiDiPakai: '2023-05-15',
+            hargaPerolehan: 120000000,
+            tanggalPelepasan: '2026-03-15',
+            hasilPelepasan: 80000000,
+            nilaiBukuSaatLepas: 50000000,
+            labaRugiLepas: 30000000
+          }
+        ];
+      }
+
+      // Rumus Laba/Rugi Pelepasan Aset:
+      // 1. Bulan Laporan: Hasil pelepasan (harga jual) - nilai buku saat lepas pada modul daftar aset pada bulan ini
+      // 2. Sejak Awal Pembukaan: Hasil pelepasan (harga jual) - nilai buku saat lepas pada modul daftar aset dari awal sampai sekarang
+      // 3. Catatan: hasil pelepasan - nilai buku
+      function getPelepasanAsetMetrics(periodKey) {
+        const list = getDaftarAsetList();
+        const prefixes = getPeriodMonthPrefixes(periodKey);
+
+        let totalLabaRugiBulan = 0;
+        let totalLabaRugiSejakAwal = 0;
+        let countDisposed = 0;
+
+        list.forEach(function (item) {
+          if (!item) return;
+
+          const rawDate = item.tanggalPelepasan || item.tanggalLepas || '';
+          const hasHasil = item.hasilPelepasan !== undefined && item.hasilPelepasan !== null && item.hasilPelepasan !== '-';
+          const isDilepas = Boolean(rawDate || hasHasil || String(item.status || '').toLowerCase() === 'dilepas' || String(item.status || '').toLowerCase() === 'dijual');
+
+          if (!isDilepas) return;
+          countDisposed++;
+
+          const hasilPelepasan = parseMoneyValue(item.hasilPelepasan);
+          const nilaiBukuLepas = hitungNilaiBukuLepas(item);
+          // Rumus: hasil pelepasan (harga jual) - nilai buku saat lepas
+          const labaRugi = hasilPelepasan - nilaiBukuLepas;
+
+          // Sejak Awal Pembukaan: akumulasi dari awal mula pembukaan sampai sekarang
+          totalLabaRugiSejakAwal += labaRugi;
+
+          // Bulan Laporan: khusus transaksi pada bulan laporan ini
+          const iso = toIsoDate(rawDate);
+          const matchesPeriod = prefixes.some(function (p) {
+            return iso && iso.startsWith(p);
+          });
+
+          if (matchesPeriod) {
+            totalLabaRugiBulan += labaRugi;
+          }
+        });
+
+        // Fallback jika belum ada pelepasan di list daftar aset
+        if (countDisposed === 0) {
+          const defaultData = LABA_RUGI_DATA[periodKey] || LABA_RUGI_DATA.okt2026;
+          if (defaultData && defaultData.statement && defaultData.statement.pelepasanAset) {
+            totalLabaRugiBulan = defaultData.statement.pelepasanAset.bulan || 0;
+            totalLabaRugiSejakAwal = defaultData.statement.pelepasanAset.ytd || 0;
+          }
+        }
+
+        return {
+          totalLabaRugiBulan: totalLabaRugiBulan,
+          totalLabaRugiSejakAwal: totalLabaRugiSejakAwal,
+          notes: 'hasil pelepasan - nilai buku'
+        };
+      }
+
       /* ===== STATE VARIABLES ===== */
       let currentPeriod = 'okt2026';
       let currentGranularity = 'weekly'; // 'daily' | 'weekly' | 'monthly'
@@ -1028,30 +1743,454 @@
       function renderDashboard() {
         const data = LABA_RUGI_DATA[currentPeriod] || LABA_RUGI_DATA.okt2026;
 
+        // Ambil data Pendapatan dinamis dari Modul Pendapatan:
+        // - Laporan Bulanan: total DPP khusus transaksi di bulan ini/perbulan
+        // - Sejak Awal Pembukaan: total seluruh DPP dari awal mula pembukaan sampai sekarang
+        // - Catatan: 'Pendapatan seluruh PPN'
+        const pndMetrics = getPendapatanMetrics(currentPeriod);
+        const statement = JSON.parse(JSON.stringify(data.statement));
+        statement.pendapatan = {
+          bulan: pndMetrics.totalDppBulan,
+          ytd: pndMetrics.totalDppSejakAwal,
+          notes: pndMetrics.notes,
+          notesTitle: pndMetrics.notesTitle
+        };
+
+        // Ambil data Beban Operasional dinamis dari Modul Pengeluaran & Beban:
+        // - Bulan Laporan: total beban diakui khusus transaksi di bulan ini/perbulan
+        // - Sejak Awal Pembukaan: total seluruh beban yang diakui dari awal mula pembukaan sampai sekarang
+        // - Catatan: 'Termasuk reimbursement tagihan tanggal rincian belum termasuk beban'
+        const bOpMetrics = getBebanOperasionalMetrics(currentPeriod);
+        statement.bebanOperasional = {
+          bulan: bOpMetrics.totalBebanDiakuiBulan,
+          ytd: bOpMetrics.totalBebanDiakuiSejakAwal,
+          notes: bOpMetrics.notes
+        };
+
+        // Ambil data Beban Payroll dinamis dari Modul Payroll:
+        // - Bulan Laporan: total beban bruto khusus transaksi pada bulan ini saja / perbulan
+        // - Sejak Awal Pembukaan: total seluruh beban bruto yang diakui dari mulai awal pembukaan sampai sekarang
+        // - Catatan: 'gaji, tunjangan, bonus, potongan, bukan pengurangan beban gaji'
+        const bPayMetrics = getBebanPayrollMetrics(currentPeriod);
+        statement.bebanPayroll = {
+          bulan: bPayMetrics.totalBebanBrutoBulan,
+          ytd: bPayMetrics.totalBebanBrutoSejakAwal,
+          notes: bPayMetrics.notes
+        };
+
+        // Ambil data Beban Penyusutan dinamis dari Modul Penyusutan Aset:
+        // - Bulan Laporan: total akum akhir khusus transaksi di bulan ini/perbulan
+        // - Sejak Awal Pembukaan: total seluruh akum akhir diakui dari awal mula pembukaan sampai sekarang
+        // - Catatan: '1 bulan penuh sejak bulan mulai dipakai'
+        const bPenMetrics = getBebanPenyusutanMetrics(currentPeriod);
+        statement.bebanPenyusutan = {
+          bulan: bPenMetrics.totalAkumAkhirBulan,
+          ytd: bPenMetrics.totalAkumAkhirSejakAwal,
+          notes: bPenMetrics.notes
+        };
+
+        // Ambil data Laba/Rugi Pelepasan Aset dinamis dari Modul Daftar Aset:
+        // - Bulan Laporan: hasil pelepasan (harga jual) - nilai buku saat lepas pada modul daftar aset pada bulan ini
+        // - Sejak Awal Pembukaan: hasil pelepasan (harga jual) - nilai buku saat lepas pada modul daftar aset dari awal sampai sekarang
+        // - Catatan: 'hasil pelepasan - nilai buku'
+        const lepAsetMetrics = getPelepasanAsetMetrics(currentPeriod);
+        statement.pelepasanAset = {
+          bulan: lepAsetMetrics.totalLabaRugiBulan,
+          ytd: lepAsetMetrics.totalLabaRugiSejakAwal,
+          notes: lepAsetMetrics.notes
+        };
+
         // 1. Summary Cards
         const cardPendapatan = document.getElementById('cardPendapatan');
         const cardTotalBeban = document.getElementById('cardTotalBeban');
         const cardLabaBersih = document.getElementById('cardLabaBersih');
         const cardBebanOperasional = document.getElementById('cardBebanOperasional');
 
-        if (cardPendapatan) cardPendapatan.textContent = formatRupiah(data.cards.pendapatan);
-        if (cardTotalBeban) cardTotalBeban.textContent = formatRupiah(data.cards.totalBeban);
-        if (cardLabaBersih) cardLabaBersih.textContent = formatRupiah(data.cards.labaBersih);
-        if (cardBebanOperasional) cardBebanOperasional.textContent = formatRupiah(data.cards.bebanOperasional);
+        // Total Beban:
+        // - Bulan Laporan: Beban Operasional + Beban Payroll + Beban Penyusutan (khusus bulan laporan)
+        // - Sejak Awal Pembukaan: Beban Operasional + Beban Payroll + Beban Penyusutan (dari awal pembukaan sampai sekarang)
+        const totBebanBln = statement.bebanOperasional.bulan + statement.bebanPayroll.bulan + statement.bebanPenyusutan.bulan;
+        const totBebanYtd = statement.bebanOperasional.ytd + statement.bebanPayroll.ytd + statement.bebanPenyusutan.ytd;
+        statement.totalBeban = {
+          bulan: totBebanBln,
+          ytd: totBebanYtd
+        };
 
-        // 2. Trend Line / Bar Chart
-        const trendDataSet = (data.trend && data.trend[currentGranularity])
-          ? data.trend[currentGranularity]
-          : (data.trend.weekly || data.trend);
+        // Laba Sebelum Pajak:
+        // - Bulan Laporan: pendapatan - total beban + laba rugi lepas pada daftar aset pada bulan ini
+        // - Sejak Awal Pembukaan: pendapatan - total beban + laba rugi lepas dari awal mula pembukaan sampai sekarang
+        const labaKotorBln = statement.pendapatan.bulan - totBebanBln + statement.pelepasanAset.bulan;
+        const labaKotorYtd = statement.pendapatan.ytd - totBebanYtd + statement.pelepasanAset.ytd;
+        statement.labaSebelumPajak = {
+          bulan: labaKotorBln,
+          ytd: labaKotorYtd
+        };
 
+        // Laba Bersih:
+        // - Bulan Laporan: laba sebelum pajak - beban pajak penghasilan pada bulan ini / perbulan
+        // - Sejak Awal Pembukaan: laba sebelum pajak - beban pajak penghasilan dari mula pembukaan sampai sekarang
+        const labaBersihBln = labaKotorBln - statement.pajakPenghasilan.bulan;
+        const labaBersihYtd = labaKotorYtd - statement.pajakPenghasilan.ytd;
+        statement.labaBersih = {
+          bulan: labaBersihBln,
+          ytd: labaBersihYtd
+        };
+
+        if (cardPendapatan) cardPendapatan.textContent = formatRupiah(statement.pendapatan.bulan);
+        if (cardTotalBeban) cardTotalBeban.textContent = formatRupiah(totBebanBln);
+        if (cardLabaBersih) cardLabaBersih.textContent = formatRupiah(labaBersihBln);
+        if (cardBebanOperasional) cardBebanOperasional.textContent = formatRupiah(statement.bebanOperasional.bulan);
+
+        // 2. Trend Line / Bar Chart (Real Data dari Transaksi Seluruh Modul)
+        const trendDataSet = buildRealTrendData(currentPeriod, currentGranularity);
         updateTrendKPIs(trendDataSet);
         renderTrendChart(trendDataSet, currentChartType);
 
-        // 3. Komponen Beban Donut Chart
-        renderDonutChart(data.components);
+        // 3. Komponen Beban Donut Chart (Real Proporsi Beban Berjalan)
+        const opRp = statement.bebanOperasional.bulan || 0;
+        const payRp = statement.bebanPayroll.bulan || 0;
+        const penRp = statement.bebanPenyusutan.bulan || 0;
+        const totBeban = opRp + payRp + penRp;
+
+        const opPct = totBeban > 0 ? (opRp / totBeban) * 100 : 0;
+        const payPct = totBeban > 0 ? (payRp / totBeban) * 100 : 0;
+        const penPct = totBeban > 0 ? (penRp / totBeban) * 100 : 0;
+
+        renderDonutChart({
+          operasional: { bulan: opRp, pct: opPct },
+          penyusutan: { bulan: penRp, pct: penPct },
+          payroll: { bulan: payRp, pct: payPct },
+          total: totBeban
+        });
 
         // 4. Laba Rugi Full Table
-        renderLabaRugiTable(data.statement);
+        renderLabaRugiTable(statement);
+      }
+
+      /* ===== BUILD REAL TREND DATA DARI SELURUH MODUL ===== */
+      function getPeriodYm(periodKey) {
+        if (periodKey === 'okt2026') return '2026-10';
+        if (periodKey === 'sep2026') return '2026-09';
+        if (periodKey === 'agu2026') return '2026-08';
+        if (periodKey === 'q3_2026') return '2026-q3';
+        if (periodKey === 'tahun2026') return '2026';
+        return '2026-10';
+      }
+
+      function buildRealTrendData(periodKey, granularity) {
+        const pendapatanList = getPendapatanList();
+        const bebanOpList = getPengeluaranBebanList();
+        const payrollList = getPayrollList();
+        const penyusutanList = getPenyusutanList();
+
+        const ym = getPeriodYm(periodKey);
+
+        function getDayNum(dateStr) {
+          const iso = toIsoDate(dateStr);
+          if (!iso) return 0;
+          return parseInt(iso.slice(8, 10), 10) || 0;
+        }
+
+        function isDateInMonth(dateStr, targetYm) {
+          const iso = toIsoDate(dateStr);
+          return iso ? iso.startsWith(targetYm) : false;
+        }
+
+        // 1. BULANAN (Monthly Trend)
+        if (granularity === 'monthly') {
+          const monthDefs = [
+            { ym: '2026-05', label: 'Mei' },
+            { ym: '2026-06', label: 'Jun' },
+            { ym: '2026-07', label: 'Jul' },
+            { ym: '2026-08', label: 'Agu' },
+            { ym: '2026-09', label: 'Sep' },
+            { ym: '2026-10', label: 'Okt' }
+          ];
+
+          const labels = [];
+          const pendapatanArr = [];
+          const bebanArr = [];
+          const labaArr = [];
+
+          monthDefs.forEach(function (mDef) {
+            labels.push(mDef.label);
+            let pTotal = 0;
+            let bTotal = 0;
+
+            pendapatanList.forEach(function (p) {
+              const d = p.tanggalPengakuan || p.tanggal || p.jatuhTempo || '';
+              if (isDateInMonth(d, mDef.ym)) {
+                pTotal += (Number(p.dpp) || 0);
+              }
+            });
+
+            bebanOpList.forEach(function (b) {
+              const d = b.tanggalPengakuan || b.tanggalBayarLama || b.jatuhTempo || '';
+              if (isDateInMonth(d, mDef.ym)) {
+                bTotal += (Number(b.bebanDiAkui) || 0);
+              }
+            });
+
+            payrollList.forEach(function (py) {
+              const pYm = parsePayrollPeriodToYm(py.periode || py.tanggal || '');
+              if (pYm === mDef.ym) {
+                bTotal += (Number(py.bebanBruto) || 0);
+              }
+            });
+
+            penyusutanList.forEach(function (pn) {
+              const d = pn.mulaiDipakai || pn.tanggal || '';
+              const pnIso = toIsoDate(d);
+              if (pnIso && pnIso.startsWith(mDef.ym)) {
+                bTotal += (Number(pn.akumAkhir) || 0);
+              }
+            });
+
+            pendapatanArr.push(pTotal);
+            bebanArr.push(bTotal);
+            labaArr.push(pTotal - bTotal);
+          });
+
+          return {
+            labels: labels,
+            pendapatan: pendapatanArr,
+            beban: bebanArr,
+            laba: labaArr
+          };
+        }
+
+        // 2. HARIAN (Daily Trend)
+        if (granularity === 'daily') {
+          const targetYm = (ym.length === 7) ? ym : '2026-10';
+          const monthShort = targetYm === '2026-10' ? 'Okt' : (targetYm === '2026-09' ? 'Sep' : (targetYm === '2026-08' ? 'Agu' : 'Bln'));
+          const dayBuckets = [
+            { label: '01 ' + monthShort, start: 1, end: 3 },
+            { label: '04 ' + monthShort, start: 4, end: 6 },
+            { label: '07 ' + monthShort, start: 7, end: 9 },
+            { label: '10 ' + monthShort, start: 10, end: 12 },
+            { label: '13 ' + monthShort, start: 13, end: 15 },
+            { label: '16 ' + monthShort, start: 16, end: 18 },
+            { label: '19 ' + monthShort, start: 19, end: 21 },
+            { label: '22 ' + monthShort, start: 22, end: 24 },
+            { label: '25 ' + monthShort, start: 25, end: 27 },
+            { label: '28 ' + monthShort, start: 28, end: 30 },
+            { label: '31 ' + monthShort, start: 31, end: 31 }
+          ];
+
+          const labels = [];
+          const pendapatanArr = [];
+          const bebanArr = [];
+          const labaArr = [];
+
+          dayBuckets.forEach(function (bucket) {
+            labels.push(bucket.label);
+            let pTotal = 0;
+            let bTotal = 0;
+
+            pendapatanList.forEach(function (p) {
+              const d = p.tanggalPengakuan || p.tanggal || p.jatuhTempo || '';
+              if (isDateInMonth(d, targetYm)) {
+                const day = getDayNum(d);
+                if (day >= bucket.start && day <= bucket.end) {
+                  pTotal += (Number(p.dpp) || 0);
+                }
+              }
+            });
+
+            bebanOpList.forEach(function (b) {
+              const d = b.tanggalPengakuan || b.tanggalBayarLama || b.jatuhTempo || '';
+              if (isDateInMonth(d, targetYm)) {
+                const day = getDayNum(d);
+                if (day >= bucket.start && day <= bucket.end) {
+                  bTotal += (Number(b.bebanDiAkui) || 0);
+                }
+              }
+            });
+
+            if (bucket.start <= 25 && bucket.end >= 25) {
+              payrollList.forEach(function (py) {
+                const pYm = parsePayrollPeriodToYm(py.periode || py.tanggal || '');
+                if (pYm === targetYm) {
+                  bTotal += (Number(py.bebanBruto) || 0);
+                }
+              });
+            }
+
+            if (bucket.end >= 30) {
+              penyusutanList.forEach(function (pn) {
+                const d = pn.mulaiDipakai || pn.tanggal || '';
+                const pnIso = toIsoDate(d);
+                if (pnIso && pnIso.startsWith(targetYm)) {
+                  bTotal += (Number(pn.akumAkhir) || 0);
+                }
+              });
+            }
+
+            pendapatanArr.push(pTotal);
+            bebanArr.push(bTotal);
+            labaArr.push(pTotal - bTotal);
+          });
+
+          return {
+            labels: labels,
+            pendapatan: pendapatanArr,
+            beban: bebanArr,
+            laba: labaArr
+          };
+        }
+
+        // 3. MINGGUAN (Weekly Trend) - Default
+        if (periodKey === 'q3_2026') {
+          const qMonths = [
+            { ym: '2026-07', label: 'Juli 2026' },
+            { ym: '2026-08', label: 'Agustus 2026' },
+            { ym: '2026-09', label: 'September 2026' },
+            { ym: '2026-10', label: 'Oktober (Proj)' }
+          ];
+          const labels = [];
+          const pendapatanArr = [];
+          const bebanArr = [];
+          const labaArr = [];
+
+          qMonths.forEach(function (qm) {
+            labels.push(qm.label);
+            let pTotal = 0;
+            let bTotal = 0;
+
+            pendapatanList.forEach(function (p) {
+              const d = p.tanggalPengakuan || p.tanggal || p.jatuhTempo || '';
+              if (isDateInMonth(d, qm.ym)) pTotal += (Number(p.dpp) || 0);
+            });
+            bebanOpList.forEach(function (b) {
+              const d = b.tanggalPengakuan || b.tanggalBayarLama || b.jatuhTempo || '';
+              if (isDateInMonth(d, qm.ym)) bTotal += (Number(b.bebanDiAkui) || 0);
+            });
+            payrollList.forEach(function (py) {
+              const pYm = parsePayrollPeriodToYm(py.periode || py.tanggal || '');
+              if (pYm === qm.ym) bTotal += (Number(py.bebanBruto) || 0);
+            });
+            penyusutanList.forEach(function (pn) {
+              const d = pn.mulaiDipakai || pn.tanggal || '';
+              const pnIso = toIsoDate(d);
+              if (pnIso && pnIso.startsWith(qm.ym)) bTotal += (Number(pn.akumAkhir) || 0);
+            });
+
+            pendapatanArr.push(pTotal);
+            bebanArr.push(bTotal);
+            labaArr.push(pTotal - bTotal);
+          });
+
+          return { labels: labels, pendapatan: pendapatanArr, beban: bebanArr, laba: labaArr };
+        }
+
+        if (periodKey === 'tahun2026') {
+          const quarters = [
+            { prefix: '2026-01', prefix2: '2026-02', prefix3: '2026-03', label: 'Q1 2026' },
+            { prefix: '2026-04', prefix2: '2026-05', prefix3: '2026-06', label: 'Q2 2026' },
+            { prefix: '2026-07', prefix2: '2026-08', prefix3: '2026-09', label: 'Q3 2026' },
+            { prefix: '2026-10', prefix2: '2026-11', prefix3: '2026-12', label: 'Q4 2026' }
+          ];
+          const labels = [];
+          const pendapatanArr = [];
+          const bebanArr = [];
+          const labaArr = [];
+
+          quarters.forEach(function (q) {
+            labels.push(q.label);
+            let pTotal = 0;
+            let bTotal = 0;
+            const matchYm = function (d) {
+              const iso = toIsoDate(d);
+              return iso && (iso.startsWith(q.prefix) || iso.startsWith(q.prefix2) || iso.startsWith(q.prefix3));
+            };
+            pendapatanList.forEach(function (p) {
+              if (matchYm(p.tanggalPengakuan || p.tanggal || p.jatuhTempo || '')) pTotal += (Number(p.dpp) || 0);
+            });
+            bebanOpList.forEach(function (b) {
+              if (matchYm(b.tanggalPengakuan || b.tanggalBayarLama || b.jatuhTempo || '')) bTotal += (Number(b.bebanDiAkui) || 0);
+            });
+            payrollList.forEach(function (py) {
+              const pYm = parsePayrollPeriodToYm(py.periode || py.tanggal || '');
+              if (pYm === q.prefix || pYm === q.prefix2 || pYm === q.prefix3) bTotal += (Number(py.bebanBruto) || 0);
+            });
+            penyusutanList.forEach(function (pn) {
+              if (matchYm(pn.mulaiDipakai || pn.tanggal || '')) bTotal += (Number(pn.akumAkhir) || 0);
+            });
+            pendapatanArr.push(pTotal);
+            bebanArr.push(bTotal);
+            labaArr.push(pTotal - bTotal);
+          });
+
+          return { labels: labels, pendapatan: pendapatanArr, beban: bebanArr, laba: labaArr };
+        }
+
+        // 4 Minggu dalam 1 bulan terpilih
+        const targetYm = (ym.length === 7) ? ym : '2026-10';
+        const monthShort = targetYm === '2026-10' ? 'Okt' : (targetYm === '2026-09' ? 'Sep' : (targetYm === '2026-08' ? 'Agu' : 'Bln'));
+        const weeks = [
+          { label: 'Minggu 1 (1-7 ' + monthShort + ')', start: 1, end: 7 },
+          { label: 'Minggu 2 (8-14 ' + monthShort + ')', start: 8, end: 14 },
+          { label: 'Minggu 3 (15-21 ' + monthShort + ')', start: 15, end: 21 },
+          { label: 'Minggu 4 (22-31 ' + monthShort + ')', start: 22, end: 31 }
+        ];
+
+        const labels = [];
+        const pendapatanArr = [];
+        const bebanArr = [];
+        const labaArr = [];
+
+        weeks.forEach(function (w, idx) {
+          labels.push(w.label);
+          let pTotal = 0;
+          let bTotal = 0;
+
+          pendapatanList.forEach(function (p) {
+            const d = p.tanggalPengakuan || p.tanggal || p.jatuhTempo || '';
+            if (isDateInMonth(d, targetYm)) {
+              const day = getDayNum(d);
+              if (day >= w.start && day <= w.end) {
+                pTotal += (Number(p.dpp) || 0);
+              }
+            }
+          });
+
+          bebanOpList.forEach(function (b) {
+            const d = b.tanggalPengakuan || b.tanggalBayarLama || b.jatuhTempo || '';
+            if (isDateInMonth(d, targetYm)) {
+              const day = getDayNum(d);
+              if (day >= w.start && day <= w.end) {
+                bTotal += (Number(b.bebanDiAkui) || 0);
+              }
+            }
+          });
+
+          if (idx === 3) {
+            payrollList.forEach(function (py) {
+              const pYm = parsePayrollPeriodToYm(py.periode || py.tanggal || '');
+              if (pYm === targetYm) {
+                bTotal += (Number(py.bebanBruto) || 0);
+              }
+            });
+            penyusutanList.forEach(function (pn) {
+              const d = pn.mulaiDipakai || pn.tanggal || '';
+              const pnIso = toIsoDate(d);
+              if (pnIso && pnIso.startsWith(targetYm)) {
+                bTotal += (Number(pn.akumAkhir) || 0);
+              }
+            });
+          }
+
+          pendapatanArr.push(pTotal);
+          bebanArr.push(bTotal);
+          labaArr.push(pTotal - bTotal);
+        });
+
+        return {
+          labels: labels,
+          pendapatan: pendapatanArr,
+          beban: bebanArr,
+          laba: labaArr
+        };
       }
 
       /* ===== UPDATE MINI KPIS FOR TREND KEUANGAN ===== */
@@ -1070,7 +2209,7 @@
         const peakPendapatanLabel = trendData.labels[maxPendapatanIdx] || '-';
         const kpiValPendapatan = document.getElementById('kpiValPendapatan');
         const kpiTagPendapatan = document.getElementById('kpiTagPendapatan');
-        if (kpiValPendapatan) kpiValPendapatan.textContent = 'Rp. ' + maxPendapatan.toLocaleString('id-ID') + ' Jt';
+        if (kpiValPendapatan) kpiValPendapatan.textContent = formatRupiah(maxPendapatan > 0 ? maxPendapatan : 0);
         if (kpiTagPendapatan) kpiTagPendapatan.textContent = peakPendapatanLabel.split(' ')[0] || peakPendapatanLabel;
 
         // 2. Puncak Beban
@@ -1085,7 +2224,7 @@
         const peakBebanLabel = trendData.labels[maxBebanIdx] || '-';
         const kpiValBeban = document.getElementById('kpiValBeban');
         const kpiTagBeban = document.getElementById('kpiTagBeban');
-        if (kpiValBeban) kpiValBeban.textContent = 'Rp. ' + maxBeban.toLocaleString('id-ID') + ' Jt';
+        if (kpiValBeban) kpiValBeban.textContent = formatRupiah(maxBeban > 0 ? maxBeban : 0);
         if (kpiTagBeban) kpiTagBeban.textContent = peakBebanLabel.split(' ')[0] || peakBebanLabel;
 
         // 3. Margin Laba Rata-rata
@@ -1103,9 +2242,15 @@
           if (Number(marginPct) >= 20) {
             kpiTagMargin.textContent = 'Sangat Sehat';
             kpiTagMargin.className = 'lr-trend-kpi-tag is-green';
-          } else {
+          } else if (Number(marginPct) >= 10) {
             kpiTagMargin.textContent = 'Moderat';
             kpiTagMargin.className = 'lr-trend-kpi-tag is-blue';
+          } else if (Number(marginPct) > 0) {
+            kpiTagMargin.textContent = 'Rendah';
+            kpiTagMargin.className = 'lr-trend-kpi-tag is-yellow';
+          } else {
+            kpiTagMargin.textContent = 'Defisit';
+            kpiTagMargin.className = 'lr-trend-kpi-tag is-red';
           }
         }
       }
@@ -1212,8 +2357,10 @@
         ];
 
         const allValues = [].concat(trendData.pendapatan, trendData.beban, trendData.laba);
-        const maxVal = Math.max.apply(null, allValues) || 500;
-        const suggestedMax = Math.ceil((maxVal * 1.15) / 50) * 50;
+        const maxVal = Math.max.apply(null, allValues) || 1000000;
+        const minVal = Math.min.apply(null, allValues);
+        const stepUnit = maxVal > 1000000000 ? 500000000 : (maxVal > 100000000 ? 50000000 : (maxVal > 10000000 ? 5000000 : 1000000));
+        const suggestedMax = Math.ceil((maxVal * 1.15) / stepUnit) * stepUnit;
 
         trendChartInstance = new Chart(ctx, {
           type: isBar ? 'bar' : 'line',
@@ -1265,8 +2412,7 @@
                 callbacks: {
                   label: function (context) {
                     const raw = context.parsed.y;
-                    const formatted = 'Rp. ' + raw.toLocaleString('id-ID') + ' Jt';
-                    return ' ' + context.dataset.label + ': ' + formatted;
+                    return ' ' + context.dataset.label + ': ' + formatRupiah(raw);
                   },
                   afterBody: function (items) {
                     if (items.length >= 2) {
@@ -1274,7 +2420,7 @@
                       const b = items[1].parsed.y || 0;
                       const diff = p - b;
                       const sign = diff >= 0 ? '+' : '';
-                      return '\n  Laba Operasional: ' + sign + 'Rp. ' + diff.toLocaleString('id-ID') + ' Jt';
+                      return '\n  Laba Operasional: ' + sign + formatRupiah(diff);
                     }
                     return '';
                   }
@@ -1292,18 +2438,26 @@
                 }
               },
               y: {
-                beginAtZero: true,
+                beginAtZero: minVal >= 0,
                 suggestedMax: suggestedMax,
                 grid: {
                   color: '#f1f5f9',
                   drawBorder: false
                 },
                 ticks: {
-                  stepSize: suggestedMax > 500 ? 100 : 50,
                   font: { family: 'Outfit', size: 11.5 },
                   color: '#64748b',
                   callback: function (val) {
-                    return 'Rp. ' + val + ' Jt';
+                    if (Math.abs(val) >= 1000000000) {
+                      return 'Rp. ' + (val / 1000000000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M';
+                    }
+                    if (Math.abs(val) >= 1000000) {
+                      return 'Rp. ' + (val / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' Jt';
+                    }
+                    if (Math.abs(val) >= 1000) {
+                      return 'Rp. ' + (val / 1000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' Rb';
+                    }
+                    return 'Rp. ' + val.toLocaleString('id-ID');
                   }
                 }
               }
@@ -1325,14 +2479,32 @@
         const penVal = components.penyusutan.pct;
         const payVal = components.payroll.pct;
 
+        const opRp = components.operasional.bulan || 0;
+        const penRp = components.penyusutan.bulan || 0;
+        const payRp = components.payroll.bulan || 0;
+
         // Update Legend Values
         const legOp = document.getElementById('legendBebanOperasional');
         const legPen = document.getElementById('legendBebanPenyusutan');
         const legPay = document.getElementById('legendBebanPayroll');
 
-        if (legOp) legOp.textContent = opVal.toFixed(0) + '%';
-        if (legPen) legPen.textContent = penVal.toFixed(0) + '%';
-        if (legPay) legPay.textContent = payVal.toFixed(0) + '%';
+        if (legOp) {
+          legOp.textContent = opVal.toFixed(1) + '%';
+          legOp.title = 'Beban Operasional: ' + formatRupiah(opRp);
+        }
+        if (legPen) {
+          legPen.textContent = penVal.toFixed(1) + '%';
+          legPen.title = 'Beban Penyusutan: ' + formatRupiah(penRp);
+        }
+        if (legPay) {
+          legPay.textContent = payVal.toFixed(1) + '%';
+          legPay.title = 'Beban Payroll: ' + formatRupiah(payRp);
+        }
+
+        const hasData = (opVal + penVal + payVal) > 0;
+        const chartData = hasData
+          ? [Number(opVal.toFixed(1)), Number(penVal.toFixed(1)), Number(payVal.toFixed(1))]
+          : [0, 0, 0];
 
         donutChartInstance = new Chart(ctx, {
           type: 'doughnut',
@@ -1340,7 +2512,7 @@
             labels: ['Beban Operasional', 'Beban Penyusutan', 'Beban Payroll'],
             datasets: [
               {
-                data: [opVal, penVal, payVal],
+                data: chartData,
                 backgroundColor: ['#0ea5e9', '#facc15', '#ef4444'],
                 hoverBackgroundColor: ['#0284c7', '#eab308', '#dc2626'],
                 borderWidth: 2.5,
@@ -1360,11 +2532,16 @@
                 backgroundColor: '#0f172a',
                 titleFont: { family: 'Outfit', size: 12, weight: 600 },
                 bodyFont: { family: 'Outfit', size: 12 },
-                padding: 8,
+                padding: 10,
                 cornerRadius: 6,
                 callbacks: {
                   label: function (context) {
-                    return ' ' + context.label + ': ' + context.parsed + '%';
+                    const idx = context.dataIndex;
+                    let rp = 0; let pct = 0;
+                    if (idx === 0) { rp = opRp; pct = opVal; }
+                    else if (idx === 1) { rp = penRp; pct = penVal; }
+                    else if (idx === 2) { rp = payRp; pct = payVal; }
+                    return ' ' + context.label + ': ' + formatRupiah(rp) + ' (' + pct.toFixed(1) + '%)';
                   }
                 }
               }
@@ -1396,12 +2573,18 @@
         const lepAsetBln = statement.pelepasanAset.bulan;
         const lepAsetYtd = statement.pelepasanAset.ytd;
 
+        // Rumus Laba Sebelum Pajak:
+        // - Bulan Laporan: Pendapatan - Total Beban + Laba/Rugi Lepas pada Daftar Aset pada bulan ini
+        // - Sejak Awal Pembukaan: Pendapatan - Total Beban + Laba/Rugi Lepas dari awal mula pembukaan sampai sekarang
         const labaKotorBln = pBln - totBebanBln + lepAsetBln;
         const labaKotorYtd = pYtd - totBebanYtd + lepAsetYtd;
 
         const pajakBln = statement.pajakPenghasilan.bulan;
         const pajakYtd = statement.pajakPenghasilan.ytd;
 
+        // Rumus Laba Bersih:
+        // - Bulan Laporan: laba sebelum pajak - beban pajak penghasilan pada bulan ini / perbulan
+        // - Sejak Awal Pembukaan: laba sebelum pajak - beban pajak penghasilan dari mula pembukaan sampai sekarang
         const labaBersihBln = labaKotorBln - pajakBln;
         const labaBersihYtd = labaKotorYtd - pajakYtd;
 
@@ -1413,6 +2596,7 @@
             bulan: formatRupiah(pBln),
             ytd: formatRupiah(pYtd),
             notes: statement.pendapatan.notes,
+            notesTitle: statement.pendapatan.notesTitle || '',
             amountClass: 'lr-val-positive'
           },
           // 2. Beban operasional
@@ -1459,7 +2643,7 @@
             bulan: formatRupiah(lepAsetBln),
             ytd: formatRupiah(lepAsetYtd),
             notes: statement.pelepasanAset.notes,
-            amountClass: lepAsetBln > 0 ? 'lr-val-positive' : ''
+            amountClass: lepAsetBln > 0 ? 'lr-val-positive' : (lepAsetBln < 0 ? 'lr-val-negative' : '')
           },
           // 7. Laba sebelum pajak (Highlight Subtotal)
           {
@@ -1488,7 +2672,7 @@
             bulan: formatRupiah(labaBersihBln),
             ytd: formatRupiah(labaBersihYtd),
             notes: 'Net Income setelah beban pajak periode',
-            amountClass: 'lr-val-primary'
+            amountClass: labaBersihBln >= 0 ? 'lr-val-primary' : 'lr-val-negative'
           }
         ];
 
@@ -1503,7 +2687,7 @@
             '<td class="col-component">' + escapeHtml(r.name) + '</td>',
             '<td class="col-amount ' + (r.amountClass || '') + '">' + escapeHtml(r.bulan) + '</td>',
             '<td class="col-amount ' + (r.amountClass || '') + '">' + escapeHtml(r.ytd) + '</td>',
-            '<td class="col-notes">' + escapeHtml(r.notes || '-') + '</td>',
+            '<td class="col-notes"' + (r.notesTitle ? ' title="' + escapeHtml(r.notesTitle) + '"' : '') + '>' + escapeHtml(r.notes || '-') + '</td>',
             '</tr>'
           ].join('');
         }).join('');
@@ -1548,6 +2732,21 @@
           renderDashboard();
         });
       }
+
+      // Sinkronisasi otomatis saat ada perubahan di Modul Pendapatan, Pengeluaran & Beban, Payroll, Penyusutan Aset, atau Daftar Aset
+      window.addEventListener('storage', function (e) {
+        if (!e.key || e.key === PENDAPATAN_STORAGE_KEY || e.key === PENGELUARAN_STORAGE_KEY || e.key === PENGELUARAN_FALLBACK_KEY || e.key === PAYROLL_STORAGE_KEY || e.key === PAYROLL_FALLBACK_KEY || e.key === PENYUSUTAN_STORAGE_KEY || DAFTAR_ASET_STORAGE_KEYS.indexOf(e.key) !== -1) {
+          renderDashboard();
+        }
+      });
+
+      window.addEventListener('accounting-daftar-aset-updated', function () {
+        renderDashboard();
+      });
+
+      window.addEventListener('focus', function () {
+        renderDashboard();
+      });
 
       // Initial Render
       renderDashboard();
