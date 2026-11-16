@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Karyawan | Bisa Media</title>
+  <link rel="stylesheet" href="../../assets/css/style.css?v=20261114_karyawan_v1" />
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    #karyawanTable {
+      width: 100%;
+      min-width: 650px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    #karyawanTable th,
+    #karyawanTable td {
+      vertical-align: middle;
+      padding: 14px 18px;
+    }
+
+    #karyawanTable th:nth-child(1),
+    #karyawanTable td:nth-child(1) {
+      width: 55px;
+      text-align: center;
+    }
+
+    #karyawanTable th:nth-child(2),
+    #karyawanTable td:nth-child(2) {
+      width: 160px;
+    }
+
+    #karyawanTable th:nth-child(3),
+    #karyawanTable td:nth-child(3) {
+      width: 200px;
+    }
+
+    #karyawanTable th:nth-child(4),
+    #karyawanTable td:nth-child(4) {
+      min-width: 240px;
+    }
+
+    #karyawanTable th:nth-child(5),
+    #karyawanTable td:nth-child(5) {
+      width: 70px;
+      text-align: center;
+    }
+
+    #karyawanTable thead th {
+      background: #f4f4f5;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+      border-top: 1px solid #e4e4e7;
+      border-bottom: 1px solid #e4e4e7;
+    }
+
+    #karyawanTable thead th:first-child {
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-left: 1px solid #e4e4e7;
+    }
+
+    #karyawanTable thead th:last-child {
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+      border-right: 1px solid #e4e4e7;
+    }
+
+    #karyawanTable tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s ease;
+    }
+
+    #karyawanTable tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    #karyawanTable tbody td {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .karyawan-panel-line {
+      display: block;
+      height: 4px;
+      margin: -20px -20px 16px;
+      border-radius: 16px 16px 0 0;
+      background: var(--blue-800, #1e5a96);
+    }
+
+    /* ===== Toolbar Data Karyawan ===== */
+    .karyawan-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .karyawan-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .karyawan-search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 280px;
+    }
+
+    .karyawan-search-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 15px;
+      height: 15px;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    .karyawan-search-wrap input {
+      width: 100%;
+      height: 36px;
+      padding: 0 12px 0 34px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .karyawan-search-wrap input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .karyawan-search-wrap input::placeholder {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .btn-tambah-karyawan {
+      height: 36px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 6px;
+      background: #28a5de;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-tambah-karyawan:hover {
+      background: #0284c7;
+    }
+
+    .btn-tambah-karyawan:active {
+      transform: scale(0.98);
+    }
+
+    .karyawan-dashed-divider {
+      border: none;
+      border-top: 1px dashed #d4d4d8;
+      margin: 0 0 16px 0;
+    }
+
+    /* Badges & Tags */
+    .karyawan-id-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      background: #e0f2fe;
+      color: #0284c7;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      border: 1px solid #bae6fd;
+    }
+
+    .karyawan-nik-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .karyawan-nama-text {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .karyawan-kontrak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #f8fafc;
+      color: #334155;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .karyawan-kontrak-badge.is-empty {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 0;
+    }
+
+    /* Action button in table */
+    .btn-action-trigger,
+    .karyawan-action-btn {
+      width: 32px !important;
+      height: 32px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 50% !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      color: #0f172a !important;
+      background: transparent !important;
+      cursor: pointer !important;
+      transition: background 0.15s ease, color 0.15s ease !important;
+    }
+
+    .btn-action-trigger:hover,
+    .karyawan-action-btn:hover {
+      background: #f1f5f9 !important;
+    }
+
+    .btn-action-trigger svg,
+    .karyawan-action-btn svg {
+      width: 18px !important;
+      height: 18px !important;
+      fill: currentColor !important;
+      pointer-events: none !important;
+    }
+
+    /* Sticky Action Column on the Right */
+    #karyawanTable th.col-sticky-action,
+    #karyawanTable td.col-sticky-action {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 10;
+      background-color: #ffffff !important;
+      border-left: 1px solid #e2e8f0 !important;
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05);
+      text-align: center !important;
+      width: 70px !important;
+    }
+
+    #karyawanTable th.col-sticky-action {
+      z-index: 11;
+      background-color: #f4f4f5 !important;
+    }
+
+    #karyawanTable tbody tr:hover td.col-sticky-action {
+      background-color: #f8fafc !important;
+    }
+
+    /* Floating Action Menu */
+    .karyawan-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, .08);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+    }
+
+    .karyawan-action-menu.is-open {
+      display: block;
+    }
+
+    .karyawan-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      color: #0f172a;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .karyawan-action-menu button:hover {
+      background: #f8fafc;
+      color: #0076C5;
+    }
+
+    .karyawan-action-menu button.is-danger {
+      color: #ef4444;
+    }
+
+    .karyawan-action-menu button.is-danger:hover {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .karyawan-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: #0076C5;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .karyawan-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .karyawan-action-icon.is-danger {
+      background: #dc2626;
+    }
+
+    /* Modal Form Karyawan - 3 Kolom Simetris (3 3 3) */
+    .karyawan-modal-box {
+      width: 760px;
+      max-width: 94vw;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .karyawan-modal-accent-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--blue-800, #1e5a96);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .karyawan-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .karyawan-modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .karyawan-modal-title em {
+      font-style: italic;
+      color: #0284c7;
+    }
+
+    .karyawan-modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      line-height: 1;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .karyawan-modal-close-btn:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .karyawan-modal-dashed-divider {
+      border: none;
+      border-top: 1px dashed #e2e8f0;
+      margin: 0 0 18px 0;
+    }
+
+    .karyawan-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .karyawan-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .karyawan-form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .karyawan-form-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .karyawan-form-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      color: #0f172a;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .karyawan-form-input:focus {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .karyawan-form-input-readonly {
+      background: #f1f5f9;
+      color: #475569;
+      cursor: not-allowed;
+      border-color: #cbd5e1;
+    }
+
+    .karyawan-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .karyawan-btn-simpan {
+      height: 38px;
+      padding: 0 22px;
+      background: #0284c7;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .karyawan-btn-simpan:hover {
+      background: #0369a1;
+    }
+
+    .karyawan-btn-simpan:active {
+      transform: scale(0.98);
+    }
+
+    .karyawan-btn-tutup {
+      height: 38px;
+      padding: 0 20px;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .karyawan-btn-tutup:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-overlay.is-active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .karyawan-empty-cell {
+      text-align: center;
+      padding: 40px 20px !important;
+      color: #94a3b8;
+      font-size: 13.5px;
+      font-style: italic;
+    }
+
+    .swal2-container {
+      z-index: 9999999 !important;
+    }
+  </style>
+</head>
+
+<body class="dashboard-body">
+  <aside id="app-sidebar"></aside>
+
+  <div class="dashboard-shell">
+    <header class="topbar"></header>
+
+    <main class="dashboard-content">
+      <div class="dashboard-heading">
+        <h1>Data Karyawan</h1>
+      </div>
+
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line karyawan-panel-line"></div>
+
+        <div class="karyawan-toolbar">
+          <div class="karyawan-toolbar__left">
+            <div class="karyawan-search-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="karyawanSearch" type="search" placeholder="Cari ID, NIK, atau Nama Karyawan..." autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="karyawan-toolbar__right">
+            <button id="btnTambahKaryawan" class="btn-tambah-karyawan" type="button">+ Tambah Karyawan</button>
+          </div>
+        </div>
+
+        <div class="karyawan-dashed-divider"></div>
+
+        <div class="table-wrap campaign-table" id="karyawanTableWrap">
+          <table id="karyawanTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ID Karyawan</th>
+                <th>NIK</th>
+                <th>Nama Karyawan</th>
+                <th>Selesai Kontrak</th>
+                <th class="col-sticky-action" style="width: 70px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="karyawanTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== MODAL TAMBAH / EDIT KARYAWAN ===== -->
+  <div id="karyawanFormModal" class="modal-overlay">
+    <div class="karyawan-modal-box">
+      <div class="karyawan-modal-accent-line"></div>
+
+      <div class="karyawan-modal-header">
+        <h2 class="karyawan-modal-title">
+          <em><span id="karyawanFormActionText">Tambah</span></em> Data Karyawan
+        </h2>
+        <button class="karyawan-modal-close-btn" type="button" data-close-modal="karyawanFormModal" aria-label="Tutup">&times;</button>
+      </div>
+      <div class="karyawan-modal-dashed-divider"></div>
+
+      <form id="karyawanForm" autocomplete="off">
+        <input type="hidden" id="karyawanEditId" />
+
+        <div class="karyawan-form-grid">
+          <div class="karyawan-form-field">
+            <label class="karyawan-form-label" for="karyawanId">ID Karyawan</label>
+            <input type="text" id="karyawanId" class="karyawan-form-input karyawan-form-input-readonly" placeholder="Otomatis (contoh: KRY-001)" readonly tabindex="-1" style="cursor: not-allowed;" />
+          </div>
+
+          <div class="karyawan-form-field">
+            <label class="karyawan-form-label" for="karyawanNik">NIK</label>
+            <input type="text" id="karyawanNik" class="karyawan-form-input" placeholder="Masukkan NIK Karyawan" required />
+          </div>
+
+          <div class="karyawan-form-field">
+            <label class="karyawan-form-label" for="karyawanNama">Nama Karyawan</label>
+            <input type="text" id="karyawanNama" class="karyawan-form-input" placeholder="Masukkan Nama Lengkap Karyawan" required />
+          </div>
+
+          <div class="karyawan-form-field">
+            <label class="karyawan-form-label" for="karyawanSelesaiKontrak">Selesai Kontrak</label>
+            <input type="date" id="karyawanSelesaiKontrak" class="karyawan-form-input" />
+          </div>
+        </div>
+
+        <div class="karyawan-modal-footer">
+          <button type="button" class="karyawan-btn-tutup" data-close-modal="karyawanFormModal">Batal</button>
+          <button type="submit" class="karyawan-btn-simpan">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL LIHAT KARYAWAN ===== -->
+  <div id="karyawanViewModal" class="modal-overlay">
+    <div class="karyawan-modal-box">
+      <div class="karyawan-modal-accent-line"></div>
+
+      <div class="karyawan-modal-header">
+        <h2 class="karyawan-modal-title">
+          <em>Lihat</em> Data Karyawan
+        </h2>
+        <button class="karyawan-modal-close-btn" type="button" data-close-modal="karyawanViewModal" aria-label="Tutup">&times;</button>
+      </div>
+      <div class="karyawan-modal-dashed-divider"></div>
+
+      <div class="karyawan-form-grid">
+        <div class="karyawan-form-field">
+          <label class="karyawan-form-label">ID Karyawan</label>
+          <input type="text" id="viewKaryawanId" class="karyawan-form-input karyawan-form-input-readonly" readonly />
+        </div>
+
+        <div class="karyawan-form-field">
+          <label class="karyawan-form-label">NIK</label>
+          <input type="text" id="viewKaryawanNik" class="karyawan-form-input karyawan-form-input-readonly" readonly />
+        </div>
+
+        <div class="karyawan-form-field">
+          <label class="karyawan-form-label">Nama Karyawan</label>
+          <input type="text" id="viewKaryawanNama" class="karyawan-form-input karyawan-form-input-readonly" readonly />
+        </div>
+
+        <div class="karyawan-form-field">
+          <label class="karyawan-form-label">Selesai Kontrak</label>
+          <input type="text" id="viewKaryawanSelesaiKontrak" class="karyawan-form-input karyawan-form-input-readonly" readonly />
+        </div>
+      </div>
+
+      <div class="karyawan-modal-footer">
+        <button type="button" class="karyawan-btn-tutup" data-close-modal="karyawanViewModal">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FLOATING ACTION MENU ===== -->
+  <div id="karyawanActionMenu" class="karyawan-action-menu" role="menu" aria-hidden="true">
+    <button type="button" role="menuitem" data-action="view">
+      <span class="karyawan-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" role="menuitem" data-action="edit">
+      <span class="karyawan-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+    <button type="button" role="menuitem" class="is-danger" data-action="delete">
+      <span class="karyawan-action-icon is-danger" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </span>
+      <span>Hapus</span>
+    </button>
+  </div>
+
+  <script src="../../assets/js/layout.js?v=20261114_hd_v2"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'accounting_master_karyawan_v1';
+
+      const DEFAULT_KARYAWAN_DATA = [
+        { id: 'KRY-001', nik: 'BM-2024-001', nama: 'Ahmad Fauzi', divisi: 'MCN', selesaiKontrak: '2026-12-31' },
+        { id: 'KRY-002', nik: 'BM-2024-002', nama: 'Raka Wijaya', divisi: 'Marketing & Brand', selesaiKontrak: '2027-06-30' }
+      ];
+
+      let karyawanData = loadData();
+      let currentActionId = null;
+
+      // DOM Elements
+      const tableBody = document.getElementById('karyawanTableBody');
+      const searchInput = document.getElementById('karyawanSearch');
+      const btnTambah = document.getElementById('btnTambahKaryawan');
+      const formModal = document.getElementById('karyawanFormModal');
+      const viewModal = document.getElementById('karyawanViewModal');
+      const form = document.getElementById('karyawanForm');
+      const actionMenu = document.getElementById('karyawanActionMenu');
+
+      const editIdInput = document.getElementById('karyawanEditId');
+      const idInput = document.getElementById('karyawanId');
+      const nikInput = document.getElementById('karyawanNik');
+      const namaInput = document.getElementById('karyawanNama');
+      const selesaiKontrakInput = document.getElementById('karyawanSelesaiKontrak');
+      const formActionText = document.getElementById('karyawanFormActionText');
+
+      const viewId = document.getElementById('viewKaryawanId');
+      const viewNik = document.getElementById('viewKaryawanNik');
+      const viewNama = document.getElementById('viewKaryawanNama');
+      const viewSelesaiKontrak = document.getElementById('viewKaryawanSelesaiKontrak');
+
+      function formatDateIndo(dateStr) {
+        if (!dateStr || dateStr === '-') return '-';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        const day = String(d.getDate()).padStart(2, '0');
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const m = months[d.getMonth()] || String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return day + ' ' + m + ' ' + year;
+      }
+
+      // Ambil data karyawan riil yang ada di modul Payroll
+      function getKaryawanFromPayroll() {
+        // Baca data master yang tersimpan untuk mempertahankan selesaiKontrak jika sudah pernah diedit
+        let existingMap = {};
+        try {
+          const rawM = localStorage.getItem(STORAGE_KEY);
+          if (rawM) {
+            const arrM = JSON.parse(rawM);
+            if (Array.isArray(arrM)) {
+              arrM.forEach(function (m) {
+                if (m && m.id) existingMap[m.id] = m;
+                if (m && m.nik) existingMap[m.nik.toLowerCase()] = m;
+              });
+            }
+          }
+        } catch (eM) {}
+
+        const payrollKeys = [
+          'bisa_payroll_data_v1',
+          'accounting_payroll_data_v1',
+          'accounting_payroll_data'
+        ];
+        for (let i = 0; i < payrollKeys.length; i++) {
+          try {
+            const raw = localStorage.getItem(payrollKeys[i]);
+            if (raw) {
+              const list = JSON.parse(raw);
+              if (Array.isArray(list) && list.length > 0) {
+                const employees = [];
+                const seen = new Set();
+                let counter = 1;
+                let needUpdatePayroll = false;
+                list.forEach(function (p) {
+                  if (!p || typeof p !== 'object') return;
+                  const nik = String(p.nik || '').trim();
+                  const nama = String(p.nama || p.namaKaryawan || '').trim();
+                  if ((nik && nik !== '-') || (nama && nama !== '-')) {
+                    const key = (nik || nama).toLowerCase();
+                    if (!seen.has(key)) {
+                      seen.add(key);
+                      const idKry = (p.idKaryawan && p.idKaryawan !== '-' && p.idKaryawan !== 'Otomatis')
+                        ? p.idKaryawan
+                        : ('KRY-' + String(counter).padStart(3, '0'));
+                      if (!p.idKaryawan || p.idKaryawan === '-' || p.idKaryawan === 'Otomatis') {
+                        p.idKaryawan = idKry;
+                        needUpdatePayroll = true;
+                      }
+                      const existing = existingMap[idKry] || existingMap[nik.toLowerCase()];
+                      const defaultKontrak = (idKry === 'KRY-001' || nik === 'BM-2024-001')
+                        ? '2026-12-31'
+                        : ((idKry === 'KRY-002' || nik === 'BM-2024-002') ? '2027-06-30' : '');
+
+                      employees.push({
+                        id: idKry,
+                        nik: nik || '-',
+                        nama: nama || '-',
+                        selesaiKontrak: (existing && existing.selesaiKontrak) ? existing.selesaiKontrak : (p.selesaiKontrak || defaultKontrak)
+                      });
+                      counter++;
+                    }
+                  }
+                });
+                if (employees.length > 0) {
+                  try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(employees));
+                    if (needUpdatePayroll) {
+                      localStorage.setItem(payrollKeys[i], JSON.stringify(list));
+                      window.dispatchEvent(new CustomEvent('payroll_data_changed'));
+                    }
+                  } catch (eSave) {}
+                  return employees;
+                }
+              }
+            }
+          } catch (e) {
+            console.warn('[Data Karyawan] Gagal membaca payroll:', e);
+          }
+        }
+        return [];
+      }
+
+      function loadData() {
+        // 1. Prioritaskan mengambil data karyawan dari storage master karyawan jika sudah ada
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              parsed.forEach(function (emp) {
+                if (emp && emp.selesaiKontrak === undefined) {
+                  if (emp.id === 'KRY-001' || emp.nik === 'BM-2024-001') emp.selesaiKontrak = '2026-12-31';
+                  else if (emp.id === 'KRY-002' || emp.nik === 'BM-2024-002') emp.selesaiKontrak = '2027-06-30';
+                  else emp.selesaiKontrak = '';
+                }
+              });
+              return parsed;
+            }
+          }
+        } catch (e) {
+          console.warn('[Data Karyawan] Gagal load dari localStorage:', e);
+        }
+
+        // 2. Jika storage master kosong, ambil dari Payroll
+        const fromPayroll = getKaryawanFromPayroll();
+        if (fromPayroll && fromPayroll.length > 0) {
+          return fromPayroll;
+        }
+
+        // 3. Fallback: 2 karyawan riil tetap tersedia
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_KARYAWAN_DATA));
+        } catch (eSave) {}
+        return DEFAULT_KARYAWAN_DATA.slice();
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(karyawanData));
+          window.dispatchEvent(new CustomEvent('accounting_karyawan_changed', { detail: karyawanData }));
+        } catch (e) {
+          console.error('[Data Karyawan] Gagal menyimpan ke localStorage:', e);
+        }
+      }
+
+      function generateNextId() {
+        let maxNum = 0;
+        karyawanData.forEach(function (item) {
+          const match = String(item.id || '').match(/KRY-(\d+)/i);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            if (num > maxNum) maxNum = num;
+          }
+        });
+        const next = maxNum + 1;
+        return 'KRY-' + String(next).padStart(3, '0');
+      }
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function renderTable() {
+        if (!tableBody) return;
+        const q = (searchInput.value || '').trim().toLowerCase();
+
+        const filtered = karyawanData.filter(function (it) {
+          if (!q) return true;
+          const id = (it.id || '').toLowerCase();
+          const nik = (it.nik || '').toLowerCase();
+          const nama = (it.nama || '').toLowerCase();
+          const kontrak = (it.selesaiKontrak || '').toLowerCase();
+          const kontrakFormatted = formatDateIndo(it.selesaiKontrak).toLowerCase();
+          return id.includes(q) || nik.includes(q) || nama.includes(q) || kontrak.includes(q) || kontrakFormatted.includes(q);
+        });
+
+        if (filtered.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="6" class="karyawan-empty-cell">Belum ada data karyawan yang cocok.</td></tr>';
+          return;
+        }
+
+        tableBody.innerHTML = filtered.map(function (it, idx) {
+          const kontrakDisplay = formatDateIndo(it.selesaiKontrak);
+          const kontrakHtml = (kontrakDisplay && kontrakDisplay !== '-')
+            ? '<span class="karyawan-kontrak-badge"><svg style="width:13px;height:13px;color:#0284c7;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>' + escapeHtml(kontrakDisplay) + '</span>'
+            : '<span class="karyawan-kontrak-badge is-empty">-</span>';
+
+          return [
+            '<tr>',
+            '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (idx + 1) + '</td>',
+            '<td><span class="karyawan-id-badge">' + escapeHtml(it.id) + '</span></td>',
+            '<td><span class="karyawan-nik-text">' + escapeHtml(it.nik) + '</span></td>',
+            '<td><span class="karyawan-nama-text">' + escapeHtml(it.nama) + '</span></td>',
+            '<td>' + kontrakHtml + '</td>',
+            '<td class="col-sticky-action" style="text-align: center;">',
+            '  <button type="button" class="btn-action-trigger karyawan-action-btn" data-action-toggle="' + escapeHtml(it.id) + '" aria-label="Menu Aksi" title="Opsi">',
+            '    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>',
+            '  </button>',
+            '</td>',
+            '</tr>'
+          ].join('');
+        }).join('');
+      }
+
+      /* Modal Control */
+      function openModal(modalEl) {
+        if (!modalEl) return;
+        modalEl.classList.add('is-active');
+      }
+
+      function closeModal(modalEl) {
+        if (!modalEl) return;
+        modalEl.classList.remove('is-active');
+      }
+
+      // Close modal trigger [data-close-modal]
+      document.querySelectorAll('[data-close-modal]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const targetId = this.getAttribute('data-close-modal');
+          const targetModal = document.getElementById(targetId);
+          if (targetModal) closeModal(targetModal);
+        });
+      });
+
+      // Close modal saat klik backdrop overlay
+      [formModal, viewModal].forEach(function (m) {
+        if (!m) return;
+        m.addEventListener('click', function (e) {
+          if (e.target === m) closeModal(m);
+        });
+      });
+
+      /* Button Tambah */
+      if (btnTambah) {
+        btnTambah.addEventListener('click', function () {
+          closeActionMenus();
+          form.reset();
+          editIdInput.value = '';
+          idInput.value = generateNextId();
+          if (selesaiKontrakInput) selesaiKontrakInput.value = '';
+          formActionText.textContent = 'Tambah';
+          openModal(formModal);
+          setTimeout(function () {
+            if (nikInput) nikInput.focus();
+          }, 50);
+        });
+      }
+
+      /* Form Submit (Tambah / Edit) */
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const editId = (editIdInput.value || '').trim();
+          const nik = (nikInput.value || '').trim();
+          const nama = (namaInput.value || '').trim();
+          const selesaiKontrak = selesaiKontrakInput ? (selesaiKontrakInput.value || '').trim() : '';
+
+          if (!nik) {
+            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'NIK karyawan wajib diisi.' });
+            return;
+          }
+          if (!nama) {
+            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Nama karyawan wajib diisi.' });
+            return;
+          }
+
+          // Cek duplikasi NIK pada record lain
+          const duplicateNik = karyawanData.find(function (it) {
+            if (editId && it.id === editId) return false;
+            return String(it.nik).trim().toLowerCase() === nik.toLowerCase();
+          });
+          if (duplicateNik) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'NIK Sudah Terdaftar',
+              text: 'NIK "' + nik + '" sudah digunakan oleh ' + duplicateNik.nama + ' (' + duplicateNik.id + ').'
+            });
+            return;
+          }
+
+          if (editId) {
+            // Mode Edit
+            const targetIdx = karyawanData.findIndex(function (it) { return it.id === editId; });
+            if (targetIdx !== -1) {
+              karyawanData[targetIdx].nik = nik;
+              karyawanData[targetIdx].nama = nama;
+              karyawanData[targetIdx].selesaiKontrak = selesaiKontrak;
+            }
+            saveData();
+            renderTable();
+            closeModal(formModal);
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil Diperbarui',
+              text: 'Data karyawan berhasil diperbarui.',
+              timer: 1400,
+              showConfirmButton: false
+            });
+          } else {
+            // Mode Tambah
+            const newId = generateNextId();
+            const newItem = {
+              id: newId,
+              nik: nik,
+              nama: nama,
+              selesaiKontrak: selesaiKontrak
+            };
+            karyawanData.unshift(newItem);
+            saveData();
+            renderTable();
+            closeModal(formModal);
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Berhasil Disimpan',
+              text: 'Data karyawan baru berhasil ditambahkan.',
+              timer: 1400,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+
+      /* Search Input Event */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          closeActionMenus();
+          renderTable();
+        });
+      }
+
+      /* Floating Action Menu Handlers */
+      function closeActionMenus() {
+        if (actionMenu) {
+          actionMenu.classList.remove('is-open');
+        }
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && currentActionId === id) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = 145;
+        const menuHeight = 130;
+
+        let left = rect.right - menuWidth;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.left = left + 'px';
+        actionMenu.style.top = top + 'px';
+      }
+
+      // Delegate click table action trigger
+      if (tableBody) {
+        tableBody.addEventListener('click', function (e) {
+          const toggle = e.target.closest('[data-action-toggle]');
+          if (toggle) {
+            e.preventDefault();
+            e.stopPropagation();
+            openActionMenu(toggle);
+          }
+        });
+      }
+
+      // Action menu click (Lihat, Edit, Hapus)
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (e) {
+          const btn = e.target.closest('button[data-action]');
+          if (!btn || !currentActionId) return;
+          const action = btn.getAttribute('data-action');
+          const target = karyawanData.find(function (it) { return it.id === currentActionId; });
+
+          closeActionMenus();
+          if (!target) return;
+
+          if (action === 'view') {
+            if (viewId) viewId.value = target.id || '';
+            if (viewNik) viewNik.value = target.nik || '';
+            if (viewNama) viewNama.value = target.nama || '';
+            if (viewSelesaiKontrak) viewSelesaiKontrak.value = formatDateIndo(target.selesaiKontrak);
+            openModal(viewModal);
+          } else if (action === 'edit') {
+            form.reset();
+            editIdInput.value = target.id;
+            idInput.value = target.id;
+            nikInput.value = target.nik || '';
+            namaInput.value = target.nama || '';
+            if (selesaiKontrakInput) selesaiKontrakInput.value = target.selesaiKontrak || '';
+            formActionText.textContent = 'Edit';
+            openModal(formModal);
+            setTimeout(function () {
+              if (nikInput) nikInput.focus();
+            }, 50);
+          } else if (action === 'delete') {
+            Swal.fire({
+              title: 'Hapus Data Karyawan?',
+              text: 'Data karyawan ' + target.nama + ' (' + target.id + ') akan dihapus secara permanen.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#ef4444',
+              cancelButtonColor: '#64748b',
+              confirmButtonText: 'Ya, Hapus',
+              cancelButtonText: 'Batal'
+            }).then(function (result) {
+              if (result.isConfirmed) {
+                karyawanData = karyawanData.filter(function (it) { return it.id !== target.id; });
+                saveData();
+                renderTable();
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Terhapus',
+                  text: 'Data karyawan berhasil dihapus.',
+                  timer: 1400,
+                  showConfirmButton: false
+                });
+              }
+            });
+          }
+        });
+      }
+
+      // Close menu saat klik di luar
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#karyawanActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+      });
+
+      window.addEventListener('scroll', closeActionMenus, true);
+      window.addEventListener('resize', closeActionMenus);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          closeActionMenus();
+          document.querySelectorAll('.modal-overlay.is-active').forEach(closeModal);
+        }
+      });
+
+      const tableWrap = document.getElementById('karyawanTableWrap');
+      if (tableWrap) {
+        tableWrap.addEventListener('scroll', closeActionMenus, { passive: true });
+      }
+
+      // Realtime sync dari tab/window lain & event payroll
+      window.addEventListener('storage', function (e) {
+        if (e.key === STORAGE_KEY || e.key === 'bisa_payroll_data_v1' || e.key === 'accounting_payroll_data_v1') {
+          karyawanData = loadData();
+          renderTable();
+        }
+      });
+
+      window.addEventListener('payroll_data_changed', function () {
+        karyawanData = loadData();
+        renderTable();
+      });
+
+      // Initial render
+      renderTable();
+    })();
+  </script>
+</body>
+
+</html>
