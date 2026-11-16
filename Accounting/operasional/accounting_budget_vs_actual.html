@@ -2079,10 +2079,10 @@
         <form id="formBudgetCrud" autocomplete="off">
           <div class="budget-form-grid">
             
-            <!-- Row 1, Col 1: Periode -->
+            <!-- Row 1, Col 1: Periode (Tanggal) -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudPeriode">Periode</label>
-              <input type="text" id="crudPeriode" class="modal-field-input" placeholder="Tambah Periode" required />
+              <input type="date" id="crudPeriode" class="modal-field-input" required />
             </div>
 
             <!-- Row 1, Col 2: Kode COA (Dropdown Popover) -->
@@ -2099,13 +2099,13 @@
               </div>
             </div>
 
-            <!-- Row 1, Col 3: Nama Akun COA -->
+            <!-- Row 1, Col 3: Nama Akun COA (Auto Fill dari Master COA) -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudNamaAkunCOA">Nama Akun COA</label>
-              <input type="text" id="crudNamaAkunCOA" class="modal-field-input" placeholder="Nama Akun COA" required />
+              <input type="text" id="crudNamaAkunCOA" class="modal-field-input" placeholder="Nama Akun COA" readonly style="background-color: #f8fafc; cursor: default;" required />
             </div>
 
-            <!-- Row 2, Col 1: Divisi -->
+            <!-- Row 2, Col 1: Divisi (Auto Fill dari Master COA) -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudDivisi">Divisi</label>
               <input type="text" id="crudDivisi" list="listDivisiPengecualian" class="modal-field-input" placeholder="Pilih atau ketik divisi" required autocomplete="off" />
@@ -2138,7 +2138,11 @@
             <!-- Row 3, Col 3: Status -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudStatus">Status</label>
-              <input type="text" id="crudStatus" class="modal-field-input" placeholder="Status" required />
+              <input type="text" id="crudStatus" list="listStatusOptions" class="modal-field-input" placeholder="Status" required />
+              <datalist id="listStatusOptions">
+                <option value="Dalam Budget"></option>
+                <option value="Over Budget"></option>
+              </datalist>
             </div>
 
             <!-- Row 4, Col 1: Divisi Pengecualian -->
@@ -2148,16 +2152,16 @@
               <datalist id="listDivisiPengecualian"></datalist>
             </div>
 
-            <!-- Row 4, Col 2: Kelompok COA -->
+            <!-- Row 4, Col 2: Kelompok COA (Auto Fill dari Master COA) -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudKelompokCOA">Kelompok COA</label>
-              <input type="text" id="crudKelompokCOA" class="modal-field-input" placeholder="Kelompok COA" required />
+              <input type="text" id="crudKelompokCOA" class="modal-field-input" placeholder="Kelompok COA" readonly style="background-color: #f8fafc; cursor: default;" required />
             </div>
 
-            <!-- Row 4, Col 3: Status COA -->
+            <!-- Row 4, Col 3: Status COA (Auto Fill dari Master COA) -->
             <div class="modal-field">
               <label class="modal-field-label" for="crudStatusCOA">Status COA</label>
-              <input type="text" id="crudStatusCOA" class="modal-field-input" placeholder="Status COA" required />
+              <input type="text" id="crudStatusCOA" class="modal-field-input" placeholder="Status COA" readonly style="background-color: #f8fafc; cursor: default;" required />
             </div>
 
           </div>
@@ -2308,9 +2312,175 @@
     document.addEventListener('DOMContentLoaded', function () {
       'use strict';
 
-      /* ===== DATA MODEL BUDGET VS ACTUAL ===== */
+      /* ===== DATA MODEL BUDGET VS ACTUAL & MASTER COA INTEGRATION ===== */
       const STORAGE_KEY = 'accounting_budget_vs_actual_data';
       const DIVISI_KEY = 'accounting_master_divisi_v1';
+      const MASTER_COA_KEY = 'accounting_master_coa_v1';
+
+      /* ===== INTEGRASI MODUL PENGELUARAN & BEBAN UNTUK RUMUS ACTUAL BEBAN ===== */
+      const PENGELUARAN_STORAGE_KEY = 'accounting_pengeluaran_beban_data_v5';
+      const PENGELUARAN_FALLBACK_KEY = 'accounting_pengeluaran_beban_data';
+
+      const DEFAULT_PENGELUARAN_LIST = [
+        {
+          idDokumen: 'EXP-2609-001',
+          tanggalPengakuan: '2026-09-04',
+          kodeCoa: '5009',
+          namaAkunCoa: 'Beban Administrasi Bank',
+          bebanDiAkui: 30000,
+          statusApproval: 'Disetujui'
+        },
+        {
+          idDokumen: 'EXP-2609-002',
+          tanggalPengakuan: '2026-09-08',
+          kodeCoa: '5001',
+          namaAkunCoa: 'Beban Pemasaran & Iklan',
+          bebanDiAkui: 1500000,
+          statusApproval: 'Disetujui'
+        },
+        {
+          idDokumen: 'EXP-2609-003',
+          tanggalPengakuan: '2026-09-15',
+          kodeCoa: '5002',
+          namaAkunCoa: 'Beban Sewa Gedung',
+          bebanDiAkui: 4500000,
+          statusApproval: 'Disetujui'
+        },
+        {
+          idDokumen: 'EXP-2609-004',
+          tanggalPengakuan: '2026-09-20',
+          kodeCoa: '5009',
+          namaAkunCoa: 'Beban Administrasi Kantor',
+          bebanDiAkui: 450000,
+          statusApproval: 'Disetujui'
+        },
+        {
+          idDokumen: 'EXP-2609-005',
+          tanggalPengakuan: '2026-10-18',
+          kodeCoa: '5010',
+          namaAkunCoa: 'Beban Server & IT',
+          bebanDiAkui: 850000,
+          statusApproval: 'Disetujui'
+        }
+      ];
+
+      function getPengeluaranList() {
+        try {
+          let raw = localStorage.getItem(PENGELUARAN_STORAGE_KEY);
+          if (!raw) raw = localStorage.getItem(PENGELUARAN_FALLBACK_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {
+          console.warn('Gagal membaca data pengeluaran dan beban:', e);
+        }
+        return DEFAULT_PENGELUARAN_LIST;
+      }
+
+      // Rumus Actual Beban: Diambil dari Beban Diakui modul Pengeluaran & Beban
+      // Syarat 1: Kode COA harus sama
+      // Syarat 2: Bulan transaksi harus sama (YYYY-MM)
+      function getActualBebanInfo(kodeCoa, periodeDate) {
+        if (!kodeCoa || !periodeDate) return { total: 0, hasMatch: false, count: 0 };
+        const targetCode = String(kodeCoa).trim().toLowerCase();
+        const isoDate = toIsoDate(periodeDate);
+        const targetMonth = isoDate ? isoDate.slice(0, 7) : '';
+        if (!targetMonth) return { total: 0, hasMatch: false, count: 0 };
+
+        const expList = getPengeluaranList();
+        let totalBeban = 0;
+        let count = 0;
+
+        expList.forEach(function (e) {
+          if (!e) return;
+          // Syarat 1: Kode COA harus sama
+          const expCode = String(e.kodeCoa || e.kodeCOA || e.kode || '').trim().toLowerCase();
+          if (expCode !== targetCode) return;
+
+          // Syarat 2: Bulan transaksi harus sama
+          const expDate = toIsoDate(e.tanggalPengakuan || e.tanggal || e.tanggalBayarLama || e.tanggalTransaksi);
+          const expMonth = expDate ? expDate.slice(0, 7) : '';
+          if (expMonth !== targetMonth) return;
+
+          // Ambil Beban Diakui
+          const val = Number(e.bebanDiAkui !== undefined ? e.bebanDiAkui : (e.bebanDiakui !== undefined ? e.bebanDiakui : (e.dpp || e.tagihanBruto || 0))) || 0;
+          totalBeban += val;
+          count++;
+        });
+
+        return { total: totalBeban, hasMatch: count > 0, count: count };
+      }
+
+      function getActualBebanFromPengeluaran(kodeCoa, periodeDate) {
+        return getActualBebanInfo(kodeCoa, periodeDate).total;
+      }
+
+      // 35 Akun COA Resmi Persis Sesuai Master COA
+      const fallbackMasterCOA = [
+        { kode: '1001', nama: 'Kas Kecil', kelompok: 'Aset', subKelompok: 'Kas & Bank', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1002', nama: 'Bank BCA', kelompok: 'Aset', subKelompok: 'Kas & Bank', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1003', nama: 'Bank BCA', kelompok: 'Aset', subKelompok: 'Kas & Bank', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1005', nama: 'SEABANK', kelompok: 'Aset', subKelompok: 'Kas & Bank', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1006', nama: 'BNI', kelompok: 'Aset', subKelompok: 'Kas & Bank', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1101', nama: 'Piutang Usaha', kelompok: 'Aset', subKelompok: 'Piutang', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1102', nama: 'Piutang Karyawan', kelompok: 'Aset', subKelompok: 'Piutang', devisDefault: 'HR', aktif: 'Ya' },
+        { kode: '1201', nama: 'Uang Muka', kelompok: 'Aset', subKelompok: 'Aset Lancar', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1301', nama: 'Peralatan Produksi & Studio', kelompok: 'Aset', subKelompok: 'Aset Tetap', devisDefault: 'Produksi', aktif: 'Ya' },
+        { kode: '1302', nama: 'Peralatan & Perlengkapan Kantor', kelompok: 'Aset', subKelompok: 'Aset Tetap', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1303', nama: 'Furniture & Mebel', kelompok: 'Aset', subKelompok: 'Aset Tetap', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '1391', nama: 'Akumulasi Penyusutan', kelompok: 'Aset', subKelompok: 'Kontra Aset', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '2001', nama: 'Utang Usaha', kelompok: 'Liabilitas', subKelompok: 'Liabilitas Lancar', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '2002', nama: 'Utang Gaji', kelompok: 'Liabilitas', subKelompok: 'Liabilitas Lancar', devisDefault: 'HR', aktif: 'Ya' },
+        { kode: '2003', nama: 'Beban Akrual', kelompok: 'Liabilitas', subKelompok: 'Liabilitas Lancar', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '2004', nama: 'Pendapatan Diterima Di Muka', kelompok: 'Liabilitas', subKelompok: 'Liabilitas Lancar', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '2101', nama: 'Utang Bank', kelompok: 'Liabilitas', subKelompok: 'Liabilitas Jangka Panjang', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '3001', nama: 'Modal', kelompok: 'Ekuitas', subKelompok: 'Modal', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '3101', nama: 'Laba Ditahan', kelompok: 'Ekuitas', subKelompok: 'Laba Ditahan', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '4001', nama: 'Pendapatan MCN', kelompok: 'Pendapatan', subKelompok: 'Revenue', devisDefault: 'MCN', aktif: 'Ya' },
+        { kode: '4002', nama: 'Pendapatan TAP', kelompok: 'Pendapatan', subKelompok: 'Revenue', devisDefault: 'TAP', aktif: 'Ya' },
+        { kode: '4003', nama: 'Pendapatan TSP', kelompok: 'Pendapatan', subKelompok: 'Revenue', devisDefault: 'TSP', aktif: 'Ya' },
+        { kode: '4004', nama: 'Pendapatan Iklan', kelompok: 'Pendapatan', subKelompok: 'Revenue', devisDefault: 'Agency', aktif: 'Ya' },
+        { kode: '4005', nama: 'Pendapatan Live HUB', kelompok: 'Pendapatan', subKelompok: 'Revenue', devisDefault: 'Live HUB', aktif: 'Ya' },
+        { kode: '4006', nama: 'Pendapatan Event', kelompok: 'Pendapatan', subKelompok: 'Revenue', devisDefault: 'Event', aktif: 'Ya' },
+        { kode: '5001', nama: 'Beban Gaji', kelompok: 'Beban', subKelompok: 'SDM', devisDefault: 'HR', aktif: 'Ya' },
+        { kode: '5002', nama: 'Beban Internet', kelompok: 'Beban', subKelompok: 'Operasional', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5003', nama: 'Beban Iklan', kelompok: 'Beban', subKelompok: 'Marketing', devisDefault: 'Marketing', aktif: 'Ya' },
+        { kode: '5004', nama: 'Beban Pentry', kelompok: 'Beban', subKelompok: 'Pentry', devisDefault: 'Pentry', aktif: 'Ya' },
+        { kode: '5005', nama: 'Beban Transportasi', kelompok: 'Beban', subKelompok: 'Transportasi', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5006', nama: 'Beban Makan', kelompok: 'Beban', subKelompok: 'Konsumsi', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5007', nama: 'Beban Sewa', kelompok: 'Beban', subKelompok: 'Operasional', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5008', nama: 'Beban Penyusutan', kelompok: 'Beban', subKelompok: 'Non-kas', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5009', nama: 'Beban Berlangganan', kelompok: 'Beban', subKelompok: 'Operasional', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5010', nama: 'Beban Project', kelompok: 'Beban', subKelompok: 'Project', devisDefault: 'Agency', aktif: 'Ya' },
+        { kode: '5011', nama: 'Transfer Internal', kelompok: 'Beban', subKelompok: 'Operasional', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5012', nama: 'Beban Rewards', kelompok: 'Beban', subKelompok: 'SDM', devisDefault: 'General', aktif: 'Ya' },
+        { kode: '5013', nama: 'Beban Admin', kelompok: 'Beban', subKelompok: 'Operasional', devisDefault: 'General', aktif: 'Ya' }
+      ];
+
+      function getMasterCoaList() {
+        try {
+          const raw = localStorage.getItem(MASTER_COA_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed.map(function (it) {
+                return {
+                  kode: String(it.kode || it.kodeCoa || '').trim(),
+                  nama: String(it.nama || it.namaAkun || '').trim(),
+                  kelompok: String(it.kelompok || 'Beban').trim(),
+                  subKelompok: String(it.subKelompok || '').trim(),
+                  devisDefault: String(it.devisDefault || it.divisi || 'General').trim(),
+                  aktif: (it.aktif === 'Tidak' || it.aktif === 'Non-Aktif') ? 'Non-Aktif' : 'Aktif'
+                };
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('Gagal membaca master COA dari localStorage:', e);
+        }
+        return fallbackMasterCOA;
+      }
 
       function getMasterDivisiList() {
         try {
@@ -2346,110 +2516,111 @@
         }).join('');
       }
 
+      // Default data awal Budget vs Actual dengan format Tanggal (YYYY-MM-DD), Akun COA dari Data Master, dan Actual Beban Terkoneksi Real dari Pengeluaran
       const defaultBudgetData = [
         {
           id: 1,
-          periode: 'Sep 2026',
-          kodeCOA: '5-10100',
-          namaAkunCOA: 'Beban Gaji & Upah Karyawan',
-          divisi: 'Operasional',
+          periode: '2026-09-01',
+          kodeCOA: '5001',
+          namaAkunCOA: 'Beban Gaji',
+          divisi: 'HR',
           budget: 65000000,
-          actualBeban: 62000000,
-          sisaBudget: 3000000,
-          persenTerpakai: 95.38,
-          status: 'Near Budget',
+          actualBeban: 1500000,
+          sisaBudget: 63500000,
+          persenTerpakai: 2.31,
+          status: 'Dalam Budget',
           divisiPengecualian: '-',
-          kelompokCOA: 'Beban Operasional',
+          kelompokCOA: 'Beban',
           statusCOA: 'Aktif'
         },
         {
           id: 2,
-          periode: 'Sep 2026',
-          kodeCOA: '5-10200',
-          namaAkunCOA: 'Beban Pemasaran & Media Iklan',
+          periode: '2026-09-05',
+          kodeCOA: '5003',
+          namaAkunCOA: 'Beban Iklan',
           divisi: 'Marketing',
           budget: 35000000,
-          actualBeban: 28500000,
-          sisaBudget: 6500000,
-          persenTerpakai: 81.43,
-          status: 'Under Budget',
+          actualBeban: 0,
+          sisaBudget: 35000000,
+          persenTerpakai: 0.00,
+          status: 'Dalam Budget',
           divisiPengecualian: '-',
-          kelompokCOA: 'Beban Pemasaran',
+          kelompokCOA: 'Beban',
           statusCOA: 'Aktif'
         },
         {
           id: 3,
-          periode: 'Sep 2026',
-          kodeCOA: '5-10300',
-          namaAkunCOA: 'Beban Sewa Gedung & Kantor',
-          divisi: 'Finance',
+          periode: '2026-09-10',
+          kodeCOA: '5007',
+          namaAkunCOA: 'Beban Sewa',
+          divisi: 'General',
           budget: 20000000,
-          actualBeban: 20000000,
-          sisaBudget: 0,
-          persenTerpakai: 100.00,
-          status: 'Near Budget',
+          actualBeban: 0,
+          sisaBudget: 20000000,
+          persenTerpakai: 0.00,
+          status: 'Dalam Budget',
           divisiPengecualian: '-',
-          kelompokCOA: 'Beban Umum & Administrasi',
+          kelompokCOA: 'Beban',
           statusCOA: 'Aktif'
         },
         {
           id: 4,
-          periode: 'Sep 2026',
-          kodeCOA: '5-10400',
-          namaAkunCOA: 'Beban Cloud Server & SaaS IT',
-          divisi: 'IT / Tech',
-          budget: 15000000,
-          actualBeban: 16800000,
-          sisaBudget: -1800000,
-          persenTerpakai: 112.00,
-          status: 'Over Budget',
+          periode: '2026-09-15',
+          kodeCOA: '5002',
+          namaAkunCOA: 'Beban Internet',
+          divisi: 'General',
+          budget: 5000000,
+          actualBeban: 4500000,
+          sisaBudget: 500000,
+          persenTerpakai: 90.00,
+          status: 'Dalam Budget',
           divisiPengecualian: 'Dev Special',
-          kelompokCOA: 'Beban Operasional',
+          kelompokCOA: 'Beban',
           statusCOA: 'Aktif'
         },
         {
           id: 5,
-          periode: 'Sep 2026',
-          kodeCOA: '5-10500',
-          namaAkunCOA: 'Beban Perlengkapan & ATK Kantor',
-          divisi: 'HR / GA',
+          periode: '2026-09-18',
+          kodeCOA: '5004',
+          namaAkunCOA: 'Beban Pentry',
+          divisi: 'Pentry',
           budget: 8000000,
-          actualBeban: 5200000,
-          sisaBudget: 2800000,
-          persenTerpakai: 65.00,
-          status: 'Under Budget',
+          actualBeban: 0,
+          sisaBudget: 8000000,
+          persenTerpakai: 0.00,
+          status: 'Dalam Budget',
           divisiPengecualian: '-',
-          kelompokCOA: 'Beban Umum & Administrasi',
+          kelompokCOA: 'Beban',
           statusCOA: 'Aktif'
         },
         {
           id: 6,
-          periode: 'Sep 2026',
-          kodeCOA: '5-10600',
-          namaAkunCOA: 'Beban Produksi Konten Kreatif',
-          divisi: 'Creative',
-          budget: 18000000,
-          actualBeban: 14200000,
-          sisaBudget: 3800000,
-          persenTerpakai: 78.89,
-          status: 'Under Budget',
+          periode: '2026-09-22',
+          kodeCOA: '5009',
+          namaAkunCOA: 'Beban Berlangganan',
+          divisi: 'General',
+          budget: 400000,
+          actualBeban: 480000,
+          sisaBudget: -80000,
+          persenTerpakai: 120.00,
+          status: 'Over Budget',
           divisiPengecualian: '-',
-          kelompokCOA: 'Beban Pemasaran',
+          kelompokCOA: 'Beban',
           statusCOA: 'Aktif'
         },
         {
           id: 7,
-          periode: 'Sep 2026',
-          kodeCOA: '5-10700',
-          namaAkunCOA: 'Beban Listrik, Air & Utilitas',
-          divisi: 'Operasional',
-          budget: 6000000,
-          actualBeban: 6450000,
-          sisaBudget: -450000,
-          persenTerpakai: 107.50,
-          status: 'Over Budget',
+          periode: '2026-10-01',
+          kodeCOA: '5010',
+          namaAkunCOA: 'Beban Project',
+          divisi: 'Agency',
+          budget: 1000000,
+          actualBeban: 850000,
+          sisaBudget: 150000,
+          persenTerpakai: 85.00,
+          status: 'Dalam Budget',
           divisiPengecualian: '-',
-          kelompokCOA: 'Beban Umum & Administrasi',
+          kelompokCOA: 'Beban',
           statusCOA: 'Aktif'
         }
       ];
@@ -2458,8 +2629,44 @@
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            let parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              let needsSave = false;
+              // Migrasi otomatis jika data di browser masih format teks seperti 'Sep 2026'
+              // serta sinkronisasi Actual Beban dari modul Pengeluaran & Beban (syarat: kode & bulan sama)
+              parsed = parsed.map(function (item, idx) {
+                if (!item.periode || item.periode === 'Sep 2026' || !item.periode.includes('-')) {
+                  const day = String(Math.min(28, (idx + 1) * 4)).padStart(2, '0');
+                  item.periode = '2026-09-' + day;
+                  needsSave = true;
+                }
+                const actualInfo = getActualBebanInfo(item.kodeCOA, item.periode);
+                if (actualInfo.hasMatch && item.actualBeban !== actualInfo.total) {
+                  item.actualBeban = actualInfo.total;
+                  needsSave = true;
+                }
+                const b = Number(item.budget) || 0;
+                const a = Number(item.actualBeban) || 0;
+                const sisa = b - a;
+                const pct = b > 0 ? parseFloat(((a / b) * 100).toFixed(2)) : 0;
+                if (item.sisaBudget !== sisa || item.persenTerpakai !== pct) {
+                  item.sisaBudget = sisa;
+                  item.persenTerpakai = pct;
+                  needsSave = true;
+                }
+                // Rumus Status: actual > budget = Over Budget, actual <= budget = Dalam Budget
+                const newStatus = a > b ? 'Over Budget' : 'Dalam Budget';
+                if (item.status !== newStatus) {
+                  item.status = newStatus;
+                  needsSave = true;
+                }
+                return item;
+              });
+              if (needsSave) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+              }
+              return parsed;
+            }
           }
         } catch (e) {
           console.error('Gagal memuat data budget vs actual:', e);
@@ -2529,7 +2736,7 @@
       const btnCancelCalendar = document.getElementById('btnCancelCalendar');
       const btnApplyCalendar = document.getElementById('btnApplyCalendar');
 
-      /* ===== FORMATTING UTILITIES ===== */
+      /* ===== FORMATTING UTILITIES & RUMUS-RUMUS ===== */
       function escapeHtml(str) {
         if (str === null || str === undefined) return '';
         return String(str)
@@ -2538,6 +2745,33 @@
           .replace(/>/g, '&gt;')
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#39;');
+      }
+
+      function formatDateIndo(dateStr) {
+        if (!dateStr || dateStr === '-') return '-';
+        if (typeof dateStr === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+        const parts = String(dateStr).slice(0, 10).split('-');
+        if (parts.length === 3 && parts[0].length === 4) {
+          return parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+        return String(dateStr);
+      }
+
+      function toIsoDate(dateStr) {
+        if (!dateStr || dateStr === '-') return '';
+        if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+        if (typeof dateStr === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+          const parts = dateStr.split('/');
+          return parts[2] + '-' + parts[1] + '-' + parts[0];
+        }
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+          const y = d.getFullYear();
+          const m = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return y + '-' + m + '-' + day;
+        }
+        return '';
       }
 
       function formatRupiahSpasi(num) {
@@ -2550,35 +2784,37 @@
 
       function getStatusBadge(status) {
         const s = (status || '').toLowerCase();
-        if (s.includes('under')) {
-          return '<span class="badge-status badge-under">Under Budget</span>';
-        }
-        if (s.includes('near') || s.includes('warning')) {
-          return '<span class="badge-status badge-near">Near Budget</span>';
-        }
-        if (s.includes('over')) {
+        if (s.includes('over') || s.includes('lebih')) {
           return '<span class="badge-status badge-over">Over Budget</span>';
         }
-        return '<span class="badge-status badge-under">' + escapeHtml(status) + '</span>';
+        return '<span class="badge-status badge-under">Dalam Budget</span>';
       }
 
       function getStatusCOABadge(status) {
         const s = (status || '').toLowerCase();
-        if (s === 'aktif') {
+        if (s === 'aktif' || s === 'ok' || s === 'ya') {
           return '<span class="badge-status badge-coa-aktif">Aktif</span>';
         }
         return '<span class="badge-status badge-coa-nonaktif">Non-Aktif</span>';
       }
 
+      // Rumus % Terpakai: (Actual Beban / Budget) * 100, hasil berbentuk %
+      function formatPercent(num) {
+        if (num === null || num === undefined || isNaN(num)) return '0%';
+        const p = Number(num);
+        const formatted = (p % 1 === 0) ? p.toFixed(0) : p.toFixed(1);
+        return formatted + '%';
+      }
+
       function getPercentBadge(percent) {
         const p = parseFloat(percent) || 0;
         let colorClass = 'percent-safe';
-        if (p >= 100) {
+        if (p > 100) {
           colorClass = 'percent-danger';
         } else if (p >= 85) {
           colorClass = 'percent-warning';
         }
-        return '<span class="percent-badge ' + colorClass + '">' + p.toFixed(1) + '%</span>';
+        return '<span class="percent-badge ' + colorClass + '">' + formatPercent(p) + '</span>';
       }
 
       /* ===== FILTERING LOGIC ===== */
@@ -2586,7 +2822,9 @@
         return budgetData.filter(function (item) {
           if (filterState.search) {
             const q = filterState.search.toLowerCase();
-            const matchPeriode = (item.periode || '').toLowerCase().includes(q);
+            const pIndo = formatDateIndo(item.periode).toLowerCase();
+            const pIso = (item.periode || '').toLowerCase();
+            const matchPeriode = pIndo.includes(q) || pIso.includes(q);
             const matchKode = (item.kodeCOA || '').toLowerCase().includes(q);
             const matchNama = (item.namaAkunCOA || '').toLowerCase().includes(q);
             const matchDiv = (item.divisi || '').toLowerCase().includes(q);
@@ -2594,12 +2832,31 @@
             if (!matchPeriode && !matchKode && !matchNama && !matchDiv && !matchKel) return false;
           }
 
+          if (filterState.startDate && filterState.endDate) {
+            const p = toIsoDate(item.periode);
+            if (p && (p < filterState.startDate || p > filterState.endDate)) return false;
+          } else if (filterState.startDate) {
+            const p = toIsoDate(item.periode);
+            if (p && p < filterState.startDate) return false;
+          }
+
           if (filterState.divisi && filterState.divisi !== 'Semua Divisi') {
             if ((item.divisi || '').toLowerCase() !== filterState.divisi.toLowerCase()) return false;
           }
 
           if (filterState.status && filterState.status !== 'Semua Status') {
-            if ((item.status || '').toLowerCase() !== filterState.status.toLowerCase()) return false;
+            const fs = filterState.status.toLowerCase();
+            const actualInfo = getActualBebanInfo(item.kodeCOA, item.periode);
+            const actualVal = actualInfo.hasMatch ? actualInfo.total : Number(item.actualBeban || 0);
+            const b = Number(item.budget || 0);
+            const currentStatus = (actualVal > b ? 'Over Budget' : 'Dalam Budget').toLowerCase();
+            if (fs.includes('over')) {
+              if (!currentStatus.includes('over')) return false;
+            } else if (fs.includes('dalam') || fs.includes('under') || fs.includes('near')) {
+              if (currentStatus.includes('over')) return false;
+            } else if (currentStatus !== fs) {
+              return false;
+            }
           }
 
           if (filterState.kelompok && filterState.kelompok !== 'Semua Kelompok') {
@@ -2628,21 +2885,35 @@
 
         let html = '';
         rows.forEach(function (item, idx) {
-          const sisa = Number(item.budget || 0) - Number(item.actualBeban || 0);
+          // Rumus Actual Beban: Diambil dari Beban Diakui modul Pengeluaran & Beban
+          // dengan syarat Kode COA sama dan Bulan Transaksi sama
+          const actualInfo = getActualBebanInfo(item.kodeCOA, item.periode);
+          const actualVal = actualInfo.hasMatch ? actualInfo.total : Number(item.actualBeban || 0);
+
+          // Rumus Sisa Budget = Budget - Actual Beban
+          const b = Number(item.budget || 0);
+          const a = actualVal;
+          const sisa = b - a;
+
+          // Rumus % Terpakai = (Actual Beban / Budget) * 100
+          const pct = b > 0 ? (a / b) * 100 : 0;
           const sisaClass = sisa < 0 ? 'color: #dc2626; font-weight: 600;' : 'color: #16a34a; font-weight: 500;';
+
+          // Rumus Status: actual > budget = Over Budget, actual <= budget = Dalam Budget
+          const status = actualVal > b ? 'Over Budget' : 'Dalam Budget';
 
           html += `
             <tr data-id="${item.id}">
               <td style="text-align: center; color: #94a3b8;">${idx + 1}</td>
-              <td style="font-weight: 500; color: #1e293b;">${escapeHtml(item.periode)}</td>
+              <td style="font-weight: 500; color: #1e293b;">${escapeHtml(formatDateIndo(item.periode))}</td>
               <td><span style="font-family: monospace; font-size: 12.5px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: #0284c7; font-weight: 600;">${escapeHtml(item.kodeCOA)}</span></td>
               <td style="font-weight: 500; color: #0f172a;">${escapeHtml(item.namaAkunCOA)}</td>
               <td><span style="color: #475569; font-weight: 500;">${escapeHtml(item.divisi)}</span></td>
               <td style="text-align: right; font-weight: 600; color: #1e293b;">${formatRupiahSpasi(item.budget)}</td>
-              <td style="text-align: right; font-weight: 600; color: #475569;">${formatRupiahSpasi(item.actualBeban)}</td>
+              <td style="text-align: right; font-weight: 600; color: #475569;" title="${actualInfo.hasMatch ? 'Beban Diakui modul Pengeluaran & Beban' : ''}">${formatRupiahSpasi(a)}</td>
               <td style="text-align: right; ${sisaClass}">${formatRupiahSpasi(sisa)}</td>
-              <td style="text-align: center;">${getPercentBadge(item.persenTerpakai)}</td>
-              <td style="text-align: center;">${getStatusBadge(item.status)}</td>
+              <td style="text-align: center;">${getPercentBadge(pct)}</td>
+              <td style="text-align: center;">${getStatusBadge(status)}</td>
               <td style="color: #64748b;">${escapeHtml(item.divisiPengecualian || '-')}</td>
               <td><span style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px; font-size: 11.5px; color: #334155;">${escapeHtml(item.kelompokCOA)}</span></td>
               <td style="text-align: center;">${getStatusCOABadge(item.statusCOA)}</td>
@@ -2808,50 +3079,72 @@
 
       let currentEditingId = null;
 
-      // Master List of COA Items (Sesuai Gambar 2 Screenshot User)
-      const masterCOAList = [
-        { code: '5001', name: 'Beban Gaji & Upah', group: 'Beban Operasional', status: 'OK' },
-        { code: '5002', name: 'Beban Operasional Kantor', group: 'Beban Operasional', status: 'OK' },
-        { code: '5003', name: 'Beban Pemasaran & Iklan', group: 'Beban Pemasaran', status: 'OK' },
-        { code: '5004', name: 'Beban Konsumsi & Lembur', group: 'Beban Operasional', status: 'OK' },
-        { code: '5005', name: 'Beban Perjalanan Dinas', group: 'Beban Operasional', status: 'OK' },
-        { code: '5006', name: 'Beban Perlengkapan & Utilitas', group: 'Beban Operasional', status: 'OK' },
-        { code: '5007', name: 'Beban Sewa', group: 'Beban', status: 'OK' },
-        { code: '5008', name: 'Beban Pemeliharaan & Servis', group: 'Beban Operasional', status: 'OK' },
-        { code: '5009', name: 'Beban Komunikasi & Internet', group: 'Beban Operasional', status: 'OK' },
-        { code: '5010', name: 'Beban Pajak & Retribusi', group: 'Beban Umum & Administrasi', status: 'OK' },
-        { code: '5011', name: 'Beban Administrasi Bank', group: 'Beban Umum & Administrasi', status: 'OK' }
-      ];
-
-      // Render Dropdown COA List inside Modal (Gambar 2)
+      // Render Dropdown COA List inside Modal dari Data Master COA
       function renderCoaDropdownList() {
         if (!menuCoaModal) return;
         const activeCode = (crudKodeCOA && crudKodeCOA.value) ? crudKodeCOA.value.trim() : '';
         menuCoaModal.innerHTML = '';
-        masterCOAList.forEach(function (coa) {
+        const list = getMasterCoaList();
+
+        // Urutkan akun Beban (5001-5013) di atas karena modul Budget vs Actual berfokus pada anggaran beban operasional
+        const sorted = list.slice().sort(function (a, b) {
+          const aIsBeban = a.kelompok === 'Beban' ? 0 : 1;
+          const bIsBeban = b.kelompok === 'Beban' ? 0 : 1;
+          if (aIsBeban !== bIsBeban) return aIsBeban - bIsBeban;
+          return a.kode.localeCompare(b.kode, undefined, { numeric: true });
+        });
+
+        sorted.forEach(function (coa) {
           const opt = document.createElement('div');
-          const isSelected = activeCode === coa.code;
+          const isSelected = activeCode === coa.kode;
           opt.className = 'modal-opt-item' + (isSelected ? ' is-selected' : '');
-          opt.setAttribute('data-code', coa.code);
-          opt.setAttribute('title', coa.code + ' - ' + coa.name + ' (' + coa.group + ')');
+          opt.setAttribute('data-code', coa.kode);
+          opt.setAttribute('title', coa.kode + ' - ' + coa.nama + ' (' + (coa.subKelompok || coa.kelompok) + ')');
           opt.innerHTML = `
             <span class="modal-opt-main">
-              <span class="modal-opt-code">${coa.code}</span>
-              <span class="modal-opt-name">${coa.name}</span>
+              <span class="modal-opt-code">${escapeHtml(coa.kode)}</span>
+              <span class="modal-opt-name">${escapeHtml(coa.nama)}</span>
             </span>
-            <span class="modal-opt-group">${coa.group}</span>
+            <span class="modal-opt-group">${escapeHtml(coa.subKelompok || coa.kelompok)}</span>
           `;
           opt.addEventListener('click', function (e) {
             e.stopPropagation();
-            crudKodeCOA.value = coa.code;
-            crudNamaAkunCOA.value = coa.name;
-            crudKelompokCOA.value = coa.group;
-            crudStatusCOA.value = coa.status;
-            renderCoaDropdownList();
-            wrapCoaModal.classList.remove('is-open');
+            applyMasterCoaToForm(coa);
           });
           menuCoaModal.appendChild(opt);
         });
+      }
+
+      // Auto fill Nama Akun, Divisi, Kelompok COA & Status COA dari Data Master COA
+      function applyMasterCoaToForm(coa) {
+        if (!coa) return;
+        crudKodeCOA.value = coa.kode;
+        crudNamaAkunCOA.value = coa.nama;
+        crudDivisi.value = coa.devisDefault || 'General';
+        crudKelompokCOA.value = coa.kelompok || 'Beban';
+        crudStatusCOA.value = (coa.aktif === 'Tidak' || coa.aktif === 'Non-Aktif') ? 'Non-Aktif' : 'Aktif';
+
+        // Rumus Actual Beban: Diambil otomatis dari Beban Diakui modul Pengeluaran & Beban
+        // dengan syarat Kode COA sama dan Bulan Transaksi sama
+        const realActual = getActualBebanFromPengeluaran(coa.kode, crudPeriode.value);
+        crudActualBeban.value = formatRupiahInput(realActual);
+        delete crudStatus.dataset.userEdited;
+        calculateBudgetFields();
+
+        renderCoaDropdownList();
+        if (wrapCoaModal) wrapCoaModal.classList.remove('is-open');
+      }
+
+      function onCoaInputLookup(codeVal) {
+        const q = String(codeVal || '').trim().toLowerCase();
+        if (!q) return;
+        const list = getMasterCoaList();
+        const found = list.find(function (c) {
+          return String(c.kode).toLowerCase() === q;
+        });
+        if (found) {
+          applyMasterCoaToForm(found);
+        }
       }
       renderCoaDropdownList();
 
@@ -2860,6 +3153,21 @@
           e.stopPropagation();
           renderCoaDropdownList();
           wrapCoaModal.classList.toggle('is-open');
+        });
+        crudKodeCOA.addEventListener('input', function () {
+          onCoaInputLookup(this.value);
+        });
+      }
+
+      // Saat periode (tanggal) diubah, update otomatis Actual Beban jika Kode COA sudah dipilih
+      if (crudPeriode) {
+        crudPeriode.addEventListener('change', function () {
+          if (crudKodeCOA && crudKodeCOA.value) {
+            const realActual = getActualBebanFromPengeluaran(crudKodeCOA.value, this.value);
+            crudActualBeban.value = formatRupiahInput(realActual);
+            delete crudStatus.dataset.userEdited;
+            calculateBudgetFields();
+          }
         });
       }
 
@@ -2872,17 +3180,40 @@
 
       // Number & Currency Helpers
       function parseNumber(val) {
-        if (!val) return 0;
-        const cleaned = String(val).replace(/[^0-9.-]/g, '');
-        return parseFloat(cleaned) || 0;
+        if (val === null || val === undefined) return 0;
+        if (typeof val === 'number') return isNaN(val) ? 0 : val;
+        const str = String(val).trim();
+        if (!str) return 0;
+
+        const isNeg = str.includes('-');
+        let cleaned = str.replace(/[^0-9,.-]/g, '');
+
+        if (cleaned.includes(',') && cleaned.includes('.')) {
+          cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+        } else if (cleaned.includes('.')) {
+          const parts = cleaned.split('.');
+          if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) {
+            cleaned = cleaned.replace(/\./g, '');
+          }
+        } else if (cleaned.includes(',')) {
+          cleaned = cleaned.replace(',', '.');
+        }
+
+        const num = parseFloat(cleaned);
+        return isNaN(num) ? 0 : (isNeg && num > 0 ? -num : num);
       }
 
       function formatRupiahInput(num) {
-        if (isNaN(num)) return 'Rp -';
-        return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+        if (isNaN(num) || num === null || num === undefined) return 'Rp -';
+        const val = Math.round(Number(num));
+        if (val < 0) {
+          return '-Rp ' + Math.abs(val).toLocaleString('id-ID');
+        }
+        return 'Rp ' + val.toLocaleString('id-ID');
       }
 
       // Auto Calculation of Sisa Budget & % Terpakai
+      // Rumus: Sisa Budget = Budget - Actual Beban
       function calculateBudgetFields() {
         const b = parseNumber(crudBudget.value);
         const a = parseNumber(crudActualBeban.value);
@@ -2890,27 +3221,44 @@
 
         if (crudBudget.value.trim() !== '') {
           crudSisaBudget.value = formatRupiahInput(sisa);
+          if (sisa < 0) {
+            crudSisaBudget.style.color = '#dc2626';
+            crudSisaBudget.style.fontWeight = '600';
+          } else {
+            crudSisaBudget.style.color = '#16a34a';
+            crudSisaBudget.style.fontWeight = '600';
+          }
         } else {
           crudSisaBudget.value = 'Rp. -';
+          crudSisaBudget.style.color = '#475569';
+          crudSisaBudget.style.fontWeight = 'normal';
         }
 
         if (b > 0) {
-          const pct = ((a / b) * 100).toFixed(1);
-          crudPersenTerpakai.value = pct + '%';
+          // Rumus % Terpakai: (Actual Beban / Budget) * 100, hasil berbentuk %
+          const pct = ((a / b) * 100);
+          crudPersenTerpakai.value = formatPercent(pct);
+          if (pct > 100) {
+            crudPersenTerpakai.style.color = '#dc2626';
+            crudPersenTerpakai.style.fontWeight = '600';
+          } else if (pct >= 85) {
+            crudPersenTerpakai.style.color = '#d97706';
+            crudPersenTerpakai.style.fontWeight = '600';
+          } else {
+            crudPersenTerpakai.style.color = '#16a34a';
+            crudPersenTerpakai.style.fontWeight = '600';
+          }
 
+          // Rumus Status: actual > budget = Over Budget, actual <= budget = Dalam Budget
           if (!crudStatus.dataset.userEdited) {
-            if (a > b) {
-              crudStatus.value = 'Over Budget';
-            } else if (a >= b * 0.85) {
-              crudStatus.value = 'Waspada';
-            } else {
-              crudStatus.value = 'Dalam Budget';
-            }
+            crudStatus.value = a > b ? 'Over Budget' : 'Dalam Budget';
           }
         } else {
           crudPersenTerpakai.value = '0%';
+          crudPersenTerpakai.style.color = '#475569';
+          crudPersenTerpakai.style.fontWeight = 'normal';
           if (!crudStatus.dataset.userEdited) {
-            crudStatus.value = 'Dalam Budget';
+            crudStatus.value = a > 0 ? 'Over Budget' : 'Dalam Budget';
           }
         }
       }
@@ -2945,20 +3293,26 @@
         delete crudStatus.dataset.userEdited;
         crudModalTitle.innerHTML = '<em>Tambah</em> Budget vs Actual';
 
-        // Pre-fill default values matching Gambar 1
-        crudPeriode.value = '';
+        // Pre-fill default values matching Gambar 1 dengan format tanggal ISO YYYY-MM-DD
+        const todayIso = new Date().toISOString().slice(0, 10);
+        crudPeriode.value = todayIso;
         crudKodeCOA.value = '';
         crudNamaAkunCOA.value = '';
         crudDivisi.value = '';
         crudBudget.value = '';
         crudActualBeban.value = '';
         crudSisaBudget.value = '';
+        crudSisaBudget.style.color = '#475569';
+        crudSisaBudget.style.fontWeight = 'normal';
         crudPersenTerpakai.value = '0%';
-        crudStatus.value = '';
+        crudPersenTerpakai.style.color = '#475569';
+        crudPersenTerpakai.style.fontWeight = 'normal';
+        crudStatus.value = 'Dalam Budget';
         crudDivisiPengecualian.value = '';
         crudKelompokCOA.value = '';
-        crudStatusCOA.value = '';
+        crudStatusCOA.value = 'Aktif';
 
+        renderCoaDropdownList();
         if (budgetCrudModal) {
           budgetCrudModal.classList.add('is-active');
         }
@@ -2972,20 +3326,45 @@
         if (formBudgetCrud) formBudgetCrud.reset();
         crudModalTitle.innerHTML = '<em>Edit</em> Budget vs Actual';
 
-        crudPeriode.value = item.periode || '';
+        const actualInfo = getActualBebanInfo(item.kodeCOA, item.periode);
+        const actualVal = actualInfo.hasMatch ? actualInfo.total : Number(item.actualBeban || 0);
+        const b = Number(item.budget || 0);
+        const sisa = b - actualVal;
+        const pct = b > 0 ? (actualVal / b) * 100 : 0;
+
+        crudPeriode.value = toIsoDate(item.periode) || new Date().toISOString().slice(0, 10);
         crudKodeCOA.value = item.kodeCOA || '';
         crudNamaAkunCOA.value = item.namaAkunCOA || '';
         crudDivisi.value = item.divisi || '';
-        crudBudget.value = formatRupiahInput(item.budget);
-        crudActualBeban.value = formatRupiahInput(item.actualBeban);
-        crudSisaBudget.value = formatRupiahInput(item.sisaBudget);
-        crudPersenTerpakai.value = (typeof item.persenTerpakai === 'number' ? item.persenTerpakai.toFixed(1) : item.persenTerpakai) + '%';
-        crudStatus.value = item.status || 'Dalam Budget';
+        crudBudget.value = formatRupiahInput(b);
+        crudActualBeban.value = formatRupiahInput(actualVal);
+        crudSisaBudget.value = formatRupiahInput(sisa);
+        if (sisa < 0) {
+          crudSisaBudget.style.color = '#dc2626';
+          crudSisaBudget.style.fontWeight = '600';
+        } else {
+          crudSisaBudget.style.color = '#16a34a';
+          crudSisaBudget.style.fontWeight = '600';
+        }
+        crudPersenTerpakai.value = formatPercent(pct);
+        if (pct > 100) {
+          crudPersenTerpakai.style.color = '#dc2626';
+          crudPersenTerpakai.style.fontWeight = '600';
+        } else if (pct >= 85) {
+          crudPersenTerpakai.style.color = '#d97706';
+          crudPersenTerpakai.style.fontWeight = '600';
+        } else {
+          crudPersenTerpakai.style.color = '#16a34a';
+          crudPersenTerpakai.style.fontWeight = '600';
+        }
+        const autoStatus = actualVal > b ? 'Over Budget' : 'Dalam Budget';
+        crudStatus.value = item.status || autoStatus;
         crudStatus.dataset.userEdited = 'true';
         crudDivisiPengecualian.value = item.divisiPengecualian || '-';
         crudKelompokCOA.value = item.kelompokCOA || '';
-        crudStatusCOA.value = item.statusCOA || 'OK';
+        crudStatusCOA.value = item.statusCOA || 'Aktif';
 
+        renderCoaDropdownList();
         if (budgetCrudModal) {
           budgetCrudModal.classList.add('is-active');
         }
@@ -2994,19 +3373,45 @@
       // Open Modal Lihat Detail (Gambar 3)
       function openDetailBudgetModal(item) {
         if (!item) return;
-        detailPeriode.textContent = item.periode || '-';
+        const actualInfo = getActualBebanInfo(item.kodeCOA, item.periode);
+        const actualVal = actualInfo.hasMatch ? actualInfo.total : Number(item.actualBeban || 0);
+        const b = Number(item.budget || 0);
+        const sisa = b - actualVal;
+        const pct = b > 0 ? (actualVal / b) * 100 : 0;
+        const pctStr = formatPercent(pct);
+
+        // Rumus Status: actual > budget = Over Budget, actual <= budget = Dalam Budget
+        const status = actualVal > b ? 'Over Budget' : 'Dalam Budget';
+
+        detailPeriode.textContent = formatDateIndo(item.periode);
         detailKodeCOA.textContent = item.kodeCOA || '-';
         detailNamaAkunCOA.textContent = item.namaAkunCOA || '-';
         detailDivisi.textContent = item.divisi || '-';
-        detailBudget.textContent = formatRupiahInput(item.budget);
-        detailActualBeban.textContent = formatRupiahInput(item.actualBeban);
-        detailSisaBudget.textContent = formatRupiahInput(item.sisaBudget);
-        const pctStr = (typeof item.persenTerpakai === 'number' ? item.persenTerpakai.toFixed(1) : item.persenTerpakai) + '%';
+        detailBudget.textContent = formatRupiahInput(b);
+        detailActualBeban.textContent = formatRupiahInput(actualVal);
+        detailSisaBudget.textContent = formatRupiahInput(sisa);
+        if (sisa < 0) {
+          detailSisaBudget.style.color = '#dc2626';
+          detailSisaBudget.style.fontWeight = '600';
+        } else {
+          detailSisaBudget.style.color = '#16a34a';
+          detailSisaBudget.style.fontWeight = '600';
+        }
         detailPersenTerpakai.textContent = pctStr;
-        detailStatus.textContent = item.status || 'Dalam Budget';
+        if (pct > 100) {
+          detailPersenTerpakai.style.color = '#dc2626';
+          detailPersenTerpakai.style.fontWeight = '600';
+        } else if (pct >= 85) {
+          detailPersenTerpakai.style.color = '#d97706';
+          detailPersenTerpakai.style.fontWeight = '600';
+        } else {
+          detailPersenTerpakai.style.color = '#16a34a';
+          detailPersenTerpakai.style.fontWeight = '600';
+        }
+        detailStatus.textContent = status;
         detailDivisiPengecualian.textContent = item.divisiPengecualian || '-';
         detailKelompokCOA.textContent = item.kelompokCOA || '-';
-        detailStatusCOA.textContent = item.statusCOA || 'OK';
+        detailStatusCOA.textContent = item.statusCOA || 'Aktif';
 
         if (budgetDetailModal) {
           budgetDetailModal.classList.add('is-active');
@@ -3038,23 +3443,30 @@
           e.preventDefault();
 
           const bVal = parseNumber(crudBudget.value);
-          const aVal = parseNumber(crudActualBeban.value);
+          let aVal = parseNumber(crudActualBeban.value);
+          const pengeluaranBeban = getActualBebanFromPengeluaran(crudKodeCOA.value, crudPeriode.value);
+          if (pengeluaranBeban > 0 && aVal === 0) {
+            aVal = pengeluaranBeban;
+          }
           const sisaVal = bVal - aVal;
-          const pctVal = bVal > 0 ? parseFloat(((aVal / bVal) * 100).toFixed(1)) : 0;
+          const pctVal = bVal > 0 ? parseFloat(((aVal / bVal) * 100).toFixed(2)) : 0;
+
+          // Rumus Status: actual > budget = Over Budget, actual <= budget = Dalam Budget
+          const autoStatus = aVal > bVal ? 'Over Budget' : 'Dalam Budget';
 
           const recordData = {
-            periode: crudPeriode.value.trim() || 'Sep 2026',
-            kodeCOA: crudKodeCOA.value.trim() || '5007',
-            namaAkunCOA: crudNamaAkunCOA.value.trim() || 'Beban Operasional',
+            periode: crudPeriode.value.trim() || new Date().toISOString().slice(0, 10),
+            kodeCOA: crudKodeCOA.value.trim() || '5001',
+            namaAkunCOA: crudNamaAkunCOA.value.trim() || 'Beban Gaji',
             divisi: crudDivisi.value.trim() || 'General',
             budget: bVal,
             actualBeban: aVal,
             sisaBudget: sisaVal,
             persenTerpakai: pctVal,
-            status: crudStatus.value.trim() || (aVal > bVal ? 'Over Budget' : 'Dalam Budget'),
+            status: crudStatus.value.trim() || autoStatus,
             divisiPengecualian: crudDivisiPengecualian.value.trim() || '-',
             kelompokCOA: crudKelompokCOA.value.trim() || 'Beban',
-            statusCOA: crudStatusCOA.value.trim() || 'OK'
+            statusCOA: crudStatusCOA.value.trim() || 'Aktif'
           };
 
           if (currentEditingId) {
@@ -3104,7 +3516,7 @@
 
       /* ===== FILTER FUNNEL DROPDOWN: DIVISI, STATUS, KELOMPOK ===== */
       const divisiOptions = ['Semua Divisi', 'Operasional', 'Marketing', 'Finance', 'IT / Tech', 'HR / GA', 'Creative'];
-      const statusOptions = ['Semua Status', 'Under Budget', 'Near Budget', 'Over Budget'];
+      const statusOptions = ['Semua Status', 'Dalam Budget', 'Over Budget'];
       const kelompokOptions = ['Semua Kelompok', 'Beban Operasional', 'Beban Pemasaran', 'Beban Umum & Administrasi'];
 
       function setupDropdownFilter(boxEl, inputEl, listEl, options, stateKey) {
@@ -3391,18 +3803,25 @@
         ];
 
         const exportData = rows.map(function (item, idx) {
-          const sisa = Number(item.budget || 0) - Number(item.actualBeban || 0);
+          const actualInfo = getActualBebanInfo(item.kodeCOA, item.periode);
+          const actualVal = actualInfo.hasMatch ? actualInfo.total : Number(item.actualBeban || 0);
+          const b = Number(item.budget || 0);
+          const sisa = b - actualVal;
+          const pct = b > 0 ? (actualVal / b) * 100 : 0;
+          const pctStr = formatPercent(pct);
+          // Rumus Status: actual > budget = Over Budget, actual <= budget = Dalam Budget
+          const status = actualVal > b ? 'Over Budget' : 'Dalam Budget';
           return [
             idx + 1,
-            item.periode || '-',
+            formatDateIndo(item.periode),
             item.kodeCOA || '-',
             item.namaAkunCOA || '-',
             item.divisi || '-',
-            item.budget || 0,
-            item.actualBeban || 0,
+            b,
+            actualVal,
             sisa,
-            (item.persenTerpakai || 0) + '%',
-            item.status || 'Under Budget',
+            pctStr,
+            status,
             item.divisiPengecualian || '-',
             item.kelompokCOA || '-',
             item.statusCOA || 'Aktif'
@@ -3465,11 +3884,18 @@
       window.addEventListener('scroll', closeActionMenus, true);
 
       window.addEventListener('storage', function (e) {
-        if (!e.key || e.key === STORAGE_KEY || e.key === DIVISI_KEY) {
+        if (!e.key || e.key === STORAGE_KEY || e.key === DIVISI_KEY || e.key === MASTER_COA_KEY || e.key === PENGELUARAN_STORAGE_KEY || e.key === PENGELUARAN_FALLBACK_KEY) {
           budgetData = loadData();
           updateDivisiPengecualianDatalist();
+          renderCoaDropdownList();
           renderTable();
         }
+      });
+
+      window.addEventListener('focus', function () {
+        budgetData = loadData();
+        renderCoaDropdownList();
+        renderTable();
       });
 
       window.addEventListener('accounting_divisi_changed', function () {
