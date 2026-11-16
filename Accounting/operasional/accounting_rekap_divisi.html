@@ -1721,7 +1721,7 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js"></script>
-  <script src="../../assets/js/layout.js?v=20261111_hd_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261114_ukpk"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -2324,7 +2324,7 @@
             },
             {
               id: 'pnd-4',
-              idPendapatan: '7691348184035411736',
+              idPendapatan: '7691348184035411737',
               tanggalPengakuan: '2026-08-10',
               customer: 'Brand Cosmo Style',
               noInvoice: 'INV-202609-004',
@@ -2346,6 +2346,93 @@
               buktiUrl: 'detail_tracking_jualan.png',
               buktiDataUrl: '',
               status: 'Lewat Jatuh Tempo',
+              namaAkunCoa: 'Bank BCA',
+              kelompokCoa: 'Aset',
+              statusCoa: 'Ok',
+              divisiPengecualian: '-'
+            },
+            {
+              id: 'pnd-5',
+              idPendapatan: '7691348184035411735',
+              tanggalPengakuan: '2026-09-12',
+              customer: 'Shopee Live Media',
+              noInvoice: 'INV-202609-005',
+              kodeCoa: '4001',
+              divisi: 'MCN',
+              keterangan: 'Shopee Mega Sale Campaign',
+              dpp: 8000000,
+              ppn: 0,
+              totalTagihan: 8000000,
+              terbayarKas: 8000000,
+              sisaPiutang: 0,
+              jatuhTempo: '2026-09-30',
+              hatuhTempo: '2026-09-30',
+              projectBrand: 'Shopee Mega Sale',
+              statusLama: 'Lunas',
+              tanggalBayarLama: '2026-09-12',
+              akunLama: 'BNI',
+              pic: 'Ridha',
+              buktiUrl: 'detail_tracking_jualan.png',
+              buktiDataUrl: '',
+              status: 'Lunas',
+              namaAkunCoa: 'Pendapatan MCN',
+              kelompokCoa: 'Pendapatan',
+              statusCoa: 'Ok',
+              divisiPengecualian: '-'
+            },
+            {
+              id: 'pnd-6',
+              idPendapatan: '7691348184035411738',
+              tanggalPengakuan: '2026-09-20',
+              customer: 'Serum Glow Indonesia',
+              noInvoice: 'INV-202609-006',
+              kodeCoa: '1002',
+              divisi: 'Operasional',
+              keterangan: 'Product Launching Serum Glow',
+              dpp: 12000000,
+              ppn: 0,
+              totalTagihan: 12000000,
+              terbayarKas: 12000000,
+              sisaPiutang: 0,
+              jatuhTempo: '2026-10-05',
+              hatuhTempo: '2026-10-05',
+              projectBrand: 'Product Launching Serum Glow',
+              statusLama: 'Lunas',
+              tanggalBayarLama: '2026-09-20',
+              akunLama: 'Bank BCA',
+              pic: 'Ahmad Fauzi',
+              buktiUrl: 'detail_tracking_jualan.png',
+              buktiDataUrl: '',
+              status: 'Lunas',
+              namaAkunCoa: 'Bank BCA',
+              kelompokCoa: 'Aset',
+              statusCoa: 'Ok',
+              divisiPengecualian: '-'
+            },
+            {
+              id: 'pnd-7',
+              idPendapatan: '7691348184035411739',
+              tanggalPengakuan: '2026-10-05',
+              customer: 'Tap & Tsp Agency',
+              noInvoice: 'INV-202609-007',
+              kodeCoa: '1002',
+              divisi: 'Operasional',
+              keterangan: 'Management Fee Project',
+              dpp: 4500000,
+              ppn: 0,
+              totalTagihan: 4500000,
+              terbayarKas: 0,
+              sisaPiutang: 4500000,
+              jatuhTempo: '2026-11-10',
+              hatuhTempo: '2026-11-10',
+              projectBrand: 'Tap & Tsp',
+              statusLama: 'Belum Lunas',
+              tanggalBayarLama: '',
+              akunLama: 'Bank BCA',
+              pic: 'Siti Rahma',
+              buktiUrl: 'detail_tracking_jualan.png',
+              buktiDataUrl: '',
+              status: 'Belum Lunas',
               namaAkunCoa: 'Bank BCA',
               kelompokCoa: 'Aset',
               statusCoa: 'Ok',
@@ -2757,12 +2844,44 @@
         return true;
       }
 
+      function getPenyusutanAsetListForRekap() {
+        try {
+          const raw = localStorage.getItem(PENYUSUTAN_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {}
+
+        try {
+          const rawAst = localStorage.getItem(DAFTAR_ASET_KEY);
+          if (rawAst) {
+            const parsedAst = JSON.parse(rawAst);
+            if (Array.isArray(parsedAst) && parsedAst.length > 0) {
+              return parsedAst.map(function (ast) {
+                const perBulan = Number(ast.bebanBulanIni !== undefined ? ast.bebanBulanIni : (ast.penyusutanBulan !== undefined ? ast.penyusutanBulan : (ast.perBulan || 0)));
+                return {
+                  id: ast.id || ast.kodeAset,
+                  kodeAset: ast.kodeAset,
+                  namaAset: ast.namaAset,
+                  divisi: ast.divisi || '-',
+                  projectBrand: ast.projectBrand || '-',
+                  bebanBulanIni: perBulan
+                };
+              });
+            }
+          }
+        } catch (e2) {}
+
+        return DEFAULT_PENYUSUTAN_LIST;
+      }
+
       /* ===== PERHITUNGAN AGREGASI REKAP DIVISI SESUAI SPESIFIKASI =====
          1. Divisi: Auto Fill dari Master COA ( Divisi Default )
          2. Pendapatan: Auto Fill dari Pendapatan ( DPP ) => {yang Divisi nya sama}
          3. Beban: Auto Fill dari Pengeluaran & Beban ( Beban Diakui ) => {yang Divisi nya sama}
          4. Payroll: Auto Fill dari Payroll ( Beban Bruto ) => {yang Divisi nya sama}
-         5. Penyusutan: Auto Fill dari Penyusutan Aset => {yang Divisi nya sama}
+         5. Penyusutan: Auto Fill dari Penyusutan Aset ( Beban Bulan Ini ) => {yang Divisi nya sama}
          6. Laba Sebelum Pajak: Pendapatan - Beban - Payroll - Penyusutan
          7. Margin: Sebelum Pajak ÷ Pendapatan // Format persen (%). Kalau pendapatan 0 => "n.a."
       ================================================================ */
@@ -2774,7 +2893,7 @@
         const pndList = getStoredList(PENDAPATAN_KEY, PENDAPATAN_FALLBACK_KEY, DEFAULT_PENDAPATAN_LIST);
         const expList = getStoredList(PENGELUARAN_KEY, PENGELUARAN_FALLBACK_KEY, DEFAULT_PENGELUARAN_LIST);
         const payList = getStoredList(PAYROLL_KEY, PAYROLL_FALLBACK_KEY, DEFAULT_PAYROLL_LIST, PAYROLL_LEGACY_KEY);
-        const astList = getStoredList(PENYUSUTAN_KEY, DAFTAR_ASET_KEY, DEFAULT_PENYUSUTAN_LIST);
+        const astList = getPenyusutanAsetListForRekap();
 
         // Kumpulkan divisi dari transaksi yang mungkin belum terdaftar di Master COA
         const divSet = new Set(divisions.map(function (d) { return d.toLowerCase(); }));
@@ -2957,11 +3076,31 @@
         if (!item) return;
 
         if (detailDivisi) detailDivisi.textContent = item.divisi || '-';
-        if (detailPendapatan) detailPendapatan.textContent = formatRupiahSpasi(item.pendapatan);
-        if (detailBeban) detailBeban.textContent = item.beban ? formatRupiahSpasi(item.beban) : 'Rp. 0';
-        if (detailPayroll) detailPayroll.textContent = item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0';
-        if (detailPenyusutan) detailPenyusutan.textContent = item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0';
-        if (detailLabaSebelumPajak) detailLabaSebelumPajak.textContent = formatRupiahSpasi(item.labaSebelumPajak);
+        if (detailPendapatan) {
+          detailPendapatan.textContent = formatRupiahSpasi(item.pendapatan);
+          detailPendapatan.style.color = '#16a34a';
+          detailPendapatan.style.fontWeight = '600';
+        }
+        if (detailBeban) {
+          detailBeban.textContent = item.beban ? formatRupiahSpasi(item.beban) : 'Rp. 0';
+          detailBeban.style.color = item.beban > 0 ? '#dc2626' : '#64748b';
+          detailBeban.style.fontWeight = '600';
+        }
+        if (detailPayroll) {
+          detailPayroll.textContent = item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0';
+          detailPayroll.style.color = item.payroll > 0 ? '#dc2626' : '#64748b';
+          detailPayroll.style.fontWeight = '600';
+        }
+        if (detailPenyusutan) {
+          detailPenyusutan.textContent = item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0';
+          detailPenyusutan.style.color = item.penyusutan > 0 ? '#dc2626' : '#64748b';
+          detailPenyusutan.style.fontWeight = '600';
+        }
+        if (detailLabaSebelumPajak) {
+          detailLabaSebelumPajak.textContent = formatRupiahSpasi(item.labaSebelumPajak);
+          detailLabaSebelumPajak.style.color = Number(item.labaSebelumPajak) >= 0 ? '#16a34a' : '#dc2626';
+          detailLabaSebelumPajak.style.fontWeight = '700';
+        }
         if (detailMargin) {
           detailMargin.textContent = (item.pendapatan === 0 || item.margin === 'n.a.') ? 'n.a.' : formatMarginPercent(item.margin);
         }
@@ -3013,14 +3152,15 @@
             marginBadge = '<span class="badge-margin badge-margin-negative">' + escapeHtml(formatMarginPercent(item.margin)) + '</span>';
           }
 
+          const labaNum = Number(item.labaSebelumPajak) || 0;
           tr.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-size: 13px;">' + (idx + 1) + '</td>',
             '<td style="font-weight: 600; color: #0f172a;">' + escapeHtml(item.divisi) + '</td>',
-            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 500; color: #0284c7;">' + escapeHtml(formatRupiahSpasi(item.pendapatan)) + '</td>',
-            '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.beban ? formatRupiahSpasi(item.beban) : 'Rp. 0') + '</td>',
-            '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0') + '</td>',
-            '<td class="rekap-cell-italic" style="text-align: right; color: #475569;">' + escapeHtml(item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0') + '</td>',
-            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 600; color: #0f172a;">' + escapeHtml(formatRupiahSpasi(item.labaSebelumPajak)) + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 600; color: #16a34a;">' + escapeHtml(formatRupiahSpasi(item.pendapatan)) + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 600; color: ' + (item.beban > 0 ? '#dc2626' : '#64748b') + ';">' + escapeHtml(item.beban ? formatRupiahSpasi(item.beban) : 'Rp. 0') + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 600; color: ' + (item.payroll > 0 ? '#dc2626' : '#64748b') + ';">' + escapeHtml(item.payroll ? formatRupiahSpasi(item.payroll) : 'Rp. 0') + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 600; color: ' + (item.penyusutan > 0 ? '#dc2626' : '#64748b') + ';">' + escapeHtml(item.penyusutan ? formatRupiahSpasi(item.penyusutan) : 'Rp. 0') + '</td>',
+            '<td class="rekap-cell-italic" style="text-align: right; font-weight: 700; color: ' + (labaNum >= 0 ? '#16a34a' : '#dc2626') + ';">' + escapeHtml(formatRupiahSpasi(item.labaSebelumPajak)) + '</td>',
             '<td style="text-align: right;">' + marginBadge + '</td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
               '<button type="button" class="btn-rekap-view" data-view-id="' + escapeHtml(item.id) + '" aria-label="Lihat Detail" title="Lihat Rekap Divisi">' +
@@ -3458,6 +3598,8 @@
       });
 
       window.addEventListener('payroll_data_changed', refreshRekapData);
+      window.addEventListener('penyusutan_data_changed', refreshRekapData);
+      window.addEventListener('accounting-daftar-aset-updated', refreshRekapData);
       window.addEventListener('focus', refreshRekapData);
       window.addEventListener('pageshow', refreshRekapData);
       document.addEventListener('visibilitychange', function () {

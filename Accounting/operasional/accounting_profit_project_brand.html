@@ -1724,6 +1724,15 @@
       const APPROVAL_STORAGE_KEY = 'BISA_APPROVAL_PENGELUARAN_DATA_V5';
       const PAYROLL_STORAGE_KEY = 'bisa_payroll_data_v1';
       const PAYROLL_FALLBACK_KEY = 'accounting_payroll_data_v1';
+      const PENYUSUTAN_STORAGE_KEY = 'accounting_penyusutan_aset_data';
+      const DAFTAR_ASET_STORAGE_KEYS = ['bisa_accounting_daftar_aset_data_v4', 'accounting_daftar_aset_data'];
+
+      const DEFAULT_PENYUSUTAN_FALLBACK_LIST = [
+        { id: 'AST-001', kodeAset: 'AST-001', namaAset: 'Dispenser Mini Miyako', bebanBulanIni: 5556, divisi: 'Produksi', projectBrand: '-' },
+        { id: 'AST-002', kodeAset: 'AST-002', namaAset: 'Sony Alpha A7 IV + Lens 24-70mm', bebanBulanIni: 791667, divisi: 'Kreatif', projectBrand: 'Brand Alpha' },
+        { id: 'AST-003', kodeAset: 'AST-003', namaAset: 'MacBook Pro M3 Max 36GB', bebanBulanIni: 1208333, divisi: 'IT & Tech', projectBrand: '-' },
+        { id: 'AST-004', kodeAset: 'AST-004', namaAset: 'Meja Meeting Kayu Jati Custom 3M', bebanBulanIni: 216667, divisi: 'Operasional', projectBrand: '-' }
+      ];
 
       function normalizeProjectBrandName(val) {
         return String(val || '')
@@ -1912,6 +1921,57 @@
         return resultMap;
       }
 
+      function getPenyusutanAsetList() {
+        try {
+          const raw = localStorage.getItem(PENYUSUTAN_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        } catch (e) {}
+
+        // Fallback jika belum pernah tersimpan di storage penyusutan aset
+        try {
+          for (let i = 0; i < DAFTAR_ASET_STORAGE_KEYS.length; i++) {
+            const rawAst = localStorage.getItem(DAFTAR_ASET_STORAGE_KEYS[i]);
+            if (rawAst) {
+              const parsedAst = JSON.parse(rawAst);
+              if (Array.isArray(parsedAst) && parsedAst.length > 0) {
+                return parsedAst.map(function (ast) {
+                  const perBulan = Number(ast.penyusutanBulan !== undefined ? ast.penyusutanBulan : (ast.perBulan !== undefined ? ast.perBulan : (ast.bebanBulanIni || 0)));
+                  return {
+                    id: ast.id || ast.kodeAset,
+                    kodeAset: ast.kodeAset,
+                    namaAset: ast.namaAset,
+                    divisi: ast.divisi || '-',
+                    projectBrand: ast.projectBrand || '-',
+                    bebanBulanIni: perBulan
+                  };
+                });
+              }
+            }
+          }
+        } catch (e2) {}
+
+        return DEFAULT_PENYUSUTAN_FALLBACK_LIST;
+      }
+
+      function getPenyusutanBebanBulanIniMapByBrand() {
+        const resultMap = new Map();
+        const list = getPenyusutanAsetList();
+
+        list.forEach(function (item) {
+          if (!item) return;
+          const cleanPb = normalizeProjectBrandName(item.projectBrand);
+          if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+          const key = cleanPb.toLowerCase();
+          const val = parseNumericNominal(item.bebanBulanIni !== undefined ? item.bebanBulanIni : (item.penyusutanBulan || item.perBulan || 0));
+          resultMap.set(key, (resultMap.get(key) || 0) + val);
+        });
+
+        return resultMap;
+      }
+
       function calculateMarginPercent(labaSebelumPajak, pendapatan) {
         const rev = Number(pendapatan) || 0;
         const laba = Number(labaSebelumPajak) || 0;
@@ -1931,7 +1991,7 @@
         const pendapatanDpp = opts.dppMap ? (opts.dppMap.get(key) || 0) : 0;
         const beban = opts.bebanMap ? (opts.bebanMap.get(key) || 0) : 0;
         const payroll = opts.payrollMap ? (opts.payrollMap.get(key) || 0) : 0;
-        const penyusutan = 0;
+        const penyusutan = opts.penyusutanMap ? (opts.penyusutanMap.get(key) || 0) : 0;
         const laba = pendapatanDpp - (beban + payroll + penyusutan);
         const margin = calculateMarginPercent(laba, pendapatanDpp);
         return {
@@ -1956,11 +2016,12 @@
         const dppMap = getPendapatanDppMapByBrand();
         const bebanMap = getPengeluaranBebanDiakuiMapByBrand();
         const payrollMap = getPayrollBebanBrutoMapByBrand();
+        const penyusutanMap = getPenyusutanBebanBulanIniMapByBrand();
 
         const aggMap = new Map();
 
         // 1. Utamakan membaca langsung dari transaksi Kas & Bank (hanya kolom projectBrand yang diambil)
-        //    Kolom Pendapatan mengambil jumlah DPP dari modul Pendapatan; kolom Beban mengambil jumlah Beban Diakui dari modul Pengeluaran & Beban; kolom Payroll mengambil Beban Bruto dari Payroll.
+        //    Kolom Pendapatan mengambil jumlah DPP dari modul Pendapatan; kolom Beban mengambil jumlah Beban Diakui dari modul Pengeluaran & Beban; kolom Payroll mengambil Beban Bruto dari Payroll; kolom Penyusutan mengambil Beban Bulan Ini dari Penyusutan Aset.
         try {
           const rawKb = localStorage.getItem(KB_STORAGE_KEY);
           if (rawKb !== null) {
@@ -2032,7 +2093,33 @@
           console.error('Error reading Payroll brands:', ePay);
         }
 
-        // 3. Fallback snapshot relasi Kas & Bank jika key utama belum ada
+        // 3. Kumpulkan project/brand dari modul Penyusutan Aset agar otomatis muncul di Profit Project/Brand
+        try {
+          const astList = getPenyusutanAsetList();
+          astList.forEach(function (ast) {
+            if (!ast) return;
+            const rawPb = String(ast.projectBrand || '').trim();
+            const cleanPb = normalizeProjectBrandName(rawPb);
+            if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+
+            const key = cleanPb.toLowerCase();
+            if (!aggMap.has(key)) {
+              aggMap.set(key, {
+                projectBrand: cleanPb,
+                rawProjectBrand: rawPb,
+                tanggal: new Date().toISOString().split('T')[0],
+                jenisSet: new Set(['Penyusutan Aset']),
+                txIds: []
+              });
+            } else {
+              aggMap.get(key).jenisSet.add('Penyusutan Aset');
+            }
+          });
+        } catch (eAst) {
+          console.error('Error reading Penyusutan brands:', eAst);
+        }
+
+        // 4. Fallback snapshot relasi Kas & Bank jika key utama belum ada
         if (aggMap.size === 0) {
           try {
             const rawRel = localStorage.getItem(KB_PROFIT_REL_KEY);
@@ -2070,6 +2157,7 @@
             dppMap: dppMap,
             bebanMap: bebanMap,
             payrollMap: payrollMap,
+            penyusutanMap: penyusutanMap,
             tanggal: entry.tanggal || new Date().toISOString().split('T')[0],
             periode: formatPeriodeFromDate(entry.tanggal),
             keterangan: 'Relasi Project/Brand' + txDesc,
@@ -2199,15 +2287,21 @@
 
         const avgMargin = data.length > 0 ? Number((sumMargin / data.length).toFixed(1)) : 0;
 
-        if (cardTotalPendapatan) cardTotalPendapatan.textContent = formatRupiahCard(totalPendapatan);
-        if (cardTotalBeban) cardTotalBeban.textContent = totalBebanAll === 0 ? 'Rp. 0' : formatRupiah(totalBebanAll);
+        if (cardTotalPendapatan) {
+          cardTotalPendapatan.textContent = formatRupiahCard(totalPendapatan);
+          cardTotalPendapatan.style.color = '#16a34a';
+        }
+        if (cardTotalBeban) {
+          cardTotalBeban.textContent = totalBebanAll === 0 ? 'Rp. 0' : formatRupiah(totalBebanAll);
+          cardTotalBeban.style.color = '#dc2626';
+        }
         if (cardLabaSebelumPajak) {
           cardLabaSebelumPajak.textContent = formatRupiahCard(totalLaba);
-          cardLabaSebelumPajak.style.color = totalLaba < 0 ? '#dc2626' : '';
+          cardLabaSebelumPajak.style.color = totalLaba >= 0 ? '#16a34a' : '#dc2626';
         }
         if (cardRataRataMargin) {
           cardRataRataMargin.textContent = formatMarginPercent(avgMargin);
-          cardRataRataMargin.style.color = avgMargin < 0 ? '#dc2626' : '';
+          cardRataRataMargin.style.color = avgMargin >= 0 ? '#16a34a' : '#dc2626';
         }
       }
 
@@ -2228,15 +2322,15 @@
           const row = document.createElement('tr');
           const labaVal = Number(item.labaSebelumPajak) || 0;
           const marginVal = calculateMarginPercent(labaVal, item.pendapatan);
-          const labaStyle = labaVal < 0 ? 'font-weight: 600; color: #dc2626;' : 'font-weight: 600;';
-          const marginStyle = marginVal < 0 ? 'color: #dc2626;' : '';
+          const labaStyle = labaVal < 0 ? 'font-weight: 700; color: #dc2626;' : 'font-weight: 700; color: #16a34a;';
+          const marginStyle = marginVal < 0 ? 'color: #dc2626;' : 'color: #16a34a;';
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '.</td>',
             '<td class="pnd-cell-italic" style="font-weight: 500;">' + escapeHtml(item.projectBrand || '-') + '</td>',
-            '<td class="pnd-cell-italic">' + (Number(item.pendapatan) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.pendapatan))) + '</td>',
-            '<td class="pnd-cell-italic">' + (Number(item.beban) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.beban))) + '</td>',
-            '<td class="pnd-cell-italic">' + (Number(item.payroll) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.payroll))) + '</td>',
-            '<td class="pnd-cell-italic">' + (Number(item.penyusutan) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.penyusutan))) + '</td>',
+            '<td class="pnd-cell-italic" style="color: #16a34a; font-weight: 600;">' + (Number(item.pendapatan) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.pendapatan))) + '</td>',
+            '<td class="pnd-cell-italic" style="color: ' + (Number(item.beban) > 0 ? '#dc2626' : '#64748b') + '; font-weight: 600;">' + (Number(item.beban) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.beban))) + '</td>',
+            '<td class="pnd-cell-italic" style="color: ' + (Number(item.payroll) > 0 ? '#dc2626' : '#64748b') + '; font-weight: 600;">' + (Number(item.payroll) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.payroll))) + '</td>',
+            '<td class="pnd-cell-italic" style="color: ' + (Number(item.penyusutan) > 0 ? '#dc2626' : '#64748b') + '; font-weight: 600;">' + (Number(item.penyusutan) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.penyusutan))) + '</td>',
             '<td class="pnd-cell-italic" style="' + labaStyle + '">' + (labaVal === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(labaVal))) + '</td>',
             '<td class="pnd-cell-italic" style="text-align: center;"><span class="margin-badge" style="' + marginStyle + '">' + formatMarginPercent(marginVal) + '</span></td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
@@ -2259,17 +2353,34 @@
         const marginVal = calculateMarginPercent(labaVal, item.pendapatan);
 
         if (detailProjectBrand) detailProjectBrand.textContent = item.projectBrand || '-';
-        if (detailPendapatan) detailPendapatan.textContent = Number(item.pendapatan) === 0 ? 'Rp. 0' : formatRupiah(item.pendapatan);
-        if (detailBeban) detailBeban.textContent = Number(item.beban) === 0 ? 'Rp. 0' : formatRupiah(item.beban);
-        if (detailPayroll) detailPayroll.textContent = Number(item.payroll) === 0 ? 'Rp. 0' : formatRupiah(item.payroll);
-        if (detailPenyusutan) detailPenyusutan.textContent = Number(item.penyusutan) === 0 ? 'Rp. 0' : formatRupiah(item.penyusutan);
+        if (detailPendapatan) {
+          detailPendapatan.textContent = Number(item.pendapatan) === 0 ? 'Rp. 0' : formatRupiah(item.pendapatan);
+          detailPendapatan.style.color = '#16a34a';
+          detailPendapatan.style.fontWeight = '600';
+        }
+        if (detailBeban) {
+          detailBeban.textContent = Number(item.beban) === 0 ? 'Rp. 0' : formatRupiah(item.beban);
+          detailBeban.style.color = Number(item.beban) > 0 ? '#dc2626' : '#64748b';
+          detailBeban.style.fontWeight = '600';
+        }
+        if (detailPayroll) {
+          detailPayroll.textContent = Number(item.payroll) === 0 ? 'Rp. 0' : formatRupiah(item.payroll);
+          detailPayroll.style.color = Number(item.payroll) > 0 ? '#dc2626' : '#64748b';
+          detailPayroll.style.fontWeight = '600';
+        }
+        if (detailPenyusutan) {
+          detailPenyusutan.textContent = Number(item.penyusutan) === 0 ? 'Rp. 0' : formatRupiah(item.penyusutan);
+          detailPenyusutan.style.color = Number(item.penyusutan) > 0 ? '#dc2626' : '#64748b';
+          detailPenyusutan.style.fontWeight = '600';
+        }
         if (detailLabaSebelumPajak) {
           detailLabaSebelumPajak.textContent = labaVal === 0 ? 'Rp. 0' : formatRupiah(labaVal);
-          detailLabaSebelumPajak.style.color = labaVal < 0 ? '#dc2626' : '';
+          detailLabaSebelumPajak.style.color = labaVal >= 0 ? '#16a34a' : '#dc2626';
+          detailLabaSebelumPajak.style.fontWeight = '700';
         }
         if (detailMargin) {
           detailMargin.textContent = formatMarginPercent(marginVal);
-          detailMargin.style.color = marginVal < 0 ? '#dc2626' : '';
+          detailMargin.style.color = marginVal >= 0 ? '#16a34a' : '#dc2626';
         }
 
         detailModal.classList.add('is-active');
@@ -2552,7 +2663,7 @@
       }
 
       window.addEventListener('storage', function (e) {
-        if (e.key === STORAGE_KEY || e.key === KB_STORAGE_KEY || e.key === KB_PROFIT_REL_KEY || e.key === PENDAPATAN_STORAGE_KEY || e.key === BEBAN_STORAGE_KEY || e.key === APPROVAL_STORAGE_KEY || e.key === PAYROLL_STORAGE_KEY || e.key === PAYROLL_FALLBACK_KEY) {
+        if (e.key === STORAGE_KEY || e.key === KB_STORAGE_KEY || e.key === KB_PROFIT_REL_KEY || e.key === PENDAPATAN_STORAGE_KEY || e.key === BEBAN_STORAGE_KEY || e.key === APPROVAL_STORAGE_KEY || e.key === PAYROLL_STORAGE_KEY || e.key === PAYROLL_FALLBACK_KEY || e.key === PENYUSUTAN_STORAGE_KEY || (DAFTAR_ASET_STORAGE_KEYS && DAFTAR_ASET_STORAGE_KEYS.indexOf(e.key) !== -1)) {
           refreshProfitFromStorage();
         }
       });
@@ -2561,6 +2672,8 @@
       window.addEventListener('pendapatanUpdated', refreshProfitFromStorage);
       window.addEventListener('pengeluaranBebanUpdated', refreshProfitFromStorage);
       window.addEventListener('payroll_data_changed', refreshProfitFromStorage);
+      window.addEventListener('penyusutan_data_changed', refreshProfitFromStorage);
+      window.addEventListener('accounting-daftar-aset-updated', refreshProfitFromStorage);
       window.addEventListener('focus', refreshProfitFromStorage);
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) refreshProfitFromStorage();

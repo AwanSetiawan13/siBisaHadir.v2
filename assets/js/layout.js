@@ -276,6 +276,7 @@
           { label: 'Laba Rugi', link: 'Accounting/operasional/accounting_laba_rugi.html' },
           { label: 'Neraca', link: 'Accounting/operasional/accounting_neraca.html' },
           { label: 'Rekap Divisi', link: 'Accounting/operasional/accounting_rekap_divisi.html' },
+          { label: 'Utang Karyawan', link: 'Accounting/operasional/accounting_utang_karyawan.html' },
           { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html' },
           { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' }
           // { label: 'History Dokumen', link: 'Accounting/operasional/accounting_history_dokumen.html' } /* Dihapus sementara */
@@ -306,7 +307,8 @@
           { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' },
           { label: 'Divisi', link: 'Accounting/data_master/accounting_divisi.html' },
           { label: 'Jenis Transaksi', link: 'Accounting/data_master/accounting_jenis_transaksi.html' },
-          { label: 'Customer | Project', link: 'Accounting/data_master/accounting_customer_project.html' }
+          { label: 'Customer | Project', link: 'Accounting/data_master/accounting_customer_project.html' },
+          { label: 'Data Karyawan', link: 'Accounting/data_master/accounting_data_karyawan.html' }
         ]
       }
     ]
@@ -1782,6 +1784,7 @@
       'accounting_laba_rugi.html': 'Laba Rugi',
       'accounting_neraca.html': 'Neraca',
       'accounting_rekap_divisi.html': 'Rekap Divisi',
+      'accounting_utang_karyawan.html': 'Utang Karyawan',
       'accounting_piutang_karyawan.html': 'Piutang Karyawan',
       'accounting_budget_vs_actual.html': 'Budget vs Actual',
       'accounting_history_dokumen.html': 'History Dokumen',
@@ -1797,7 +1800,8 @@
       'accounting_penanggung_jawab.html': 'Penanggung Jawab',
       'accounting_divisi.html': 'Divisi',
       'accounting_jenis_transaksi.html': 'Jenis Transaksi',
-      'accounting_customer_project.html': 'Customer | Project'
+      'accounting_customer_project.html': 'Customer | Project',
+      'accounting_data_karyawan.html': 'Data Karyawan'
     };
 
     const accountingPageTitle = accountingTitles[currentFile] || (document.title ? document.title.split('|')[0].trim() : 'Dashboard');

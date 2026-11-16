@@ -2576,7 +2576,9 @@
           <!-- Row 7: Project/Brand, Tanggal Pelepasan, Bukti/Foto -->
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudProjectBrand">Project/Brand</label>
-            <input type="text" id="crudProjectBrand" class="modal-field-input" placeholder="-" />
+            <select id="crudProjectBrand" class="modal-field-input">
+              <option value="">Pilih Project/Brand</option>
+            </select>
           </div>
           <div class="modal-field col-span-4">
             <label class="modal-field-label" for="crudTanggalPelepasan">Tanggal Pelepasan (Opsional)</label>
@@ -2972,6 +2974,7 @@
       const STORAGE_KEY = 'bisa_accounting_daftar_aset_data_v4';
       const DIVISI_KEY = 'accounting_master_divisi_v1';
       const MASTER_COA_KEY = 'accounting_master_coa_v1';
+      const PENDAPATAN_STORAGE_KEY = 'accounting_pendapatan_data_v1';
 
       const DEFAULT_MASTER_COA_LIST = [
         { kode: '1001', nama: 'Kas Kecil', kelompok: 'Aset', aktif: 'Ya' },
@@ -3116,6 +3119,61 @@
         }
         select.innerHTML = html;
         select.value = current;
+      }
+
+      /* ---------- Populate Project/Brand dropdown from Pendapatan ---------- */
+      function getPendapatanProjectBrandList() {
+        try {
+          var raw = localStorage.getItem(PENDAPATAN_STORAGE_KEY);
+          if (raw) {
+            var arr = JSON.parse(raw);
+            if (Array.isArray(arr)) {
+              var seen = {};
+              var result = [];
+              arr.forEach(function (item) {
+                var pb = String(item.projectBrand || '').trim();
+                // Strip ID prefix like "7691348184035411735 | "
+                pb = pb.replace(/^\d+\s*\|\s*/, '');
+                if (pb && pb !== '-' && !seen[pb]) {
+                  seen[pb] = true;
+                  result.push(pb);
+                }
+              });
+              return result;
+            }
+          }
+        } catch (e) {
+          console.warn('[Daftar Aset] Gagal membaca Pendapatan:', e);
+        }
+        return [];
+      }
+
+      function populateProjectBrandSelect(selectedVal) {
+        var select = document.getElementById('crudProjectBrand');
+        if (!select) return;
+        var brands = getPendapatanProjectBrandList();
+        var current = selectedVal !== undefined
+          ? String(selectedVal || '').trim()
+          : String(select.value || '').trim();
+        // Also strip prefix from current value
+        current = current.replace(/^\d+\s*\|\s*/, '');
+        var seen = {};
+        var html = '<option value="">Pilih Project/Brand</option>';
+        brands.forEach(function (nama) {
+          if (seen[nama]) return;
+          seen[nama] = true;
+          html += '<option value="' + escapeHtml(nama) + '">' + escapeHtml(nama) + '</option>';
+        });
+        // If current value not in list, add it so it doesn't get lost
+        if (current && current !== '-' && !seen[current]) {
+          html += '<option value="' + escapeHtml(current) + '">' + escapeHtml(current) + '</option>';
+        }
+        // Also add a "-" option
+        if (!seen['-']) {
+          html += '<option value="-">-</option>';
+        }
+        select.innerHTML = html;
+        select.value = current || '';
       }
 
       function loadData() {
@@ -4071,7 +4129,7 @@
         if (crudMulaiDiPakai) crudMulaiDiPakai.value = '';
         if (crudPIC) crudPIC.value = '';
         if (crudDivisi) populateDivisiSelect('');
-        if (crudProjectBrand) crudProjectBrand.value = '';
+        if (crudProjectBrand) populateProjectBrandSelect('');
         if (crudTanggalPelepasan) crudTanggalPelepasan.value = '';
         if (crudHasilPelepasan) crudHasilPelepasan.value = '';
         if (crudNilaiBukuSaatLepas) crudNilaiBukuSaatLepas.value = '';
@@ -4122,7 +4180,7 @@
         crudMulaiDiPakai.value = item.mulaiDiPakai || '';
         crudPIC.value = item.pic || '';
         populateDivisiSelect(item.divisi || '');
-        crudProjectBrand.value = item.projectBrand || '-';
+        populateProjectBrandSelect(item.projectBrand || '-');
         crudTanggalPelepasan.value = item.tanggalPelepasan || '';
         crudHasilPelepasan.value = formatRupiahValue(item.hasilPelepasan);
         crudNilaiBukuSaatLepas.value = item.nilaiBukuSaatLepas || '-';
@@ -4923,8 +4981,12 @@
           asetData = loadData();
           updateDivisiPengecualianDatalist();
           populateDivisiSelect();
+          populateProjectBrandSelect();
           renderCoaDropdownItems();
           renderTable();
+        }
+        if (!e.key || e.key === PENDAPATAN_STORAGE_KEY) {
+          populateProjectBrandSelect();
         }
       });
 
@@ -4933,9 +4995,14 @@
         populateDivisiSelect();
       });
 
+      window.addEventListener('pendapatan_data_changed', function () {
+        populateProjectBrandSelect();
+      });
+
       /* ===== INITIALIZATION ===== */
       updateDivisiPengecualianDatalist();
       populateDivisiSelect();
+      populateProjectBrandSelect();
       initFilterOptions();
       renderTable();
     })();
