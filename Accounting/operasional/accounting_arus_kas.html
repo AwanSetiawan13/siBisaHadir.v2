@@ -190,15 +190,36 @@
       min-width: 0;
     }
 
+    .ak-bank-card-header-top {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 2px;
+      min-width: 0;
+      line-height: 1.2;
+    }
+
     .ak-bank-card-category {
       font-size: 11px;
       font-weight: 700;
       color: #64748b;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
       text-transform: uppercase;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    }
+
+    .ak-bank-card-sep {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .ak-bank-card-norek {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0284c7;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
     }
 
     .ak-bank-card-number {
@@ -241,7 +262,7 @@
     }
 
     .ak-bank-row-val--saldo {
-      color: #0076C5;
+      color: #0f172a;
       font-weight: 800;
     }
 
@@ -969,8 +990,12 @@
               </svg>
             </div>
             <div class="ak-bank-card-title-box">
-              <span class="ak-bank-card-category">KAS KECIL</span>
-              <span class="ak-bank-card-number">COA 1001</span>
+              <div class="ak-bank-card-header-top">
+                <span class="ak-bank-card-category">KAS KECIL</span>
+                <span class="ak-bank-card-sep">|</span>
+                <span class="ak-bank-card-norek">COA 1001</span>
+              </div>
+              <span class="ak-bank-card-number" id="bkSaldo_kasKecil">Rp. 15.000.000</span>
             </div>
           </div>
           <hr class="ak-dashed-divider" />
@@ -1007,8 +1032,12 @@
               </svg>
             </div>
             <div class="ak-bank-card-title-box">
-              <span class="ak-bank-card-category">BANK BCA 1</span>
-              <span class="ak-bank-card-number">2092026028</span>
+              <div class="ak-bank-card-header-top">
+                <span class="ak-bank-card-category">BANK BCA 1</span>
+                <span class="ak-bank-card-sep">|</span>
+                <span class="ak-bank-card-norek">2092026028</span>
+              </div>
+              <span class="ak-bank-card-number" id="bkSaldo_bca1">Rp. 462.026.500</span>
             </div>
           </div>
           <hr class="ak-dashed-divider" />
@@ -1046,8 +1075,12 @@
               </svg>
             </div>
             <div class="ak-bank-card-title-box">
-              <span class="ak-bank-card-category">BANK BCA 2</span>
-              <span class="ak-bank-card-number">2091139784</span>
+              <div class="ak-bank-card-header-top">
+                <span class="ak-bank-card-category">BANK BCA 2</span>
+                <span class="ak-bank-card-sep">|</span>
+                <span class="ak-bank-card-norek">2091139784</span>
+              </div>
+              <span class="ak-bank-card-number" id="bkSaldo_bca2">Rp. 280.748.155</span>
             </div>
           </div>
           <hr class="ak-dashed-divider" />
@@ -1086,8 +1119,12 @@
               </svg>
             </div>
             <div class="ak-bank-card-title-box">
-              <span class="ak-bank-card-category">SEABANK</span>
-              <span class="ak-bank-card-number">901631003438</span>
+              <div class="ak-bank-card-header-top">
+                <span class="ak-bank-card-category">SEABANK</span>
+                <span class="ak-bank-card-sep">|</span>
+                <span class="ak-bank-card-norek">901631003438</span>
+              </div>
+              <span class="ak-bank-card-number" id="bkSaldo_seabank">Rp. 123.335.000</span>
             </div>
           </div>
           <hr class="ak-dashed-divider" />
@@ -1126,8 +1163,12 @@
               </svg>
             </div>
             <div class="ak-bank-card-title-box">
-              <span class="ak-bank-card-category">BNI</span>
-              <span class="ak-bank-card-number">2049368973</span>
+              <div class="ak-bank-card-header-top">
+                <span class="ak-bank-card-category">BNI</span>
+                <span class="ak-bank-card-sep">|</span>
+                <span class="ak-bank-card-norek">2049368973</span>
+              </div>
+              <span class="ak-bank-card-number" id="bkSaldo_bni">Rp. 95.000.000</span>
             </div>
           </div>
           <hr class="ak-dashed-divider" />
@@ -2235,12 +2276,15 @@
             : ((comp.pendanaan && comp.pendanaan.bersih !== undefined) ? comp.pendanaan.bersih : 0);
 
           const totalArus = opsBersih + invBersih + pendBersih;
+          const saldoBank = (bData.cards && bData.cards.saldoAkhir !== undefined) ? bData.cards.saldoAkhir : 0;
 
+          const elSaldo = document.getElementById('bkSaldo_' + k);
           const elOps = document.getElementById('bkOps_' + k);
           const elInv = document.getElementById('bkInv_' + k);
           const elPend = document.getElementById('bkPend_' + k);
           const elTotal = document.getElementById('bkTotal_' + k);
 
+          if (elSaldo) elSaldo.textContent = formatRupiah(saldoBank);
           if (elOps) elOps.textContent = formatRupiah(opsBersih);
           if (elInv) elInv.textContent = formatRupiah(invBersih);
           if (elPend) elPend.textContent = formatRupiah(pendBersih);

@@ -307,7 +307,6 @@
           { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' },
           { label: 'Divisi', link: 'Accounting/data_master/accounting_divisi.html' },
           { label: 'Jenis Transaksi', link: 'Accounting/data_master/accounting_jenis_transaksi.html' },
-          { label: 'Customer | Project', link: 'Accounting/data_master/accounting_customer_project.html' },
           { label: 'Data Karyawan', link: 'Accounting/data_master/accounting_data_karyawan.html' }
         ]
       }
@@ -1066,7 +1065,25 @@
         const total = rows.length;
         if (total === 0 && !table.id) return;
 
+        const customSizesAttr = table.getAttribute('data-page-sizes');
+        const customSizeAttr = table.getAttribute('data-page-size');
+
+        let pageSizes = [10, 30, 50];
         let pageSize = 10;
+
+        if (customSizesAttr) {
+          pageSizes = customSizesAttr.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n) && n > 0);
+          if (pageSizes.length > 0) pageSize = pageSizes[0];
+        } else if (table.classList.contains('dash-table') && table.closest('.dash-lower-stack')) {
+          pageSizes = [5, 10];
+          pageSize = 5;
+        }
+
+        if (customSizeAttr) {
+          const parsed = parseInt(customSizeAttr, 10);
+          if (!isNaN(parsed) && parsed > 0) pageSize = parsed;
+        }
+
         let currentPage = 1;
 
         const pagWrap = document.createElement('div');
@@ -1152,6 +1169,9 @@
             `;
           }
 
+          const unit = table.getAttribute('data-unit') || 'baris';
+          const optionsHtml = pageSizes.map(sz => `<option value="${sz}" ${pageSize === sz ? 'selected' : ''}>${sz}</option>`).join('');
+
           pagWrap.innerHTML = `
             <div class="hirezy-pagination-left">
               <div class="hirezy-pagination-info">
@@ -1159,12 +1179,10 @@
               </div>
               <div class="hirezy-pagination-size">
                 <span class="hirezy-size-label">Tampilkan:</span>
-                <select class="hirezy-page-size-select" aria-label="Pilih jumlah data per halaman">
-                  <option value="10" ${pageSize === 10 ? 'selected' : ''}>10</option>
-                  <option value="30" ${pageSize === 30 ? 'selected' : ''}>30</option>
-                  <option value="50" ${pageSize === 50 ? 'selected' : ''}>50</option>
+                <select class="hirezy-page-size-select" aria-label="Pilih jumlah baris per halaman">
+                  ${optionsHtml}
                 </select>
-                <span class="hirezy-size-unit">data</span>
+                <span class="hirezy-size-unit">${unit}</span>
               </div>
             </div>
             ${totalPages > 1 ? `<div class="hirezy-pagination-btns">${buttonsHtml}</div>` : ''}
@@ -1173,11 +1191,20 @@
           const sizeSelect = pagWrap.querySelector('.hirezy-page-size-select');
           if (sizeSelect) {
             sizeSelect.addEventListener('change', function () {
-              pageSize = parseInt(this.value, 10) || 10;
+              pageSize = parseInt(this.value, 10) || pageSizes[0] || 10;
               currentPage = 1;
               renderPaginationUI();
             });
           }
+        }
+
+        // Amati perubahan isi tbody agar saat data di-render secara dinamis, pagination UI ikut diperbarui
+        if (tbody && !table.__paginationObserved) {
+          table.__paginationObserved = true;
+          const obs = new MutationObserver(function () {
+            renderPaginationUI();
+          });
+          obs.observe(tbody, { childList: true });
         }
 
         // Integrasi instan dengan Search Bar tabel lokal jika ada
@@ -2711,36 +2738,87 @@
     }
   });
 
-  // Validasi global untuk seluruh form yang memiliki field wajib (required):
-  // Mengganti tooltip bawaan browser dengan alert "Data Belum Lengkap" yang seragam di semua modul.
+  // Validasi global untuk seluruh modul:
+  // Semua field form data yang BUKAN opsional (tanpa label/placeholder 'opsional' / 'optional') wajib diisi.
+  // Jika disubmit dalam keadaan kosong, memunculkan SweetAlert "Data Belum Diisi" dan mencegah submit bawaan browser.
   (function initGlobalRequiredFormValidation() {
     function getFieldLabel(el) {
       if (!el) return '';
       if (el.id) {
         const lbl = document.querySelector('label[for="' + el.id + '"]');
-        if (lbl && lbl.textContent) return lbl.textContent.replace(/\*/g, '').trim();
+        if (lbl && lbl.textContent) {
+          return lbl.textContent.replace(/\*/g, '').replace(/\(opsional\)|\(optional\)/gi, '').trim();
+        }
       }
-      const fieldWrap = el.closest ? el.closest('.modal-field, .kb-form-group, .form-group, .field-group') : null;
+      const fieldWrap = el.closest ? el.closest('.modal-field, .kb-form-group, .form-group, .field-group, .karyawan-form-field, .col-form-group') : null;
       if (fieldWrap) {
-        const lbl = fieldWrap.querySelector('label, .modal-field-label');
-        if (lbl && lbl.textContent) return lbl.textContent.replace(/\*/g, '').trim();
+        const lbl = fieldWrap.querySelector('label, .modal-field-label, .karyawan-form-label, .kb-form-label, .form-label');
+        if (lbl && lbl.textContent) {
+          return lbl.textContent.replace(/\*/g, '').replace(/\(opsional\)|\(optional\)/gi, '').trim();
+        }
       }
-      if (el.getAttribute && el.getAttribute('aria-label')) return el.getAttribute('aria-label').trim();
-      if (el.placeholder) return String(el.placeholder).trim();
+      if (el.getAttribute && el.getAttribute('aria-label')) {
+        return el.getAttribute('aria-label').replace(/\(opsional\)|\(optional\)/gi, '').trim();
+      }
+      if (el.placeholder && !el.placeholder.toLowerCase().includes('cari') && !el.placeholder.toLowerCase().includes('search')) {
+        return String(el.placeholder).replace(/\(opsional\)|\(optional\)/gi, '').trim();
+      }
       return el.name || el.id || 'Kolom';
     }
 
+    function isFieldOptional(el) {
+      if (!el) return false;
+      const placeholder = (el.placeholder || '').toLowerCase();
+      const ariaLabel = (el.getAttribute && el.getAttribute('aria-label') ? el.getAttribute('aria-label') : '').toLowerCase();
+      const title = (el.title || '').toLowerCase();
+
+      let labelText = '';
+      if (el.id) {
+        const lbl = document.querySelector('label[for="' + el.id + '"]');
+        if (lbl) labelText += ' ' + lbl.textContent;
+      }
+      const fieldWrap = el.closest ? el.closest('.modal-field, .kb-form-group, .form-group, .field-group, .karyawan-form-field, .col-form-group') : null;
+      if (fieldWrap) {
+        const lbl = fieldWrap.querySelector('label, .modal-field-label, .karyawan-form-label, .kb-form-label, .form-label, small, .form-text');
+        if (lbl) labelText += ' ' + lbl.textContent;
+      }
+      labelText = labelText.toLowerCase();
+
+      const optionalRegex = /\b(opsional|optional)\b/i;
+      return optionalRegex.test(placeholder) ||
+             optionalRegex.test(ariaLabel) ||
+             optionalRegex.test(title) ||
+             optionalRegex.test(labelText) ||
+             el.hasAttribute('data-optional');
+    }
+
     function isFieldVisible(el) {
-      if (!el || el.disabled || el.type === 'hidden') return false;
-      if (typeof window.getComputedStyle === 'function') {
-        let cur = el;
-        while (cur && cur.nodeType === 1) {
-          const st = window.getComputedStyle(cur);
+      if (!el || el.disabled || el.readOnly || el.type === 'hidden') return false;
+      // Filter out elements that are completely hidden
+      if (el.offsetWidth === 0 && el.offsetHeight === 0 && el.getClientRects().length === 0) {
+        if (typeof window.getComputedStyle === 'function') {
+          const st = window.getComputedStyle(el);
           if (st.display === 'none' || st.visibility === 'hidden') return false;
-          cur = cur.parentElement;
         }
       }
       return true;
+    }
+
+    function isInsideFilterOrSearch(el) {
+      if (!el) return false;
+      // Cek apakah elemen ada di search box atau container filter tabel
+      if (el.closest) {
+        if (el.closest('.filter-box, .table-filters, .filter-container, .search-box, .dataTables_filter, .table-search, .toolbar-filter, .ak-trend-toolbar, .navbar, .sidebar, header, nav')) {
+          return true;
+        }
+      }
+      const id = (el.id || '').toLowerCase();
+      const name = (el.name || '').toLowerCase();
+      const ph = (el.placeholder || '').toLowerCase();
+      if (id.includes('search') || id.includes('filter') || id.includes('cari')) return true;
+      if (name.includes('search') || name.includes('filter') || name.includes('cari')) return true;
+      if (ph.includes('cari') || ph.includes('search') || ph.includes('filter')) return true;
+      return false;
     }
 
     function isFieldEmpty(el) {
@@ -2753,7 +2831,21 @@
         if (!name) return !el.checked;
         return !form.querySelector('input[type="radio"][name="' + name + '"]:checked');
       }
-      if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') {
+      if (type === 'file') {
+        return !el.value && (!el.files || el.files.length === 0);
+      }
+      if (tag === 'SELECT') {
+        const val = String(el.value || '').trim();
+        if (!val) return true;
+        if (el.selectedIndex === 0 && (val === '0' || val === '')) {
+          const optText = (el.options[0] && el.options[0].text) ? el.options[0].text.toLowerCase() : '';
+          if (optText.includes('pilih') || optText.includes('select') || optText.includes('--') || optText === '-') {
+            return true;
+          }
+        }
+        return false;
+      }
+      if (tag === 'INPUT' || tag === 'TEXTAREA') {
         return String(el.value || '').trim() === '';
       }
       return false;
@@ -2769,6 +2861,11 @@
       document.querySelectorAll('form').forEach(disableNativeValidation);
     }
 
+    // Blokir tooltip validasi bawaan browser (e.g. "Please fill out this field")
+    document.addEventListener('invalid', function (e) {
+      e.preventDefault();
+    }, true);
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', scanForms);
     } else {
@@ -2776,69 +2873,357 @@
     }
     window.addEventListener('load', scanForms);
 
-    document.addEventListener('click', function (e) {
-      const btn = e.target && e.target.closest ? e.target.closest('button, input[type="submit"]') : null;
-      if (!btn) return;
-      const form = btn.form || (btn.closest ? btn.closest('form') : null);
-      if (form && (btn.type === 'submit' || !btn.getAttribute('type'))) {
-        disableNativeValidation(form);
+    let isAlertShowing = false;
+
+    function highlightErrorField(el) {
+      if (!el) return;
+      el.classList.add('has-error-mandatory');
+      const originalBorder = el.style.borderColor;
+      const originalBoxShadow = el.style.boxShadow;
+      el.style.borderColor = '#ef4444';
+      el.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.2)';
+
+      function removeHighlight() {
+        el.style.borderColor = originalBorder;
+        el.style.boxShadow = originalBoxShadow;
+        el.classList.remove('has-error-mandatory');
+        el.removeEventListener('input', removeHighlight);
+        el.removeEventListener('change', removeHighlight);
       }
-    }, true);
+      el.addEventListener('input', removeHighlight);
+      el.addEventListener('change', removeHighlight);
+    }
 
-    document.addEventListener('submit', function (e) {
-      const form = e.target;
-      if (!form || form.tagName !== 'FORM' || form.hasAttribute('data-skip-required-alert')) return;
-      disableNativeValidation(form);
-
-      const requiredFields = Array.from(form.querySelectorAll('[required]')).filter(isFieldVisible);
-      if (requiredFields.length === 0) return;
-
+    function validateContainer(container) {
+      if (!container) return { isValid: true };
+      const inputs = Array.from(container.querySelectorAll('input, select, textarea'));
       const missingLabels = [];
       let firstEmpty = null;
       const seenRadio = new Set();
 
-      requiredFields.forEach(function (el) {
-        if ((el.type || '').toLowerCase() === 'radio' && el.name) {
-          if (seenRadio.has(el.name)) return;
+      for (let i = 0; i < inputs.length; i++) {
+        const el = inputs[i];
+        if (!isFieldVisible(el)) continue;
+        if (isInsideFilterOrSearch(el)) continue;
+
+        const isExplicitRequired = el.hasAttribute('required');
+        const isOptional = isFieldOptional(el);
+
+        // Jika ada penanda opsional, jangan wajibkan!
+        if (isOptional) continue;
+
+        // Checkbox dan radio hanya divalidasi jika ada atribut required eksplisit
+        const type = (el.type || '').toLowerCase();
+        if ((type === 'checkbox' || type === 'radio') && !isExplicitRequired) continue;
+
+        if (type === 'radio' && el.name) {
+          if (seenRadio.has(el.name)) continue;
           seenRadio.add(el.name);
         }
+
         if (isFieldEmpty(el)) {
           if (!firstEmpty) firstEmpty = el;
+          highlightErrorField(el);
           const label = getFieldLabel(el);
           if (label && missingLabels.indexOf(label) === -1) {
             missingLabels.push(label);
           }
         }
-      });
+      }
 
       if (firstEmpty) {
+        return {
+          isValid: false,
+          firstEmpty: firstEmpty,
+          missingLabels: missingLabels
+        };
+      }
+      return { isValid: true };
+    }
+
+    function showAlert(result) {
+      if (isAlertShowing) return;
+      isAlertShowing = true;
+
+      const labels = result.missingLabels || [];
+      let htmlMessage = 'Harap lengkapi semua data yang wajib diisi sebelum menyimpan.';
+      if (labels.length > 0) {
+        const items = labels.slice(0, 6).map(function (lbl) {
+          return '<li style="margin-bottom: 3px;">' + lbl + '</li>';
+        }).join('');
+        const more = labels.length > 6 ? '<li style="color:#64748b; list-style:none;">...dan ' + (labels.length - 6) + ' kolom lainnya</li>' : '';
+        htmlMessage = '<div style="text-align: left; font-size: 13.5px; color: #334155;">' +
+                      '<p style="margin-bottom: 8px; font-weight: 500;">Kolom berikut belum diisi:</p>' +
+                      '<ul style="margin: 0; padding-left: 20px; color: #dc2626; font-weight: 600;">' +
+                      items + more +
+                      '</ul>' +
+                      '</div>';
+      }
+
+      function onAlertClosed() {
+        isAlertShowing = false;
+        if (result.firstEmpty) {
+          try {
+            if (typeof result.firstEmpty.focus === 'function') {
+              result.firstEmpty.focus();
+            }
+            if (typeof result.firstEmpty.scrollIntoView === 'function') {
+              result.firstEmpty.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          } catch (errFocus) {}
+        }
+      }
+
+      if (typeof window.Swal !== 'undefined') {
+        window.Swal.fire({
+          icon: 'warning',
+          title: 'Data Belum Diisi',
+          html: htmlMessage,
+          confirmButtonText: 'Lengkapi Data',
+          confirmButtonColor: '#0076C5'
+        }).then(onAlertClosed);
+      } else {
+        const textMsg = labels.length > 0
+          ? 'Data Belum Diisi:\n- ' + labels.join('\n- ')
+          : 'Harap lengkapi semua kolom yang wajib diisi.';
+        window.alert(textMsg);
+        onAlertClosed();
+      }
+    }
+
+    // Intercept form submit event (capture phase)
+    document.addEventListener('submit', function (e) {
+      const form = e.target;
+      if (!form || form.tagName !== 'FORM' || form.hasAttribute('data-skip-required-alert')) return;
+      if (isInsideFilterOrSearch(form)) return;
+      disableNativeValidation(form);
+
+      const validation = validateContainer(form);
+      if (!validation.isValid) {
         e.preventDefault();
         e.stopImmediatePropagation();
+        showAlert(validation);
+      }
+    }, true);
 
-        const message = missingLabels.length > 0
-          ? 'Data belum lengkap. Kolom berikut wajib diisi: ' + missingLabels.slice(0, 6).join(', ') + (missingLabels.length > 6 ? ', dan lainnya.' : '.')
-          : 'Data belum lengkap. Harap lengkapi semua kolom yang wajib diisi.';
+    // Intercept klik pada tombol simpan / submit (capture phase) untuk form & modal
+    document.addEventListener('click', function (e) {
+      const btn = e.target && e.target.closest ? e.target.closest('button, input[type="submit"], a.btn') : null;
+      if (!btn) return;
 
-        if (typeof window.Swal !== 'undefined') {
-          window.Swal.fire({
-            icon: 'warning',
-            title: 'Data Belum Lengkap',
-            text: message,
-            confirmButtonColor: '#28a5de'
-          }).then(function () {
-            if (firstEmpty && !firstEmpty.readOnly && typeof firstEmpty.focus === 'function') {
-              firstEmpty.focus();
-            }
-          });
-        } else {
-          window.alert(message);
-          if (firstEmpty && !firstEmpty.readOnly && typeof firstEmpty.focus === 'function') {
-            firstEmpty.focus();
-          }
-        }
+      // Cek apakah tombol adalah tombol simpan / submit
+      const type = (btn.type || '').toLowerCase();
+      const txt = (btn.textContent || '').trim().toLowerCase();
+      const cls = (btn.className || '').toLowerCase();
+
+      const isSaveBtn = type === 'submit' ||
+                        cls.includes('simpan') ||
+                        cls.includes('btn-save') ||
+                        cls.includes('btn-submit') ||
+                        txt === 'simpan' ||
+                        txt === 'submit' ||
+                        txt.startsWith('simpan ') ||
+                        txt.startsWith('submit ') ||
+                        txt === 'tambah data' ||
+                        txt === 'simpan data';
+
+      if (!isSaveBtn) return;
+
+      const container = btn.form || (btn.closest ? btn.closest('form, .modal-box, .modal-dialog, .modal-content, .karyawan-modal-box, .kb-modal-box, .modal-overlay') : null);
+      if (!container || isInsideFilterOrSearch(container) || container.hasAttribute('data-skip-required-alert')) return;
+
+      if (container.tagName === 'FORM') {
+        disableNativeValidation(container);
+      }
+
+      const validation = validateContainer(container);
+      if (!validation.isValid) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        showAlert(validation);
       }
     }, true);
   })();
+
+  
+  /* ==========================================================================
+     GLOBAL FIXED MODAL HEADER & FOOTER HANDLER
+     Memastikan tombol close 'x' di bagian atas dan tombol submit di bagian bawah
+     selalu tetap muncul (fixed / sticky) saat modal di-scroll pada semua modul.
+     ========================================================================== */
+  function initFixedModalHeaderAndFooter() {
+    function calibrateModalBox(box) {
+      if (!box) return;
+
+      // 1. Dapatkan padding aktual modal box
+      const computed = window.getComputedStyle(box);
+      const padTop = parseFloat(computed.paddingTop) || 0;
+      const padBottom = parseFloat(computed.paddingBottom) || 0;
+      const padLeft = parseFloat(computed.paddingLeft) || 0;
+      const padRight = parseFloat(computed.paddingRight) || 0;
+
+      // 2. Cari Header & Tombol Close 'x'
+      const header = box.querySelector('.modal-header, [class*="-modal-header"], .modal-header-row, .rrk-month-modal__heading') ||
+                     box.querySelector('.modal-title, [class*="-modal-title"]')?.closest('div');
+      
+      if (header && (header.parentElement === box || header.closest('.modal-box, [class*="-modal-box"], .modal-content') === box)) {
+        header.classList.add('agy-fixed-modal-header');
+        header.style.setProperty('position', 'sticky', 'important');
+        header.style.setProperty('top', '0', 'important');
+        header.style.setProperty('z-index', '50', 'important');
+        header.style.setProperty('background-color', (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') ? computed.backgroundColor : '#ffffff', 'important');
+        header.style.setProperty('flex-shrink', '0', 'important');
+
+        if (padTop > 0 && !header.dataset.agyPadAdjusted) {
+          header.style.setProperty('margin-top', `-${padTop}px`, 'important');
+          header.style.setProperty('margin-left', `-${padLeft}px`, 'important');
+          header.style.setProperty('margin-right', `-${padRight}px`, 'important');
+          header.style.setProperty('padding-top', `${padTop}px`, 'important');
+          header.style.setProperty('padding-left', `${padLeft}px`, 'important');
+          header.style.setProperty('padding-right', `${padRight}px`, 'important');
+          header.style.setProperty('padding-bottom', '12px', 'important');
+          header.style.setProperty('border-top-left-radius', 'inherit', 'important');
+          header.style.setProperty('border-top-right-radius', 'inherit', 'important');
+          header.style.setProperty('box-shadow', '0 1px 0 rgba(0, 0, 0, 0.05), 0 3px 8px rgba(0, 0, 0, 0.02)', 'important');
+          header.dataset.agyPadAdjusted = 'true';
+        }
+      }
+
+      // Tombol Close 'x'
+      const closeBtn = box.querySelector('.modal-close, [class*="-modal-close"], .btn-modal-close-x, .btn-close, button[data-close-modal], [aria-label="Tutup"], [aria-label="Close"]');
+      if (closeBtn) {
+        closeBtn.classList.add('agy-fixed-modal-close');
+        closeBtn.style.setProperty('z-index', '60', 'important');
+        closeBtn.style.setProperty('cursor', 'pointer', 'important');
+        if (!header || !header.contains(closeBtn)) {
+          closeBtn.style.setProperty('position', 'sticky', 'important');
+          closeBtn.style.setProperty('top', '12px', 'important');
+          closeBtn.style.setProperty('align-self', 'flex-end', 'important');
+        }
+      }
+
+      // Garis aksen jika ada
+      const accentLine = box.querySelector('[class*="-modal-accent"], .modal-accent-line');
+      if (accentLine) {
+        accentLine.style.setProperty('position', 'sticky', 'important');
+        accentLine.style.setProperty('top', '0', 'important');
+        accentLine.style.setProperty('z-index', '55', 'important');
+      }
+
+      // 3. Cari Footer / Container Tombol Submit
+      let footer = box.querySelector('.modal-footer, [class*="-modal-footer"], .modal-actions, [class*="-modal-actions"], .delete-modal-actions, .form-footer, .bm-template-upload-actions, .bm-template-detail-footer');
+
+      // Jika modal tidak memiliki modal-footer formal, cari container dari tombol submit
+      if (!footer) {
+        const submitBtn = box.querySelector('button[type="submit"], .btn-simpan, .btn-save, #btnSubmitCampaign, button[id*="simpan" i], button[id*="submit" i]');
+        if (submitBtn) {
+          const parentGroup = submitBtn.closest('.form-group, .modal-form-actions') || submitBtn.parentElement;
+          if (parentGroup && parentGroup !== box) {
+            footer = parentGroup;
+          }
+        }
+      }
+
+      if (footer) {
+        footer.classList.add('agy-fixed-modal-footer');
+        footer.style.setProperty('position', 'sticky', 'important');
+        footer.style.setProperty('bottom', '0', 'important');
+        footer.style.setProperty('z-index', '45', 'important');
+        footer.style.setProperty('background-color', (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') ? computed.backgroundColor : '#ffffff', 'important');
+        footer.style.setProperty('flex-shrink', '0', 'important');
+
+        if (padBottom > 0 && !footer.dataset.agyPadAdjusted) {
+          footer.style.setProperty('margin-bottom', `-${padBottom}px`, 'important');
+          footer.style.setProperty('margin-left', `-${padLeft}px`, 'important');
+          footer.style.setProperty('margin-right', `-${padRight}px`, 'important');
+          footer.style.setProperty('padding-bottom', `${padBottom}px`, 'important');
+          footer.style.setProperty('padding-left', `${padLeft}px`, 'important');
+          footer.style.setProperty('padding-right', `${padRight}px`, 'important');
+          footer.style.setProperty('padding-top', '12px', 'important');
+          footer.style.setProperty('border-bottom-left-radius', 'inherit', 'important');
+          footer.style.setProperty('border-bottom-right-radius', 'inherit', 'important');
+          footer.style.setProperty('border-top', '1px solid #f1f5f9', 'important');
+          footer.style.setProperty('box-shadow', '0 -4px 14px rgba(15, 23, 42, 0.06)', 'important');
+          footer.dataset.agyPadAdjusted = 'true';
+        }
+      }
+
+      box.dataset.agyModalCalibrated = 'true';
+    }
+
+    function scanAllModals() {
+      const modalBoxes = document.querySelectorAll('.modal-box, [class*="-modal-box"], .modal-content, .delete-modal-box');
+      modalBoxes.forEach(calibrateModalBox);
+    }
+
+    // Jalankan segera
+    scanAllModals();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scanAllModals);
+    }
+
+    // Jalankan saat ada interaksi membuka modal
+    document.addEventListener('click', function (e) {
+      const target = e.target;
+      if (target.closest && target.closest('[data-open-modal], [data-bs-toggle="modal"], .btn-tambah, .btn-edit, .btn-primary, [onclick*="Modal" i], [onclick*="modal" i]')) {
+        setTimeout(scanAllModals, 10);
+        setTimeout(scanAllModals, 80);
+        setTimeout(scanAllModals, 250);
+      }
+    }, true);
+
+    // Observer untuk mendeteksi saat modal dibuka (perubahan class 'is-active', 'show', style display)
+    if (window.MutationObserver) {
+      const observer = new MutationObserver(function (mutations) {
+        let shouldScan = false;
+        for (let i = 0; i < mutations.length; i++) {
+          const m = mutations[i];
+          if (m.type === 'attributes' && (m.attributeName === 'class' || m.attributeName === 'style')) {
+            const target = m.target;
+            if (target.classList && (target.classList.contains('modal-overlay') || target.classList.contains('modal') || target.classList.contains('is-active') || target.classList.contains('show'))) {
+              shouldScan = true;
+              break;
+            }
+          } else if (m.type === 'childList' && m.addedNodes.length > 0) {
+            shouldScan = true;
+            break;
+          }
+        }
+        if (shouldScan) {
+          scanAllModals();
+        }
+      });
+
+      if (document.body) {
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class', 'style']
+        });
+      } else {
+        document.addEventListener('DOMContentLoaded', function () {
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'style']
+          });
+        });
+      }
+    }
+
+    window.addEventListener('resize', function () {
+      document.querySelectorAll('[data-agy-modal-calibrated]').forEach(function (b) {
+        delete b.dataset.agyModalCalibrated;
+        delete b.dataset.agyPadAdjusted;
+      });
+      scanAllModals();
+    });
+  }
+
+  // Panggil initFixedModalHeaderAndFooter
+  initFixedModalHeaderAndFooter();
 
   window.bmRenderSidebar = renderAppSidebar;
   window.bmRenderSidebarEngine = renderAppSidebar;
