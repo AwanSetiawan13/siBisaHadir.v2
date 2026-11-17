@@ -3931,99 +3931,127 @@
       }
 
       function syncProfitProjectBrandStorage(customData) {
-        const sourceData = Array.isArray(customData) ? customData : (Array.isArray(kbData) ? kbData : []);
-        const aggMap = new Map();
-        const dppMap = getPendapatanDppMapForProfit();
-        const bebanMap = getBebanDiakuiMapForProfit();
+        try {
+          const sourceData = Array.isArray(customData) ? customData : (Array.isArray(kbData) ? kbData : []);
+          const aggMap = new Map();
+          const dppMap = getPendapatanDppMapForProfit();
+          const bebanMap = getBebanDiakuiMapForProfit();
 
-        // Ambil daftar Project / Brand dari transaksi Kas & Bank (tanpa nominal Kas & Bank),
-        // isi kolom Pendapatan dari total DPP modul Pendapatan & kolom Beban dari total Beban Diakui modul Pengeluaran & Beban.
-        sourceData.forEach(function (it) {
-          if (!it) return;
-          const rawPb = String(it.projectBrand || '').trim();
-          const cleanPb = normalizeProjectBrandName(rawPb);
-          if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+          // Ambil daftar Project / Brand dari transaksi Kas & Bank (tanpa nominal Kas & Bank),
+          // isi kolom Pendapatan dari total DPP modul Pendapatan & kolom Beban dari total Beban Diakui modul Pengeluaran & Beban.
+          sourceData.forEach(function (it) {
+            if (!it) return;
+            const rawPb = String(it.projectBrand || '').trim();
+            const cleanPb = normalizeProjectBrandName(rawPb);
+            if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
 
-          const key = cleanPb.toLowerCase();
-          if (!aggMap.has(key)) {
-            aggMap.set(key, {
-              projectBrand: cleanPb,
-              rawProjectBrand: rawPb,
-              tanggal: it.tanggal || '',
-              jenisSet: new Set(),
-              txIds: []
-            });
-          }
+            const key = cleanPb.toLowerCase();
+            if (!aggMap.has(key)) {
+              aggMap.set(key, {
+                projectBrand: cleanPb,
+                rawProjectBrand: rawPb,
+                tanggal: it.tanggal || '',
+                jenisSet: new Set(),
+                txIds: []
+              });
+            }
 
-          const entry = aggMap.get(key);
-          if (rawPb.includes(' | ') && !entry.rawProjectBrand.includes(' | ')) {
-            entry.rawProjectBrand = rawPb;
-          }
-          if (it.tanggal && (!entry.tanggal || String(it.tanggal) > String(entry.tanggal))) {
-            entry.tanggal = it.tanggal;
-          }
-          if (it.jenis && String(it.jenis).trim()) {
-            entry.jenisSet.add(String(it.jenis).trim());
-          }
-          if (it.idTransaksi) entry.txIds.push(it.idTransaksi);
-        });
-
-        const relBrands = [];
-        let relIdx = 1;
-        aggMap.forEach(function (entry, key) {
-          const jenisLabel = entry.jenisSet.size > 0 ? ': ' + Array.from(entry.jenisSet).join(', ') : '';
-          const pendapatanDpp = dppMap.get(key) || 0;
-          const beban = bebanMap.get(key) || 0;
-          const payroll = 0;
-          const penyusutan = 0;
-          const laba = pendapatanDpp - (beban + payroll + penyusutan);
-          const rawMargin = pendapatanDpp > 0 ? Number(((laba / pendapatanDpp) * 100).toFixed(1)) : 0;
-          const margin = Math.abs(rawMargin) < 0.05 ? 0 : rawMargin;
-          relBrands.push({
-            id: 'PRF-KB-' + String(relIdx++).padStart(3, '0'),
-            projectBrand: entry.projectBrand,
-            rawProjectBrand: entry.rawProjectBrand,
-            pendapatan: pendapatanDpp,
-            beban: beban,
-            payroll: payroll,
-            penyusutan: penyusutan,
-            labaSebelumPajak: laba,
-            margin: margin,
-            tanggal: entry.tanggal || new Date().toISOString().split('T')[0],
-            periode: formatPeriodeFromDate(entry.tanggal),
-            keterangan: 'Relasi Project/Brand dari modul Kas & Bank (' + entry.txIds.length + ' transaksi' + jenisLabel + ')',
-            txCount: entry.txIds.length,
-            source: 'kas_bank'
+            const entry = aggMap.get(key);
+            if (rawPb.includes(' | ') && !String(entry.rawProjectBrand || '').includes(' | ')) {
+              entry.rawProjectBrand = rawPb;
+            }
+            if (it.tanggal && (!entry.tanggal || String(it.tanggal) > String(entry.tanggal))) {
+              entry.tanggal = it.tanggal;
+            }
+            if (it.jenis && String(it.jenis).trim()) {
+              entry.jenisSet.add(String(it.jenis).trim());
+            }
+            if (it.idTransaksi) entry.txIds.push(it.idTransaksi);
           });
-        });
 
-        try {
-          localStorage.setItem('accounting_kas_bank_profit_rel_v1', JSON.stringify({
-            brands: relBrands,
-            updatedAt: new Date().toISOString()
-          }));
-        } catch (e) {}
+          const relBrands = [];
+          let relIdx = 1;
+          aggMap.forEach(function (entry, key) {
+            const jenisLabel = (entry.jenisSet && entry.jenisSet.size > 0) ? ': ' + Array.from(entry.jenisSet).join(', ') : '';
+            const pendapatanDpp = dppMap.get(key) || 0;
+            const beban = bebanMap.get(key) || 0;
+            const payroll = 0;
+            const penyusutan = 0;
+            const laba = pendapatanDpp - (beban + payroll + penyusutan);
+            const rawMargin = pendapatanDpp > 0 ? Number(((laba / pendapatanDpp) * 100).toFixed(1)) : 0;
+            const margin = Math.abs(rawMargin) < 0.05 ? 0 : rawMargin;
+            relBrands.push({
+              id: 'PRF-KB-' + String(relIdx++).padStart(3, '0'),
+              projectBrand: entry.projectBrand,
+              rawProjectBrand: entry.rawProjectBrand,
+              pendapatan: pendapatanDpp,
+              beban: beban,
+              payroll: payroll,
+              penyusutan: penyusutan,
+              labaSebelumPajak: laba,
+              margin: margin,
+              tanggal: entry.tanggal || new Date().toISOString().split('T')[0],
+              periode: formatPeriodeFromDate(entry.tanggal),
+              keterangan: 'Relasi Project/Brand dari modul Kas & Bank (' + entry.txIds.length + ' transaksi' + jenisLabel + ')',
+              txCount: entry.txIds.length,
+              source: 'kas_bank'
+            });
+          });
 
-        // Sinkronkan daftar Project/Brand realtime langsung ke storage Profit Project / Brand
-        try {
-          localStorage.setItem('bisa_profit_project_brand_data', JSON.stringify(relBrands));
           try {
-            window.dispatchEvent(new CustomEvent('accounting_profit_project_brand_changed'));
-          } catch (evErr) {}
-        } catch (e) {}
+            localStorage.setItem('accounting_kas_bank_profit_rel_v1', JSON.stringify({
+              brands: relBrands,
+              updatedAt: new Date().toISOString()
+            }));
+          } catch (e) {}
+
+          // Sinkronkan daftar Project/Brand realtime langsung ke storage Profit Project / Brand
+          try {
+            localStorage.setItem('bisa_profit_project_brand_data', JSON.stringify(relBrands));
+            try {
+              window.dispatchEvent(new CustomEvent('accounting_profit_project_brand_changed'));
+            } catch (evErr) {}
+          } catch (e) {}
+        } catch (errSync) {
+          console.warn('syncProfitProjectBrandStorage error:', errSync);
+        }
       }
 
       function saveData() {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(kbData));
-          syncArusKasSaldoStorage(kbData);
-          syncProfitProjectBrandStorage(kbData);
-          try {
-            window.dispatchEvent(new CustomEvent('accounting_kas_bank_changed'));
-          } catch (e) {}
         } catch (error) {
-          showToast('Gagal menyimpan data Kas & Bank', 'error');
+          console.warn('Gagal menyimpan kbData lengkap ke localStorage (kemungkinan quota terlampaui), mencoba fallback tanpa bukti besar:', error);
+          try {
+            // Jika quota localStorage penuh (misal karena upload file bukti), simpan tanpa buktiDataUrl besar agar data transaksi utama tetap tersimpan
+            const sanitized = kbData.map(function (item) {
+              const copy = Object.assign({}, item);
+              if (copy.buktiDataUrl && copy.buktiDataUrl.length > 50000) {
+                delete copy.buktiDataUrl;
+              }
+              return copy;
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+          } catch (fallbackError) {
+            console.error('Fallback penyimpanan Kas & Bank gagal:', fallbackError);
+          }
         }
+
+        try {
+          syncArusKasSaldoStorage(kbData);
+        } catch (eSync1) {
+          console.warn('Gagal syncArusKasSaldoStorage:', eSync1);
+        }
+
+        try {
+          syncProfitProjectBrandStorage(kbData);
+        } catch (eSync2) {
+          console.warn('Gagal syncProfitProjectBrandStorage:', eSync2);
+        }
+
+        try {
+          window.dispatchEvent(new CustomEvent('accounting_kas_bank_changed'));
+        } catch (e) {}
       }
 
       function escapeHtml(value) {
@@ -5695,7 +5723,46 @@
         });
       }
 
-      /* File upload handler */
+      /* File upload handler & Image Compressor */
+      function compressImageFileToDataUrl(file, callback) {
+        if (!file) return callback('');
+        if (!String(file.type || '').startsWith('image/')) {
+          return callback('');
+        }
+        const reader = new FileReader();
+        reader.onerror = function () { callback(''); };
+        reader.onload = function (e) {
+          const img = new Image();
+          img.onerror = function () { callback(e.target.result || ''); };
+          img.onload = function () {
+            try {
+              const maxSide = 900;
+              const ratio = Math.min(1, maxSide / Math.max(img.width || 1, img.height || 1));
+              const width = Math.max(1, Math.round((img.width || 1) * ratio));
+              const height = Math.max(1, Math.round((img.height || 1) * ratio));
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return callback(e.target.result);
+              ctx.drawImage(img, 0, 0, width, height);
+              let dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+              if (dataUrl.length > 250000) {
+                canvas.width = Math.max(1, Math.round(width * 0.7));
+                canvas.height = Math.max(1, Math.round(height * 0.7));
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+              }
+              callback(dataUrl);
+            } catch (err) {
+              callback(e.target.result || '');
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
       if (kbBuktiInput) {
         kbBuktiInput.addEventListener('change', function () {
           if (this.files && this.files[0]) {
@@ -5703,11 +5770,9 @@
             tempUploadedFile = file.name;
             if (kbBuktiFileName) kbBuktiFileName.textContent = tempUploadedFile;
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              tempUploadedFileDataUrl = e.target.result;
-            };
-            reader.readAsDataURL(file);
+            compressImageFileToDataUrl(file, function (dataUrl) {
+              tempUploadedFileDataUrl = dataUrl;
+            });
             if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'inline-flex';
           } else {
             if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
@@ -6668,7 +6733,8 @@
             return;
           }
 
-          if (editId) {
+          const isEdit = Boolean(editId);
+          if (isEdit) {
             const index = kbData.findIndex(function (item) {
               return String(item.id) === String(editId);
             });
@@ -6677,20 +6743,24 @@
               kbData[index] = Object.assign({}, prev, payload, {
                 buktiDataUrl: tempUploadedFileDataUrl || prev.buktiDataUrl || ''
               });
-              showToast('Data Transaksi berhasil diperbarui', 'success');
             }
           } else {
             kbData.unshift(Object.assign({
               id: 'kb-' + Date.now(),
               buktiDataUrl: tempUploadedFileDataUrl || ''
             }, payload));
-            showToast('Data Transaksi berhasil ditambahkan', 'success');
           }
 
           kbData = recalculateRunningBalances(kbData);
           saveData();
           renderTable();
           closeModal(formModal);
+
+          if (isEdit) {
+            showToast('Data Transaksi berhasil diperbarui', 'success');
+          } else {
+            showToast('Data Transaksi berhasil ditambahkan', 'success');
+          }
         });
       }
 
