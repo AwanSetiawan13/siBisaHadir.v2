@@ -2821,6 +2821,39 @@
       return false;
     }
 
+    function isMoneyInput(el) {
+      if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return false;
+      const type = (el.type || '').toLowerCase();
+      if (type === 'file' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit' || type === 'reset') return false;
+
+      const id = (el.id || '').toLowerCase();
+      const name = (el.name || '').toLowerCase();
+      const cls = (el.className || '').toLowerCase();
+      const ph = (el.placeholder || '').toLowerCase();
+
+      let labelText = '';
+      if (el.id) {
+        const lbl = document.querySelector('label[for="' + el.id + '"]');
+        if (lbl) labelText += ' ' + lbl.textContent;
+      }
+      const wrap = el.closest ? el.closest('.form-group, .field, .modal-field, .col-form-group, [class*="-field"], [class*="-group"]') : null;
+      if (wrap) {
+        const lbl = wrap.querySelector('label, [class*="-label"]');
+        if (lbl) labelText += ' ' + lbl.textContent;
+      }
+      labelText = labelText.toLowerCase();
+
+      const moneyKeywords = [
+        'uang', 'nominal', 'rupiah', 'rp', 'biaya', 'budget', 'tarif', 'gaji', 'harga',
+        'bayar', 'saldo', 'masuk', 'keluar', 'tagihan', 'dpp', 'ppn', 'pph', 'sisa',
+        'utang', 'piutang', 'tunjangan', 'potongan', 'kas', 'price', 'amount', 'fee', 'cost'
+      ];
+
+      return moneyKeywords.some(function (k) {
+        return id.includes(k) || name.includes(k) || cls.includes(k) || ph.includes(k) || labelText.includes(k);
+      }) || ph.includes('rp') || cls.includes('format-rupiah') || cls.includes('money');
+    }
+
     function isFieldEmpty(el) {
       const tag = (el.tagName || '').toUpperCase();
       const type = (el.type || '').toLowerCase();
@@ -2846,7 +2879,19 @@
         return false;
       }
       if (tag === 'INPUT' || tag === 'TEXTAREA') {
-        return String(el.value || '').trim() === '';
+        const raw = String(el.value || '').trim();
+        if (raw === '') return true;
+
+        // Jika kolom uang bernilai 0 / Rp 0 / Rp. 0 / Rp -
+        // Angka 0 tetap dapat dimasukkan dan diakui sebagai data yang valid (TIDAK KOSONG)
+        if (isMoneyInput(el)) {
+          const digits = raw.replace(/\D/g, '');
+          const lower = raw.toLowerCase();
+          if (digits === '0' || lower === '0' || lower === 'rp 0' || lower === 'rp. 0' || lower === 'rp -' || lower === 'rp. -') {
+            return false;
+          }
+        }
+        return false;
       }
       return false;
     }
@@ -2896,6 +2941,24 @@
 
     function validateContainer(container) {
       if (!container) return { isValid: true };
+
+      // Untuk semua modul yang memiliki data uang yang wajib diisi:
+      // Angka 0 tetap dapat dimasukkan dan jika data uang kosong saat disubmit, otomatis diisi Rp 0 / 0 agar valid
+      const moneyInputs = Array.from(container.querySelectorAll('input:not([type="hidden"]):not([disabled]):not([readonly]), textarea:not([disabled]):not([readonly])'));
+      moneyInputs.forEach(function (inp) {
+        if (isMoneyInput(inp) && isFieldEmpty(inp) && !isFieldOptional(inp) && !isInsideFilterOrSearch(inp)) {
+          if (inp.type === 'number') {
+            inp.value = '0';
+          } else {
+            inp.value = 'Rp 0';
+          }
+          try {
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+            inp.dispatchEvent(new Event('change', { bubbles: true }));
+          } catch (e) {}
+        }
+      });
+
       const inputs = Array.from(container.querySelectorAll('input, select, textarea'));
       const missingLabels = [];
       let firstEmpty = null;
@@ -3043,187 +3106,38 @@
         showAlert(validation);
       }
     }, true);
-  })();
 
-  
-  /* ==========================================================================
-     GLOBAL FIXED MODAL HEADER & FOOTER HANDLER
-     Memastikan tombol close 'x' di bagian atas dan tombol submit di bagian bawah
-     selalu tetap muncul (fixed / sticky) saat modal di-scroll pada semua modul.
-     ========================================================================== */
-  function initFixedModalHeaderAndFooter() {
-    function calibrateModalBox(box) {
-      if (!box) return;
-
-      // 1. Dapatkan padding aktual modal box
-      const computed = window.getComputedStyle(box);
-      const padTop = parseFloat(computed.paddingTop) || 0;
-      const padBottom = parseFloat(computed.paddingBottom) || 0;
-      const padLeft = parseFloat(computed.paddingLeft) || 0;
-      const padRight = parseFloat(computed.paddingRight) || 0;
-
-      // 2. Cari Header & Tombol Close 'x'
-      const header = box.querySelector('.modal-header, [class*="-modal-header"], .modal-header-row, .rrk-month-modal__heading') ||
-                     box.querySelector('.modal-title, [class*="-modal-title"]')?.closest('div');
-      
-      if (header && (header.parentElement === box || header.closest('.modal-box, [class*="-modal-box"], .modal-content') === box)) {
-        header.classList.add('agy-fixed-modal-header');
-        header.style.setProperty('position', 'sticky', 'important');
-        header.style.setProperty('top', '0', 'important');
-        header.style.setProperty('z-index', '50', 'important');
-        header.style.setProperty('background-color', (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') ? computed.backgroundColor : '#ffffff', 'important');
-        header.style.setProperty('flex-shrink', '0', 'important');
-
-        if (padTop > 0 && !header.dataset.agyPadAdjusted) {
-          header.style.setProperty('margin-top', `-${padTop}px`, 'important');
-          header.style.setProperty('margin-left', `-${padLeft}px`, 'important');
-          header.style.setProperty('margin-right', `-${padRight}px`, 'important');
-          header.style.setProperty('padding-top', `${padTop}px`, 'important');
-          header.style.setProperty('padding-left', `${padLeft}px`, 'important');
-          header.style.setProperty('padding-right', `${padRight}px`, 'important');
-          header.style.setProperty('padding-bottom', '12px', 'important');
-          header.style.setProperty('border-top-left-radius', 'inherit', 'important');
-          header.style.setProperty('border-top-right-radius', 'inherit', 'important');
-          header.style.setProperty('box-shadow', '0 1px 0 rgba(0, 0, 0, 0.05), 0 3px 8px rgba(0, 0, 0, 0.02)', 'important');
-          header.dataset.agyPadAdjusted = 'true';
+    // Memastikan angka 0 tetap dapat diketik dan tersimpan di semua kolom uang
+    document.addEventListener('input', function (e) {
+      const el = e.target;
+      if (!el || el.tagName !== 'INPUT' || !isMoneyInput(el)) return;
+      const raw = String(el.value || '').trim();
+      const digits = raw.replace(/\D/g, '');
+      if (raw === '0' || (digits === '0' && raw.length > 0)) {
+        if (el.type === 'number') {
+          el.value = '0';
+        } else if (!raw.toLowerCase().startsWith('rp')) {
+          el.value = 'Rp 0';
         }
-      }
-
-      // Tombol Close 'x'
-      const closeBtn = box.querySelector('.modal-close, [class*="-modal-close"], .btn-modal-close-x, .btn-close, button[data-close-modal], [aria-label="Tutup"], [aria-label="Close"]');
-      if (closeBtn) {
-        closeBtn.classList.add('agy-fixed-modal-close');
-        closeBtn.style.setProperty('z-index', '60', 'important');
-        closeBtn.style.setProperty('cursor', 'pointer', 'important');
-        if (!header || !header.contains(closeBtn)) {
-          closeBtn.style.setProperty('position', 'sticky', 'important');
-          closeBtn.style.setProperty('top', '12px', 'important');
-          closeBtn.style.setProperty('align-self', 'flex-end', 'important');
-        }
-      }
-
-      // Garis aksen jika ada
-      const accentLine = box.querySelector('[class*="-modal-accent"], .modal-accent-line');
-      if (accentLine) {
-        accentLine.style.setProperty('position', 'sticky', 'important');
-        accentLine.style.setProperty('top', '0', 'important');
-        accentLine.style.setProperty('z-index', '55', 'important');
-      }
-
-      // 3. Cari Footer / Container Tombol Submit
-      let footer = box.querySelector('.modal-footer, [class*="-modal-footer"], .modal-actions, [class*="-modal-actions"], .delete-modal-actions, .form-footer, .bm-template-upload-actions, .bm-template-detail-footer');
-
-      // Jika modal tidak memiliki modal-footer formal, cari container dari tombol submit
-      if (!footer) {
-        const submitBtn = box.querySelector('button[type="submit"], .btn-simpan, .btn-save, #btnSubmitCampaign, button[id*="simpan" i], button[id*="submit" i]');
-        if (submitBtn) {
-          const parentGroup = submitBtn.closest('.form-group, .modal-form-actions') || submitBtn.parentElement;
-          if (parentGroup && parentGroup !== box) {
-            footer = parentGroup;
-          }
-        }
-      }
-
-      if (footer) {
-        footer.classList.add('agy-fixed-modal-footer');
-        footer.style.setProperty('position', 'sticky', 'important');
-        footer.style.setProperty('bottom', '0', 'important');
-        footer.style.setProperty('z-index', '45', 'important');
-        footer.style.setProperty('background-color', (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') ? computed.backgroundColor : '#ffffff', 'important');
-        footer.style.setProperty('flex-shrink', '0', 'important');
-
-        if (padBottom > 0 && !footer.dataset.agyPadAdjusted) {
-          footer.style.setProperty('margin-bottom', `-${padBottom}px`, 'important');
-          footer.style.setProperty('margin-left', `-${padLeft}px`, 'important');
-          footer.style.setProperty('margin-right', `-${padRight}px`, 'important');
-          footer.style.setProperty('padding-bottom', `${padBottom}px`, 'important');
-          footer.style.setProperty('padding-left', `${padLeft}px`, 'important');
-          footer.style.setProperty('padding-right', `${padRight}px`, 'important');
-          footer.style.setProperty('padding-top', '12px', 'important');
-          footer.style.setProperty('border-bottom-left-radius', 'inherit', 'important');
-          footer.style.setProperty('border-bottom-right-radius', 'inherit', 'important');
-          footer.style.setProperty('border-top', '1px solid #f1f5f9', 'important');
-          footer.style.setProperty('box-shadow', '0 -4px 14px rgba(15, 23, 42, 0.06)', 'important');
-          footer.dataset.agyPadAdjusted = 'true';
-        }
-      }
-
-      box.dataset.agyModalCalibrated = 'true';
-    }
-
-    function scanAllModals() {
-      const modalBoxes = document.querySelectorAll('.modal-box, [class*="-modal-box"], .modal-content, .delete-modal-box');
-      modalBoxes.forEach(calibrateModalBox);
-    }
-
-    // Jalankan segera
-    scanAllModals();
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', scanAllModals);
-    }
-
-    // Jalankan saat ada interaksi membuka modal
-    document.addEventListener('click', function (e) {
-      const target = e.target;
-      if (target.closest && target.closest('[data-open-modal], [data-bs-toggle="modal"], .btn-tambah, .btn-edit, .btn-primary, [onclick*="Modal" i], [onclick*="modal" i]')) {
-        setTimeout(scanAllModals, 10);
-        setTimeout(scanAllModals, 80);
-        setTimeout(scanAllModals, 250);
       }
     }, true);
 
-    // Observer untuk mendeteksi saat modal dibuka (perubahan class 'is-active', 'show', style display)
-    if (window.MutationObserver) {
-      const observer = new MutationObserver(function (mutations) {
-        let shouldScan = false;
-        for (let i = 0; i < mutations.length; i++) {
-          const m = mutations[i];
-          if (m.type === 'attributes' && (m.attributeName === 'class' || m.attributeName === 'style')) {
-            const target = m.target;
-            if (target.classList && (target.classList.contains('modal-overlay') || target.classList.contains('modal') || target.classList.contains('is-active') || target.classList.contains('show'))) {
-              shouldScan = true;
-              break;
-            }
-          } else if (m.type === 'childList' && m.addedNodes.length > 0) {
-            shouldScan = true;
-            break;
-          }
+    document.addEventListener('blur', function (e) {
+      const el = e.target;
+      if (!el || el.tagName !== 'INPUT' || !isMoneyInput(el)) return;
+      const raw = String(el.value || '').trim();
+      const digits = raw.replace(/\D/g, '');
+      if (digits === '0' || raw === '0') {
+        if (el.type === 'number') {
+          el.value = '0';
+        } else {
+          el.value = 'Rp 0';
         }
-        if (shouldScan) {
-          scanAllModals();
-        }
-      });
-
-      if (document.body) {
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-          attributes: true,
-          attributeFilter: ['class', 'style']
-        });
-      } else {
-        document.addEventListener('DOMContentLoaded', function () {
-          observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['class', 'style']
-          });
-        });
       }
-    }
+    }, true);
+  })();
 
-    window.addEventListener('resize', function () {
-      document.querySelectorAll('[data-agy-modal-calibrated]').forEach(function (b) {
-        delete b.dataset.agyModalCalibrated;
-        delete b.dataset.agyPadAdjusted;
-      });
-      scanAllModals();
-    });
-  }
-
-  // Panggil initFixedModalHeaderAndFooter
-  initFixedModalHeaderAndFooter();
+  
 
   window.bmRenderSidebar = renderAppSidebar;
   window.bmRenderSidebarEngine = renderAppSidebar;
