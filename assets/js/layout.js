@@ -4,6 +4,17 @@
 
   window.__bmSidebarEngineLoaded = true;
 
+  // Fail-safe: konten tidak boleh tetap tersembunyi jika render sidebar gagal.
+  function markSidebarReady() {
+    if (document.body) document.body.classList.add('sidebar-ready');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', markSidebarReady, { once: true });
+  }
+  markSidebarReady();
+  window.setTimeout(markSidebarReady, 0);
+  window.setTimeout(markSidebarReady, 600);
+
   // Preload SweetAlert2 CDN agar selalu siap seketika saat dibutuhkan
   (function preloadSweetAlert() {
     if (!window.Swal && !document.querySelector('script[src*="sweetalert2"]')) {
@@ -977,16 +988,6 @@
       el.style.setProperty('max-width', '100%', 'important');
     });
 
-    // Selesaikan animasi progress bar saat halaman baru selesai dimuat
-    const existingBar = document.getElementById('bm-nav-progress');
-    if (existingBar) {
-      existingBar.style.width = '100%';
-      setTimeout(() => {
-        existingBar.style.opacity = '0';
-        setTimeout(() => existingBar.remove(), 250);
-      }, 150);
-    }
-
     // 5b. Role-based Unified Navbar (SPV KOL & Staff KOL)
     if (role === 'spv_kol') {
       renderSpvKolNavbar();
@@ -1068,7 +1069,7 @@
         const customSizesAttr = table.getAttribute('data-page-sizes');
         const customSizeAttr = table.getAttribute('data-page-size');
 
-        let pageSizes = [10, 30, 50];
+        let pageSizes = [5, 10, 25, 50];
         let pageSize = 10;
 
         if (customSizesAttr) {
@@ -1082,7 +1083,14 @@
         if (customSizeAttr) {
           const parsed = parseInt(customSizeAttr, 10);
           if (!isNaN(parsed) && parsed > 0) pageSize = parsed;
+        } else if (!customSizesAttr && rows.length <= 5 && rows.length > 0) {
+          pageSize = 5;
         }
+
+        if (!pageSizes.includes(pageSize)) {
+          pageSizes.push(pageSize);
+        }
+        pageSizes = Array.from(new Set(pageSizes)).sort((a, b) => a - b);
 
         let currentPage = 1;
 
@@ -1093,6 +1101,12 @@
           const allRows = tbody ? Array.from(tbody.querySelectorAll('tr:not(.db-empty-row):not(.hirezy-empty-search-row)')) : [];
           const activeRows = allRows.filter(r => r.getAttribute('data-search-hidden') !== 'true');
           const currentTotal = activeRows.length;
+
+          // Jika user belum pernah mengubah ukuran halaman manual dan data <= 5, selaraskan pageSize ke 5
+          if (!table.__userChangedPageSize && !customSizeAttr && currentTotal > 0 && currentTotal <= 5 && pageSizes.includes(5)) {
+            pageSize = 5;
+          }
+
           const totalPages = Math.max(1, Math.ceil(currentTotal / pageSize));
 
           if (currentPage > totalPages) currentPage = totalPages;
@@ -1169,7 +1183,7 @@
             `;
           }
 
-          const unit = table.getAttribute('data-unit') || 'baris';
+          const unit = table.getAttribute('data-unit') || 'data';
           const optionsHtml = pageSizes.map(sz => `<option value="${sz}" ${pageSize === sz ? 'selected' : ''}>${sz}</option>`).join('');
 
           pagWrap.innerHTML = `
@@ -1179,7 +1193,7 @@
               </div>
               <div class="hirezy-pagination-size">
                 <span class="hirezy-size-label">Tampilkan:</span>
-                <select class="hirezy-page-size-select" aria-label="Pilih jumlah baris per halaman">
+                <select class="hirezy-page-size-select" aria-label="Pilih jumlah data per halaman">
                   ${optionsHtml}
                 </select>
                 <span class="hirezy-size-unit">${unit}</span>
@@ -1191,6 +1205,7 @@
           const sizeSelect = pagWrap.querySelector('.hirezy-page-size-select');
           if (sizeSelect) {
             sizeSelect.addEventListener('change', function () {
+              table.__userChangedPageSize = true;
               pageSize = parseInt(this.value, 10) || pageSizes[0] || 10;
               currentPage = 1;
               renderPaginationUI();
@@ -1253,16 +1268,6 @@
         table.addEventListener('tableDataUpdated', function () {
           renderPaginationUI();
         });
-
-        if (tbody && window.MutationObserver) {
-          const observer = new MutationObserver(function (mutations) {
-            const hasChildChanges = mutations.some(m => m.type === 'childList');
-            if (hasChildChanges) {
-              renderPaginationUI();
-            }
-          });
-          observer.observe(tbody, { childList: true });
-        }
 
         renderPaginationUI();
         if (scrollWrap) {
@@ -1918,16 +1923,15 @@
       </div>`;
   }
 
-  // 6. Smooth Feature Transition Handler (Navigasi Antar-Fitur Sangat Halus & Responsif)
+  // 6. Navigation Link Handler (Tutup drawer mobile saat link diklik)
   document.addEventListener('click', function (e) {
-    // Abaikan jika membuka di tab baru (ctrl/meta/shift atau klik non-kiri)
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
 
-    const link = e.target.closest('.app-nav-item:not(.is-active):not(.is-disabled), .app-sub-item:not(.is-active):not(.is-disabled)');
+    const link = e.target.closest('.app-nav-item, .app-sub-item');
     if (!link) return;
 
     const href = link.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('javascript:') || link.target === '_blank' || href.startsWith('http')) return;
+    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
 
     // Tutup drawer jika di mobile
     const sidebar = document.getElementById('app-sidebar');
@@ -1935,48 +1939,6 @@
     if (sidebar && sidebar.classList.contains('is-open')) {
       sidebar.classList.remove('is-open');
       if (backdrop) backdrop.classList.remove('is-visible');
-    }
-
-    // 1. Feedback visual seketika pada menu item yang diklik
-    document.querySelectorAll('.app-nav-item.is-active, .app-sub-item.is-active').forEach(el => {
-      el.classList.remove('is-active');
-      el.style.backgroundColor = 'transparent';
-      el.style.color = '#475569';
-      el.style.boxShadow = 'none';
-      el.style.fontWeight = '500';
-      const dot = el.querySelector('span[style*="border-radius"]');
-      if (dot) dot.style.backgroundColor = '#cbd5e1';
-    });
-
-    link.classList.add('is-active');
-    link.style.backgroundColor = '#0284c7';
-    link.style.color = '#ffffff';
-    link.style.fontWeight = '600';
-    link.style.boxShadow = '0 3px 8px rgba(2,132,199,0.25)';
-    const newDot = link.querySelector('span[style*="border-radius"]');
-    if (newDot) newDot.style.backgroundColor = '#ffffff';
-
-    // 2. Progress bar ultra halus di bagian paling atas (SaaS style loading)
-    let bar = document.getElementById('bm-nav-progress');
-    if (!bar) {
-      bar = document.createElement('div');
-      bar.id = 'bm-nav-progress';
-      bar.style.cssText = 'position:fixed;top:0;left:0;height:2.5px;width:0%;background:linear-gradient(90deg,#0284c7,#38bdf8);z-index:99999;transition:width 0.28s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 10px rgba(56,189,248,0.7);pointer-events:none;';
-      document.body.appendChild(bar);
-    }
-    bar.style.opacity = '1';
-    bar.style.width = '35%';
-    requestAnimationFrame(() => {
-      bar.style.width = '80%';
-    });
-
-    // 3. Efek Outro Tenang (Tanpa pergeseran posisi / translateY)
-    const content = document.querySelector('.dashboard-shell') ||
-      document.querySelector('.layout-page') ||
-      document.querySelector('main');
-    if (content) {
-      content.style.transition = 'opacity 0.12s ease';
-      content.style.opacity = '0.9';
     }
   });
 
@@ -2255,10 +2217,20 @@
     }
   });
 
+  function renderAppSidebarSafe() {
+    try {
+      renderAppSidebar();
+    } catch (error) {
+      console.error('renderAppSidebar failed:', error);
+    } finally {
+      markSidebarReady();
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderAppSidebar);
+    document.addEventListener('DOMContentLoaded', renderAppSidebarSafe);
   } else {
-    renderAppSidebar();
+    renderAppSidebarSafe();
   }
 
   // Helper Global Minimalist Empty State Component (Sesuai Referensi Pengguna)
@@ -3137,7 +3109,11 @@
     }, true);
   })();
 
-  
+  // Jaminan body selalu visible dan ready
+  markSidebarReady();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', markSidebarReady);
+  }
 
   window.bmRenderSidebar = renderAppSidebar;
   window.bmRenderSidebarEngine = renderAppSidebar;
