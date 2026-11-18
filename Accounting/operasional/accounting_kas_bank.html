@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kas & Bank | Bisa Media</title>
-  <link rel="stylesheet" href="../../assets/css/style.css?v=20261031" />
+  <link rel="stylesheet" href="../../assets/css/style.css?v=20261118_v2" />
   <link rel="icon" type="image/png" href="../../media/logo.png" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
@@ -3254,7 +3254,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="../../vendor/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
-  <script src="../../assets/js/layout.js?v=20261111_hd_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261118_v2"></script>
   <script>
     (function () {
       'use strict';
@@ -5043,6 +5043,7 @@
             if (this.checked) {
               const code = this.value;
               setReferensiValue(code, code ? code : 'Pilih Referensi Dokumen');
+              applyPendapatanAutofillByReferensi(code);
               closeFormDropdowns();
             }
           });
@@ -5072,7 +5073,30 @@
           });
         }
 
-        // Kolom Project / Brand dan Divisi keduanya TIDAK auto-fill (dipilih bebas secara mandiri)
+        // Divisi tidak auto-fill; Project/Brand diisi saat user memilih invoice pendapatan.
+      }
+
+      function applyPendapatanAutofillByReferensi(kode) {
+        const code = String(kode || '').trim();
+        if (!code) return;
+
+        const pnd = getRealPendapatanList().find(function (p) {
+          return p && String(p.noInvoice || '').trim().toLowerCase() === code.toLowerCase();
+        });
+        if (!pnd) return;
+
+        const keteranganInput = document.getElementById('kbKeterangan');
+        if (keteranganInput) {
+          const customer = String(pnd.customer || pnd.namaPelanggan || '').trim();
+          const keterangan = String(pnd.keterangan || '').trim();
+          keteranganInput.value = keterangan || customer;
+        }
+
+        const projectBrand = String(pnd.projectBrand || '').trim();
+        if (projectBrand && projectBrand !== '-') {
+          const formatted = formatBrandWithId(projectBrand, pnd.idPendapatan) || projectBrand;
+          setProjectBrandValue(formatted, formatted);
+        }
       }
 
       /* ===== DYNAMIC JENIS TRANSAKSI (Dari Master Data accounting_master_jenis_transaksi_v1) ===== */

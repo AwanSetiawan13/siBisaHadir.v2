@@ -18456,8 +18456,7 @@ table::-webkit-scrollbar-track,
 .col-sticky-action::-webkit-scrollbar-track {
   background: #f1f5f9;
 } 
-body.dashboard-body:not(.sidebar-ready) { opacity: 0; visibility: hidden; }
-body.dashboard-body.sidebar-ready { opacity: 1; visibility: visible; transition: opacity 0.15s ease-in; }
+body.dashboard-body { opacity: 1; visibility: visible; }
 
 .btn-bulk-cancel {
   display: inline-flex;
@@ -18478,4 +18477,170 @@ body.dashboard-body.sidebar-ready { opacity: 1; visibility: visible; transition:
 
 .btn-bulk-cancel:hover {
   color: #7f1d1d;
+}
+
+/* ==========================================================================
+   MODAL BACKDROP BLUR & HIDE SIDEBAR ON ACTIVE MODAL
+   Memastikan background blur saat modal tampil dan sidebar tidak muncul
+   ========================================================================== */
+
+/* Pastikan semua overlay modal berada di atas seluruh elemen layout (sidebar, header, dll) */
+.modal-overlay,
+[class*="-modal-overlay"],
+.modal-backdrop,
+.modal.fade.show {
+  z-index: 99999 !important;
+}
+
+/* Background blur & translucent gelap saat modal aktif / tampil */
+.modal-overlay.is-active,
+[class*="-modal-overlay"].is-active,
+.modal.show,
+.modal.is-active,
+.modal-backdrop.show,
+.modal-overlay[style*="display: flex"]:not([style*="display: none"]):not([style*="visibility: hidden"]),
+.modal-overlay[style*="display: block"]:not([style*="display: none"]):not([style*="visibility: hidden"]),
+[class*="-modal-overlay"][style*="display: flex"]:not([style*="display: none"]):not([style*="visibility: hidden"]),
+[class*="-modal-overlay"][style*="display: block"]:not([style*="display: none"]):not([style*="visibility: hidden"]) {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+}
+
+/* Sembunyikan sidebar secara total saat modal sedang aktif / tampil */
+body:has(.modal-overlay.is-active) #app-sidebar,
+body:has(.modal-overlay.is-active) aside#app-sidebar,
+body:has(.modal-overlay.is-active) .sidebar,
+body:has(.modal-overlay.is-active) .kol-sidebar,
+body:has([class*="-modal-overlay"].is-active) #app-sidebar,
+body:has([class*="-modal-overlay"].is-active) aside#app-sidebar,
+body:has([class*="-modal-overlay"].is-active) .sidebar,
+body:has([class*="-modal-overlay"].is-active) .kol-sidebar,
+body:has(.modal.show) #app-sidebar,
+body:has(.modal.show) aside#app-sidebar,
+body:has(.modal.show) .sidebar,
+body:has(.modal.show) .kol-sidebar,
+body:has(.modal.is-active) #app-sidebar,
+body:has(.modal.is-active) aside#app-sidebar,
+body:has(.modal.is-active) .sidebar,
+body:has(.modal.is-active) .kol-sidebar,
+body:has(.modal-backdrop.show) #app-sidebar,
+body:has(.modal-backdrop.show) aside#app-sidebar,
+body:has(.modal-backdrop.show) .sidebar,
+body:has(.modal-backdrop.show) .kol-sidebar {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+  transition: opacity 0.2s ease, visibility 0.2s ease !important;
+}
+
+/* ==========================================================================
+   ENHANCED RESPONSIVE DESIGN UNTUK SEMUA MODUL
+   ========================================================================== */
+
+/* 1. Viewport Safety */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* 2. Container Tabel Responsif - Horizontal Scroll Mulus di Layar Kecil */
+.table-responsive,
+.data-table-wrap,
+.dash-table-container,
+.campaign-scroll-table-wrap,
+[class*="-table-wrap"] {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* 3. Filter Bar & Search Wrap Responsif */
+.filter-bar,
+.table-filters,
+.toolbar-filter,
+.campaign-filter-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px 12px !important;
+  align-items: center !important;
+}
+
+/* 4. Breakpoint Tablet (<= 991.98px) */
+@media (max-width: 991.98px) {
+  .dash-summary-row,
+  .kpi-grid,
+  .summary-cards,
+  .accounting-cards-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .dash-upper-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+}
+
+/* 5. Breakpoint Mobile (<= 767.98px) */
+@media (max-width: 767.98px) {
+  .dash-summary-row,
+  .kpi-grid,
+  .summary-cards,
+  .accounting-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Modal Responsif di Mobile */
+  .modal-box,
+  [class*="-modal-box"],
+  .modal-content,
+  .delete-modal-box {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 12px auto !important;
+    max-height: calc(100vh - 24px) !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Form Grid di Modal Berubah Jadi 1 Kolom */
+  .karyawan-form-grid,
+  .pnd-form-grid,
+  .modal-form-grid,
+  .form-grid-2,
+  .form-grid-3,
+  [class*="-form-grid"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  [style*="grid-column: span"],
+  .col-span-2,
+  .col-span-3 {
+    grid-column: span 1 !important;
+  }
+
+  /* Pagination Responsif di Mobile */
+  .hirezy-pagination-wrap {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+    text-align: center !important;
+    padding: 12px 8px !important;
+  }
+
+  .hirezy-pagination-left {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .hirezy-pagination-btns {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
 }
