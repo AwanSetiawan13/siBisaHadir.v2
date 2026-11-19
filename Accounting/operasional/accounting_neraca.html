@@ -10,6 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700;1,800&display=swap" rel="stylesheet">
+  <!-- SheetJS for Export Excel (.xlsx) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     /* ===== RESET & ROOT STYLING ===== */
@@ -22,26 +24,316 @@
     }
 
     .dashboard-content {
-      padding: 24px 28px 40px 28px;
+      padding: 20px 24px 40px 24px;
       max-width: 1600px;
       margin: 0 auto;
       box-sizing: border-box;
     }
 
-    /* ===== TOPBAR MINIMAL & BERSIH ===== */
-    .neraca-topbar {
+    /* ===== 4 SUMMARY KPI CARDS (KONSISTEN OPERASIONAL) ===== */
+    .pnd-summary-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .pnd-summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .pnd-summary-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pnd-card {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-top: 3.5px solid #0076C5;
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .pnd-card.pnd-card--aset {
+      border-top-color: #0076C5;
+    }
+
+    .pnd-card.pnd-card--liabilitas {
+      border-top-color: #ef4444;
+    }
+
+    .pnd-card.pnd-card--ekuitas {
+      border-top-color: #16a34a;
+    }
+
+    .pnd-card.pnd-card--total-pasiva {
+      border-top-color: #f59e0b;
+    }
+
+    .pnd-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+    }
+
+    .pnd-card.pnd-card--aset:hover {
+      box-shadow: 0 6px 14px rgba(0, 118, 197, 0.12);
+    }
+
+    .pnd-card.pnd-card--liabilitas:hover {
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.12);
+    }
+
+    .pnd-card.pnd-card--ekuitas:hover {
+      box-shadow: 0 6px 14px rgba(22, 163, 74, 0.12);
+    }
+
+    .pnd-card.pnd-card--total-pasiva:hover {
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.12);
+    }
+
+    .pnd-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pnd-card-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    .pnd-card-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+    }
+
+    .pnd-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #0076C5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.28);
+    }
+
+    .pnd-card-icon.icon-aset {
+      background: #0076C5;
+      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.28);
+    }
+
+    .pnd-card-icon.icon-liabilitas {
+      background: #ef4444;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.28);
+    }
+
+    .pnd-card-icon.icon-ekuitas {
+      background: #16a34a;
+      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.28);
+    }
+
+    .pnd-card-icon.icon-pasiva {
+      background: #f59e0b;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.28);
+    }
+
+    .pnd-card-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: #ffffff;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* ===== MAIN PANEL & TOP ACCENT LINE (KONSISTEN OPERASIONAL) ===== */
+    .panel.campaign-panel,
+    .campaign-panel {
+      background: #ffffff !important;
+      border-radius: 14px !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+      padding: 20px !important;
+      position: relative !important;
+      overflow: visible !important;
+      box-sizing: border-box !important;
+      margin-bottom: 24px;
+    }
+
+    .campaign-panel__line,
+    .pnd-panel-line {
+      display: block !important;
+      height: 4px !important;
+      margin: -20px -20px 16px -20px !important;
+      border-radius: 14px 14px 0 0 !important;
+      background: #0076C5 !important;
+      width: calc(100% + 40px) !important;
+    }
+
+    /* ===== TOOLBAR (FILTER, KALENDER, EXCEL, SEARCH, PERIODE) ===== */
+    .pnd-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 20px;
+      margin: 0 0 18px 0;
+      padding: 0 0 14px 0;
+      border-bottom: 1px dashed #cbd5e1;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 50;
+    }
+
+    .pnd-toolbar__left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
-    .neraca-period-wrap {
+    .pnd-toolbar__right {
       display: flex;
       align-items: center;
       gap: 10px;
+      margin-left: auto;
+    }
+
+    .filter-dropdown-wrapper {
+      position: relative;
+    }
+
+    .pnd-btn-icon {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #0284c7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .pnd-btn-icon:hover {
+      border-color: #0284c7;
+      color: #0284c7;
+      background: #f0f9ff;
+    }
+
+    .pnd-btn-icon.has-filter {
+      background: #e0f2fe !important;
+      border-color: #0284c7 !important;
+      color: #0284c7 !important;
+    }
+
+    .pnd-btn-icon.has-filter::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
+
+    .pnd-btn-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .pnd-btn-excel {
+      background: #f0fdf4 !important;
+      border-color: #86efac !important;
+      color: #15803d !important;
+    }
+
+    .pnd-btn-excel:hover {
+      background: #dcfce7 !important;
+      border-color: #4ade80 !important;
+    }
+
+    /* Search Box */
+    .pnd-search-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 200px;
+      transition: width 0.2s ease;
+    }
+
+    .pnd-search-wrap:focus-within {
+      width: 260px;
+    }
+
+    .pnd-search-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 14px;
+      height: 14px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .pnd-search-wrap input {
+      width: 100%;
+      height: 34px;
+      padding: 0 14px 0 32px;
+      border: 1px solid #cbd5e1;
+      border-radius: 18px;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      outline: none;
+      box-sizing: border-box;
+      transition: all 0.15s ease;
+    }
+
+    .pnd-search-wrap input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    .pnd-search-wrap input::placeholder {
+      color: #94a3b8;
+      font-style: italic;
+    }
+
+    /* Custom Dropdown Periode di Kanan Toolbar */
+    .neraca-period-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .neraca-period-label {
@@ -50,7 +342,6 @@
       font-weight: 500;
     }
 
-    /* Custom Dropdown Periode (Modern, Elegan, Halus) */
     .neraca-custom-dropdown {
       position: relative;
       display: inline-block;
@@ -60,25 +351,27 @@
       display: inline-flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       background: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 9px;
-      padding: 7px 14px;
-      font-size: 13.5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      height: 34px;
+      padding: 0 12px;
+      font-size: 13px;
       font-weight: 600;
       color: #0f172a;
       font-family: 'Outfit', sans-serif;
       cursor: pointer;
       outline: none;
       transition: all 0.15s ease;
-      min-width: 200px;
+      min-width: 190px;
       user-select: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     }
 
     .neraca-dropdown-trigger:hover {
-      border-color: #94a3b8;
-      background-color: #f8fafc;
+      border-color: #0284c7;
+      background-color: #f0f9ff;
     }
 
     .neraca-custom-dropdown.is-open .neraca-dropdown-trigger {
@@ -88,8 +381,8 @@
     }
 
     .neraca-dropdown-arrow {
-      width: 15px;
-      height: 15px;
+      width: 14px;
+      height: 14px;
       color: #64748b;
       transition: transform 0.2s ease, color 0.15s ease;
       flex-shrink: 0;
@@ -103,14 +396,14 @@
     .neraca-dropdown-menu {
       position: absolute;
       top: calc(100% + 6px);
-      left: 0;
-      min-width: 220px;
+      right: 0;
+      min-width: 210px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 10px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12);
       padding: 6px;
-      z-index: 100;
+      z-index: 120;
       opacity: 0;
       visibility: hidden;
       transform: translateY(-6px);
@@ -162,381 +455,444 @@
       opacity: 1;
     }
 
-
-    /* ===== MAIN 3-COLUMN GRID SESUAI MOCKUP GAMBAR ===== */
-    .neraca-main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-
-    /* ===== 3 TOP SUMMARY CARDS (PERSIS MOCKUP) ===== */
-    .neraca-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-top: 3.5px solid #0076C5;
-      border-radius: 12px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .neraca-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
-    }
-
-    .neraca-card-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .neraca-card-label {
-      font-size: 13.5px;
-      color: #64748b;
-      font-weight: 500;
-      letter-spacing: -0.1px;
-    }
-
-    .neraca-card-value {
-      font-size: 24px;
-      font-weight: 800;
-      font-style: italic;
-      color: #0f172a;
-      letter-spacing: -0.4px;
-      line-height: 1.2;
-    }
-
-    .neraca-card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 9px;
-      background: #0076C5;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(0, 118, 197, 0.28);
-    }
-
-    .neraca-card-icon svg {
-      width: 22px;
-      height: 22px;
-      stroke: #ffffff;
-      stroke-width: 2.2;
-      fill: none;
-    }
-
-    /* ===== 2 MAIN CONTENT PANELS (PERSIS MOCKUP) ===== */
-    /* Panel Kiri (Aset) menempati Kolom 1 */
-    .neraca-panel-aset {
-      grid-column: 1 / 2;
-    }
-
-    /* Panel Kanan (Liabilitas & Ekuitas) membentang Kolom 2 & 3 */
-    .neraca-panel-liab {
-      grid-column: 2 / 4;
-    }
-
-    .neraca-panel {
+    /* ===== POPOVER FILTER & DUAL-MONTH CALENDAR ===== */
+    .pnd-filter-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 270px;
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 22px 24px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-      box-sizing: border-box;
-      min-height: 520px;
-    }
-
-    .neraca-panel-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 19px;
-      font-weight: 700;
-      font-style: italic;
-      color: #0f172a;
-      margin: 0 0 14px 0;
-      letter-spacing: -0.2px;
-    }
-
-    .neraca-dashed-divider {
-      border: none;
-      border-top: 1px dashed #cbd5e1;
-      margin: 0 0 18px 0;
-    }
-
-    /* ===== FINANCIAL STATEMENT TABLE (BERSIH & RAPI) ===== */
-    .neraca-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px;
-    }
-
-    /* Category Header Row */
-    .neraca-table tr.category-header-row td {
-      padding: 11px 8px 6px 8px;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #0076C5;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    /* Regular Account Row */
-    .neraca-table tr.account-row td {
-      padding: 9px 8px;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
-    }
-
-    .neraca-table tr.account-row:hover td {
-      background: #f8fafc;
-    }
-
-    .neraca-table td.col-name {
-      font-weight: 500;
-      color: #1e293b;
-    }
-
-    .neraca-table td.col-amount {
-      text-align: right;
-      font-weight: 600;
-      color: #0f172a;
-      white-space: nowrap;
-      width: 160px;
-    }
-
-    .neraca-table td.col-amount.is-negative {
-      color: #dc2626;
-    }
-
-    /* Subtotal Row */
-    .neraca-table tr.subtotal-row td {
-      padding: 10px 8px;
-      font-weight: 700;
-      color: #0f172a;
-      border-top: 1.5px dashed #cbd5e1;
-      border-bottom: 1.5px dashed #cbd5e1;
-      background: #fafbfc;
-    }
-
-    /* Grand Total Row (TOTAL ASET & TOTAL LIABILITAS + EKUITAS) */
-    .neraca-table tr.grandtotal-row td {
-      padding: 13px 10px;
-      font-size: 14.5px;
-      font-weight: 700;
-      color: #0369a1;
-      background: #f0f9ff;
-      border-top: 2px solid #bae6fd;
-      border-bottom: 2px solid #bae6fd;
-    }
-
-    .neraca-table tr.grandtotal-row td.col-amount {
-      color: #0284c7;
-      font-size: 15.5px;
-      font-weight: 800;
-    }
-
-    /* Dokumen Cetak Header & Signatures (Hanya Tampil Saat Print) */
-    .neraca-print-header,
-    .neraca-print-signatures {
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+      padding: 16px;
+      z-index: 200;
       display: none;
     }
 
-    .neraca-cards-row {
-      display: contents;
+    .pnd-filter-popover.is-open {
+      display: block;
     }
 
-    /* Print media style (Format Dokumen Resmi Perusahaan) */
-    @media print {
-      @page {
-        size: A4 portrait;
-        margin: 12mm 15mm 15mm 15mm;
-      }
-
-      body {
-        background: #ffffff !important;
-        color: #0f172a !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-
-      aside,
-      .topbar,
-      .neraca-topbar,
-      .neraca-card-icon {
-        display: none !important;
-      }
-
-      .dashboard-shell {
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      .dashboard-content {
-        padding: 0 !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-      }
-
-      /* Header Laporan Resmi */
-      .neraca-print-header {
-        display: block !important;
-        text-align: center;
-        margin-bottom: 18px;
-        border-bottom: 2px solid #0f172a;
-        padding-bottom: 10px;
-      }
-
-      .neraca-print-company {
-        font-size: 16pt;
-        font-weight: 800;
-        letter-spacing: 0.5px;
-        color: #0f172a;
-        margin: 0;
-      }
-
-      .neraca-print-title {
-        font-size: 13pt;
-        font-weight: 700;
-        color: #1e293b;
-        margin: 3px 0 0 0;
-      }
-
-      .neraca-print-period {
-        font-size: 10pt;
-        font-weight: 600;
-        color: #475569;
-        margin: 3px 0 0 0;
-      }
-
-      .neraca-print-unit {
-        font-size: 8.5pt;
-        font-style: italic;
-        color: #64748b;
-        margin-top: 2px;
-      }
-
-      /* 3 Card Ringkasan saat Cetak */
-      .neraca-main-grid {
-        display: block !important;
-      }
-
-      .neraca-cards-row {
-        display: flex !important;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 18px;
-      }
-
-      .neraca-card {
-        flex: 1;
-        border: 1px solid #cbd5e1 !important;
-        border-top: 3px solid #0076C5 !important;
-        box-shadow: none !important;
-        padding: 10px 14px !important;
-        break-inside: avoid;
-      }
-
-      .neraca-card-label {
-        font-size: 9pt !important;
-      }
-
-      .neraca-card-value {
-        font-size: 13pt !important;
-      }
-
-      /* Panel Laporan saat Cetak */
-      .neraca-panel {
-        box-shadow: none !important;
-        border: 1px solid #cbd5e1 !important;
-        border-radius: 8px !important;
-        padding: 12px 16px !important;
-        margin-bottom: 16px !important;
-        min-height: auto !important;
-        break-inside: avoid;
-        page-break-inside: avoid;
-      }
-
-      .neraca-panel-title {
-        font-size: 12pt !important;
-        margin-bottom: 8px !important;
-      }
-
-      .neraca-dashed-divider {
-        margin-bottom: 10px !important;
-      }
-
-      .neraca-table {
-        font-size: 9.5pt !important;
-      }
-
-      .neraca-table td {
-        padding: 5px 6px !important;
-      }
-
-      .neraca-table tr.category-header-row td {
-        background: #f1f5f9 !important;
-        font-size: 8.5pt !important;
-        padding: 5px 6px !important;
-      }
-
-      .neraca-table tr.grandtotal-row td {
-        background: #e0f2fe !important;
-        font-size: 10.5pt !important;
-      }
-
-      /* Area Tanda Tangan Cetak */
-      .neraca-print-signatures {
-        display: flex !important;
-        justify-content: space-between;
-        margin-top: 26px;
-        padding-top: 10px;
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-
-      .print-sign-box {
-        text-align: center;
-        width: 170px;
-      }
-
-      .print-sign-role {
-        font-size: 9pt;
-        color: #475569;
-        margin-bottom: 50px;
-      }
-
-      .print-sign-name {
-        font-size: 9.5pt;
-        font-weight: 700;
-        color: #0f172a;
-        border-top: 1px solid #0f172a;
-        padding-top: 4px;
-      }
+    .pnd-filter-group {
+      margin-bottom: 12px;
     }
 
-    /* Responsive Breakpoints */
-    @media (max-width: 1080px) {
-      .neraca-main-grid {
-        grid-template-columns: 1fr;
-      }
-      .neraca-panel-aset,
-      .neraca-panel-liab {
-        grid-column: 1 / -1;
-      }
+    .pnd-filter-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
     }
 
-    @media (max-width: 640px) {
-      .dashboard-content {
-        padding: 16px 14px;
-      }
+    .pnd-filter-select {
+      width: 100%;
+      height: 36px;
+      padding: 0 10px;
+      border: 1.5px solid #38bdf8;
+      border-radius: 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      color: #0f172a;
+      background: #ffffff;
+      outline: none;
+    }
+
+    .pnd-filter-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .pnd-filter-btn-reset {
+      height: 32px;
+      padding: 0 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #f8fafc;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .pnd-filter-btn-apply {
+      height: 32px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 7px;
+      background: #0076C5;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Calendar Popover */
+    .pnd-calendar-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 16px 38px rgba(15, 23, 42, 0.14);
+      padding: 16px;
+      z-index: 220;
+      display: none;
+      width: 640px;
+      max-width: 92vw;
+      box-sizing: border-box;
+    }
+
+    .pnd-calendar-popover.is-open {
+      display: block;
+    }
+
+    .pnd-cal-body {
+      display: flex;
+      gap: 16px;
+    }
+
+    .pnd-cal-sidebar {
+      width: 145px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-right: 1px solid #f1f5f9;
+      padding-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .pnd-cal-preset-btn {
+      text-align: left;
+      padding: 7px 10px;
+      border: none;
+      border-radius: 7px;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .pnd-cal-preset-btn:hover,
+    .pnd-cal-preset-btn.is-active {
+      background: #eff6ff;
+      color: #0076C5;
+      font-weight: 600;
+    }
+
+    .pnd-cal-months {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .pnd-cal-month-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .pnd-cal-nav {
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #64748b;
+      user-select: none;
+    }
+
+    .pnd-cal-nav:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .pnd-cal-weekdays,
+    .pnd-cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+    }
+
+    .pnd-cal-weekdays span {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 4px 0;
+    }
+
+    .pnd-cal-day {
+      font-size: 12px;
+      padding: 6px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #334155;
+      user-select: none;
+    }
+
+    .pnd-cal-day:hover:not(.is-empty) {
+      background: #f1f5f9;
+    }
+
+    .pnd-cal-day.is-empty {
+      cursor: default;
+    }
+
+    .pnd-cal-day.is-selected {
+      background: #0076C5 !important;
+      color: #ffffff !important;
+      font-weight: 700;
+    }
+
+    .pnd-cal-day.is-in-range {
+      background: #e0f2fe;
+      color: #0284c7;
+      border-radius: 0;
+    }
+
+    .pnd-cal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .pnd-cal-selected-info {
+      font-size: 12.5px;
+      color: #64748b;
+    }
+
+    .pnd-cal-selected-info span {
+      color: #0f172a;
+      font-weight: 600;
+    }
+
+    .pnd-cal-footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pnd-cal-btn-cancel {
+      height: 32px;
+      padding: 0 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #f8fafc;
+      color: #334155;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .pnd-cal-btn-apply {
+      height: 32px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 7px;
+      background: #0076C5;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ===== STANDARD OPERATIONAL TABLE TEMPLATE (1 TABEL 5 KOLOM: # | ASET | NILAI | LIABILITAS & EKUITAS | NILAI) ===== */
+    .table-wrap {
+      overflow-x: auto;
+      width: 100%;
+      border-radius: 8px;
+      position: relative;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+    }
+
+    .neraca-std-table {
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .neraca-std-table thead th {
+      background-color: #f4f4f5 !important;
+      color: #0f172a !important;
+      font-family: 'Outfit', sans-serif !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      font-style: italic;
+      padding: 12px 16px !important;
+      border-top: 1px solid #e4e4e7 !important;
+      border-bottom: 1px solid #e4e4e7 !important;
+      vertical-align: middle !important;
+      box-sizing: border-box !important;
+      text-align: left;
+    }
+
+    .neraca-std-table thead th:first-child {
+      border-top-left-radius: 8px !important;
+      border-bottom-left-radius: 8px !important;
+      border-left: 1px solid #e4e4e7 !important;
+      border-right: 1px solid #e2e8f0 !important;
+      width: 48px !important;
+      min-width: 48px !important;
+      max-width: 55px !important;
+      text-align: center !important;
+      padding: 12px 8px !important;
+      font-style: normal;
+    }
+
+    .neraca-std-table thead th:nth-child(2) {
+      width: 30%;
+      padding-left: 20px !important;
+    }
+
+    .neraca-std-table thead th:nth-child(3) {
+      width: 17%;
+      text-align: left !important;
+    }
+
+    .neraca-std-table thead th:nth-child(4) {
+      width: 33%;
+      padding-left: 32px !important;
+    }
+
+    .neraca-std-table thead th:last-child {
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+      border-right: 1px solid #e4e4e7 !important;
+      width: 16%;
+      text-align: left !important;
+    }
+
+    .neraca-std-table tbody tr {
+      border-bottom: 1px solid #f1f5f9 !important;
+      transition: background 0.15s ease !important;
+    }
+
+    .neraca-std-table tbody td {
+      padding: 11px 16px !important;
+      vertical-align: middle !important;
+      color: #334155 !important;
+      font-size: 13.5px !important;
+      font-family: 'Outfit', sans-serif !important;
+      border-bottom: 1px solid #f1f5f9 !important;
+      box-sizing: border-box !important;
+    }
+
+    .neraca-std-table tbody td.col-num {
+      text-align: center !important;
+      width: 48px !important;
+      min-width: 48px !important;
+      color: #64748b !important;
+      font-weight: 500 !important;
+      border-right: 1px solid #e2e8f0 !important;
+      padding: 11px 8px !important;
+    }
+
+    .neraca-std-table tbody td.col-aset-name {
+      font-weight: 500 !important;
+      font-style: italic;
+      color: #1e293b !important;
+      padding-left: 20px !important;
+    }
+
+    .neraca-std-table tbody td.col-aset-val {
+      font-weight: 500 !important;
+      font-style: italic;
+      color: #1e293b !important;
+      white-space: nowrap !important;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .neraca-std-table tbody td.col-liab-name {
+      font-weight: 500 !important;
+      font-style: italic;
+      color: #1e293b !important;
+      padding-left: 32px !important;
+    }
+
+    .neraca-std-table tbody td.col-liab-val {
+      font-weight: 500 !important;
+      font-style: italic;
+      color: #1e293b !important;
+      white-space: nowrap !important;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .neraca-std-table tbody tr.account-row:hover td {
+      background-color: #f8fafc !important;
+    }
+
+    /* Baris Total Aset & Total Liabilitas (Sejajar Sesuai Gambar) */
+    .neraca-std-table tbody tr.subtotal-row td {
+      background-color: #f8fafc !important;
+      font-weight: 700 !important;
+      font-style: italic;
+      color: #0f172a !important;
+      border-top: 1.5px dashed #cbd5e1 !important;
+      border-bottom: 1.5px dashed #cbd5e1 !important;
+      padding: 13px 16px !important;
+    }
+
+    .neraca-std-table tbody tr.subtotal-row td.col-num {
+      font-style: normal;
+      padding: 13px 8px !important;
+    }
+
+    .neraca-std-table tbody tr.subtotal-row td.col-aset-name {
+      padding-left: 20px !important;
+    }
+
+    .neraca-std-table tbody tr.subtotal-row td.col-liab-name {
+      padding-left: 32px !important;
+    }
+
+    /* Baris Grand Total (Total liabilitas & ekuitas) */
+    .neraca-std-table tbody tr.grandtotal-row td {
+      background-color: #f0f9ff !important;
+      color: #0f172a !important;
+      font-weight: 700 !important;
+      font-style: italic;
+      font-size: 14px !important;
+      border-top: 1.5px solid #bae6fd !important;
+      border-bottom: 1.5px solid #bae6fd !important;
+      padding: 13px 16px !important;
+    }
+
+    .neraca-std-table tbody tr.grandtotal-row td.col-num {
+      font-style: normal;
+      padding: 13px 8px !important;
+    }
+
+    .neraca-std-table tbody tr.grandtotal-row td.col-liab-name {
+      padding-left: 32px !important;
+      color: #0369a1 !important;
+    }
+
+    .neraca-std-table tbody tr.grandtotal-row td.col-liab-val {
+      color: #0076C5 !important;
+      font-weight: 800 !important;
     }
   </style>
 </head>
@@ -548,303 +904,373 @@
     <header class="topbar"></header>
 
     <main class="dashboard-content">
-      <!-- DOKUMEN CETAK RESMI (HANYA MUNCUL SAAT PRINT) -->
-      <div class="neraca-print-header">
-        <h1 class="neraca-print-company">PT BISA MEDIA GROUP</h1>
-        <h2 class="neraca-print-title">LAPORAN POSISI KEUANGAN (NERACA)</h2>
-        <div class="neraca-print-period" id="printDocPeriod">Per 31 Oktober 2026</div>
-        <div class="neraca-print-unit">(Disajikan dalam Rupiah penuh - IDR)</div>
-      </div>
-
-      <!-- ===== TOPBAR: PILIH PERIODE & AKSI EXCEL / CETAK ===== -->
-      <section class="neraca-topbar">
-        <div class="neraca-period-wrap">
-          <label class="neraca-period-label" for="periodTriggerBtn">Periode:</label>
-          <div class="neraca-custom-dropdown" id="periodCustomDropdown">
-            <button type="button" class="neraca-dropdown-trigger" id="periodTriggerBtn" aria-haspopup="true" aria-expanded="false">
-              <span id="periodSelectedLabel">Per 31 Oktober 2026</span>
-              <svg class="neraca-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </button>
-            <div class="neraca-dropdown-menu" id="periodDropdownMenu" role="menu">
-              <div class="neraca-dropdown-item is-selected" data-value="okt2026" role="menuitem">
-                <span>Per 31 Oktober 2026</span>
-                <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-              <div class="neraca-dropdown-item" data-value="sep2026" role="menuitem">
-                <span>Per 30 September 2026</span>
-                <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-              <div class="neraca-dropdown-item" data-value="agu2026" role="menuitem">
-                <span>Per 31 Agustus 2026</span>
-                <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-              <div class="neraca-dropdown-item" data-value="des2025" role="menuitem">
-                <span>Per 31 Desember 2025</span>
-                <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-            </div>
-            <input type="hidden" id="periodSelector" value="okt2026" />
+      <!-- ===== 4 SUMMARY KPI CARDS NERACA (KONSISTEN OPERASIONAL) ===== -->
+      <section class="pnd-summary-cards" aria-label="Ringkasan Posisi Keuangan Neraca">
+        <!-- Card 1: Total Aset (Biru) -->
+        <div class="pnd-card pnd-card--aset">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Total Aset</span>
+            <span class="pnd-card-value" id="cardTotalAset">Rp. -</span>
+          </div>
+          <div class="pnd-card-icon icon-aset" title="Total Aset">
+            <svg viewBox="0 0 24 24">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
           </div>
         </div>
 
+        <!-- Card 2: Total Liabilitas (Merah) -->
+        <div class="pnd-card pnd-card--liabilitas">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Total Liabilitas</span>
+            <span class="pnd-card-value" id="cardTotalLiabilitas">Rp. -</span>
+          </div>
+          <div class="pnd-card-icon icon-liabilitas" title="Total Liabilitas">
+            <svg viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+        </div>
 
+        <!-- Card 3: Total Ekuitas (Hijau) -->
+        <div class="pnd-card pnd-card--ekuitas">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Ekuitas &amp; Modal</span>
+            <span class="pnd-card-value" id="cardEkuitasModal">Rp. -</span>
+          </div>
+          <div class="pnd-card-icon icon-ekuitas" title="Ekuitas & Modal">
+            <svg viewBox="0 0 24 24">
+              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Total Liabilitas & Ekuitas (Amber) -->
+        <div class="pnd-card pnd-card--total-pasiva">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Total Liabilitas &amp; Ekuitas</span>
+            <span class="pnd-card-value" id="cardTotalLiabEkuitas">Rp. -</span>
+          </div>
+          <div class="pnd-card-icon icon-pasiva" title="Total Liabilitas & Ekuitas">
+            <svg viewBox="0 0 24 24">
+              <rect x="2" y="6" width="20" height="13" rx="2"></rect>
+              <path d="M16 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"></path>
+              <path d="M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </div>
+        </div>
       </section>
 
-      <!-- ===== MAIN GRID: 3 CARDS ATAS & 2 PANELS BAWAH (SESUAI GAMBAR) ===== -->
-      <div class="neraca-main-grid">
-        <div class="neraca-cards-row">
-          <!-- Card 1: Total Aset -->
-          <div class="neraca-card">
-            <div class="neraca-card-info">
-              <span class="neraca-card-label">Total Aset</span>
-              <span class="neraca-card-value" id="cardTotalAset">Rp. -</span>
+      <!-- ===== MAIN PANEL NERACA (TEMPLATE TABEL KONSISTEN OPERASIONAL) ===== -->
+      <section class="panel campaign-panel">
+        <div class="campaign-panel__line pnd-panel-line"></div>
+
+        <!-- Toolbar Konsisten: Filter, Kalender, Export Excel, Search, & Periode -->
+        <div class="pnd-toolbar">
+          <div class="pnd-toolbar__left">
+            <!-- 1. Filter Popover Button -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnFilterNeraca" class="pnd-btn-icon" type="button" aria-label="Filter Neraca" title="Filter Komponen Neraca">
+                <svg viewBox="0 0 24 24">
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+                </svg>
+              </button>
+
+              <div id="filterNeracaDropdown" class="pnd-filter-popover">
+                <div class="pnd-filter-group">
+                  <label class="pnd-filter-label" for="filterKategoriNeraca">Tampilkan Kelompok</label>
+                  <select id="filterKategoriNeraca" class="pnd-filter-select">
+                    <option value="all">Semua (Aset &amp; Liabilitas + Ekuitas)</option>
+                    <option value="aset">Hanya Aset</option>
+                    <option value="liabilitas_ekuitas">Hanya Liabilitas &amp; Ekuitas</option>
+                  </select>
+                </div>
+
+                <div class="pnd-filter-actions">
+                  <button type="button" id="resetFilterNeraca" class="pnd-filter-btn-reset"><em>Riset</em></button>
+                  <button type="button" id="applyFilterNeraca" class="pnd-filter-btn-apply"><em>Terapkan</em></button>
+                </div>
+              </div>
             </div>
-            <div class="neraca-card-icon" title="Total Aset">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+
+            <!-- 2. Kalender Dual-Month Popover Button -->
+            <div class="filter-dropdown-wrapper">
+              <button id="btnCalendarNeraca" class="pnd-btn-icon" type="button" aria-label="Pilih Tanggal" title="Filter Berdasarkan Periode Tanggal">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </button>
+
+              <div id="calendarNeracaDropdown" class="pnd-calendar-popover">
+                <div class="pnd-cal-body">
+                  <div class="pnd-cal-sidebar">
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="today">Hari ini</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="yesterday">Kemarin</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last7">7 hari terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last30">30 hari terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last3m">3 bulan terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last6m">6 bulan terakhir</button>
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last1y">1 tahun terakhir</button>
+                  </div>
+                  <div class="pnd-cal-months">
+                    <div class="pnd-cal-month">
+                      <div class="pnd-cal-month-header">
+                        <span class="pnd-cal-nav" id="nrCalPrevYear" title="Tahun Sebelumnya">&laquo;</span>
+                        <span class="pnd-cal-nav" id="nrCalPrevMonth" title="Bulan Sebelumnya">&lsaquo;</span>
+                        <span class="pnd-cal-month-title" id="nrCalTitleLeft">2026 - 10</span>
+                        <span></span>
+                      </div>
+                      <div class="pnd-cal-weekdays">
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                      </div>
+                      <div class="pnd-cal-days-grid" id="nrCalGridLeft"></div>
+                    </div>
+                    <div class="pnd-cal-month">
+                      <div class="pnd-cal-month-header">
+                        <span></span>
+                        <span class="pnd-cal-month-title" id="nrCalTitleRight">2026 - 11</span>
+                        <span class="pnd-cal-nav" id="nrCalNextMonth" title="Bulan Berikutnya">&rsaquo;</span>
+                        <span class="pnd-cal-nav" id="nrCalNextYear" title="Tahun Berikutnya">&raquo;</span>
+                      </div>
+                      <div class="pnd-cal-weekdays">
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+                      </div>
+                      <div class="pnd-cal-days-grid" id="nrCalGridRight"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="pnd-cal-footer">
+                  <div class="pnd-cal-selected-info">
+                    Dipilih: <span id="nrCalSelectedText">Semua Periode</span>
+                  </div>
+                  <div class="pnd-cal-footer-actions">
+                    <button type="button" id="btnCancelCalendarNeraca" class="pnd-cal-btn-cancel">Batal</button>
+                    <button type="button" id="btnApplyCalendarNeraca" class="pnd-cal-btn-apply">Terapkan</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Export Excel Button -->
+            <button id="btnExportNeraca" class="pnd-btn-icon pnd-btn-excel" type="button" aria-label="Export Excel" title="Export Neraca ke Excel (.xlsx)">
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
+            </button>
+
+            <!-- 4. Search Input -->
+            <div class="pnd-search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="neracaSearchInput" placeholder="Cari akun neraca..." autocomplete="off" />
             </div>
           </div>
 
-          <!-- Card 2: Total Liabilitas -->
-          <div class="neraca-card">
-            <div class="neraca-card-info">
-              <span class="neraca-card-label">Total Liabilitas</span>
-              <span class="neraca-card-value" id="cardTotalLiabilitas">Rp. -</span>
-            </div>
-            <div class="neraca-card-icon" title="Total Liabilitas">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            </div>
-          </div>
-
-          <!-- Card 3: Ekuitas & Modal -->
-          <div class="neraca-card">
-            <div class="neraca-card-info">
-              <span class="neraca-card-label">Ekuitas &amp; Modal</span>
-              <span class="neraca-card-value" id="cardEkuitasModal">Rp. -</span>
-            </div>
-            <div class="neraca-card-icon" title="Ekuitas & Modal">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-              </svg>
+          <!-- Kanan Toolbar: Pilihan Periode -->
+          <div class="pnd-toolbar__right">
+            <div class="neraca-period-wrap">
+              <label class="neraca-period-label" for="periodTriggerBtn">Periode:</label>
+              <div class="neraca-custom-dropdown" id="periodCustomDropdown">
+                <button type="button" class="neraca-dropdown-trigger" id="periodTriggerBtn" aria-haspopup="true" aria-expanded="false">
+                  <span id="periodSelectedLabel">Per 31 Oktober 2026</span>
+                  <svg class="neraca-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="neraca-dropdown-menu" id="periodDropdownMenu" role="menu">
+                  <div class="neraca-dropdown-item is-selected" data-value="okt2026" role="menuitem">
+                    <span>Per 31 Oktober 2026</span>
+                    <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div class="neraca-dropdown-item" data-value="sep2026" role="menuitem">
+                    <span>Per 30 September 2026</span>
+                    <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div class="neraca-dropdown-item" data-value="agu2026" role="menuitem">
+                    <span>Per 31 Agustus 2026</span>
+                    <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                  <div class="neraca-dropdown-item" data-value="des2025" role="menuitem">
+                    <span>Per 31 Desember 2025</span>
+                    <svg class="neraca-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </div>
+                </div>
+                <input type="hidden" id="periodSelector" value="okt2026" />
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- PANEL KIRI: ASET (KOLOM 1) -->
-        <section class="neraca-panel neraca-panel-aset">
-          <h2 class="neraca-panel-title"><em>Aset</em></h2>
-          <div class="neraca-dashed-divider"></div>
-
-          <table class="neraca-table">
-            <tbody id="tbodyAset">
-              <!-- Render dinamis -->
+        <!-- ===== 1 TABEL NERACA 5 KOLOM (# | ASET | NILAI | LIABILITAS & EKUITAS | NILAI - 1 LEMBAR PENUH) ===== -->
+        <div class="table-wrap" id="wrapTableNeraca">
+          <table class="neraca-std-table no-pagination" id="tableNeraca">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Aset</th>
+                <th>Nilai</th>
+                <th>Liabilitas &amp; Ekuitas</th>
+                <th>Nilai</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyNeraca">
+              <!-- Render dinamis 100% sesuai gambar -->
             </tbody>
           </table>
-        </section>
-
-        <!-- PANEL KANAN: LIABILITAS & EKUITAS (MEMBENTANG KOLOM 2 & 3) -->
-        <section class="neraca-panel neraca-panel-liab">
-          <h2 class="neraca-panel-title"><em>Liabilitas &amp; Ekuitas</em></h2>
-          <div class="neraca-dashed-divider"></div>
-
-          <table class="neraca-table">
-            <tbody id="tbodyLiabilitasEkuitas">
-              <!-- Render dinamis -->
-            </tbody>
-          </table>
-        </section>
-      </div>
-
-      <!-- AREA TANDA TANGAN RESMI (HANYA MUNCUL SAAT PRINT) -->
-      <div class="neraca-print-signatures">
-        <div class="print-sign-box">
-          <div class="print-sign-role">Dibuat Oleh:</div>
-          <div class="print-sign-name">Staf Akuntansi</div>
         </div>
-        <div class="print-sign-box">
-          <div class="print-sign-role">Diperiksa Oleh:</div>
-          <div class="print-sign-name">Supervisor Keuangan</div>
-        </div>
-        <div class="print-sign-box">
-          <div class="print-sign-role" id="printSignDate">Jakarta, 31 Oktober 2026<br>Disetujui Oleh:</div>
-          <div class="print-sign-name">Direktur Utama / CFO</div>
-        </div>
-      </div>
+      </section>
     </main>
   </div>
 
   <!-- Main Layout Script -->
-  <script src="../../assets/js/layout.js?v=20261118_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
 
-  <!-- Script Logika Neraca Keuangan Sederhana & Sesuai Gambar -->
+  <!-- Script Logika Neraca Keuangan Sesuai Gambar & Konsisten Template -->
   <script>
     (function () {
       'use strict';
 
-      /* ===== DATASET PERIODIK NERACA ===== */
+      /* ===== DATASET PERIODIK NERACA (ISI PERSIS SESUAI GAMBAR SPESIFIKASI) ===== */
       const NERACA_DATA = {
         okt2026: {
-          asetLancar: [
-            { name: 'Kas & Setara Kas (BCA, Seabank, BNI, Kas Kecil)', amount: 1840000000 },
-            { name: 'Piutang Usaha', amount: 1450000000 },
-            { name: 'Piutang Karyawan', amount: 45000000 },
-            { name: 'Biaya Sewa & Server Dibayar di Muka', amount: 165000000 },
-            { name: 'Perlengkapan Kantor & Operasional', amount: 80000000 }
+          aset: [
+            { name: 'Kas & Bank', amount: null },
+            { name: 'Piutang usaha', amount: null },
+            { name: 'Piutang karyawan', amount: null },
+            { name: 'Aset tetap (neto)', amount: null },
+            { name: 'Aset lain (saldo awal)', amount: null }
           ],
-          asetTetap: [
-            { name: 'Peralatan Komputer & Server', amount: 1250000000 },
-            { name: 'Peralatan Studio & Kamera', amount: 900000000 },
-            { name: 'Kendaraan Operasional', amount: 1680000000 },
-            { name: 'Hak Cipta & Aset Digital (Software License)', amount: 1520000000 },
-            { name: 'Akumulasi Penyusutan Aset Tetap', amount: -480000000, isContra: true }
-          ],
-          liabilitasLancar: [
-            { name: 'Utang Usaha (Vendor & KOL Partner)', amount: 620000000 },
-            { name: 'Utang Gaji & Beban Karyawan', amount: 290000000 },
-            { name: 'Utang Pajak (PPh 21, PPh 23, PPN)', amount: 185000000 },
-            { name: 'Beban Akrual Masih Harus Dibayar', amount: 125000000 }
-          ],
-          liabilitasPanjang: [
-            { name: 'Utang Bank Jangka Panjang (Kredit Investasi)', amount: 900000000 }
+          liabilitas: [
+            { name: 'Utang vendor & reimbursement', amount: null },
+            { name: 'Payroll belum tercatat dibayar', amount: null },
+            { name: 'PPN / pajak terisi', amount: null },
+            { name: 'Potongan payroll belum dialokasikan', amount: null },
+            { name: 'Liabilitas lain (saldo awal)', amount: null }
           ],
           ekuitas: [
-            { name: 'Modal Disetor Pemilik Saham', amount: 4000000000 },
-            { name: 'Tambahan Modal Disetor (Agio Saham)', amount: 500000000 },
-            { name: 'Laba Ditahan (Retained Earnings)', amount: 1180300000 },
-            { name: 'Laba Bersih Tahun Berjalan', amount: 649700000 }
+            { name: 'Modal awal', amount: null },
+            { name: 'Laba ditahan awal', amount: null },
+            { name: 'Laba sejak awal pembukuan', amount: null },
+            { name: 'Setoran / penarikan modal', amount: null },
+            { name: 'Saldo pinjaman pendanaan', amount: null }
           ]
         },
         sep2026: {
-          asetLancar: [
-            { name: 'Kas & Setara Kas', amount: 1690000000 },
-            { name: 'Piutang Usaha', amount: 1380000000 },
-            { name: 'Piutang Karyawan', amount: 42000000 },
-            { name: 'Biaya Dibayar di Muka', amount: 175000000 },
-            { name: 'Perlengkapan Kantor', amount: 75000000 }
+          aset: [
+            { name: 'Kas & Bank', amount: null },
+            { name: 'Piutang usaha', amount: null },
+            { name: 'Piutang karyawan', amount: null },
+            { name: 'Aset tetap (neto)', amount: null },
+            { name: 'Aset lain (saldo awal)', amount: null }
           ],
-          asetTetap: [
-            { name: 'Peralatan Komputer & Server', amount: 1250000000 },
-            { name: 'Peralatan Studio & Kamera', amount: 900000000 },
-            { name: 'Kendaraan Operasional', amount: 1680000000 },
-            { name: 'Hak Cipta & Aset Digital', amount: 1520000000 },
-            { name: 'Akumulasi Penyusutan', amount: -360000000, isContra: true }
-          ],
-          liabilitasLancar: [
-            { name: 'Utang Usaha', amount: 580000000 },
-            { name: 'Utang Gaji & Payroll', amount: 275000000 },
-            { name: 'Utang Pajak', amount: 167400000 },
-            { name: 'Beban Akrual', amount: 110000000 }
-          ],
-          liabilitasPanjang: [
-            { name: 'Utang Bank Jangka Panjang', amount: 950000000 }
+          liabilitas: [
+            { name: 'Utang vendor & reimbursement', amount: null },
+            { name: 'Payroll belum tercatat dibayar', amount: null },
+            { name: 'PPN / pajak terisi', amount: null },
+            { name: 'Potongan payroll belum dialokasikan', amount: null },
+            { name: 'Liabilitas lain (saldo awal)', amount: null }
           ],
           ekuitas: [
-            { name: 'Modal Disetor', amount: 4000000000 },
-            { name: 'Tambahan Modal Disetor', amount: 500000000 },
-            { name: 'Laba Ditahan', amount: 1300000000 },
-            { name: 'Laba Bersih Tahun Berjalan', amount: 469600000 }
+            { name: 'Modal awal', amount: null },
+            { name: 'Laba ditahan awal', amount: null },
+            { name: 'Laba sejak awal pembukuan', amount: null },
+            { name: 'Setoran / penarikan modal', amount: null },
+            { name: 'Saldo pinjaman pendanaan', amount: null }
           ]
         },
         agu2026: {
-          asetLancar: [
-            { name: 'Kas & Setara Kas', amount: 1562000000 },
-            { name: 'Piutang Usaha', amount: 1290000000 },
-            { name: 'Piutang Karyawan', amount: 38000000 },
-            { name: 'Biaya Dibayar di Muka', amount: 185000000 },
-            { name: 'Perlengkapan Kantor', amount: 70000000 }
+          aset: [
+            { name: 'Kas & Bank', amount: null },
+            { name: 'Piutang usaha', amount: null },
+            { name: 'Piutang karyawan', amount: null },
+            { name: 'Aset tetap (neto)', amount: null },
+            { name: 'Aset lain (saldo awal)', amount: null }
           ],
-          asetTetap: [
-            { name: 'Peralatan Komputer & Server', amount: 1250000000 },
-            { name: 'Peralatan Studio & Kamera', amount: 900000000 },
-            { name: 'Kendaraan Operasional', amount: 1680000000 },
-            { name: 'Hak Cipta & Aset Digital', amount: 1520000000 },
-            { name: 'Akumulasi Penyusutan', amount: -240000000, isContra: true }
-          ],
-          liabilitasLancar: [
-            { name: 'Utang Usaha', amount: 540000000 },
-            { name: 'Utang Gaji', amount: 260000000 },
-            { name: 'Utang Pajak', amount: 155000000 },
-            { name: 'Beban Akrual', amount: 100000000 }
-          ],
-          liabilitasPanjang: [
-            { name: 'Utang Bank Jangka Panjang', amount: 1000000000 }
+          liabilitas: [
+            { name: 'Utang vendor & reimbursement', amount: null },
+            { name: 'Payroll belum tercatat dibayar', amount: null },
+            { name: 'PPN / pajak terisi', amount: null },
+            { name: 'Potongan payroll belum dialokasikan', amount: null },
+            { name: 'Liabilitas lain (saldo awal)', amount: null }
           ],
           ekuitas: [
-            { name: 'Modal Disetor', amount: 4000000000 },
-            { name: 'Tambahan Modal Disetor', amount: 500000000 },
-            { name: 'Laba Ditahan', amount: 1420000000 },
-            { name: 'Laba Bersih Tahun Berjalan', amount: 270000000 }
+            { name: 'Modal awal', amount: null },
+            { name: 'Laba ditahan awal', amount: null },
+            { name: 'Laba sejak awal pembukuan', amount: null },
+            { name: 'Setoran / penarikan modal', amount: null },
+            { name: 'Saldo pinjaman pendanaan', amount: null }
           ]
         },
         des2025: {
-          asetLancar: [
-            { name: 'Kas & Setara Kas', amount: 1288000000 },
-            { name: 'Piutang Usaha', amount: 980000000 },
-            { name: 'Piutang Karyawan', amount: 25000000 },
-            { name: 'Biaya Dibayar di Muka', amount: 120000000 },
-            { name: 'Perlengkapan Kantor', amount: 55000000 }
+          aset: [
+            { name: 'Kas & Bank', amount: null },
+            { name: 'Piutang usaha', amount: null },
+            { name: 'Piutang karyawan', amount: null },
+            { name: 'Aset tetap (neto)', amount: null },
+            { name: 'Aset lain (saldo awal)', amount: null }
           ],
-          asetTetap: [
-            { name: 'Peralatan Komputer & Server', amount: 980000000 },
-            { name: 'Peralatan Studio & Kamera', amount: 650000000 },
-            { name: 'Kendaraan Operasional', amount: 1200000000 },
-            { name: 'Hak Cipta & Aset Digital', amount: 1200000000 },
-            { name: 'Akumulasi Penyusutan', amount: -280000000, isContra: true }
-          ],
-          liabilitasLancar: [
-            { name: 'Utang Usaha', amount: 420000000 },
-            { name: 'Utang Gaji', amount: 210000000 },
-            { name: 'Utang Pajak', amount: 118000000 },
-            { name: 'Beban Akrual', amount: 80000000 }
-          ],
-          liabilitasPanjang: [
-            { name: 'Utang Bank Jangka Panjang', amount: 850000000 }
+          liabilitas: [
+            { name: 'Utang vendor & reimbursement', amount: null },
+            { name: 'Payroll belum tercatat dibayar', amount: null },
+            { name: 'PPN / pajak terisi', amount: null },
+            { name: 'Potongan payroll belum dialokasikan', amount: null },
+            { name: 'Liabilitas lain (saldo awal)', amount: null }
           ],
           ekuitas: [
-            { name: 'Modal Disetor', amount: 3500000000 },
-            { name: 'Tambahan Modal Disetor', amount: 300000000 },
-            { name: 'Laba Ditahan', amount: 740000000 },
-            { name: 'Laba Bersih Tahun Berjalan', amount: 0 }
+            { name: 'Modal awal', amount: null },
+            { name: 'Laba ditahan awal', amount: null },
+            { name: 'Laba sejak awal pembukuan', amount: null },
+            { name: 'Setoran / penarikan modal', amount: null },
+            { name: 'Saldo pinjaman pendanaan', amount: null }
           ]
         }
       };
 
       /* ===== DOM ELEMENTS ===== */
       const periodSelector = document.getElementById('periodSelector');
+      const searchInput = document.getElementById('neracaSearchInput');
 
-      // Top 3 Cards
+      // Top 4 Cards
       const cardTotalAset = document.getElementById('cardTotalAset');
       const cardTotalLiabilitas = document.getElementById('cardTotalLiabilitas');
       const cardEkuitasModal = document.getElementById('cardEkuitasModal');
+      const cardTotalLiabEkuitas = document.getElementById('cardTotalLiabEkuitas');
 
-      // Table Bodies
-      const tbodyAset = document.getElementById('tbodyAset');
-      const tbodyLiabilitasEkuitas = document.getElementById('tbodyLiabilitasEkuitas');
+      // Unified Table Body
+      const tbodyNeraca = document.getElementById('tbodyNeraca');
+
+      let activeCategoryFilter = 'all';
 
       /* ===== HELPER FUNCTIONS ===== */
       function formatRupiah(num) {
-        if (num === null || num === undefined || isNaN(num)) return 'Rp. -';
-        const isNeg = num < 0;
-        const absVal = Math.abs(Math.round(num));
+        if (num === null || num === undefined || num === '' || isNaN(num)) return 'Rp. -';
+        const n = Number(num);
+        if (n === 0) return 'Rp. -';
+        const isNeg = n < 0;
+        const absVal = Math.abs(Math.round(n));
         const formatted = absVal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         return isNeg ? '(Rp. ' + formatted + ')' : 'Rp. ' + formatted;
       }
@@ -859,115 +1285,319 @@
           .replace(/'/g, '&#39;');
       }
 
-      /* ===== RENDER NERACA ===== */
+      /* ===== RENDER NERACA (1 TABEL 4 KOLOM PERSIS GAMBAR) ===== */
       function renderNeraca() {
         const periodKey = periodSelector ? periodSelector.value : 'okt2026';
         const data = NERACA_DATA[periodKey] || NERACA_DATA.okt2026;
+        const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
 
-        // Subtotals Aset
-        const sumAsetLancar = data.asetLancar.reduce((acc, cur) => acc + cur.amount, 0);
-        const sumAsetTetap = data.asetTetap.reduce((acc, cur) => acc + cur.amount, 0);
-        const totalAset = sumAsetLancar + sumAsetTetap;
+        // Filter items by search query & category filter
+        const showAset = activeCategoryFilter === 'all' || activeCategoryFilter === 'aset';
+        const showPasiva = activeCategoryFilter === 'all' || activeCategoryFilter === 'liabilitas_ekuitas';
 
-        // Subtotals Liabilitas & Ekuitas
-        const sumLiabLancar = data.liabilitasLancar.reduce((acc, cur) => acc + cur.amount, 0);
-        const sumLiabPanjang = data.liabilitasPanjang.reduce((acc, cur) => acc + cur.amount, 0);
-        const totalLiabilitas = sumLiabLancar + sumLiabPanjang;
+        const filteredAset = showAset
+          ? data.aset.filter(item => !query || item.name.toLowerCase().includes(query))
+          : [];
+        const filteredLiab = showPasiva
+          ? data.liabilitas.filter(item => !query || item.name.toLowerCase().includes(query))
+          : [];
+        const filteredEkuitas = showPasiva
+          ? data.ekuitas.filter(item => !query || item.name.toLowerCase().includes(query))
+          : [];
 
-        const sumEkuitas = data.ekuitas.reduce((acc, cur) => acc + cur.amount, 0);
-        const totalLiabEkuitas = totalLiabilitas + sumEkuitas;
+        // Calculate Totals (null if all items are null)
+        const hasAsetVal = data.aset.some(cur => typeof cur.amount === 'number');
+        const totalAset = hasAsetVal ? data.aset.reduce((acc, cur) => acc + (Number(cur.amount) || 0), 0) : null;
 
-        // Update 3 Cards Atas
+        const hasLiabVal = data.liabilitas.some(cur => typeof cur.amount === 'number');
+        const totalLiabilitas = hasLiabVal ? data.liabilitas.reduce((acc, cur) => acc + (Number(cur.amount) || 0), 0) : null;
+
+        const hasEkuitasVal = data.ekuitas.some(cur => typeof cur.amount === 'number');
+        const sumEkuitas = hasEkuitasVal ? data.ekuitas.reduce((acc, cur) => acc + (Number(cur.amount) || 0), 0) : null;
+
+        const totalLiabEkuitas = (hasLiabVal || hasEkuitasVal)
+          ? ((totalLiabilitas || 0) + (sumEkuitas || 0))
+          : null;
+
+        // Update 4 Cards Atas
         if (cardTotalAset) cardTotalAset.textContent = formatRupiah(totalAset);
         if (cardTotalLiabilitas) cardTotalLiabilitas.textContent = formatRupiah(totalLiabilitas);
         if (cardEkuitasModal) cardEkuitasModal.textContent = formatRupiah(sumEkuitas);
+        if (cardTotalLiabEkuitas) cardTotalLiabEkuitas.textContent = formatRupiah(totalLiabEkuitas);
 
-        // Render Panel Kiri (Aset)
-        let htmlAset = '';
-        htmlAset += '<tr class="category-header-row"><td colspan="2">Aset Lancar</td></tr>';
-        data.asetLancar.forEach(item => {
-          htmlAset += '<tr class="account-row">' +
-            '<td class="col-name">' + escapeHtml(item.name) + '</td>' +
-            '<td class="col-amount">' + formatRupiah(item.amount) + '</td>' +
+        let html = '';
+        let rowNum = 1;
+
+        // Bagian 1: Baris Aset (Kiri) berpasangan sejajar dengan Baris Liabilitas (Kanan)
+        const topRowsCount = Math.max(filteredAset.length, filteredLiab.length);
+        for (let i = 0; i < topRowsCount; i++) {
+          const asetItem = filteredAset[i] || null;
+          const liabItem = filteredLiab[i] || null;
+
+          html += '<tr class="account-row">' +
+            '<td class="col-num">' + (rowNum++) + '</td>' +
+            '<td class="col-aset-name">' + (asetItem ? escapeHtml(asetItem.name) : '') + '</td>' +
+            '<td class="col-aset-val">' + (asetItem ? formatRupiah(asetItem.amount) : '') + '</td>' +
+            '<td class="col-liab-name">' + (liabItem ? escapeHtml(liabItem.name) : '') + '</td>' +
+            '<td class="col-liab-val">' + (liabItem ? formatRupiah(liabItem.amount) : '') + '</td>' +
             '</tr>';
-        });
-        htmlAset += '<tr class="subtotal-row">' +
-          '<td class="col-name">Total Aset Lancar</td>' +
-          '<td class="col-amount">' + formatRupiah(sumAsetLancar) + '</td>' +
+        }
+
+        // Bagian 2: Baris Subtotal Sejajar (Total aset di Kiri | Total liabilitas di Kanan)
+        html += '<tr class="subtotal-row">' +
+          '<td class="col-num">' + (rowNum++) + '</td>' +
+          '<td class="col-aset-name">' + (showAset ? 'Total aset' : '') + '</td>' +
+          '<td class="col-aset-val">' + (showAset ? formatRupiah(totalAset) : '') + '</td>' +
+          '<td class="col-liab-name">' + (showPasiva ? 'Total liabilitas' : '') + '</td>' +
+          '<td class="col-liab-val">' + (showPasiva ? formatRupiah(totalLiabilitas) : '') + '</td>' +
           '</tr>';
 
-        htmlAset += '<tr class="category-header-row"><td colspan="2">Aset Tetap</td></tr>';
-        data.asetTetap.forEach(item => {
-          const isNeg = item.amount < 0;
-          htmlAset += '<tr class="account-row">' +
-            '<td class="col-name">' + escapeHtml(item.name) + '</td>' +
-            '<td class="col-amount' + (isNeg ? ' is-negative' : '') + '">' + formatRupiah(item.amount) + '</td>' +
+        // Bagian 3: Baris Ekuitas (Kiri kosong | Kanan: Modal awal s/d Saldo pinjaman pendanaan)
+        if (showPasiva) {
+          filteredEkuitas.forEach(item => {
+            html += '<tr class="account-row">' +
+              '<td class="col-num">' + (rowNum++) + '</td>' +
+              '<td class="col-aset-name"></td>' +
+              '<td class="col-aset-val"></td>' +
+              '<td class="col-liab-name">' + escapeHtml(item.name) + '</td>' +
+              '<td class="col-liab-val">' + formatRupiah(item.amount) + '</td>' +
+              '</tr>';
+          });
+
+          // Bagian 4: Baris Grand Total (Kiri kosong | Kanan: Total liabilitas & ekuitas)
+          html += '<tr class="grandtotal-row">' +
+            '<td class="col-num">' + (rowNum++) + '</td>' +
+            '<td class="col-aset-name"></td>' +
+            '<td class="col-aset-val"></td>' +
+            '<td class="col-liab-name">Total liabilitas &amp; ekuitas</td>' +
+            '<td class="col-liab-val">' + formatRupiah(totalLiabEkuitas) + '</td>' +
             '</tr>';
-        });
-        htmlAset += '<tr class="subtotal-row">' +
-          '<td class="col-name">Total Aset Tetap</td>' +
-          '<td class="col-amount">' + formatRupiah(sumAsetTetap) + '</td>' +
-          '</tr>';
+        }
 
-        htmlAset += '<tr class="grandtotal-row">' +
-          '<td class="col-name">TOTAL ASET</td>' +
-          '<td class="col-amount">' + formatRupiah(totalAset) + '</td>' +
-          '</tr>';
-
-        if (tbodyAset) tbodyAset.innerHTML = htmlAset;
-
-        // Render Panel Kanan (Liabilitas & Ekuitas)
-        let htmlLiab = '';
-        htmlLiab += '<tr class="category-header-row"><td colspan="2">Liabilitas Jangka Pendek</td></tr>';
-        data.liabilitasLancar.forEach(item => {
-          htmlLiab += '<tr class="account-row">' +
-            '<td class="col-name">' + escapeHtml(item.name) + '</td>' +
-            '<td class="col-amount">' + formatRupiah(item.amount) + '</td>' +
-            '</tr>';
-        });
-        htmlLiab += '<tr class="subtotal-row">' +
-          '<td class="col-name">Total Liabilitas Jangka Pendek</td>' +
-          '<td class="col-amount">' + formatRupiah(sumLiabLancar) + '</td>' +
-          '</tr>';
-
-        htmlLiab += '<tr class="category-header-row"><td colspan="2">Liabilitas Jangka Panjang</td></tr>';
-        data.liabilitasPanjang.forEach(item => {
-          htmlLiab += '<tr class="account-row">' +
-            '<td class="col-name">' + escapeHtml(item.name) + '</td>' +
-            '<td class="col-amount">' + formatRupiah(item.amount) + '</td>' +
-            '</tr>';
-        });
-        htmlLiab += '<tr class="subtotal-row">' +
-          '<td class="col-name">Total Liabilitas Jangka Panjang</td>' +
-          '<td class="col-amount">' + formatRupiah(sumLiabPanjang) + '</td>' +
-          '</tr>';
-
-        htmlLiab += '<tr class="subtotal-row" style="background: #f1f5f9;">' +
-          '<td class="col-name">Total Liabilitas</td>' +
-          '<td class="col-amount">' + formatRupiah(totalLiabilitas) + '</td>' +
-          '</tr>';
-
-        htmlLiab += '<tr class="category-header-row"><td colspan="2">Ekuitas &amp; Modal</td></tr>';
-        data.ekuitas.forEach(item => {
-          htmlLiab += '<tr class="account-row">' +
-            '<td class="col-name">' + escapeHtml(item.name) + '</td>' +
-            '<td class="col-amount">' + formatRupiah(item.amount) + '</td>' +
-            '</tr>';
-        });
-        htmlLiab += '<tr class="subtotal-row">' +
-          '<td class="col-name">Total Ekuitas &amp; Modal</td>' +
-          '<td class="col-amount">' + formatRupiah(sumEkuitas) + '</td>' +
-          '</tr>';
-
-        htmlLiab += '<tr class="grandtotal-row">' +
-          '<td class="col-name">TOTAL LIABILITAS &amp; EKUITAS</td>' +
-          '<td class="col-amount">' + formatRupiah(totalLiabEkuitas) + '</td>' +
-          '</tr>';
-
-        if (tbodyLiabilitasEkuitas) tbodyLiabilitasEkuitas.innerHTML = htmlLiab;
+        if (tbodyNeraca) tbodyNeraca.innerHTML = html;
       }
 
-      /* ===== EVENT LISTENERS: CUSTOM DROPDOWN PERIODE (MODERN & HALUS) ===== */
+      /* ===== SEARCH LISTENER ===== */
+      if (searchInput) {
+        searchInput.addEventListener('input', function () {
+          renderNeraca();
+        });
+      }
+
+      /* ===== FILTER POPOVER ===== */
+      const btnFilterNeraca = document.getElementById('btnFilterNeraca');
+      const filterNeracaDropdown = document.getElementById('filterNeracaDropdown');
+      const filterKategoriNeraca = document.getElementById('filterKategoriNeraca');
+      const resetFilterNeraca = document.getElementById('resetFilterNeraca');
+      const applyFilterNeraca = document.getElementById('applyFilterNeraca');
+
+      if (btnFilterNeraca && filterNeracaDropdown) {
+        btnFilterNeraca.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (calendarNeracaDropdown) calendarNeracaDropdown.classList.remove('is-open');
+          filterNeracaDropdown.classList.toggle('is-open');
+        });
+
+        if (applyFilterNeraca) {
+          applyFilterNeraca.addEventListener('click', function () {
+            activeCategoryFilter = filterKategoriNeraca ? filterKategoriNeraca.value : 'all';
+            btnFilterNeraca.classList.toggle('has-filter', activeCategoryFilter !== 'all');
+            filterNeracaDropdown.classList.remove('is-open');
+            renderNeraca();
+          });
+        }
+
+        if (resetFilterNeraca) {
+          resetFilterNeraca.addEventListener('click', function () {
+            activeCategoryFilter = 'all';
+            if (filterKategoriNeraca) filterKategoriNeraca.value = 'all';
+            btnFilterNeraca.classList.remove('has-filter');
+            filterNeracaDropdown.classList.remove('is-open');
+            renderNeraca();
+          });
+        }
+      }
+
+      /* ===== DUAL-MONTH CALENDAR POPOVER ===== */
+      const btnCalendarNeraca = document.getElementById('btnCalendarNeraca');
+      const calendarNeracaDropdown = document.getElementById('calendarNeracaDropdown');
+      const nrCalTitleLeft = document.getElementById('nrCalTitleLeft');
+      const nrCalTitleRight = document.getElementById('nrCalTitleRight');
+      const nrCalGridLeft = document.getElementById('nrCalGridLeft');
+      const nrCalGridRight = document.getElementById('nrCalGridRight');
+      const nrCalSelectedText = document.getElementById('nrCalSelectedText');
+      const btnCancelCalendarNeraca = document.getElementById('btnCancelCalendarNeraca');
+      const btnApplyCalendarNeraca = document.getElementById('btnApplyCalendarNeraca');
+
+      let calViewYear = 2026;
+      let calViewMonth = 9; // October (0-based)
+      let calStartDate = null;
+      let calEndDate = null;
+
+      function formatYmd(d) {
+        if (!d) return '';
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+      }
+
+      function renderMonthGrid(year, month, container, titleEl) {
+        if (!container || !titleEl) return;
+        const mNorm = ((month % 12) + 12) % 12;
+        const yNorm = year + Math.floor(month / 12);
+        titleEl.textContent = yNorm + ' - ' + String(mNorm + 1).padStart(2, '0');
+
+        const firstDay = new Date(yNorm, mNorm, 1);
+        const startOffset = (firstDay.getDay() + 6) % 7;
+        const daysInMonth = new Date(yNorm, mNorm + 1, 0).getDate();
+
+        let html = '';
+        for (let i = 0; i < startOffset; i++) {
+          html += '<span class="pnd-cal-day is-empty"></span>';
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const cur = new Date(yNorm, mNorm, d);
+          const ymd = formatYmd(cur);
+          let cls = 'pnd-cal-day';
+          if ((calStartDate && formatYmd(calStartDate) === ymd) || (calEndDate && formatYmd(calEndDate) === ymd)) {
+            cls += ' is-selected';
+          } else if (calStartDate && calEndDate && cur > calStartDate && cur < calEndDate) {
+            cls += ' is-in-range';
+          }
+          html += '<span class="' + cls + '" data-ymd="' + ymd + '">' + d + '</span>';
+        }
+        container.innerHTML = html;
+
+        container.querySelectorAll('.pnd-cal-day:not(.is-empty)').forEach(el => {
+          el.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const parts = el.getAttribute('data-ymd').split('-').map(Number);
+            const clicked = new Date(parts[0], parts[1] - 1, parts[2]);
+            if (!calStartDate || (calStartDate && calEndDate)) {
+              calStartDate = clicked;
+              calEndDate = null;
+            } else if (clicked < calStartDate) {
+              calEndDate = calStartDate;
+              calStartDate = clicked;
+            } else {
+              calEndDate = clicked;
+            }
+            updateCalendarUI();
+          });
+        });
+      }
+
+      function updateCalendarUI() {
+        renderMonthGrid(calViewYear, calViewMonth, nrCalGridLeft, nrCalTitleLeft);
+        renderMonthGrid(calViewYear, calViewMonth + 1, nrCalGridRight, nrCalTitleRight);
+        if (nrCalSelectedText) {
+          if (calStartDate && calEndDate) {
+            nrCalSelectedText.textContent = formatYmd(calStartDate) + ' s/d ' + formatYmd(calEndDate);
+          } else if (calStartDate) {
+            nrCalSelectedText.textContent = formatYmd(calStartDate);
+          } else {
+            nrCalSelectedText.textContent = 'Semua Periode';
+          }
+        }
+      }
+
+      if (btnCalendarNeraca && calendarNeracaDropdown) {
+        btnCalendarNeraca.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (filterNeracaDropdown) filterNeracaDropdown.classList.remove('is-open');
+          calendarNeracaDropdown.classList.toggle('is-open');
+          if (calendarNeracaDropdown.classList.contains('is-open')) {
+            updateCalendarUI();
+          }
+        });
+
+        const prevYear = document.getElementById('nrCalPrevYear');
+        const prevMonth = document.getElementById('nrCalPrevMonth');
+        const nextMonth = document.getElementById('nrCalNextMonth');
+        const nextYear = document.getElementById('nrCalNextYear');
+
+        if (prevYear) prevYear.addEventListener('click', e => { e.stopPropagation(); calViewYear--; updateCalendarUI(); });
+        if (nextYear) nextYear.addEventListener('click', e => { e.stopPropagation(); calViewYear++; updateCalendarUI(); });
+        if (prevMonth) prevMonth.addEventListener('click', e => { e.stopPropagation(); calViewMonth--; updateCalendarUI(); });
+        if (nextMonth) nextMonth.addEventListener('click', e => { e.stopPropagation(); calViewMonth++; updateCalendarUI(); });
+
+        calendarNeracaDropdown.querySelectorAll('.pnd-cal-preset-btn').forEach(btn => {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            calendarNeracaDropdown.querySelectorAll('.pnd-cal-preset-btn').forEach(b => b.classList.remove('is-active'));
+            btn.classList.add('is-active');
+            const preset = btn.getAttribute('data-preset');
+            const end = new Date(2026, 9, 31);
+            let start = new Date(end);
+            if (preset === 'yesterday') { start.setDate(end.getDate() - 1); }
+            else if (preset === 'last7') { start.setDate(end.getDate() - 6); }
+            else if (preset === 'last30') { start.setDate(end.getDate() - 29); }
+            else if (preset === 'last3m') { start.setMonth(end.getMonth() - 3); }
+            else if (preset === 'last6m') { start.setMonth(end.getMonth() - 6); }
+            else if (preset === 'last1y') { start.setFullYear(end.getFullYear() - 1); }
+            calStartDate = start;
+            calEndDate = end;
+            updateCalendarUI();
+          });
+        });
+
+        if (btnCancelCalendarNeraca) {
+          btnCancelCalendarNeraca.addEventListener('click', function (e) {
+            e.stopPropagation();
+            calStartDate = null;
+            calEndDate = null;
+            btnCalendarNeraca.classList.remove('has-filter');
+            calendarNeracaDropdown.classList.remove('is-open');
+            updateCalendarUI();
+          });
+        }
+
+        if (btnApplyCalendarNeraca) {
+          btnApplyCalendarNeraca.addEventListener('click', function (e) {
+            e.stopPropagation();
+            btnCalendarNeraca.classList.toggle('has-filter', Boolean(calStartDate));
+            calendarNeracaDropdown.classList.remove('is-open');
+            renderNeraca();
+          });
+        }
+      }
+
+      /* ===== EXPORT EXCEL (.XLSX) ===== */
+      const btnExportNeraca = document.getElementById('btnExportNeraca');
+      if (btnExportNeraca) {
+        btnExportNeraca.addEventListener('click', function () {
+          const periodKey = periodSelector ? periodSelector.value : 'okt2026';
+          const data = NERACA_DATA[periodKey] || NERACA_DATA.okt2026;
+          const rows = [
+            ['#', 'Aset', 'Nilai', 'Liabilitas & Ekuitas', 'Nilai']
+          ];
+          const leftList = data.aset.map(it => [it.name, formatRupiah(it.amount)]);
+          leftList.push(['Total aset', formatRupiah(null)]);
+
+          const rightList = [];
+          data.liabilitas.forEach(it => rightList.push([it.name, formatRupiah(it.amount)]));
+          rightList.push(['Total liabilitas', formatRupiah(null)]);
+          data.ekuitas.forEach(it => rightList.push([it.name, formatRupiah(it.amount)]));
+          rightList.push(['Total liabilitas & ekuitas', formatRupiah(null)]);
+
+          const maxLen = Math.max(leftList.length, rightList.length);
+          for (let i = 0; i < maxLen; i++) {
+            const l = leftList[i] || ['', ''];
+            const r = rightList[i] || ['', ''];
+            rows.push([i + 1, l[0], l[1], r[0], r[1]]);
+          }
+
+          if (typeof XLSX !== 'undefined') {
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Neraca');
+            XLSX.writeFile(wb, 'Laporan_Neraca_' + periodKey + '.xlsx');
+          }
+        });
+      }
+
+      /* ===== EVENT LISTENERS: CUSTOM DROPDOWN PERIODE ===== */
       const periodCustomDropdown = document.getElementById('periodCustomDropdown');
       const periodTriggerBtn = document.getElementById('periodTriggerBtn');
       const periodSelectedLabel = document.getElementById('periodSelectedLabel');
@@ -977,13 +1607,8 @@
         periodTriggerBtn.addEventListener('click', function (e) {
           e.stopPropagation();
           const isOpen = periodCustomDropdown.classList.contains('is-open');
-          if (isOpen) {
-            periodCustomDropdown.classList.remove('is-open');
-            periodTriggerBtn.setAttribute('aria-expanded', 'false');
-          } else {
-            periodCustomDropdown.classList.add('is-open');
-            periodTriggerBtn.setAttribute('aria-expanded', 'true');
-          }
+          periodCustomDropdown.classList.toggle('is-open', !isOpen);
+          periodTriggerBtn.setAttribute('aria-expanded', String(!isOpen));
         });
 
         if (periodDropdownMenu) {
@@ -993,39 +1618,33 @@
             const val = item.getAttribute('data-value');
             const labelText = item.querySelector('span') ? item.querySelector('span').textContent : '';
 
-            // Update label & hidden value
             if (periodSelectedLabel) periodSelectedLabel.textContent = labelText;
             if (periodSelector) periodSelector.value = val;
 
-            // Update selected class
             periodDropdownMenu.querySelectorAll('.neraca-dropdown-item').forEach(el => el.classList.remove('is-selected'));
             item.classList.add('is-selected');
 
-            // Close menu
             periodCustomDropdown.classList.remove('is-open');
             periodTriggerBtn.setAttribute('aria-expanded', 'false');
 
-            // Render data
             renderNeraca();
           });
         }
-
-        // Close on clicking outside
-        document.addEventListener('click', function (e) {
-          if (!periodCustomDropdown.contains(e.target)) {
-            periodCustomDropdown.classList.remove('is-open');
-            periodTriggerBtn.setAttribute('aria-expanded', 'false');
-          }
-        });
-
-        // Close on Escape key
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') {
-            periodCustomDropdown.classList.remove('is-open');
-            periodTriggerBtn.setAttribute('aria-expanded', 'false');
-          }
-        });
       }
+
+      // Close popovers on outside click
+      document.addEventListener('click', function (e) {
+        if (periodCustomDropdown && !periodCustomDropdown.contains(e.target)) {
+          periodCustomDropdown.classList.remove('is-open');
+          if (periodTriggerBtn) periodTriggerBtn.setAttribute('aria-expanded', 'false');
+        }
+        if (filterNeracaDropdown && btnFilterNeraca && !filterNeracaDropdown.contains(e.target) && !btnFilterNeraca.contains(e.target)) {
+          filterNeracaDropdown.classList.remove('is-open');
+        }
+        if (calendarNeracaDropdown && btnCalendarNeraca && !calendarNeracaDropdown.contains(e.target) && !btnCalendarNeraca.contains(e.target)) {
+          calendarNeracaDropdown.classList.remove('is-open');
+        }
+      });
 
       renderNeraca();
     })();

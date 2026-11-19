@@ -165,20 +165,19 @@
       border-color: #0076C5;
     }
 
-    /* ===== UPPER 2-COLUMN SECTION ===== */
+    /* ===== UPPER 2-COLUMN SECTION (TREN FINANCIAL & SALDO PER AKUN SEJAJAR) ===== */
     .dash-upper-grid {
       display: grid;
-      grid-template-columns: 1.8fr 1fr;
+      grid-template-columns: 1.85fr 1fr;
       gap: 20px;
-      margin-bottom: 24px;
-      align-items: start;
+      margin-bottom: 20px;
+      align-items: stretch;
     }
 
-    .dash-col-left,
-    .dash-col-right {
+    .dash-card-equal {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      height: 100%;
     }
 
     /* Chart Container */
@@ -186,6 +185,113 @@
       position: relative;
       width: 100%;
       height: 250px;
+      flex: 1;
+    }
+
+    /* ===== SALDO PER AKUN (SEJAJAR DENGAN GRAFIK & SCROLLABLE) ===== */
+    .dash-saldo-akun-list {
+      display: flex;
+      flex-direction: column;
+      max-height: 250px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .dash-saldo-akun-list::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .dash-saldo-akun-list::-webkit-scrollbar-track {
+      background: #f8fafc;
+      border-radius: 6px;
+    }
+
+    .dash-saldo-akun-list::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 6px;
+    }
+
+    .dash-saldo-akun-list::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .dash-saldo-akun-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 4px;
+      min-height: 82px;
+      box-sizing: border-box;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background-color 0.12s ease;
+    }
+
+    .dash-saldo-akun-item:last-child {
+      border-bottom: none;
+    }
+
+    .dash-saldo-akun-item:hover {
+      background-color: #f8fafc;
+    }
+
+    .dash-saldo-akun-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .dash-saldo-akun-name {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dash-saldo-akun-val {
+      font-size: 20px;
+      font-weight: 800;
+      font-style: italic;
+      color: #0f172a;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .dash-saldo-akun-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #0d5bd9;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(13, 91, 217, 0.22);
+    }
+
+    .dash-saldo-akun-icon svg {
+      width: 19px;
+      height: 19px;
+      stroke: #ffffff;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* Divider Pemisah Ringkasan Bulanan & Perlu Ditindaklanjuti di Dalam Tabel */
+    .dash-table tr.dash-merged-divider-row td {
+      padding: 10px 0 !important;
+      border-bottom: none !important;
+      background: transparent !important;
+    }
+
+    .dash-merged-dotted-line {
+      border-bottom: 1px dotted #cbd5e1;
+      width: 100%;
     }
 
     /* ===== TABLE STYLING (SESUAI MOCKUP GAMBAR) ===== */
@@ -606,117 +712,77 @@
         </div>
       </section>
 
-      <!-- ===== 2. UPPER 2-COLUMN SECTION ===== -->
+      <!-- ===== 2. UPPER 2-COLUMN SECTION (TREN FINANCIAL & SALDO PER AKUN SEJAJAR) ===== -->
       <section class="dash-upper-grid">
-        <!-- Kolom Kiri: Trand Financial & Ringkasan Bulanan -->
-        <div class="dash-col-left">
-          <!-- Card: Tren Financial -->
-          <div class="dash-card">
-            <div class="dash-card-header" style="flex-wrap: wrap; gap: 10px;">
-              <h3 class="dash-card-title">Tren Financial</h3>
-              <div class="dash-trend-toolbar">
-                <div class="dash-view-toggles" id="granularityToggles">
-                  <button type="button" class="dash-view-btn" data-granularity="daily">Harian</button>
-                  <button type="button" class="dash-view-btn is-active" data-granularity="weekly">Mingguan</button>
-                  <button type="button" class="dash-view-btn" data-granularity="monthly">Bulanan</button>
-                  <button type="button" class="dash-view-btn" data-granularity="yearly">Tahunan</button>
-                  <button type="button" class="dash-view-btn" data-granularity="custom">Custom</button>
-                </div>
-                <!-- Custom Date Range Picker -->
-                <div class="dash-custom-date-wrap" id="customDateWrap" style="display: none;">
-                  <input type="date" id="customDateStart" class="dash-date-input" value="2026-10-01" title="Tanggal Mulai" />
-                  <span style="font-size: 11.5px; color: #64748b; font-weight: 500;">s/d</span>
-                  <input type="date" id="customDateEnd" class="dash-date-input" value="2026-10-31" title="Tanggal Akhir" />
-                  <button type="button" id="btnApplyCustomDate" class="dash-date-apply-btn">Terapkan</button>
-                </div>
-                <select class="dash-select-period" id="selectTrendPeriod" aria-label="Pilih Periode Tren">
-                  <option value="">Pilih Periode</option>
-                  <option value="des2026">Desember 2026</option>
-                  <option value="nov2026">November 2026</option>
-                  <option value="okt2026" selected>Oktober 2026</option>
-                  <option value="sep2026">September 2026</option>
-                  <option value="agu2026">Agustus 2026</option>
-                </select>
+        <!-- Card Kiri: Tren Financial -->
+        <div class="dash-card dash-card-equal">
+          <div class="dash-card-header" style="flex-wrap: wrap; gap: 10px;">
+            <h3 class="dash-card-title">Tren Financial</h3>
+            <div class="dash-trend-toolbar">
+              <div class="dash-view-toggles" id="granularityToggles">
+                <button type="button" class="dash-view-btn" data-granularity="daily">Harian</button>
+                <button type="button" class="dash-view-btn is-active" data-granularity="weekly">Mingguan</button>
+                <button type="button" class="dash-view-btn" data-granularity="monthly">Bulanan</button>
+                <button type="button" class="dash-view-btn" data-granularity="yearly">Tahunan</button>
+                <button type="button" class="dash-view-btn" data-granularity="custom">Custom</button>
               </div>
-            </div>
-            <div class="dash-card-divider"></div>
-            <div class="dash-chart-wrap">
-              <canvas id="trendFinancialChart"></canvas>
+              <!-- Custom Date Range Picker -->
+              <div class="dash-custom-date-wrap" id="customDateWrap" style="display: none;">
+                <input type="date" id="customDateStart" class="dash-date-input" value="2026-10-01" title="Tanggal Mulai" />
+                <span style="font-size: 11.5px; color: #64748b; font-weight: 500;">s/d</span>
+                <input type="date" id="customDateEnd" class="dash-date-input" value="2026-10-31" title="Tanggal Akhir" />
+                <button type="button" id="btnApplyCustomDate" class="dash-date-apply-btn">Terapkan</button>
+              </div>
+              <select class="dash-select-period" id="selectTrendPeriod" aria-label="Pilih Periode Tren">
+                <option value="">Pilih Periode</option>
+                <option value="des2026">Desember 2026</option>
+                <option value="nov2026">November 2026</option>
+                <option value="okt2026" selected>Oktober 2026</option>
+                <option value="sep2026">September 2026</option>
+                <option value="agu2026">Agustus 2026</option>
+              </select>
             </div>
           </div>
-
-          <!-- Card: Ringkasan Bulanan -->
-          <div class="dash-card">
-            <div class="dash-card-header">
-              <h3 class="dash-card-title">Ringkasan Bulanan</h3>
-            </div>
-            <div class="dash-card-divider"></div>
-            <div class="dash-table-container">
-              <table class="dash-table no-pagination">
-                <thead>
-                  <tr>
-                    <th style="width: 32px;">#</th>
-                    <th>Indikator</th>
-                    <th class="text-right">Bulan ini</th>
-                    <th class="text-right">Bulan Lalu</th>
-                    <th class="text-right" title="Rumus: Bulan Ini - Bulan Lalu">Perubahan</th>
-                  </tr>
-                </thead>
-                <tbody id="tbodyRingkasanBulanan">
-                  <!-- Populated by JavaScript -->
-                </tbody>
-              </table>
-            </div>
+          <div class="dash-card-divider"></div>
+          <div class="dash-chart-wrap">
+            <canvas id="trendFinancialChart"></canvas>
           </div>
         </div>
 
-        <!-- Kolom Kanan: Beban Oprasional & Perlu Ditindaklanjuti -->
-        <div class="dash-col-right">
-          <!-- Card: Beban Oprasional -->
-          <div class="dash-card">
-            <div class="dash-card-header">
-              <h3 class="dash-card-title">Beban Oprasional</h3>
-            </div>
-            <div class="dash-card-divider"></div>
-            <div class="dash-donut-content">
-              <div class="dash-donut-chart-wrap">
-                <canvas id="bebanOperasionalDonut"></canvas>
-              </div>
-              <div class="dash-donut-legend" id="donutLegendList">
-                <div class="dash-legend-item">
-                  <span class="dash-legend-label">
-                    <span class="dash-legend-dot" style="background: #38bdf8;"></span>
-                    <span>Gaji Pokok</span>
-                  </span>
-                  <span class="dash-legend-percent" id="pctGajiPokok">0%</span>
-                </div>
-                <div class="dash-legend-item">
-                  <span class="dash-legend-label">
-                    <span class="dash-legend-dot" style="background: #eab308;"></span>
-                    <span>Oprasional</span>
-                  </span>
-                  <span class="dash-legend-percent" id="pctOperasional">0%</span>
-                </div>
-                <div class="dash-legend-item">
-                  <span class="dash-legend-label">
-                    <span class="dash-legend-dot" style="background: #ef4444;"></span>
-                    <span>Pajak</span>
-                  </span>
-                  <span class="dash-legend-percent" id="pctPajak">0%</span>
-                </div>
-              </div>
-            </div>
+        <!-- Card Kanan: Saldo Per Akun (Sejajar Grafik & Scrollable) -->
+        <div class="dash-card dash-card-equal">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">Saldo Per Akun</h3>
           </div>
+          <div class="dash-card-divider"></div>
+          <div class="dash-saldo-akun-list" id="saldoPerAkunList">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </section>
 
-          <!-- Card: Perlu Ditindaklanjuti -->
-          <div class="dash-card">
-            <div class="dash-card-header">
-              <h3 class="dash-card-title">Perlu Ditindaklanjuti</h3>
-            </div>
-            <div class="dash-card-divider"></div>
-            <ul class="dash-action-list" id="actionItemsList">
-              <!-- Populated by JavaScript -->
-            </ul>
+      <!-- ===== 2B. FULL-WIDTH CARD: RINGKASAN BULANAN & PERLU DITINDAKLANJUTI (DISATUKAN SESUAI GAMBAR) ===== -->
+      <section style="margin-bottom: 20px;">
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <h3 class="dash-card-title">Ringkasan Bulanan</h3>
+          </div>
+          <div class="dash-card-divider"></div>
+          <div class="dash-table-container">
+            <table class="dash-table no-pagination">
+              <thead>
+                <tr>
+                  <th style="width: 36px;">#</th>
+                  <th>Indikator</th>
+                  <th class="text-right">Bulan ini</th>
+                  <th class="text-right">Bulan Lalu</th>
+                  <th class="text-right" title="Persentase Perubahan">Perubahan</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyRingkasanBulanan">
+                <!-- Populated by JavaScript (9 Baris Ringkasan Bulanan + 10 Baris Perlu Ditindaklanjuti) -->
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -804,7 +870,7 @@
     </main>
   </div>
 
-  <script src="../../assets/js/layout.js?v=20261118_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
 
   <script>
     (function () {
@@ -1515,6 +1581,8 @@
         // 5. KAS & BANK (REAL DARI MODUL KAS & BANK & ARUS KAS)
         let liveKasBankTotal = 0;
         let hasRealSaldoStored = false;
+        let currentAccounts = Object.assign({}, BASE_ACCOUNTS);
+        let customAccountsFromStorage = [];
 
         try {
           const rawSaldo = localStorage.getItem('accounting_arus_kas_saldo_akun_v1');
@@ -1524,13 +1592,23 @@
               liveKasBankTotal = parsedSaldo.totalSaldo;
               hasRealSaldoStored = true;
             }
+            if (parsedSaldo) {
+              if (typeof parsedSaldo.kasKecil === 'number') currentAccounts.kasKecil = parsedSaldo.kasKecil;
+              if (typeof parsedSaldo.bca1 === 'number') currentAccounts.bca1 = parsedSaldo.bca1;
+              if (typeof parsedSaldo.bca2 === 'number') currentAccounts.bca2 = parsedSaldo.bca2;
+              if (typeof parsedSaldo.seabank === 'number') currentAccounts.seabank = parsedSaldo.seabank;
+              if (typeof parsedSaldo.bni === 'number') currentAccounts.bni = parsedSaldo.bni;
+              if (Array.isArray(parsedSaldo.accountsList) && parsedSaldo.accountsList.length > 0) {
+                customAccountsFromStorage = parsedSaldo.accountsList;
+              }
+            }
           }
         } catch (e) {}
 
         const liveKbList = getLiveKasBankList();
 
         if (!hasRealSaldoStored) {
-          let currentAccounts = Object.assign({}, BASE_ACCOUNTS);
+          currentAccounts = Object.assign({}, BASE_ACCOUNTS);
           liveKbList.forEach(function (it) {
             if (!it) return;
             const rek = String(it.nomorRekening || '').replace(/\D/g, '');
@@ -1541,7 +1619,7 @@
             if (rek.includes('2092026028') || coa === '1002') k = 'bca1';
             else if (rek.includes('2091139784') || coa === '1003') k = 'bca2';
             else if (rek.includes('901631003438') || coa === '1005' || bank.includes('seabank')) k = 'seabank';
-            else if (rek.includes('1920260017') || coa === '1006' || bank.includes('bni')) k = 'bni';
+            else if (rek.includes('1920260017') || rek.includes('2049368973') || coa === '1006' || bank.includes('bni')) k = 'bni';
             else if (coa === '1001' || bank.includes('kas kecil')) k = 'kasKecil';
 
             if (k) {
@@ -1551,6 +1629,27 @@
             }
           });
           liveKasBankTotal = currentAccounts.kasKecil + currentAccounts.bca1 + currentAccounts.bca2 + currentAccounts.seabank + currentAccounts.bni;
+        }
+
+        const saldoPerAkunItems = [
+          { key: 'kasKecil', name: 'Kas Kecil', saldo: currentAccounts.kasKecil },
+          { key: 'bca1', name: 'Bank BCA 1', saldo: currentAccounts.bca1 },
+          { key: 'bca2', name: 'Bank BCA 2', saldo: currentAccounts.bca2 },
+          { key: 'seabank', name: 'SEABANK', saldo: currentAccounts.seabank },
+          { key: 'bni', name: 'Bank BNI', saldo: currentAccounts.bni }
+        ];
+
+        // Tambahkan akun bank tambahan dari data master jika ada
+        if (customAccountsFromStorage.length > 5) {
+          customAccountsFromStorage.slice(5).forEach(function (extra, idx) {
+            if (extra && extra.name) {
+              saldoPerAkunItems.push({
+                key: 'extra_' + idx,
+                name: extra.name,
+                saldo: Number(extra.saldo) || 0
+              });
+            }
+          });
         }
 
         return {
@@ -1567,13 +1666,13 @@
 
           hasLiveKasBank: liveKbList.length > 0,
           bankTransaksi: liveKasBankTotal,
-          kasBankList: liveKbList
+          kasBankList: liveKbList,
+          saldoPerAkun: saldoPerAkunItems
         };
       }
 
       /* ===== CHART INSTANCES ===== */
       let trendChartInstance = null;
-      let donutChartInstance = null;
 
       /* ===== RENDER DASHBOARD ===== */
       function renderDashboard(periodKey) {
@@ -1601,26 +1700,12 @@
         const trendDataSet = buildRealTrendData(currentPeriod, currentGranularity);
         renderTrendChart(trendDataSet);
 
-        // 3. BEBAN OPERASIONAL DONUT CHART (UPDATE DARI MODUL PAYROLL & BEBAN)
-        let donutMetrics = data ? data.bebanDonut : null;
-        if (live.hasLiveBeban && live.beban > 0) {
-          const pctGaji = Math.round((live.payroll / live.beban) * 100);
-          const pctOp = Math.round((live.bebanOp / live.beban) * 100);
-          const pctPjk = Math.max(0, 100 - pctGaji - pctOp);
-          donutMetrics = {
-            gajiPokok: pctGaji,
-            operasional: pctOp,
-            pajak: pctPjk
-          };
-        }
-        renderBebanDonut(donutMetrics);
+        // 3. SALDO PER AKUN LIST (SEJAJAR DENGAN GRAFIK & SCROLLABLE)
+        renderSaldoPerAkun(live.saldoPerAkun);
 
-        // 4. RINGKASAN BULANAN TABLE (9 INDIKATOR SESUAI SUMBER FITUR MASING-MASING)
+        // 4. RINGKASAN BULANAN & PERLU DITINDAKLANJUTI (DISATUKAN DALAM 1 TABEL)
         const ringkasanLive = getLiveRingkasanBulanan(currentPeriod, live, data, finalPendapatan, finalBeban, finalLabaBersih, finalBank);
-        renderRingkasanBulanan(ringkasanLive);
-
-        // 5. PERLU DITINDAKLANJUTI LIST
-        renderActionItems(data ? data.actionItems : null);
+        renderRingkasanBulanan(ringkasanLive, data ? data.actionItems : null);
 
         // 6. LOWER 3 TABLES (REAL-TIME DARI MODUL MASING-MASING DENGAN LIMIT HANYA 5 DAN 10 BARIS)
         // Table 1: Kas & Bank (REAL DARI MODUL KAS & BANK)
@@ -2151,57 +2236,39 @@
         });
       }
 
-      /* ===== 2. BEBAN OPERASIONAL DONUT CHART ===== */
-      function renderBebanDonut(donutMetrics) {
-        const ctx = document.getElementById('bebanOperasionalDonut') || document.getElementById('bebanDonutChart');
-        if (!ctx) return;
+      /* ===== 2. SALDO PER AKUN LIST (SEJAJAR GRAFIK & SCROLLABLE) ===== */
+      function renderSaldoPerAkun(accountsList) {
+        const container = document.getElementById('saldoPerAkunList');
+        if (!container) return;
 
-        if (donutChartInstance) {
-          donutChartInstance.destroy();
-          donutChartInstance = null;
-        }
+        const items = (Array.isArray(accountsList) && accountsList.length > 0) ? accountsList : [
+          { key: 'kasKecil', name: 'Kas Kecil', saldo: 15000000 },
+          { key: 'bca1', name: 'Bank BCA 1', saldo: 450000000 },
+          { key: 'bca2', name: 'Bank BCA 2', saldo: 280000000 },
+          { key: 'seabank', name: 'SEABANK', saldo: 125000000 },
+          { key: 'bni', name: 'Bank BNI', saldo: 95000000 }
+        ];
 
-        const gaji = donutMetrics ? donutMetrics.gajiPokok : 55;
-        const op = donutMetrics ? donutMetrics.operasional : 35;
-        const pjk = donutMetrics ? donutMetrics.pajak : 10;
+        const bankSvg = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">' +
+          '<rect x="2" y="6" width="20" height="13" rx="2"></rect>' +
+          '<path d="M16 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"></path>' +
+          '<path d="M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>' +
+          '</svg>';
 
-        const valGaji = document.getElementById('pctGajiPokok') || document.getElementById('donutValGaji');
-        const valOp = document.getElementById('pctOperasional') || document.getElementById('donutValOp');
-        const valPajak = document.getElementById('pctPajak') || document.getElementById('donutValPajak');
-        if (valGaji) valGaji.textContent = gaji + '%';
-        if (valOp) valOp.textContent = op + '%';
-        if (valPajak) valPajak.textContent = pjk + '%';
-
-        donutChartInstance = new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Gaji Pokok', 'Operasional Usaha', 'Pajak & Lainnya'],
-            datasets: [
-              {
-                data: [gaji, op, pjk],
-                backgroundColor: ['#0076C5', '#38bdf8', '#f59e0b'],
-                borderWidth: 2,
-                borderColor: '#ffffff',
-                hoverOffset: 4
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    return ' ' + context.label + ': ' + context.parsed + '%';
-                  }
-                }
-              }
-            }
-          }
+        let html = '';
+        items.forEach(function (acc) {
+          html += '<div class="dash-saldo-akun-item">' +
+            '<div class="dash-saldo-akun-info">' +
+              '<span class="dash-saldo-akun-name">' + escapeHtml(acc.name) + '</span>' +
+              '<span class="dash-saldo-akun-val">' + formatRupiah(acc.saldo) + '</span>' +
+            '</div>' +
+            '<div class="dash-saldo-akun-icon" title="' + escapeHtml(acc.name) + '">' +
+              bankSvg +
+            '</div>' +
+          '</div>';
         });
+
+        container.innerHTML = html;
       }
 
       /* ===== FUNGSI PENGHITUNG 9 INDIKATOR RINGKASAN BULANAN (DENGAN ROLLOVER BULAN LALU OTOMATIS) ===== */
@@ -2398,29 +2465,22 @@
         return rows;
       }
 
-      /* ===== 3. RINGKASAN BULANAN TABLE ===== */
-      function renderRingkasanBulanan(rows) {
+      /* ===== 3. RINGKASAN BULANAN & PERLU DITINDAKLANJUTI (DISATUKAN DALAM 1 TABEL) ===== */
+      function renderRingkasanBulanan(rows, actionItems) {
         const tbody = document.getElementById('tbodyRingkasanBulanan');
         if (!tbody) return;
 
         let html = '';
         if (rows && rows.length > 0) {
           rows.forEach((r, idx) => {
-            const iniVal = Number(r.ini) || 0;
-            const laluVal = Number(r.lalu) || 0;
-            // Rumus Perubahan: Bulan Ini - Bulan Lalu
-            const diff = (r.selisih !== undefined && r.selisih !== null) ? r.selisih : (iniVal - laluVal);
-            const pct = (r.perubahan !== undefined && r.perubahan !== null) ? r.perubahan : 0;
-            const pctStr = (pct >= 0 ? '+' : '') + pct + '%';
+            const pct = (r.perubahan !== undefined && r.perubahan !== null) ? Number(r.perubahan) : 0;
+            const pctStr = (pct > 0 ? '+' : '') + pct + '%';
 
-            let changeHtml = '<span class="dash-text-muted">Rp. 0 (0%)</span>';
-            if (diff > 0) {
-              changeHtml = '<span class="dash-change-up">+' + formatRupiah(diff) + ' <small style="font-size: 11px; opacity: 0.85;">(' + pctStr + ')</small></span>';
-            } else if (diff < 0) {
-              const absDiff = Math.abs(diff);
-              changeHtml = '<span class="dash-change-down">-' + formatRupiah(absDiff) + ' <small style="font-size: 11px; opacity: 0.85;">(' + pctStr + ')</small></span>';
-            } else {
-              changeHtml = '<span class="dash-text-muted">Rp. 0 (0%)</span>';
+            let changeHtml = '<span class="dash-text-muted">0%</span>';
+            if (pct > 0) {
+              changeHtml = '<span class="dash-change-up">' + pctStr + '</span>';
+            } else if (pct < 0) {
+              changeHtml = '<span class="dash-change-down">' + pctStr + '</span>';
             }
 
             html += '<tr>' +
@@ -2428,34 +2488,40 @@
               '<td style="font-weight: 600;" title="' + escapeHtml(r.source || '') + '">' + escapeHtml(r.indikator) + '</td>' +
               '<td class="text-right font-numeric" style="font-weight: 600; color: #0076C5;">' + formatRupiah(r.ini) + '</td>' +
               '<td class="text-right font-numeric text-muted">' + formatRupiah(r.lalu) + '</td>' +
-              '<td class="text-right font-numeric" title="Rumus Perubahan: Bulan Ini - Bulan Lalu (' + formatRupiah(r.ini) + ' - ' + formatRupiah(r.lalu) + ')">' + changeHtml + '</td>' +
+              '<td class="text-right font-numeric" title="Persentase Perubahan: ' + pctStr + '">' + changeHtml + '</td>' +
               '</tr>';
           });
-        } else {
-          tbody.innerHTML = '<tr><td colspan="5" class="dash-empty-cell">Belum ada data Ringkasan Bulanan</td></tr>';
-          return;
         }
+
+        // Garis pemisah putus-putus & 10 baris Perlu Ditindaklanjuti di dalam tabel yang sama (Sesuai Gambar)
+        const actList = (Array.isArray(actionItems) && actionItems.length > 0) ? actionItems : [
+          { id: 1, title: 'Perlu ditindaklanjuti', amount: 0 },
+          { id: 2, title: 'Payroll Dibayar tanpa kas', amount: 0 },
+          { id: 3, title: 'Beban Lunas tanpa kas', amount: 0 },
+          { id: 4, title: 'Tagihan perlu rincian', amount: 0 },
+          { id: 5, title: 'Piutang karyawan', amount: 45000000 },
+          { id: 6, title: 'Pajak belum terisi', amount: 0 },
+          { id: 7, title: 'Selisih arus kas', amount: 0 },
+          { id: 8, title: 'Selisih neraca', amount: 0 },
+          { id: 9, title: 'Laba sebelum pajak', amount: 520000000 },
+          { id: 10, title: 'COA / rekening perlu diperiksa', amount: 0 }
+        ];
+
+        html += '<tr class="dash-merged-divider-row">' +
+          '<td colspan="5"><div class="dash-merged-dotted-line"></div></td>' +
+          '</tr>';
+
+        actList.forEach(function (it, idx) {
+          html += '<tr>' +
+            '<td class="col-num">' + (it.id || (idx + 1)) + '.</td>' +
+            '<td style="font-weight: 500; font-style: italic; color: #334155;">' + escapeHtml(it.title) + '</td>' +
+            '<td class="text-right"></td>' +
+            '<td class="text-right"></td>' +
+            '<td class="text-right font-numeric" style="font-weight: 600; font-style: italic; color: #0f172a;">' + (it.amount > 0 ? formatRupiah(it.amount) : 'Rp. -') + '</td>' +
+            '</tr>';
+        });
+
         tbody.innerHTML = html;
-      }
-
-      /* ===== 4. PERLU DITINDAKLANJUTI LIST ===== */
-      function renderActionItems(items) {
-        const ul = document.getElementById('actionItemsList');
-        if (!ul) return;
-
-        let html = '';
-        if (items && items.length > 0) {
-          items.forEach(it => {
-            html += '<li class="dash-action-item">' +
-              '<span class="dash-action-title">' +
-              '<span class="dash-action-index">' + it.id + '.</span>' +
-              '<span>' + escapeHtml(it.title) + '</span>' +
-              '</span>' +
-              '<span class="dash-action-amount">' + (it.amount > 0 ? formatRupiah(it.amount) : 'Rp. -') + '</span>' +
-              '</li>';
-          });
-        }
-        ul.innerHTML = html;
       }
 
       /* ===== 5. KAS & BANK TABLE (REAL-TIME DARI MODUL KAS & BANK - OPSI 5 & 10 BARIS) ===== */

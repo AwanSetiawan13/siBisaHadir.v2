@@ -1,0 +1,5281 @@
+<!DOCTYPE html>
+
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Tagihan Berkala | Bisa Media</title>
+
+
+
+  <!-- Google Fonts: Outfit -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+
+
+  <!-- Global & Vendor CSS -->
+
+  <link rel="stylesheet" href="../../assets/css/style.css?v=20261118_v4" />
+
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+
+
+
+  <!-- SweetAlert2 -->
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+  <style>
+
+    /* ==========================================================================
+
+       TAGIHAN BERKALA - EXACT SYSTEM MATCH (PENDAPATAN, KAS BANK & OPERASIONAL)
+
+       ========================================================================== */
+
+
+
+    body {
+
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      color: #1e293b;
+
+      background-color: #f8fafc;
+
+    }
+
+
+
+    /* ===== SUMMARY KPI CARDS ===== */
+
+    .pnd-summary-cards {
+
+      display: grid;
+
+      grid-template-columns: repeat(4, 1fr);
+
+      gap: 16px;
+
+      margin-bottom: 20px;
+
+    }
+
+
+
+    @media (max-width: 1024px) {
+
+      .pnd-summary-cards {
+
+        grid-template-columns: repeat(2, 1fr);
+
+      }
+
+    }
+
+
+
+    @media (max-width: 640px) {
+
+      .pnd-summary-cards {
+
+        grid-template-columns: 1fr;
+
+      }
+
+    }
+
+
+
+    .pnd-card {
+
+      position: relative;
+
+      background: #ffffff;
+
+      border: 1px solid #e2e8f0;
+
+      border-top: 3.5px solid #0076C5;
+
+      border-radius: 12px;
+
+      padding: 14px 18px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    }
+
+
+
+    .pnd-card.pnd-card--total {
+
+      border-top-color: #0076C5;
+
+    }
+
+
+
+    .pnd-card.pnd-card--biaya {
+
+      border-top-color: #ef4444;
+
+    }
+
+
+
+    .pnd-card.pnd-card--menjelang,
+
+    .pnd-card.pnd-card--menunggu-review {
+
+      border-top-color: #f59e0b;
+
+    }
+
+
+
+    .pnd-card.pnd-card--lunas,
+
+    .pnd-card.pnd-card--disetujui {
+
+      border-top-color: #16a34a;
+
+    }
+
+
+
+    .pnd-card.pnd-card--ditolak,
+
+    .pnd-card.pnd-card--terlambat {
+
+      border-top-color: #ef4444;
+
+    }
+
+
+
+    .pnd-card:hover {
+
+      transform: translateY(-2px);
+
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+
+    }
+
+
+
+    .pnd-card.pnd-card--total:hover {
+
+      box-shadow: 0 6px 14px rgba(0, 118, 197, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--biaya:hover {
+
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--menjelang:hover,
+
+    .pnd-card.pnd-card--menunggu-review:hover {
+
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--lunas:hover,
+
+    .pnd-card.pnd-card--disetujui:hover {
+
+      box-shadow: 0 6px 14px rgba(22, 163, 74, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--ditolak:hover,
+
+    .pnd-card.pnd-card--terlambat:hover {
+
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.12);
+
+    }
+
+
+
+    .pnd-card-info {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+
+    }
+
+
+
+    .pnd-card-label {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 500;
+
+      color: #64748b;
+
+    }
+
+
+
+    .pnd-card-value {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 20px;
+
+      font-weight: 700;
+
+      color: #0f172a;
+
+      letter-spacing: -0.3px;
+
+    }
+
+
+
+    .pnd-card-icon {
+
+      width: 40px;
+
+      height: 40px;
+
+      border-radius: 10px;
+
+      background: #0076C5;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #ffffff;
+
+      flex-shrink: 0;
+
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
+
+    }
+
+
+
+    .pnd-card-icon svg {
+
+      width: 20px;
+
+      height: 20px;
+
+      stroke: #ffffff;
+
+      stroke-width: 2;
+
+    }
+
+
+
+    .pnd-card-icon.icon-total,
+
+    .pnd-card-icon.icon-blue {
+
+      background: #0076C5;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-biaya,
+
+    .pnd-card-icon.icon-purple {
+
+      background: #ef4444;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-menjelang,
+
+    .pnd-card-icon.icon-menunggu-review,
+
+    .pnd-card-icon.icon-amber {
+
+      background: #f59e0b;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-lunas,
+
+    .pnd-card-icon.icon-disetujui,
+
+    .pnd-card-icon.icon-green {
+
+      background: #16a34a;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-ditolak,
+
+    .pnd-card-icon.icon-terlambat,
+
+    .pnd-card-icon.icon-red {
+
+      background: #ef4444;
+
+      color: #ffffff;
+
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.28);
+
+    }
+
+
+
+    /* ===== MAIN PANEL & TOOLBAR ===== */
+
+    .panel.campaign-panel,
+
+    .campaign-panel {
+
+      border-radius: 14px !important;
+
+      border: 1px solid #e2e8f0 !important;
+
+      background: #ffffff !important;
+
+      padding: 20px !important;
+
+      position: relative !important;
+
+      overflow: visible !important;
+
+      box-sizing: border-box !important;
+
+      margin-bottom: 24px;
+
+    }
+
+
+
+    .campaign-panel__line,
+
+    .pnd-panel-line {
+
+      display: block !important;
+
+      height: 4px !important;
+
+      margin: -20px -20px 16px -20px !important;
+
+      border-radius: 14px 14px 0 0 !important;
+
+      background: #0076C5 !important;
+
+      width: calc(100% + 40px) !important;
+
+    }
+
+
+
+    .pnd-toolbar {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 16px;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .pnd-toolbar__left {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .pnd-toolbar__right {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+    }
+
+
+
+    .filter-dropdown-wrapper {
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-btn-icon {
+
+      width: 34px;
+
+      height: 34px;
+
+      padding: 0;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      color: #0284c7;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      cursor: pointer;
+
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+      transition: all 0.15s ease;
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-btn-icon:hover {
+
+      border-color: #0284c7;
+
+      color: #0284c7;
+
+      background: #f0f9ff;
+
+    }
+
+
+
+    .pnd-btn-icon.has-filter {
+
+      background: #e0f2fe !important;
+
+      border-color: #0284c7 !important;
+
+      color: #0284c7 !important;
+
+    }
+
+
+
+    .pnd-btn-icon.has-filter::after {
+
+      content: '';
+
+      position: absolute;
+
+      top: -3px;
+
+      right: -3px;
+
+      width: 8px;
+
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #ef4444;
+
+      border: 2px solid #ffffff;
+
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+
+    }
+
+
+
+    .pnd-btn-icon svg {
+
+      width: 16px;
+
+      height: 16px;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 2;
+
+      stroke-linecap: round;
+
+      stroke-linejoin: round;
+
+    }
+
+
+
+    .pnd-btn-excel {
+
+      background: #f0fdf4 !important;
+
+      border-color: #86efac !important;
+
+      color: #15803d !important;
+
+    }
+
+
+
+    .pnd-btn-excel:hover {
+
+      background: #dcfce7 !important;
+
+      border-color: #4ade80 !important;
+
+    }
+
+
+
+    /* Search Box */
+
+    .pnd-search-wrap {
+
+      position: relative;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      width: 190px;
+
+      transition: width 0.2s ease;
+
+    }
+
+
+
+    .pnd-search-wrap:focus-within {
+
+      width: 270px;
+
+    }
+
+
+
+    .pnd-search-wrap svg {
+
+      position: absolute;
+
+      left: 10px;
+
+      width: 15px;
+
+      height: 15px;
+
+      color: #64748b;
+
+      pointer-events: none;
+
+    }
+
+
+
+    .pnd-search-wrap input {
+
+      width: 100%;
+
+      height: 34px;
+
+      padding: 0 30px 0 32px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      color: #1e293b;
+
+      outline: none;
+
+      box-sizing: border-box;
+
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    }
+
+
+
+    .pnd-search-wrap input:focus {
+
+      border-color: #38bdf8;
+
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+
+    }
+
+
+
+    .pnd-search-clear {
+
+      position: absolute;
+
+      right: 8px;
+
+      width: 18px;
+
+      height: 18px;
+
+      border: 0;
+
+      background: #cbd5e1;
+
+      color: #ffffff;
+
+      border-radius: 50%;
+
+      font-size: 11px;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      cursor: pointer;
+
+      line-height: 1;
+
+    }
+
+
+
+    .pnd-search-clear.is-visible {
+
+      display: flex;
+
+    }
+
+
+
+    /* Primary Add Button */
+
+    .btn-tambah-pnd {
+
+      height: 36px;
+
+      padding: 0 18px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #28a5de;
+
+      color: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 6px;
+
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+
+      transition: background 0.15s ease, transform 0.1s ease;
+
+    }
+
+
+
+    .btn-tambah-pnd:hover {
+
+      background: #0284c7;
+
+    }
+
+
+
+    .btn-tambah-pnd:active {
+
+      transform: scale(0.98);
+
+    }
+
+
+
+    /* ===== POPOVER FILTER ===== */
+
+    .pnd-filter-popover {
+
+      position: absolute;
+
+      top: calc(100% + 8px);
+
+      left: 0;
+
+      width: 290px;
+
+      background: #ffffff;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 16px;
+
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+
+      padding: 18px 18px 16px 18px;
+
+      z-index: 120;
+
+      display: none;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-filter-popover.is-active {
+
+      display: block;
+
+    }
+
+
+
+    .pnd-filter-group {
+
+      margin-bottom: 14px;
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-filter-label {
+
+      display: block;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 14px;
+
+      font-weight: 500;
+
+      color: #1e293b;
+
+      margin-bottom: 6px;
+
+    }
+
+
+
+    .pnd-filter-select,
+
+    .pnd-filter-input {
+
+      width: 100%;
+
+      height: 38px;
+
+      padding: 0 12px;
+
+      border: 1.5px solid #38bdf8;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      color: #1e293b;
+
+      outline: none;
+
+      box-sizing: border-box;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-filter-actions {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 10px;
+
+      margin-top: 14px;
+
+      padding-top: 12px;
+
+      border-top: 1px solid #f1f5f9;
+
+    }
+
+
+
+    .pnd-filter-btn-reset {
+
+      border: none;
+
+      background: none;
+
+      color: #64748b;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 14px;
+
+      font-weight: 500;
+
+      cursor: pointer;
+
+      padding: 6px 10px;
+
+    }
+
+
+
+    .pnd-filter-btn-reset em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-filter-btn-reset:hover {
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-filter-btn-apply {
+
+      height: 34px;
+
+      padding: 0 16px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #0076C5;
+
+      color: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+      box-shadow: 0 2px 4px rgba(0, 118, 197, 0.2);
+
+    }
+
+
+
+    .pnd-filter-btn-apply em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-filter-btn-apply:hover {
+
+      background: #005fa0;
+
+    }
+
+
+
+    /* ===== POPOVER KALENDER DUAL-MONTH (Konsisten Pendapatan & Kas Bank) ===== */
+
+    .pnd-calendar-popover {
+
+      position: absolute;
+
+      top: calc(100% + 8px);
+
+      left: 0;
+
+      width: 630px;
+
+      max-width: 95vw;
+
+      background: #ffffff;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 14px;
+
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      padding: 18px 20px 16px 20px;
+
+      z-index: 125;
+
+      display: none;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-calendar-popover.is-active {
+
+      display: block;
+
+    }
+
+
+
+    .pnd-cal-body {
+
+      display: flex;
+
+      gap: 18px;
+
+    }
+
+
+
+    .pnd-cal-sidebar {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 8px;
+
+      width: 145px;
+
+      flex-shrink: 0;
+
+    }
+
+
+
+    .pnd-cal-preset-btn {
+
+      background: #f4f5f8;
+
+      border: none;
+
+      border-radius: 6px;
+
+      padding: 9px 12px;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      color: #1e293b;
+
+      text-align: left;
+
+      cursor: pointer;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-cal-preset-btn:hover {
+
+      background: #e2e8f0;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-cal-preset-btn.is-active {
+
+      background: #0076C5;
+
+      color: #ffffff;
+
+    }
+
+
+
+    .pnd-cal-months {
+
+      flex: 1;
+
+      display: flex;
+
+      gap: 16px;
+
+      min-width: 0;
+
+    }
+
+
+
+    .pnd-cal-month-box {
+
+      flex: 1;
+
+      min-width: 0;
+
+    }
+
+
+
+    .pnd-cal-month-header {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 12px;
+
+      font-family: 'Outfit', sans-serif;
+
+    }
+
+
+
+    .pnd-cal-month-title {
+
+      font-size: 14.5px;
+
+      font-weight: 800;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-cal-nav {
+
+      cursor: pointer;
+
+      padding: 2px 8px;
+
+      border-radius: 4px;
+
+      color: #475569;
+
+      font-size: 15px;
+
+      font-weight: 800;
+
+      user-select: none;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-cal-nav:hover {
+
+      background: #f1f5f9;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-cal-weekdays {
+
+      display: grid;
+
+      grid-template-columns: repeat(7, 1fr);
+
+      text-align: center;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      color: #64748b;
+
+      margin-bottom: 8px;
+
+    }
+
+
+
+    .pnd-cal-days-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(7, 1fr);
+
+      gap: 3px 0;
+
+      text-align: center;
+
+    }
+
+
+
+    .pnd-cal-day {
+
+      height: 32px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 12.5px;
+
+      font-weight: 500;
+
+      color: #334155;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      transition: all 0.1s ease;
+
+      user-select: none;
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-cal-day:hover:not(.pnd-day-muted) {
+
+      background: #f1f5f9;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-muted {
+
+      color: #cbd5e1;
+
+      cursor: default;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-selected-start {
+
+      background: #0076C5 !important;
+
+      color: #ffffff !important;
+
+      font-weight: 700;
+
+      border-radius: 6px;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-selected-end {
+
+      background: #eff6ff !important;
+
+      color: #0076C5 !important;
+
+      font-weight: 700;
+
+      border: 1.5px solid #0076C5;
+
+      border-radius: 6px;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-in-range {
+
+      background: #eff6ff;
+
+      color: #0076C5;
+
+      border-radius: 0;
+
+    }
+
+
+
+    .pnd-cal-footer {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-top: 14px;
+
+      padding-top: 12px;
+
+      border-top: 1px solid #f1f5f9;
+
+    }
+
+
+
+    .pnd-cal-selected-info {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 12.5px;
+
+      color: #64748b;
+
+    }
+
+
+
+    .pnd-cal-selected-info span {
+
+      color: #0f172a;
+
+      font-weight: 600;
+
+    }
+
+
+
+    .pnd-cal-footer-actions {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+    }
+
+
+
+    .pnd-cal-btn-cancel {
+
+      height: 34px;
+
+      padding: 0 18px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      background: #f8fafc;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      color: #0f172a;
+
+      cursor: pointer;
+
+      transition: background 0.15s;
+
+    }
+
+
+
+    .pnd-cal-btn-cancel:hover {
+
+      background: #e2e8f0;
+
+    }
+
+
+
+    .pnd-cal-btn-apply {
+
+      height: 34px;
+
+      padding: 0 20px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #0076C5;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      color: #ffffff;
+
+      cursor: pointer;
+
+      transition: background 0.15s;
+
+    }
+
+
+
+    .pnd-cal-btn-apply:hover {
+
+      background: #005fa0;
+
+    }
+
+
+
+    @media (max-width: 680px) {
+
+      .pnd-calendar-popover {
+
+        width: calc(100vw - 32px);
+
+      }
+
+      .pnd-cal-body {
+
+        flex-direction: column;
+
+      }
+
+      .pnd-cal-sidebar {
+
+        width: 100%;
+
+        flex-direction: row;
+
+        overflow-x: auto;
+
+      }
+
+      .pnd-cal-months {
+
+        flex-direction: column;
+
+      }
+
+    }
+
+
+
+    /* ===== UNIFIED MODERN TABLE STYLING ===== */
+
+    .table-wrap.campaign-table {
+
+      overflow-x: auto !important;
+
+      background: #ffffff !important;
+
+      border: 1px solid #e4e4e7 !important;
+
+      border-radius: 12px !important;
+
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+
+      margin-bottom: 16px !important;
+
+      position: relative !important;
+
+    }
+
+
+
+    #tbTable {
+
+      width: 100% !important;
+
+      border-collapse: separate !important;
+
+      border-spacing: 0 !important;
+
+      font-size: 13px !important;
+
+      text-align: left !important;
+
+      white-space: nowrap !important;
+
+    }
+
+
+
+    #tbTable thead th {
+
+      background-color: #f4f4f5 !important;
+
+      color: #52525b !important;
+
+      font-weight: 600 !important;
+
+      font-size: 12px !important;
+
+      letter-spacing: 0.02em !important;
+
+      text-transform: capitalize !important;
+
+      padding: 12px 14px !important;
+
+      border-bottom: 1px solid #e4e4e7 !important;
+
+      border-top: none !important;
+
+      white-space: nowrap !important;
+
+    }
+
+
+
+    #tbTable thead th:first-child {
+
+      border-top-left-radius: 8px !important;
+
+      border-bottom-left-radius: 8px !important;
+
+      border-left: 1px solid #e4e4e7 !important;
+
+    }
+
+
+
+    #tbTable thead th:last-child {
+
+      border-top-right-radius: 8px !important;
+
+      border-bottom-right-radius: 8px !important;
+
+      border-right: 1px solid #e4e4e7 !important;
+
+    }
+
+
+
+    #tbTable tbody tr {
+
+      border-bottom: 1px solid #f1f5f9 !important;
+
+      transition: background 0.15s ease !important;
+
+    }
+
+
+
+    #tbTable tbody td {
+
+      padding: 12px 14px !important;
+
+      vertical-align: middle !important;
+
+      color: #334155 !important;
+
+      font-size: 13px !important;
+
+      font-family: 'Outfit', sans-serif !important;
+
+      border-bottom: 1px solid #f1f5f9 !important;
+
+      box-sizing: border-box !important;
+
+    }
+
+
+
+    #tbTable tbody tr:hover,
+
+    #tbTable tbody tr:hover td {
+
+      background-color: #f8fafc !important;
+
+    }
+
+
+
+    /* Italic Cell Styling */
+
+    .pnd-cell-italic {
+
+      font-style: italic !important;
+
+      color: #334155 !important;
+
+    }
+
+
+
+    /* Sticky Action Column */
+
+    #tbTable th.col-sticky-action,
+
+    #tbTable td.col-sticky-action {
+
+      position: sticky !important;
+
+      right: 0 !important;
+
+      z-index: 10 !important;
+
+      background-color: #ffffff !important;
+
+      border-left: 1px solid #e2e8f0 !important;
+
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+
+      text-align: center !important;
+
+      width: 60px !important;
+
+      min-width: 60px !important;
+
+    }
+
+
+
+    #tbTable th.col-sticky-action {
+
+      z-index: 11 !important;
+
+      background-color: #f4f4f5 !important;
+
+      border-top-right-radius: 8px !important;
+
+      border-bottom-right-radius: 8px !important;
+
+      border-right: 1px solid #e4e4e7 !important;
+
+    }
+
+
+
+    #tbTable tbody tr:hover td.col-sticky-action {
+
+      background-color: #f8fafc !important;
+
+    }
+
+
+
+    /* Action Trigger Button (⋮) */
+
+    .pnd-action-btn {
+
+      width: 32px;
+
+      height: 32px;
+
+      padding: 0;
+
+      border: 0;
+
+      border-radius: 50%;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #0f172a;
+
+      background: transparent;
+
+      cursor: pointer;
+
+      transition: background 0.15s ease;
+
+    }
+
+
+
+    .pnd-action-btn:hover {
+
+      background: #f1f5f9;
+
+    }
+
+
+
+    .pnd-action-btn svg {
+
+      width: 18px;
+
+      height: 18px;
+
+      fill: currentColor;
+
+    }
+
+
+
+    .pnd-empty-cell {
+
+      text-align: center;
+
+      padding: 40px 16px !important;
+
+      color: #94a3b8;
+
+      font-size: 14px;
+
+      font-style: italic;
+
+    }
+
+
+
+    /* ===== FLOATING ACTION MENU ===== */
+
+    .pnd-action-menu {
+
+      display: none;
+
+      position: fixed;
+
+      z-index: 2147483000;
+
+      min-width: 145px;
+
+      padding: 6px;
+
+      border: 1px solid rgba(0, 0, 0, .08);
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+
+    }
+
+
+
+    .pnd-action-menu.is-open {
+
+      display: block;
+
+    }
+
+
+
+    .pnd-action-menu button {
+
+      width: 100%;
+
+      min-height: 38px;
+
+      padding: 7px 12px;
+
+      border: 0;
+
+      border-radius: 6px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      color: #334155;
+
+      background: transparent;
+
+      cursor: pointer;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 500;
+
+      text-align: left;
+
+      transition: all 0.12s ease;
+
+    }
+
+
+
+    .pnd-action-menu button:hover {
+
+      color: #0f172a;
+
+      background: #f1f5f9;
+
+    }
+
+
+
+    .pnd-action-icon {
+
+      width: 26px;
+
+      height: 26px;
+
+      border-radius: 6px;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      flex: 0 0 26px;
+
+      color: #ffffff;
+
+      background: #0076C5;
+
+    }
+
+
+
+    .pnd-action-icon svg {
+
+      width: 15px;
+
+      height: 15px;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 2;
+
+      stroke-linecap: round;
+
+      stroke-linejoin: round;
+
+    }
+
+
+
+    .pnd-action-menu button.is-danger {
+
+      color: #dc2626;
+
+    }
+
+
+
+    .pnd-action-menu button.is-danger:hover {
+
+      background: #fef2f2;
+
+    }
+
+
+
+    .pnd-action-menu .pnd-action-icon.is-danger {
+
+      background: #e02424;
+
+    }
+
+
+
+    /* ===== STATUS BADGES ===== */
+
+    .pnd-status-badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 4px 10px;
+
+      border-radius: 9999px;
+
+      font-size: 11.5px;
+
+      font-weight: 600;
+
+      font-style: normal;
+
+      white-space: nowrap;
+
+    }
+
+
+
+    .badge-lunas {
+
+      background-color: #dcfce7;
+
+      color: #15803d;
+
+      border: 1px solid #bbf7d0;
+
+    }
+
+
+
+    .badge-menjelang {
+
+      background-color: #fef3c7;
+
+      color: #b45309;
+
+      border: 1px solid #fde68a;
+
+    }
+
+
+
+    .badge-terlambat {
+
+      background-color: #fee2e2;
+
+      color: #b91c1c;
+
+      border: 1px solid #fecaca;
+
+    }
+
+
+
+    .badge-aktif {
+
+      background-color: #e0f2fe;
+
+      color: #0284c7;
+
+      border: 1px solid #bae6fd;
+
+    }
+
+
+
+    /* ===== PAGINATION ===== */
+
+    .pnd-pagination {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      flex-wrap: wrap;
+
+      font-size: 13px;
+
+      font-family: 'Outfit', sans-serif;
+
+      color: #64748b;
+
+      padding-top: 4px;
+
+    }
+
+
+
+    .pnd-pagination-left {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+    }
+
+
+
+    .pnd-perpage-select {
+
+      height: 32px;
+
+      padding: 0 8px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      font-size: 12.5px;
+
+      font-family: 'Outfit', sans-serif;
+
+      color: #334155;
+
+      background: #ffffff;
+
+      outline: none;
+
+    }
+
+
+
+    .pnd-pagination-controls {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+    }
+
+
+
+    .pnd-page-btn {
+
+      min-width: 32px;
+
+      height: 32px;
+
+      padding: 0 8px;
+
+      border: 1px solid #e2e8f0;
+
+      background: #ffffff;
+
+      color: #475569;
+
+      font-size: 12.5px;
+
+      font-weight: 500;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-page-btn:hover:not(:disabled) {
+
+      background: #f1f5f9;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-page-btn.is-active {
+
+      background: #0076C5;
+
+      border-color: #0076C5;
+
+      color: #ffffff;
+
+      font-weight: 600;
+
+    }
+
+
+
+    .pnd-page-btn:disabled {
+
+      opacity: 0.45;
+
+      cursor: not-allowed;
+
+    }
+
+
+
+    /* ===== MODAL TAMBAH / EDIT / DETAIL ===== */
+
+    .pnd-modal-overlay {
+
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(15, 23, 42, 0.45);
+
+      backdrop-filter: blur(2.5px);
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      z-index: 99999;
+
+      padding: 16px;
+
+      overflow-y: auto;
+
+    }
+
+
+
+    .pnd-modal-overlay.is-active {
+
+      display: flex;
+
+    }
+
+
+
+    .pnd-modal-box {
+
+      background: #ffffff;
+
+      border-radius: 12px;
+
+      width: 780px;
+
+      max-width: 95vw;
+
+      max-height: 90vh;
+
+      overflow-y: auto;
+
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+
+      padding: 24px 28px;
+
+      position: relative;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-modal-accent {
+
+      position: absolute;
+
+      top: 0;
+
+      left: 0;
+
+      right: 0;
+
+      height: 3.5px;
+
+      background: #0076C5;
+
+      border-radius: 12px 12px 0 0;
+
+    }
+
+
+
+    .pnd-modal-header {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 12px;
+
+    }
+
+
+
+    .pnd-modal-title {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 18px;
+
+      font-weight: 500;
+
+      color: #1e293b;
+
+      margin: 0;
+
+    }
+
+
+
+    .pnd-modal-title em {
+
+      font-style: italic;
+
+      font-weight: 700;
+
+    }
+
+
+
+    .pnd-modal-close {
+
+      width: 24px;
+
+      height: 24px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      background: #ffffff;
+
+      color: #64748b;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-modal-close:hover {
+
+      background: #f1f5f9;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-dashed-divider {
+
+      border-bottom: 1.5px dashed #e2e8f0;
+
+      margin-bottom: 16px;
+
+    }
+
+
+
+    .pnd-form-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(2, 1fr);
+
+      gap: 12px 16px;
+
+    }
+
+
+
+    @media (max-width: 640px) {
+
+      .pnd-form-grid {
+
+        grid-template-columns: 1fr;
+
+      }
+
+    }
+
+
+
+    .pnd-col-full {
+
+      grid-column: 1 / -1;
+
+    }
+
+
+
+    .pnd-form-group {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+
+    }
+
+
+
+    .pnd-form-label {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 500;
+
+      color: #1e293b;
+
+    }
+
+
+
+    .pnd-form-input,
+
+    .pnd-form-select,
+
+    .pnd-form-textarea {
+
+      width: 100%;
+
+      height: 38px;
+
+      padding: 0 12px;
+
+      border: 1.5px solid #38bdf8;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      color: #1e293b;
+
+      outline: none;
+
+      box-sizing: border-box;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-form-textarea {
+
+      height: 72px;
+
+      padding: 8px 12px;
+
+      resize: vertical;
+
+    }
+
+
+
+    .pnd-form-input:focus,
+
+    .pnd-form-select:focus,
+
+    .pnd-form-textarea:focus {
+
+      border-color: #0076C5;
+
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+
+    }
+
+
+
+    .pnd-modal-footer {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 10px;
+
+      margin-top: 18px;
+
+      padding-top: 14px;
+
+      border-top: 1px solid #f1f5f9;
+
+    }
+
+
+
+    .pnd-btn-cancel-modal {
+
+      height: 36px;
+
+      padding: 0 16px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      background: #ffffff;
+
+      color: #64748b;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .pnd-btn-cancel-modal em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-btn-cancel-modal:hover {
+
+      background: #f8fafc;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-btn-submit-save {
+
+      height: 36px;
+
+      padding: 0 20px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #28a5de;
+
+      color: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+
+    }
+
+
+
+    .pnd-btn-submit-save em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-btn-submit-save:hover {
+
+      background: #0284c7;
+
+    }
+
+
+
+    /* Modal Detail View */
+
+    .pnd-detail-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(2, 1fr);
+
+      gap: 12px 18px;
+
+    }
+
+
+
+    @media (max-width: 640px) {
+
+      .pnd-detail-grid {
+
+        grid-template-columns: 1fr;
+
+      }
+
+    }
+
+
+
+    .pnd-detail-item {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 2px;
+
+      background: #f8fafc;
+
+      padding: 8px 12px;
+
+      border-radius: 8px;
+
+      border: 1px solid #e2e8f0;
+
+    }
+
+
+
+    .pnd-detail-item.col-full {
+
+      grid-column: 1 / -1;
+
+    }
+
+
+
+    .pnd-detail-label {
+
+      font-size: 11px;
+
+      font-weight: 600;
+
+      color: #64748b;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.03em;
+
+    }
+
+
+
+    .pnd-detail-value {
+
+      font-size: 13.5px;
+
+      font-weight: 600;
+
+      color: #0f172a;
+
+      word-break: break-word;
+
+    }
+
+  </style>
+
+</head>
+
+<body class="bg-slate-50">
+
+  <!-- Layout Sidebar & Shell -->
+
+  <aside id="app-sidebar"></aside>
+
+
+
+  <div class="dashboard-shell">
+
+    <header class="topbar"></header>
+
+
+
+    <main class="dashboard-content">
+
+      <!-- 4 Summary KPI Cards -->
+
+      <section class="pnd-summary-cards" aria-label="Ringkasan Tagihan Berkala">
+        <!-- Card 1: Total Item Tagihan (Biru) -->
+        <div class="pnd-card pnd-card--total">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Total Tagihan Berkala</span>
+            <span class="pnd-card-value" id="cardTotalTagihan">0</span>
+          </div>
+          <div class="pnd-card-icon icon-total" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Sudah Terbayar (Hijau) -->
+        <div class="pnd-card pnd-card--lunas">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Sudah Terbayar</span>
+            <span class="pnd-card-value" id="cardTerbayar">0</span>
+          </div>
+          <div class="pnd-card-icon icon-lunas" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 3: Jatuh Tempo Bulan Ini (Amber) -->
+        <div class="pnd-card pnd-card--menjelang">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Jatuh Tempo Bulan Ini</span>
+            <span class="pnd-card-value" id="cardJatuhTempo">0</span>
+          </div>
+          <div class="pnd-card-icon icon-menjelang" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 4: Total Biaya Berkala (Merah) -->
+        <div class="pnd-card pnd-card--biaya">
+          <div class="pnd-card-info">
+            <span class="pnd-card-label">Total Biaya Berkala</span>
+            <span class="pnd-card-value" id="cardTotalBiaya">Rp. 0</span>
+          </div>
+          <div class="pnd-card-icon icon-biaya" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="6" width="20" height="13" rx="2"></rect>
+              <path d="M16 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"></path>
+              <path d="M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+
+
+      <!-- Main Panel & Toolbar -->
+
+      <section class="panel campaign-panel">
+
+        <div class="campaign-panel__line pnd-panel-line"></div>
+
+
+
+        <!-- Toolbar Tagihan Berkala -->
+
+        <div class="pnd-toolbar">
+
+          <div class="pnd-toolbar__left">
+
+            <!-- Filter Popover Button -->
+
+            <div class="filter-dropdown-wrapper">
+
+              <button id="btnFilterTb" class="pnd-btn-icon" type="button" aria-label="Filter" title="Filter Tagihan Berkala">
+
+                <svg viewBox="0 0 24 24">
+
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+
+                </svg>
+
+              </button>
+
+
+
+              <!-- Popover Filter -->
+
+              <div id="filterTbDropdown" class="pnd-filter-popover">
+
+                <div class="pnd-filter-group">
+
+                  <label class="pnd-filter-label" for="filterUmurEkonomis">Umur Ekonomis</label>
+
+                  <select id="filterUmurEkonomis" class="pnd-filter-select">
+
+                    <option value="">Semua Umur Ekonomis</option>
+
+                    <option value="1 Bulan">1 Bulan</option>
+
+                    <option value="3 Bulan">3 Bulan</option>
+
+                    <option value="6 Bulan">6 Bulan</option>
+
+                    <option value="1 Tahun">1 Tahun (12 Bulan)</option>
+
+                  </select>
+
+                </div>
+
+
+
+                <div class="pnd-filter-group">
+
+                  <label class="pnd-filter-label" for="filterStatus">Status Pembayaran</label>
+
+                  <select id="filterStatus" class="pnd-filter-select">
+
+                    <option value="">Semua Status</option>
+
+                    <option value="Lunas">Lunas (Sudah Bayar)</option>
+
+                    <option value="Menjelang Jatuh Tempo">Menjelang Jatuh Tempo</option>
+
+                    <option value="Terlambat">Lewat Jatuh Tempo</option>
+
+                  </select>
+
+                </div>
+
+
+
+                <div class="pnd-filter-actions">
+
+                  <button type="button" id="resetFilterTb" class="pnd-filter-btn-reset"><em>Riset</em></button>
+
+                  <button type="button" id="applyFilterTb" class="pnd-filter-btn-apply"><em>Terapkan</em></button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            <!-- Kalender Popover Button -->
+
+            <div class="filter-dropdown-wrapper">
+
+              <button id="btnCalendarTb" class="pnd-btn-icon" type="button" aria-label="Pilih Tanggal" title="Filter Berdasarkan Tanggal">
+
+                <svg viewBox="0 0 24 24">
+
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+
+                </svg>
+
+              </button>
+
+
+
+              <!-- Dual Month Calendar Popover (Konsisten Kas & Bank / Pendapatan) -->
+
+              <div id="calendarTbDropdown" class="pnd-calendar-popover">
+
+                <div class="pnd-cal-body">
+
+                  <div class="pnd-cal-sidebar">
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="today">Hari ini</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="yesterday">Kemarin</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last7">7 hari terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last30">30 hari terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last3m">3 bulan terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last6m">6 bulan terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last12m">12 bulan terakhir</button>
+
+                  </div>
+
+
+
+                  <div class="pnd-cal-months">
+
+                    <div class="pnd-cal-month-box">
+
+                      <div class="pnd-cal-month-header">
+
+                        <span class="pnd-cal-nav" id="tbCalPrevYear" title="Tahun Sebelumnya">&laquo;</span>
+
+                        <span class="pnd-cal-month-title" id="tbCalTitleLeft">2026 - 11</span>
+
+                        <span class="pnd-cal-nav" id="tbCalPrevMonth" title="Bulan Sebelumnya">&lsaquo;</span>
+
+                      </div>
+
+                      <div class="pnd-cal-weekdays">
+
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+
+                      </div>
+
+                      <div class="pnd-cal-days-grid" id="tbCalGridLeft"></div>
+
+                    </div>
+
+
+
+                    <div class="pnd-cal-month-box">
+
+                      <div class="pnd-cal-month-header">
+
+                        <span class="pnd-cal-nav" id="tbCalNextMonth" title="Bulan Berikutnya">&rsaquo;</span>
+
+                        <span class="pnd-cal-month-title" id="tbCalTitleRight">2026 - 12</span>
+
+                        <span class="pnd-cal-nav" id="tbCalNextYear" title="Tahun Berikutnya">&raquo;</span>
+
+                      </div>
+
+                      <div class="pnd-cal-weekdays">
+
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+
+                      </div>
+
+                      <div class="pnd-cal-days-grid" id="tbCalGridRight"></div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+
+                <div class="pnd-cal-footer">
+
+                  <div class="pnd-cal-selected-info">
+
+                    Dipilih: <span id="tbCalSelectedText">-</span>
+
+                  </div>
+
+                  <div class="pnd-cal-footer-actions">
+
+                    <button type="button" id="btnCancelCalendarTb" class="pnd-cal-btn-cancel">Batal</button>
+
+                    <button type="button" id="btnApplyCalendarTb" class="pnd-cal-btn-apply">Terapkan</button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            <!-- Export Excel Button (Konsisten Kas & Bank / Pendapatan) -->
+
+            <button id="btnExportTb" class="pnd-btn-icon pnd-btn-excel" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor">
+
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+
+              </svg>
+
+            </button>
+
+
+
+            <!-- Search Wrap -->
+
+            <div class="pnd-search-wrap">
+
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
+
+                <circle cx="11" cy="11" r="8"></circle>
+
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+
+              </svg>
+
+              <input id="searchInput" type="search" placeholder="Cari Item, Keterangan, Akses..." autocomplete="off" />
+
+              <button type="button" id="searchClearBtn" class="pnd-search-clear" title="Hapus pencarian">&times;</button>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="pnd-toolbar__right">
+
+            <button id="btnTambahTagihan" class="btn-tambah-pnd" type="button">+ Tambah</button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Table Responsive Container (8 Kolom Sesuai Mockup Gambar User + Kolom Aksi) -->
+
+        <div class="table-wrap campaign-table" id="tbTableWrap">
+
+          <table id="tbTable">
+
+            <thead>
+
+              <tr>
+
+                <th style="width: 44px; text-align: center;">#</th>
+
+                <th>Item Tagihan</th>
+
+                <th>Umur Ekonomis</th>
+
+                <th>Akses</th>
+
+                <th style="text-align: right;">Harga</th>
+
+                <th style="text-align: center;">Tanggal Bayar</th>
+
+                <th style="text-align: center;">Jatuh Tempo</th>
+
+                <th style="text-align: center;">Status</th>
+
+                <th>Keterangan</th>
+
+                <th>Keterangan Tambahan</th>
+
+                <th class="col-sticky-action" style="width: 60px; text-align: center;">Aksi</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="tbTableBody">
+
+              <!-- Dynamically rendered via JavaScript -->
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+
+        <!-- Pagination Controls -->
+
+        <div class="pnd-pagination">
+
+          <div class="pnd-pagination-left">
+
+            <span>Tampilkan</span>
+
+            <select id="perPageSelect" class="pnd-perpage-select">
+
+              <option value="10">10</option>
+
+              <option value="25">25</option>
+
+              <option value="50">50</option>
+
+              <option value="100">100</option>
+
+            </select>
+
+            <span>data per halaman</span>
+
+            <span style="margin-left: 8px; color: #cbd5e1;">|</span>
+
+            <span id="paginationInfo" style="margin-left: 8px;">Menampilkan 0-0 dari 0 data</span>
+
+          </div>
+
+          <div class="pnd-pagination-controls" id="paginationControls">
+
+            <!-- Dynamically rendered page buttons -->
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+
+  <!-- ===== FLOATING ACTION MENU (⋮) ===== -->
+
+  <div id="tbActionMenu" class="pnd-action-menu">
+
+    <button type="button" id="actionView">
+
+      <span class="pnd-action-icon">
+
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+
+      </span>
+
+      <em>Lihat</em>
+
+    </button>
+
+    <button type="button" id="actionEdit">
+
+      <span class="pnd-action-icon">
+
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+
+      </span>
+
+      <em>Edit</em>
+
+    </button>
+
+    <button type="button" id="actionDelete" class="is-danger">
+
+      <span class="pnd-action-icon is-danger">
+
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+
+      </span>
+
+      <em>Hapus</em>
+
+    </button>
+
+  </div>
+
+
+
+  <!-- ===== MODAL TAMBAH / EDIT TAGIHAN BERKALA ===== -->
+
+  <div id="tbFormModal" class="pnd-modal-overlay">
+
+    <div class="pnd-modal-box">
+
+      <div class="pnd-modal-accent"></div>
+
+
+
+      <div class="pnd-modal-header">
+
+        <h2 class="pnd-modal-title">
+
+          <em><span id="tbFormActionText">Tambah</span></em> Tagihan Berkala
+
+        </h2>
+
+        <button type="button" class="pnd-modal-close" data-close-modal="tbFormModal" aria-label="Tutup">&times;</button>
+
+      </div>
+
+
+
+      <div class="pnd-dashed-divider"></div>
+
+
+
+      <form id="tbForm" autocomplete="off">
+
+        <input type="hidden" id="editIndex" value="-1" />
+
+
+
+        <div class="pnd-form-grid">
+
+          <!-- 1. Item Tagihan -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formItemTagihan">Item Tagihan</label>
+
+            <input type="text" id="formItemTagihan" class="pnd-form-input" placeholder="Contoh: Sewa Server VPS / Internet Kantor" required />
+
+          </div>
+
+
+
+          <!-- 2. Umur Ekonomis -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formUmurEkonomis">Umur Ekonomis</label>
+
+            <input type="text" id="formUmurEkonomis" class="pnd-form-input" list="umurList" placeholder="1 Bulan, 1 Tahun, 6 Bulan..." required />
+
+            <datalist id="umurList">
+
+              <option value="1 Bulan"></option>
+
+              <option value="3 Bulan"></option>
+
+              <option value="6 Bulan"></option>
+
+              <option value="1 Tahun"></option>
+
+              <option value="2 Tahun"></option>
+
+            </datalist>
+
+          </div>
+
+
+
+          <!-- 3. Akses -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formAkses">Akses</label>
+
+            <input type="text" id="formAkses" class="pnd-form-input" placeholder="ID Pelanggan / Email Akun / URL Portal" required />
+
+          </div>
+
+
+
+          <!-- 4. Harga -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formHarga">Harga (Biaya Berkala)</label>
+
+            <input type="number" id="formHarga" class="pnd-form-input" min="0" step="1000" placeholder="0" required />
+
+          </div>
+
+
+
+          <!-- 5. Tanggal Bayar -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formTanggalBayar">Tanggal Bayar</label>
+
+            <input type="date" id="formTanggalBayar" class="pnd-form-input" required />
+
+          </div>
+
+
+
+          <!-- 6. Jatuh Tempo -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formJatuhTempo">Jatuh Tempo</label>
+
+            <input type="date" id="formJatuhTempo" class="pnd-form-input" required />
+
+          </div>
+
+
+
+          <!-- 7. Status Pembayaran -->
+
+          <div class="pnd-form-group pnd-col-full">
+
+            <label class="pnd-form-label" for="formStatus">Status Pembayaran</label>
+
+            <select id="formStatus" class="pnd-form-select" required>
+
+              <option value="Lunas" selected>Lunas (Sudah Bayar)</option>
+
+              <option value="Menjelang Jatuh Tempo">Menjelang Jatuh Tempo</option>
+
+              <option value="Terlambat">Lewat Jatuh Tempo</option>
+
+            </select>
+
+          </div>
+
+
+
+          <!-- 8. Keterangan & Keterangan Tambahan (Bersebelahan Sesuai Request User) -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formKeterangan">Keterangan</label>
+
+            <textarea id="formKeterangan" class="pnd-form-textarea" placeholder="Contoh: Provider Biznet Dedicated 100Mbps..." required style="height: 75px;"></textarea>
+
+          </div>
+
+
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formKeteranganTambahan">Keterangan Tambahan</label>
+
+            <textarea id="formKeteranganTambahan" class="pnd-form-textarea" placeholder="Tambahkan catatan khusus, kontak vendor, atau instruksi pembayaran..." style="height: 75px;"></textarea>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="pnd-modal-footer">
+
+          <button type="button" class="pnd-btn-cancel-modal" data-close-modal="tbFormModal"><em>Batal</em></button>
+
+          <button type="submit" class="pnd-btn-submit-save"><em>Simpan</em></button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ===== MODAL LIHAT DETAIL TAGIHAN BERKALA ===== -->
+
+  <div id="tbViewModal" class="pnd-modal-overlay">
+
+    <div class="pnd-modal-box">
+
+      <div class="pnd-modal-accent"></div>
+
+
+
+      <div class="pnd-modal-header">
+
+        <h2 class="pnd-modal-title">
+
+          <em>Lihat</em> Tagihan Berkala
+
+        </h2>
+
+        <button type="button" class="pnd-modal-close" data-close-modal="tbViewModal" aria-label="Tutup">&times;</button>
+
+      </div>
+
+
+
+      <div class="pnd-dashed-divider"></div>
+
+
+
+      <div class="pnd-detail-grid" id="detailContainer">
+
+        <!-- Rendered dynamically -->
+
+      </div>
+
+
+
+      <div class="pnd-modal-footer">
+
+        <button type="button" class="pnd-btn-cancel-modal" data-close-modal="tbViewModal"><em>Tutup</em></button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Layout Script & Module Business Logic -->
+
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
+
+  <script>
+
+    (function () {
+
+      'use strict';
+
+
+
+      /* ===== LOCAL STORAGE KEY & INITIAL MOCK DATA ===== */
+
+      const STORAGE_KEY = 'accounting_tagihan_berkala_v1';
+
+
+
+      const initialMockData = [
+
+        {
+
+          id: 'TB-001',
+
+          itemTagihan: 'Sewa Server Cloud AWS EC2',
+
+          keterangan: 'Infrastruktur backend utama production & database',
+
+          umurEkonomis: '1 Bulan',
+
+          akses: 'aws-admin@bisamedia.id / Account ID: 882194',
+
+          harga: 4850000,
+
+          tanggalBayar: '2026-11-05',
+
+          jatuhTempo: '2026-12-05',
+
+          keteranganTambahan: 'Autodebit kartu kredit corporate, invoice dikirim via email',
+
+          status: 'Lunas'
+
+        },
+
+        {
+
+          id: 'TB-002',
+
+          itemTagihan: 'Internet Dedicated Office Biznet',
+
+          keterangan: 'Koneksi internet dedicated 150 Mbps kantor pusat',
+
+          umurEkonomis: '1 Bulan',
+
+          akses: 'ID Pel: 10098452 / PT Bisa Media Kreasi',
+
+          harga: 3200000,
+
+          tanggalBayar: '2026-11-08',
+
+          jatuhTempo: '2026-12-10',
+
+          keteranganTambahan: 'Pembayaran via Virtual Account BCA',
+
+          status: 'Lunas'
+
+        },
+
+        {
+
+          id: 'TB-003',
+
+          itemTagihan: 'Google Workspace Enterprise',
+
+          keterangan: 'Email corporate, Google Drive & Meet 45 akun karyawan',
+
+          umurEkonomis: '1 Bulan',
+
+          akses: 'billing@bisamedia.id',
+
+          harga: 4050000,
+
+          tanggalBayar: '2026-11-02',
+
+          jatuhTempo: '2026-12-02',
+
+          keteranganTambahan: 'Paket Standard 45 user x Rp 90.000',
+
+          status: 'Lunas'
+
+        },
+
+        {
+
+          id: 'TB-004',
+
+          itemTagihan: 'Langganan Figma Organization',
+
+          keterangan: 'Lisensi tools desain kolaborasi tim UI/UX & Creative',
+
+          umurEkonomis: '1 Tahun',
+
+          akses: 'design-lead@bisamedia.id',
+
+          harga: 8400000,
+
+          tanggalBayar: '2026-06-15',
+
+          jatuhTempo: '2026-11-25',
+
+          keteranganTambahan: 'Perpanjangan tahunan 5 seat editor',
+
+          status: 'Menjelang Jatuh Tempo'
+
+        },
+
+        {
+
+          id: 'TB-005',
+
+          itemTagihan: 'Zoom Workplace Pro Business',
+
+          keterangan: 'Akun premium video conference meeting klien & internal',
+
+          umurEkonomis: '1 Bulan',
+
+          akses: 'zoom-admin@bisamedia.id',
+
+          harga: 850000,
+
+          tanggalBayar: '2026-10-20',
+
+          jatuhTempo: '2026-11-20',
+
+          keteranganTambahan: 'Kapasitas 300 peserta per meeting',
+
+          status: 'Menjelang Jatuh Tempo'
+
+        },
+
+        {
+
+          id: 'TB-006',
+
+          itemTagihan: 'Sewa Gedung & Ruang Kantor Lt. 2',
+
+          keterangan: 'Biaya sewa operasional ruang kantor lt. 2',
+
+          umurEkonomis: '6 Bulan',
+
+          akses: 'Pengelola Gedung Wisma Bisa Lt. 2',
+
+          harga: 45000000,
+
+          tanggalBayar: '2026-05-30',
+
+          jatuhTempo: '2026-11-30',
+
+          keteranganTambahan: 'Termasuk sinking fund dan pemeliharaan lift',
+
+          status: 'Menjelang Jatuh Tempo'
+
+        },
+
+        {
+
+          id: 'TB-007',
+
+          itemTagihan: 'Listrik PLN Pascabayar Kantor',
+
+          keterangan: 'Tagihan daya listrik kantor pusat 16.500 VA',
+
+          umurEkonomis: '1 Bulan',
+
+          akses: 'ID Pelanggan PLN: 538829104822',
+
+          harga: 5650000,
+
+          tanggalBayar: '2026-10-18',
+
+          jatuhTempo: '2026-11-20',
+
+          keteranganTambahan: 'Bayar via BCA KlikPay sebelum tgl 20',
+
+          status: 'Menjelang Jatuh Tempo'
+
+        },
+
+        {
+
+          id: 'TB-008',
+
+          itemTagihan: 'Perpanjangan Domain Utama (.ID & .COM)',
+
+          keterangan: 'Domain bisamedia.id & bisamedia.com di Niagahoster',
+
+          umurEkonomis: '1 Tahun',
+
+          akses: 'tech-domain@bisamedia.id',
+
+          harga: 550000,
+
+          tanggalBayar: '2026-11-12',
+
+          jatuhTempo: '2027-11-12',
+
+          keteranganTambahan: 'Perpanjangan 1 tahun masa aktif',
+
+          status: 'Lunas'
+
+        }
+
+      ];
+
+
+
+      function loadData() {
+
+        try {
+
+          const raw = localStorage.getItem(STORAGE_KEY);
+
+          if (raw) {
+
+            const parsed = JSON.parse(raw);
+
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+
+          }
+
+        } catch (e) {
+
+          console.error('Error loading data from localStorage', e);
+
+        }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(initialMockData));
+
+        return initialMockData;
+
+      }
+
+
+
+      function saveData(data) {
+
+        try {
+
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+        } catch (e) {
+
+          console.error('Error saving data to localStorage', e);
+
+        }
+
+      }
+
+
+
+      let dataList = loadData();
+
+
+
+      /* ===== STATE & FILTERING ===== */
+
+      let filters = {
+
+        search: '',
+
+        umurEkonomis: '',
+
+        status: '',
+
+        startDate: '',
+
+        endDate: ''
+
+      };
+
+
+
+      let currentPage = 1;
+
+      let perPage = 10;
+
+      let activeActionId = null;
+
+
+
+      /* ===== DOM ELEMENTS ===== */
+
+      const tableBody = document.getElementById('tbTableBody');
+
+      const searchInput = document.getElementById('searchInput');
+
+      const searchClearBtn = document.getElementById('searchClearBtn');
+
+      const perPageSelect = document.getElementById('perPageSelect');
+
+      const paginationInfo = document.getElementById('paginationInfo');
+
+      const paginationControls = document.getElementById('paginationControls');
+
+
+
+      // Popovers
+
+      const btnFilterTb = document.getElementById('btnFilterTb');
+
+      const filterTbDropdown = document.getElementById('filterTbDropdown');
+
+      const filterUmurEkonomis = document.getElementById('filterUmurEkonomis');
+
+      const filterStatus = document.getElementById('filterStatus');
+
+      const applyFilterTb = document.getElementById('applyFilterTb');
+
+      const resetFilterTb = document.getElementById('resetFilterTb');
+
+
+
+      const btnCalendarTb = document.getElementById('btnCalendarTb');
+
+      const calendarTbDropdown = document.getElementById('calendarTbDropdown');
+
+      const calStartDate = document.getElementById('calStartDate');
+
+      const calEndDate = document.getElementById('calEndDate');
+
+      const applyCalBtn = document.getElementById('applyCalBtn');
+
+      const resetCalBtn = document.getElementById('resetCalBtn');
+
+
+
+      const btnExportTb = document.getElementById('btnExportTb');
+
+      const exportTbDropdown = document.getElementById('exportTbDropdown');
+
+      const btnExportExcel = document.getElementById('btnExportExcel');
+
+      const btnExportCsv = document.getElementById('btnExportCsv');
+
+      const btnPrintTable = document.getElementById('btnPrintTable');
+
+
+
+      const btnTambahTagihan = document.getElementById('btnTambahTagihan');
+
+      const tbActionMenu = document.getElementById('tbActionMenu');
+
+      const actionView = document.getElementById('actionView');
+
+      const actionEdit = document.getElementById('actionEdit');
+
+      const actionDelete = document.getElementById('actionDelete');
+
+
+
+      // Modals
+
+      const tbFormModal = document.getElementById('tbFormModal');
+
+      const tbForm = document.getElementById('tbForm');
+
+      const tbFormActionText = document.getElementById('tbFormActionText');
+
+      const editIndex = document.getElementById('editIndex');
+
+
+
+      const formItemTagihan = document.getElementById('formItemTagihan');
+
+      const formKeterangan = document.getElementById('formKeterangan');
+
+      const formUmurEkonomis = document.getElementById('formUmurEkonomis');
+
+      const formAkses = document.getElementById('formAkses');
+
+      const formHarga = document.getElementById('formHarga');
+
+      const formStatus = document.getElementById('formStatus');
+
+      const formTanggalBayar = document.getElementById('formTanggalBayar');
+
+      const formJatuhTempo = document.getElementById('formJatuhTempo');
+
+      const formKeteranganTambahan = document.getElementById('formKeteranganTambahan');
+
+
+
+      const tbViewModal = document.getElementById('tbViewModal');
+
+      const detailContainer = document.getElementById('detailContainer');
+
+
+
+      // KPI Elements
+
+      const cardTotalTagihan = document.getElementById('cardTotalTagihan');
+
+      const cardTotalBiaya = document.getElementById('cardTotalBiaya');
+
+      const cardJatuhTempo = document.getElementById('cardJatuhTempo');
+
+      const cardTerbayar = document.getElementById('cardTerbayar');
+
+
+
+      /* ===== HELPER FUNCTIONS ===== */
+
+      function escapeHtml(text) {
+
+        if (!text) return '';
+
+        return String(text)
+
+          .replace(/&/g, '&amp;')
+
+          .replace(/</g, '&lt;')
+
+          .replace(/>/g, '&gt;')
+
+          .replace(/"/g, '&quot;')
+
+          .replace(/'/g, '&#039;');
+
+      }
+
+
+
+      function formatRupiah(num) {
+
+        const val = Number(num) || 0;
+
+        return 'Rp. ' + val.toLocaleString('id-ID');
+
+      }
+
+
+
+      function formatDateIndo(dateStr) {
+
+        if (!dateStr || dateStr === '-') return '-';
+
+        const parts = String(dateStr).split('-');
+
+        if (parts.length === 3) {
+
+          const months = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+          const m = parseInt(parts[1], 10);
+
+          return `${parts[2]} ${months[m] || parts[1]} ${parts[0]}`;
+
+        }
+
+        return dateStr;
+
+      }
+
+
+
+      function renderStatusBadge(status) {
+
+        const s = (status || '').toLowerCase();
+
+        let cls = 'badge-lunas';
+
+        let text = status || 'Lunas';
+
+        if (s.includes('lunas') || s.includes('sudah')) {
+
+          cls = 'badge-lunas';
+
+          text = 'Lunas';
+
+        } else if (s.includes('menjelang') || s.includes('tempo')) {
+
+          cls = 'badge-menjelang';
+
+          text = 'Menjelang Jatuh Tempo';
+
+        } else if (s.includes('lewat') || s.includes('terlambat') || s.includes('belum')) {
+
+          cls = 'badge-terlambat';
+
+          text = 'Lewat Jatuh Tempo';
+
+        }
+
+        return `<span class="pnd-status-badge ${cls}">${escapeHtml(text)}</span>`;
+
+      }
+
+
+
+      /* ===== UPDATE KPI CARDS ===== */
+
+      function updateKpis() {
+
+        const total = dataList.length;
+
+        let totalBiaya = 0;
+
+        let jatuhTempoCount = 0;
+
+        let lunasCount = 0;
+
+
+
+        dataList.forEach(item => {
+
+          totalBiaya += Number(item.harga) || 0;
+
+          const s = (item.status || '').toLowerCase();
+
+          if (s.includes('lunas') || s.includes('sudah')) {
+
+            lunasCount++;
+
+          } else {
+
+            jatuhTempoCount++;
+
+          }
+
+        });
+
+
+
+        if (cardTotalTagihan) cardTotalTagihan.textContent = total;
+
+        if (cardTotalBiaya) cardTotalBiaya.textContent = formatRupiah(totalBiaya);
+
+        if (cardJatuhTempo) cardJatuhTempo.textContent = jatuhTempoCount;
+
+        if (cardTerbayar) cardTerbayar.textContent = lunasCount;
+
+      }
+
+
+
+      /* ===== FILTERING & RENDERING ===== */
+
+      function getFilteredData() {
+
+        const q = filters.search.trim().toLowerCase();
+
+
+
+        return dataList.filter(item => {
+
+          if (q) {
+
+            const matchSearch =
+
+              (item.itemTagihan || '').toLowerCase().includes(q) ||
+
+              (item.keterangan || '').toLowerCase().includes(q) ||
+
+              (item.akses || '').toLowerCase().includes(q) ||
+
+              (item.keteranganTambahan || '').toLowerCase().includes(q);
+
+            if (!matchSearch) return false;
+
+          }
+
+
+
+          if (filters.umurEkonomis && item.umurEkonomis !== filters.umurEkonomis) return false;
+
+
+
+          if (filters.status) {
+
+            const s = (item.status || '').toLowerCase();
+
+            const f = filters.status.toLowerCase();
+
+            if (f === 'lunas' && !s.includes('lunas')) return false;
+
+            if (f.includes('menjelang') && !s.includes('menjelang')) return false;
+
+            if (f.includes('terlambat') && !s.includes('lewat') && !s.includes('terlambat')) return false;
+
+          }
+
+
+
+          if (filters.startDate) {
+
+            const tBayar = item.tanggalBayar || '';
+
+            const jTempo = item.jatuhTempo || '';
+
+            const matchDate = (tBayar && tBayar >= filters.startDate) || (jTempo && jTempo >= filters.startDate);
+
+            if (!matchDate) return false;
+
+          }
+
+          if (filters.endDate) {
+
+            const tBayar = item.tanggalBayar || '';
+
+            const jTempo = item.jatuhTempo || '';
+
+            const matchDate = (tBayar && tBayar <= filters.endDate) || (jTempo && jTempo <= filters.endDate);
+
+            if (!matchDate) return false;
+
+          }
+
+
+
+          return true;
+
+        });
+
+      }
+
+
+
+      function renderTable() {
+
+        if (!tableBody) return;
+
+        tableBody.innerHTML = '';
+
+
+
+        const filtered = getFilteredData();
+
+        const totalItems = filtered.length;
+
+        const totalPages = Math.ceil(totalItems / perPage) || 1;
+
+
+
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        if (currentPage < 1) currentPage = 1;
+
+
+
+        const startIndex = (currentPage - 1) * perPage;
+
+        const endIndex = Math.min(startIndex + perPage, totalItems);
+
+        const pageData = filtered.slice(startIndex, endIndex);
+
+
+
+        if (pageData.length === 0) {
+
+          tableBody.innerHTML = '<tr><td colspan="11" class="pnd-empty-cell">Tidak ada data tagihan berkala yang sesuai.</td></tr>';
+
+          paginationInfo.textContent = 'Menampilkan 0-0 dari 0 data';
+
+          paginationControls.innerHTML = '';
+
+          updateKpis();
+
+          return;
+
+        }
+
+
+
+        pageData.forEach((item, idx) => {
+
+          const rowNumber = startIndex + idx + 1;
+
+          const tr = document.createElement('tr');
+
+
+
+          tr.innerHTML = [
+
+            '<td style="text-align: center; color: #64748b; font-style: italic;">' + rowNumber + '.</td>',
+
+            '<td class="pnd-cell-italic" style="color: #0f172a; font-weight: 600; white-space: nowrap;">' + escapeHtml(item.itemTagihan || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(item.umurEkonomis || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="color: #0284c7; font-weight: 500; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + escapeHtml(item.akses || '') + '">' + escapeHtml(item.akses || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="text-align: right; color: #16a34a; font-weight: 700; white-space: nowrap;">' + formatRupiah(item.harga) + '</td>',
+
+            '<td class="pnd-cell-italic" style="text-align: center; white-space: nowrap;">' + formatDateIndo(item.tanggalBayar) + '</td>',
+
+            '<td class="pnd-cell-italic" style="text-align: center; white-space: nowrap; color: #b45309; font-weight: 500;">' + formatDateIndo(item.jatuhTempo) + '</td>',
+
+            '<td style="text-align: center; white-space: nowrap;">' + renderStatusBadge(item.status) + '</td>',
+
+            '<td class="pnd-cell-italic" style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + escapeHtml(item.keterangan || '') + '">' + escapeHtml(item.keterangan || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + escapeHtml(item.keteranganTambahan || '') + '">' + escapeHtml(item.keteranganTambahan || '-') + '</td>',
+
+            '<td class="col-sticky-action" style="text-align: center;">' +
+
+              '<button type="button" class="pnd-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
+
+              '</button>' +
+
+            '</td>'
+
+          ].join('');
+
+
+
+          tableBody.appendChild(tr);
+
+        });
+
+
+
+        paginationInfo.textContent = `Menampilkan ${startIndex + 1}-${endIndex} dari ${totalItems} data`;
+
+        renderPaginationControls(totalPages);
+
+        updateKpis();
+
+      }
+
+
+
+      function renderPaginationControls(totalPages) {
+
+        paginationControls.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+
+
+        const prevBtn = document.createElement('button');
+
+        prevBtn.type = 'button';
+
+        prevBtn.className = 'pnd-page-btn';
+
+        prevBtn.innerHTML = '&lsaquo;';
+
+        prevBtn.disabled = currentPage === 1;
+
+        prevBtn.addEventListener('click', () => {
+
+          if (currentPage > 1) {
+
+            currentPage--;
+
+            renderTable();
+
+          }
+
+        });
+
+        paginationControls.appendChild(prevBtn);
+
+
+
+        for (let p = 1; p <= totalPages; p++) {
+
+          if (totalPages > 7) {
+
+            if (p !== 1 && p !== totalPages && Math.abs(p - currentPage) > 2) {
+
+              if (p === 2 || p === totalPages - 1) {
+
+                const dots = document.createElement('span');
+
+                dots.style.padding = '0 4px';
+
+                dots.textContent = '...';
+
+                paginationControls.appendChild(dots);
+
+              }
+
+              continue;
+
+            }
+
+          }
+
+
+
+          const pageBtn = document.createElement('button');
+
+          pageBtn.type = 'button';
+
+          pageBtn.className = 'pnd-page-btn' + (p === currentPage ? ' is-active' : '');
+
+          pageBtn.textContent = p;
+
+          pageBtn.addEventListener('click', () => {
+
+            currentPage = p;
+
+            renderTable();
+
+          });
+
+          paginationControls.appendChild(pageBtn);
+
+        }
+
+
+
+        const nextBtn = document.createElement('button');
+
+        nextBtn.type = 'button';
+
+        nextBtn.className = 'pnd-page-btn';
+
+        nextBtn.innerHTML = '&rsaquo;';
+
+        nextBtn.disabled = currentPage === totalPages;
+
+        nextBtn.addEventListener('click', () => {
+
+          if (currentPage < totalPages) {
+
+            currentPage++;
+
+            renderTable();
+
+          }
+
+        });
+
+        paginationControls.appendChild(nextBtn);
+
+      }
+
+
+
+      /* ===== CLOSE ALL POPOVERS & MENUS ===== */
+
+      function closeAllPopovers() {
+
+        if (filterTbDropdown) filterTbDropdown.classList.remove('is-active');
+
+        if (calendarTbDropdown) calendarTbDropdown.classList.remove('is-active');
+
+        if (exportTbDropdown) exportTbDropdown.classList.remove('is-active');
+
+        if (tbActionMenu) tbActionMenu.classList.remove('is-open');
+
+      }
+
+
+
+      document.addEventListener('click', function (e) {
+
+        if (!e.target.closest('.filter-dropdown-wrapper') && !e.target.closest('.pnd-action-menu') && !e.target.closest('.pnd-action-btn')) {
+
+          closeAllPopovers();
+
+        }
+
+      });
+
+
+
+      /* ===== SEARCH EVENTS ===== */
+
+      searchInput.addEventListener('input', function () {
+
+        filters.search = this.value;
+
+        currentPage = 1;
+
+        if (this.value) {
+
+          searchClearBtn.classList.add('is-visible');
+
+        } else {
+
+          searchClearBtn.classList.remove('is-visible');
+
+        }
+
+        renderTable();
+
+      });
+
+
+
+      searchClearBtn.addEventListener('click', function () {
+
+        searchInput.value = '';
+
+        filters.search = '';
+
+        searchClearBtn.classList.remove('is-visible');
+
+        currentPage = 1;
+
+        renderTable();
+
+      });
+
+
+
+      perPageSelect.addEventListener('change', function () {
+
+        perPage = parseInt(this.value, 10) || 10;
+
+        currentPage = 1;
+
+        renderTable();
+
+      });
+
+
+
+      /* ===== FILTER POPOVER EVENTS ===== */
+
+      btnFilterTb.addEventListener('click', function (e) {
+
+        e.stopPropagation();
+
+        const isOpen = filterTbDropdown.classList.contains('is-active');
+
+        closeAllPopovers();
+
+        if (!isOpen) filterTbDropdown.classList.add('is-active');
+
+      });
+
+
+
+      applyFilterTb.addEventListener('click', function () {
+
+        filters.umurEkonomis = filterUmurEkonomis.value;
+
+        filters.status = filterStatus.value;
+
+
+
+        if (filters.umurEkonomis || filters.status) {
+
+          btnFilterTb.classList.add('has-filter');
+
+        } else {
+
+          btnFilterTb.classList.remove('has-filter');
+
+        }
+
+
+
+        currentPage = 1;
+
+        renderTable();
+
+        closeAllPopovers();
+
+      });
+
+
+
+      resetFilterTb.addEventListener('click', function () {
+
+        filterUmurEkonomis.value = '';
+
+        filterStatus.value = '';
+
+        filters.umurEkonomis = '';
+
+        filters.status = '';
+
+        btnFilterTb.classList.remove('has-filter');
+
+
+
+        currentPage = 1;
+
+        renderTable();
+
+        closeAllPopovers();
+
+      });
+
+
+
+      /* ===== DUAL-MONTH CALENDAR (Konsisten Kas & Bank / Pendapatan) ===== */
+
+      let calViewYear = 2026;
+
+      let calViewMonth = 11;
+
+      let calSelectedStart = null;
+
+      let calSelectedEnd = null;
+
+
+
+      function formatYMD(y, m, d) {
+
+        return String(y) + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+      }
+
+
+
+      function updateCalendarSelectedText() {
+
+        const infoEl = document.getElementById('tbCalSelectedText');
+
+        if (!infoEl) return;
+
+        if (calSelectedStart && calSelectedEnd) {
+
+          infoEl.textContent = calSelectedStart + ' - ' + calSelectedEnd;
+
+        } else if (calSelectedStart) {
+
+          infoEl.textContent = calSelectedStart + ' - --';
+
+        } else {
+
+          infoEl.textContent = '- - -';
+
+        }
+
+      }
+
+
+
+      function renderCalendarMonth(containerId, titleId, year, month) {
+
+        const container = document.getElementById(containerId);
+
+        const titleEl = document.getElementById(titleId);
+
+        if (!container || !titleEl) return;
+
+
+
+        titleEl.textContent = year + ' - ' + String(month).padStart(2, '0');
+
+        container.innerHTML = '';
+
+
+
+        const firstDayIdx = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        const prevMonthDays = new Date(year, month - 1, 0).getDate();
+
+
+
+        for (let i = firstDayIdx - 1; i >= 0; i--) {
+
+          const dayNum = prevMonthDays - i;
+
+          const cell = document.createElement('div');
+
+          cell.className = 'pnd-cal-day pnd-day-muted';
+
+          cell.textContent = dayNum;
+
+          container.appendChild(cell);
+
+        }
+
+
+
+        for (let d = 1; d <= daysInMonth; d++) {
+
+          const dateStr = formatYMD(year, month, d);
+
+          const cell = document.createElement('div');
+
+          cell.className = 'pnd-cal-day';
+
+          cell.textContent = d;
+
+
+
+          if (dateStr === calSelectedStart) {
+
+            cell.classList.add('pnd-day-selected-start');
+
+          } else if (dateStr === calSelectedEnd) {
+
+            cell.classList.add('pnd-day-selected-end');
+
+          } else if (calSelectedStart && calSelectedEnd && dateStr > calSelectedStart && dateStr < calSelectedEnd) {
+
+            cell.classList.add('pnd-day-in-range');
+
+          }
+
+
+
+          cell.addEventListener('click', function (e) {
+
+            e.stopPropagation();
+
+            if (!calSelectedStart || (calSelectedStart && calSelectedEnd)) {
+
+              calSelectedStart = dateStr;
+
+              calSelectedEnd = null;
+
+            } else if (calSelectedStart && !calSelectedEnd) {
+
+              if (dateStr < calSelectedStart) {
+
+                calSelectedStart = dateStr;
+
+                calSelectedEnd = null;
+
+              } else {
+
+                calSelectedEnd = dateStr;
+
+              }
+
+            }
+
+            updateCalendarSelectedText();
+
+            renderDualCalendar();
+
+          });
+
+
+
+          container.appendChild(cell);
+
+        }
+
+
+
+        const totalSlots = container.children.length;
+
+        const remaining = (totalSlots % 7 === 0) ? 0 : 7 - (totalSlots % 7);
+
+        for (let nextD = 1; nextD <= remaining; nextD++) {
+
+          const cell = document.createElement('div');
+
+          cell.className = 'pnd-cal-day pnd-day-muted';
+
+          cell.textContent = nextD;
+
+          container.appendChild(cell);
+
+        }
+
+      }
+
+
+
+      function renderDualCalendar() {
+
+        renderCalendarMonth('tbCalGridLeft', 'tbCalTitleLeft', calViewYear, calViewMonth);
+
+
+
+        let nextM = calViewMonth + 1;
+
+        let nextY = calViewYear;
+
+        if (nextM > 12) {
+
+          nextM = 1;
+
+          nextY++;
+
+        }
+
+        renderCalendarMonth('tbCalGridRight', 'tbCalTitleRight', nextY, nextM);
+
+        updateCalendarSelectedText();
+
+      }
+
+
+
+      const tbNavPrevYear = document.getElementById('tbCalPrevYear');
+
+      const tbNavNextYear = document.getElementById('tbCalNextYear');
+
+      const tbNavPrevMonth = document.getElementById('tbCalPrevMonth');
+
+      const tbNavNextMonth = document.getElementById('tbCalNextMonth');
+
+      const btnCancelCalendarTb = document.getElementById('btnCancelCalendarTb');
+
+      const btnApplyCalendarTb = document.getElementById('btnApplyCalendarTb');
+
+
+
+      if (tbNavPrevYear) tbNavPrevYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear--; renderDualCalendar(); });
+
+      if (tbNavNextYear) tbNavNextYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear++; renderDualCalendar(); });
+
+      if (tbNavPrevMonth) {
+
+        tbNavPrevMonth.addEventListener('click', function (e) {
+
+          e.stopPropagation();
+
+          calViewMonth--;
+
+          if (calViewMonth < 1) { calViewMonth = 12; calViewYear--; }
+
+          renderDualCalendar();
+
+        });
+
+      }
+
+      if (tbNavNextMonth) {
+
+        tbNavNextMonth.addEventListener('click', function (e) {
+
+          e.stopPropagation();
+
+          calViewMonth++;
+
+          if (calViewMonth > 12) { calViewMonth = 1; calViewYear++; }
+
+          renderDualCalendar();
+
+        });
+
+      }
+
+
+
+      document.querySelectorAll('#calendarTbDropdown .pnd-cal-preset-btn').forEach(function (btn) {
+
+        btn.addEventListener('click', function (e) {
+
+          e.stopPropagation();
+
+          document.querySelectorAll('#calendarTbDropdown .pnd-cal-preset-btn').forEach(function (b) { b.classList.remove('is-active'); });
+
+          btn.classList.add('is-active');
+
+
+
+          const preset = btn.getAttribute('data-preset');
+
+          const now = new Date(2026, 10, 1);
+
+          let startD = new Date(now);
+
+          let endD = new Date(now);
+
+
+
+          if (preset === 'today') {
+
+            // today
+
+          } else if (preset === 'yesterday') {
+
+            startD.setDate(startD.getDate() - 1);
+
+            endD.setDate(endD.getDate() - 1);
+
+          } else if (preset === 'last7') {
+
+            startD.setDate(startD.getDate() - 6);
+
+          } else if (preset === 'last30') {
+
+            startD.setDate(startD.getDate() - 29);
+
+          } else if (preset === 'last3m') {
+
+            startD.setMonth(startD.getMonth() - 3);
+
+          } else if (preset === 'last6m') {
+
+            startD.setMonth(startD.getMonth() - 6);
+
+          } else if (preset === 'last12m') {
+
+            startD.setFullYear(startD.getFullYear() - 1);
+
+          }
+
+
+
+          calSelectedStart = formatYMD(startD.getFullYear(), startD.getMonth() + 1, startD.getDate());
+
+          calSelectedEnd = formatYMD(endD.getFullYear(), endD.getMonth() + 1, endD.getDate());
+
+          calViewYear = startD.getFullYear();
+
+          calViewMonth = startD.getMonth() + 1;
+
+
+
+          renderDualCalendar();
+
+        });
+
+      });
+
+
+
+      if (btnCalendarTb && calendarTbDropdown) {
+
+        btnCalendarTb.addEventListener('click', function (e) {
+
+          e.preventDefault();
+
+          e.stopPropagation();
+
+          const willOpen = !calendarTbDropdown.classList.contains('is-active');
+
+          closeAllPopovers();
+
+          if (willOpen) {
+
+            calendarTbDropdown.classList.add('is-active');
+
+            renderDualCalendar();
+
+          }
+
+        });
+
+      }
+
+
+
+      if (btnApplyCalendarTb) {
+
+        btnApplyCalendarTb.addEventListener('click', function () {
+
+          filters.startDate = calSelectedStart || '';
+
+          filters.endDate = calSelectedEnd || calSelectedStart || '';
+
+          if (filters.startDate || filters.endDate) {
+
+            btnCalendarTb.classList.add('has-filter');
+
+            btnCalendarTb.setAttribute('title', 'Filter tanggal: ' + filters.startDate + ' s/d ' + filters.endDate);
+
+          } else {
+
+            btnCalendarTb.classList.remove('has-filter');
+
+            btnCalendarTb.setAttribute('title', 'Filter Berdasarkan Tanggal');
+
+          }
+
+          currentPage = 1;
+
+          renderTable();
+
+          closeAllPopovers();
+
+        });
+
+      }
+
+
+
+      if (btnCancelCalendarTb) {
+
+        btnCancelCalendarTb.addEventListener('click', function () {
+
+          calSelectedStart = filters.startDate || null;
+
+          calSelectedEnd = filters.endDate || null;
+
+          if (!filters.startDate && !filters.endDate) {
+
+            btnCalendarTb.classList.remove('has-filter');
+
+          }
+
+          renderDualCalendar();
+
+          closeAllPopovers();
+
+        });
+
+      }
+
+
+
+      /* ===== EXPORT DIRECT TO EXCEL (.xlsx) (Konsisten Kas & Bank / Pendapatan) ===== */
+
+      function exportToExcel() {
+
+        const filtered = getFilteredData();
+
+        if (filtered.length === 0) {
+
+          if (typeof Swal !== 'undefined') {
+
+            Swal.fire({ icon: 'warning', title: 'Data Kosong', text: 'Tidak ada data tagihan berkala untuk diekspor.' });
+
+          }
+
+          return;
+
+        }
+
+
+
+        const todayStr = new Date().toISOString().slice(0, 10);
+
+        const filename = 'Tagihan_Berkala_' + todayStr + '.xlsx';
+
+
+
+        const headers = [
+
+          'No',
+
+          'Item Tagihan',
+
+          'Keterangan',
+
+          'Umur Ekonomis',
+
+          'Akses',
+
+          'Harga',
+
+          'Tanggal Bayar',
+
+          'Jatuh Tempo',
+
+          'Keterangan Tambahan',
+
+          'Status'
+
+        ];
+
+
+
+        const rows = filtered.map(function (item, idx) {
+
+          return [
+
+            idx + 1,
+
+            item.itemTagihan || '-',
+
+            item.keterangan || '-',
+
+            item.umurEkonomis || '-',
+
+            item.akses || '-',
+
+            Number(item.harga || 0),
+
+            item.tanggalBayar || '-',
+
+            item.jatuhTempo || '-',
+
+            item.keteranganTambahan || '-',
+
+            item.status || 'Lunas'
+
+          ];
+
+        });
+
+
+
+        if (typeof window.exportBisaExcel === 'function') {
+
+          window.exportBisaExcel({
+
+            title: 'LAPORAN TAGIHAN BERKALA',
+
+            filename: filename,
+
+            sheetName: 'Tagihan Berkala',
+
+            headers: headers,
+
+            rows: rows
+
+          });
+
+        } else {
+
+          let tableHtml = '<table border="1"><thead><tr>';
+
+          headers.forEach(h => { tableHtml += '<th style="background:#0076C5;color:#fff;">' + h + '</th>'; });
+
+          tableHtml += '</tr></thead><tbody>';
+
+          rows.forEach(r => {
+
+            tableHtml += '<tr>';
+
+            r.forEach(c => { tableHtml += '<td>' + String(c).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</td>'; });
+
+            tableHtml += '</tr>';
+
+          });
+
+          tableHtml += '</tbody></table>';
+
+
+
+          const blob = new Blob(['\uFEFF' + tableHtml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+
+          const url = URL.createObjectURL(blob);
+
+          const link = document.createElement('a');
+
+          link.href = url;
+
+          link.download = 'Tagihan_Berkala_' + todayStr + '.xls';
+
+          document.body.appendChild(link);
+
+          link.click();
+
+          document.body.removeChild(link);
+
+        }
+
+      }
+
+
+
+      if (btnExportTb) {
+
+        btnExportTb.addEventListener('click', exportToExcel);
+
+      }
+
+
+
+      /* ===== ACTION MENU TRIGGER & POSITIONING ===== */
+
+      document.addEventListener('click', function (e) {
+
+        const trigger = e.target.closest('[data-action-toggle]');
+
+        if (trigger) {
+
+          e.stopPropagation();
+
+          const itemId = trigger.getAttribute('data-action-toggle');
+
+          activeActionId = itemId;
+
+
+
+          const rect = trigger.getBoundingClientRect();
+
+          const menuWidth = 145;
+
+          const menuHeight = 120;
+
+
+
+          let left = rect.left - menuWidth + 24;
+
+          let top = rect.bottom + 4;
+
+
+
+          if (left < 10) left = 10;
+
+          if (top + menuHeight > window.innerHeight) {
+
+            top = rect.top - menuHeight - 4;
+
+          }
+
+
+
+          tbActionMenu.style.left = left + 'px';
+
+          tbActionMenu.style.top = top + 'px';
+
+          tbActionMenu.classList.add('is-open');
+
+        }
+
+      });
+
+
+
+      // View Detail
+
+      actionView.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        if (!activeActionId) return;
+
+        const item = dataList.find(d => d.id === activeActionId);
+
+        if (!item) return;
+
+
+
+        detailContainer.innerHTML = `
+
+          <div class="pnd-detail-item col-full">
+
+            <span class="pnd-detail-label">Item Tagihan</span>
+
+            <span class="pnd-detail-value" style="color: #0076C5; font-size: 15px;">${escapeHtml(item.itemTagihan || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Umur Ekonomis</span>
+
+            <span class="pnd-detail-value">${escapeHtml(item.umurEkonomis || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Harga (Biaya Berkala)</span>
+
+            <span class="pnd-detail-value" style="color: #16a34a; font-size: 15px;">${formatRupiah(item.harga)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Akses</span>
+
+            <span class="pnd-detail-value" style="color: #0284c7;">${escapeHtml(item.akses || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Status Pembayaran</span>
+
+            <span class="pnd-detail-value">${renderStatusBadge(item.status)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Tanggal Bayar</span>
+
+            <span class="pnd-detail-value">${formatDateIndo(item.tanggalBayar)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Jatuh Tempo</span>
+
+            <span class="pnd-detail-value" style="color: #b45309;">${formatDateIndo(item.jatuhTempo)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Keterangan</span>
+
+            <span class="pnd-detail-value" style="font-weight: 400; color: #334155;">${escapeHtml(item.keterangan || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Keterangan Tambahan</span>
+
+            <span class="pnd-detail-value" style="font-weight: 400; color: #334155;">${escapeHtml(item.keteranganTambahan || '-')}</span>
+
+          </div>
+
+        `;
+
+
+
+        tbViewModal.classList.add('is-active');
+
+      });
+
+
+
+      // Edit Item
+
+      actionEdit.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        if (!activeActionId) return;
+
+        const idx = dataList.findIndex(d => d.id === activeActionId);
+
+        if (idx === -1) return;
+
+        const item = dataList[idx];
+
+
+
+        tbFormActionText.textContent = 'Edit';
+
+        editIndex.value = idx;
+
+
+
+        formItemTagihan.value = item.itemTagihan || '';
+
+        formKeterangan.value = item.keterangan || '';
+
+        formUmurEkonomis.value = item.umurEkonomis || '';
+
+        formAkses.value = item.akses || '';
+
+        formHarga.value = item.harga || 0;
+
+        formStatus.value = item.status || 'Lunas';
+
+        formTanggalBayar.value = item.tanggalBayar || '';
+
+        formJatuhTempo.value = item.jatuhTempo || '';
+
+        formKeteranganTambahan.value = item.keteranganTambahan || '';
+
+
+
+        tbFormModal.classList.add('is-active');
+
+      });
+
+
+
+      // Delete Item
+
+      actionDelete.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        if (!activeActionId) return;
+
+        const item = dataList.find(d => d.id === activeActionId);
+
+        if (!item) return;
+
+
+
+        Swal.fire({
+
+          title: 'Hapus Tagihan Berkala?',
+
+          html: `Apakah Anda yakin ingin menghapus tagihan <strong>${escapeHtml(item.itemTagihan)}</strong>?`,
+
+          icon: 'warning',
+
+          showCancelButton: true,
+
+          confirmButtonColor: '#ef4444',
+
+          cancelButtonColor: '#64748b',
+
+          confirmButtonText: 'Ya, Hapus!',
+
+          cancelButtonText: 'Batal',
+
+          reverseButtons: true
+
+        }).then(result => {
+
+          if (result.isConfirmed) {
+
+            dataList = dataList.filter(d => d.id !== activeActionId);
+
+            saveData(dataList);
+
+            renderTable();
+
+
+
+            Swal.fire({
+
+              title: 'Berhasil Dihapus',
+
+              text: 'Data tagihan berkala telah berhasil dihapus.',
+
+              icon: 'success',
+
+              timer: 1600,
+
+              showConfirmButton: false
+
+            });
+
+          }
+
+        });
+
+      });
+
+
+
+      /* ===== TAMBAH TAGIHAN (NEW MODAL) ===== */
+
+      btnTambahTagihan.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        tbFormActionText.textContent = 'Tambah';
+
+        editIndex.value = -1;
+
+        tbForm.reset();
+
+
+
+        const today = new Date().toISOString().slice(0, 10);
+
+        formTanggalBayar.value = today;
+
+        formStatus.value = 'Lunas';
+
+
+
+        tbFormModal.classList.add('is-active');
+
+      });
+
+
+
+      /* ===== FORM SUBMIT (SAVE) ===== */
+
+      tbForm.addEventListener('submit', function (e) {
+
+        e.preventDefault();
+
+
+
+        const idx = parseInt(editIndex.value, 10);
+
+        const newItem = {
+
+          id: idx === -1 ? ('TB-' + String(Date.now()).slice(-5)) : dataList[idx].id,
+
+          itemTagihan: formItemTagihan.value.trim(),
+
+          keterangan: formKeterangan.value.trim(),
+
+          umurEkonomis: formUmurEkonomis.value.trim(),
+
+          akses: formAkses.value.trim(),
+
+          harga: parseFloat(formHarga.value) || 0,
+
+          status: formStatus.value,
+
+          tanggalBayar: formTanggalBayar.value,
+
+          jatuhTempo: formJatuhTempo.value,
+
+          keteranganTambahan: formKeteranganTambahan.value.trim()
+
+        };
+
+
+
+        if (idx === -1) {
+
+          dataList.unshift(newItem);
+
+        } else {
+
+          dataList[idx] = newItem;
+
+        }
+
+
+
+        saveData(dataList);
+
+        tbFormModal.classList.remove('is-active');
+
+        renderTable();
+
+
+
+        Swal.fire({
+
+          title: 'Berhasil Disimpan',
+
+          text: `Data tagihan berkala telah berhasil ${idx === -1 ? 'ditambahkan' : 'diperbarui'}.`,
+
+          icon: 'success',
+
+          timer: 1600,
+
+          showConfirmButton: false
+
+        });
+
+      });
+
+
+
+      /* ===== MODAL CLOSE EVENTS ===== */
+
+      document.querySelectorAll('[data-close-modal]').forEach(btn => {
+
+        btn.addEventListener('click', function () {
+
+          const modalId = this.getAttribute('data-close-modal');
+
+          const modal = document.getElementById(modalId);
+
+          if (modal) modal.classList.remove('is-active');
+
+        });
+
+      });
+
+
+
+      document.querySelectorAll('.pnd-modal-overlay').forEach(overlay => {
+
+        overlay.addEventListener('click', function (e) {
+
+          if (e.target === this) {
+
+            this.classList.remove('is-active');
+
+          }
+
+        });
+
+      });
+
+
+
+      /* ===== INITIALIZE ===== */
+
+      renderTable();
+
+    })();
+
+  </script>
+
+</body>
+
+</html>
+

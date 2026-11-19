@@ -589,6 +589,11 @@
 
     .pnd-filter-group {
       margin-bottom: 14px;
+      position: relative;
+    }
+
+    .pnd-filter-box.is-open {
+      z-index: 70;
     }
 
     .pnd-filter-label {
@@ -2434,7 +2439,7 @@
                 </svg>
               </button>
 
-              <!-- Popover Filter Kode COA (Sesuai Referensi Gambar 1 & 2) -->
+              <!-- Popover Filter Kode COA & Customer -->
               <div id="filterPndDropdown" class="pnd-filter-popover">
                 <div class="pnd-filter-group">
                   <label class="pnd-filter-label" for="filterKodeCoa">Kode COA</label>
@@ -2448,6 +2453,21 @@
                       </span>
                     </div>
                     <div class="pnd-filter-dropdown-list" id="listFilterKodeCoa"></div>
+                  </div>
+                </div>
+
+                <div class="pnd-filter-group">
+                  <label class="pnd-filter-label" for="filterCustomer">Customer</label>
+                  <div class="pnd-filter-box" id="boxFilterCustomer">
+                    <div class="pnd-filter-input-wrap">
+                      <input type="text" id="filterCustomer" class="pnd-filter-input" placeholder="Pilih Customer" autocomplete="off" />
+                      <span class="pnd-filter-arrow" title="Buka pilihan">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                    <div class="pnd-filter-dropdown-list" id="listFilterCustomer"></div>
                   </div>
                 </div>
 
@@ -3059,7 +3079,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="../../vendor/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
-  <script src="../../assets/js/layout.js?v=20261118_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
   <script>
     (function () {
       'use strict';
@@ -3083,6 +3103,7 @@
       const applyFilterBtn = document.getElementById('applyFilterPnd');
       const resetFilterBtn = document.getElementById('resetFilterPnd');
       const filterKodeCoaInput = document.getElementById('filterKodeCoa');
+      const filterCustomerInput = document.getElementById('filterCustomer');
 
       // Calendar Toolbar Elements
       const calendarDropdown = document.getElementById('calendarPndDropdown');
@@ -3154,7 +3175,7 @@
       let tempUploadedFile = '';
       let tempUploadedFileDataUrl = '';
       let pndData = loadData();
-      let filters = { kodeCoa: '', tglMulai: '', tglSelesai: '' };
+      let filters = { kodeCoa: '', customer: '', tglMulai: '', tglSelesai: '' };
 
       /* ===== RELASI DATA MASTER & KAS & BANK ===== */
       function getMasterCoaList() {
@@ -3821,9 +3842,13 @@
 
       function updateFilterIndicators() {
         if (btnFilter) {
-          if (filters.kodeCoa) {
+          const activeFilters = [];
+          if (filters.kodeCoa) activeFilters.push('COA: ' + filters.kodeCoa);
+          if (filters.customer) activeFilters.push('Customer: ' + filters.customer);
+
+          if (activeFilters.length > 0) {
             btnFilter.classList.add('has-filter');
-            btnFilter.setAttribute('title', 'Filter aktif: ' + filters.kodeCoa);
+            btnFilter.setAttribute('title', 'Filter aktif: ' + activeFilters.join(', '));
           } else {
             btnFilter.classList.remove('has-filter');
             btnFilter.setAttribute('title', 'Filter Pendapatan');
@@ -3843,6 +3868,7 @@
       function getFilteredData() {
         const query = (searchInput && searchInput.value ? searchInput.value : '').trim().toLowerCase();
         const fKode = (filters.kodeCoa || '').trim().toLowerCase();
+        const fCustomer = (filters.customer || '').trim().toLowerCase();
         const fMulai = filters.tglMulai || '';
         const fSelesai = filters.tglSelesai || '';
 
@@ -3868,6 +3894,12 @@
             matchesKode = itemCoa.includes(fKode) || itemCoa.includes(filterCoaCode);
           }
 
+          let matchesCustomer = true;
+          if (fCustomer) {
+            const itemCust = String(item.customer || '').toLowerCase();
+            matchesCustomer = itemCust.includes(fCustomer);
+          }
+
           let matchesDate = true;
           if (fMulai && item.tanggalPengakuan) {
             if (item.tanggalPengakuan < fMulai) matchesDate = false;
@@ -3876,7 +3908,7 @@
             if (item.tanggalPengakuan > fSelesai) matchesDate = false;
           }
 
-          return matchesQuery && matchesKode && matchesDate;
+          return matchesQuery && matchesKode && matchesCustomer && matchesDate;
         });
       }
 
@@ -3934,11 +3966,17 @@
       }
 
       function closeFilterSearchBoxes() {
-        const box = document.getElementById('boxFilterKodeCoa');
-        if (box) {
-          box.classList.remove('is-open');
+        const boxCoa = document.getElementById('boxFilterKodeCoa');
+        if (boxCoa) {
+          boxCoa.classList.remove('is-open');
           const inp = document.getElementById('filterKodeCoa');
           if (inp && !inp.value) inp.placeholder = 'Pilih Kode COA';
+        }
+        const boxCust = document.getElementById('boxFilterCustomer');
+        if (boxCust) {
+          boxCust.classList.remove('is-open');
+          const inp = document.getElementById('filterCustomer');
+          if (inp && !inp.value) inp.placeholder = 'Pilih Customer';
         }
       }
 
@@ -5016,7 +5054,107 @@
         }
       }
 
+      function getCustomerOptions() {
+        const set = new Set();
+        pndData.forEach(function (d) {
+          const cust = (d.customer || '').trim();
+          if (cust && cust !== '-') {
+            set.add(cust);
+          }
+        });
+        try {
+          const rawCust = localStorage.getItem('accounting_master_customer_v1') || localStorage.getItem('accounting_master_customer_project_v1');
+          if (rawCust) {
+            const parsed = JSON.parse(rawCust);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(function (c) {
+                const name = (c.customer || c.namaCustomer || c.namaPelanggan || c.nama || '').trim();
+                if (name && name !== '-') set.add(name);
+              });
+            }
+          }
+        } catch (e) {}
+        return Array.from(set).sort(function (a, b) {
+          return a.localeCompare(b, undefined, { sensitivity: 'base' });
+        });
+      }
+
+      function initSearchableCustomerFilter() {
+        const box = document.getElementById('boxFilterCustomer');
+        const input = document.getElementById('filterCustomer');
+        const list = document.getElementById('listFilterCustomer');
+        if (!box || !input || !list) return;
+
+        function renderList(query) {
+          const q = (query || '').toLowerCase().trim();
+          const options = getCustomerOptions();
+          const filtered = options.filter(function (opt) {
+            return !q || String(opt).toLowerCase().includes(q);
+          });
+
+          list.innerHTML = '';
+          if (filtered.length === 0) {
+            const emptyItem = document.createElement('div');
+            emptyItem.className = 'pnd-filter-item';
+            emptyItem.style.color = '#94a3b8';
+            emptyItem.style.fontStyle = 'italic';
+            emptyItem.style.cursor = 'default';
+            emptyItem.textContent = 'Tidak ditemukan';
+            list.appendChild(emptyItem);
+            return;
+          }
+
+          filtered.forEach(function (opt) {
+            const itemDiv = document.createElement('div');
+            const isSelected = input.value.trim().toLowerCase() === String(opt).toLowerCase();
+            itemDiv.className = 'pnd-filter-item' + (isSelected ? ' is-selected' : '');
+            itemDiv.textContent = opt;
+            itemDiv.addEventListener('click', function (e) {
+              e.stopPropagation();
+              input.value = opt;
+              box.classList.remove('is-open');
+              input.placeholder = 'Pilih Customer';
+            });
+            list.appendChild(itemDiv);
+          });
+        }
+
+        input.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = box.classList.contains('is-open');
+          closeFilterSearchBoxes();
+          if (!isOpen) {
+            box.classList.add('is-open');
+            input.placeholder = 'Cari Customer';
+            renderList(input.value);
+          }
+        });
+
+        input.addEventListener('input', function () {
+          if (!box.classList.contains('is-open')) {
+            box.classList.add('is-open');
+          }
+          renderList(input.value);
+        });
+
+        const arrow = box.querySelector('.pnd-filter-arrow');
+        if (arrow) {
+          arrow.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = box.classList.contains('is-open');
+            closeFilterSearchBoxes();
+            if (!isOpen) {
+              box.classList.add('is-open');
+              input.placeholder = 'Cari Customer';
+              renderList('');
+              input.focus();
+            }
+          });
+        }
+      }
+
       initSearchableCoaFilter();
+      initSearchableCustomerFilter();
 
       if (btnFilter && filterDropdown) {
         btnFilter.addEventListener('click', function (e) {
@@ -5031,6 +5169,7 @@
       if (applyFilterBtn) {
         applyFilterBtn.addEventListener('click', function () {
           filters.kodeCoa = filterKodeCoaInput ? filterKodeCoaInput.value.trim() : '';
+          filters.customer = filterCustomerInput ? filterCustomerInput.value.trim() : '';
           renderTable();
           updateFilterIndicators();
           closePopovers();
@@ -5040,7 +5179,9 @@
       if (resetFilterBtn) {
         resetFilterBtn.addEventListener('click', function () {
           if (filterKodeCoaInput) filterKodeCoaInput.value = '';
+          if (filterCustomerInput) filterCustomerInput.value = '';
           filters.kodeCoa = '';
+          filters.customer = '';
           closeFilterSearchBoxes();
           renderTable();
           updateFilterIndicators();
@@ -5447,7 +5588,8 @@
             namaAkunCoa: document.getElementById('pndNamaAkunCoa').value.trim(),
             kelompokCoa: document.getElementById('pndKelompokCoa').value.trim(),
             statusCoa: document.getElementById('pndStatusCoa').value.trim() || 'Aktif (Ya)',
-            divisiPengecualian: document.getElementById('pndDivisiPengecualian').value.trim() || '-'
+            divisiPengecualian: document.getElementById('pndDivisiPengecualian').value.trim() || '-',
+            updatedAt: Date.now()
           };
 
           if (editId) {
@@ -5457,7 +5599,8 @@
             }
           } else {
             pndData.unshift(Object.assign({
-              id: 'pnd-' + Date.now()
+              id: 'pnd-' + Date.now(),
+              createdAt: Date.now()
             }, payload));
           }
 

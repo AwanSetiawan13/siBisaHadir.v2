@@ -1,0 +1,5894 @@
+<!DOCTYPE html>
+
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Pengajuan Barang & Jasa | Bisa Media</title>
+
+
+
+  <!-- Google Fonts: Outfit -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+
+
+  <!-- Global & Vendor CSS -->
+
+  <link rel="stylesheet" href="../../assets/css/style.css?v=20261118_v4" />
+
+  <link rel="icon" type="image/png" href="../../media/logo.png" />
+
+
+
+  <!-- SweetAlert2 -->
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+  <style>
+
+    /* ==========================================================================
+
+       PENGAJUAN BARANG & JASA - EXACT SYSTEM MATCH (PENDAPATAN & KAS BANK)
+
+       ========================================================================== */
+
+
+
+    body {
+
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      color: #1e293b;
+
+      background-color: #f8fafc;
+
+    }
+
+
+
+    /* ===== SUMMARY KPI CARDS (Konsisten Pendapatan & Approval Pengeluaran) ===== */
+
+    .pnd-summary-cards {
+
+      display: grid;
+
+      grid-template-columns: repeat(4, 1fr);
+
+      gap: 16px;
+
+      margin-bottom: 20px;
+
+    }
+
+
+
+    @media (max-width: 1024px) {
+
+      .pnd-summary-cards {
+
+        grid-template-columns: repeat(2, 1fr);
+
+      }
+
+    }
+
+
+
+    @media (max-width: 640px) {
+
+      .pnd-summary-cards {
+
+        grid-template-columns: 1fr;
+
+      }
+
+    }
+
+
+
+    .pnd-card {
+
+      position: relative;
+
+      background: #ffffff;
+
+      border: 1px solid #e2e8f0;
+
+      border-top: 3.5px solid #0076C5;
+
+      border-radius: 12px;
+
+      padding: 14px 18px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    }
+
+
+
+    .pnd-card.pnd-card--total {
+
+      border-top-color: #0076C5;
+
+    }
+
+
+
+    .pnd-card.pnd-card--disetujui {
+
+      border-top-color: #16a34a;
+
+    }
+
+
+
+    .pnd-card.pnd-card--menunggu-review {
+
+      border-top-color: #f59e0b;
+
+    }
+
+
+
+    .pnd-card.pnd-card--biaya {
+
+      border-top-color: #ef4444;
+
+    }
+
+
+
+    .pnd-card.pnd-card--ditolak {
+
+      border-top-color: #ef4444;
+
+    }
+
+
+
+    .pnd-card:hover {
+
+      transform: translateY(-2px);
+
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+
+    }
+
+
+
+    .pnd-card.pnd-card--total:hover {
+
+      box-shadow: 0 6px 14px rgba(0, 118, 197, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--disetujui:hover {
+
+      box-shadow: 0 6px 14px rgba(22, 163, 74, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--menunggu-review:hover {
+
+      box-shadow: 0 6px 14px rgba(245, 158, 11, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--biaya:hover {
+
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.12);
+
+    }
+
+
+
+    .pnd-card.pnd-card--ditolak:hover {
+
+      box-shadow: 0 6px 14px rgba(239, 68, 68, 0.12);
+
+    }
+
+
+
+    .pnd-card-info {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+
+    }
+
+
+
+    .pnd-card-label {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 500;
+
+      color: #64748b;
+
+    }
+
+
+
+    .pnd-card-value {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 20px;
+
+      font-weight: 700;
+
+      color: #0f172a;
+
+      letter-spacing: -0.3px;
+
+    }
+
+
+
+    .pnd-card-icon {
+
+      width: 40px;
+
+      height: 40px;
+
+      border-radius: 10px;
+
+      background: #0076C5;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #ffffff;
+
+      flex-shrink: 0;
+
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
+
+    }
+
+
+
+    .pnd-card-icon svg {
+
+      width: 20px;
+
+      height: 20px;
+
+      stroke: #ffffff;
+
+      stroke-width: 2;
+
+    }
+
+
+
+    .pnd-card-icon.icon-total,
+
+    .pnd-card-icon.icon-blue {
+
+      background: #0076C5;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-disetujui,
+
+    .pnd-card-icon.icon-green {
+
+      background: #16a34a;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-menunggu-review,
+
+    .pnd-card-icon.icon-amber {
+
+      background: #f59e0b;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-biaya,
+
+    .pnd-card-icon.icon-purple {
+
+      background: #ef4444;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.28);
+
+    }
+
+
+
+    .pnd-card-icon.icon-ditolak,
+
+    .pnd-card-icon.icon-red {
+
+      background: #ef4444;
+
+      color: #ffffff;
+
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.28);
+
+    }
+
+
+
+    /* ===== MAIN PANEL & TOOLBAR ===== */
+
+    .panel.campaign-panel,
+
+    .campaign-panel {
+
+      border-radius: 14px !important;
+
+      border: 1px solid #e2e8f0 !important;
+
+      background: #ffffff !important;
+
+      padding: 20px !important;
+
+      position: relative !important;
+
+      overflow: visible !important;
+
+      box-sizing: border-box !important;
+
+      margin-bottom: 24px;
+
+    }
+
+
+
+    .campaign-panel__line,
+
+    .pnd-panel-line {
+
+      display: block !important;
+
+      height: 4px !important;
+
+      margin: -20px -20px 16px -20px !important;
+
+      border-radius: 14px 14px 0 0 !important;
+
+      background: #0076C5 !important;
+
+      width: calc(100% + 40px) !important;
+
+    }
+
+
+
+    .pnd-toolbar {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      margin-bottom: 16px;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .pnd-toolbar__left {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .pnd-toolbar__right {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+    }
+
+
+
+    .filter-dropdown-wrapper {
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-btn-icon {
+
+      width: 34px;
+
+      height: 34px;
+
+      padding: 0;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      color: #0284c7;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      cursor: pointer;
+
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+      transition: all 0.15s ease;
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-btn-icon:hover {
+
+      border-color: #0284c7;
+
+      color: #0284c7;
+
+      background: #f0f9ff;
+
+    }
+
+
+
+    .pnd-btn-icon.has-filter {
+
+      background: #e0f2fe !important;
+
+      border-color: #0284c7 !important;
+
+      color: #0284c7 !important;
+
+    }
+
+
+
+    .pnd-btn-icon.has-filter::after {
+
+      content: '';
+
+      position: absolute;
+
+      top: -3px;
+
+      right: -3px;
+
+      width: 8px;
+
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #ef4444;
+
+      border: 2px solid #ffffff;
+
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+
+    }
+
+
+
+    .pnd-btn-icon svg {
+
+      width: 16px;
+
+      height: 16px;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 2;
+
+      stroke-linecap: round;
+
+      stroke-linejoin: round;
+
+    }
+
+
+
+    .pnd-btn-excel {
+
+      background: #f0fdf4 !important;
+
+      border-color: #86efac !important;
+
+      color: #15803d !important;
+
+    }
+
+
+
+    .pnd-btn-excel:hover {
+
+      background: #dcfce7 !important;
+
+      border-color: #4ade80 !important;
+
+    }
+
+
+
+    /* Search Box (Konsisten Kas & Bank / Pendapatan) */
+
+    .pnd-search-wrap {
+
+      position: relative;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      width: 180px;
+
+      transition: width 0.2s ease;
+
+    }
+
+
+
+    .pnd-search-wrap:focus-within {
+
+      width: 260px;
+
+    }
+
+
+
+    .pnd-search-wrap svg {
+
+      position: absolute;
+
+      left: 10px;
+
+      width: 15px;
+
+      height: 15px;
+
+      color: #64748b;
+
+      pointer-events: none;
+
+    }
+
+
+
+    .pnd-search-wrap input {
+
+      width: 100%;
+
+      height: 34px;
+
+      padding: 0 30px 0 32px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      color: #1e293b;
+
+      outline: none;
+
+      box-sizing: border-box;
+
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    }
+
+
+
+    .pnd-search-wrap input:focus {
+
+      border-color: #38bdf8;
+
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+
+    }
+
+
+
+    .pnd-search-clear {
+
+      position: absolute;
+
+      right: 8px;
+
+      width: 18px;
+
+      height: 18px;
+
+      border: 0;
+
+      background: #cbd5e1;
+
+      color: #ffffff;
+
+      border-radius: 50%;
+
+      font-size: 11px;
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      cursor: pointer;
+
+      line-height: 1;
+
+    }
+
+
+
+    .pnd-search-clear.is-visible {
+
+      display: flex;
+
+    }
+
+
+
+    /* Primary Add Button (Konsisten .btn-tambah-pnd) */
+
+    .btn-tambah-pnd {
+
+      height: 36px;
+
+      padding: 0 18px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #28a5de;
+
+      color: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 6px;
+
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+
+      transition: background 0.15s ease, transform 0.1s ease;
+
+    }
+
+
+
+    .btn-tambah-pnd:hover {
+
+      background: #0284c7;
+
+    }
+
+
+
+    .btn-tambah-pnd:active {
+
+      transform: scale(0.98);
+
+    }
+
+
+
+    /* ===== POPOVER FILTER (Konsisten Kas & Bank / Pendapatan) ===== */
+
+    .pnd-filter-popover {
+
+      position: absolute;
+
+      top: calc(100% + 8px);
+
+      left: 0;
+
+      width: 290px;
+
+      background: #ffffff;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 16px;
+
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+
+      padding: 18px 18px 16px 18px;
+
+      z-index: 120;
+
+      display: none;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-filter-popover.is-active {
+
+      display: block;
+
+    }
+
+
+
+    .pnd-filter-group {
+
+      margin-bottom: 14px;
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-filter-label {
+
+      display: block;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 14px;
+
+      font-weight: 500;
+
+      color: #1e293b;
+
+      margin-bottom: 6px;
+
+    }
+
+
+
+    .pnd-filter-select,
+
+    .pnd-filter-input {
+
+      width: 100%;
+
+      height: 38px;
+
+      padding: 0 12px;
+
+      border: 1.5px solid #38bdf8;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      color: #1e293b;
+
+      outline: none;
+
+      box-sizing: border-box;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-filter-actions {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 10px;
+
+      margin-top: 14px;
+
+      padding-top: 12px;
+
+      border-top: 1px solid #f1f5f9;
+
+    }
+
+
+
+    .pnd-filter-btn-reset {
+
+      border: none;
+
+      background: none;
+
+      color: #64748b;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 14px;
+
+      font-weight: 500;
+
+      cursor: pointer;
+
+      padding: 6px 10px;
+
+    }
+
+
+
+    .pnd-filter-btn-reset em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-filter-btn-reset:hover {
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-filter-btn-apply {
+
+      height: 34px;
+
+      padding: 0 16px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #0076C5;
+
+      color: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+      box-shadow: 0 2px 4px rgba(0, 118, 197, 0.2);
+
+    }
+
+
+
+    .pnd-filter-btn-apply em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-filter-btn-apply:hover {
+
+      background: #005fa0;
+
+    }
+
+
+
+    /* ===== POPOVER KALENDER DUAL-MONTH (Konsisten Pendapatan & Kas Bank) ===== */
+
+    .pnd-calendar-popover {
+
+      position: absolute;
+
+      top: calc(100% + 8px);
+
+      left: 0;
+
+      width: 630px;
+
+      max-width: 95vw;
+
+      background: #ffffff;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 14px;
+
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+      padding: 18px 20px 16px 20px;
+
+      z-index: 125;
+
+      display: none;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-calendar-popover.is-active {
+
+      display: block;
+
+    }
+
+
+
+    .pnd-cal-body {
+
+      display: flex;
+
+      gap: 18px;
+
+    }
+
+
+
+    .pnd-cal-sidebar {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 8px;
+
+      width: 145px;
+
+      flex-shrink: 0;
+
+    }
+
+
+
+    .pnd-cal-preset-btn {
+
+      background: #f4f5f8;
+
+      border: none;
+
+      border-radius: 6px;
+
+      padding: 9px 12px;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      color: #1e293b;
+
+      text-align: left;
+
+      cursor: pointer;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-cal-preset-btn:hover {
+
+      background: #e2e8f0;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-cal-preset-btn.is-active {
+
+      background: #0076C5;
+
+      color: #ffffff;
+
+    }
+
+
+
+    .pnd-cal-months {
+
+      flex: 1;
+
+      display: flex;
+
+      gap: 16px;
+
+      min-width: 0;
+
+    }
+
+
+
+    .pnd-cal-month-box {
+
+      flex: 1;
+
+      min-width: 0;
+
+    }
+
+
+
+    .pnd-cal-month-header {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 12px;
+
+      font-family: 'Outfit', sans-serif;
+
+    }
+
+
+
+    .pnd-cal-month-title {
+
+      font-size: 14.5px;
+
+      font-weight: 800;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-cal-nav {
+
+      cursor: pointer;
+
+      padding: 2px 8px;
+
+      border-radius: 4px;
+
+      color: #475569;
+
+      font-size: 15px;
+
+      font-weight: 800;
+
+      user-select: none;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-cal-nav:hover {
+
+      background: #f1f5f9;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-cal-weekdays {
+
+      display: grid;
+
+      grid-template-columns: repeat(7, 1fr);
+
+      text-align: center;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      color: #64748b;
+
+      margin-bottom: 8px;
+
+    }
+
+
+
+    .pnd-cal-days-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(7, 1fr);
+
+      gap: 3px 0;
+
+      text-align: center;
+
+    }
+
+
+
+    .pnd-cal-day {
+
+      height: 32px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 12.5px;
+
+      font-weight: 500;
+
+      color: #334155;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      transition: all 0.1s ease;
+
+      user-select: none;
+
+      position: relative;
+
+    }
+
+
+
+    .pnd-cal-day:hover:not(.pnd-day-muted) {
+
+      background: #f1f5f9;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-muted {
+
+      color: #cbd5e1;
+
+      cursor: default;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-selected-start {
+
+      background: #0076C5 !important;
+
+      color: #ffffff !important;
+
+      font-weight: 700;
+
+      border-radius: 6px;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-selected-end {
+
+      background: #eff6ff !important;
+
+      color: #0076C5 !important;
+
+      font-weight: 700;
+
+      border: 1.5px solid #0076C5;
+
+      border-radius: 6px;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-cal-day.pnd-day-in-range {
+
+      background: #eff6ff;
+
+      color: #0076C5;
+
+      border-radius: 0;
+
+    }
+
+
+
+    .pnd-cal-footer {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-top: 14px;
+
+      padding-top: 12px;
+
+      border-top: 1px solid #f1f5f9;
+
+    }
+
+
+
+    .pnd-cal-selected-info {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 12.5px;
+
+      color: #64748b;
+
+    }
+
+
+
+    .pnd-cal-selected-info span {
+
+      color: #0f172a;
+
+      font-weight: 600;
+
+    }
+
+
+
+    .pnd-cal-footer-actions {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+    }
+
+
+
+    .pnd-cal-btn-cancel {
+
+      height: 34px;
+
+      padding: 0 18px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      background: #f8fafc;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      color: #0f172a;
+
+      cursor: pointer;
+
+      transition: background 0.15s;
+
+    }
+
+
+
+    .pnd-cal-btn-cancel:hover {
+
+      background: #e2e8f0;
+
+    }
+
+
+
+    .pnd-cal-btn-apply {
+
+      height: 34px;
+
+      padding: 0 20px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #0076C5;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      color: #ffffff;
+
+      cursor: pointer;
+
+      transition: background 0.15s;
+
+    }
+
+
+
+    .pnd-cal-btn-apply:hover {
+
+      background: #005fa0;
+
+    }
+
+
+
+    @media (max-width: 680px) {
+
+      .pnd-calendar-popover {
+
+        width: calc(100vw - 32px);
+
+      }
+
+      .pnd-cal-body {
+
+        flex-direction: column;
+
+      }
+
+      .pnd-cal-sidebar {
+
+        width: 100%;
+
+        flex-direction: row;
+
+        overflow-x: auto;
+
+      }
+
+      .pnd-cal-months {
+
+        flex-direction: column;
+
+      }
+
+    }
+
+
+
+    /* ===== UNIFIED MODERN TABLE STYLING (EXACT MATCH PENDAPATAN) ===== */
+
+    .table-wrap.campaign-table {
+
+      overflow-x: auto !important;
+
+      background: #ffffff !important;
+
+      border: 1px solid #e4e4e7 !important;
+
+      border-radius: 12px !important;
+
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05) !important;
+
+      margin-bottom: 16px !important;
+
+      position: relative !important;
+
+    }
+
+
+
+    #pbjTable {
+
+      width: 100% !important;
+
+      border-collapse: separate !important;
+
+      border-spacing: 0 !important;
+
+      font-size: 13px !important;
+
+      text-align: left !important;
+
+      white-space: nowrap !important;
+
+    }
+
+
+
+    #pbjTable thead th {
+
+      background-color: #f4f4f5 !important;
+
+      color: #52525b !important;
+
+      font-weight: 600 !important;
+
+      font-size: 12px !important;
+
+      letter-spacing: 0.02em !important;
+
+      text-transform: capitalize !important;
+
+      padding: 12px 14px !important;
+
+      border-bottom: 1px solid #e4e4e7 !important;
+
+      border-top: none !important;
+
+      white-space: nowrap !important;
+
+    }
+
+
+
+    #pbjTable thead th:first-child {
+
+      border-top-left-radius: 8px !important;
+
+      border-bottom-left-radius: 8px !important;
+
+      border-left: 1px solid #e4e4e7 !important;
+
+    }
+
+
+
+    #pbjTable thead th:last-child {
+
+      border-top-right-radius: 8px !important;
+
+      border-bottom-right-radius: 8px !important;
+
+      border-right: 1px solid #e4e4e7 !important;
+
+    }
+
+
+
+    #pbjTable tbody tr {
+
+      border-bottom: 1px solid #f1f5f9 !important;
+
+      transition: background 0.15s ease !important;
+
+    }
+
+
+
+    #pbjTable tbody td {
+
+      padding: 12px 14px !important;
+
+      vertical-align: middle !important;
+
+      color: #334155 !important;
+
+      font-size: 13px !important;
+
+      font-family: 'Outfit', sans-serif !important;
+
+      border-bottom: 1px solid #f1f5f9 !important;
+
+      box-sizing: border-box !important;
+
+    }
+
+
+
+    #pbjTable tbody tr:hover,
+
+    #pbjTable tbody tr:hover td {
+
+      background-color: #f8fafc !important;
+
+    }
+
+
+
+    /* Italic Cell Styling (Konsisten Seluruh Modul Accounting) */
+
+    .pnd-cell-italic {
+
+      font-style: italic !important;
+
+      color: #334155 !important;
+
+    }
+
+
+
+    /* Sticky Action Column */
+
+    #pbjTable th.col-sticky-action,
+
+    #pbjTable td.col-sticky-action {
+
+      position: sticky !important;
+
+      right: 0 !important;
+
+      z-index: 10 !important;
+
+      background-color: #ffffff !important;
+
+      border-left: 1px solid #e2e8f0 !important;
+
+      box-shadow: -4px 0 8px -2px rgba(0, 0, 0, 0.05) !important;
+
+      text-align: center !important;
+
+      width: 60px !important;
+
+      min-width: 60px !important;
+
+    }
+
+
+
+    #pbjTable th.col-sticky-action {
+
+      z-index: 11 !important;
+
+      background-color: #f4f4f5 !important;
+
+      border-top-right-radius: 8px !important;
+
+      border-bottom-right-radius: 8px !important;
+
+      border-right: 1px solid #e4e4e7 !important;
+
+    }
+
+
+
+    #pbjTable tbody tr:hover td.col-sticky-action {
+
+      background-color: #f8fafc !important;
+
+    }
+
+
+
+    /* Action Trigger Button (⋮) */
+
+    .pnd-action-btn {
+
+      width: 32px;
+
+      height: 32px;
+
+      padding: 0;
+
+      border: 0;
+
+      border-radius: 50%;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #0f172a;
+
+      background: transparent;
+
+      cursor: pointer;
+
+      transition: background 0.15s ease;
+
+    }
+
+
+
+    .pnd-action-btn:hover {
+
+      background: #f1f5f9;
+
+    }
+
+
+
+    .pnd-action-btn svg {
+
+      width: 18px;
+
+      height: 18px;
+
+      fill: currentColor;
+
+    }
+
+
+
+    .pnd-empty-cell {
+
+      text-align: center;
+
+      padding: 40px 16px !important;
+
+      color: #94a3b8;
+
+      font-size: 14px;
+
+      font-style: italic;
+
+    }
+
+
+
+    /* ===== FLOATING ACTION MENU (Konsisten Pendapatan & Kas Bank) ===== */
+
+    .pnd-action-menu {
+
+      display: none;
+
+      position: fixed;
+
+      z-index: 2147483000;
+
+      min-width: 145px;
+
+      padding: 6px;
+
+      border: 1px solid rgba(0, 0, 0, .08);
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .14);
+
+    }
+
+
+
+    .pnd-action-menu.is-open {
+
+      display: block;
+
+    }
+
+
+
+    .pnd-action-menu button {
+
+      width: 100%;
+
+      min-height: 38px;
+
+      padding: 7px 12px;
+
+      border: 0;
+
+      border-radius: 6px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+      color: #334155;
+
+      background: transparent;
+
+      cursor: pointer;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      font-weight: 500;
+
+      text-align: left;
+
+      transition: all 0.12s ease;
+
+    }
+
+
+
+    .pnd-action-menu button:hover {
+
+      color: #0f172a;
+
+      background: #f1f5f9;
+
+    }
+
+
+
+    .pnd-action-icon {
+
+      width: 26px;
+
+      height: 26px;
+
+      border-radius: 6px;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      flex: 0 0 26px;
+
+      color: #ffffff;
+
+      background: #0076C5;
+
+    }
+
+
+
+    .pnd-action-icon svg {
+
+      width: 15px;
+
+      height: 15px;
+
+      fill: none;
+
+      stroke: currentColor;
+
+      stroke-width: 2;
+
+      stroke-linecap: round;
+
+      stroke-linejoin: round;
+
+    }
+
+
+
+    .pnd-action-menu button.is-danger {
+
+      color: #dc2626;
+
+    }
+
+
+
+    .pnd-action-menu button.is-danger:hover {
+
+      background: #fef2f2;
+
+    }
+
+
+
+    .pnd-action-menu .pnd-action-icon.is-danger {
+
+      background: #e02424;
+
+    }
+
+
+
+    /* ===== STATUS BADGES (Exact Match System) ===== */
+
+    .pnd-status-badge {
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 4px 10px;
+
+      border-radius: 9999px;
+
+      font-size: 11.5px;
+
+      font-weight: 600;
+
+      font-style: normal;
+
+      white-space: nowrap;
+
+    }
+
+
+
+    /* Green Badges (Approved / Selesai) */
+
+    .pnd-status-lunas,
+
+    .badge-approved,
+
+    .badge-selesai {
+
+      background-color: #dcfce7;
+
+      color: #15803d;
+
+      border: 1px solid #bbf7d0;
+
+    }
+
+
+
+    /* Amber Badges (Pending / Sedang) */
+
+    .pnd-status-belum,
+
+    .badge-pending,
+
+    .badge-sedang {
+
+      background-color: #fef3c7;
+
+      color: #b45309;
+
+      border: 1px solid #fde68a;
+
+    }
+
+
+
+    /* Red Badges (Rejected / Mendesak) */
+
+    .pnd-status-lewat,
+
+    .badge-rejected,
+
+    .badge-mendesak {
+
+      background-color: #fee2e2;
+
+      color: #b91c1c;
+
+      border: 1px solid #fecaca;
+
+    }
+
+
+
+    /* Blue Badges (Diajukan) */
+
+    .badge-diajukan {
+
+      background-color: #e0f2fe;
+
+      color: #0284c7;
+
+      border: 1px solid #bae6fd;
+
+    }
+
+
+
+    /* Purple Badges (Diproses / Tinggi) */
+
+    .badge-diproses,
+
+    .badge-tinggi {
+
+      background-color: #ede9fe;
+
+      color: #6d28d9;
+
+      border: 1px solid #ddd6fe;
+
+    }
+
+
+
+    /* Gray Badges (Dibatalkan / Rendah) */
+
+    .badge-dibatalkan,
+
+    .badge-rendah {
+
+      background-color: #f1f5f9;
+
+      color: #64748b;
+
+      border: 1px solid #cbd5e1;
+
+    }
+
+
+
+    /* ===== PAGINATION ===== */
+
+    .pnd-pagination {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      gap: 12px;
+
+      flex-wrap: wrap;
+
+      font-size: 13px;
+
+      font-family: 'Outfit', sans-serif;
+
+      color: #64748b;
+
+      padding-top: 4px;
+
+    }
+
+
+
+    .pnd-pagination-left {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 10px;
+
+    }
+
+
+
+    .pnd-perpage-select {
+
+      height: 32px;
+
+      padding: 0 8px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      font-size: 12.5px;
+
+      font-family: 'Outfit', sans-serif;
+
+      color: #334155;
+
+      background: #ffffff;
+
+      outline: none;
+
+    }
+
+
+
+    .pnd-pagination-controls {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+    }
+
+
+
+    .pnd-page-btn {
+
+      min-width: 32px;
+
+      height: 32px;
+
+      padding: 0 8px;
+
+      border: 1px solid #e2e8f0;
+
+      background: #ffffff;
+
+      color: #475569;
+
+      font-size: 12.5px;
+
+      font-weight: 500;
+
+      border-radius: 6px;
+
+      cursor: pointer;
+
+      display: inline-flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-page-btn:hover:not(:disabled) {
+
+      background: #f1f5f9;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-page-btn.is-active {
+
+      background: #0076C5;
+
+      border-color: #0076C5;
+
+      color: #ffffff;
+
+      font-weight: 600;
+
+    }
+
+
+
+    .pnd-page-btn:disabled {
+
+      opacity: 0.45;
+
+      cursor: not-allowed;
+
+    }
+
+
+
+    /* ===== MODAL TAMBAH / EDIT / DETAIL (Exact Match Pendapatan) ===== */
+
+    .pnd-modal-overlay {
+
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(15, 23, 42, 0.45);
+
+      backdrop-filter: blur(2.5px);
+
+      display: none;
+
+      align-items: center;
+
+      justify-content: center;
+
+      z-index: 99999;
+
+      padding: 16px;
+
+      overflow-y: auto;
+
+    }
+
+
+
+    .pnd-modal-overlay.is-active {
+
+      display: flex;
+
+    }
+
+
+
+    .pnd-modal-box {
+
+      background: #ffffff;
+
+      border-radius: 12px;
+
+      width: 820px;
+
+      max-width: 95vw;
+
+      max-height: 90vh;
+
+      overflow-y: auto;
+
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+
+      padding: 24px 28px;
+
+      position: relative;
+
+      box-sizing: border-box;
+
+    }
+
+
+
+    .pnd-modal-accent {
+
+      position: absolute;
+
+      top: 0;
+
+      left: 0;
+
+      right: 0;
+
+      height: 3.5px;
+
+      background: #0076C5;
+
+      border-radius: 12px 12px 0 0;
+
+    }
+
+
+
+    .pnd-modal-header {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: space-between;
+
+      margin-bottom: 12px;
+
+    }
+
+
+
+    .pnd-modal-title {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 18px;
+
+      font-weight: 500;
+
+      color: #1e293b;
+
+      margin: 0;
+
+    }
+
+
+
+    .pnd-modal-title em {
+
+      font-style: italic;
+
+      font-weight: 700;
+
+    }
+
+
+
+    .pnd-modal-close {
+
+      width: 24px;
+
+      height: 24px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      background: #ffffff;
+
+      color: #64748b;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-modal-close:hover {
+
+      background: #f1f5f9;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-dashed-divider {
+
+      border-bottom: 1.5px dashed #e2e8f0;
+
+      margin-bottom: 16px;
+
+    }
+
+
+
+    .pnd-form-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(2, 1fr);
+
+      gap: 12px 16px;
+
+    }
+
+
+
+    @media (max-width: 640px) {
+
+      .pnd-form-grid {
+
+        grid-template-columns: 1fr;
+
+      }
+
+    }
+
+
+
+    .pnd-col-full {
+
+      grid-column: 1 / -1;
+
+    }
+
+
+
+    .pnd-form-group {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 4px;
+
+    }
+
+
+
+    .pnd-form-label {
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 500;
+
+      color: #1e293b;
+
+    }
+
+
+
+    .pnd-form-input,
+
+    .pnd-form-select,
+
+    .pnd-form-textarea {
+
+      width: 100%;
+
+      height: 38px;
+
+      padding: 0 12px;
+
+      border: 1.5px solid #38bdf8;
+
+      border-radius: 8px;
+
+      background: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13px;
+
+      color: #1e293b;
+
+      outline: none;
+
+      box-sizing: border-box;
+
+      transition: all 0.15s ease;
+
+    }
+
+
+
+    .pnd-form-textarea {
+
+      height: 72px;
+
+      padding: 8px 12px;
+
+      resize: vertical;
+
+    }
+
+
+
+    .pnd-form-input:focus,
+
+    .pnd-form-select:focus,
+
+    .pnd-form-textarea:focus {
+
+      border-color: #0076C5;
+
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+
+    }
+
+
+
+    .pnd-modal-footer {
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: flex-end;
+
+      gap: 10px;
+
+      margin-top: 18px;
+
+      padding-top: 14px;
+
+      border-top: 1px solid #f1f5f9;
+
+    }
+
+
+
+    .pnd-btn-cancel-modal {
+
+      height: 36px;
+
+      padding: 0 16px;
+
+      border: 1px solid #cbd5e1;
+
+      border-radius: 6px;
+
+      background: #ffffff;
+
+      color: #64748b;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 600;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .pnd-btn-cancel-modal em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-btn-cancel-modal:hover {
+
+      background: #f8fafc;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .pnd-btn-submit-save {
+
+      height: 36px;
+
+      padding: 0 20px;
+
+      border: none;
+
+      border-radius: 6px;
+
+      background: #28a5de;
+
+      color: #ffffff;
+
+      font-family: 'Outfit', sans-serif;
+
+      font-size: 13.5px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      box-shadow: 0 2px 4px rgba(40, 165, 222, 0.25);
+
+    }
+
+
+
+    .pnd-btn-submit-save em {
+
+      font-style: italic;
+
+    }
+
+
+
+    .pnd-btn-submit-save:hover {
+
+      background: #0284c7;
+
+    }
+
+
+
+    /* Modal Detail View */
+
+    .pnd-detail-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(2, 1fr);
+
+      gap: 12px 18px;
+
+    }
+
+
+
+    @media (max-width: 640px) {
+
+      .pnd-detail-grid {
+
+        grid-template-columns: 1fr;
+
+      }
+
+    }
+
+
+
+    .pnd-detail-item {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 2px;
+
+      background: #f8fafc;
+
+      padding: 8px 12px;
+
+      border-radius: 8px;
+
+      border: 1px solid #e2e8f0;
+
+    }
+
+
+
+    .pnd-detail-item.col-full {
+
+      grid-column: 1 / -1;
+
+    }
+
+
+
+    .pnd-detail-label {
+
+      font-size: 11px;
+
+      font-weight: 600;
+
+      color: #64748b;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.03em;
+
+    }
+
+
+
+    .pnd-detail-value {
+
+      font-size: 13.5px;
+
+      font-weight: 600;
+
+      color: #0f172a;
+
+      word-break: break-word;
+
+    }
+
+  </style>
+
+</head>
+
+<body class="bg-slate-50">
+
+  <!-- Layout Sidebar & Shell -->
+
+  <aside id="app-sidebar"></aside>
+
+
+
+  <div class="dashboard-shell">
+
+    <header class="topbar"></header>
+
+
+
+    <main class="dashboard-content">
+
+      <!-- 4 Summary KPI Cards (Konsisten Approval Pengeluaran & Pendapatan) -->
+
+      <section class="pnd-summary-cards" aria-label="Ringkasan Pengajuan Barang & Jasa">
+
+        <!-- Card 1: Total Pengajuan -->
+
+        <div class="pnd-card pnd-card--total">
+
+          <div class="pnd-card-info">
+
+            <span class="pnd-card-label">Total Pengajuan</span>
+
+            <span class="pnd-card-value" id="cardTotalPengajuan">0</span>
+
+          </div>
+
+          <div class="pnd-card-icon icon-total" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+
+              <polyline points="14 2 14 8 20 8"></polyline>
+
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+
+            </svg>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Card 2: Disetujui -->
+
+        <div class="pnd-card pnd-card--disetujui">
+
+          <div class="pnd-card-info">
+
+            <span class="pnd-card-label">Disetujui</span>
+
+            <span class="pnd-card-value" id="cardDisetujui">0</span>
+
+          </div>
+
+          <div class="pnd-card-icon icon-disetujui" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+
+            </svg>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Card 3: Menunggu Review / Approval -->
+
+        <div class="pnd-card pnd-card--menunggu-review">
+
+          <div class="pnd-card-info">
+
+            <span class="pnd-card-label">Menunggu Review</span>
+
+            <span class="pnd-card-value" id="cardMenungguApproval">0</span>
+
+          </div>
+
+          <div class="pnd-card-icon icon-menunggu-review" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+
+              <circle cx="12" cy="12" r="10"></circle>
+
+              <polyline points="12 6 12 12 16 14"></polyline>
+
+            </svg>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Card 4: Total Estimasi Biaya -->
+
+        <div class="pnd-card pnd-card--biaya">
+
+          <div class="pnd-card-info">
+
+            <span class="pnd-card-label">Total Estimasi Biaya</span>
+
+            <span class="pnd-card-value" id="cardTotalEstimasi">Rp. 0</span>
+
+          </div>
+
+          <div class="pnd-card-icon icon-biaya" aria-hidden="true">
+
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+
+              <rect x="2" y="6" width="20" height="13" rx="2"></rect>
+
+              <path d="M16 12a2 2 0 1 0 4 0 2 2 0 1 0-4 0z"></path>
+
+              <path d="M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"></path>
+
+            </svg>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- Main Panel & Toolbar -->
+
+      <section class="panel campaign-panel">
+
+        <div class="campaign-panel__line pnd-panel-line"></div>
+
+
+
+        <!-- Toolbar Pengajuan Barang & Jasa (Konsisten Kas & Bank / Pendapatan) -->
+
+        <div class="pnd-toolbar">
+
+          <div class="pnd-toolbar__left">
+
+            <!-- Filter Popover Button -->
+
+            <div class="filter-dropdown-wrapper">
+
+              <button id="btnFilterPnd" class="pnd-btn-icon" type="button" aria-label="Filter" title="Filter Pengajuan">
+
+                <svg viewBox="0 0 24 24">
+
+                  <path d="M4 5h16l-6 7v5l-4 2v-7z"></path>
+
+                </svg>
+
+              </button>
+
+
+
+              <!-- Popover Filter -->
+
+              <div id="filterPndDropdown" class="pnd-filter-popover">
+
+                <div class="pnd-filter-group">
+
+                  <label class="pnd-filter-label" for="filterKategori">Kategori</label>
+
+                  <select id="filterKategori" class="pnd-filter-select">
+
+                    <option value="">Semua Kategori</option>
+
+                    <option value="Barang Operasional">Barang Operasional</option>
+
+                    <option value="Perlengkapan Kantor">Perlengkapan Kantor</option>
+
+                    <option value="Perangkat Keras & IT">Perangkat Keras & IT</option>
+
+                    <option value="Jasa Maintenance">Jasa Maintenance</option>
+
+                    <option value="Jasa Konsultan & Profesional">Jasa Konsultan & Profesional</option>
+
+                    <option value="Pemasaran & Media">Pemasaran & Media</option>
+
+                    <option value="Lainnya">Lainnya</option>
+
+                  </select>
+
+                </div>
+
+
+
+                <div class="pnd-filter-group">
+
+                  <label class="pnd-filter-label" for="filterUrgensi">Urgensi</label>
+
+                  <select id="filterUrgensi" class="pnd-filter-select">
+
+                    <option value="">Semua Urgensi</option>
+
+                    <option value="Mendesak">Mendesak</option>
+
+                    <option value="Tinggi">Tinggi</option>
+
+                    <option value="Sedang">Sedang</option>
+
+                    <option value="Rendah">Rendah</option>
+
+                  </select>
+
+                </div>
+
+
+
+                <div class="pnd-filter-group">
+
+                  <label class="pnd-filter-label" for="filterApproval">Approval</label>
+
+                  <select id="filterApproval" class="pnd-filter-select">
+
+                    <option value="">Semua Approval</option>
+
+                    <option value="Approved">Approved (Disetujui)</option>
+
+                    <option value="Pending">Pending (Menunggu)</option>
+
+                    <option value="Rejected">Rejected (Ditolak)</option>
+
+                  </select>
+
+                </div>
+
+
+
+                <div class="pnd-filter-group">
+
+                  <label class="pnd-filter-label" for="filterStatus">Status</label>
+
+                  <select id="filterStatus" class="pnd-filter-select">
+
+                    <option value="">Semua Status</option>
+
+                    <option value="Diajukan">Diajukan</option>
+
+                    <option value="Diproses">Diproses</option>
+
+                    <option value="Selesai">Selesai</option>
+
+                    <option value="Dibatalkan">Dibatalkan</option>
+
+                  </select>
+
+                </div>
+
+
+
+                <div class="pnd-filter-actions">
+
+                  <button type="button" id="resetFilterPnd" class="pnd-filter-btn-reset"><em>Riset</em></button>
+
+                  <button type="button" id="applyFilterPnd" class="pnd-filter-btn-apply"><em>Terapkan</em></button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            <!-- Kalender Popover Button -->
+
+            <div class="filter-dropdown-wrapper">
+
+              <button id="btnCalendarPnd" class="pnd-btn-icon" type="button" aria-label="Pilih Tanggal" title="Filter Berdasarkan Periode">
+
+                <svg viewBox="0 0 24 24">
+
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+
+                </svg>
+
+              </button>
+
+
+
+              <!-- Dual Month Calendar Popover (Konsisten Kas & Bank / Pendapatan) -->
+
+              <div id="calendarPndDropdown" class="pnd-calendar-popover">
+
+                <div class="pnd-cal-body">
+
+                  <div class="pnd-cal-sidebar">
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="today">Hari ini</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="yesterday">Kemarin</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last7">7 hari terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last30">30 hari terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last3m">3 bulan terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last6m">6 bulan terakhir</button>
+
+                    <button type="button" class="pnd-cal-preset-btn" data-preset="last12m">12 bulan terakhir</button>
+
+                  </div>
+
+
+
+                  <div class="pnd-cal-months">
+
+                    <div class="pnd-cal-month-box">
+
+                      <div class="pnd-cal-month-header">
+
+                        <span class="pnd-cal-nav" id="pbjCalPrevYear" title="Tahun Sebelumnya">&laquo;</span>
+
+                        <span class="pnd-cal-month-title" id="pbjCalTitleLeft">2026 - 11</span>
+
+                        <span class="pnd-cal-nav" id="pbjCalPrevMonth" title="Bulan Sebelumnya">&lsaquo;</span>
+
+                      </div>
+
+                      <div class="pnd-cal-weekdays">
+
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+
+                      </div>
+
+                      <div class="pnd-cal-days-grid" id="pbjCalGridLeft"></div>
+
+                    </div>
+
+
+
+                    <div class="pnd-cal-month-box">
+
+                      <div class="pnd-cal-month-header">
+
+                        <span class="pnd-cal-nav" id="pbjCalNextMonth" title="Bulan Berikutnya">&rsaquo;</span>
+
+                        <span class="pnd-cal-month-title" id="pbjCalTitleRight">2026 - 12</span>
+
+                        <span class="pnd-cal-nav" id="pbjCalNextYear" title="Tahun Berikutnya">&raquo;</span>
+
+                      </div>
+
+                      <div class="pnd-cal-weekdays">
+
+                        <span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+
+                      </div>
+
+                      <div class="pnd-cal-days-grid" id="pbjCalGridRight"></div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+
+                <div class="pnd-cal-footer">
+
+                  <div class="pnd-cal-selected-info">
+
+                    Dipilih: <span id="pbjCalSelectedText">-</span>
+
+                  </div>
+
+                  <div class="pnd-cal-footer-actions">
+
+                    <button type="button" id="btnCancelCalendarPnd" class="pnd-cal-btn-cancel">Batal</button>
+
+                    <button type="button" id="btnApplyCalendarPnd" class="pnd-cal-btn-apply">Terapkan</button>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+            <!-- Export Excel Button (Konsisten Kas & Bank / Pendapatan) -->
+
+            <button id="btnExportPnd" class="pnd-btn-icon pnd-btn-excel" type="button" aria-label="Export Excel" title="Export ke Excel (.xlsx)">
+
+              <svg viewBox="0 0 24 24" style="width: 16px; height: 16px;" fill="none" stroke="currentColor">
+
+                <rect x="3.5" y="3.5" width="17" height="17" rx="2.5" fill="#107c41" stroke="#0e6b37" stroke-width="1.2" />
+
+                <line x1="12" y1="7" x2="18" y2="7" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <line x1="12" y1="12" x2="18" y2="12" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <line x1="12" y1="17" x2="18" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <line x1="12" y1="7" x2="12" y2="17" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+
+                <path d="M5.5 8.5L9.5 15.5M9.5 8.5L5.5 15.5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+
+              </svg>
+
+            </button>
+
+
+
+            <!-- Search Wrap (Konsisten Pendapatan & Kas Bank) -->
+
+            <div class="pnd-search-wrap">
+
+              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2">
+
+                <circle cx="11" cy="11" r="8"></circle>
+
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+
+              </svg>
+
+              <input id="searchInput" type="search" placeholder="Cari ID, Barang, PIC..." autocomplete="off" />
+
+              <button type="button" id="searchClearBtn" class="pnd-search-clear" title="Hapus pencarian">&times;</button>
+
+            </div>
+
+          </div>
+
+
+
+          <div class="pnd-toolbar__right">
+
+            <button id="btnTambahPengajuan" class="btn-tambah-pnd" type="button">+ Tambah</button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Table Responsive Container (Konsisten campaign-table) -->
+
+        <div class="table-wrap campaign-table" id="pbjTableWrap">
+
+          <table id="pbjTable">
+
+            <thead>
+
+              <tr>
+
+                <th style="width: 44px; text-align: center;">#</th>
+
+                <th>ID Pengajuan</th>
+
+                <th>Priode</th>
+
+                <th>Kategori</th>
+
+                <th>Nama Barang / Jasa</th>
+
+                <th style="text-align: center;">Qty</th>
+
+                <th>Satuan</th>
+
+                <th style="text-align: right;">Satuan Satuan</th>
+
+                <th style="text-align: right;">Estimasi Biaya</th>
+
+                <th style="text-align: center;">Urgensi</th>
+
+                <th style="text-align: center;">Approval</th>
+
+                <th style="text-align: center;">Status</th>
+
+                <th>PIC</th>
+
+                <th>Catatan</th>
+
+                <th>Approved</th>
+
+                <th>Realisasi</th>
+
+                <th class="col-sticky-action" style="width: 60px; text-align: center;">Aksi</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="pbjTableBody">
+
+              <!-- Dynamically rendered via JavaScript -->
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+
+        <!-- Pagination Controls (Konsisten Kas & Bank / Pendapatan) -->
+
+        <div class="pnd-pagination">
+
+          <div class="pnd-pagination-left">
+
+            <span>Tampilkan</span>
+
+            <select id="perPageSelect" class="pnd-perpage-select">
+
+              <option value="10">10</option>
+
+              <option value="25">25</option>
+
+              <option value="50">50</option>
+
+              <option value="100">100</option>
+
+            </select>
+
+            <span>data per halaman</span>
+
+            <span style="margin-left: 8px; color: #cbd5e1;">|</span>
+
+            <span id="paginationInfo" style="margin-left: 8px;">Menampilkan 0-0 dari 0 data</span>
+
+          </div>
+
+          <div class="pnd-pagination-controls" id="paginationControls">
+
+            <!-- Dynamically rendered page buttons -->
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+
+  <!-- ===== FLOATING ACTION MENU (⋮) (Konsisten Pendapatan & Kas Bank) ===== -->
+
+  <div id="pbjActionMenu" class="pnd-action-menu">
+
+    <button type="button" id="actionView">
+
+      <span class="pnd-action-icon">
+
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+
+      </span>
+
+      <em>Lihat</em>
+
+    </button>
+
+    <button type="button" id="actionEdit">
+
+      <span class="pnd-action-icon">
+
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+
+      </span>
+
+      <em>Edit</em>
+
+    </button>
+
+    <button type="button" id="actionDelete" class="is-danger">
+
+      <span class="pnd-action-icon is-danger">
+
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+
+      </span>
+
+      <em>Hapus</em>
+
+    </button>
+
+  </div>
+
+
+
+  <!-- ===== MODAL TAMBAH / EDIT PENGAJUAN BARANG & JASA ===== -->
+
+  <div id="pbjFormModal" class="pnd-modal-overlay">
+
+    <div class="pnd-modal-box">
+
+      <div class="pnd-modal-accent"></div>
+
+
+
+      <div class="pnd-modal-header">
+
+        <h2 class="pnd-modal-title">
+
+          <em><span id="pbjFormActionText">Tambah</span></em> Pengajuan Barang & Jasa
+
+        </h2>
+
+        <button type="button" class="pnd-modal-close" data-close-modal="pbjFormModal" aria-label="Tutup">&times;</button>
+
+      </div>
+
+
+
+      <div class="pnd-dashed-divider"></div>
+
+
+
+      <form id="pbjForm" autocomplete="off">
+
+        <input type="hidden" id="editIndex" value="-1" />
+
+
+
+        <div class="pnd-form-grid">
+
+          <!-- 1. ID Pengajuan Barang & Jasa -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formIdPengajuan">ID Pengajuan Barang & Jasa</label>
+
+            <input type="text" id="formIdPengajuan" class="pnd-form-input" placeholder="PBJ-2026-001" required />
+
+          </div>
+
+
+
+          <!-- 2. Priode -->
+          <div class="pnd-form-group">
+            <label class="pnd-form-label" for="formPeriode">Priode</label>
+            <input type="text" id="formPeriode" class="pnd-form-input bisa-datepicker-input" placeholder="dd/mm/yyyy" autocomplete="off" required />
+          </div>
+
+
+
+          <!-- 3. Kategori (Dropdown) -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formKategori">Kategori</label>
+
+            <select id="formKategori" class="pnd-form-select" required>
+
+              <option value="">-- Pilih Kategori --</option>
+
+              <option value="Barang Operasional">Barang Operasional</option>
+
+              <option value="Perlengkapan Kantor">Perlengkapan Kantor</option>
+
+              <option value="Perangkat Keras & IT">Perangkat Keras & IT</option>
+
+              <option value="Jasa Maintenance">Jasa Maintenance</option>
+
+              <option value="Jasa Konsultan & Profesional">Jasa Konsultan & Profesional</option>
+
+              <option value="Pemasaran & Media">Pemasaran & Media</option>
+
+              <option value="Lainnya">Lainnya</option>
+
+            </select>
+
+          </div>
+
+
+
+          <!-- 4. Nama Barang / Jasa -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formNamaBarang">Nama Barang / Jasa</label>
+
+            <input type="text" id="formNamaBarang" class="pnd-form-input" placeholder="Nama barang atau jasa..." required />
+
+          </div>
+
+
+
+          <!-- 5. Qty -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formQty">Qty</label>
+
+            <input type="number" id="formQty" class="pnd-form-input" min="1" step="1" placeholder="1" required />
+
+          </div>
+
+
+
+          <!-- 6. Satuan -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formSatuan">Satuan</label>
+
+            <input type="text" id="formSatuan" class="pnd-form-input" list="satuanList" placeholder="Unit, Pcs, Box, Rim..." required />
+
+            <datalist id="satuanList">
+
+              <option value="Unit"></option>
+
+              <option value="Pcs"></option>
+
+              <option value="Box"></option>
+
+              <option value="Rim"></option>
+
+              <option value="Paket"></option>
+
+              <option value="Bulan"></option>
+
+              <option value="Hari"></option>
+
+              <option value="Set"></option>
+
+            </datalist>
+
+          </div>
+
+
+
+          <!-- 7. Satuan Satuan (Harga Satuan) -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formHargaSatuan">Satuan Satuan (Harga Satuan)</label>
+
+            <input type="number" id="formHargaSatuan" class="pnd-form-input" min="0" step="1000" placeholder="0" required />
+
+          </div>
+
+
+
+          <!-- 8. Estimasi Biaya -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formEstimasiBiaya">Estimasi Biaya</label>
+
+            <input type="number" id="formEstimasiBiaya" class="pnd-form-input" min="0" step="1000" placeholder="0" required />
+
+          </div>
+
+
+
+          <!-- 9. Urgensi (Dropdown) -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formUrgensi">Urgensi</label>
+
+            <select id="formUrgensi" class="pnd-form-select" required>
+
+              <option value="Rendah">Rendah</option>
+
+              <option value="Sedang" selected>Sedang</option>
+
+              <option value="Tinggi">Tinggi</option>
+
+              <option value="Mendesak">Mendesak</option>
+
+            </select>
+
+          </div>
+
+
+
+          <!-- 10. Approval (Dropdown) -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formApproval">Approval</label>
+
+            <select id="formApproval" class="pnd-form-select" required>
+
+              <option value="Approved">Approved (Disetujui)</option>
+
+              <option value="Pending" selected>Pending (Menunggu)</option>
+
+              <option value="Rejected">Rejected (Ditolak)</option>
+
+            </select>
+
+          </div>
+
+
+
+          <!-- 11. Status (Dropdown) -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formStatus">Status</label>
+
+            <select id="formStatus" class="pnd-form-select" required>
+
+              <option value="Diajukan" selected>Diajukan</option>
+
+              <option value="Diproses">Diproses</option>
+
+              <option value="Selesai">Selesai</option>
+
+              <option value="Dibatalkan">Dibatalkan</option>
+
+            </select>
+
+          </div>
+
+
+
+          <!-- 12. PIC -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formPic">PIC</label>
+
+            <input type="text" id="formPic" class="pnd-form-input" placeholder="Penanggung Jawab" required />
+
+          </div>
+
+
+
+          <!-- 14. Approved -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formApprovedBy">Approved</label>
+
+            <input type="text" id="formApprovedBy" class="pnd-form-input" placeholder="Disetujui Oleh / Tanggal" />
+
+          </div>
+
+
+
+          <!-- 15. Realisasi -->
+
+          <div class="pnd-form-group">
+
+            <label class="pnd-form-label" for="formRealisasi">Realisasi</label>
+
+            <input type="text" id="formRealisasi" class="pnd-form-input" placeholder="Rp. 0 / Status Realisasi" />
+
+          </div>
+
+
+
+          <!-- 13. Catatan -->
+
+          <div class="pnd-form-group pnd-col-full">
+
+            <label class="pnd-form-label" for="formCatatan">Catatan</label>
+
+            <textarea id="formCatatan" class="pnd-form-textarea" placeholder="Tambahkan keterangan atau justifikasi pengajuan..."></textarea>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="pnd-modal-footer">
+
+          <button type="button" class="pnd-btn-cancel-modal" data-close-modal="pbjFormModal"><em>Batal</em></button>
+
+          <button type="submit" class="pnd-btn-submit-save"><em>Simpan</em></button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ===== MODAL LIHAT DETAIL PENGAJUAN BARANG & JASA ===== -->
+
+  <div id="pbjViewModal" class="pnd-modal-overlay">
+
+    <div class="pnd-modal-box">
+
+      <div class="pnd-modal-accent"></div>
+
+
+
+      <div class="pnd-modal-header">
+
+        <h2 class="pnd-modal-title">
+
+          <em>Lihat</em> Pengajuan Barang & Jasa
+
+        </h2>
+
+        <button type="button" class="pnd-modal-close" data-close-modal="pbjViewModal" aria-label="Tutup">&times;</button>
+
+      </div>
+
+
+
+      <div class="pnd-dashed-divider"></div>
+
+
+
+      <div class="pnd-detail-grid" id="detailContainer">
+
+        <!-- Rendered dynamically -->
+
+      </div>
+
+
+
+      <div class="pnd-modal-footer">
+
+        <button type="button" class="pnd-btn-cancel-modal" data-close-modal="pbjViewModal"><em>Tutup</em></button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Layout Script & Module Business Logic -->
+
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
+
+  <script>
+
+    (function () {
+
+      'use strict';
+
+
+
+      /* ===== LOCAL STORAGE KEY & INITIAL MOCK DATA ===== */
+
+      const STORAGE_KEY = 'accounting_pengajuan_barang_jasa_v1';
+
+
+
+      const initialMockData = [
+
+        {
+
+          id: 'PBJ-2026-001',
+
+          periode: 'November 2026',
+
+          kategori: 'Perangkat Keras & IT',
+
+          namaBarang: 'MacBook Pro M3 Pro 16/512GB',
+
+          qty: 2,
+
+          satuan: 'Unit',
+
+          hargaSatuan: 28500000,
+
+          estimasiBiaya: 57000000,
+
+          urgensi: 'Tinggi',
+
+          approval: 'Approved',
+
+          status: 'Diproses',
+
+          pic: 'Budi Santoso',
+
+          catatan: 'Pengadaan workstation tim creative & tech',
+
+          approved: 'Manager IT (10/11/2026)',
+
+          realisasi: 'Rp 56.800.000'
+
+        },
+
+        {
+
+          id: 'PBJ-2026-002',
+
+          periode: 'November 2026',
+
+          kategori: 'Perlengkapan Kantor',
+
+          namaBarang: 'Kertas HVS PaperOne A4 80gr',
+
+          qty: 25,
+
+          satuan: 'Rim',
+
+          hargaSatuan: 55000,
+
+          estimasiBiaya: 1375000,
+
+          urgensi: 'Sedang',
+
+          approval: 'Approved',
+
+          status: 'Selesai',
+
+          pic: 'Dewi Lestari',
+
+          catatan: 'Stok bulanan dokumen operasional & faktur',
+
+          approved: 'Manager GA (05/11/2026)',
+
+          realisasi: 'Rp 1.375.000'
+
+        },
+
+        {
+
+          id: 'PBJ-2026-003',
+
+          periode: 'November 2026',
+
+          kategori: 'Jasa Maintenance',
+
+          namaBarang: 'Maintenance & Service AC Ruang Server',
+
+          qty: 6,
+
+          satuan: 'Unit',
+
+          hargaSatuan: 150000,
+
+          estimasiBiaya: 900000,
+
+          urgensi: 'Mendesak',
+
+          approval: 'Approved',
+
+          status: 'Selesai',
+
+          pic: 'Ahmad Fauzi',
+
+          catatan: 'Cuci berkala dan perbaikan modul freon',
+
+          approved: 'Manager Ops (03/11/2026)',
+
+          realisasi: 'Rp 900.000'
+
+        },
+
+        {
+
+          id: 'PBJ-2026-004',
+
+          periode: 'November 2026',
+
+          kategori: 'Jasa Konsultan & Profesional',
+
+          namaBarang: 'Audit Eksternal Laporan Keuangan Q3',
+
+          qty: 1,
+
+          satuan: 'Paket',
+
+          hargaSatuan: 35000000,
+
+          estimasiBiaya: 35000000,
+
+          urgensi: 'Tinggi',
+
+          approval: 'Pending',
+
+          status: 'Diajukan',
+
+          pic: 'Siti Rahma',
+
+          catatan: 'Pemeriksaan kepatuhan tahunan',
+
+          approved: 'Menunggu Direktur',
+
+          realisasi: '-'
+
+        },
+
+        {
+
+          id: 'PBJ-2026-005',
+
+          periode: 'November 2026',
+
+          kategori: 'Barang Operasional',
+
+          namaBarang: 'Seragam & Rompi Event Campaign',
+
+          qty: 40,
+
+          satuan: 'Pcs',
+
+          hargaSatuan: 125000,
+
+          estimasiBiaya: 5000000,
+
+          urgensi: 'Sedang',
+
+          approval: 'Approved',
+
+          status: 'Diproses',
+
+          pic: 'Rian Pratama',
+
+          catatan: 'Seragam crew lapangan roadshow Desember',
+
+          approved: 'Spv Marketing (12/11/2026)',
+
+          realisasi: 'Rp 4.950.000'
+
+        },
+
+        {
+
+          id: 'PBJ-2026-006',
+
+          periode: 'November 2026',
+
+          kategori: 'Pemasaran & Media',
+
+          namaBarang: 'Sewa LED Videotron Bundaran HI (1 Minggu)',
+
+          qty: 1,
+
+          satuan: 'Paket',
+
+          hargaSatuan: 45000000,
+
+          estimasiBiaya: 45000000,
+
+          urgensi: 'Mendesak',
+
+          approval: 'Pending',
+
+          status: 'Diajukan',
+
+          pic: 'Maya Salsabila',
+
+          catatan: 'Peluncuran campaign brand tier-1',
+
+          approved: 'Menunggu CMO',
+
+          realisasi: '-'
+
+        },
+
+        {
+
+          id: 'PBJ-2026-007',
+
+          periode: 'November 2026',
+
+          kategori: 'Perangkat Keras & IT',
+
+          namaBarang: 'Headset Wireless Logitech Zone Vibe',
+
+          qty: 8,
+
+          satuan: 'Unit',
+
+          hargaSatuan: 1650000,
+
+          estimasiBiaya: 13200000,
+
+          urgensi: 'Rendah',
+
+          approval: 'Rejected',
+
+          status: 'Dibatalkan',
+
+          pic: 'Ferry Gunawan',
+
+          catatan: 'Ditolak: optimalkan headset yang ada',
+
+          approved: 'Manager IT (08/11/2026)',
+
+          realisasi: 'Dibatalkan'
+
+        },
+
+        {
+
+          id: 'PBJ-2026-008',
+
+          periode: 'November 2026',
+
+          kategori: 'Barang Operasional',
+
+          namaBarang: 'Dispenser & Galon Air Mineral Ruang Kerja',
+
+          qty: 2,
+
+          satuan: 'Unit',
+
+          hargaSatuan: 1850000,
+
+          estimasiBiaya: 3700000,
+
+          urgensi: 'Sedang',
+
+          approval: 'Pending',
+
+          status: 'Diajukan',
+
+          pic: 'Dewi Lestari',
+
+          catatan: 'Penggantian unit bocor di lt. 2',
+
+          approved: 'Menunggu Spv GA',
+
+          realisasi: '-'
+
+        }
+
+      ];
+
+
+
+      function loadData() {
+
+        try {
+
+          const raw = localStorage.getItem(STORAGE_KEY);
+
+          if (raw) {
+
+            const parsed = JSON.parse(raw);
+
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+
+          }
+
+        } catch (e) {
+
+          console.error('Error loading data from localStorage', e);
+
+        }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(initialMockData));
+
+        return initialMockData;
+
+      }
+
+
+
+      function saveData(data) {
+
+        try {
+
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+        } catch (e) {
+
+          console.error('Error saving data to localStorage', e);
+
+        }
+
+      }
+
+
+
+      let dataList = loadData();
+
+
+
+      /* ===== STATE & FILTERING ===== */
+
+      let filters = {
+
+        search: '',
+
+        kategori: '',
+
+        urgensi: '',
+
+        approval: '',
+
+        status: '',
+
+        startDate: '',
+
+        endDate: ''
+
+      };
+
+
+
+      let currentPage = 1;
+
+      let perPage = 10;
+
+      let activeActionId = null;
+
+
+
+      /* ===== DOM ELEMENTS ===== */
+
+      const tableBody = document.getElementById('pbjTableBody');
+
+      const searchInput = document.getElementById('searchInput');
+
+      const searchClearBtn = document.getElementById('searchClearBtn');
+
+      const perPageSelect = document.getElementById('perPageSelect');
+
+      const paginationInfo = document.getElementById('paginationInfo');
+
+      const paginationControls = document.getElementById('paginationControls');
+
+
+
+      // Popovers & Buttons
+
+      const btnFilterPnd = document.getElementById('btnFilterPnd');
+
+      const filterPndDropdown = document.getElementById('filterPndDropdown');
+
+      const filterKategori = document.getElementById('filterKategori');
+
+      const filterUrgensi = document.getElementById('filterUrgensi');
+
+      const filterApproval = document.getElementById('filterApproval');
+
+      const filterStatus = document.getElementById('filterStatus');
+
+      const applyFilterPnd = document.getElementById('applyFilterPnd');
+
+      const resetFilterPnd = document.getElementById('resetFilterPnd');
+
+
+
+      const btnCalendarPnd = document.getElementById('btnCalendarPnd');
+
+      const calendarPndDropdown = document.getElementById('calendarPndDropdown');
+
+      const calStartDate = document.getElementById('calStartDate');
+
+      const calEndDate = document.getElementById('calEndDate');
+
+      const applyCalBtn = document.getElementById('applyCalBtn');
+
+      const resetCalBtn = document.getElementById('resetCalBtn');
+
+
+
+      const btnExportPnd = document.getElementById('btnExportPnd');
+
+      const exportPndDropdown = document.getElementById('exportPndDropdown');
+
+      const btnExportExcel = document.getElementById('btnExportExcel');
+
+      const btnExportCsv = document.getElementById('btnExportCsv');
+
+      const btnPrintTable = document.getElementById('btnPrintTable');
+
+
+
+      const btnTambahPengajuan = document.getElementById('btnTambahPengajuan');
+
+      const pbjActionMenu = document.getElementById('pbjActionMenu');
+
+      const actionView = document.getElementById('actionView');
+
+      const actionEdit = document.getElementById('actionEdit');
+
+      const actionDelete = document.getElementById('actionDelete');
+
+
+
+      // Modals
+
+      const pbjFormModal = document.getElementById('pbjFormModal');
+
+      const pbjForm = document.getElementById('pbjForm');
+
+      const pbjFormActionText = document.getElementById('pbjFormActionText');
+
+      const editIndex = document.getElementById('editIndex');
+
+
+
+      const formIdPengajuan = document.getElementById('formIdPengajuan');
+
+      const formPeriode = document.getElementById('formPeriode');
+
+      const formKategori = document.getElementById('formKategori');
+
+      const formNamaBarang = document.getElementById('formNamaBarang');
+
+      const formQty = document.getElementById('formQty');
+
+      const formSatuan = document.getElementById('formSatuan');
+
+      const formHargaSatuan = document.getElementById('formHargaSatuan');
+
+      const formEstimasiBiaya = document.getElementById('formEstimasiBiaya');
+
+      const formUrgensi = document.getElementById('formUrgensi');
+
+      const formApproval = document.getElementById('formApproval');
+
+      const formStatus = document.getElementById('formStatus');
+
+      const formPic = document.getElementById('formPic');
+
+      const formApprovedBy = document.getElementById('formApprovedBy');
+
+      const formRealisasi = document.getElementById('formRealisasi');
+
+      const formCatatan = document.getElementById('formCatatan');
+
+
+
+      const pbjViewModal = document.getElementById('pbjViewModal');
+
+      const detailContainer = document.getElementById('detailContainer');
+
+
+
+      // KPI Elements
+
+      const cardTotalPengajuan = document.getElementById('cardTotalPengajuan');
+
+      const cardMenungguApproval = document.getElementById('cardMenungguApproval');
+
+      const cardDisetujui = document.getElementById('cardDisetujui');
+
+      const cardTotalEstimasi = document.getElementById('cardTotalEstimasi');
+
+
+
+      /* ===== HELPER FUNCTIONS ===== */
+
+      function escapeHtml(text) {
+
+        if (!text) return '';
+
+        return String(text)
+
+          .replace(/&/g, '&amp;')
+
+          .replace(/</g, '&lt;')
+
+          .replace(/>/g, '&gt;')
+
+          .replace(/"/g, '&quot;')
+
+          .replace(/'/g, '&#039;');
+
+      }
+
+
+
+      function formatRupiah(num) {
+
+        const val = Number(num) || 0;
+
+        return 'Rp. ' + val.toLocaleString('id-ID');
+
+      }
+
+
+
+      function renderUrgensiBadge(urgensi) {
+
+        const u = (urgensi || '').toLowerCase();
+
+        let cls = 'badge-sedang';
+
+        if (u.includes('mendesak') || u.includes('urgent')) cls = 'badge-mendesak';
+
+        else if (u.includes('tinggi')) cls = 'badge-tinggi';
+
+        else if (u.includes('rendah')) cls = 'badge-rendah';
+
+        return `<span class="pnd-status-badge ${cls}">${escapeHtml(urgensi || '-')}</span>`;
+
+      }
+
+
+
+      function renderApprovalBadge(appr) {
+
+        const a = (appr || '').toLowerCase();
+
+        let cls = 'badge-pending';
+
+        let text = appr || 'Pending';
+
+        if (a.includes('approv') || a.includes('setuju')) {
+
+          cls = 'badge-approved';
+
+          text = 'Approved';
+
+        } else if (a.includes('reject') || a.includes('tolak')) {
+
+          cls = 'badge-rejected';
+
+          text = 'Rejected';
+
+        } else {
+
+          cls = 'badge-pending';
+
+          text = 'Pending';
+
+        }
+
+        return `<span class="pnd-status-badge ${cls}">${text}</span>`;
+
+      }
+
+
+
+      function renderStatusBadge(stat) {
+
+        const s = (stat || '').toLowerCase();
+
+        let cls = 'badge-diajukan';
+
+        if (s.includes('selesai')) cls = 'badge-selesai';
+
+        else if (s.includes('proses')) cls = 'badge-diproses';
+
+        else if (s.includes('batal')) cls = 'badge-dibatalkan';
+
+        return `<span class="pnd-status-badge ${cls}">${escapeHtml(stat || '-')}</span>`;
+
+      }
+
+
+
+      /* Auto-compute Estimasi Biaya from Qty * Harga Satuan */
+
+      function autoCalcEstimasi() {
+
+        const qty = parseFloat(formQty.value) || 0;
+
+        const harga = parseFloat(formHargaSatuan.value) || 0;
+
+        if (qty > 0 && harga > 0) {
+
+          formEstimasiBiaya.value = Math.round(qty * harga);
+
+        }
+
+      }
+
+
+
+      formQty.addEventListener('input', autoCalcEstimasi);
+
+      formHargaSatuan.addEventListener('input', autoCalcEstimasi);
+
+
+
+      /* ===== KPI CARDS UPDATE ===== */
+
+      function updateKpis() {
+
+        const total = dataList.length;
+
+        let pending = 0;
+
+        let approved = 0;
+
+        let totalEstimasi = 0;
+
+
+
+        dataList.forEach(item => {
+
+          const a = (item.approval || '').toLowerCase();
+
+          if (a.includes('approv') || a.includes('setuju')) approved++;
+
+          else if (!a.includes('reject') && !a.includes('tolak')) pending++;
+
+
+
+          totalEstimasi += Number(item.estimasiBiaya) || 0;
+
+        });
+
+
+
+        if (cardTotalPengajuan) cardTotalPengajuan.textContent = total;
+
+        if (cardMenungguApproval) cardMenungguApproval.textContent = pending;
+
+        if (cardDisetujui) cardDisetujui.textContent = approved;
+
+        if (cardTotalEstimasi) cardTotalEstimasi.textContent = formatRupiah(totalEstimasi);
+
+      }
+
+
+
+      /* ===== FILTERING & RENDERING ===== */
+
+      function getFilteredData() {
+
+        const q = filters.search.trim().toLowerCase();
+
+
+
+        return dataList.filter(item => {
+
+          if (q) {
+
+            const matchSearch =
+
+              (item.id || '').toLowerCase().includes(q) ||
+
+              (item.namaBarang || '').toLowerCase().includes(q) ||
+
+              (item.kategori || '').toLowerCase().includes(q) ||
+
+              (item.pic || '').toLowerCase().includes(q) ||
+
+              (item.periode || '').toLowerCase().includes(q);
+
+            if (!matchSearch) return false;
+
+          }
+
+
+
+          if (filters.kategori && item.kategori !== filters.kategori) return false;
+
+
+
+          if (filters.urgensi && (item.urgensi || '').toLowerCase() !== filters.urgensi.toLowerCase()) return false;
+
+
+
+          if (filters.approval) {
+
+            const appr = (item.approval || '').toLowerCase();
+
+            const f = filters.approval.toLowerCase();
+
+            if (f === 'approved' && !appr.includes('approv') && !appr.includes('setuju')) return false;
+
+            if (f === 'rejected' && !appr.includes('reject') && !appr.includes('tolak')) return false;
+
+            if (f === 'pending' && (appr.includes('approv') || appr.includes('reject') || appr.includes('setuju') || appr.includes('tolak'))) return false;
+
+          }
+
+
+
+          if (filters.status && (item.status || '').toLowerCase() !== filters.status.toLowerCase()) return false;
+
+
+
+          if (filters.startDate || filters.endDate) {
+
+            const rng = getPeriodeDateRange(item.periode);
+
+            if (rng) {
+
+              if (filters.startDate && rng.end < filters.startDate) return false;
+
+              if (filters.endDate && rng.start > filters.endDate) return false;
+
+            }
+
+          }
+
+
+
+          return true;
+
+        });
+
+      }
+
+
+
+      function renderTable() {
+
+        if (!tableBody) return;
+
+        tableBody.innerHTML = '';
+
+
+
+        const filtered = getFilteredData();
+
+        const totalItems = filtered.length;
+
+        const totalPages = Math.ceil(totalItems / perPage) || 1;
+
+
+
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        if (currentPage < 1) currentPage = 1;
+
+
+
+        const startIndex = (currentPage - 1) * perPage;
+
+        const endIndex = Math.min(startIndex + perPage, totalItems);
+
+        const pageData = filtered.slice(startIndex, endIndex);
+
+
+
+        if (pageData.length === 0) {
+
+          tableBody.innerHTML = '<tr><td colspan="17" class="pnd-empty-cell">Tidak ada data pengajuan yang sesuai.</td></tr>';
+
+          paginationInfo.textContent = 'Menampilkan 0-0 dari 0 data';
+
+          paginationControls.innerHTML = '';
+
+          updateKpis();
+
+          return;
+
+        }
+
+
+
+        pageData.forEach((item, idx) => {
+
+          const rowNumber = startIndex + idx + 1;
+
+          const tr = document.createElement('tr');
+
+
+
+          tr.innerHTML = [
+
+            '<td style="text-align: center; color: #64748b; font-style: italic;">' + rowNumber + '.</td>',
+
+            '<td class="pnd-cell-italic" style="color: #0076C5; font-weight: 600;">' + escapeHtml(item.id || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(item.periode || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(item.kategori || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="color: #0f172a; font-weight: 500; white-space: normal; max-width: 220px;">' + escapeHtml(item.namaBarang || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="text-align: center; font-weight: 600;">' + (item.qty || 1) + '</td>',
+
+            '<td class="pnd-cell-italic">' + escapeHtml(item.satuan || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="text-align: right; color: #16a34a; font-weight: 600; white-space: nowrap;">' + formatRupiah(item.hargaSatuan) + '</td>',
+
+            '<td class="pnd-cell-italic" style="text-align: right; color: #16a34a; font-weight: 700; white-space: nowrap;">' + formatRupiah(item.estimasiBiaya) + '</td>',
+
+            '<td style="text-align: center; white-space: nowrap;">' + renderUrgensiBadge(item.urgensi) + '</td>',
+
+            '<td style="text-align: center; white-space: nowrap;">' + renderApprovalBadge(item.approval) + '</td>',
+
+            '<td style="text-align: center; white-space: nowrap;">' + renderStatusBadge(item.status) + '</td>',
+
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(item.pic || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="' + escapeHtml(item.catatan || '') + '">' + escapeHtml(item.catatan || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(item.approved || '-') + '</td>',
+
+            '<td class="pnd-cell-italic" style="white-space: nowrap;">' + escapeHtml(item.realisasi || '-') + '</td>',
+
+            '<td class="col-sticky-action" style="text-align: center;">' +
+
+              '<button type="button" class="pnd-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
+
+              '</button>' +
+
+            '</td>'
+
+          ].join('');
+
+
+
+          tableBody.appendChild(tr);
+
+        });
+
+
+
+        paginationInfo.textContent = `Menampilkan ${startIndex + 1}-${endIndex} dari ${totalItems} data`;
+
+        renderPaginationControls(totalPages);
+
+        updateKpis();
+
+      }
+
+
+
+      function renderPaginationControls(totalPages) {
+
+        paginationControls.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+
+
+        const prevBtn = document.createElement('button');
+
+        prevBtn.type = 'button';
+
+        prevBtn.className = 'pnd-page-btn';
+
+        prevBtn.innerHTML = '&lsaquo;';
+
+        prevBtn.disabled = currentPage === 1;
+
+        prevBtn.addEventListener('click', () => {
+
+          if (currentPage > 1) {
+
+            currentPage--;
+
+            renderTable();
+
+          }
+
+        });
+
+        paginationControls.appendChild(prevBtn);
+
+
+
+        for (let p = 1; p <= totalPages; p++) {
+
+          if (totalPages > 7) {
+
+            if (p !== 1 && p !== totalPages && Math.abs(p - currentPage) > 2) {
+
+              if (p === 2 || p === totalPages - 1) {
+
+                const dots = document.createElement('span');
+
+                dots.style.padding = '0 4px';
+
+                dots.textContent = '...';
+
+                paginationControls.appendChild(dots);
+
+              }
+
+              continue;
+
+            }
+
+          }
+
+
+
+          const pageBtn = document.createElement('button');
+
+          pageBtn.type = 'button';
+
+          pageBtn.className = 'pnd-page-btn' + (p === currentPage ? ' is-active' : '');
+
+          pageBtn.textContent = p;
+
+          pageBtn.addEventListener('click', () => {
+
+            currentPage = p;
+
+            renderTable();
+
+          });
+
+          paginationControls.appendChild(pageBtn);
+
+        }
+
+
+
+        const nextBtn = document.createElement('button');
+
+        nextBtn.type = 'button';
+
+        nextBtn.className = 'pnd-page-btn';
+
+        nextBtn.innerHTML = '&rsaquo;';
+
+        nextBtn.disabled = currentPage === totalPages;
+
+        nextBtn.addEventListener('click', () => {
+
+          if (currentPage < totalPages) {
+
+            currentPage++;
+
+            renderTable();
+
+          }
+
+        });
+
+        paginationControls.appendChild(nextBtn);
+
+      }
+
+
+
+      /* ===== CLOSE ALL POPOVERS & MENUS ===== */
+
+      function closeAllPopovers() {
+
+        if (filterPndDropdown) filterPndDropdown.classList.remove('is-active');
+
+        if (calendarPndDropdown) calendarPndDropdown.classList.remove('is-active');
+
+        if (exportPndDropdown) exportPndDropdown.classList.remove('is-active');
+
+        if (pbjActionMenu) pbjActionMenu.classList.remove('is-open');
+
+      }
+
+
+
+      document.addEventListener('click', function (e) {
+
+        if (!e.target.closest('.filter-dropdown-wrapper') && !e.target.closest('.pnd-action-menu') && !e.target.closest('.pnd-action-btn')) {
+
+          closeAllPopovers();
+
+        }
+
+      });
+
+
+
+      /* ===== SEARCH EVENTS ===== */
+
+      searchInput.addEventListener('input', function () {
+
+        filters.search = this.value;
+
+        currentPage = 1;
+
+        if (this.value) {
+
+          searchClearBtn.classList.add('is-visible');
+
+        } else {
+
+          searchClearBtn.classList.remove('is-visible');
+
+        }
+
+        renderTable();
+
+      });
+
+
+
+      searchClearBtn.addEventListener('click', function () {
+
+        searchInput.value = '';
+
+        filters.search = '';
+
+        searchClearBtn.classList.remove('is-visible');
+
+        currentPage = 1;
+
+        renderTable();
+
+      });
+
+
+
+      perPageSelect.addEventListener('change', function () {
+
+        perPage = parseInt(this.value, 10) || 10;
+
+        currentPage = 1;
+
+        renderTable();
+
+      });
+
+
+
+      /* ===== FILTER POPOVER EVENTS ===== */
+
+      btnFilterPnd.addEventListener('click', function (e) {
+
+        e.stopPropagation();
+
+        const isOpen = filterPndDropdown.classList.contains('is-active');
+
+        closeAllPopovers();
+
+        if (!isOpen) filterPndDropdown.classList.add('is-active');
+
+      });
+
+
+
+      applyFilterPnd.addEventListener('click', function () {
+
+        filters.kategori = filterKategori.value;
+
+        filters.urgensi = filterUrgensi.value;
+
+        filters.approval = filterApproval.value;
+
+        filters.status = filterStatus.value;
+
+
+
+        if (filters.kategori || filters.urgensi || filters.approval || filters.status) {
+
+          btnFilterPnd.classList.add('has-filter');
+
+        } else {
+
+          btnFilterPnd.classList.remove('has-filter');
+
+        }
+
+
+
+        currentPage = 1;
+
+        renderTable();
+
+        closeAllPopovers();
+
+      });
+
+
+
+      resetFilterPnd.addEventListener('click', function () {
+
+        filterKategori.value = '';
+
+        filterUrgensi.value = '';
+
+        filterApproval.value = '';
+
+        filterStatus.value = '';
+
+        filters.kategori = '';
+
+        filters.urgensi = '';
+
+        filters.approval = '';
+
+        filters.status = '';
+
+        btnFilterPnd.classList.remove('has-filter');
+
+
+
+        currentPage = 1;
+
+        renderTable();
+
+        closeAllPopovers();
+
+      });
+
+
+
+            function getPeriodeDateRange(periodeStr) {
+
+        if (!periodeStr) return null;
+
+        const monthsMap = {
+
+          'januari': 1, 'februari': 2, 'maret': 3, 'april': 4, 'mei': 5, 'juni': 6,
+
+          'juli': 7, 'agustus': 8, 'september': 9, 'oktober': 10, 'november': 11, 'desember': 12,
+
+          'jan': 1, 'feb': 2, 'mar': 3, 'apr': 4, 'jun': 6, 'jul': 7, 'agu': 8, 'sep': 9, 'okt': 10, 'nov': 11, 'des': 12
+
+        };
+
+        const parts = String(periodeStr).toLowerCase().split(/\s+/);
+
+        let m = null, y = null;
+
+        parts.forEach(p => {
+
+          if (monthsMap[p]) m = monthsMap[p];
+
+          else if (/^\d{4}$/.test(p)) y = parseInt(p, 10);
+
+        });
+
+        if (y && m) {
+
+          const start = `${y}-${String(m).padStart(2, '0')}-01`;
+
+          const lastDay = new Date(y, m, 0).getDate();
+
+          const end = `${y}-${String(m).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+          return { start, end };
+
+        }
+
+        if (/^\d{4}-\d{2}/.test(periodeStr)) {
+          return { start: String(periodeStr).slice(0, 10), end: String(periodeStr).slice(0, 10) };
+        }
+
+        const dmyMatch = String(periodeStr).trim().match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+        if (dmyMatch) {
+          const iso = `${dmyMatch[3]}-${dmyMatch[2].padStart(2, '0')}-${dmyMatch[1].padStart(2, '0')}`;
+          return { start: iso, end: iso };
+        }
+
+        return null;
+
+      }
+
+
+
+      /* ===== DUAL-MONTH CALENDAR (Konsisten Kas & Bank / Pendapatan) ===== */
+
+      let calViewYear = 2026;
+
+      let calViewMonth = 11;
+
+      let calSelectedStart = null;
+
+      let calSelectedEnd = null;
+
+
+
+      function formatYMD(y, m, d) {
+
+        return String(y) + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+
+      }
+
+
+
+      function updateCalendarSelectedText() {
+
+        const infoEl = document.getElementById('pbjCalSelectedText');
+
+        if (!infoEl) return;
+
+        if (calSelectedStart && calSelectedEnd) {
+
+          infoEl.textContent = calSelectedStart + ' - ' + calSelectedEnd;
+
+        } else if (calSelectedStart) {
+
+          infoEl.textContent = calSelectedStart + ' - --';
+
+        } else {
+
+          infoEl.textContent = '- - -';
+
+        }
+
+      }
+
+
+
+      function renderCalendarMonth(containerId, titleId, year, month) {
+
+        const container = document.getElementById(containerId);
+
+        const titleEl = document.getElementById(titleId);
+
+        if (!container || !titleEl) return;
+
+
+
+        titleEl.textContent = year + ' - ' + String(month).padStart(2, '0');
+
+        container.innerHTML = '';
+
+
+
+        const firstDayIdx = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        const prevMonthDays = new Date(year, month - 1, 0).getDate();
+
+
+
+        for (let i = firstDayIdx - 1; i >= 0; i--) {
+
+          const dayNum = prevMonthDays - i;
+
+          const cell = document.createElement('div');
+
+          cell.className = 'pnd-cal-day pnd-day-muted';
+
+          cell.textContent = dayNum;
+
+          container.appendChild(cell);
+
+        }
+
+
+
+        for (let d = 1; d <= daysInMonth; d++) {
+
+          const dateStr = formatYMD(year, month, d);
+
+          const cell = document.createElement('div');
+
+          cell.className = 'pnd-cal-day';
+
+          cell.textContent = d;
+
+
+
+          if (dateStr === calSelectedStart) {
+
+            cell.classList.add('pnd-day-selected-start');
+
+          } else if (dateStr === calSelectedEnd) {
+
+            cell.classList.add('pnd-day-selected-end');
+
+          } else if (calSelectedStart && calSelectedEnd && dateStr > calSelectedStart && dateStr < calSelectedEnd) {
+
+            cell.classList.add('pnd-day-in-range');
+
+          }
+
+
+
+          cell.addEventListener('click', function (e) {
+
+            e.stopPropagation();
+
+            if (!calSelectedStart || (calSelectedStart && calSelectedEnd)) {
+
+              calSelectedStart = dateStr;
+
+              calSelectedEnd = null;
+
+            } else if (calSelectedStart && !calSelectedEnd) {
+
+              if (dateStr < calSelectedStart) {
+
+                calSelectedStart = dateStr;
+
+                calSelectedEnd = null;
+
+              } else {
+
+                calSelectedEnd = dateStr;
+
+              }
+
+            }
+
+            updateCalendarSelectedText();
+
+            renderDualCalendar();
+
+          });
+
+
+
+          container.appendChild(cell);
+
+        }
+
+
+
+        const totalSlots = container.children.length;
+
+        const remaining = (totalSlots % 7 === 0) ? 0 : 7 - (totalSlots % 7);
+
+        for (let nextD = 1; nextD <= remaining; nextD++) {
+
+          const cell = document.createElement('div');
+
+          cell.className = 'pnd-cal-day pnd-day-muted';
+
+          cell.textContent = nextD;
+
+          container.appendChild(cell);
+
+        }
+
+      }
+
+
+
+      function renderDualCalendar() {
+
+        renderCalendarMonth('pbjCalGridLeft', 'pbjCalTitleLeft', calViewYear, calViewMonth);
+
+
+
+        let nextM = calViewMonth + 1;
+
+        let nextY = calViewYear;
+
+        if (nextM > 12) {
+
+          nextM = 1;
+
+          nextY++;
+
+        }
+
+        renderCalendarMonth('pbjCalGridRight', 'pbjCalTitleRight', nextY, nextM);
+
+        updateCalendarSelectedText();
+
+      }
+
+
+
+      const pbjNavPrevYear = document.getElementById('pbjCalPrevYear');
+
+      const pbjNavNextYear = document.getElementById('pbjCalNextYear');
+
+      const pbjNavPrevMonth = document.getElementById('pbjCalPrevMonth');
+
+      const pbjNavNextMonth = document.getElementById('pbjCalNextMonth');
+
+      const btnCancelCalendarPnd = document.getElementById('btnCancelCalendarPnd');
+
+      const btnApplyCalendarPnd = document.getElementById('btnApplyCalendarPnd');
+
+
+
+      if (pbjNavPrevYear) pbjNavPrevYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear--; renderDualCalendar(); });
+
+      if (pbjNavNextYear) pbjNavNextYear.addEventListener('click', function (e) { e.stopPropagation(); calViewYear++; renderDualCalendar(); });
+
+      if (pbjNavPrevMonth) {
+
+        pbjNavPrevMonth.addEventListener('click', function (e) {
+
+          e.stopPropagation();
+
+          calViewMonth--;
+
+          if (calViewMonth < 1) { calViewMonth = 12; calViewYear--; }
+
+          renderDualCalendar();
+
+        });
+
+      }
+
+      if (pbjNavNextMonth) {
+
+        pbjNavNextMonth.addEventListener('click', function (e) {
+
+          e.stopPropagation();
+
+          calViewMonth++;
+
+          if (calViewMonth > 12) { calViewMonth = 1; calViewYear++; }
+
+          renderDualCalendar();
+
+        });
+
+      }
+
+
+
+      document.querySelectorAll('#calendarPndDropdown .pnd-cal-preset-btn').forEach(function (btn) {
+
+        btn.addEventListener('click', function (e) {
+
+          e.stopPropagation();
+
+          document.querySelectorAll('#calendarPndDropdown .pnd-cal-preset-btn').forEach(function (b) { b.classList.remove('is-active'); });
+
+          btn.classList.add('is-active');
+
+
+
+          const preset = btn.getAttribute('data-preset');
+
+          const now = new Date(2026, 10, 1);
+
+          let startD = new Date(now);
+
+          let endD = new Date(now);
+
+
+
+          if (preset === 'today') {
+
+            // today
+
+          } else if (preset === 'yesterday') {
+
+            startD.setDate(startD.getDate() - 1);
+
+            endD.setDate(endD.getDate() - 1);
+
+          } else if (preset === 'last7') {
+
+            startD.setDate(startD.getDate() - 6);
+
+          } else if (preset === 'last30') {
+
+            startD.setDate(startD.getDate() - 29);
+
+          } else if (preset === 'last3m') {
+
+            startD.setMonth(startD.getMonth() - 3);
+
+          } else if (preset === 'last6m') {
+
+            startD.setMonth(startD.getMonth() - 6);
+
+          } else if (preset === 'last12m') {
+
+            startD.setFullYear(startD.getFullYear() - 1);
+
+          }
+
+
+
+          calSelectedStart = formatYMD(startD.getFullYear(), startD.getMonth() + 1, startD.getDate());
+
+          calSelectedEnd = formatYMD(endD.getFullYear(), endD.getMonth() + 1, endD.getDate());
+
+          calViewYear = startD.getFullYear();
+
+          calViewMonth = startD.getMonth() + 1;
+
+
+
+          renderDualCalendar();
+
+        });
+
+      });
+
+
+
+      if (btnCalendarPnd && calendarPndDropdown) {
+
+        btnCalendarPnd.addEventListener('click', function (e) {
+
+          e.preventDefault();
+
+          e.stopPropagation();
+
+          const willOpen = !calendarPndDropdown.classList.contains('is-active');
+
+          closeAllPopovers();
+
+          if (willOpen) {
+
+            calendarPndDropdown.classList.add('is-active');
+
+            renderDualCalendar();
+
+          }
+
+        });
+
+      }
+
+
+
+      if (btnApplyCalendarPnd) {
+
+        btnApplyCalendarPnd.addEventListener('click', function () {
+
+          filters.startDate = calSelectedStart || '';
+
+          filters.endDate = calSelectedEnd || calSelectedStart || '';
+
+          if (filters.startDate || filters.endDate) {
+
+            btnCalendarPnd.classList.add('has-filter');
+
+            btnCalendarPnd.setAttribute('title', 'Filter periode: ' + filters.startDate + ' s/d ' + filters.endDate);
+
+          } else {
+
+            btnCalendarPnd.classList.remove('has-filter');
+
+            btnCalendarPnd.setAttribute('title', 'Filter Berdasarkan Periode');
+
+          }
+
+          currentPage = 1;
+
+          renderTable();
+
+          closeAllPopovers();
+
+        });
+
+      }
+
+
+
+      if (btnCancelCalendarPnd) {
+
+        btnCancelCalendarPnd.addEventListener('click', function () {
+
+          calSelectedStart = filters.startDate || null;
+
+          calSelectedEnd = filters.endDate || null;
+
+          if (!filters.startDate && !filters.endDate) {
+
+            btnCalendarPnd.classList.remove('has-filter');
+
+          }
+
+          renderDualCalendar();
+
+          closeAllPopovers();
+
+        });
+
+      }
+
+
+
+      /* ===== EXPORT DIRECT TO EXCEL (.xlsx) (Konsisten Kas & Bank / Pendapatan) ===== */
+
+      function exportToExcel() {
+
+        const filtered = getFilteredData();
+
+        if (filtered.length === 0) {
+
+          if (typeof Swal !== 'undefined') {
+
+            Swal.fire({ icon: 'warning', title: 'Data Kosong', text: 'Tidak ada data pengajuan untuk diekspor.' });
+
+          }
+
+          return;
+
+        }
+
+
+
+        const todayStr = new Date().toISOString().slice(0, 10);
+
+        const filename = 'Pengajuan_Barang_Jasa_' + todayStr + '.xlsx';
+
+
+
+        const headers = [
+
+          'No',
+
+          'ID Pengajuan',
+
+          'Priode',
+
+          'Kategori',
+
+          'Nama Barang / Jasa',
+
+          'Qty',
+
+          'Satuan',
+
+          'Satuan Satuan',
+
+          'Estimasi Biaya',
+
+          'Urgensi',
+
+          'Approval',
+
+          'Status',
+
+          'PIC',
+
+          'Catatan',
+
+          'Approved',
+
+          'Realisasi'
+
+        ];
+
+
+
+        const rows = filtered.map(function (item, idx) {
+
+          return [
+
+            idx + 1,
+
+            item.id || '-',
+
+            item.periode || '-',
+
+            item.kategori || '-',
+
+            item.namaBarang || '-',
+
+            item.qty || 1,
+
+            item.satuan || '-',
+
+            Number(item.hargaSatuan || 0),
+
+            Number(item.estimasiBiaya || 0),
+
+            item.urgensi || '-',
+
+            item.approval || '-',
+
+            item.status || '-',
+
+            item.pic || '-',
+
+            item.catatan || '-',
+
+            item.approved || '-',
+
+            item.realisasi || '-'
+
+          ];
+
+        });
+
+
+
+        if (typeof window.exportBisaExcel === 'function') {
+
+          window.exportBisaExcel({
+
+            title: 'LAPORAN PENGAJUAN BARANG & JASA',
+
+            filename: filename,
+
+            sheetName: 'Pengajuan Barang Jasa',
+
+            headers: headers,
+
+            rows: rows
+
+          });
+
+        } else {
+
+          let tableHtml = '<table border="1"><thead><tr>';
+
+          headers.forEach(h => { tableHtml += '<th style="background:#0076C5;color:#fff;">' + h + '</th>'; });
+
+          tableHtml += '</tr></thead><tbody>';
+
+          rows.forEach(r => {
+
+            tableHtml += '<tr>';
+
+            r.forEach(c => { tableHtml += '<td>' + String(c).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</td>'; });
+
+            tableHtml += '</tr>';
+
+          });
+
+          tableHtml += '</tbody></table>';
+
+
+
+          const blob = new Blob(['\uFEFF' + tableHtml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+
+          const url = URL.createObjectURL(blob);
+
+          const link = document.createElement('a');
+
+          link.href = url;
+
+          link.download = 'Pengajuan_Barang_Jasa_' + todayStr + '.xls';
+
+          document.body.appendChild(link);
+
+          link.click();
+
+          document.body.removeChild(link);
+
+        }
+
+      }
+
+
+
+      if (btnExportPnd) {
+
+        btnExportPnd.addEventListener('click', exportToExcel);
+
+      }
+
+
+
+      /* ===== ACTION MENU TRIGGER & POSITIONING ===== */
+
+      document.addEventListener('click', function (e) {
+
+        const trigger = e.target.closest('[data-action-toggle]');
+
+        if (trigger) {
+
+          e.stopPropagation();
+
+          const itemId = trigger.getAttribute('data-action-toggle');
+
+          activeActionId = itemId;
+
+
+
+          const rect = trigger.getBoundingClientRect();
+
+          const menuWidth = 145;
+
+          const menuHeight = 120;
+
+
+
+          let left = rect.left - menuWidth + 24;
+
+          let top = rect.bottom + 4;
+
+
+
+          if (left < 10) left = 10;
+
+          if (top + menuHeight > window.innerHeight) {
+
+            top = rect.top - menuHeight - 4;
+
+          }
+
+
+
+          pbjActionMenu.style.left = left + 'px';
+
+          pbjActionMenu.style.top = top + 'px';
+
+          pbjActionMenu.classList.add('is-open');
+
+        }
+
+      });
+
+
+
+      // View Detail
+
+      actionView.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        if (!activeActionId) return;
+
+        const item = dataList.find(d => d.id === activeActionId);
+
+        if (!item) return;
+
+
+
+        detailContainer.innerHTML = `
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">ID Pengajuan</span>
+
+            <span class="pnd-detail-value" style="color: #0076C5;">${escapeHtml(item.id || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Priode</span>
+
+            <span class="pnd-detail-value">${escapeHtml(item.periode || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Kategori</span>
+
+            <span class="pnd-detail-value">${escapeHtml(item.kategori || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Nama Barang / Jasa</span>
+
+            <span class="pnd-detail-value">${escapeHtml(item.namaBarang || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Qty & Satuan</span>
+
+            <span class="pnd-detail-value">${item.qty || 1} ${escapeHtml(item.satuan || '')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Satuan Satuan (Harga)</span>
+
+            <span class="pnd-detail-value" style="color: #16a34a;">${formatRupiah(item.hargaSatuan)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Estimasi Biaya</span>
+
+            <span class="pnd-detail-value" style="color: #16a34a; font-size: 15px;">${formatRupiah(item.estimasiBiaya)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Urgensi</span>
+
+            <span class="pnd-detail-value">${renderUrgensiBadge(item.urgensi)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Approval</span>
+
+            <span class="pnd-detail-value">${renderApprovalBadge(item.approval)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Status</span>
+
+            <span class="pnd-detail-value">${renderStatusBadge(item.status)}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">PIC</span>
+
+            <span class="pnd-detail-value">${escapeHtml(item.pic || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Approved</span>
+
+            <span class="pnd-detail-value">${escapeHtml(item.approved || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item">
+
+            <span class="pnd-detail-label">Realisasi</span>
+
+            <span class="pnd-detail-value">${escapeHtml(item.realisasi || '-')}</span>
+
+          </div>
+
+          <div class="pnd-detail-item col-full">
+
+            <span class="pnd-detail-label">Catatan</span>
+
+            <span class="pnd-detail-value" style="font-weight: 400; color: #475569;">${escapeHtml(item.catatan || '-')}</span>
+
+          </div>
+
+        `;
+
+
+
+        pbjViewModal.classList.add('is-active');
+
+      });
+
+
+
+      // Edit Item
+
+      actionEdit.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        if (!activeActionId) return;
+
+        const idx = dataList.findIndex(d => d.id === activeActionId);
+
+        if (idx === -1) return;
+
+        const item = dataList[idx];
+
+
+
+        pbjFormActionText.textContent = 'Edit';
+
+        editIndex.value = idx;
+
+
+
+        formIdPengajuan.value = item.id || '';
+
+        formIdPengajuan.readOnly = true;
+
+        formPeriode.value = item.periode || '';
+
+        formKategori.value = item.kategori || '';
+
+        formNamaBarang.value = item.namaBarang || '';
+
+        formQty.value = item.qty || 1;
+
+        formSatuan.value = item.satuan || '';
+
+        formHargaSatuan.value = item.hargaSatuan || 0;
+
+        formEstimasiBiaya.value = item.estimasiBiaya || 0;
+
+        formUrgensi.value = item.urgensi || 'Sedang';
+
+        formApproval.value = item.approval || 'Pending';
+
+        formStatus.value = item.status || 'Diajukan';
+
+        formPic.value = item.pic || '';
+
+        formApprovedBy.value = item.approved || '';
+
+        formRealisasi.value = item.realisasi || '';
+
+        formCatatan.value = item.catatan || '';
+
+
+
+        pbjFormModal.classList.add('is-active');
+
+      });
+
+
+
+      // Delete Item
+
+      actionDelete.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        if (!activeActionId) return;
+
+        const item = dataList.find(d => d.id === activeActionId);
+
+        if (!item) return;
+
+
+
+        Swal.fire({
+
+          title: 'Hapus Pengajuan?',
+
+          html: `Apakah Anda yakin ingin menghapus pengajuan <strong>${escapeHtml(item.id)}</strong> - <em>${escapeHtml(item.namaBarang)}</em>?`,
+
+          icon: 'warning',
+
+          showCancelButton: true,
+
+          confirmButtonColor: '#ef4444',
+
+          cancelButtonColor: '#64748b',
+
+          confirmButtonText: 'Ya, Hapus!',
+
+          cancelButtonText: 'Batal',
+
+          reverseButtons: true
+
+        }).then(result => {
+
+          if (result.isConfirmed) {
+
+            dataList = dataList.filter(d => d.id !== activeActionId);
+
+            saveData(dataList);
+
+            renderTable();
+
+
+
+            Swal.fire({
+
+              title: 'Berhasil Dihapus',
+
+              text: 'Data pengajuan barang & jasa telah berhasil dihapus.',
+
+              icon: 'success',
+
+              timer: 1600,
+
+              showConfirmButton: false
+
+            });
+
+          }
+
+        });
+
+      });
+
+
+
+      /* ===== TAMBAH PENGAJUAN (NEW MODAL) ===== */
+
+      btnTambahPengajuan.addEventListener('click', function () {
+
+        closeAllPopovers();
+
+        pbjFormActionText.textContent = 'Tambah';
+
+        editIndex.value = -1;
+
+        pbjForm.reset();
+
+
+
+        const nextNum = dataList.length + 1;
+
+        const padNum = String(nextNum).padStart(3, '0');
+
+        formIdPengajuan.value = `PBJ-2026-${padNum}`;
+
+        formIdPengajuan.readOnly = false;
+
+
+
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        formPeriode.value = `${dd}/${mm}/${yyyy}`;
+
+        formQty.value = 1;
+
+        formHargaSatuan.value = 0;
+
+        formEstimasiBiaya.value = 0;
+
+        formUrgensi.value = 'Sedang';
+
+        formApproval.value = 'Pending';
+
+        formStatus.value = 'Diajukan';
+
+        formApprovedBy.value = 'Pending';
+
+        formRealisasi.value = '-';
+
+
+
+        pbjFormModal.classList.add('is-active');
+
+      });
+
+
+
+      /* ===== FORM SUBMIT (SAVE) ===== */
+
+      pbjForm.addEventListener('submit', function (e) {
+
+        e.preventDefault();
+
+
+
+        const idx = parseInt(editIndex.value, 10);
+
+        const newItem = {
+
+          id: formIdPengajuan.value.trim(),
+
+          periode: formPeriode.value.trim(),
+
+          kategori: formKategori.value,
+
+          namaBarang: formNamaBarang.value.trim(),
+
+          qty: parseFloat(formQty.value) || 1,
+
+          satuan: formSatuan.value.trim(),
+
+          hargaSatuan: parseFloat(formHargaSatuan.value) || 0,
+
+          estimasiBiaya: parseFloat(formEstimasiBiaya.value) || 0,
+
+          urgensi: formUrgensi.value,
+
+          approval: formApproval.value,
+
+          status: formStatus.value,
+
+          pic: formPic.value.trim(),
+
+          approved: formApprovedBy.value.trim() || 'Pending',
+
+          realisasi: formRealisasi.value.trim() || '-',
+
+          catatan: formCatatan.value.trim()
+
+        };
+
+
+
+        if (idx === -1) {
+
+          const exists = dataList.some(d => d.id.toLowerCase() === newItem.id.toLowerCase());
+
+          if (exists) {
+
+            Swal.fire({
+
+              title: 'ID Pengajuan Duplikat',
+
+              text: `ID ${newItem.id} sudah digunakan. Harap gunakan ID lain.`,
+
+              icon: 'error'
+
+            });
+
+            return;
+
+          }
+
+          dataList.unshift(newItem);
+
+        } else {
+
+          dataList[idx] = newItem;
+
+        }
+
+
+
+        saveData(dataList);
+
+        pbjFormModal.classList.remove('is-active');
+
+        renderTable();
+
+
+
+        Swal.fire({
+
+          title: 'Berhasil Disimpan',
+
+          text: `Data pengajuan barang & jasa telah berhasil ${idx === -1 ? 'ditambahkan' : 'diperbarui'}.`,
+
+          icon: 'success',
+
+          timer: 1600,
+
+          showConfirmButton: false
+
+        });
+
+      });
+
+
+
+      /* ===== MODAL CLOSE EVENTS ===== */
+
+      document.querySelectorAll('[data-close-modal]').forEach(btn => {
+
+        btn.addEventListener('click', function () {
+
+          const modalId = this.getAttribute('data-close-modal');
+
+          const modal = document.getElementById(modalId);
+
+          if (modal) modal.classList.remove('is-active');
+
+        });
+
+      });
+
+
+
+      document.querySelectorAll('.pnd-modal-overlay').forEach(overlay => {
+
+        overlay.addEventListener('click', function (e) {
+
+          if (e.target === this) {
+
+            this.classList.remove('is-active');
+
+          }
+
+        });
+
+      });
+
+
+
+      /* ===== INITIALIZE ===== */
+
+      renderTable();
+
+    })();
+
+  </script>
+
+</body>
+
+</html>
+

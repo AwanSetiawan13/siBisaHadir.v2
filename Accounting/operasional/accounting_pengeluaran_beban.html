@@ -3055,7 +3055,7 @@
   </div>
 
   <!-- Universal Scripts -->
-  <script src="../../assets/js/layout.js?v=20261118_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup_v3"></script>
 
   <!-- Main Logic Script -->
@@ -4274,15 +4274,29 @@
       });
 
       function initDynamicModalDropdowns() {
-        // 1. ID Approval Dropdown
+        // 1. ID Approval Dropdown (Urutkan yang belum terpakai / baru di paling atas + tanda NEW)
         const dropdownApproval = document.getElementById('dropdownIdApproval');
         if (dropdownApproval) {
-          const aprs = getApprovalList();
+          const usedAprIds = new Set();
+          (pndData || []).forEach(function (it) {
+            if (it && it.idApproval) usedAprIds.add(String(it.idApproval).trim().toLowerCase());
+          });
+          const aprs = getApprovalList().slice().sort(function (a, b) {
+            const aNew = !usedAprIds.has(String(a.idApproval || '').trim().toLowerCase());
+            const bNew = !usedAprIds.has(String(b.idApproval || '').trim().toLowerCase());
+            if (aNew !== bNew) return aNew ? -1 : 1;
+            return 0;
+          });
           dropdownApproval.innerHTML = '';
           aprs.forEach(function (apr) {
+            const isNewApr = !usedAprIds.has(String(apr.idApproval || '').trim().toLowerCase());
             const label = document.createElement('label');
             label.className = 'pnd-select-item';
-            label.innerHTML = '<input type="radio" name="optIdApproval" value="' + escapeHtml(apr.idApproval) + '" data-label="' + escapeHtml(apr.idApproval) + ' - ' + escapeHtml(apr.pemohon || '') + ' (' + formatRupiah(apr.nominal) + ')" /><span>' + escapeHtml(apr.idApproval) + ' - ' + escapeHtml(apr.pemohon || '') + ' (' + formatRupiah(apr.nominal) + ')</span>';
+            if (isNewApr) label.style.background = '#f0f9ff';
+            const newBadge = isNewApr
+              ? '<span style="margin-left: auto; padding: 1.5px 6px; border-radius: 999px; font-size: 9.5px; font-weight: 800; background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; letter-spacing: 0.5px;">NEW</span>'
+              : '';
+            label.innerHTML = '<input type="radio" name="optIdApproval" value="' + escapeHtml(apr.idApproval) + '" data-label="' + escapeHtml(apr.idApproval) + ' - ' + escapeHtml(apr.pemohon || '') + ' (' + formatRupiah(apr.nominal) + ')" /><span style="display:flex;align-items:center;gap:6px;width:100%;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(apr.idApproval) + ' - ' + escapeHtml(apr.pemohon || '') + ' (' + formatRupiah(apr.nominal) + ')</span>' + newBadge + '</span>';
             dropdownApproval.appendChild(label);
           });
         }
@@ -5114,7 +5128,9 @@
           divisiPengecualian: pndDivisiPengecualian.value.trim(),
           namaAkunCoa: pndNamaAkunCoa.value.trim(),
           kelompokCoa: pndKelompokCoa.value.trim(),
-          statusCoa: pndStatusCoa.value.trim()
+          statusCoa: pndStatusCoa.value.trim(),
+          createdAt: Date.now(),
+          updatedAt: Date.now()
         };
 
         if (editId) {
