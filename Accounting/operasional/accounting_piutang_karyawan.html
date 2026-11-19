@@ -1332,7 +1332,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js"></script>
-  <script src="../../assets/js/layout.js?v=20261118_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
 
   <script>
     (function () {
@@ -1585,12 +1585,19 @@
         const currentVal = crudIdPinjamanBayar.value;
         const masterMap = getMasterKaryawanMap();
         crudIdPinjamanBayar.innerHTML = '<option value="">Pilih Pinjaman</option>';
-        (utangList || []).forEach(function (loan) {
+        const sortedLoans = (utangList || []).slice().sort(function (a, b) {
+          const aNew = (cleanRupiah(a.totalBayar) === 0 && cleanRupiah(a.sisaUtang) > 0);
+          const bNew = (cleanRupiah(b.totalBayar) === 0 && cleanRupiah(b.sisaUtang) > 0);
+          if (aNew !== bNew) return aNew ? -1 : 1;
+          return (Number(b.updatedAt || b.createdAt || 0)) - (Number(a.updatedAt || a.createdAt || 0));
+        });
+        sortedLoans.forEach(function (loan) {
           const idLoan = loan.idPinjaman || loan.idPinjam || '';
           if (!idLoan) return;
+          const isNewLoan = (cleanRupiah(loan.totalBayar) === 0 && cleanRupiah(loan.sisaUtang) > 0);
           const opt = document.createElement('option');
           opt.value = idLoan;
-          opt.textContent = idLoan + ' - ' + (loan.namaKaryawan || loan.nama || '-') + ' (Sisa: ' + formatRupiah(loan.sisaUtang) + ')';
+          opt.textContent = (isNewLoan ? '[NEW] ' : '') + idLoan + ' - ' + (loan.namaKaryawan || loan.nama || '-') + ' (Sisa: ' + formatRupiah(loan.sisaUtang) + ')';
           opt.dataset.nik = loan.nik || '';
           opt.dataset.nama = loan.namaKaryawan || loan.nama || '';
           opt.dataset.divisi = loan.divisi || getEmployeeDivisi(loan.nik) || '';
@@ -1665,7 +1672,58 @@
               } catch (e) {}
             }
           }
-          if (!payrolls || !Array.isArray(payrolls)) return;
+          if (!payrolls || !Array.isArray(payrolls) || payrolls.length === 0) {
+            payrolls = [
+              {
+                id: 'PAY-001',
+                idKaryawan: 'KRY-001',
+                periode: 'Oktober 2026',
+                nik: 'BM-2024-001',
+                nama: 'Ahmad Fauzi',
+                divisi: 'MCN',
+                gajiPokok: 5000000,
+                tunjangan: 1000000,
+                bonusLembur: 500000,
+                perjalananDinas: 0,
+                penerimaanLainnya: 0,
+                keterlambatan: 0,
+                penguranganLainnya: 0,
+                takeHomePay: 6500000,
+                statusLama: 'Tetap',
+                idPinjaman: '-',
+                potonganPiutang: 0,
+                idPayroll: 'PR-202610-001',
+                projectBrand: 'Seluruh Kreator MCN',
+                bebanBruto: 6500000,
+                terbayarKas: 0,
+                sisaPayroll: 6500000
+              },
+              {
+                id: 'PAY-002',
+                idKaryawan: 'KRY-002',
+                periode: 'Oktober 2026',
+                nik: 'BM-2024-002',
+                nama: 'Raka Wijaya',
+                divisi: 'Marketing & Brand',
+                gajiPokok: 4500000,
+                tunjangan: 750000,
+                bonusLembur: 250000,
+                perjalananDinas: 0,
+                penerimaanLainnya: 0,
+                keterlambatan: 0,
+                penguranganLainnya: 0,
+                takeHomePay: 5500000,
+                statusLama: 'Tetap',
+                idPinjaman: '-',
+                potonganPiutang: 0,
+                idPayroll: 'PR-202610-002',
+                projectBrand: 'Campaign Brand A',
+                bebanBruto: 5500000,
+                terbayarKas: 0,
+                sisaPayroll: 5500000
+              }
+            ];
+          }
 
           // Ambil referensi pinjaman dari Utang Karyawan
           let loans = [];
@@ -1910,11 +1968,17 @@
               item.takeHomePay = gapok + tunjangan + bonus + dinas + penerimaanLain - keterlambatan - pengLain - newPotongan;
               const terbayar = Number(item.terbayarKas) || 0;
               item.sisaPayroll = Math.max(0, item.takeHomePay - terbayar);
+              if (newPotongan > 0) {
+                item.updatedAt = Date.now();
+              }
               hasChanges = true;
             }
           });
 
           if (hasChanges) {
+            payrolls.sort(function (a, b) {
+              return (Number(b.updatedAt || b.createdAt || 0)) - (Number(a.updatedAt || a.createdAt || 0));
+            });
             payrollKeys.forEach(function (k) {
               localStorage.setItem(k, JSON.stringify(payrolls));
             });
@@ -2333,9 +2397,9 @@
         if (!hint) return;
         const m = crudMetode ? crudMetode.value : '';
         if (m === 'Potong Gaji') {
-          hint.innerHTML = '<span style="color: #0284c7; font-weight: 500;">ℹ Berelasi dengan Potongan Piutang di Payroll &amp; Kontrak</span>';
+          hint.innerHTML = '<span style="color: #0284c7; font-weight: 500;">ℹ Masuk ke Potongan Piutang di Payroll &rarr; ID Payroll muncul di Referensi Dokumen Kas &amp; Bank</span>';
         } else {
-          hint.innerHTML = '<span style="color: #16a34a; font-weight: 500;">✓ Murni Piutang &amp; Utang (Bebas dari Payroll)</span>';
+          hint.innerHTML = '<span style="color: #16a34a; font-weight: 500;">✓ Langsung masuk ke Referensi Dokumen Kas &amp; Bank (Tanpa memotong Payroll)</span>';
         }
       }
 
@@ -2453,6 +2517,7 @@
               piutangList[idx].metode = metode;
               piutangList[idx].nominal = nominal;
               piutangList[idx].catatan = catatan;
+              piutangList[idx].updatedAt = Date.now();
             }
           } else {
             const newPay = {
@@ -2466,7 +2531,9 @@
               divisi: divisi,
               metode: metode,
               nominal: nominal,
-              catatan: catatan
+              catatan: catatan,
+              createdAt: Date.now(),
+              updatedAt: Date.now()
             };
             piutangList.unshift(newPay);
           }

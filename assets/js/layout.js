@@ -143,7 +143,9 @@
           { label: 'Data Kreator', link: 'SpvKol/operasional/spvkol_kreator.html' },
           { label: 'Tracking Kreator', link: 'SpvKol/operasional/spvkol_tracking_kreator.html' },
           { label: 'Tracking Sampel', link: 'SpvKol/operasional/spvkol_tracking_sampel.html' },
-          { label: 'Performa Kreator', link: 'SpvKol/operasional/spvkol_Performa_Kreator.html' }
+          { label: 'Performa Kreator', link: 'SpvKol/operasional/spvkol_Performa_Kreator.html' },
+          { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html' },
+          { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html' }
         ]
       },
       {
@@ -215,7 +217,9 @@
           { label: 'Data Kreator', link: 'StaffKol/operasional/staffkol_kreator.html' },
           { label: 'Tracking Kreator', link: 'StaffKol/operasional/staffkol_tracking_kreator.html' },
           { label: 'Tracking Sampel', link: 'StaffKol/operasional/staffkol_tracking_sampel.html' },
-          { label: 'Performa Kreator', link: 'StaffKol/operasional/staffkol_Performa_Kreator.html' }
+          { label: 'Performa Kreator', link: 'StaffKol/operasional/staffkol_Performa_Kreator.html' },
+          { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html' },
+          { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html' }
         ]
       },
       {
@@ -289,7 +293,9 @@
           { label: 'Rekap Divisi', link: 'Accounting/operasional/accounting_rekap_divisi.html' },
           { label: 'Utang Karyawan', link: 'Accounting/operasional/accounting_utang_karyawan.html' },
           { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html' },
-          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' }
+          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' },
+          { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html' },
+          { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html' }
           // { label: 'History Dokumen', link: 'Accounting/operasional/accounting_history_dokumen.html' } /* Dihapus sementara */
         ]
       },
@@ -2796,7 +2802,8 @@
     function isMoneyInput(el) {
       if (!el || (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA')) return false;
       const type = (el.type || '').toLowerCase();
-      if (type === 'file' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit' || type === 'reset') return false;
+      if (type === 'file' || type === 'checkbox' || type === 'radio' || type === 'button' || type === 'submit' || type === 'reset' || type === 'date' || type === 'search') return false;
+      if (el.classList && el.classList.contains('bisa-datepicker-input')) return false;
 
       const id = (el.id || '').toLowerCase();
       const name = (el.name || '').toLowerCase();
@@ -2813,17 +2820,34 @@
         const lbl = wrap.querySelector('label, [class*="-label"]');
         if (lbl) labelText += ' ' + lbl.textContent;
       }
-      labelText = labelText.toLowerCase();
+      labelText = labelText.toLowerCase().trim();
+
+      // Jangan pernah anggap kolom NIK, ID, Nama, Tanggal, Rekening, Tenor, Keterangan, Status, Divisi, Project/Brand sebagai kolom Rupiah
+      const nonMoneyExclude = [
+        'nik', 'nip', 'nama', 'kode', 'nomor', 'rekening', 'telepon', 'telp', 'email',
+        'alamat', 'catatan', 'keterangan', 'deskripsi', 'divisi', 'jabatan', 'status',
+        'periode', 'tanggal', 'tgl', 'tenor', 'pic', 'vendor', 'customer', 'project', 'brand'
+      ];
+      if (nonMoneyExclude.some(function (ex) {
+        return id.includes(ex) || name.includes(ex) || labelText === ex || labelText.startsWith(ex + ' ');
+      })) {
+        return false;
+      }
+      if (id.startsWith('id') || id.includes('idpinjam') || id.includes('idkaryawan') || id.includes('idpayroll') || id.includes('idpembayaran') || id.includes('idtransaksi')) {
+        return false;
+      }
 
       const moneyKeywords = [
-        'uang', 'nominal', 'rupiah', 'rp', 'biaya', 'budget', 'tarif', 'gaji', 'harga',
-        'bayar', 'saldo', 'masuk', 'keluar', 'tagihan', 'dpp', 'ppn', 'pph', 'sisa',
-        'utang', 'piutang', 'tunjangan', 'potongan', 'kas', 'price', 'amount', 'fee', 'cost'
+        'uangmasuk', 'uangkeluar', 'uang_masuk', 'uang_keluar', 'nominal', 'rupiah',
+        'biaya', 'budget', 'tarif', 'gaji', 'harga', 'saldo', 'tagihan', 'dpp', 'ppn', 'pph',
+        'sisa', 'tunjangan', 'potongan', 'terbayar', 'pokokpinjaman', 'cicilan',
+        'takehomepay', 'bebanbruto', 'keterlambatan', 'pengurangan', 'penerimaan',
+        'perjalanandinas', 'bonus', 'price', 'amount', 'fee', 'cost'
       ];
 
       return moneyKeywords.some(function (k) {
-        return id.includes(k) || name.includes(k) || cls.includes(k) || ph.includes(k) || labelText.includes(k);
-      }) || ph.includes('rp') || cls.includes('format-rupiah') || cls.includes('money');
+        return id.includes(k) || name.includes(k) || labelText.includes(k);
+      }) || ph.startsWith('rp') || cls.includes('format-rupiah') || cls.includes('money');
     }
 
     function isFieldEmpty(el) {
@@ -2874,8 +2898,60 @@
       }
     }
 
+    function cleanNikString(val) {
+      if (val === null || val === undefined) return val;
+      const str = String(val).trim();
+      if (/^-?rp\.?\s*/i.test(str)) {
+        return str.replace(/^-?rp\.?\s*/i, '').trim() || '0';
+      }
+      return str;
+    }
+
+    function sanitizeStoredNikFields() {
+      const storageKeysToClean = [
+        'accounting_master_karyawan_v1',
+        'bisa_master_karyawan_v1',
+        'master_karyawan_data',
+        'bisa_payroll_data_v1',
+        'accounting_payroll_data_v1',
+        'accounting_payroll_data',
+        'accounting_utang_karyawan_data',
+        'accounting_piutang_karyawan_data'
+      ];
+      storageKeysToClean.forEach(function (key) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) return;
+          let changed = false;
+          parsed.forEach(function (item) {
+            if (!item || typeof item !== 'object') return;
+            ['nik', 'nikBayar', 'nikKaryawan'].forEach(function (field) {
+              if (typeof item[field] === 'string' && /^-?rp\.?\s*/i.test(item[field].trim())) {
+                item[field] = cleanNikString(item[field]);
+                changed = true;
+              }
+            });
+          });
+          if (changed) {
+            localStorage.setItem(key, JSON.stringify(parsed));
+          }
+        } catch (e) {}
+      });
+    }
+
+    // Jalankan pembersihan NIK segera saat layout.js dieksekusi (sebelum script halaman membaca localStorage)
+    sanitizeStoredNikFields();
+
     function scanForms() {
+      sanitizeStoredNikFields();
       document.querySelectorAll('form').forEach(disableNativeValidation);
+      document.querySelectorAll('input[id*="Nik" i], input[name*="nik" i]').forEach(function (inp) {
+        if (inp.value && /^-?rp\.?\s*/i.test(inp.value.trim())) {
+          inp.value = cleanNikString(inp.value);
+        }
+      });
     }
 
     // Blokir tooltip validasi bawaan browser (e.g. "Please fill out this field")
@@ -3107,6 +3183,950 @@
         }
       }
     }, true);
+  })();
+
+  /* ============================================================================
+     UNIVERSAL BISA CUSTOM DATEPICKER ENGINE (KONSISTEN DENGAN MODUL PENDAPATAN)
+     ============================================================================ */
+  (function initUniversalBisaDatePicker() {
+    const DP_MONTH_NAMES = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    const CALENDAR_ICON_SVG =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+        '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>' +
+        '<line x1="16" y1="2" x2="16" y2="6"></line>' +
+        '<line x1="8" y1="2" x2="8" y2="6"></line>' +
+        '<line x1="3" y1="10" x2="21" y2="10"></line>' +
+      '</svg>';
+
+    const nativeInputValueDesc = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+
+    function formatYMD(y, m, d) {
+      return String(y) + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    }
+
+    function isoToDisplay(iso) {
+      if (!iso) return '';
+      const s = String(iso).trim();
+      const m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (m) {
+        return m[3].padStart(2, '0') + '/' + m[2].padStart(2, '0') + '/' + m[1];
+      }
+      return s;
+    }
+
+    function displayToIso(display) {
+      if (!display) return '';
+      const s = String(display).trim();
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+      const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (m) {
+        return m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
+      }
+      return '';
+    }
+
+    function injectBisaDatePickerStyles() {
+      if (document.getElementById('bisa-universal-datepicker-styles')) return;
+      const style = document.createElement('style');
+      style.id = 'bisa-universal-datepicker-styles';
+      style.textContent = `
+        .bisa-datepicker-wrap {
+          position: relative;
+          width: 100%;
+          display: flex;
+          align-items: center;
+        }
+        .bisa-datepicker-wrap.is-compact {
+          width: auto;
+          display: inline-flex;
+        }
+        .bisa-datepicker-wrap .bisa-datepicker-input {
+          width: 100%;
+          padding-right: 34px !important;
+          cursor: pointer;
+          box-sizing: border-box;
+        }
+        .bisa-datepicker-wrap.is-compact .bisa-datepicker-input {
+          width: 130px;
+          padding-right: 28px !important;
+        }
+        .bisa-datepicker-icon {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #64748b;
+          cursor: pointer;
+          pointer-events: auto;
+          transition: color 0.15s ease;
+          z-index: 2;
+        }
+        .bisa-datepicker-wrap.is-compact .bisa-datepicker-icon {
+          right: 6px;
+          width: 16px;
+          height: 16px;
+        }
+        .bisa-datepicker-wrap:focus-within .bisa-datepicker-icon,
+        .bisa-datepicker-icon:hover {
+          color: #0076C5;
+        }
+        .bisa-datepicker-icon svg {
+          width: 16px;
+          height: 16px;
+          stroke: currentColor;
+        }
+        .bisa-datepicker-wrap.is-compact .bisa-datepicker-icon svg {
+          width: 13.5px;
+          height: 13.5px;
+        }
+        .bisa-dp-popover {
+          position: fixed;
+          display: none;
+          z-index: 2147483600;
+          width: 290px;
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          border-radius: 14px;
+          box-shadow: 0 14px 34px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.04);
+          padding: 16px 16px 12px 16px;
+          box-sizing: border-box;
+          font-family: 'Outfit', sans-serif;
+          user-select: none;
+          animation: bisaDpFadeIn 0.15s ease-out;
+        }
+        @keyframes bisaDpFadeIn {
+          from { opacity: 0; transform: translateY(-4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .bisa-dp-popover.is-open {
+          display: block;
+        }
+        .bisa-dp-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 12px;
+        }
+        .bisa-dp-title {
+          font-size: 14.5px;
+          font-weight: 700;
+          color: #0f172a;
+          letter-spacing: -0.2px;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .bisa-dp-month-text {
+          color: #0f172a;
+          font-weight: 700;
+        }
+        .bisa-dp-year-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #f0f9ff;
+          color: #0076C5;
+          border: 1px solid #bae6fd;
+          border-radius: 7px;
+          padding: 2px 8px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 13.5px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .bisa-dp-year-btn:hover,
+        .bisa-dp-year-btn.is-active {
+          background: #0076C5;
+          color: #ffffff;
+          border-color: #0076C5;
+        }
+        .bisa-dp-year-btn svg {
+          width: 12px;
+          height: 12px;
+          stroke: currentColor;
+          stroke-width: 2.5;
+          fill: none;
+          transition: transform 0.15s ease;
+        }
+        .bisa-dp-year-btn.is-active svg {
+          transform: rotate(180deg);
+        }
+        .bisa-dp-year-panel {
+          display: none;
+          margin-bottom: 6px;
+          animation: bisaDpFadeIn 0.12s ease-out;
+        }
+        .bisa-dp-year-panel.is-open {
+          display: block;
+        }
+        .bisa-dp-year-panel-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 8px;
+          padding: 0 2px;
+        }
+        .bisa-dp-year-range-label {
+          font-size: 12.5px;
+          font-weight: 700;
+          color: #475569;
+        }
+        .bisa-dp-year-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 6px;
+        }
+        .bisa-dp-year-cell {
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+          border: 1px solid #f1f5f9;
+          background: #f8fafc;
+          font-size: 13px;
+          font-weight: 600;
+          color: #1e293b;
+          cursor: pointer;
+          transition: all 0.12s ease;
+        }
+        .bisa-dp-year-cell:hover {
+          background: #e0f2fe;
+          color: #0076C5;
+          border-color: #bae6fd;
+        }
+        .bisa-dp-year-cell.is-current-year {
+          border: 1.5px solid #38bdf8;
+          color: #0284c7;
+        }
+        .bisa-dp-year-cell.is-selected {
+          background: #0076C5 !important;
+          color: #ffffff !important;
+          border-color: #0076C5 !important;
+          box-shadow: 0 2px 6px rgba(0, 118, 197, 0.3);
+        }
+        .bisa-dp-navs {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .bisa-dp-nav-btn {
+          width: 28px;
+          height: 28px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #e2e8f0;
+          background: #ffffff;
+          border-radius: 7px;
+          color: #475569;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          padding: 0;
+        }
+        .bisa-dp-nav-btn:hover {
+          background: #f1f5f9;
+          color: #0076C5;
+          border-color: #cbd5e1;
+        }
+        .bisa-dp-nav-btn svg {
+          width: 14px;
+          height: 14px;
+          stroke: currentColor;
+          stroke-width: 2.4;
+          fill: none;
+        }
+        .bisa-dp-weekdays {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 2px;
+          margin-bottom: 6px;
+          text-align: center;
+        }
+        .bisa-dp-weekday {
+          font-size: 11px;
+          font-weight: 600;
+          color: #94a3b8;
+          padding: 4px 0;
+          text-transform: uppercase;
+        }
+        .bisa-dp-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 3px;
+        }
+        .bisa-dp-day {
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 7px;
+          font-size: 13px;
+          font-weight: 500;
+          color: #1e293b;
+          cursor: pointer;
+          transition: all 0.12s ease;
+          position: relative;
+        }
+        .bisa-dp-day:hover {
+          background: #f0f9ff;
+          color: #0284c7;
+          font-weight: 600;
+        }
+        .bisa-dp-day.is-other-month {
+          color: #cbd5e1;
+        }
+        .bisa-dp-day.is-today {
+          border: 1.5px solid #38bdf8;
+          color: #0284c7;
+          font-weight: 700;
+        }
+        .bisa-dp-day.is-selected {
+          background: #0076C5 !important;
+          color: #ffffff !important;
+          font-weight: 700;
+          box-shadow: 0 2px 6px rgba(0, 118, 197, 0.35);
+          border: none;
+        }
+        .bisa-dp-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 10px;
+          padding-top: 8px;
+          border-top: 1px solid #f1f5f9;
+        }
+        .bisa-dp-action-btn {
+          background: transparent;
+          border: none;
+          font-family: 'Outfit', sans-serif;
+          font-size: 12.5px;
+          font-weight: 600;
+          cursor: pointer;
+          padding: 4px 8px;
+          border-radius: 6px;
+          transition: all 0.12s ease;
+        }
+        .bisa-dp-btn-clear {
+          color: #64748b;
+        }
+        .bisa-dp-btn-clear:hover {
+          background: #fef2f2;
+          color: #dc2626;
+        }
+        .bisa-dp-btn-today {
+          color: #0076C5;
+          font-weight: 700;
+        }
+        .bisa-dp-btn-today:hover {
+          background: #f0f9ff;
+          color: #0284c7;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    let dpPopover = null;
+    let dpTitle = null;
+    let dpMonthText = null;
+    let dpYearBtn = null;
+    let dpYearText = null;
+    let dpYearPanel = null;
+    let dpYearRangeLabel = null;
+    let dpYearGrid = null;
+    let dpYearPrevRange = null;
+    let dpYearNextRange = null;
+    let dpCalendarBody = null;
+    let dpGrid = null;
+    let dpPrev = null;
+    let dpNext = null;
+    let dpClear = null;
+    let dpToday = null;
+    let dpActiveInput = null;
+    let dpViewYear = new Date().getFullYear();
+    let dpViewMonth = new Date().getMonth() + 1;
+    let dpYearPageStart = dpViewYear - 4;
+    let isYearPanelOpen = false;
+
+    function toggleYearPanel(forceState) {
+      isYearPanelOpen = typeof forceState === 'boolean' ? forceState : !isYearPanelOpen;
+      if (isYearPanelOpen) {
+        dpYearPageStart = dpViewYear - 4;
+        renderYearGrid();
+      }
+      if (dpYearPanel) {
+        dpYearPanel.classList.toggle('is-open', isYearPanelOpen);
+      }
+      if (dpYearBtn) {
+        dpYearBtn.classList.toggle('is-active', isYearPanelOpen);
+      }
+      if (dpCalendarBody) {
+        dpCalendarBody.style.display = isYearPanelOpen ? 'none' : 'block';
+      }
+    }
+
+    function renderYearGrid() {
+      if (!dpYearGrid || !dpYearRangeLabel) return;
+      const startY = dpYearPageStart;
+      const endY = startY + 11;
+      dpYearRangeLabel.textContent = startY + ' - ' + endY;
+      dpYearGrid.innerHTML = '';
+
+      const currentRealYear = new Date().getFullYear();
+      for (let y = startY; y <= endY; y++) {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'bisa-dp-year-cell';
+        if (y === currentRealYear) cell.classList.add('is-current-year');
+        if (y === dpViewYear) cell.classList.add('is-selected');
+        cell.textContent = String(y);
+        cell.setAttribute('data-year', String(y));
+        dpYearGrid.appendChild(cell);
+      }
+    }
+
+    function ensurePopoverElement() {
+      let existing = document.getElementById('bisaDatePickerPopover');
+      if (existing && !existing.__bisaUniversalBound) {
+        // Replace legacy inline popover so all pages get the easy Year Picker
+        const replacement = document.createElement('div');
+        replacement.id = 'bisaDatePickerPopover';
+        replacement.className = 'bisa-dp-popover';
+        existing.parentNode.replaceChild(replacement, existing);
+        existing = replacement;
+      }
+
+      dpPopover = existing;
+      if (!dpPopover) {
+        dpPopover = document.createElement('div');
+        dpPopover.id = 'bisaDatePickerPopover';
+        dpPopover.className = 'bisa-dp-popover';
+        document.body.appendChild(dpPopover);
+      }
+
+      if (!dpPopover.__bisaUniversalBound) {
+        dpPopover.__bisaUniversalBound = true;
+        dpPopover.setAttribute('role', 'dialog');
+        dpPopover.setAttribute('aria-modal', 'true');
+        dpPopover.innerHTML =
+          '<div class="bisa-dp-header">' +
+            '<div class="bisa-dp-title" id="bisaDpTitle">' +
+              '<span class="bisa-dp-month-text" id="bisaDpMonthText">Oktober</span>' +
+              '<button type="button" class="bisa-dp-year-btn" id="bisaDpYearBtn" title="Klik untuk memilih tahun">' +
+                '<span id="bisaDpYearText">2026</span>' +
+                '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
+              '</button>' +
+            '</div>' +
+            '<div class="bisa-dp-navs">' +
+              '<button type="button" class="bisa-dp-nav-btn" id="bisaDpPrev" aria-label="Bulan sebelumnya" title="Bulan sebelumnya">' +
+                '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+              '</button>' +
+              '<button type="button" class="bisa-dp-nav-btn" id="bisaDpNext" aria-label="Bulan berikutnya" title="Bulan berikutnya">' +
+                '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="bisa-dp-year-panel" id="bisaDpYearPanel">' +
+            '<div class="bisa-dp-year-panel-header">' +
+              '<button type="button" class="bisa-dp-nav-btn" id="bisaDpYearPrevRange" title="12 Tahun Sebelumnya">' +
+                '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>' +
+              '</button>' +
+              '<span class="bisa-dp-year-range-label" id="bisaDpYearRangeLabel">2022 - 2033</span>' +
+              '<button type="button" class="bisa-dp-nav-btn" id="bisaDpYearNextRange" title="12 Tahun Berikutnya">' +
+                '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
+              '</button>' +
+            '</div>' +
+            '<div class="bisa-dp-year-grid" id="bisaDpYearGrid"></div>' +
+          '</div>' +
+          '<div id="bisaDpCalendarBody">' +
+            '<div class="bisa-dp-weekdays">' +
+              '<div class="bisa-dp-weekday">Min</div>' +
+              '<div class="bisa-dp-weekday">Sen</div>' +
+              '<div class="bisa-dp-weekday">Sel</div>' +
+              '<div class="bisa-dp-weekday">Rab</div>' +
+              '<div class="bisa-dp-weekday">Kam</div>' +
+              '<div class="bisa-dp-weekday">Jum</div>' +
+              '<div class="bisa-dp-weekday">Sab</div>' +
+            '</div>' +
+            '<div class="bisa-dp-grid" id="bisaDpGrid"></div>' +
+          '</div>' +
+          '<div class="bisa-dp-footer">' +
+            '<button type="button" class="bisa-dp-action-btn bisa-dp-btn-clear" id="bisaDpClear">Clear</button>' +
+            '<button type="button" class="bisa-dp-action-btn bisa-dp-btn-today" id="bisaDpToday">Today</button>' +
+          '</div>';
+
+        dpTitle = document.getElementById('bisaDpTitle');
+        dpMonthText = document.getElementById('bisaDpMonthText');
+        dpYearBtn = document.getElementById('bisaDpYearBtn');
+        dpYearText = document.getElementById('bisaDpYearText');
+        dpYearPanel = document.getElementById('bisaDpYearPanel');
+        dpYearRangeLabel = document.getElementById('bisaDpYearRangeLabel');
+        dpYearGrid = document.getElementById('bisaDpYearGrid');
+        dpYearPrevRange = document.getElementById('bisaDpYearPrevRange');
+        dpYearNextRange = document.getElementById('bisaDpYearNextRange');
+        dpCalendarBody = document.getElementById('bisaDpCalendarBody');
+        dpGrid = document.getElementById('bisaDpGrid');
+        dpPrev = document.getElementById('bisaDpPrev');
+        dpNext = document.getElementById('bisaDpNext');
+        dpClear = document.getElementById('bisaDpClear');
+        dpToday = document.getElementById('bisaDpToday');
+
+        if (dpYearBtn) {
+          dpYearBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleYearPanel();
+          });
+        }
+
+        if (dpYearPrevRange) {
+          dpYearPrevRange.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dpYearPageStart -= 12;
+            renderYearGrid();
+          });
+        }
+
+        if (dpYearNextRange) {
+          dpYearNextRange.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dpYearPageStart += 12;
+            renderYearGrid();
+          });
+        }
+
+        if (dpYearGrid) {
+          dpYearGrid.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const cell = e.target.closest('.bisa-dp-year-cell');
+            if (!cell) return;
+            const chosenY = parseInt(cell.getAttribute('data-year'), 10);
+            if (!isNaN(chosenY)) {
+              dpViewYear = chosenY;
+              toggleYearPanel(false);
+              renderCalendarGrid();
+            }
+          });
+        }
+
+        if (dpPrev) {
+          dpPrev.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (isYearPanelOpen) {
+              dpYearPageStart -= 12;
+              renderYearGrid();
+              return;
+            }
+            dpViewMonth--;
+            if (dpViewMonth < 1) { dpViewMonth = 12; dpViewYear--; }
+            renderCalendarGrid();
+          });
+        }
+
+        if (dpNext) {
+          dpNext.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (isYearPanelOpen) {
+              dpYearPageStart += 12;
+              renderYearGrid();
+              return;
+            }
+            dpViewMonth++;
+            if (dpViewMonth > 12) { dpViewMonth = 1; dpViewYear++; }
+            renderCalendarGrid();
+          });
+        }
+
+        if (dpGrid) {
+          dpGrid.addEventListener('click', function (e) {
+            const dayCell = e.target.closest('.bisa-dp-day');
+            if (!dayCell || !dpActiveInput) return;
+            const chosenIso = dayCell.getAttribute('data-date');
+            applyDateToInput(dpActiveInput, chosenIso);
+            dpActiveInput.dispatchEvent(new Event('input', { bubbles: true }));
+            dpActiveInput.dispatchEvent(new Event('change', { bubbles: true }));
+            closePopover();
+          });
+        }
+
+        if (dpClear) {
+          dpClear.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (dpActiveInput) {
+              applyDateToInput(dpActiveInput, '');
+              dpActiveInput.dispatchEvent(new Event('input', { bubbles: true }));
+              dpActiveInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            closePopover();
+          });
+        }
+
+        if (dpToday) {
+          dpToday.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (dpActiveInput) {
+              const todayIso = new Date().toISOString().split('T')[0];
+              applyDateToInput(dpActiveInput, todayIso);
+              dpActiveInput.dispatchEvent(new Event('input', { bubbles: true }));
+              dpActiveInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            closePopover();
+          });
+        }
+
+        document.addEventListener('click', function (e) {
+          if (!dpPopover || !dpPopover.classList.contains('is-open')) return;
+          if (!e.target.closest('#bisaDatePickerPopover') && !e.target.closest('.bisa-datepicker-wrap')) {
+            closePopover();
+          }
+        });
+
+        window.addEventListener('resize', closePopover);
+        window.addEventListener('scroll', function (e) {
+          if (dpPopover && dpPopover.classList.contains('is-open')) {
+            if (e.target && e.target.closest && e.target.closest('#bisaDatePickerPopover')) return;
+            closePopover();
+          }
+        }, true);
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closePopover();
+        });
+      }
+    }
+
+    function getRawVisibleValue(inputEl) {
+      if (!inputEl) return '';
+      if (nativeInputValueDesc && nativeInputValueDesc.get) {
+        return String(nativeInputValueDesc.get.call(inputEl) || '').trim();
+      }
+      return String(inputEl.value || '').trim();
+    }
+
+    function setRawVisibleValue(inputEl, str) {
+      if (!inputEl) return;
+      if (nativeInputValueDesc && nativeInputValueDesc.set) {
+        nativeInputValueDesc.set.call(inputEl, str);
+      } else {
+        inputEl.setAttribute('value', str);
+      }
+    }
+
+    function getIsoFromInput(inputEl) {
+      if (!inputEl) return '';
+      if (inputEl.dataset.isoValue && /^\d{4}-\d{2}-\d{2}$/.test(inputEl.dataset.isoValue)) {
+        return inputEl.dataset.isoValue;
+      }
+      if (inputEl.dataset.iso && /^\d{4}-\d{2}-\d{2}$/.test(inputEl.dataset.iso)) {
+        return inputEl.dataset.iso;
+      }
+      const raw = getRawVisibleValue(inputEl);
+      return displayToIso(raw);
+    }
+
+    function applyDateToInput(inputEl, isoOrDisplay) {
+      if (!inputEl) return;
+      const str = String(isoOrDisplay || '').trim();
+      if (!str) {
+        inputEl.dataset.isoValue = '';
+        inputEl.dataset.iso = '';
+        setRawVisibleValue(inputEl, '');
+        return;
+      }
+      let iso = '';
+      let disp = '';
+      if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(str)) {
+        const parts = str.split('-');
+        iso = formatYMD(parts[0], parts[1], parts[2]);
+        disp = isoToDisplay(iso);
+      } else if (/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$/.test(str)) {
+        iso = displayToIso(str);
+        disp = isoToDisplay(iso);
+      } else {
+        iso = str;
+        disp = str;
+      }
+      inputEl.dataset.isoValue = iso;
+      inputEl.dataset.iso = iso;
+      setRawVisibleValue(inputEl, disp);
+    }
+
+    function renderCalendarGrid() {
+      if (!dpPopover || !dpGrid) return;
+      if (dpMonthText && dpYearText) {
+        dpMonthText.textContent = DP_MONTH_NAMES[dpViewMonth - 1];
+        dpYearText.textContent = String(dpViewYear);
+      } else if (dpTitle) {
+        dpTitle.textContent = DP_MONTH_NAMES[dpViewMonth - 1] + ' ' + dpViewYear;
+      }
+
+      const firstDay = new Date(dpViewYear, dpViewMonth - 1, 1).getDay();
+      const daysInMonth = new Date(dpViewYear, dpViewMonth, 0).getDate();
+      const daysInPrevMonth = new Date(dpViewYear, dpViewMonth - 1, 0).getDate();
+
+      const todayIso = new Date().toISOString().split('T')[0];
+      const selectedIso = dpActiveInput ? getIsoFromInput(dpActiveInput) : '';
+
+      dpGrid.innerHTML = '';
+
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const d = daysInPrevMonth - i;
+        let prevM = dpViewMonth - 1;
+        let prevY = dpViewYear;
+        if (prevM < 1) { prevM = 12; prevY--; }
+        const iso = formatYMD(prevY, prevM, d);
+        const cell = document.createElement('div');
+        cell.className = 'bisa-dp-day is-other-month';
+        cell.textContent = d;
+        cell.setAttribute('data-date', iso);
+        if (iso === selectedIso) cell.classList.add('is-selected');
+        if (iso === todayIso) cell.classList.add('is-today');
+        dpGrid.appendChild(cell);
+      }
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const iso = formatYMD(dpViewYear, dpViewMonth, d);
+        const cell = document.createElement('div');
+        cell.className = 'bisa-dp-day';
+        cell.textContent = d;
+        cell.setAttribute('data-date', iso);
+        if (iso === selectedIso) cell.classList.add('is-selected');
+        if (iso === todayIso) cell.classList.add('is-today');
+        dpGrid.appendChild(cell);
+      }
+
+      const totalRendered = firstDay + daysInMonth;
+      const totalCells = totalRendered > 35 ? 42 : 35;
+      const remaining = totalCells - totalRendered;
+      for (let d = 1; d <= remaining; d++) {
+        let nextM = dpViewMonth + 1;
+        let nextY = dpViewYear;
+        if (nextM > 12) { nextM = 1; nextY++; }
+        const iso = formatYMD(nextY, nextM, d);
+        const cell = document.createElement('div');
+        cell.className = 'bisa-dp-day is-other-month';
+        cell.textContent = d;
+        cell.setAttribute('data-date', iso);
+        if (iso === selectedIso) cell.classList.add('is-selected');
+        if (iso === todayIso) cell.classList.add('is-today');
+        dpGrid.appendChild(cell);
+      }
+    }
+
+    function openPopoverForInput(inputEl) {
+      if (!inputEl || inputEl.disabled) return;
+      ensurePopoverElement();
+      dpActiveInput = inputEl;
+
+      const currentIso = getIsoFromInput(inputEl);
+      if (currentIso && /^\d{4}-\d{2}-\d{2}$/.test(currentIso)) {
+        const parts = currentIso.split('-');
+        dpViewYear = parseInt(parts[0], 10);
+        dpViewMonth = parseInt(parts[1], 10);
+      } else {
+        const now = new Date();
+        dpViewYear = now.getFullYear();
+        dpViewMonth = now.getMonth() + 1;
+      }
+
+      toggleYearPanel(false);
+      renderCalendarGrid();
+
+      const rect = inputEl.getBoundingClientRect();
+      let top = rect.bottom + 6;
+      let left = rect.left;
+      const popoverWidth = 290;
+      const popoverHeight = 330;
+
+      if (left + popoverWidth > window.innerWidth - 12) {
+        left = window.innerWidth - popoverWidth - 12;
+      }
+      if (top + popoverHeight > window.innerHeight - 12) {
+        top = Math.max(12, rect.top - popoverHeight - 6);
+      }
+
+      dpPopover.style.top = top + 'px';
+      dpPopover.style.left = Math.max(12, left) + 'px';
+      dpPopover.classList.add('is-open');
+    }
+
+    function closePopover() {
+      if (dpPopover) {
+        dpPopover.classList.remove('is-open');
+      }
+      toggleYearPanel(false);
+      dpActiveInput = null;
+    }
+
+    function installValueAndTypeBridge(inputEl, isIsoMode) {
+      if (inputEl.__bisaBridgeInstalled) return;
+      inputEl.__bisaBridgeInstalled = true;
+
+      // Prevent dynamic script assignment like input.type = 'date'
+      try {
+        Object.defineProperty(inputEl, 'type', {
+          configurable: true,
+          get: function () { return 'text'; },
+          set: function (v) {
+            if (String(v).toLowerCase() !== 'date') {
+              inputEl.setAttribute('type', v);
+            }
+          }
+        });
+      } catch (e) {}
+
+      // Seamless value getter/setter: displays dd/mm/yyyy on screen while returning YYYY-MM-DD to ISO scripts
+      try {
+        Object.defineProperty(inputEl, 'value', {
+          configurable: true,
+          get: function () {
+            const raw = getRawVisibleValue(inputEl);
+            if (!raw) return '';
+            if (isIsoMode) {
+              const iso = inputEl.dataset.isoValue || displayToIso(raw);
+              return iso || raw;
+            }
+            return raw;
+          },
+          set: function (val) {
+            applyDateToInput(inputEl, val);
+          }
+        });
+      } catch (e) {}
+    }
+
+    function upgradeDateInput(inputEl) {
+      if (!inputEl || inputEl.__bisaDatePickerUpgraded) return;
+      // Ensure universal popover with Year Selector replaces any legacy inline popover
+      ensurePopoverElement();
+
+      const wasNativeWrapped = Boolean(inputEl.closest('.bisa-datepicker-wrap'));
+
+      // Skip readonly calculated display fields (like view modals or automatic readonly fields)
+      const id = inputEl.id || '';
+      if (id.toLowerCase().startsWith('view') || inputEl.classList.contains('is-muted') || inputEl.classList.contains('is-calc')) {
+        return;
+      }
+      // Skip payroll custom month picker #crudPeriode in accounting_payroll.html
+      if (id === 'crudPeriode' && document.getElementById('payrollMonthPickerPopover')) {
+        return;
+      }
+
+      inputEl.__bisaDatePickerUpgraded = true;
+
+      const origType = (inputEl.getAttribute('type') || '').toLowerCase();
+      const origOnFocus = inputEl.getAttribute('onfocus') || '';
+      const origVal = getRawVisibleValue(inputEl);
+      const isIsoMode = !wasNativeWrapped && (origType === 'date' || origOnFocus.includes('date') || /^\d{4}-\d{2}-\d{2}$/.test(origVal));
+
+      inputEl.removeAttribute('onfocus');
+      inputEl.removeAttribute('onblur');
+      inputEl.setAttribute('type', 'text');
+      inputEl.setAttribute('autocomplete', 'off');
+      if (!inputEl.getAttribute('placeholder')) {
+        inputEl.setAttribute('placeholder', 'dd/mm/yyyy');
+      }
+      inputEl.classList.add('bisa-datepicker-input');
+
+      if (!wasNativeWrapped) {
+        installValueAndTypeBridge(inputEl, isIsoMode);
+        if (origVal) {
+          applyDateToInput(inputEl, origVal);
+        }
+      }
+
+      let wrap = inputEl.closest('.bisa-datepicker-wrap');
+      if (!wrap) {
+        wrap = document.createElement('div');
+        const isCompact = inputEl.classList.contains('dash-date-input') ||
+                          inputEl.classList.contains('lr-date-input') ||
+                          inputEl.classList.contains('ak-date-input');
+        wrap.className = 'bisa-datepicker-wrap' + (isCompact ? ' is-compact' : '');
+        inputEl.parentNode.insertBefore(wrap, inputEl);
+        wrap.appendChild(inputEl);
+
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'bisa-datepicker-icon';
+        iconSpan.innerHTML = CALENDAR_ICON_SVG;
+        wrap.appendChild(iconSpan);
+      }
+
+      const iconEl = wrap.querySelector('.bisa-datepicker-icon');
+      if (iconEl && !iconEl.__bisaUniversalIconBound) {
+        iconEl.__bisaUniversalIconBound = true;
+        iconEl.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          openPopoverForInput(inputEl);
+        }, true);
+      }
+
+      inputEl.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        openPopoverForInput(inputEl);
+      }, true);
+
+      inputEl.addEventListener('blur', function () {
+        const raw = getRawVisibleValue(inputEl);
+        const iso = displayToIso(raw);
+        if (iso) {
+          applyDateToInput(inputEl, iso);
+        }
+      });
+    }
+
+    function scanAndUpgradeAllDateInputs() {
+      injectBisaDatePickerStyles();
+      const selector = [
+        'input[type="date"]',
+        'input[onfocus*="date"]',
+        'input.bisa-datepicker-input',
+        '#formTanggalBayar',
+        '#formJatuhTempo',
+        '#formPeriode',
+        '#crudTglPinjam',
+        '#crudJatuhTempo',
+        '#crudTanggalBayar',
+        '#crudTanggalBeli',
+        '#crudMulaiDiPakai',
+        '#crudTanggalPelepasan',
+        '#crudTanggal',
+        '#crudTanggalMulai',
+        '#crudTanggalSelesai',
+        '#crudTanggalStorLama',
+        '#crudPeriode',
+        '#customDateStart',
+        '#customDateEnd',
+        '#karyawanSelesaiKontrak',
+        '#schedDateInput',
+        '#inputTimelineMulai',
+        '#inputTimelineSelesai'
+      ].join(',');
+
+      document.querySelectorAll(selector).forEach(upgradeDateInput);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scanAndUpgradeAllDateInputs);
+    } else {
+      scanAndUpgradeAllDateInputs();
+    }
+    setTimeout(scanAndUpgradeAllDateInputs, 150);
   })();
 
   // Jaminan body selalu visible dan ready

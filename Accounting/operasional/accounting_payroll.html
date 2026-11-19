@@ -2587,7 +2587,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js"></script>
-  <script src="../../assets/js/layout.js?v=20261118_v2"></script>
+  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
 
   <script>
     (function () {
@@ -2762,8 +2762,8 @@
             item.periode = formatBulanTahunOnly(item.periode);
           }
           if (item) {
-            // Migrasi otomatis data dummy lama ('Brand A' / 'Brand B') ke data riil Pendapatan
-            if (item.projectBrand === 'Brand A' || !item.projectBrand || item.projectBrand === '-') {
+            // Migrasi otomatis hanya untuk data dummy lama ('Brand A' / 'Brand B')
+            if (item.projectBrand === 'Brand A') {
               if (item.idKaryawan === 'KRY-001' || item.nik === 'BM-2024-001' || (item.nama && item.nama.includes('Ahmad Fauzi'))) {
                 item.projectBrand = 'Seluruh Kreator MCN';
                 needSave = true;
@@ -3195,11 +3195,31 @@
         const projects = getProjectBrandFromPendapatan();
 
         const filtered = projects.filter(function (p) {
-          if (!q) return true;
+          if (!q || q === '0') return true;
           return p.toLowerCase().includes(q);
         });
 
-        if (filtered.length === 0) {
+        // Opsi '0' (Kosong / Tanpa Project/Brand)
+        if (!q || '0'.includes(q) || 'kosong'.includes(q) || 'tanpa'.includes(q)) {
+          const optZero = document.createElement('div');
+          optZero.className = 'modal-opt-item';
+          optZero.style.color = '#64748b';
+          optZero.style.fontStyle = 'italic';
+          if (crudProjectBrand && (crudProjectBrand.value.trim() === '0' || crudProjectBrand.value.trim() === '-')) {
+            optZero.classList.add('is-selected');
+          }
+          optZero.textContent = '0 (Kosong / Tanpa Project/Brand)';
+          optZero.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (crudProjectBrand) {
+              crudProjectBrand.value = '0';
+            }
+            closeProjectBrandDropdown();
+          });
+          menuProjectBrand.appendChild(optZero);
+        }
+
+        if (filtered.length === 0 && menuProjectBrand.children.length === 0) {
           const empty = document.createElement('div');
           empty.className = 'modal-opt-item';
           empty.style.color = '#94a3b8';
@@ -3760,8 +3780,8 @@
         if (found) {
           const nominal = found.nominal || 0;
           if (crudPotonganPiutang) {
-            // Ketika utang sudah lunas atau nominal 0 di bulan selanjutnya, kosongkan potongan piutang
-            crudPotonganPiutang.value = nominal > 0 ? formatRupiah(nominal) : '';
+            // Tampilkan Rp. 0 ketika tidak ada potongan / utang sudah lunas
+            crudPotonganPiutang.value = formatRupiah(nominal);
             if (found.isBulanAkhirKontrak && nominal > 0) {
               crudPotonganPiutang.title = 'Tagihan sisa pinjaman ditarik penuh ke bulan ini karena masa kontrak karyawan berakhir pada ' + (found.selesaiKontrak || 'bulan ini');
             } else if (found.paidViaCashOrTransfer) {
@@ -4004,7 +4024,7 @@
 
         const kasKeluar = getTerbayarKasFromKasBank(idPay);
         if (crudTerbayarKas) {
-          crudTerbayarKas.value = kasKeluar > 0 ? formatRupiah(kasKeluar) : '';
+          crudTerbayarKas.value = formatRupiah(kasKeluar);
         }
         calcPayrollCrud();
       }
@@ -4136,16 +4156,22 @@
         const bruto = gapok + tunjangan + bonus;
         // Rumus Sisa Payroll: Take Home Pay - Terbayar Kas
         const sisa = Math.max(0, thp - terbayarKas);
-        const hasAnyInput = !!(gapok || tunjangan || bonus || dinas || penerimaanLain || keterlambatan || pengLain || potPiutang || terbayarKas);
+        const hasAnyInput = [
+          crudGajiPokok, crudTunjangan, crudBonusLembur,
+          crudPerjalananDinas, crudPenerimaanLainnya,
+          crudKeterlambatan, crudPenguranganLainnya
+        ].some(function (el) {
+          return el && String(el.value || '').trim() !== '';
+        }) || !!(gapok || tunjangan || bonus || dinas || penerimaanLain || keterlambatan || pengLain || potPiutang || terbayarKas);
 
         if (crudTakeHomePay && !isElementFocused(crudTakeHomePay)) {
-          crudTakeHomePay.value = (thp !== 0 || hasAnyInput) ? formatRupiah(thp) : '';
+          crudTakeHomePay.value = (thp !== 0 || hasAnyInput) ? formatRupiah(thp) : formatRupiah(0);
         }
         if (crudBebanBruto && !isElementFocused(crudBebanBruto)) {
-          crudBebanBruto.value = (bruto > 0 || hasAnyInput) ? formatRupiah(bruto) : '';
+          crudBebanBruto.value = (bruto > 0 || hasAnyInput) ? formatRupiah(bruto) : formatRupiah(0);
         }
         if (crudSisaPayroll && !isElementFocused(crudSisaPayroll)) {
-          crudSisaPayroll.value = (sisa > 0 || hasAnyInput) ? formatRupiah(sisa) : '';
+          crudSisaPayroll.value = (sisa > 0 || hasAnyInput) ? formatRupiah(sisa) : formatRupiah(0);
         }
       }
 
@@ -4440,30 +4466,30 @@
           if (crudNik) crudNik.value = item.nik || '';
           if (crudNama) crudNama.value = item.nama || '';
           populateCrudDivisiDropdown(item.divisi || '');
-          if (crudGajiPokok) crudGajiPokok.value = item.gajiPokok ? formatRupiah(item.gajiPokok) : '';
-          if (crudTunjangan) crudTunjangan.value = item.tunjangan ? formatRupiah(item.tunjangan) : '';
-          if (crudBonusLembur) crudBonusLembur.value = item.bonusLembur ? formatRupiah(item.bonusLembur) : '';
-          if (crudPerjalananDinas) crudPerjalananDinas.value = item.perjalananDinas ? formatRupiah(item.perjalananDinas) : '';
-          if (crudPenerimaanLainnya) crudPenerimaanLainnya.value = item.penerimaanLainnya ? formatRupiah(item.penerimaanLainnya) : '';
-          if (crudKeterlambatan) crudKeterlambatan.value = item.keterlambatan ? formatRupiah(item.keterlambatan) : '';
+          if (crudGajiPokok) crudGajiPokok.value = formatRupiah(item.gajiPokok || 0);
+          if (crudTunjangan) crudTunjangan.value = formatRupiah(item.tunjangan || 0);
+          if (crudBonusLembur) crudBonusLembur.value = formatRupiah(item.bonusLembur || 0);
+          if (crudPerjalananDinas) crudPerjalananDinas.value = formatRupiah(item.perjalananDinas || 0);
+          if (crudPenerimaanLainnya) crudPenerimaanLainnya.value = formatRupiah(item.penerimaanLainnya || 0);
+          if (crudKeterlambatan) crudKeterlambatan.value = formatRupiah(item.keterlambatan || 0);
           const valPengLain = (item.penguranganLainnya !== undefined ? item.penguranganLainnya : item.potonganLain) || 0;
-          if (crudPenguranganLainnya) crudPenguranganLainnya.value = valPengLain ? formatRupiah(valPengLain) : '';
-          if (crudPotonganLain && crudPotonganLain !== crudPenguranganLainnya) crudPotonganLain.value = valPengLain ? formatRupiah(valPengLain) : '';
-          if (crudTakeHomePay) crudTakeHomePay.value = item.takeHomePay ? formatRupiah(item.takeHomePay) : '';
+          if (crudPenguranganLainnya) crudPenguranganLainnya.value = formatRupiah(valPengLain);
+          if (crudPotonganLain && crudPotonganLain !== crudPenguranganLainnya) crudPotonganLain.value = formatRupiah(valPengLain);
+          if (crudTakeHomePay) crudTakeHomePay.value = formatRupiah(item.takeHomePay || 0);
           if (crudStatusLama) crudStatusLama.value = item.statusLama || '';
-          if (crudIdPinjaman) { crudIdPinjaman.value = item.idPinjaman || ''; crudIdPinjaman.dataset.autoFilled = '0'; }
-          if (crudPotonganPiutang) { crudPotonganPiutang.value = item.potonganPiutang ? formatRupiah(item.potonganPiutang) : ''; crudPotonganPiutang.dataset.autoFilled = '0'; }
+          if (crudIdPinjaman) { crudIdPinjaman.value = item.idPinjaman || '-'; crudIdPinjaman.dataset.autoFilled = '0'; }
+          if (crudPotonganPiutang) { crudPotonganPiutang.value = formatRupiah(item.potonganPiutang || 0); crudPotonganPiutang.dataset.autoFilled = '0'; }
           if (crudIdPayroll) crudIdPayroll.value = item.idPayroll || '';
           if (crudProjectBrand) crudProjectBrand.value = item.projectBrand || ''; closeProjectBrandDropdown(); renderProjectBrandDropdown(crudProjectBrand.value);
-          if (crudBebanBruto) crudBebanBruto.value = item.bebanBruto ? formatRupiah(item.bebanBruto) : '';
+          if (crudBebanBruto) crudBebanBruto.value = formatRupiah(item.bebanBruto || 0);
           const initialKb = getTerbayarKasFromKasBank(item.idPayroll || (crudIdPayroll ? crudIdPayroll.value : ''));
           const finalTerbayar = initialKb > 0 ? initialKb : (item.terbayarKas || 0);
           if (crudTerbayarKas) {
-            crudTerbayarKas.value = finalTerbayar ? formatRupiah(finalTerbayar) : '';
+            crudTerbayarKas.value = formatRupiah(finalTerbayar);
             crudTerbayarKas.dataset.autoFilled = initialKb > 0 ? '1' : '0';
           }
           const finalSisa = Math.max(0, (item.takeHomePay || 0) - finalTerbayar);
-          if (crudSisaPayroll) crudSisaPayroll.value = finalSisa ? formatRupiah(finalSisa) : '';
+          if (crudSisaPayroll) crudSisaPayroll.value = formatRupiah(finalSisa);
           if (crudBuktiFileName) crudBuktiFileName.textContent = item.buktiName || (item.bukti ? item.bukti + '.png' : 'Tidak ada file dipilih');
           if (crudBukti) crudBukti.value = '';
           if (crudSlipGajiFileName) crudSlipGajiFileName.textContent = item.slipGajiName || 'Tidak ada file dipilih';
@@ -4559,16 +4585,17 @@
           buktiName: buktiName,
           buktiImg: buktiUrl,
           slipGajiName: slipName,
-          slipGajiImg: slipUrl
+          slipGajiImg: slipUrl,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
         };
 
         if (isEdit) {
           const idx = payrollData.findIndex(function (u) { return String(u.id) === String(id); });
           if (idx !== -1) {
-            payrollData[idx] = payload;
-          } else {
-            payrollData.unshift(payload);
+            payrollData.splice(idx, 1);
           }
+          payrollData.unshift(payload);
         } else {
           payrollData.unshift(payload);
         }
@@ -4635,8 +4662,13 @@
           calcPayrollCrud();
         });
         inp.addEventListener('blur', function () {
-          const num = parseNumber(this.value);
-          this.value = num !== 0 ? formatRupiah(num) : '';
+          const raw = String(this.value || '').trim();
+          if (!raw) {
+            this.value = '';
+          } else {
+            const num = parseNumber(raw);
+            this.value = formatRupiah(num);
+          }
           calcPayrollCrud();
         });
       });
