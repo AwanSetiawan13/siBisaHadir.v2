@@ -40,8 +40,7 @@ const blankFiles = [
   { dest: 'Accounting/operasional/accounting_rekap_divisi.html', title: 'Rekap Divisi' },
   { dest: 'Accounting/operasional/accounting_piutang_karyawan.html', title: 'Piutang Karyawan' },
   { dest: 'Accounting/operasional/accounting_budget_vs_actual.html', title: 'Budget vs Actual' },
-  { dest: 'Accounting/data_master/accounting_master_coa.html', title: 'Master COA' },
-  { dest: 'Accounting/data_master/accounting_bank_lama.html', title: 'Bank Lama' }
+  { dest: 'Accounting/data_master/accounting_master_coa.html', title: 'Master COA' }
 ];
 
 const storageKeys = [

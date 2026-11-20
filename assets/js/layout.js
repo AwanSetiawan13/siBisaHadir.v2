@@ -320,7 +320,6 @@
         type: 'group', label: 'Data Master', icon: 'tag', id: 'm-acc-master',
         children: [
           { label: 'Master COA', link: 'Accounting/data_master/accounting_master_coa.html' },
-          { label: 'Bank Lama', link: 'Accounting/data_master/accounting_bank_lama.html' },
           { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' },
           { label: 'Divisi', link: 'Accounting/data_master/accounting_divisi.html' },
           { label: 'Jenis Transaksi', link: 'Accounting/data_master/accounting_jenis_transaksi.html' },
@@ -1834,7 +1833,6 @@
       'accounting_laporan.html': 'Laporan',
       'accounting_pengaduan.html': 'Pengaduan',
       'accounting_master_coa.html': 'Master COA',
-      'accounting_bank_lama.html': 'Bank Lama',
       'accounting_penanggung_jawab.html': 'Penanggung Jawab',
       'accounting_divisi.html': 'Divisi',
       'accounting_jenis_transaksi.html': 'Jenis Transaksi',

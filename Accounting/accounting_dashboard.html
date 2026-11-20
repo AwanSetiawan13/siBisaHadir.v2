@@ -226,14 +226,14 @@
         </div>
 
         <div id="lanyard-container"
-          style="position:absolute;top:-47px;right:-2px;width:220px;height:350px;pointer-events:auto;z-index:30;"></div>
+          style="position:absolute;top:-47px;right:-2px;width:220px;height:350px;pointer-events:none;z-index:30;"></div>
       </div>
     </main>
   </div>
 
   <script src="../assets/js/layout.js?v=20261119_v1"></script>
   <script src="../assets/js/banner_assets.js"></script>
-  <script src="../assets/js/lanyard.js"></script>
+  <script src="../assets/js/lanyard.js?v=20261120_v2"></script>
   <script>
     (function () {
       function drawIDCard(userName, role) {
@@ -317,18 +317,26 @@
 
         const ridhaImgSrc = window.LANYARD_RIDHA_AYU_B64 || '../media/ridha_ayu_id_card.jpg';
         const img = new Image();
-        img.onload = () => {
+        let launched = false;
+        function doLaunch() {
+          if (launched) return;
+          launched = true;
           window._lanyardUserImg = img;
           launch();
-        };
+        }
+        img.onload = doLaunch;
         img.onerror = () => {
           if (img.src !== '../media/ridha_ayu_id_card.jpg') {
             img.src = '../media/ridha_ayu_id_card.jpg';
-          } else {
+          } else if (!launched) {
+            launched = true;
             launch();
           }
         };
         img.src = ridhaImgSrc;
+        if (img.complete && img.naturalWidth) {
+          doLaunch();
+        }
       }
 
       if (document.readyState === 'loading') {
