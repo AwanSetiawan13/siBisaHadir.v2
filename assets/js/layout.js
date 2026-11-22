@@ -15,15 +15,6 @@
   window.setTimeout(markSidebarReady, 0);
   window.setTimeout(markSidebarReady, 600);
 
-  // Preload SweetAlert2 CDN agar selalu siap seketika saat dibutuhkan
-  (function preloadSweetAlert() {
-    if (!window.Swal && !document.querySelector('script[src*="sweetalert2"]')) {
-      const swalScript = document.createElement('script');
-      swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
-      document.head.appendChild(swalScript);
-    }
-  })();
-
   // 1. Tentukan Root Prefix secara dinamis
   let depth = 1;
   const normalizedPath = window.location.pathname.replace(/\\/g, '/');
@@ -34,6 +25,20 @@
   }
   const rootPrefix = depth > 0 ? '../'.repeat(depth) : '';
   const currentFile = normalizedPath.split('/').pop() || 'BM_dashboard.html';
+
+  // Preload SweetAlert2 (Local vendor first, fallback ke CDN) agar selalu siap seketika saat dibutuhkan
+  (function preloadSweetAlert() {
+    if (!window.Swal && !document.querySelector('script[src*="sweetalert2"]')) {
+      const swalScript = document.createElement('script');
+      swalScript.src = (rootPrefix || '') + 'vendor/sweetalert2.min.js';
+      swalScript.onerror = function () {
+        const cdnScript = document.createElement('script');
+        cdnScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+        document.head.appendChild(cdnScript);
+      };
+      document.head.appendChild(swalScript);
+    }
+  })();
 
   // Preload Bisa Excel Engine agar seluruh fitur export otomatis menghasilkan Excel rapi bertabel & berwarna
   (function preloadExcelEngine() {
@@ -320,7 +325,6 @@
         type: 'group', label: 'Data Master', icon: 'tag', id: 'm-acc-master',
         children: [
           { label: 'Master COA', link: 'Accounting/data_master/accounting_master_coa.html' },
-          { label: 'Bank Lama', link: 'Accounting/data_master/accounting_bank_lama.html' },
           { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' },
           { label: 'Divisi', link: 'Accounting/data_master/accounting_divisi.html' },
           { label: 'Jenis Transaksi', link: 'Accounting/data_master/accounting_jenis_transaksi.html' },
@@ -885,6 +889,53 @@
       }
       .swal2-container {
         z-index: 9999999 !important;
+      }
+
+      /* SweetAlert2 Validation Redesign for Incomplete Data */
+      .swal2-validation-popup {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        border-radius: 16px !important;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16) !important;
+      }
+      .swal2-validation-popup .swal2-icon.swal2-warning {
+        border-color: #f59e0b !important;
+        color: #f59e0b !important;
+        margin: 8px auto 14px auto !important;
+        width: 64px !important;
+        height: 64px !important;
+      }
+      .swal2-validation-popup .swal2-icon.swal2-warning .swal2-icon-content {
+        font-size: 40px !important;
+      }
+      .swal2-validation-popup .swal2-title {
+        padding: 0 0 2px 0 !important;
+        margin: 0 !important;
+      }
+      .swal2-validation-popup .swal2-html-container {
+        margin: 0 !important;
+        padding: 0 4px !important;
+        overflow: visible !important;
+      }
+      .swal2-validation-confirm-btn {
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 13.5px !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        padding: 10px 28px !important;
+        background-color: #0076C5 !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 4px 14px rgba(0, 118, 197, 0.25) !important;
+        transition: all 0.18s ease !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+      .swal2-validation-confirm-btn:hover {
+        background-color: #00609f !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 18px rgba(0, 118, 197, 0.35) !important;
       }
     `;
     document.head.appendChild(s);
@@ -1834,7 +1885,6 @@
       'accounting_laporan.html': 'Laporan',
       'accounting_pengaduan.html': 'Pengaduan',
       'accounting_master_coa.html': 'Master COA',
-      'accounting_bank_lama.html': 'Bank Lama',
       'accounting_penanggung_jawab.html': 'Penanggung Jawab',
       'accounting_divisi.html': 'Divisi',
       'accounting_jenis_transaksi.html': 'Jenis Transaksi',
@@ -3052,23 +3102,59 @@
       return { isValid: true };
     }
 
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function showAlert(result) {
       if (isAlertShowing) return;
       isAlertShowing = true;
 
       const labels = result.missingLabels || [];
-      let htmlMessage = 'Harap lengkapi semua data yang wajib diisi sebelum menyimpan.';
+      let htmlMessage = '<p style="font-size: 14px; color: #64748b; margin: 0 0 10px 0; line-height: 1.5;">Harap lengkapi semua data wajib yang masih kosong sebelum menyimpan formulir.</p>';
+
       if (labels.length > 0) {
-        const items = labels.slice(0, 6).map(function (lbl) {
-          return '<li style="margin-bottom: 3px;">' + lbl + '</li>';
+        const count = labels.length;
+        const gridCols = count === 1 ? '1fr' : 'repeat(2, minmax(0, 1fr))';
+        const cardsHtml = labels.map(function (lbl, idx) {
+          return '<div style="background: #ffffff; border: 1px solid #fee2e2; border-left: 3.5px solid #ef4444; border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); box-sizing: border-box; min-width: 0;">' +
+            '<span style="display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #fee2e2; color: #ef4444; font-size: 11px; font-weight: 800; flex-shrink: 0;">' + (idx + 1) + '</span>' +
+            '<span style="font-family: \'Outfit\', sans-serif; font-size: 13px; font-weight: 600; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left;" title="' + escapeHtml(lbl) + '">' + escapeHtml(lbl) + '</span>' +
+          '</div>';
         }).join('');
-        const more = labels.length > 6 ? '<li style="color:#64748b; list-style:none;">...dan ' + (labels.length - 6) + ' kolom lainnya</li>' : '';
-        htmlMessage = '<div style="text-align: left; font-size: 13.5px; color: #334155;">' +
-                      '<p style="margin-bottom: 8px; font-weight: 500;">Kolom berikut belum diisi:</p>' +
-                      '<ul style="margin: 0; padding-left: 20px; color: #dc2626; font-weight: 600;">' +
-                      items + more +
-                      '</ul>' +
-                      '</div>';
+
+        htmlMessage = '<div style="font-family: \'Outfit\', sans-serif; text-align: left; margin: 4px 0 0 0;">' +
+          '<p style="font-size: 13.5px; color: #64748b; margin: 0 0 14px 0; text-align: center; line-height: 1.5;">' +
+            'Terdapat <b style="color: #0076C5;">' + count + ' kolom wajib</b> yang masih kosong.<br/>Silakan lengkapi kolom berikut sebelum menyimpan:' +
+          '</p>' +
+          '<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 14px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);">' +
+            '<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0;">' +
+              '<span style="font-size: 11.5px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 6px;">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                  '<circle cx="12" cy="12" r="10"></circle>' +
+                  '<line x1="12" y1="8" x2="12" y2="12"></line>' +
+                  '<line x1="12" y1="16" x2="12.01" y2="16"></line>' +
+                '</svg>' +
+                'Kolom Belum Terisi' +
+              '</span>' +
+              '<span style="background: #fee2e2; color: #b91c1c; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px;">' +
+                count + ' Wajib Diisi' +
+              '</span>' +
+            '</div>' +
+            '<div style="display: grid; grid-template-columns: ' + gridCols + '; gap: 8px; max-height: 190px; overflow-y: auto; padding-right: 2px;">' +
+              cardsHtml +
+            '</div>' +
+          '</div>' +
+          '<p style="margin: 12px 0 0 0; font-size: 12px; color: #94a3b8; text-align: center; font-style: italic;">' +
+            'Klik tombol di bawah untuk langsung menuju kolom yang perlu diisi' +
+          '</p>' +
+        '</div>';
       }
 
       function onAlertClosed() {
@@ -3088,14 +3174,20 @@
       if (typeof window.Swal !== 'undefined') {
         window.Swal.fire({
           icon: 'warning',
-          title: 'Data Belum Diisi',
+          title: '<span style="font-family: \'Outfit\', sans-serif; font-size: 20px; font-weight: 700; color: #1e293b;">Data Belum Lengkap</span>',
           html: htmlMessage,
-          confirmButtonText: 'Lengkapi Data',
-          confirmButtonColor: '#0076C5'
+          confirmButtonText: '<span style="display: inline-flex; align-items: center; gap: 8px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Lengkapi Data</span>',
+          confirmButtonColor: '#0076C5',
+          width: 480,
+          padding: '24px 20px 22px 20px',
+          customClass: {
+            popup: 'swal2-validation-popup',
+            confirmButton: 'swal2-validation-confirm-btn'
+          }
         }).then(onAlertClosed);
       } else {
         const textMsg = labels.length > 0
-          ? 'Data Belum Diisi:\n- ' + labels.join('\n- ')
+          ? 'Data Belum Lengkap:\n- ' + labels.join('\n- ')
           : 'Harap lengkapi semua kolom yang wajib diisi.';
         window.alert(textMsg);
         onAlertClosed();

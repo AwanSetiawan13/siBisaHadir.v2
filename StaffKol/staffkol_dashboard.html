@@ -471,7 +471,7 @@
 
         <!-- 3D Lanyard container -->
         <div id="lanyard-container"
-          style="position:absolute;top:-47px;right:-2px;width:220px;height:350px;pointer-events:auto;z-index:30;"></div>
+          style="position:absolute;top:-47px;right:-2px;width:220px;height:350px;pointer-events:none;z-index:30;"></div>
       </div>
 
 
@@ -1732,7 +1732,7 @@
   </script>
   <script src="../assets/js/layout.js?v=20261119_v1"></script>
   <script src="../assets/js/banner_assets.js"></script>
-  <script src="../assets/js/lanyard.js"></script>
+  <script src="../assets/js/lanyard.js?v=20261120_v2"></script>
   <script>
     (function () {
       function drawIDCard(userName, role) {
@@ -1813,6 +1813,7 @@
             strapLength: 0.38,
             strapColor: '#1e3a8a',
             strapWidth: 0.55,
+            showStrap: true,
             metal: 'silver',
             gravity: 1.0,
             damping: 0.5,
@@ -1825,12 +1826,19 @@
 
         if (window.LANYARD_USER_B64) {
           const img = new Image();
-          img.onload = () => {
+          let launched = false;
+          function doLaunch() {
+            if (launched) return;
+            launched = true;
             window._lanyardUserImg = img;
             launch();
-          };
-          img.onerror = () => launch();
+          }
+          img.onload = doLaunch;
+          img.onerror = () => { if (!launched) { launched = true; launch(); } };
           img.src = window.LANYARD_USER_B64;
+          if (img.complete && img.naturalWidth) {
+            doLaunch();
+          }
         } else {
           launch();
         }
