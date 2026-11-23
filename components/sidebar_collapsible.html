@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+
+<head>
+  <meta name="google" content="notranslate" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collapsible Grouped Sidebar - Bisa Media</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Outfit (Sesuai siBisaHadir v2) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', 'Outfit', 'system-ui', '-apple-system', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                primary: '#0284c7', // Warna Biru Khas siBisaHadir v2 (#0284c7 / #0076c5)
+                dark: '#0076c5',
+                light: '#f0f9ff',
+                hover: '#f1f5f9',
+              }
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Complete Embedded Styling Matching siBisaHadir.v2 Theme & Palette -->
+  <style>
+    /* Base Resets & Typography */
+    *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #f1f5f9; }
+    html { line-height: 1.5; -webkit-text-size-adjust: 100%; font-family: 'Plus Jakarta Sans', Outfit, system-ui, sans-serif; }
+    body { margin: 0; line-height: inherit; color: #1e293b; background-color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* Flexbox & Layout Utilities */
+    .flex { display: flex; }
+    .inline-flex { display: inline-flex; }
+    .hidden { display: none !important; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .items-start { align-items: flex-start; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .flex-1 { flex: 1 1 0%; }
+    .flex-shrink-0 { flex-shrink: 0; }
+    .gap-1 { gap: 0.25rem; }
+    .gap-1\.5 { gap: 0.375rem; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-2\.5 { gap: 0.625rem; }
+    .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
+    .gap-5 { gap: 1.25rem; }
+    .space-y-0\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.125rem; }
+    .space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.25rem; }
+    .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+    .space-y-3 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.75rem; }
+    .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+    .space-y-5 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.25rem; }
+    .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+    @media (min-width: 640px) {
+      .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sm\:flex-row { flex-direction: row; }
+      .sm\:items-center { align-items: center; }
+    }
+    @media (min-width: 768px) {
+      .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+      .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+
+    /* Positioning & Layout */
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+    .fixed { position: fixed; }
+    .sticky { position: sticky; }
+    .top-0 { top: 0; }
+    .bottom-0 { bottom: 0; }
+    .left-0 { left: 0; }
+    .right-0 { right: 0; }
+    .inset-0 { inset: 0; }
+    .inset-y-0 { top: 0; bottom: 0; }
+    .left-full { left: 100%; }
+    .top-1\/2 { top: 50%; }
+    .-translate-y-1\/2 { transform: translateY(-50%); }
+    .z-10 { z-index: 10; }
+    .z-30 { z-index: 30; }
+    .z-40 { z-index: 40; }
+    .z-50 { z-index: 50; }
+
+    /* Dimensions */
+    .w-full { width: 100%; }
+    .w-3\.5 { width: 0.875rem; }
+    .w-4 { width: 1rem; }
+    .w-5 { width: 1.25rem; }
+    .w-6 { width: 1.5rem; }
+    .w-8 { width: 2rem; }
+    .w-9 { width: 2.25rem; }
+    .w-10 { width: 2.5rem; }
+    .w-11 { width: 2.75rem; }
+    .w-1\.5 { width: 0.375rem; }
+    .w-64 { width: 16rem; }
+    .w-72 { width: 18rem; }
+    .w-20 { width: 5rem; }
+    .min-w-0 { min-width: 0; }
+    .max-w-3xl { max-width: 48rem; }
+    .max-w-7xl { max-width: 80rem; }
+    .h-full { height: 100%; }
+    .min-h-full { min-height: 100%; }
+    .h-16 { height: 4rem; }
+    .h-3\.5 { height: 0.875rem; }
+    .h-4 { height: 1rem; }
+    .h-5 { height: 1.25rem; }
+    .h-6 { height: 1.5rem; }
+    .h-8 { height: 2rem; }
+    .h-9 { height: 2.25rem; }
+    .h-10 { height: 2.5rem; }
+    .h-11 { height: 2.75rem; }
+    .h-1\.5 { height: 0.375rem; }
+    .max-h-\[360px\] { max-height: 360px; }
+
+    /* Spacing & Padding */
+    .p-1 { padding: 0.25rem; }
+    .p-2 { padding: 0.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-4 { padding: 1rem; }
+    .p-5 { padding: 1.25rem; }
+    .p-6 { padding: 1.5rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .pt-1 { padding-top: 0.25rem; }
+    .pt-2 { padding-top: 0.5rem; }
+    .pl-3 { padding-left: 0.75rem; }
+    .pr-1 { padding-right: 0.25rem; }
+    .pb-4 { padding-bottom: 1rem; }
+    .m-0 { margin: 0; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .ml-auto { margin-left: auto; }
+    .ml-0 { margin-left: 0; }
+    .ml-3 { margin-left: 0.75rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mt-1 { margin-top: 0.25rem; }
+
+    /* Typography */
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-base { font-size: 1rem; line-height: 1.5rem; }
+    .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+    .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+    .text-\[10px\] { font-size: 10px; }
+    .text-\[11px\] { font-size: 11px; }
+    .text-\[12\.5px\] { font-size: 12.5px; }
+    .text-\[13px\] { font-size: 13px; }
+    .text-\[22px\] { font-size: 22px; }
+    .text-\[24px\] { font-size: 24px; }
+    .font-normal { font-weight: 400; }
+    .font-medium { font-weight: 500; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    .font-extrabold { font-weight: 800; }
+    .uppercase { text-transform: uppercase; }
+    .tracking-tight { letter-spacing: -0.03em; }
+    .tracking-wide { letter-spacing: 0.025em; }
+    .tracking-wider { letter-spacing: 0.06em; }
+    .leading-tight { line-height: 1.2; }
+    .leading-normal { line-height: 1.5; }
+    .leading-relaxed { line-height: 1.625; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .whitespace-nowrap { white-space: nowrap; }
+    a { text-decoration: none; color: inherit; }
+
+    /* Colors - Sesuai dengan siBisaHadir.v2 Theme */
+    .text-white { color: #ffffff !important; }
+    .text-slate-400 { color: #94a3b8; }
+    .text-slate-500 { color: #64748b; }
+    .text-slate-600 { color: #475569; }
+    .text-slate-700 { color: #334155; }
+    .text-slate-800 { color: #1e293b; }
+    .text-slate-900 { color: #0f172a; }
+    .text-sky-100 { color: #e0f2fe; }
+    .text-sky-200 { color: #bae6fd; }
+    .text-sky-600 { color: #0284c7; }
+    .text-sky-700 { color: #0369a1; }
+    .text-emerald-600 { color: #059669; }
+    .text-rose-600 { color: #e11d48; }
+    .text-purple-600 { color: #9333ea; }
+    .text-amber-600 { color: #d97706; }
+    .text-indigo-600 { color: #4f46e5; }
+    .text-teal-600 { color: #0d9488; }
+    .text-blue-600 { color: #2563eb; }
+
+    .bg-white { background-color: #ffffff; }
+    .bg-white\/15 { background-color: rgba(255, 255, 255, 0.15); }
+    .bg-white\/90 { background-color: rgba(255, 255, 255, 0.90); }
+    .bg-slate-50 { background-color: #f8fafc; }
+    .bg-slate-100 { background-color: #f1f5f9; }
+    .bg-slate-100\/80 { background-color: rgba(241, 245, 249, 0.8); }
+    .bg-slate-200 { background-color: #e2e8f0; }
+    .bg-slate-900 { background-color: #0f172a; }
+    .bg-slate-900\/40 { background-color: rgba(15, 23, 42, 0.4); }
+    .bg-sky-50 { background-color: #f0f9ff; }
+    .bg-sky-600 { background-color: #0284c7; }
+    .bg-emerald-50 { background-color: #ecfdf5; }
+    .bg-amber-50 { background-color: #fffbeb; }
+    .bg-purple-50 { background-color: #faf5ff; }
+    .bg-rose-50 { background-color: #fff1f2; }
+    .bg-indigo-50 { background-color: #eef2ff; }
+    .bg-teal-50 { background-color: #f0fdfa; }
+    .bg-blue-50 { background-color: #eff6ff; }
+
+    /* Welcome Banner Gradient persis seperti di Accounting Dashboard siBisaHadir */
+    .bg-bisamedia-banner {
+      background: linear-gradient(108deg, #1f9ad6 0%, #28a5de 38%, #49b6e7 78%, #5ec2ed 100%) !important;
+      box-shadow: 0 8px 24px rgba(27, 138, 211, 0.25) !important;
+    }
+
+    /* Borders & Rounded */
+    .border { border-width: 1px; }
+    .border-b { border-bottom-width: 1px; }
+    .border-r { border-right-width: 1px; }
+    .border-t { border-top-width: 1px; }
+    .border-slate-100 { border-color: #f1f5f9; }
+    .border-slate-200 { border-color: #e2e8f0; }
+    .border-slate-200\/80 { border-color: rgba(226, 232, 240, 0.8); }
+    .border-slate-200\/90 { border-color: rgba(226, 232, 240, 0.9); }
+    .border-slate-300 { border-color: #cbd5e1; }
+    .border-sky-100 { border-color: #e0f2fe; }
+    .border-sky-200 { border-color: #bae6fd; }
+    .border-emerald-200 { border-color: #a7f3d0; }
+    .border-purple-200 { border-color: #e9d5ff; }
+    .border-amber-200 { border-color: #fde68a; }
+    .border-rose-200 { border-color: #fecdd3; }
+    .border-indigo-200 { border-color: #c7d2fe; }
+    .border-teal-200 { border-color: #99f6e4; }
+    .border-blue-200 { border-color: #bfdbfe; }
+    .border-white\/20 { border-color: rgba(255, 255, 255, 0.2); }
+
+    .rounded-md { border-radius: 0.375rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-xl { border-radius: 0.625rem; }
+    .rounded-2xl { border-radius: 1rem; }
+    .rounded-full { border-radius: 9999px; }
+
+    /* Shadows */
+    .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+    .shadow-soft { box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.05), 0 1px 4px -1px rgba(15, 23, 42, 0.03); }
+    .shadow-popover { box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.15), 0 10px 15px -5px rgba(15, 23, 42, 0.08); }
+    .shadow-pill { box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25) !important; }
+
+    /* Transitions */
+    .transition-all { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .transition-colors { transition: color 0.15s, background-color 0.15s, border-color 0.15s; }
+    .transition-transform { transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .transition-opacity { transition: opacity 0.25s ease; }
+    .duration-150 { transition-duration: 150ms; }
+    .duration-200 { transition-duration: 200ms; }
+    .duration-300 { transition-duration: 300ms; }
+    .ease-in-out { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+
+    .cursor-pointer { cursor: pointer; }
+    .overflow-hidden { overflow: hidden; }
+    .overflow-x-hidden { overflow-x: hidden; }
+    .overflow-y-auto { overflow-y: auto; }
+    .pointer-events-none { pointer-events: none; }
+    .pointer-events-auto { pointer-events: auto; }
+    .opacity-0 { opacity: 0; }
+    .opacity-100 { opacity: 1; }
+    .backdrop-blur-sm { backdrop-filter: blur(4px); }
+    .backdrop-blur-md { backdrop-filter: blur(8px); }
+
+    button { cursor: pointer; background: transparent; font-family: inherit; }
+
+    /* ========================================================================= */
+    /* ATURAN WARNA AKTIF & HOVER BERSIH & ELEGAN PERSIS SIBISAHADIR V2         */
+    /* ========================================================================= */
+    
+    /* 1. Item Navigasi Default (Tidak Aktif) */
+    .nav-link,
+    .submenu-link,
+    .flyout-link {
+      color: #475569;
+    }
+    /* Semua label sidebar selalu bold agar konsisten di modul mana pun */
+    .nav-link,
+    .submenu-link,
+    .flyout-link,
+    .group-header {
+      font-weight: 700 !important;
+    }
+    .nav-link svg,
+    .submenu-link svg,
+    .flyout-link svg {
+      stroke: #94a3b8;
+      transition: stroke 0.15s ease, transform 0.15s ease;
+    }
+
+    /* 2. Item Tidak Aktif (Hover State) */
+    .nav-link:hover,
+    .submenu-link:not(.is-active):hover,
+    .flyout-link:not(.is-active):hover,
+    .group-header:hover {
+      background-color: #f1f5f9 !important;
+      color: #0284c7 !important;
+      transform: translateX(2px);
+    }
+    .nav-link:hover svg,
+    .submenu-link:not(.is-active):hover svg,
+    .flyout-link:not(.is-active):hover svg,
+    .group-header:hover svg {
+      stroke: #0284c7 !important;
+    }
+
+    /* 3. Item Aktif (Solid Bisa Blue #0284c7 dengan Teks & Ikon Putih Bersih) */
+    .nav-link.is-active,
+    .submenu-link.is-active,
+    .flyout-link.is-active {
+      background-color: #0284c7 !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25) !important;
+      border-color: transparent !important;
+    }
+    .nav-link.is-active svg,
+    .submenu-link.is-active svg,
+    .flyout-link.is-active svg {
+      stroke: #ffffff !important;
+    }
+    .nav-link.is-active .active-dot,
+    .submenu-link.is-active .active-dot,
+    .flyout-link.is-active .active-dot {
+      background-color: #ffffff !important;
+    }
+
+    /* Responsive Classes */
+    @media (max-width: 1023px) {
+      .lg\:hidden { display: flex !important; }
+      #flyoutLaporanKeuangan { display: none !important; }
+      #appSidebar {
+        transform: translateX(-100%);
+        width: 18rem !important; /* 288px */
+      }
+      #appSidebar.translate-x-0 {
+        transform: translateX(0) !important;
+      }
+      #mainContentWrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .lg\:hidden { display: none !important; }
+      .hidden.lg\:flex { display: flex !important; }
+      .hidden.lg\:inline-flex { display: inline-flex !important; }
+      #appSidebar {
+        transform: translateX(0) !important;
+      }
+      #appSidebar.lg\:w-64 { width: 16rem !important; } /* 256px */
+      #appSidebar.lg\:w-20 { width: 5rem !important; } /* 80px */
+      #mainContentWrapper.lg\:ml-64 { margin-left: 16rem !important; width: calc(100% - 16rem) !important; }
+      #mainContentWrapper.lg\:ml-20 { margin-left: 5rem !important; width: calc(100% - 5rem) !important; }
+      .lg\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+      .lg\:p-8 { padding: 2rem; }
+    }
+
+    /* Dynamic overrides for Collapsed Rail mode (.is-collapsed) SCOPED TO DESKTOP ONLY */
+    @media (min-width: 1024px) {
+      #appSidebar.is-collapsed .brand-text,
+      #appSidebar.is-collapsed .nav-heading,
+      #appSidebar.is-collapsed .nav-label,
+      #appSidebar.is-collapsed .group-label,
+      #appSidebar.is-collapsed .group-badge-chevron,
+      #appSidebar.is-collapsed .user-info,
+      #appSidebar.is-collapsed .logout-btn {
+        display: none !important;
+        opacity: 0 !important;
+        width: 0 !important;
+      }
+
+      #appSidebar.is-collapsed .nav-link,
+      #appSidebar.is-collapsed .group-header {
+        justify-content: center !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      #appSidebar.is-collapsed .user-card {
+        justify-content: center !important;
+        padding: 6px !important;
+      }
+    }
+
+    /* Flyout hover bridge and shadow */
+    .flyout-popover {
+      z-index: 9999 !important;
+    }
+    .hover-bridge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -20px;
+      width: 20px;
+    }
+
+    /* Custom Scrollbar for Sidebar Nav */
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 999px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+  </style>
+</head>
+
+<body class="h-full text-slate-800 antialiased overflow-x-hidden">
+
+  <!-- ========================================================================= -->
+  <!-- MOBILE BACKDROP OVERLAY                                                   -->
+  <!-- ========================================================================= -->
+  <div id="sidebarBackdrop"
+    class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden"
+    aria-hidden="true" onclick="closeMobileSidebar()"></div>
+
+  <!-- ========================================================================= -->
+  <!-- FLOATING FLYOUT POPOVER (PORTALED TO BODY LEVEL FOR UNCLIPPED DISPLAY)    -->
+  <!-- ========================================================================= -->
+  <div id="flyoutLaporanKeuangan"
+    class="flyout-popover hover-bridge hidden fixed w-64 bg-white border border-slate-200/90 rounded-2xl shadow-popover p-2 z-[9999] transition-all duration-200">
+    
+    <!-- Flyout Header -->
+    <div class="px-3 py-2 border-b border-slate-100 flex items-center justify-between mb-1">
+      <div class="flex items-center gap-2">
+        <i data-lucide="file-spreadsheet" class="w-4 h-4 text-sky-600"></i>
+        <span class="text-xs font-bold text-slate-900">Laporan Keuangan</span>
+      </div>
+      <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-sky-50 text-sky-600 border border-sky-100">8 Menu</span>
+    </div>
+
+    <!-- Flyout Menu Links -->
+    <div class="space-y-0.5 max-h-[360px] overflow-y-auto custom-scroll p-1">
+      <a href="../Accounting/laporan_keuangan/accounting_profit_project_brand.html" onclick="handleSubmenuClick(event, 'profit-brand')"
+        class="flyout-link notranslate flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 transition-all" translate="no" data-menu-id="profit-brand">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        <span class="notranslate font-bold" translate="no">Profit Project & Brand</span>
+        <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+
+      <a href="../Accounting/laporan_keuangan/accounting_arus_kas.html" onclick="handleSubmenuClick(event, 'arus-kas')"
+        class="flyout-link is-active flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold shadow-pill transition-all" data-menu-id="arus-kas">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+        <span>Arus Kas</span>
+        <span class="active-dot ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+
+      <a href="../Accounting/laporan_keuangan/accounting_piutang.html" onclick="handleSubmenuClick(event, 'piutang')"
+        class="flyout-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 transition-all" data-menu-id="piutang">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><circle cx="18" cy="6" r="3"/></svg>
+        <span>Piutang</span>
+        <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+
+      <a href="../Accounting/laporan_keuangan/accounting_utang.html" onclick="handleSubmenuClick(event, 'utang')"
+        class="flyout-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 transition-all" data-menu-id="utang">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        <span>Utang</span>
+        <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+
+      <a href="../Accounting/laporan_keuangan/accounting_penyusutan_aset.html" onclick="handleSubmenuClick(event, 'penyusutan-aset')"
+        class="flyout-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 transition-all" data-menu-id="penyusutan-aset">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg>
+        <span>Penyusutan Aset</span>
+        <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+
+      <a href="../Accounting/laporan_keuangan/accounting_laba_rugi.html" onclick="handleSubmenuClick(event, 'laba-rugi')"
+        class="flyout-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 transition-all" data-menu-id="laba-rugi">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+        <span>Laba Rugi</span>
+        <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+
+      <a href="../Accounting/laporan_keuangan/accounting_neraca.html" onclick="handleSubmenuClick(event, 'neraca')"
+        class="flyout-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 transition-all" data-menu-id="neraca">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+        <span>Neraca</span>
+        <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+
+      <a href="../Accounting/laporan_keuangan/accounting_rekap_divisi.html" onclick="handleSubmenuClick(event, 'rekap-divisi')"
+        class="flyout-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-600 transition-all" data-menu-id="rekap-divisi">
+        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        <span>Rekap Divisi</span>
+        <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- APP SHELL CONTAINER                                                       -->
+  <!-- ========================================================================= -->
+  <div class="min-h-full flex flex-col">
+
+    <!-- ======================================================================= -->
+    <!-- COLLAPSIBLE GROUPED SIDEBAR                                             -->
+    <!-- ======================================================================= -->
+    <aside id="appSidebar"
+      class="group fixed inset-y-0 left-0 z-50 flex flex-col bg-white border-r border-slate-200/80 transition-all duration-300 ease-in-out
+             -translate-x-full lg:translate-x-0 w-72 lg:w-64"
+      aria-label="Main Navigation">
+
+      <!-- 1. SIDEBAR BRAND HEADER (Logo Persis siBisaHadir.v2) -->
+      <div class="h-16 px-4 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
+        <!-- Logo Brand & Title -->
+        <a href="../Accounting/accounting_dashboard.html" class="flex items-center gap-3 overflow-hidden text-decoration-none rounded-xl py-1 px-1">
+          <!-- Logo Image Resmi Bisa Media -->
+          <img src="../media/logo.png"
+            class="w-9 h-9 object-contain flex-shrink-0 transition-transform duration-200 hover:scale-105"
+            alt="Logo Bisa Media"
+            onerror="this.style.display='none'; document.getElementById('fallbackLogo').classList.remove('hidden');" />
+          <div id="fallbackLogo" class="hidden w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-extrabold text-lg flex-shrink-0">
+            B
+          </div>
+          <!-- Brand Text -->
+          <div class="brand-text flex flex-col transition-all duration-200 overflow-hidden whitespace-nowrap">
+            <span style="font-size:22px; font-weight:800; color:#0f172a; letter-spacing:-0.7px; line-height:1.15;">Bisa Media</span>
+            <span style="font-size:11px; font-weight:700; color:#0284c7; letter-spacing:0.8px;" class="uppercase">Accounting</span>
+          </div>
+        </a>
+
+        <!-- Desktop Collapse Button -->
+        <button id="btnToggleCollapseDesktop" type="button"
+          onclick="toggleDesktopSidebar()"
+          class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-[#0284c7] hover:bg-slate-100 transition-colors duration-150"
+          title="Toggle Sidebar (Expand / Collapse)"
+          aria-label="Toggle Sidebar">
+          <span id="iconToggleSidebarWrap">
+            <i data-lucide="panel-left-close" class="w-4 h-4"></i>
+          </span>
+        </button>
+
+        <!-- Mobile Close Button -->
+        <button type="button" onclick="closeMobileSidebar()"
+          class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors duration-150"
+          aria-label="Tutup Menu">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- 2. SCROLLABLE NAVIGATION MENU -->
+      <div class="flex-1 overflow-y-auto custom-scroll px-3 py-4 space-y-5">
+
+        <!-- Nav Group: Menu Utama -->
+        <div>
+          <div class="nav-heading px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 transition-all duration-200">
+            <span>Menu Utama</span>
+          </div>
+          <ul class="space-y-1" style="list-style: none; padding: 0; margin: 0;">
+            <!-- Dashboard Item -->
+            <li class="relative">
+              <a href="../Accounting/accounting_dashboard.html"
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-slate-600 transition-all duration-150"
+                data-nav-id="dashboard">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0 text-slate-500"></i>
+                <span class="nav-label whitespace-nowrap transition-all duration-200">Dashboard</span>
+              </a>
+            </li>
+
+            <!-- Kalender Item -->
+            <li class="relative">
+              <a href="../Accounting/accounting_kalender.html"
+                class="nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium text-slate-600 transition-all duration-150"
+                data-nav-id="kalender">
+                <i data-lucide="calendar" class="w-5 h-5 flex-shrink-0 text-slate-500"></i>
+                <span class="nav-label whitespace-nowrap transition-all duration-200">Kalender</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- NAV GROUP: LAPORAN KEUANGAN (COLLAPSIBLE GROUP WITH ACCORDION & FLYOUT) -->
+        <!-- =================================================================== -->
+        <div id="groupLaporanKeuangan" class="relative">
+          
+          <div class="nav-heading px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 transition-all duration-200">
+            <span>Laporan</span>
+          </div>
+
+          <!-- Group Header Button (Accordion Trigger) -->
+          <button type="button"
+            id="btnGroupLaporanKeuangan"
+            onclick="toggleGroupAccordion('menuLaporanKeuangan')"
+            aria-expanded="true"
+            aria-controls="menuLaporanKeuangan"
+            class="group-header w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-[13px] font-semibold text-slate-700 transition-all duration-150">
+            
+            <div class="flex items-center gap-3 overflow-hidden">
+              <div class="w-5 h-5 flex items-center justify-center flex-shrink-0 text-[#0284c7]">
+                <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+              </div>
+              <span class="group-label whitespace-nowrap transition-all duration-200">Laporan Keuangan</span>
+            </div>
+
+            <div class="group-badge-chevron flex items-center gap-2">
+              <span id="chevronLaporanWrap">
+                <i id="chevronLaporanKeuangan" data-lucide="chevron-down" class="w-4 h-4 text-slate-400 transition-transform duration-200"></i>
+              </span>
+            </div>
+          </button>
+
+          <!-- Accordion Submenu (Used when sidebar is EXPANDED or on MOBILE) -->
+          <div id="menuLaporanKeuangan" class="accordion-content overflow-hidden transition-all duration-300 ease-in-out pl-3 pr-1 pt-1 space-y-1">
+            
+            <!-- 1. Profit Project & Brand -->
+            <a href="../Accounting/laporan_keuangan/accounting_profit_project_brand.html"
+              onclick="handleSubmenuClick(event, 'profit-brand')"
+              class="submenu-link notranslate flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-bold text-slate-700 transition-all duration-150"
+              translate="no"
+              data-menu-id="profit-brand">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              <span class="truncate notranslate font-bold" translate="no">Profit Project & Brand</span>
+              <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+
+            <!-- 2. Arus Kas (Active by Default in this Demo) -->
+            <a href="../Accounting/laporan_keuangan/accounting_arus_kas.html"
+              onclick="handleSubmenuClick(event, 'arus-kas')"
+              class="submenu-link is-active flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-semibold shadow-pill transition-all duration-150"
+              data-menu-id="arus-kas">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+              <span class="truncate">Arus Kas</span>
+              <span class="active-dot ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+
+            <!-- 3. Piutang -->
+            <a href="../Accounting/laporan_keuangan/accounting_piutang.html"
+              onclick="handleSubmenuClick(event, 'piutang')"
+              class="submenu-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium text-slate-600 transition-all duration-150"
+              data-menu-id="piutang">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><circle cx="18" cy="6" r="3"/></svg>
+              <span class="truncate">Piutang</span>
+              <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+
+            <!-- 4. Utang -->
+            <a href="../Accounting/laporan_keuangan/accounting_utang.html"
+              onclick="handleSubmenuClick(event, 'utang')"
+              class="submenu-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium text-slate-600 transition-all duration-150"
+              data-menu-id="utang">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              <span class="truncate">Utang</span>
+              <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+
+            <!-- 5. Penyusutan Aset -->
+            <a href="../Accounting/laporan_keuangan/accounting_penyusutan_aset.html"
+              onclick="handleSubmenuClick(event, 'penyusutan-aset')"
+              class="submenu-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium text-slate-600 transition-all duration-150"
+              data-menu-id="penyusutan-aset">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg>
+              <span class="truncate">Penyusutan Aset</span>
+              <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+
+            <!-- 6. Laba Rugi -->
+            <a href="../Accounting/laporan_keuangan/accounting_laba_rugi.html"
+              onclick="handleSubmenuClick(event, 'laba-rugi')"
+              class="submenu-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium text-slate-600 transition-all duration-150"
+              data-menu-id="laba-rugi">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+              <span class="truncate">Laba Rugi</span>
+              <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+
+            <!-- 7. Neraca -->
+            <a href="../Accounting/laporan_keuangan/accounting_neraca.html"
+              onclick="handleSubmenuClick(event, 'neraca')"
+              class="submenu-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium text-slate-600 transition-all duration-150"
+              data-menu-id="neraca">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+              <span class="truncate">Neraca</span>
+              <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+
+            <!-- 8. Rekap Divisi -->
+            <a href="../Accounting/laporan_keuangan/accounting_rekap_divisi.html"
+              onclick="handleSubmenuClick(event, 'rekap-divisi')"
+              class="submenu-link flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12.5px] font-medium text-slate-600 transition-all duration-150"
+              data-menu-id="rekap-divisi">
+              <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              <span class="truncate">Rekap Divisi</span>
+              <span class="active-dot hidden ml-auto w-1.5 h-1.5 rounded-full bg-white flex-shrink-0"></span>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- 3. USER PROFILE FOOTER -->
+      <div class="p-3 border-t border-slate-100 flex-shrink-0">
+        <div class="user-card flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
+          <div class="w-9 h-9 rounded-full bg-sky-100 border border-sky-200 flex items-center justify-center font-bold text-[#0284c7] flex-shrink-0 overflow-hidden">
+            <span class="text-xs">RA</span>
+          </div>
+          <div class="user-info flex-1 min-w-0 overflow-hidden transition-all duration-200">
+            <p class="text-xs font-bold text-slate-900 truncate">Ridha Ayu</p>
+            <p class="text-[11px] text-slate-500 truncate">ridha@bisamedia.com</p>
+          </div>
+          <button type="button" class="logout-btn text-slate-400 hover:text-rose-600 transition-colors" title="Logout">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================================================================= -->
+    <!-- MAIN CONTENT VIEWPORT (ADAPTS MARGIN ACCORDING TO SIDEBAR STATE)        -->
+    <!-- ======================================================================= -->
+    <div id="mainContentWrapper"
+      class="flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ml-0 lg:ml-64">
+
+      <!-- TOPBAR HEADER -->
+      <header class="h-16 bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 px-4 lg:px-8 flex items-center justify-between shadow-soft">
+        <div class="flex items-center gap-3">
+          <!-- Mobile Drawer Toggle Button -->
+          <button type="button" onclick="openMobileSidebar()"
+            class="lg:hidden flex items-center justify-center w-9 h-9 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition-colors"
+            aria-label="Buka Menu Sidebar">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+
+          <!-- Breadcrumb & Page Title -->
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-slate-400">Laporan Keuangan</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span id="topbarPageTitle" class="font-bold text-[#0284c7]">Arus Kas</span>
+          </div>
+        </div>
+
+        <!-- Controls Toolbar in Topbar -->
+        <div class="flex items-center gap-2">
+          <!-- Quick Mode Toggle for Testing -->
+          <button type="button" onclick="toggleDesktopSidebar()"
+            class="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-all shadow-sm">
+            <i data-lucide="sliders" class="w-3.5 h-3.5 text-[#0284c7]"></i>
+            <span id="btnLabelToggleState">Ciutkan Sidebar (Icon-Only)</span>
+          </button>
+
+          <a href="../Accounting/operasional/accounting_tagihan_berkala.html"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0284c7] text-white text-xs font-semibold hover:bg-[#0076c5] transition-colors shadow-sm">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Kembali ke App</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT DEMO BODY -->
+      <main class="flex-1 p-4 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
+
+        <!-- Banner Info Komponen (Warna persis Welcome Banner Accounting Dashboard) -->
+        <div class="rounded-2xl bg-bisamedia-banner text-white p-6 sm:p-8 relative overflow-hidden">
+          <div class="relative z-10 max-w-3xl space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold tracking-wide border border-white/25">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
+              <span>Modern Reusable Component</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              Collapsible Grouped Sidebar
+            </h1>
+            <p class="text-white/95 text-sm sm:text-base leading-relaxed">
+              Komponen sidebar navigasi modern dengan palet warna dan tema <strong>resmi siBisaHadir.v2</strong>.
+              Mendukung mode <strong>Icon-Only Rail</strong> dengan <strong>Floating Popover</strong> di desktop, serta <strong>Slide-Over Drawer</strong> di seluler.
+            </p>
+          </div>
+        </div>
+
+        <!-- Testing & Interactive Controls Card -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Card 1: Status Sidebar -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-soft space-y-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-sky-50 text-[#0284c7] flex items-center justify-center">
+                <i data-lucide="monitor" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Mode Tampilan</h3>
+                <p id="badgeSidebarMode" class="text-sm font-bold text-slate-800">Desktop: Expanded (w-64)</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 leading-normal">
+              Gunakan tombol di bawah untuk menguji transisi lebar sidebar dan fitur popover mengambang.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-2">
+              <button type="button" onclick="toggleDesktopSidebar()"
+                class="px-3 py-1.5 rounded-lg bg-[#0284c7] text-white text-xs font-semibold hover:bg-[#0076c5] transition-colors shadow-sm">
+                Toggle Expand / Rail
+              </button>
+              <button type="button" onclick="openMobileSidebar()"
+                class="lg:hidden px-3 py-1.5 rounded-lg bg-[#0284c7] text-white text-xs font-semibold hover:bg-[#0076c5] transition-colors">
+                Buka Mobile Drawer
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Active Menu Preview -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-soft space-y-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Menu Terpilih</h3>
+                <p id="badgeActiveMenuName" class="text-sm font-bold text-[#0284c7]">Arus Kas</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 leading-normal">
+              Keadaan aktif menerapkan solid pill biru <strong>#0284c7</strong> dengan teks putih bersih persis di aplikasi.
+            </p>
+            <div class="pt-2 flex flex-wrap gap-1.5">
+              <button type="button" onclick="setActiveMenu('profit-brand', 'Profit Project & Brand')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700">Profit Brand</button>
+              <button type="button" onclick="setActiveMenu('arus-kas', 'Arus Kas')" class="px-2 py-1 rounded bg-[#0284c7] text-white text-[11px] font-semibold">Arus Kas</button>
+              <button type="button" onclick="setActiveMenu('piutang', 'Piutang')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700">Piutang</button>
+              <button type="button" onclick="setActiveMenu('laba-rugi', 'Laba Rugi')" class="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[11px] font-semibold text-slate-700">Laba Rugi</button>
+            </div>
+          </div>
+
+          <!-- Card 3: Keamanan Alur (Zero Regression) -->
+          <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-soft space-y-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="shield-check" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Jaminan Keamanan</h3>
+                <p class="text-sm font-bold text-slate-800">Aman 100% dari Regresi</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 leading-normal">
+              File ini berdiri sendiri tanpa mengganggu kode utama. URL rute, layer z-index modal, dan CRUD tidak terpengaruh.
+            </p>
+            <div class="pt-2">
+              <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                Kompatibel dengan Alur Eksisting
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulated Data View for Selected Financial Report -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-soft space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h2 id="viewContentTitle" class="text-lg font-bold text-slate-900">Simulasi Halaman: Arus Kas</h2>
+              <p id="viewContentSubtitle" class="text-xs text-slate-500">Melihat ringkasan data transaksi kas masuk dan keluar secara komprehensif.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-sky-50 text-[#0284c7] border border-sky-100">Live Preview Data</span>
+            </div>
+          </div>
+
+          <!-- Sample KPI metric blocks -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+              <span class="text-xs font-bold text-slate-400 uppercase">Total Saldo Awal</span>
+              <p class="text-lg font-extrabold text-slate-900 mt-1">Rp 142.500.000</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+              <span class="text-xs font-bold text-slate-400 uppercase">Kas Masuk (Bulan Ini)</span>
+              <p class="text-lg font-extrabold text-emerald-600 mt-1">+Rp 84.200.000</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+              <span class="text-xs font-bold text-slate-400 uppercase">Kas Keluar (Bulan Ini)</span>
+              <p class="text-lg font-extrabold text-rose-600 mt-1">-Rp 36.150.000</p>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/60">
+              <span class="text-xs font-bold text-slate-400 uppercase">Saldo Akhir Berjalan</span>
+              <p class="text-lg font-extrabold text-[#0284c7] mt-1">Rp 190.550.000</p>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT CONTROLLERS                                                    -->
+  <!-- ========================================================================= -->
+  <script>
+    // Offline / Standalone SVG Icon Registry
+    const SVG_ICONS = {
+      'layout-dashboard': '<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>',
+      'calendar': '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+      'file-spreadsheet': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/>',
+      'trending-up': '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+      'banknote': '<rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>',
+      'hand-coins': '<path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><circle cx="18" cy="6" r="3"/>',
+      'credit-card': '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>',
+      'calculator': '<rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>',
+      'scale': '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+      'landmark': '<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+      'layout-grid': '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+      'panel-left-close': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m16 15-3-3 3-3"/>',
+      'panel-left-open': '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="m14 9 3 3-3 3"/>',
+      'chevron-down': '<path d="m6 9 6 6 6-6"/>',
+      'chevron-right': '<path d="m9 18 6-6-6-6"/>',
+      'menu': '<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>',
+      'x': '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+      'sparkles': '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>',
+      'log-out': '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>',
+      'monitor': '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
+      'check-circle-2': '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+      'shield-check': '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+      'check': '<polyline points="20 6 9 17 4 12"/>',
+      'sliders': '<line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/>',
+      'arrow-left': '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>'
+    };
+
+    function renderSvgIcons() {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+      document.querySelectorAll('[data-lucide]').forEach(el => {
+        if (el.tagName.toLowerCase() === 'svg') return;
+        const name = el.getAttribute('data-lucide');
+        const inner = SVG_ICONS[name] || '<circle cx="12" cy="12" r="10"/>';
+        const classes = el.getAttribute('class') || '';
+        const id = el.getAttribute('id') ? ` id="${el.getAttribute('id')}"` : '';
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        svg.setAttribute('stroke-linecap', 'round');
+        svg.setAttribute('stroke-linejoin', 'round');
+        svg.setAttribute('class', classes);
+        if (el.getAttribute('id')) svg.setAttribute('id', el.getAttribute('id'));
+        svg.innerHTML = inner;
+        el.parentNode.replaceChild(svg, el);
+      });
+    }
+
+    // State Variables
+    let isDesktopCollapsed = false;
+    let isMobileOpen = false;
+    let isAccordionOpen = true;
+
+    const sidebar = document.getElementById('appSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const mainWrapper = document.getElementById('mainContentWrapper');
+    const btnLabelToggle = document.getElementById('btnLabelToggleState');
+    const badgeMode = document.getElementById('badgeSidebarMode');
+    const flyout = document.getElementById('flyoutLaporanKeuangan');
+    const groupLaporan = document.getElementById('groupLaporanKeuangan');
+
+    // 1. Toggle Desktop Sidebar (Expand vs Icon-Only Rail)
+    function toggleDesktopSidebar() {
+      isDesktopCollapsed = !isDesktopCollapsed;
+      applySidebarState();
+    }
+
+    function applySidebarState() {
+      const toggleWrap = document.getElementById('iconToggleSidebarWrap');
+      if (isDesktopCollapsed) {
+        sidebar.classList.add('is-collapsed');
+        sidebar.classList.remove('lg:w-64');
+        sidebar.classList.add('lg:w-20');
+
+        mainWrapper.classList.remove('lg:ml-64');
+        mainWrapper.classList.add('lg:ml-20');
+
+        if (toggleWrap) {
+          toggleWrap.innerHTML = '<i data-lucide="panel-left-open" class="w-4 h-4"></i>';
+        }
+        if (btnLabelToggle) btnLabelToggle.textContent = 'Perlebar Sidebar (Expand)';
+        if (badgeMode) badgeMode.textContent = 'Desktop: Collapsed Rail (w-20)';
+
+        document.getElementById('menuLaporanKeuangan').style.maxHeight = '0px';
+      } else {
+        sidebar.classList.remove('is-collapsed');
+        sidebar.classList.remove('lg:w-20');
+        sidebar.classList.add('lg:w-64');
+
+        mainWrapper.classList.remove('lg:ml-20');
+        mainWrapper.classList.add('lg:ml-64');
+
+        if (toggleWrap) {
+          toggleWrap.innerHTML = '<i data-lucide="panel-left-close" class="w-4 h-4"></i>';
+        }
+        if (btnLabelToggle) btnLabelToggle.textContent = 'Ciutkan Sidebar (Icon-Only)';
+        if (badgeMode) badgeMode.textContent = 'Desktop: Expanded (w-64)';
+
+        if (isAccordionOpen) {
+          document.getElementById('menuLaporanKeuangan').style.maxHeight = '500px';
+        }
+      }
+      renderSvgIcons();
+    }
+
+    // 2. Mobile Drawer Controls
+    function openMobileSidebar() {
+      isMobileOpen = true;
+      sidebar.classList.remove('-translate-x-full');
+      sidebar.classList.add('translate-x-0');
+
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+      backdrop.classList.add('opacity-100', 'pointer-events-auto');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeMobileSidebar() {
+      isMobileOpen = false;
+      sidebar.classList.add('-translate-x-full');
+      sidebar.classList.remove('translate-x-0');
+
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+      backdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    // Close on Escape Key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isMobileOpen) {
+        closeMobileSidebar();
+      }
+    });
+
+    // 3. Accordion Group Toggle
+    function toggleGroupAccordion(menuId) {
+      if (isDesktopCollapsed && window.innerWidth >= 1024) {
+        toggleDesktopSidebar();
+        return;
+      }
+
+      const menu = document.getElementById(menuId);
+      const chevron = document.getElementById('chevronLaporanKeuangan');
+      isAccordionOpen = !isAccordionOpen;
+
+      if (isAccordionOpen) {
+        menu.style.maxHeight = '500px';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+      } else {
+        menu.style.maxHeight = '0px';
+        if (chevron) chevron.style.transform = 'rotate(-90deg)';
+      }
+    }
+
+    // 4. Hover Popover for Group in Collapsed Desktop Mode
+    function showFlyout() {
+      if (isDesktopCollapsed && window.innerWidth >= 1024 && flyout && groupLaporan) {
+        const rect = groupLaporan.getBoundingClientRect();
+        flyout.style.top = Math.max(16, rect.top - 6) + 'px';
+        flyout.style.left = (rect.right + 12) + 'px';
+        flyout.classList.remove('hidden');
+      }
+    }
+
+    function hideFlyout() {
+      if (flyout) {
+        flyout.classList.add('hidden');
+      }
+    }
+
+    if (groupLaporan && flyout) {
+      groupLaporan.addEventListener('mouseenter', showFlyout);
+      groupLaporan.addEventListener('mouseleave', function (e) {
+        const toEl = e.relatedTarget;
+        if (!flyout.contains(toEl)) {
+          hideFlyout();
+        }
+      });
+
+      flyout.addEventListener('mouseleave', hideFlyout);
+    }
+
+    // 5. Active Submenu State Manager (Solid Bisa Blue #0284c7 dengan Teks & Ikon Putih Bersih)
+    function setActiveMenu(menuId, menuLabel) {
+      document.querySelectorAll('.submenu-link, .flyout-link').forEach(el => {
+        const id = el.getAttribute('data-menu-id');
+        const isActive = id === menuId;
+        const dot = el.querySelector('.active-dot');
+
+        if (isActive) {
+          el.classList.add('is-active', 'shadow-pill');
+          el.classList.remove('text-slate-600', 'font-medium');
+          if (dot) dot.classList.remove('hidden');
+        } else {
+          el.classList.remove('is-active', 'shadow-pill');
+          el.classList.add('text-slate-600', 'font-medium');
+          if (dot) dot.classList.add('hidden');
+        }
+      });
+
+      // Update Topbar and simulated view
+      const topbarTitle = document.getElementById('topbarPageTitle');
+      const viewTitle = document.getElementById('viewContentTitle');
+      const badgeActive = document.getElementById('badgeActiveMenuName');
+
+      if (topbarTitle) topbarTitle.textContent = menuLabel;
+      if (viewTitle) viewTitle.textContent = 'Simulasi Halaman: ' + menuLabel;
+      if (badgeActive) badgeActive.textContent = menuLabel;
+
+      if (window.innerWidth < 1024 && isMobileOpen) {
+        closeMobileSidebar();
+      }
+
+      if (isDesktopCollapsed && flyout) {
+        hideFlyout();
+      }
+    }
+
+    function handleSubmenuClick(event, menuId) {
+      event.preventDefault();
+      const el = event.currentTarget;
+      const label = el.querySelector('span:not(.active-dot)')?.textContent || 'Laporan';
+      setActiveMenu(menuId, label);
+    }
+
+    // Initialize SVG Icons & Accordion
+    document.addEventListener('DOMContentLoaded', function () {
+      renderSvgIcons();
+      const menu = document.getElementById('menuLaporanKeuangan');
+      if (menu) menu.style.maxHeight = '500px';
+    });
+
+    renderSvgIcons();
+  </script>
+
+</body>
+
+</html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" translate="no" class="notranslate">
 
 <head>
+  <meta name="google" content="notranslate" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pajak | Bisa Media</title>
@@ -2293,7 +2294,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js"></script>
-  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
+  <script src="../../assets/js/layout.js?v=20261123_v4"></script>
 
   <script>
     (function () {
@@ -2700,7 +2701,9 @@
           tanggalStorLama: (crudTanggalStorLama && crudTanggalStorLama.value.trim()) || '-',
           statusLama: (crudStatusLama && crudStatusLama.value.trim()) || (sisa === 0 && kas > 0 ? 'Lunas' : 'Belum Lunas'),
           idPajak: (crudIdPajak && crudIdPajak.value.trim()) || generateNextPajakId(),
-          catatan: (crudCatatan && crudCatatan.value.trim()) || '-'
+          catatan: (crudCatatan && crudCatatan.value.trim()) || '-',
+          createdAt: Date.now(),
+          updatedAt: Date.now()
         };
 
         if (isEdit) {
@@ -2712,6 +2715,10 @@
           }
         } else {
           pajakData.unshift(payload);
+        }
+
+        if (typeof window.recordAccountingReferensiUpdate === 'function' && payload.idPajak) {
+          window.recordAccountingReferensiUpdate(payload.idPajak);
         }
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(pajakData));
