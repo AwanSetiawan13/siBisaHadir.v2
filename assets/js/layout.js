@@ -265,70 +265,80 @@
       }
     ],
     accounting: [
+      { type: 'heading', label: 'Menu Utama' },
       { type: 'item', label: 'Dashboard', icon: 'home', link: 'Accounting/accounting_dashboard.html' },
       { type: 'item', label: 'Kalender', icon: 'calendar', link: 'Accounting/accounting_kalender.html' },
+
+      { type: 'heading', label: 'Aktivitas Keuangan' },
       {
         type: 'group', label: 'Kehadiran', icon: 'clock', id: 'm-acc-kehadiran',
         children: [
-          { label: 'Kehadiran', link: 'Accounting/absensi/accounting_kehadiran.html' },
-          { label: 'Absensi Istirahat', link: 'Accounting/absensi/accounting_presensi_istirahat.html' },
-          { label: 'Absensi Lembur', link: 'Accounting/absensi/accounting_presensi_lembur.html' }
+          { label: 'Kehadiran', link: 'Accounting/absensi/accounting_kehadiran.html', icon: 'calendar-check' },
+          { label: 'Absensi Istirahat', link: 'Accounting/absensi/accounting_presensi_istirahat.html', icon: 'coffee' },
+          { label: 'Absensi Lembur', link: 'Accounting/absensi/accounting_presensi_lembur.html', icon: 'clock-alert' }
         ]
       },
       {
         type: 'group', label: 'Operasional', icon: 'briefcase', id: 'm-acc-operasional',
         children: [
-          { label: 'Dashboard', link: 'Accounting/operasional/accounting_operasional_dashboard.html' },
-          { label: 'Kas & Bank', link: 'Accounting/operasional/accounting_kas_bank.html' },
-          { label: 'Pendapatan', link: 'Accounting/operasional/accounting_pendapatan.html' },
-          { label: 'Approval Pengeluaran', link: 'Accounting/operasional/accounting_approval_pengeluaran.html' },
-          { label: 'Pengeluaran & Beban', link: 'Accounting/operasional/accounting_pengeluaran_beban.html' },
-          { label: 'Profit Project & Brand', link: 'Accounting/operasional/accounting_profit_project_brand.html' },
-          { label: 'Arus Kas', link: 'Accounting/operasional/accounting_arus_kas.html' },
-          { label: 'Piutang', link: 'Accounting/operasional/accounting_piutang.html' },
-          { label: 'Utang', link: 'Accounting/operasional/accounting_utang.html' },
-          { label: 'Payroll', link: 'Accounting/operasional/accounting_payroll.html' },
-          { label: 'Pajak', link: 'Accounting/operasional/accounting_pajak.html' },
-          { label: 'Daftar Aset', link: 'Accounting/operasional/accounting_daftar_aset.html' },
-          { label: 'Penyusutan Aset', link: 'Accounting/operasional/accounting_penyusutan_aset.html' },
-          { label: 'Mutasi Aset', link: 'Accounting/operasional/accounting_mutasi_aset.html' },
-          { label: 'Alokasi Aset Project', link: 'Accounting/operasional/accounting_alokasi_aset_project.html' },
-          { label: 'Laba Rugi', link: 'Accounting/operasional/accounting_laba_rugi.html' },
-          { label: 'Neraca', link: 'Accounting/operasional/accounting_neraca.html' },
-          { label: 'Rekap Divisi', link: 'Accounting/operasional/accounting_rekap_divisi.html' },
-          { label: 'Utang Karyawan', link: 'Accounting/operasional/accounting_utang_karyawan.html' },
-          { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html' },
-          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html' },
-          { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html' },
-          { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html' }
+          { label: 'Dashboard', link: 'Accounting/operasional/accounting_operasional_dashboard.html', icon: 'layout-dashboard' },
+          { label: 'Kas & Bank', link: 'Accounting/operasional/accounting_kas_bank.html', icon: 'wallet' },
+          { label: 'Pendapatan', link: 'Accounting/operasional/accounting_pendapatan.html', icon: 'arrow-down-left' },
+          { label: 'Approval Pengeluaran', link: 'Accounting/operasional/accounting_approval_pengeluaran.html', icon: 'check-check' },
+          { label: 'Pengeluaran & Beban', link: 'Accounting/operasional/accounting_pengeluaran_beban.html', icon: 'receipt' },
+          { label: 'Payroll', link: 'Accounting/operasional/accounting_payroll.html', icon: 'badge-dollar-sign' },
+          { label: 'Pajak', link: 'Accounting/operasional/accounting_pajak.html', icon: 'percent' },
+          { label: 'Daftar Aset', link: 'Accounting/operasional/accounting_daftar_aset.html', icon: 'boxes' },
+          { label: 'Mutasi Aset', link: 'Accounting/operasional/accounting_mutasi_aset.html', icon: 'arrow-left-right' },
+          { label: 'Alokasi Aset Project', link: 'Accounting/operasional/accounting_alokasi_aset_project.html', icon: 'layers' },
+          { label: 'Utang Karyawan', link: 'Accounting/operasional/accounting_utang_karyawan.html', icon: 'file-minus' },
+          { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html', icon: 'file-plus' },
+          { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html', icon: 'scale-balance' },
+          { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html', icon: 'shopping-cart' },
+          { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html', icon: 'repeat' }
           // { label: 'History Dokumen', link: 'Accounting/operasional/accounting_history_dokumen.html' } /* Dihapus sementara */
         ]
       },
       {
+        type: 'group', label: 'Laporan Keuangan', icon: 'spreadsheet', id: 'm-acc-laporan-keuangan',
+        children: [
+          { label: 'Profit Project & Brand', link: 'Accounting/laporan_keuangan/accounting_profit_project_brand.html', icon: 'trending-up' },
+          { label: 'Arus Kas', link: 'Accounting/laporan_keuangan/accounting_arus_kas.html', icon: 'banknote' },
+          { label: 'Piutang', link: 'Accounting/laporan_keuangan/accounting_piutang.html', icon: 'hand-coins' },
+          { label: 'Utang', link: 'Accounting/laporan_keuangan/accounting_utang.html', icon: 'credit-card' },
+          { label: 'Penyusutan Aset', link: 'Accounting/laporan_keuangan/accounting_penyusutan_aset.html', icon: 'calculator' },
+          { label: 'Laba Rugi', link: 'Accounting/laporan_keuangan/accounting_laba_rugi.html', icon: 'scale' },
+          { label: 'Neraca', link: 'Accounting/laporan_keuangan/accounting_neraca.html', icon: 'landmark' },
+          { label: 'Rekap Divisi', link: 'Accounting/laporan_keuangan/accounting_rekap_divisi.html', icon: 'layout-grid' }
+        ]
+      },
+      { type: 'heading', label: 'Perancangan & Dokumen' },
+      {
         type: 'group', label: 'Dokumen & Kolaborasi', icon: 'folder', id: 'm-acc-dokumen',
         children: [
-          { label: 'My Folders', link: 'Accounting/dokumen_kolaborasi/accounting_folder.html' }
+          { label: 'My Folders', link: 'Accounting/dokumen_kolaborasi/accounting_folder.html', icon: 'folder-open' }
         ]
       },
       {
         type: 'group', label: 'Perancangan Kerja', icon: 'task', id: 'm-acc-perancangan',
         children: [
-          { label: 'RRK', link: 'Accounting/perancangan_kerja/accounting_rrk.html' },
-          { label: 'Milestone', link: 'Accounting/perancangan_kerja/accounting_Milestone.html' },
-          { label: 'Tugas', link: 'Accounting/perancangan_kerja/accounting_tugas.html' },
-          { label: 'Projects', link: 'Accounting/perancangan_kerja/accounting_project.html' },
-          { label: 'Laporan', link: 'Accounting/perancangan_kerja/accounting_laporan.html' },
-          { label: 'Pengaduan', link: 'Accounting/perancangan_kerja/accounting_pengaduan.html' }
+          { label: 'RRK', link: 'Accounting/perancangan_kerja/accounting_rrk.html', icon: 'file-text' },
+          { label: 'Milestone', link: 'Accounting/perancangan_kerja/accounting_Milestone.html', icon: 'flag' },
+          { label: 'Tugas', link: 'Accounting/perancangan_kerja/accounting_tugas.html', icon: 'check-square' },
+          { label: 'Projects', link: 'Accounting/perancangan_kerja/accounting_project.html', icon: 'kanban' },
+          { label: 'Laporan', link: 'Accounting/perancangan_kerja/accounting_laporan.html', icon: 'file-bar-chart' },
+          { label: 'Pengaduan', link: 'Accounting/perancangan_kerja/accounting_pengaduan.html', icon: 'alert-circle' }
         ]
       },
+      { type: 'heading', label: 'Data Master' },
       {
         type: 'group', label: 'Data Master', icon: 'tag', id: 'm-acc-master',
         children: [
-          { label: 'Master COA', link: 'Accounting/data_master/accounting_master_coa.html' },
-          { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html' },
-          { label: 'Divisi', link: 'Accounting/data_master/accounting_divisi.html' },
-          { label: 'Jenis Transaksi', link: 'Accounting/data_master/accounting_jenis_transaksi.html' },
-          { label: 'Data Karyawan', link: 'Accounting/data_master/accounting_data_karyawan.html' }
+          { label: 'Master COA', link: 'Accounting/data_master/accounting_master_coa.html', icon: 'binary' },
+          { label: 'Penanggung Jawab', link: 'Accounting/data_master/accounting_penanggung_jawab.html', icon: 'user-check' },
+          { label: 'Divisi', link: 'Accounting/data_master/accounting_divisi.html', icon: 'building-2' },
+          { label: 'Jenis Transaksi', link: 'Accounting/data_master/accounting_jenis_transaksi.html', icon: 'tags' },
+          { label: 'Data Karyawan', link: 'Accounting/data_master/accounting_data_karyawan.html', icon: 'users' }
         ]
       }
     ]
@@ -351,7 +361,62 @@
     briefcase: 'package-check',
     chart: 'trending-up',
     tag: 'tags',
-    brand: 'sparkles'
+    brand: 'sparkles',
+    report: 'file-text',
+    spreadsheet: 'file-spreadsheet'
+  };
+
+  // Koleksi SVG Submenu Berkualitas Tinggi (Inline SVG: 100% Reliable, Zero Dependency Bug)
+  const SUBMENU_SVGS = {
+    // ── Laporan Keuangan ──
+    'trending-up': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`,
+    'banknote': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+    'hand-coins': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><circle cx="18" cy="6" r="3"/></svg>`,
+    'credit-card': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`,
+    'calculator': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg>`,
+    'scale': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
+    'landmark': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>`,
+    'layout-grid': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>`,
+
+    // ── Kehadiran ──
+    'calendar-check': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="m9 16 2 2 4-4"/></svg>`,
+    'coffee': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h12Z"/><path d="M6 2v2"/><path d="M17 12h2a2 2 0 0 0 2-2 2 2 0 0 0-2-2h-2"/></svg>`,
+    'clock-alert': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><path d="M12 18h.01"/></svg>`,
+
+    // ── Operasional ──
+    'layout-dashboard': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>`,
+    'wallet': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>`,
+    'arrow-down-left': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" x2="7" y1="7" y2="17"/><polyline points="17 17 7 17 7 7"/></svg>`,
+    'check-check': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>`,
+    'receipt': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>`,
+    'badge-dollar-sign': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 18V6"/></svg>`,
+    'percent': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`,
+    'boxes': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l6 3.43a2 2 0 0 0 2.06 0l6-3.43a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71l-6-3.43a2 2 0 0 0-2.06 0l-6 3.43Z"/><path d="m12 12.5 6 3.43"/><path d="m12 12.5-6 3.43"/><path d="M12 12.5V23"/></svg>`,
+    'arrow-left-right': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>`,
+    'layers': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>`,
+    'file-minus': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/></svg>`,
+    'file-plus': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 12v6"/></svg>`,
+    'scale-balance': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>`,
+    'shopping-cart': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`,
+    'repeat': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>`,
+
+    // ── Dokumen & Kolaborasi ──
+    'folder-open': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>`,
+
+    // ── Perancangan Kerja ──
+    'file-text': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>`,
+    'flag': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>`,
+    'check-square': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`,
+    'kanban': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v11"/><path d="M12 5v6"/><path d="M18 5v14"/></svg>`,
+    'file-bar-chart': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 18v-2"/><path d="M12 18v-4"/><path d="M16 18v-6"/></svg>`,
+    'alert-circle': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`,
+
+    // ── Data Master ──
+    'binary': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></svg>`,
+    'user-check': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>`,
+    'building-2': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>`,
+    'tags': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/><path d="M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.4 2.4 0 0 0 3.414 0l4.586-4.586a2.4 2.4 0 0 0 0-3.414l-5.704-5.704a2 2 0 0 0-1-.586Z"/><circle cx="6.5" cy="6.5" r="1.5"/></svg>`,
+    'users': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`
   };
 
   function renderLucideIcon(key) {
@@ -393,27 +458,83 @@
       el.setAttribute('data-expanded', 'true');
       if (chev) chev.style.transform = 'rotate(0deg)';
     }
+
+    // Pertahankan posisi scroll sidebar setelah grup dibuka/ditutup
+    const sidebarBox = document.getElementById('app-sidebar-box');
+    if (sidebarBox) {
+      sessionStorage.setItem('bm_sidebar_scroll_top', String(sidebarBox.scrollTop));
+    }
   };
 
   const activeList = menus[role] || menus['admin'];
+  // Global Tracker untuk Urutan Update Referensi Dokumen Accounting (Single Source of Truth)
+  window.recordAccountingReferensiUpdate = function (kode) {
+    if (!kode) return;
+    const clean = String(kode).trim().toLowerCase();
+    if (!clean || clean === '-' || clean === 'tambah reverensi') return;
+    try {
+      const KEY = 'accounting_referensi_updates_v1';
+      const raw = localStorage.getItem(KEY);
+      const map = (raw && typeof JSON.parse(raw) === 'object' && JSON.parse(raw) !== null) ? JSON.parse(raw) : {};
+      let maxSeq = 0;
+      Object.keys(map).forEach(function (k) {
+        if (map[k] && typeof map[k].seq === 'number' && map[k].seq > maxSeq) {
+          maxSeq = map[k].seq;
+        }
+      });
+      const entry = { seq: maxSeq + 1, ts: Date.now() };
+      map[clean] = entry;
+      if (clean.startsWith('exp-')) map['pb-' + clean.slice(4)] = entry;
+      if (clean.startsWith('pb-')) map['exp-' + clean.slice(3)] = entry;
+      localStorage.setItem(KEY, JSON.stringify(map));
+    } catch (e) {}
+  };
+
+  window.getAccountingReferensiUpdates = function () {
+    try {
+      const raw = localStorage.getItem('accounting_referensi_updates_v1');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch (e) {}
+    return {};
+  };
+
+  // Cegah browser auto-translate mengubah istilah menu seperti "Profit Project & Brand" menjadi "Proyek Keuntungan & Merek"
+  (function disableBrowserAutoTranslateOnSidebar() {
+    try {
+      if (document.documentElement) {
+        document.documentElement.setAttribute('translate', 'no');
+      }
+      if (document.head && !document.querySelector('meta[name="google"][content="notranslate"]')) {
+        const meta = document.createElement('meta');
+        meta.name = 'google';
+        meta.content = 'notranslate';
+        document.head.appendChild(meta);
+      }
+    } catch (e) {}
+  })();
+
+  const NAV_CACHE_VER = 'v=20261123_v4';
   let menuHtml = '';
   let isFirstHeading = true;
 
   activeList.forEach(m => {
     if (m.type === 'heading') {
       menuHtml += `
-        <li class="sidebar-heading-item" style="list-style:none;margin:${isFirstHeading ? '4px 6px 4px 6px' : '14px 6px 4px 6px'};padding:${isFirstHeading ? '4px 8px' : '10px 8px 4px 8px'};border-top:${isFirstHeading ? 'none' : '1px solid #f1f5f9'};font-size:9.5px;font-weight:700;color:#94a3b8;letter-spacing:0.8px;text-transform:uppercase;">
-          <span>${m.label}</span>
+        <li class="sidebar-heading-item notranslate" translate="no" style="list-style:none;margin:${isFirstHeading ? '4px 6px 4px 6px' : '14px 6px 4px 6px'};padding:${isFirstHeading ? '4px 8px' : '10px 8px 4px 8px'};border-top:${isFirstHeading ? 'none' : '1px solid #f1f5f9'};font-size:9.5px;font-weight:700;color:#94a3b8;letter-spacing:0.8px;text-transform:uppercase;">
+          <span class="app-heading-label notranslate" translate="no" data-fixed-label="${m.label}" aria-label="${m.label}"></span>
         </li>`;
       isFirstHeading = false;
     } else if (m.type === 'item') {
-      const fullLink = rootPrefix + m.link;
+      const fullLink = rootPrefix + m.link + (m.link.includes('?') ? '&' : '?') + NAV_CACHE_VER;
       const isActive = currentFile.toLowerCase() === m.link.split('/').pop().toLowerCase();
       menuHtml += `
         <li style="list-style:none;margin:0 0 3px 0;padding:0;">
-          <a href="${fullLink}" class="app-nav-item ${isActive ? 'is-active' : ''}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;font-size:13px;text-decoration:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);${isActive ? 'background-color:#0284c7;color:#ffffff;font-weight:600;box-shadow:0 3px 8px rgba(2,132,199,0.25);' : 'color:#475569;font-weight:500;'}">
+          <a href="${fullLink}" class="app-nav-item notranslate ${isActive ? 'is-active' : ''}" translate="no" data-exact-label="${m.label}" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;font-size:13px;text-decoration:none;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);${isActive ? 'background-color:#0284c7;color:#ffffff;font-weight:700;box-shadow:0 3px 8px rgba(2,132,199,0.25);' : 'color:#334155;font-weight:700;'}">
             ${renderLucideIcon(m.icon)}
-            <span>${m.label}</span>
+            <span class="app-menu-label notranslate" translate="no" data-fixed-label="${m.label}" aria-label="${m.label}" style="font-weight:700;color:inherit;"></span>
           </a>
         </li>`;
     } else if (m.type === 'group') {
@@ -425,7 +546,7 @@
         : '';
       const currentPathLower = normalizedPath.toLowerCase();
       m.children.forEach(sub => {
-        const fullSubLink = rootPrefix + sub.link;
+        const fullSubLink = rootPrefix + sub.link + (sub.link.includes('?') ? '&' : '?') + NAV_CACHE_VER;
         const subFileName = sub.link.split('/').pop().toLowerCase();
         // Cocokkan nama file ATAU full path mengandung link sub-item
         const subLinkLower = sub.link.toLowerCase();
@@ -433,11 +554,24 @@
           || currentPathLower.endsWith('/' + subLinkLower)
           || currentPathLower.includes('/' + subLinkLower);
         if (isSubActive) isGroupActive = true;
+
+        const hasCustomIcon = Boolean(sub.icon && SUBMENU_SVGS[sub.icon]);
+        const iconMarkup = hasCustomIcon
+          ? `<span class="app-sub-icon">${SUBMENU_SVGS[sub.icon]}</span>`
+          : `<span style="width:4px;height:4px;border-radius:50%;background-color:${isSubActive ? '#ffffff' : '#cbd5e1'};flex-shrink:0;"></span>`;
+
+        const padGap = hasCustomIcon
+          ? 'gap:10px;padding:7px 12px 7px 16px;'
+          : 'gap:8px;padding:6px 12px 6px 28px;';
+
+        const fixedSubLabel = subFileName === 'accounting_profit_project_brand.html' ? 'Profit Project & Brand' : sub.label;
+
         subHtml += `
-          <li style="list-style:none;margin:1px 0;padding:0;">
-            <a href="${fullSubLink}" class="app-sub-item ${isSubActive ? 'is-active' : ''}" style="display:flex;align-items:center;gap:8px;padding:6px 12px 6px 28px;font-size:12.5px;text-decoration:none;border-radius:8px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);${isSubActive ? 'background-color:#0284c7;color:#ffffff;font-weight:600;box-shadow:0 2px 6px rgba(2,132,199,0.2);' : 'color:#64748b;font-weight:500;'}">
-              <span style="width:4px;height:4px;border-radius:50%;background-color:${isSubActive ? '#ffffff' : '#cbd5e1'};flex-shrink:0;"></span>
-              <span>${sub.label}</span>
+          <li style="list-style:none;margin:2px 0;padding:0;">
+            <a href="${fullSubLink}" class="app-sub-item notranslate ${isSubActive ? 'is-active' : ''}" translate="no" data-exact-label="${fixedSubLabel}" style="display:flex;align-items:center;${padGap}font-size:12.5px;text-decoration:none;border-radius:9px;transition:all 0.18s cubic-bezier(0.4, 0, 0.2, 1);${isSubActive ? 'background-color:#0284c7;color:#ffffff;font-weight:700;box-shadow:0 2px 6px rgba(2,132,199,0.22);' : 'color:#334155;font-weight:700;'}">
+              ${iconMarkup}
+              <span class="app-menu-label notranslate" translate="no" data-fixed-label="${fixedSubLabel}" aria-label="${fixedSubLabel}" title="${fixedSubLabel}" style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;color:inherit;"></span>
+              ${hasCustomIcon && isSubActive ? '<span style="width:5px;height:5px;border-radius:50%;background-color:#ffffff;flex-shrink:0;margin-left:auto;"></span>' : ''}
             </a>
           </li>`;
       });
@@ -450,11 +584,11 @@
       menuHtml += `
         <li style="list-style:none;margin-top:4px;padding:0;">
           <div onclick="window.bmToggleGroup(this)" data-target="${m.id}" data-expanded="${isGroupActive ? 'true' : 'false'}"
-               class="app-group-header" tabindex="0"
-               style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;font-size:12.5px;font-weight:600;color:#334155;cursor:pointer;border-radius:8px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
+               class="app-group-header notranslate" translate="no" data-exact-label="${m.label}" tabindex="0"
+               style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;font-size:12.5px;font-weight:700;color:#334155;cursor:pointer;border-radius:8px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);">
             <div style="display:flex;align-items:center;gap:8px;">
               ${renderLucideIcon(m.icon)}
-              <span>${m.label}</span>
+              <span class="app-menu-label notranslate" translate="no" data-fixed-label="${m.label}" aria-label="${m.label}" style="font-weight:700;color:inherit;"></span>
             </div>
             <i data-lucide="chevron-down" class="chev" style="width:14px;height:14px;color:#94a3b8;transition:transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);transform:${isGroupActive ? 'rotate(0deg)' : 'rotate(-90deg)'};flex-shrink:0;"></i>
           </div>
@@ -507,13 +641,13 @@
   const sidebarDOM = `
     <style>
       #app-sidebar-box {
-        scroll-behavior: smooth;
+        scroll-behavior: auto;
       }
       #app-sidebar-box::-webkit-scrollbar { width: 4px; }
       #app-sidebar-box::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
       #app-sidebar-box::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
 
-      /* Animasi Halus Dropdown Submenu */
+      /* Animasi Halus Dropdown Submenu (Instan pada Load Awal, Halus saat Diklik) */
       .sidebar-submenu {
         max-height: 0;
         opacity: 0;
@@ -521,12 +655,24 @@
         margin: 0;
         padding: 0;
         list-style: none;
-        transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s ease;
       }
       .sidebar-submenu.is-expanded {
-        max-height: 2000px;
-        opacity: 1;
-        margin: 2px 0 4px 0;
+        max-height: none !important;
+        opacity: 1 !important;
+        margin: 2px 0 4px 0 !important;
+      }
+      #app-sidebar.sidebar-animated .sidebar-submenu {
+        transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s ease;
+      }
+      #app-sidebar.sidebar-animated .sidebar-submenu:not(.is-expanded) {
+        max-height: 0 !important;
+        opacity: 0 !important;
+        margin: 0 !important;
+      }
+      #app-sidebar.sidebar-animated .sidebar-submenu.is-expanded {
+        max-height: 2000px !important;
+        opacity: 1 !important;
+        margin: 2px 0 4px 0 !important;
       }
 
       /* Topbar User Profile Dropdown Display Guarantee */
@@ -575,6 +721,84 @@
         stroke: #0284c7;
       }
 
+      /* Submenu Custom Icon Styling (Monoline, Stroke Transition) */
+      .app-sub-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      .app-sub-icon svg {
+        width: 15px;
+        height: 15px;
+        stroke: #64748b;
+        stroke-width: 2;
+        transition: stroke 0.18s ease;
+      }
+      .app-sub-item.is-active .app-sub-icon svg {
+        stroke: #ffffff !important;
+      }
+      .app-sub-item:not(.is-active):hover .app-sub-icon svg {
+        stroke: #0284c7 !important;
+      }
+
+      /* Render seluruh teks label menu melalui CSS ::before agar 100% KEBAL terhadap Chrome Google Translate */
+      #app-sidebar .app-menu-label[data-fixed-label],
+      #app-sidebar .app-heading-label[data-fixed-label] {
+        font-size: 0 !important;
+      }
+      #app-sidebar .app-heading-label[data-fixed-label]::before {
+        content: attr(data-fixed-label) !important;
+        font-size: 9.5px !important;
+        font-weight: 700 !important;
+        color: #94a3b8 !important;
+        letter-spacing: 0.8px !important;
+        text-transform: uppercase !important;
+      }
+      #app-sidebar .app-menu-label[data-fixed-label]::before {
+        content: attr(data-fixed-label) !important;
+        font-size: 12.5px !important;
+        font-weight: 700 !important;
+        color: inherit !important;
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      }
+      #app-sidebar .app-nav-item .app-menu-label[data-fixed-label]::before {
+        font-size: 13px !important;
+      }
+      #app-sidebar a[href*="accounting_profit_project_brand.html"] .app-menu-label::before {
+        content: "Profit Project & Brand" !important;
+      }
+
+      /* Konsistensi Tipografi Sidebar: semua label selalu bold (700) dengan warna seragam (#334155) di setiap modul */
+      #app-sidebar,
+      #app-sidebar .app-nav-item,
+      #app-sidebar .app-sub-item,
+      #app-sidebar .app-group-header,
+      #app-sidebar .app-menu-label,
+      #app-sidebar .app-nav-item span,
+      #app-sidebar .app-sub-item span,
+      #app-sidebar .app-group-header span,
+      #app-sidebar .app-nav-item font,
+      #app-sidebar .app-sub-item font,
+      #app-sidebar .app-group-header font {
+        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        font-weight: 700 !important;
+      }
+      #app-sidebar .app-nav-item:not(.is-active),
+      #app-sidebar .app-sub-item:not(.is-active),
+      #app-sidebar .app-group-header,
+      #app-sidebar .app-nav-item:not(.is-active) span,
+      #app-sidebar .app-sub-item:not(.is-active) span,
+      #app-sidebar .app-group-header span,
+      #app-sidebar .app-nav-item:not(.is-active) font,
+      #app-sidebar .app-sub-item:not(.is-active) font,
+      #app-sidebar .app-group-header font {
+        color: #334155 !important;
+        font-weight: 700 !important;
+      }
+
       /* 1. Normal State */
       .app-nav-item,
       .app-sub-item {
@@ -583,15 +807,29 @@
       }
 
       /* 2. Hover State (HANYA untuk item yang TIDAK aktif & TIDAK disabled) */
-      .app-nav-item:not(.is-active):not(.is-disabled):hover {
+      #app-sidebar .app-nav-item:not(.is-active):not(.is-disabled):hover,
+      #app-sidebar .app-nav-item:not(.is-active):not(.is-disabled):hover span,
+      #app-sidebar .app-nav-item:not(.is-active):not(.is-disabled):hover font {
         background-color: #f1f5f9 !important;
         color: #0284c7 !important;
+      }
+      #app-sidebar .app-nav-item:not(.is-active):not(.is-disabled):hover {
         transform: translateX(2px);
       }
-      .app-sub-item:not(.is-active):not(.is-disabled):hover {
+      #app-sidebar .app-sub-item:not(.is-active):not(.is-disabled):hover,
+      #app-sidebar .app-sub-item:not(.is-active):not(.is-disabled):hover span,
+      #app-sidebar .app-sub-item:not(.is-active):not(.is-disabled):hover font {
         background-color: #f8fafc !important;
         color: #0284c7 !important;
+      }
+      #app-sidebar .app-sub-item:not(.is-active):not(.is-disabled):hover {
         transform: translateX(2px);
+      }
+      #app-sidebar .app-group-header:hover,
+      #app-sidebar .app-group-header:hover span,
+      #app-sidebar .app-group-header:hover font {
+        background-color: #f8fafc !important;
+        color: #0284c7 !important;
       }
 
       /* 3. Focus State (Aksesibilitas Keyboard Navigasi Tab) */
@@ -604,27 +842,35 @@
       }
 
       /* 4. Active State (Sedang Diakses - Solid, Tenang & Bebas Kedipan) */
-      .app-nav-item.is-active,
-      .app-nav-item.is-active:hover,
-      .app-nav-item.is-active:focus,
-      .app-nav-item.is-active:active {
+      #app-sidebar .app-nav-item.is-active,
+      #app-sidebar .app-nav-item.is-active:hover,
+      #app-sidebar .app-nav-item.is-active:focus,
+      #app-sidebar .app-nav-item.is-active:active {
         background-color: #0284c7 !important;
         color: #ffffff !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25) !important;
         cursor: default !important;
         transform: none !important;
       }
-      .app-sub-item.is-active,
-      .app-sub-item.is-active:hover,
-      .app-sub-item.is-active:focus,
-      .app-sub-item.is-active:active {
+      #app-sidebar .app-sub-item.is-active,
+      #app-sidebar .app-sub-item.is-active:hover,
+      #app-sidebar .app-sub-item.is-active:focus,
+      #app-sidebar .app-sub-item.is-active:active {
         background-color: #0284c7 !important;
         color: #ffffff !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
         box-shadow: 0 2px 6px rgba(2, 132, 199, 0.2) !important;
         cursor: default !important;
         transform: none !important;
+      }
+      #app-sidebar .app-nav-item.is-active span,
+      #app-sidebar .app-nav-item.is-active font,
+      #app-sidebar .app-sub-item.is-active span,
+      #app-sidebar .app-sub-item.is-active font {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        background: transparent !important;
       }
 
       /* 5. Disabled State */
@@ -690,12 +936,32 @@
 
       /* Responsivitas: Tablet & Mobile (< 1024px) */
       @media (max-width: 1023px) {
+        #app-sidebar,
+        aside#app-sidebar {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          bottom: 0 !important;
+          width: 0 !important;
+          z-index: 1050 !important;
+          pointer-events: none !important;
+        }
+        #app-sidebar.is-open,
+        aside#app-sidebar.is-open,
+        body.sidebar-open #app-sidebar,
+        body.sidebar-open aside#app-sidebar {
+          width: 240px !important;
+          pointer-events: auto !important;
+          transform: translateX(0) !important;
+        }
         #app-sidebar-inner {
+          z-index: 1050 !important;
           transform: translateX(-100%);
         }
-        #app-sidebar.is-open #app-sidebar-inner {
-          transform: translateX(0);
-          box-shadow: 0 10px 40px rgba(15, 23, 42, 0.25);
+        #app-sidebar.is-open #app-sidebar-inner,
+        body.sidebar-open #app-sidebar-inner {
+          transform: translateX(0) !important;
+          box-shadow: 0 10px 40px rgba(15, 23, 42, 0.25) !important;
         }
         .dashboard-shell,
         .layout-page {
@@ -756,9 +1022,12 @@
     </style>
     <div id="app-sidebar-inner" style="height:100vh;max-height:100vh;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;">
       <!-- Logo Brand (Clean Logo, No Blue Box, No MCN Platform Subtitle) -->
-      <a href="${homeLink}" class="sidebar-brand-header" style="padding:18px 16px 14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f5f9;text-decoration:none;flex-shrink:0;">
+      <a href="${homeLink}" class="sidebar-brand-header" style="padding:16px 16px 14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f1f5f9;text-decoration:none;flex-shrink:0;">
         <img src="${rootPrefix}media/logo.png" class="brand-logo-img" style="width:38px;height:38px;object-fit:contain;flex-shrink:0;display:block;transition:transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);" alt="Logo Bisa Media" onerror="this.style.display='none'" />
-        <span style="font-size:24.5px;font-weight:800;color:#0f172a;letter-spacing:-0.7px;font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;line-height:1.15;white-space:nowrap;">Bisa Media</span>
+        <div style="display:flex;flex-direction:column;">
+          <span style="font-size:23px;font-weight:800;color:#0f172a;letter-spacing:-0.7px;font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;line-height:1.15;white-space:nowrap;">Bisa Media</span>
+          ${role === 'accounting' ? '<span style="font-size:10px;font-weight:700;color:#0284c7;letter-spacing:0.8px;text-transform:uppercase;line-height:1.2;margin-top:1px;">Accounting</span>' : ''}
+        </div>
       </a>
       <!-- Scrollable Navigation Menu (Direct flex child: takes available height) -->
       <div id="app-sidebar-box" style="overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0;padding:6px 10px;scrollbar-width:thin;">
@@ -810,11 +1079,12 @@
       body.sidebar-collapsed .icon-button--menu span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
       #sidebar-backdrop {
         position: fixed; inset: 0;
-        background: rgba(0,0,0,0.35);
-        z-index: 1039;
+        background: rgba(15,23,42,0.45);
+        z-index: 1040 !important;
         opacity: 0; pointer-events: none;
         transition: opacity 0.25s ease;
-        backdrop-filter: blur(2px);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
       }
       #sidebar-backdrop.is-visible { opacity: 1; pointer-events: auto; }
 
@@ -957,15 +1227,155 @@
       container.id = 'app-sidebar';
       document.body.prepend(container);
     }
+    container.setAttribute('translate', 'no');
+    container.classList.add('notranslate');
     container.innerHTML = sidebarDOM;
 
-    // Auto-scroll sidebar agar menu aktif langsung terlihat
-    setTimeout(function () {
+    // Pastikan nama label sidebar (khususnya "Profit Project & Brand") tetap 100% konsisten, bold, dan tidak diubah oleh auto-translate browser di modul mana pun
+    let isEnforcingLabels = false;
+    function enforceSidebarExactLabels() {
+      if (isEnforcingLabels || !container) return;
+      isEnforcingLabels = true;
+      try {
+        container.querySelectorAll('[data-exact-label]').forEach(function (el) {
+          const exact = el.getAttribute('data-exact-label');
+          const labelSpan = el.querySelector('.app-menu-label');
+          if (exact && labelSpan) {
+            if (labelSpan.getAttribute('data-fixed-label') !== exact) {
+              labelSpan.setAttribute('data-fixed-label', exact);
+            }
+            if (labelSpan.textContent !== '') {
+              labelSpan.textContent = '';
+            }
+          }
+        });
+        container.querySelectorAll('a[href*="accounting_profit_project_brand.html"]').forEach(function (link) {
+          if (link.getAttribute('data-exact-label') !== 'Profit Project & Brand') {
+            link.setAttribute('data-exact-label', 'Profit Project & Brand');
+          }
+          const labelSpan = link.querySelector('.app-menu-label') || link.querySelector('span:not(.app-sub-icon)');
+          if (labelSpan) {
+            if (labelSpan.getAttribute('data-fixed-label') !== 'Profit Project & Brand') {
+              labelSpan.setAttribute('data-fixed-label', 'Profit Project & Brand');
+            }
+            if (labelSpan.textContent !== '') {
+              labelSpan.textContent = '';
+            }
+          }
+        });
+      } catch (e) {}
+      isEnforcingLabels = false;
+    }
+    enforceSidebarExactLabels();
+    setTimeout(enforceSidebarExactLabels, 150);
+    setTimeout(enforceSidebarExactLabels, 600);
+    setTimeout(enforceSidebarExactLabels, 1500);
+    if (typeof MutationObserver !== 'undefined') {
+      const labelObserver = new MutationObserver(function () {
+        enforceSidebarExactLabels();
+      });
+      labelObserver.observe(container, { childList: true, subtree: true, characterData: true });
+    }
+
+    // Sinkronisasi dan pertahankan posisi scroll sidebar agar tidak reset ke atas
+    const sidebarBox = document.getElementById('app-sidebar-box');
+    const SCROLL_STORAGE_KEY = 'bm_sidebar_scroll_top';
+
+    const BOTTOM_OPERASIONAL_PAGES = [
+      'accounting_pajak.html',
+      'accounting_daftar_aset.html',
+      'accounting_mutasi_aset.html',
+      'accounting_alokasi_aset_project.html',
+      'accounting_utang_karyawan.html',
+      'accounting_piutang_karyawan.html',
+      'accounting_budget_vs_actual.html',
+      'accounting_pengajuan_barang_jasa.html',
+      'accounting_tagihan_berkala.html',
+      'spvkol_performa_kreator.html',
+      'spvkol_tracking_sampel.html',
+      'staffkol_performa_kreator.html',
+      'staffkol_tracking_sampel.html'
+    ];
+
+    function syncSidebarScrollPosition() {
+      if (!sidebarBox) return;
+      const savedRaw = sessionStorage.getItem(SCROLL_STORAGE_KEY);
+      const savedScroll = savedRaw !== null ? parseInt(savedRaw, 10) : null;
       const activeLink = container.querySelector('.app-nav-item.is-active, .app-sub-item.is-active');
-      if (activeLink) {
-        activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      const currentFileName = window.location.pathname.split('/').pop().toLowerCase();
+      const isBottomOperasional = BOTTOM_OPERASIONAL_PAGES.some(f => currentFileName.includes(f.toLowerCase()));
+
+      if (isBottomOperasional) {
+        if (savedScroll !== null && !isNaN(savedScroll) && savedScroll >= 150) {
+          sidebarBox.scrollTop = savedScroll;
+        } else {
+          const targetBottomScroll = 200;
+          sidebarBox.scrollTop = targetBottomScroll;
+          sessionStorage.setItem(SCROLL_STORAGE_KEY, String(targetBottomScroll));
+        }
+        return;
       }
-    }, 120);
+
+      if (currentFileName.includes('accounting_profit_project_brand.html')) {
+        sidebarBox.scrollTop = 0;
+        sessionStorage.setItem(SCROLL_STORAGE_KEY, '0');
+        return;
+      }
+
+      if (savedScroll !== null && !isNaN(savedScroll)) {
+        if (savedScroll >= 150) {
+          sidebarBox.scrollTop = 0;
+          sessionStorage.setItem(SCROLL_STORAGE_KEY, '0');
+        } else {
+          sidebarBox.scrollTop = savedScroll;
+        }
+      }
+
+      // Jika item menu aktif berada di luar area pandang, gulirkan agar terlihat.
+      if (activeLink) {
+        const boxRect = sidebarBox.getBoundingClientRect();
+        const itemRect = activeLink.getBoundingClientRect();
+        const isItemVisible = (itemRect.top >= boxRect.top + 8) && (itemRect.bottom <= boxRect.bottom - 8);
+
+        if (!isItemVisible) {
+          const itemRelativeTop = sidebarBox.scrollTop + (itemRect.top - boxRect.top);
+          const boxHeight = sidebarBox.clientHeight;
+          const targetScroll = Math.max(0, itemRelativeTop - (boxHeight * 0.4));
+          sidebarBox.scrollTop = targetScroll;
+          sessionStorage.setItem(SCROLL_STORAGE_KEY, String(targetScroll));
+        }
+      }
+    }
+
+    if (sidebarBox) {
+      // Terapkan posisi scroll secara instan tanpa delay visual
+      syncSidebarScrollPosition();
+      requestAnimationFrame(syncSidebarScrollPosition);
+      setTimeout(syncSidebarScrollPosition, 80);
+
+      // Simpan posisi scroll setiap kali pengguna menggulir sidebar
+      sidebarBox.addEventListener('scroll', function () {
+        sessionStorage.setItem(SCROLL_STORAGE_KEY, String(sidebarBox.scrollTop));
+      }, { passive: true });
+
+      // Simpan posisi scroll sebelum halaman berpindah ketika link diklik
+      sidebarBox.addEventListener('click', function (e) {
+        const link = e.target.closest('a');
+        if (link) {
+          const href = (link.getAttribute('href') || '').toLowerCase();
+          if (href.includes('accounting_profit_project_brand.html')) {
+            sessionStorage.setItem(SCROLL_STORAGE_KEY, '0');
+          } else {
+            sessionStorage.setItem(SCROLL_STORAGE_KEY, String(sidebarBox.scrollTop));
+          }
+        }
+      });
+
+      // Aktifkan animasi smooth toggle setelah inisialisasi awal selesai
+      setTimeout(function () {
+        if (container) container.classList.add('sidebar-animated');
+      }, 120);
+    }
 
     // Render Lucide Icons untuk elemen menu sidebar
     if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -1889,7 +2299,9 @@
       'accounting_divisi.html': 'Divisi',
       'accounting_jenis_transaksi.html': 'Jenis Transaksi',
       'accounting_customer_project.html': 'Customer | Project',
-      'accounting_data_karyawan.html': 'Data Karyawan'
+      'accounting_data_karyawan.html': 'Data Karyawan',
+      'accounting_pengajuan_barang_jasa.html': 'Pengajuan Barang & Jasa',
+      'accounting_tagihan_berkala.html': 'Tagihan Berkala'
     };
 
     const accountingPageTitle = accountingTitles[currentFile] || (document.title ? document.title.split('|')[0].trim() : 'Dashboard');
@@ -1904,7 +2316,7 @@
           aria-label="Buka atau tutup sidebar">
           <span></span><span></span><span></span>
         </button>
-        <h2 class="hirezy-page-title">${accountingPageTitle}</h2>
+        <h2 class="hirezy-page-title notranslate" translate="no">${accountingPageTitle}</h2>
       </div>
 
       <div class="topbar__actions hirezy-topbar-right">
@@ -1994,6 +2406,7 @@
     const backdrop = document.getElementById('sidebar-backdrop');
     if (sidebar && sidebar.classList.contains('is-open')) {
       sidebar.classList.remove('is-open');
+      document.body.classList.remove('sidebar-open');
       if (backdrop) backdrop.classList.remove('is-visible');
     }
   });
@@ -2030,6 +2443,7 @@
         const backdrop = document.getElementById('sidebar-backdrop');
         if (sidebar) {
           const isOpen = sidebar.classList.toggle('is-open');
+          document.body.classList.toggle('sidebar-open', isOpen);
           if (backdrop) {
             if (isOpen) backdrop.classList.add('is-visible');
             else backdrop.classList.remove('is-visible');
@@ -2044,6 +2458,7 @@
     if (backdropEl) {
       const sidebar = document.getElementById('app-sidebar');
       if (sidebar) sidebar.classList.remove('is-open');
+      document.body.classList.remove('sidebar-open');
       backdropEl.classList.remove('is-visible');
     }
   });
@@ -2055,6 +2470,7 @@
       const backdrop = document.getElementById('sidebar-backdrop');
       if (sidebar && sidebar.classList.contains('is-open')) {
         sidebar.classList.remove('is-open');
+        document.body.classList.remove('sidebar-open');
         if (backdrop) backdrop.classList.remove('is-visible');
       }
     }
@@ -2172,7 +2588,7 @@
     if (e.target && e.target.id === 'menuSearch') {
       const q = e.target.value.toLowerCase().trim();
       document.querySelectorAll('#app-sidebar .app-nav-item, #app-sidebar .app-sub-item, .sidebar-nav .nav-item').forEach(function (item) {
-        const text = item.textContent.toLowerCase();
+        const text = ((item.getAttribute('data-exact-label') || '') + ' ' + item.textContent).toLowerCase();
         item.style.display = (!q || text.includes(q)) ? '' : 'none';
       });
       if (q) {
@@ -2766,6 +3182,33 @@
     }
   });
 
+  
+  // Global Style: Hapus UI radio button / lingkaran di semua custom dropdown (Permintaan User)
+  (function initUniversalCleanDropdownStyles() {
+    if (document.getElementById('bisa-clean-dropdown-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'bisa-clean-dropdown-styles';
+    style.textContent = `
+      .pnd-custom-radio,
+      .custom-radio,
+      .pnd-select-option input[type="radio"],
+      .pnd-select-item input[type="radio"],
+      .kb-select-item input[type="radio"],
+      .pnd-select-dropdown input[type="radio"],
+      .kb-select-dropdown input[type="radio"] {
+        display: none !important;
+      }
+      .pnd-select-option:has(input[type="radio"]:checked),
+      .pnd-select-item:has(input[type="radio"]:checked),
+      .kb-select-item:has(input[type="radio"]:checked) {
+        background: #e0f2fe !important;
+        color: #0076C5 !important;
+        font-weight: 600 !important;
+      }
+    `;
+    (document.head || document.documentElement).appendChild(style);
+  })();
+
   // Validasi global untuk seluruh modul:
   // Semua field form data yang BUKAN opsional (tanpa label/placeholder 'opsional' / 'optional') wajib diisi.
   // Jika disubmit dalam keadaan kosong, memunculkan SweetAlert "Data Belum Diisi" dan mencegah submit bawaan browser.
@@ -2778,9 +3221,9 @@
           return lbl.textContent.replace(/\*/g, '').replace(/\(opsional\)|\(optional\)/gi, '').trim();
         }
       }
-      const fieldWrap = el.closest ? el.closest('.modal-field, .kb-form-group, .form-group, .field-group, .karyawan-form-field, .col-form-group') : null;
+      const fieldWrap = el.closest ? el.closest('.pnd-field, .pnd-form-group, .modal-field, .kb-form-group, .form-group, .field-group, .karyawan-form-field, .col-form-group') : null;
       if (fieldWrap) {
-        const lbl = fieldWrap.querySelector('label, .modal-field-label, .karyawan-form-label, .kb-form-label, .form-label');
+        const lbl = fieldWrap.querySelector('label, .pnd-label, .pnd-form-label, .modal-field-label, .karyawan-form-label, .kb-form-label, .form-label');
         if (lbl && lbl.textContent) {
           return lbl.textContent.replace(/\*/g, '').replace(/\(opsional\)|\(optional\)/gi, '').trim();
         }
@@ -2805,7 +3248,7 @@
         const lbl = document.querySelector('label[for="' + el.id + '"]');
         if (lbl) labelText += ' ' + lbl.textContent;
       }
-      const fieldWrap = el.closest ? el.closest('.modal-field, .kb-form-group, .form-group, .field-group, .karyawan-form-field, .col-form-group') : null;
+      const fieldWrap = el.closest ? el.closest('.pnd-field, .modal-field, .kb-form-group, .form-group, .field-group, .karyawan-form-field, .col-form-group') : null;
       if (fieldWrap) {
         const lbl = fieldWrap.querySelector('label, .modal-field-label, .karyawan-form-label, .kb-form-label, .form-label, small, .form-text');
         if (lbl) labelText += ' ' + lbl.textContent;
@@ -2822,12 +3265,17 @@
 
     function isFieldVisible(el) {
       if (!el || el.disabled || el.readOnly || el.type === 'hidden') return false;
-      // Filter out elements that are completely hidden
-      if (el.offsetWidth === 0 && el.offsetHeight === 0 && el.getClientRects().length === 0) {
-        if (typeof window.getComputedStyle === 'function') {
-          const st = window.getComputedStyle(el);
+      if (el.hidden || (el.closest && el.closest('[hidden]'))) return false;
+      if (typeof window.getComputedStyle === 'function') {
+        let cur = el;
+        while (cur && cur.nodeType === 1 && cur !== document.body && cur !== document.documentElement) {
+          const st = window.getComputedStyle(cur);
           if (st.display === 'none' || st.visibility === 'hidden') return false;
+          cur = cur.parentElement;
         }
+      }
+      if (el.offsetWidth === 0 && el.offsetHeight === 0 && el.getClientRects().length === 0) {
+        return false;
       }
       return true;
     }
@@ -3064,9 +3512,6 @@
 
       for (let i = 0; i < inputs.length; i++) {
         const el = inputs[i];
-        if (!isFieldVisible(el)) continue;
-        if (isInsideFilterOrSearch(el)) continue;
-
         const isExplicitRequired = el.hasAttribute('required');
         const isOptional = isFieldOptional(el);
 
@@ -3081,6 +3526,27 @@
           if (seenRadio.has(el.name)) continue;
           seenRadio.add(el.name);
         }
+
+        // Validasi custom dropdown (.pnd-select-wrap / .kb-select-wrap) yang menyimpan nilai pada input[type="hidden"][required]
+        if (el.tagName === 'INPUT' && type === 'hidden') {
+          if (!isExplicitRequired || el.disabled) continue;
+          const wrap = el.closest ? el.closest('.pnd-select-wrap, .kb-select-wrap') : null;
+          if (!wrap) continue;
+          const triggerBtn = wrap.querySelector('.pnd-select-btn, .kb-select-btn');
+          if (!triggerBtn || !isFieldVisible(triggerBtn)) continue;
+          if (!String(el.value || '').trim()) {
+            if (!firstEmpty) firstEmpty = triggerBtn;
+            highlightErrorField(triggerBtn);
+            const label = getFieldLabel(el);
+            if (label && missingLabels.indexOf(label) === -1) {
+              missingLabels.push(label);
+            }
+          }
+          continue;
+        }
+
+        if (!isFieldVisible(el)) continue;
+        if (isInsideFilterOrSearch(el)) continue;
 
         if (isFieldEmpty(el)) {
           if (!firstEmpty) firstEmpty = el;

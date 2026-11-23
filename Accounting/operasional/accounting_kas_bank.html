@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" translate="no" class="notranslate">
 
 <head>
+  <meta name="google" content="notranslate" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kas & Bank | Bisa Media</title>
@@ -1620,7 +1621,9 @@
       user-select: none;
     }
 
-    .kb-select-item input[type="radio"],
+    .kb-select-item input[type="radio"] {
+      display: none !important;
+    }
     .kb-select-item input[type="checkbox"] {
       width: 14px;
       height: 14px;
@@ -3535,7 +3538,7 @@
   <!-- ExcelJS & Universal Bisa Excel Engine (.xlsx) -->
   <script src="../../vendor/exceljs.min.js"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
-  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
+  <script src="../../assets/js/layout.js?v=20261123_v4"></script>
   <script>
     (function () {
       'use strict';
@@ -5271,23 +5274,56 @@
           }
         });
 
-        const SEED_INVOICES = new Set([
+        const STATIC_SEED_CODES = new Set([
           'inv-202609-001', 'inv-202609-002', 'inv-202609-003',
-          'inv-202609-004', 'inv-202609-005', 'inv-202609-006', 'inv-202609-007'
+          'inv-202609-004', 'inv-202609-005', 'inv-202609-006', 'inv-202609-007', 'inv-202609-008',
+          'pb-2609-001', 'pb-2609-002', 'pb-2609-003', 'pb-2609-004', 'pb-2609-005',
+          'exp-2609-001', 'exp-2609-002', 'exp-2609-003', 'exp-2609-004', 'exp-2609-005',
+          'apr-2609-001', 'apr-2609-002', 'apr-2609-003', 'apr-2609-004', 'apr-2609-005',
+          'pr-202610-001', 'pr-202610-002',
+          'pjk-202610-001', 'pjk-202610-002',
+          'pbj-2026-001', 'pbj-2026-002', 'pbj-2026-003', 'pbj-2026-004', 'pbj-2026-005',
+          'tb-001', 'tb-002', 'tb-003', 'tb-004', 'tb-005', 'tb-006', 'tb-007', 'tb-008'
         ]);
-        const SEED_EXPENSES = new Set([
-          'pb-2609-001', 'pb-2609-002', 'pb-2609-003', 'pb-2609-004', 'pb-2609-005'
-        ]);
+
+        let refUpdatesMap = {};
+        try {
+          if (typeof window.getAccountingReferensiUpdates === 'function') {
+            refUpdatesMap = window.getAccountingReferensiUpdates() || {};
+          } else {
+            const rawUpd = localStorage.getItem('accounting_referensi_updates_v1');
+            if (rawUpd) refUpdatesMap = JSON.parse(rawUpd) || {};
+          }
+        } catch (e) {}
 
         function extractSortTime(item, code, fallbackIdx) {
           if (!item) return 0;
+          const lowerCode = String(code || '').trim().toLowerCase();
+          const refEntry = lowerCode ? refUpdatesMap[lowerCode] : null;
           const raw = item.updatedAt || item.createdAt;
+          let userTs = 0;
           if (raw) {
-            if (typeof raw === 'number' && raw > 1000000000) return raw;
-            const parsed = Date.parse(raw);
-            if (!isNaN(parsed) && parsed > 1000000000) return parsed;
+            if (typeof raw === 'number' && raw > 1000000000) {
+              userTs = raw;
+            } else {
+              const parsed = Date.parse(raw);
+              if (!isNaN(parsed) && parsed > 1000000000) userTs = parsed;
+            }
           }
-          const tgl = item.tanggalInvoice || item.tanggalPengeluaran || item.tanggalBayar || item.tanggalPinjam || item.tanggal || item.periode;
+          if (refEntry && refEntry.ts && refEntry.ts > userTs) {
+            userTs = refEntry.ts;
+          }
+          const userSeq = (refEntry && typeof refEntry.seq === 'number') ? refEntry.seq : 0;
+          const isUserInput = Boolean(userSeq > 0 || userTs > 0 || (lowerCode && !STATIC_SEED_CODES.has(lowerCode)));
+
+          // Semua data yang diinput/diupdate oleh user mendapatkan prioritas mutlak (> 10^15)
+          // di atas data dummy/seed bawaan, berapapun tanggal sistem komputer user.
+          if (isUserInput) {
+            const effectiveTs = userTs > 0 ? userTs : (1795400000000 - (fallbackIdx || 0));
+            return 1000000000000000 + (userSeq * 10000000000) + Math.floor(effectiveTs / 10);
+          }
+
+          const tgl = item.tanggalPengakuan || item.tanggalInvoice || item.tanggalPengeluaran || item.tanggalRequest || item.tanggalBayar || item.tanggalPinjam || item.tanggal || item.periode;
           if (tgl && typeof tgl === 'string') {
             const parts = tgl.trim().split(/[-/]/);
             if (parts.length === 3) {
@@ -5299,8 +5335,6 @@
                 if (!isNaN(d)) return d;
               }
             }
-            const p = Date.parse(tgl);
-            if (!isNaN(p)) return p;
           }
           if (code) {
             const m = String(code).match(/(?:20)?(\d{2})(\d{2})[-_]?(\d+)/);
@@ -5308,12 +5342,14 @@
               const yy = parseInt(m[1], 10);
               const mm = parseInt(m[2], 10);
               const seq = parseInt(m[3], 10);
-              const yr = yy < 100 ? 2000 + yy : yy;
-              const base = new Date(yr, mm - 1, Math.min(Math.max(seq, 1), 28)).getTime();
-              return base + seq * 1000;
+              if (mm >= 1 && mm <= 12) {
+                const yr = yy < 100 ? 2000 + yy : yy;
+                const base = new Date(yr, mm - 1, Math.min(Math.max(seq, 1), 28)).getTime();
+                return base + seq * 1000;
+              }
             }
           }
-          return fallbackIdx ? (1000000000 - fallbackIdx) : 0;
+          return fallbackIdx !== undefined ? (1000000000 - fallbackIdx) : 0;
         }
 
         // 1. Ambil Kode & No Utang dari modul Utang Karyawan secara realtime (Pengeluaran -> Kode utama EXP)
@@ -5523,6 +5559,146 @@
           console.warn('Error loading pengeluaran list for referensi:', e);
         }
 
+        // 5b. Ambil ID Pengajuan Barang & Jasa (PBJ-...)
+        try {
+          const rawPbj = localStorage.getItem('accounting_pengajuan_barang_jasa_v1');
+          const pbjList = rawPbj ? JSON.parse(rawPbj) : [];
+          if (Array.isArray(pbjList)) {
+            pbjList.forEach(function (pbj, idx) {
+              const code = String(pbj.id || pbj.idPengajuan || '').trim();
+              if (code && !seen.has(code.toLowerCase())) {
+                const lowerCode = code.toLowerCase();
+                seen.add(lowerCode);
+                const desc = 'Pengajuan: ' + (pbj.namaBarang || pbj.kategori || 'Barang/Jasa') + (pbj.periode ? ' (' + pbj.periode + ')' : '');
+                const nom = Number(pbj.totalEstimasi || pbj.estimasiBiaya || pbj.harga || 0);
+                const isUnused = !usedRefsInKb.has(lowerCode);
+                result.push({
+                  kode: code,
+                  tipe: 'expense',
+                  source: 'pengajuan_bj',
+                  labelTipe: 'Pengajuan B&J',
+                  keterangan: desc,
+                  nominal: nom,
+                  customerOrVendor: pbj.pic || pbj.vendor || pbj.pemohon || '',
+                  projectBrand: (pbj.projectBrand && pbj.projectBrand !== '-') ? String(pbj.projectBrand).trim() : '',
+                  divisi: (pbj.divisi && pbj.divisi !== '-') ? String(pbj.divisi).trim() : '',
+                  buktiUrl: (pbj.buktiUrl || '').trim(),
+                  buktiDataUrl: (pbj.buktiDataUrl || '').trim(),
+                  isUnused: isUnused,
+                  sortTime: extractSortTime(pbj, code, idx)
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Error loading pengajuan barang jasa for referensi:', e);
+        }
+
+        // 5c. Ambil ID Tagihan Berkala (TB-...)
+        try {
+          const rawTb = localStorage.getItem('accounting_tagihan_berkala_v2');
+          const tbList = rawTb ? JSON.parse(rawTb) : [];
+          if (Array.isArray(tbList)) {
+            tbList.forEach(function (tb, idx) {
+              const code = String(tb.id || tb.idTagihan || '').trim();
+              if (code && !seen.has(code.toLowerCase())) {
+                const lowerCode = code.toLowerCase();
+                seen.add(lowerCode);
+                const desc = 'Tagihan Berkala: ' + (tb.itemTagihan || tb.keterangan || 'Langganan');
+                const nom = Number(tb.harga || 0);
+                const isUnused = !usedRefsInKb.has(lowerCode);
+                result.push({
+                  kode: code,
+                  tipe: 'expense',
+                  source: 'tagihan_berkala',
+                  labelTipe: 'Tagihan Berkala',
+                  keterangan: desc,
+                  nominal: nom,
+                  customerOrVendor: tb.akses || '',
+                  projectBrand: '',
+                  divisi: 'Operasional',
+                  buktiUrl: '',
+                  buktiDataUrl: '',
+                  isUnused: isUnused,
+                  sortTime: extractSortTime(tb, code, idx)
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Error loading tagihan berkala for referensi:', e);
+        }
+
+        // 5d. Ambil ID Pajak dari modul Pajak (PJK-...)
+        try {
+          const rawPjk = localStorage.getItem('bisa_pajak_data_v1');
+          const pjkList = rawPjk ? JSON.parse(rawPjk) : [];
+          if (Array.isArray(pjkList)) {
+            pjkList.forEach(function (pjk, idx) {
+              const code = String(pjk.idPajak || pjk.id || '').trim();
+              if (code && !seen.has(code.toLowerCase())) {
+                const lowerCode = code.toLowerCase();
+                seen.add(lowerCode);
+                const desc = 'Pajak ' + (pjk.jenisPajak || '') + (pjk.periode ? ' (' + pjk.periode + ')' : '') + (pjk.catatan && pjk.catatan !== '-' ? ' - ' + pjk.catatan : '');
+                const nom = Number(pjk.dibayarKas || pjk.pajakTerutang || 0);
+                const isUnused = !usedRefsInKb.has(lowerCode);
+                result.push({
+                  kode: code,
+                  tipe: 'expense',
+                  source: 'pajak',
+                  labelTipe: 'Pajak',
+                  keterangan: desc,
+                  nominal: nom,
+                  customerOrVendor: pjk.jenisPajak || 'Pajak',
+                  projectBrand: '',
+                  divisi: (pjk.divisi && pjk.divisi !== '-') ? String(pjk.divisi).trim() : 'Operasional',
+                  buktiUrl: '',
+                  buktiDataUrl: '',
+                  isUnused: isUnused,
+                  sortTime: extractSortTime(pjk, code, idx)
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Error loading pajak for referensi:', e);
+        }
+
+        // 5e. Ambil ID Approval Pengeluaran (APR-...) yang sudah dibuat/diupdate
+        try {
+          const rawApr = localStorage.getItem('BISA_APPROVAL_PENGELUARAN_DATA_V5');
+          const aprList = rawApr ? JSON.parse(rawApr) : [];
+          if (Array.isArray(aprList)) {
+            aprList.forEach(function (apr, idx) {
+              const code = String(apr.idApproval || '').trim();
+              if (code && !seen.has(code.toLowerCase())) {
+                const lowerCode = code.toLowerCase();
+                seen.add(lowerCode);
+                const desc = [apr.pemohon, apr.keperluan].filter(Boolean).join(' - ') || 'Approval Pengeluaran';
+                const nom = Number(apr.nominal || 0);
+                const isUnused = !usedRefsInKb.has(lowerCode);
+                result.push({
+                  kode: code,
+                  tipe: 'expense',
+                  source: 'approval_pengeluaran',
+                  labelTipe: 'Approval',
+                  keterangan: desc,
+                  nominal: nom,
+                  customerOrVendor: apr.pemohon || '',
+                  projectBrand: '',
+                  divisi: (apr.divisi && apr.divisi !== '-') ? String(apr.divisi).trim() : '',
+                  buktiUrl: '',
+                  buktiDataUrl: '',
+                  isUnused: isUnused,
+                  sortTime: extractSortTime(apr, code, idx)
+                });
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('Error loading approval pengeluaran for referensi:', e);
+        }
+
         // 6. Sertakan referensi yang saat ini digunakan di Kas & Bank jika belum ada dalam list
         if (Array.isArray(kbData)) {
           kbData.forEach(function (item, idx) {
@@ -5548,28 +5724,51 @@
           });
         }
 
-        // 1. Urutkan SEMUA data berdasarkan update terbaru (paling update di paling atas)
+        // 1. Tentukan status isUnused dan apakah dokumen merupakan hasil input/update user (isUserInput).
+        result.forEach(function (it) {
+          const lowerCode = it.kode.toLowerCase();
+          it.isUnused = !usedRefsInKb.has(lowerCode);
+          it.isUserInput = (it.sortTime || 0) >= 1000000000000000;
+          it.isNew = false;
+        });
+
+        // 2. Urutkan:
+        //    a) Kelompok BELUM DIPAKAI (isUnused) selalu di atas kelompok yang sudah dipakai.
+        //    b) Di dalam kelompok yang sama, data yang paling update / terbaru (sortTime terbesar) berada PALING ATAS.
         result.sort(function (a, b) {
+          if (a.isUnused !== b.isUnused) {
+            return a.isUnused ? -1 : 1;
+          }
           return (b.sortTime || 0) - (a.sortTime || 0);
         });
 
-        // 2. Berikan label NEW HANYA pada 1 data referensi teratas yang belum pernah dipakai di Kas & Bank.
-        // Jika data tersebut sudah dipakai, status NEW otomatis hilang dan berpindah ke data berikutnya yang belum dipakai.
-        let hasAssignedNew = false;
-        result.forEach(function (it) {
-          const lowerCode = it.kode.toLowerCase();
-          const isUnused = !usedRefsInKb.has(lowerCode);
-          it.isUnused = isUnused;
-          if (isUnused && !hasAssignedNew) {
-            it.isNew = true;
-            hasAssignedNew = true;
-          } else {
-            it.isNew = false;
-          }
+        // 3. Penentuan badge NEW:
+        //    - Jika ada dokumen hasil input/update user yang belum dipakai (isUnused && isUserInput),
+        //      semua dokumen baru yang diinput user dan belum dipakai mendapat badge NEW (dengan yang paling baru di urutan #1 paling atas).
+        //    - Jika belum ada inputan baru dari user, berikan badge NEW pada 1 dokumen teratas yang belum dipakai.
+        //    - Begitu dokumen sudah dipakai di transaksi Kas & Bank (isUnused === false), badge NEW otomatis hilang.
+        const hasAnyUnusedUserInput = result.some(function (it) {
+          return it.isUnused && it.isUserInput;
         });
+
+        if (hasAnyUnusedUserInput) {
+          result.forEach(function (it) {
+            if (it.isUnused && it.isUserInput) {
+              it.isNew = true;
+            }
+          });
+        } else {
+          for (let i = 0; i < result.length; i++) {
+            if (result[i].isUnused) {
+              result[i].isNew = true;
+              break;
+            }
+          }
+        }
 
         return result;
       }
+      window.getAllDokumenReferensiList = getAllDokumenReferensiList;
 
       function matchesReferensiCategoryFilter(it, catFilter) {
         if (!catFilter || catFilter === 'all') return true;
@@ -5581,6 +5780,10 @@
         if (catFilter === 'payroll') return it.source === 'payroll' || it.labelTipe === 'Payroll' || /^PR-/i.test(it.kode);
         if (catFilter === 'utang_karyawan') return it.source === 'utang_karyawan' || /^LOAN-/i.test(it.kode);
         if (catFilter === 'piutang_karyawan_direct') return it.source === 'piutang_karyawan_direct' || /^PAY-/i.test(it.kode);
+        if (catFilter === 'pengajuan_bj') return it.source === 'pengajuan_bj' || /^PBJ-/i.test(it.kode);
+        if (catFilter === 'tagihan_berkala') return it.source === 'tagihan_berkala' || /^TB-/i.test(it.kode);
+        if (catFilter === 'pajak') return it.source === 'pajak' || /^PJK-/i.test(it.kode);
+        if (catFilter === 'approval_pengeluaran') return it.source === 'approval_pengeluaran' || /^APR-/i.test(it.kode);
         return true;
       }
 
@@ -5635,15 +5838,25 @@
             const isSelected = (it.kode === currentVal) ? ' is-selected' : '';
             const isNewClass = it.isNew ? ' is-new-ref' : '';
             const badgeClass = it.tipe === 'income' ? 'ref-badge-income' : 'ref-badge-expense';
-            const badgeText = it.tipe === 'income' ? 'INV' : 'EXP';
-            const newBadgeHtml = it.isNew ? '<span class="ref-badge-new" title="Referensi Dokumen Baru">NEW</span>' : '';
+            const badgeText = it.tipe === 'income'
+              ? (it.source === 'piutang_karyawan_direct' ? 'PAY' : 'INV')
+              : (it.source === 'payroll' ? 'PR' : (it.source === 'utang_karyawan' ? 'LOAN' : (it.source === 'pengajuan_bj' ? 'PBJ' : (it.source === 'tagihan_berkala' ? 'TB' : (it.source === 'pajak' ? 'PJK' : (it.source === 'approval_pengeluaran' ? 'APR' : 'EXP'))))));
+            
+            // Tampilkan badge NEW jika dokumen berstatus isNew (terbaru & belum dipakai).
+            // Ketika sudah dipakai di Kas & Bank (!it.isUnused), badge NEW DIHILANGKAN dan diganti badge "Sudah Dipakai".
+            const statusBadgeHtml = it.isNew 
+              ? '<span class="ref-badge-new" style="display:inline-flex;align-items:center;padding:2px 7px;border-radius:999px;font-size:9.5px;font-weight:800;letter-spacing:0.5px;background:#0284c7;color:#ffffff;box-shadow:0 1px 3px rgba(2,132,199,0.3);margin-left:auto;flex-shrink:0;" title="Referensi Dokumen Baru (Belum Digunakan)">NEW</span>' 
+              : (!it.isUnused
+                  ? '<span class="ref-badge-used" style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;margin-left:auto;flex-shrink:0;" title="Sudah dicatat di transaksi Kas & Bank">Sudah Dipakai</span>'
+                  : '');
+
             html += '<label class="kb-select-item' + isSelected + isNewClass + '">' +
               '<div style="display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">' +
                 '<input type="radio" name="optReferensi" value="' + escapeHtml(it.kode) + '" data-label="' + escapeHtml(it.kode) + '" data-desc="' + escapeHtml(it.keterangan) + '"' + isChecked + ' />' +
                 '<span class="ref-badge ' + badgeClass + '">' + badgeText + '</span>' +
                 '<span style="font-weight: 600; color: #0f172a; font-size: 12.5px;">' + escapeHtml(it.kode) + '</span>' +
                 '<span style="color: #64748b; font-size: 12px; margin-left: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">' + escapeHtml(it.keterangan ? it.keterangan : '') + '</span>' +
-                newBadgeHtml +
+                statusBadgeHtml +
               '</div>' +
             '</label>';
           });
@@ -5714,6 +5927,49 @@
           }
         }
 
+        // 2a. Khusus Referensi dari Invoice Pendapatan (INV-...):
+        if (pnd || (refItem && (refItem.labelTipe === 'Invoice' || /^INV-/i.test(code)))) {
+          setJenisValue('Pendapatan', 'Pendapatan');
+          const nomInv = pnd
+            ? Number(pnd.totalTagihan !== undefined ? pnd.totalTagihan : (Number(pnd.dpp || 0) + Number(pnd.ppn || 0)))
+            : (refItem ? Number(refItem.nominal || 0) : 0);
+          if (nomInv > 0) {
+            if (kbUangKeluar) kbUangKeluar.value = '';
+            if (kbUangMasuk) kbUangMasuk.value = formatRupiahInput(nomInv);
+            autoCalcSaldo();
+          }
+          const divInv = pnd ? pnd.divisi : (refItem ? refItem.divisi : '');
+          if (divInv && divInv !== '-') {
+            setDivisiValue(String(divInv).trim(), String(divInv).trim());
+          }
+        }
+
+        // 2a-2. Khusus Referensi dari Pengeluaran & Beban / Approval (EXP-... / PB-... / APR-...):
+        if (refItem && (refItem.labelTipe === 'Pengeluaran' || refItem.source === 'approval_pengeluaran' || /^(EXP-|PB-|APR-)/i.test(code))) {
+          setJenisValue('Pengeluaran Beban', 'Pengeluaran Beban');
+          if (refItem.nominal && refItem.nominal > 0) {
+            if (kbUangMasuk) kbUangMasuk.value = '';
+            if (kbUangKeluar) kbUangKeluar.value = formatRupiahInput(refItem.nominal);
+            autoCalcSaldo();
+          }
+          if (refItem.divisi && refItem.divisi !== '-') {
+            setDivisiValue(refItem.divisi, refItem.divisi);
+          }
+        }
+
+        // 2a-3. Khusus Referensi dari Pajak (PJK-...):
+        if (refItem && (refItem.source === 'pajak' || /^PJK-/i.test(code))) {
+          setJenisValue('Pajak', 'Pajak');
+          if (refItem.nominal && refItem.nominal > 0) {
+            if (kbUangMasuk) kbUangMasuk.value = '';
+            if (kbUangKeluar) kbUangKeluar.value = formatRupiahInput(refItem.nominal);
+            autoCalcSaldo();
+          }
+          if (refItem.divisi && refItem.divisi !== '-') {
+            setDivisiValue(refItem.divisi, refItem.divisi);
+          }
+        }
+
         // 2b. Khusus Referensi dari Utang Karyawan (Pengeluaran Pinjaman Karyawan):
         // Otomatis set Jenis = Pinjaman Karyawan, Uang Keluar = Pokok Pinjaman, dan Divisi Karyawan
         if (refItem && (refItem.source === 'utang_karyawan' || /^LOAN-/i.test(code))) {
@@ -5758,6 +6014,30 @@
             const coa1001 = getMasterCoaList().find(function (c) { return String(c.kode) === '1001'; });
             setKodeCoaValue('1001', coa1001 ? formatCoaOptionLabel(coa1001) : '1001 | Kas Kecil');
           }
+        }
+
+        // 2e. Khusus Referensi dari Pengajuan Barang & Jasa (PBJ-...):
+        if (refItem && (refItem.source === 'pengajuan_bj' || /^PBJ-/i.test(code))) {
+          setJenisValue('Pengeluaran Beban', 'Pengeluaran Beban');
+          if (refItem.nominal && refItem.nominal > 0) {
+            if (kbUangMasuk) kbUangMasuk.value = '';
+            if (kbUangKeluar) kbUangKeluar.value = formatRupiahInput(refItem.nominal);
+            autoCalcSaldo();
+          }
+          if (refItem.divisi && refItem.divisi !== '-') {
+            setDivisiValue(refItem.divisi, refItem.divisi);
+          }
+        }
+
+        // 2f. Khusus Referensi dari Tagihan Berkala (TB-...):
+        if (refItem && (refItem.source === 'tagihan_berkala' || /^TB-/i.test(code))) {
+          setJenisValue('Pengeluaran Beban', 'Pengeluaran Beban');
+          if (refItem.nominal && refItem.nominal > 0) {
+            if (kbUangMasuk) kbUangMasuk.value = '';
+            if (kbUangKeluar) kbUangKeluar.value = formatRupiahInput(refItem.nominal);
+            autoCalcSaldo();
+          }
+          setDivisiValue('Operasional', 'Operasional');
         }
 
         // 3. Auto-fill Project / Brand
@@ -7586,7 +7866,7 @@
           autoCalcSaldo();
           renderTable();
         }
-        if (e.key === 'accounting_pendapatan_data_v1' || e.key === 'accounting_pengeluaran_beban_data_v5' || e.key === 'BISA_APPROVAL_PENGELUARAN_DATA_V5' || e.key === 'accounting_utang_karyawan_data' || e.key === 'accounting_piutang_karyawan_data' || e.key === 'bisa_payroll_data_v1' || e.key === 'accounting_payroll_data_v1') {
+        if (e.key === 'accounting_pendapatan_data_v1' || e.key === 'accounting_pengeluaran_beban_data_v5' || e.key === 'BISA_APPROVAL_PENGELUARAN_DATA_V5' || e.key === 'accounting_utang_karyawan_data' || e.key === 'accounting_piutang_karyawan_data' || e.key === 'bisa_payroll_data_v1' || e.key === 'accounting_payroll_data_v1' || e.key === 'accounting_pengajuan_barang_jasa_v1' || e.key === 'accounting_tagihan_berkala_v2' || e.key === 'bisa_pajak_data_v1' || e.key === 'accounting_referensi_updates_v1') {
           kbData = loadData();
           renderReferensiDropdownItems(searchReferensiDokumen ? searchReferensiDokumen.value : '');
           renderProjectBrandDropdownItems(searchProjectBrand ? searchProjectBrand.value : '');
@@ -7623,6 +7903,30 @@
 
       window.addEventListener('payroll_data_changed', function () {
         renderReferensiDropdownItems(searchReferensiDokumen ? searchReferensiDokumen.value : '');
+      });
+
+      // Sinkronisasi realtime dalam tab yang sama: setiap kali transaksi Kas & Bank
+      // disimpan/dihapus, status NEW pada dropdown Referensi Dokumen langsung diperbarui.
+      window.addEventListener('accounting_kas_bank_changed', function () {
+        renderReferensiDropdownItems(
+          searchReferensiDokumen ? searchReferensiDokumen.value : '',
+          filterReferensiKategori ? filterReferensiKategori.value : 'all'
+        );
+        renderProjectBrandDropdownItems(searchProjectBrand ? searchProjectBrand.value : '');
+      });
+
+      window.addEventListener('pendapatanUpdated', function () {
+        renderReferensiDropdownItems(
+          searchReferensiDokumen ? searchReferensiDokumen.value : '',
+          filterReferensiKategori ? filterReferensiKategori.value : 'all'
+        );
+      });
+
+      window.addEventListener('pengeluaranBebanUpdated', function () {
+        renderReferensiDropdownItems(
+          searchReferensiDokumen ? searchReferensiDokumen.value : '',
+          filterReferensiKategori ? filterReferensiKategori.value : 'all'
+        );
       });
 
       renderJenisDropdownItems();

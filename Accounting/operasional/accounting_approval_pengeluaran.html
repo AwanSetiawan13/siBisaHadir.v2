@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" translate="no" class="notranslate">
 
 <head>
+  <meta name="google" content="notranslate" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Approval Pengeluaran | Bisa Media</title>
@@ -2513,7 +2514,7 @@
   </div>
 
   <!-- Layout Script -->
-  <script src="../../assets/js/layout.js?v=20261119_v1"></script>
+  <script src="../../assets/js/layout.js?v=20261123_v4"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup"></script>
 
   <!-- Module Implementation Script -->
@@ -3597,7 +3598,8 @@
             statusManager: sm,
             statusDirektur: sd,
             statusFinal: sf,
-            catatan: pndCatatan.value.trim() || '-'
+            catatan: pndCatatan.value.trim() || '-',
+            updatedAt: Date.now()
           };
 
           const prevSnapshotMap = new Map();
@@ -3614,7 +3616,12 @@
             }
           } else {
             payload.id = 'apr-' + Date.now();
+            payload.createdAt = Date.now();
             appData.unshift(payload);
+          }
+
+          if (typeof window.recordAccountingReferensiUpdate === 'function' && payload.idApproval) {
+            window.recordAccountingReferensiUpdate(payload.idApproval);
           }
 
           saveData(prevSnapshotMap);
