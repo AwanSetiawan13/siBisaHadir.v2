@@ -1353,6 +1353,13 @@
       margin-bottom: 24px;
     }
 
+    .pnd-form-subgrid-2col {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px 20px;
+    }
+
     .pnd-field {
       display: flex;
       flex-direction: column;
@@ -1822,6 +1829,10 @@
       }
 
       .pnd-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pnd-form-subgrid-2col {
         grid-template-columns: 1fr;
       }
     }
@@ -2792,16 +2803,22 @@
                     <span>ID Pendapatan</span>
                   </label>
                 </th>
-                <th class="th-pinnable" data-col="tanggal_pengakuan">
-                  <label class="th-pin-wrapper" title="Kunci / Pin kolom Tanggal Pengakuan agar tetap terlihat saat scroll">
-                    <input type="checkbox" class="chk-pin-col" data-col="tanggal_pengakuan" id="chkFixedTanggalPengakuan" checked />
-                    <span>Tanggal Pengakuan</span>
+                <th class="th-pinnable" data-col="id_pembayaran">
+                  <label class="th-pin-wrapper" title="Kunci / Pin kolom ID Pembayaran agar tetap terlihat saat scroll">
+                    <input type="checkbox" class="chk-pin-col" data-col="id_pembayaran" id="chkFixedIdPembayaran" />
+                    <span>ID Pembayaran</span>
                   </label>
                 </th>
                 <th class="th-pinnable" data-col="no_invoice">
                   <label class="th-pin-wrapper" title="Kunci / Pin kolom No. Invoice agar tetap terlihat saat scroll">
                     <input type="checkbox" class="chk-pin-col" data-col="no_invoice" id="chkFixedNoInvoice" checked />
                     <span>No. Invoice</span>
+                  </label>
+                </th>
+                <th class="th-pinnable" data-col="tanggal_pengakuan">
+                  <label class="th-pin-wrapper" title="Kunci / Pin kolom Tanggal Pengakuan agar tetap terlihat saat scroll">
+                    <input type="checkbox" class="chk-pin-col" data-col="tanggal_pengakuan" id="chkFixedTanggalPengakuan" checked />
+                    <span>Tanggal Pengakuan</span>
                   </label>
                 </th>
                 <th>Customer</th>
@@ -2842,12 +2859,23 @@
         <input type="hidden" id="pndEditId" />
 
         <div class="pnd-form-grid">
-          <!-- Row 1: ID Pendapatan, Tgl Pengakuan, Customer -->
+          <!-- Row 1: ID Pendapatan, ID Pembayaran, No. Invoice -->
           <div class="pnd-field">
             <label class="pnd-label" for="pndIdPendapatan">ID Pendapatan</label>
-            <input type="text" id="pndIdPendapatan" class="pnd-input" placeholder="Tambah ID" required />
+            <input type="text" id="pndIdPendapatan" class="pnd-input pnd-input-readonly" placeholder="Otomatis (AI Auto Increment)" readonly tabindex="-1" required />
           </div>
 
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndIdPembayaran">ID Pembayaran</label>
+            <input type="text" id="pndIdPembayaran" class="pnd-input" placeholder="Contoh: 7691348184035411741" />
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndNoInvoice">No. Invoice</label>
+            <input type="text" id="pndNoInvoice" class="pnd-input" placeholder="INV-202609-001" required />
+          </div>
+
+          <!-- Row 2: Tgl Pengakuan, Customer, Project/Brand -->
           <div class="pnd-field">
             <label class="pnd-label" for="pndTglPengakuan">Tgl Pengakuan</label>
             <div class="bisa-datepicker-wrap">
@@ -2868,12 +2896,12 @@
             <input type="text" id="pndCustomer" class="pnd-input" placeholder="Tambah Customer" required />
           </div>
 
-          <!-- Row 2: No. Invoice, Kode COA, Divisi -->
           <div class="pnd-field">
-            <label class="pnd-label" for="pndNoInvoice">No. Invoice</label>
-            <input type="text" id="pndNoInvoice" class="pnd-input pnd-input-readonly" placeholder="Otomatis (AI Auto Increment)" readonly tabindex="-1" required />
+            <label class="pnd-label" for="pndProjectBrand">Project/Brand</label>
+            <input type="text" id="pndProjectBrand" class="pnd-input" placeholder="Project/Brand" />
           </div>
 
+          <!-- Row 3: Kode COA, Divisi, Keterangan -->
           <div class="pnd-field">
             <label class="pnd-label">Kode COA</label>
             <div class="pnd-select-wrap" id="wrapKodeCoa">
@@ -2916,16 +2944,29 @@
           </div>
 
           <div class="pnd-field">
-            <label class="pnd-label" for="pndDivisi">Divisi</label>
-            <input type="text" id="pndDivisi" class="pnd-input pnd-input-readonly" placeholder="Otomatis Master COA" readonly tabindex="-1" />
+            <label class="pnd-label">Divisi</label>
+            <div class="pnd-select-wrap" id="wrapDivisi">
+              <div class="pnd-select-btn" id="btnTriggerDivisi">
+                <span id="labelDivisi">Pilih Divisi</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndDivisi" required />
+              <div class="pnd-select-dropdown" id="dropdownDivisi">
+                <!-- Dropdown opsi divisi terfilter sesuai Sub Perusahaan dari Kode COA -->
+              </div>
+            </div>
           </div>
 
-          <!-- Row 3: Keterangan, DPP, PPN -->
           <div class="pnd-field">
             <label class="pnd-label" for="pndKeterangan">Keterangan</label>
             <input type="text" id="pndKeterangan" class="pnd-input" placeholder="Tambah Keterangan" />
           </div>
 
+          <!-- Row 4: DPP, PPN, Total Tagihan -->
           <div class="pnd-field">
             <label class="pnd-label" for="pndDpp">DPP</label>
             <input type="text" id="pndDpp" class="pnd-input" placeholder="Rp. -" autocomplete="off" />
@@ -2936,12 +2977,12 @@
             <input type="text" id="pndPpn" class="pnd-input" placeholder="Rp. -" autocomplete="off" />
           </div>
 
-          <!-- Row 4: Total Tagihan, Terbayar Kas, Sisa Piutang -->
           <div class="pnd-field">
             <label class="pnd-label" for="pndTotalTagihan">Total Tagihan</label>
             <input type="text" id="pndTotalTagihan" class="pnd-input pnd-input-readonly" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
 
+          <!-- Row 5: Terbayar Kas, Sisa Piutang, Status -->
           <div class="pnd-field">
             <label class="pnd-label" for="pndTerbayarKas">Terbayar Kas</label>
             <input type="text" id="pndTerbayarKas" class="pnd-input pnd-input-readonly" placeholder="Rp. -" readonly tabindex="-1" />
@@ -2953,121 +2994,75 @@
             <input type="text" id="pndSisaPiutang" class="pnd-input pnd-input-readonly" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
 
-          <!-- Row 5: Jatuh Tempo, Project/Brand, Status Lama (Auto Fill & Readonly) -->
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndJatuhTempo">Jatuh Tempo</label>
-            <div class="bisa-datepicker-wrap">
-              <input type="text" id="pndJatuhTempo" class="pnd-input bisa-datepicker-input" placeholder="dd/mm/yyyy" autocomplete="off" />
-              <span class="bisa-datepicker-icon" title="Pilih Tanggal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </span>
-            </div>
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndProjectBrand">Project/Brand</label>
-            <input type="text" id="pndProjectBrand" class="pnd-input" placeholder="Project/Brand" />
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndStatusLama">Status Lama</label>
-            <input type="text" id="pndStatusLama" class="pnd-input pnd-input-readonly" placeholder="Otomatis Rumus" readonly tabindex="-1" style="cursor: not-allowed; pointer-events: none; background-color: #f1f5f9;" />
-          </div>
-
-          <!-- Row 6: Tanggal Bayar Lama, Akun Lama, PIC (Auto Fill & Readonly) -->
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndTanggalBayarLama">Tanggal Bayar Lama</label>
-            <div class="bisa-datepicker-wrap" style="pointer-events: none; cursor: not-allowed;">
-              <input type="text" id="pndTanggalBayarLama" class="pnd-input pnd-input-readonly bisa-datepicker-input" placeholder="Otomatis Tanggal" readonly tabindex="-1" autocomplete="off" style="cursor: not-allowed; pointer-events: none; background-color: #f1f5f9;" />
-              <span class="bisa-datepicker-icon" title="Otomatis" style="pointer-events: none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </span>
-            </div>
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndAkunLama">Akun Lama</label>
-            <input type="text" id="pndAkunLama" class="pnd-input pnd-input-readonly" placeholder="Otomatis Bank" readonly tabindex="-1" style="cursor: not-allowed; pointer-events: none; background-color: #f1f5f9;" />
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label">PIC</label>
-            <div class="pnd-select-wrap" id="wrapPic">
-              <div class="pnd-select-btn" id="btnTriggerPic">
-                <span id="labelPic">Pilih Nama PIC</span>
-                <span class="pnd-select-arrow">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </span>
-              </div>
-              <input type="hidden" id="pndPic" />
-              <div class="pnd-select-dropdown" id="dropdownPic">
-                <!-- Diisi dinamis dari accounting_master_penanggung_jawab_v1 -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Row 7: Bukti dengan Ikon Mata Preview, Status, Nama Akun COA -->
-          <div class="pnd-field">
-            <label class="pnd-label">Bukti</label>
-            <div class="pnd-file-box">
-              <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                <label for="pndBuktiInput" class="pnd-file-btn">Choose File</label>
-                <span id="pndBuktiFileName" class="pnd-file-name">Belum ada file</span>
-              </div>
-              <button type="button" id="btnPreviewBuktiForm" class="pnd-eye-btn" title="Lihat Bukti Transaksi">
-                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              </button>
-              <input type="file" id="pndBuktiInput" accept="image/*,.pdf" style="display: none;" />
-            </div>
-          </div>
-
           <div class="pnd-field">
             <label class="pnd-label" for="pndStatus">Status</label>
             <input type="text" id="pndStatus" class="pnd-input pnd-input-readonly" placeholder="Lunas" readonly tabindex="-1" />
           </div>
 
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndNamaAkunCoa">Nama Akun COA</label>
-            <input type="text" id="pndNamaAkunCoa" class="pnd-input pnd-input-readonly" placeholder="Otomatis Master COA" readonly tabindex="-1" />
-          </div>
-
-          <!-- Row 8: Kelompok COA, Status COA, Divisi Pengecualian -->
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndKelompokCoa">Kelompok COA</label>
-            <input type="text" id="pndKelompokCoa" class="pnd-input pnd-input-readonly" placeholder="Otomatis Master COA" readonly tabindex="-1" />
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndStatusCoa">Status COA (Opsional)</label>
-            <input type="text" id="pndStatusCoa" class="pnd-input" placeholder="Otomatis / Cek Sesuai" />
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label">Divisi Pengecualian (Opsional)</label>
-            <div class="pnd-select-wrap" id="wrapDivisiPengecualian">
-              <div class="pnd-select-btn" id="btnTriggerDivisiPengecualian">
-                <span id="labelDivisiPengecualian">Pilih atau ketik divisi</span>
-                <span class="pnd-select-arrow">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
+          <!-- Row 6 & 7: Grid 2-2 (Jatuh Tempo, PIC | Bukti, Divisi Pengecualian) -->
+          <div class="pnd-form-subgrid-2col">
+            <div class="pnd-field">
+              <label class="pnd-label" for="pndJatuhTempo">Jatuh Tempo</label>
+              <div class="bisa-datepicker-wrap">
+                <input type="text" id="pndJatuhTempo" class="pnd-input bisa-datepicker-input" placeholder="dd/mm/yyyy" autocomplete="off" />
+                <span class="bisa-datepicker-icon" title="Pilih Tanggal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
                   </svg>
                 </span>
               </div>
-              <input type="hidden" id="pndDivisiPengecualian" />
-              <div class="pnd-select-dropdown" id="dropdownDivisiPengecualian">
-                <!-- Diisi dinamis dari accounting_master_divisi_v1 -->
+            </div>
+
+            <div class="pnd-field">
+              <label class="pnd-label">PIC</label>
+              <div class="pnd-select-wrap" id="wrapPic">
+                <div class="pnd-select-btn" id="btnTriggerPic">
+                  <span id="labelPic">Pilih Nama PIC</span>
+                  <span class="pnd-select-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </span>
+                </div>
+                <input type="hidden" id="pndPic" />
+                <div class="pnd-select-dropdown" id="dropdownPic">
+                  <!-- Diisi dinamis dari accounting_master_penanggung_jawab_v1 -->
+                </div>
+              </div>
+            </div>
+
+            <div class="pnd-field">
+              <label class="pnd-label">Bukti</label>
+              <div class="pnd-file-box">
+                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                  <label for="pndBuktiInput" class="pnd-file-btn">Choose File</label>
+                  <span id="pndBuktiFileName" class="pnd-file-name">Belum ada file</span>
+                </div>
+                <button type="button" id="btnPreviewBuktiForm" class="pnd-eye-btn" title="Lihat Bukti Transaksi">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </button>
+                <input type="file" id="pndBuktiInput" accept="image/*,.pdf" style="display: none;" />
+              </div>
+            </div>
+
+            <div class="pnd-field">
+              <label class="pnd-label">Divisi Pengecualian (Opsional)</label>
+              <div class="pnd-select-wrap" id="wrapDivisiPengecualian">
+                <div class="pnd-select-btn" id="btnTriggerDivisiPengecualian">
+                  <span id="labelDivisiPengecualian">Pilih atau ketik divisi</span>
+                  <span class="pnd-select-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </span>
+                </div>
+                <input type="hidden" id="pndDivisiPengecualian" />
+                <div class="pnd-select-dropdown" id="dropdownDivisiPengecualian">
+                  <!-- Diisi dinamis dari accounting_master_divisi_v1 -->
+                </div>
               </div>
             </div>
           </div>
@@ -3095,11 +3090,21 @@
       <div class="pnd-modal-divider"></div>
 
       <div class="pnd-form-grid">
-        <!-- Row 1 -->
+        <!-- Row 1: ID Pendapatan, ID Pembayaran, No. Invoice -->
         <div class="pnd-field">
           <label class="pnd-label">ID Pendapatan</label>
           <input type="text" id="viewPndIdPendapatan" class="pnd-input is-muted" readonly />
         </div>
+        <div class="pnd-field">
+          <label class="pnd-label">ID Pembayaran</label>
+          <input type="text" id="viewPndIdPembayaran" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">No. Invoice</label>
+          <input type="text" id="viewPndNoInvoice" class="pnd-input is-muted" readonly />
+        </div>
+
+        <!-- Row 2: Tgl Pengakuan, Customer, Project/Brand -->
         <div class="pnd-field">
           <label class="pnd-label">Tgl Pengakuan</label>
           <input type="text" id="viewPndTglPengakuan" class="pnd-input is-muted" readonly />
@@ -3108,12 +3113,12 @@
           <label class="pnd-label">Customer</label>
           <input type="text" id="viewPndCustomer" class="pnd-input is-muted" readonly />
         </div>
-
-        <!-- Row 2 -->
         <div class="pnd-field">
-          <label class="pnd-label">No. Invoice</label>
-          <input type="text" id="viewPndNoInvoice" class="pnd-input is-muted" readonly />
+          <label class="pnd-label">Project/Brand</label>
+          <input type="text" id="viewPndProjectBrand" class="pnd-input is-muted" readonly />
         </div>
+
+        <!-- Row 3: Kode COA, Divisi, Keterangan -->
         <div class="pnd-field">
           <label class="pnd-label">Kode COA</label>
           <input type="text" id="viewPndKodeCoa" class="pnd-input is-muted" readonly />
@@ -3122,12 +3127,12 @@
           <label class="pnd-label">Divisi</label>
           <input type="text" id="viewPndDivisi" class="pnd-input is-muted" readonly />
         </div>
-
-        <!-- Row 3 -->
         <div class="pnd-field">
           <label class="pnd-label">Keterangan</label>
           <input type="text" id="viewPndKeterangan" class="pnd-input is-muted" readonly />
         </div>
+
+        <!-- Row 4: DPP, PPN, Total Tagihan -->
         <div class="pnd-field">
           <label class="pnd-label">DPP</label>
           <input type="text" id="viewPndDpp" class="pnd-input is-muted" readonly />
@@ -3136,12 +3141,12 @@
           <label class="pnd-label">PPN</label>
           <input type="text" id="viewPndPpn" class="pnd-input is-muted" readonly />
         </div>
-
-        <!-- Row 4 -->
         <div class="pnd-field">
           <label class="pnd-label">Total Tagihan</label>
           <input type="text" id="viewPndTotalTagihan" class="pnd-input is-muted" readonly />
         </div>
+
+        <!-- Row 5: Terbayar Kas, Sisa Piutang, Status -->
         <div class="pnd-field">
           <label class="pnd-label">Terbayar Kas</label>
           <input type="text" id="viewPndTerbayarKas" class="pnd-input is-muted" readonly />
@@ -3150,64 +3155,32 @@
           <label class="pnd-label">Sisa Piutang</label>
           <input type="text" id="viewPndSisaPiutang" class="pnd-input is-muted" readonly />
         </div>
-
-        <!-- Row 5 -->
-        <div class="pnd-field">
-          <label class="pnd-label">Jatuh Tempo</label>
-          <input type="text" id="viewPndJatuhTempo" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Project/Brand</label>
-          <input type="text" id="viewPndProjectBrand" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Status Lama</label>
-          <input type="text" id="viewPndStatusLama" class="pnd-input is-muted" readonly />
-        </div>
-
-        <!-- Row 6 -->
-        <div class="pnd-field">
-          <label class="pnd-label">Tanggal Bayar Lama</label>
-          <input type="text" id="viewPndTanggalBayarLama" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Akun Lama</label>
-          <input type="text" id="viewPndAkunLama" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">PIC</label>
-          <input type="text" id="viewPndPic" class="pnd-input is-muted" readonly />
-        </div>
-
-        <!-- Row 7 -->
-        <div class="pnd-field">
-          <label class="pnd-label">Bukti</label>
-          <button type="button" id="viewPndBuktiBtn" class="pnd-btn-lihat-bukti">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            Lihat Bukti
-          </button>
-        </div>
         <div class="pnd-field">
           <label class="pnd-label">Status</label>
           <input type="text" id="viewPndStatus" class="pnd-input is-muted" readonly />
         </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Nama Akun COA</label>
-          <input type="text" id="viewPndNamaAkunCoa" class="pnd-input is-muted" readonly />
-        </div>
 
-        <!-- Row 8 -->
-        <div class="pnd-field">
-          <label class="pnd-label">Kelompok COA</label>
-          <input type="text" id="viewPndKelompokCoa" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Status COA</label>
-          <input type="text" id="viewPndStatusCoa" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Divisi Pengecualian</label>
-          <input type="text" id="viewPndDivisiPengecualian" class="pnd-input is-muted" readonly />
+        <!-- Row 6 & 7: Grid 2-2 (Jatuh Tempo, PIC | Bukti, Divisi Pengecualian) -->
+        <div class="pnd-form-subgrid-2col">
+          <div class="pnd-field">
+            <label class="pnd-label">Jatuh Tempo</label>
+            <input type="text" id="viewPndJatuhTempo" class="pnd-input is-muted" readonly />
+          </div>
+          <div class="pnd-field">
+            <label class="pnd-label">PIC</label>
+            <input type="text" id="viewPndPic" class="pnd-input is-muted" readonly />
+          </div>
+          <div class="pnd-field">
+            <label class="pnd-label">Bukti</label>
+            <button type="button" id="viewPndBuktiBtn" class="pnd-btn-lihat-bukti">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M1 12s4-8 11-8 11 8 11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              Lihat Bukti
+            </button>
+          </div>
+          <div class="pnd-field">
+            <label class="pnd-label">Divisi Pengecualian</label>
+            <input type="text" id="viewPndDivisiPengecualian" class="pnd-input is-muted" readonly />
+          </div>
         </div>
       </div>
 
@@ -3747,7 +3720,8 @@
         return [
           {
             id: 'pnd-1',
-            idPendapatan: '7691348184035411733',
+            idPendapatan: 'PND-2026-001',
+            idPembayaran: '7691348184035411733',
             tanggalPengakuan: '2026-10-01',
             customer: 'TikTok',
             noInvoice: 'INV-202609-001',
@@ -3773,7 +3747,8 @@
           },
           {
             id: 'pnd-2',
-            idPendapatan: '7691348184035411734',
+            idPendapatan: 'PND-2026-002',
+            idPembayaran: '7691348184035411734',
             tanggalPengakuan: '2026-09-01',
             customer: 'Campaign Brand A',
             noInvoice: 'INV-202609-002',
@@ -3799,7 +3774,8 @@
           },
           {
             id: 'pnd-3',
-            idPendapatan: '7691348184035411736',
+            idPendapatan: 'PND-2026-003',
+            idPembayaran: '7691348184035411736',
             tanggalPengakuan: '2026-10-15',
             customer: 'Shopee Live Media',
             noInvoice: 'INV-202609-003',
@@ -3825,7 +3801,8 @@
           },
           {
             id: 'pnd-4',
-            idPendapatan: '7691348184035411737',
+            idPendapatan: 'PND-2026-004',
+            idPembayaran: '7691348184035411737',
             tanggalPengakuan: '2026-08-10',
             customer: 'Brand Cosmo Style',
             noInvoice: 'INV-202609-004',
@@ -3851,7 +3828,8 @@
           },
           {
             id: 'pnd-5',
-            idPendapatan: '7691348184035411735',
+            idPendapatan: 'PND-2026-005',
+            idPembayaran: '7691348184035411735',
             tanggalPengakuan: '2026-09-12',
             customer: 'Shopee Live Media',
             noInvoice: 'INV-202609-005',
@@ -3877,7 +3855,8 @@
           },
           {
             id: 'pnd-6',
-            idPendapatan: '7691348184035411738',
+            idPendapatan: 'PND-2026-006',
+            idPembayaran: '7691348184035411738',
             tanggalPengakuan: '2026-09-20',
             customer: 'Serum Glow Indonesia',
             noInvoice: 'INV-202609-006',
@@ -3903,7 +3882,8 @@
           },
           {
             id: 'pnd-7',
-            idPendapatan: '7691348184035411739',
+            idPendapatan: 'PND-2026-007',
+            idPembayaran: '7691348184035411739',
             tanggalPengakuan: '2026-10-05',
             customer: 'Tap & Tsp Agency',
             noInvoice: 'INV-202609-007',
@@ -3929,7 +3909,8 @@
           },
           {
             id: 'pnd-8',
-            idPendapatan: '7691348184035411740',
+            idPendapatan: 'PND-2026-008',
+            idPembayaran: '7691348184035411740',
             tanggalPengakuan: '2026-10-01',
             customer: 'Klontong',
             noInvoice: 'INV-202609-008',
@@ -3982,7 +3963,26 @@
 
           if (Array.isArray(parsed) && parsed.length > 0) {
             let updated = false;
-            parsed.forEach(function (it) {
+            parsed.forEach(function (it, idx) {
+              const idPenStr = String(it && it.idPendapatan ? it.idPendapatan : '').trim();
+              // Jika data lama memiliki idPendapatan berupa angka transaksi panjang (seperti 7691348184035411733),
+              // pindahkan ke idPembayaran (input manual), lalu jadikan idPendapatan sequence auto-increment PND-2026-xxx
+              if (/^\d{10,}$/.test(idPenStr)) {
+                it.idPembayaran = idPenStr;
+                it.idPendapatan = 'PND-2026-' + String(idx + 1).padStart(3, '0');
+                updated = true;
+              } else if (!it.idPendapatan || !it.idPendapatan.toUpperCase().startsWith('PND-')) {
+                it.idPendapatan = 'PND-2026-' + String(idx + 1).padStart(3, '0');
+                updated = true;
+              }
+
+              if (!it.idPembayaran || /^PMB-/i.test(it.idPembayaran)) {
+                // Jika idPembayaran dummy PMB-, cek apakah ada mapping seed data yang sesuai
+                const matchSeed = seedData.find(function (s) { return s.noInvoice === it.noInvoice || s.customer === it.customer; });
+                it.idPembayaran = matchSeed ? matchSeed.idPembayaran : (it.idPembayaran && !/^PMB-/i.test(it.idPembayaran) ? it.idPembayaran : '-');
+                updated = true;
+              }
+
               if (it && it.noInvoice && /^INV-2026-(\d{3})$/i.test(it.noInvoice)) {
                 it.noInvoice = it.noInvoice.replace(/^INV-2026-/i, 'INV-202609-');
                 updated = true;
@@ -4271,8 +4271,9 @@
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '</td>',
             '<td data-col="id_pendapatan" style="color: #334155; font-style: italic;">' + escapeHtml(item.idPendapatan || '-') + '</td>',
-            '<td data-col="tanggal_pengakuan" style="color: #334155; font-style: italic; white-space: nowrap;">' + escapeHtml(formatTanggalDisplay(item.tanggalPengakuan)) + '</td>',
+            '<td data-col="id_pembayaran" style="color: #334155; font-style: italic; white-space: nowrap;">' + escapeHtml(item.idPembayaran || '-') + '</td>',
             '<td data-col="no_invoice" style="color: #334155; font-style: italic; white-space: nowrap;">' + escapeHtml(item.noInvoice || '-') + '</td>',
+            '<td data-col="tanggal_pengakuan" style="color: #334155; font-style: italic; white-space: nowrap;">' + escapeHtml(formatTanggalDisplay(item.tanggalPengakuan)) + '</td>',
             '<td data-col="customer" style="color: #334155; font-style: italic; white-space: nowrap;">' + escapeHtml(item.customer || '-') + '</td>',
             '<td data-col="project_brand" style="color: #0f172a; font-weight: 500; font-style: italic; white-space: nowrap;">' + escapeHtml(item.projectBrand || '-') + '</td>',
             '<td data-col="divisi" style="color: #334155; font-style: italic;">' + escapeHtml(item.divisi || '-') + '</td>',
@@ -4629,6 +4630,8 @@
       /* Custom Dropdowns (Kode COA, Akun Lama, PIC, Status Lama, Divisi Pengecualian) Handling in Form */
       function closeFormDropdowns() {
         if (wrapKodeCoa) wrapKodeCoa.classList.remove('is-open');
+        const wrapDivisi = document.getElementById('wrapDivisi');
+        if (wrapDivisi) wrapDivisi.classList.remove('is-open');
         if (wrapAkunLama) wrapAkunLama.classList.remove('is-open');
         if (wrapPic) wrapPic.classList.remove('is-open');
         if (wrapStatusLama) wrapStatusLama.classList.remove('is-open');
@@ -4645,52 +4648,68 @@
         }
         const namaInput = document.getElementById('pndNamaAkunCoa');
         const kelompokInput = document.getElementById('pndKelompokCoa');
-        const divisiInput = document.getElementById('pndDivisi');
         const statusCoaInput = document.getElementById('pndStatusCoa');
 
         if (namaInput && nama !== undefined) namaInput.value = nama;
         if (kelompokInput && kelompok !== undefined) kelompokInput.value = kelompok;
-        if (divisiInput && divisi !== undefined && divisi !== '') divisiInput.value = divisi;
         if (statusCoaInput && statusCoa !== undefined && statusCoa !== '') statusCoaInput.value = statusCoa;
 
         if (dropdownKodeCoa) {
           dropdownKodeCoa.querySelectorAll('input[name="optKodeCoa"]').forEach(function (radio) {
             radio.checked = String(radio.value) === String(val);
+            if (radio.parentElement) {
+              if (radio.checked) radio.parentElement.classList.add('is-selected');
+              else radio.parentElement.classList.remove('is-selected');
+            }
           });
         }
+
+        // Tentukan Sub Perusahaan dari Kode COA (MCN, TAP, TSP)
+        let subPerusahaan = 'MCN';
+        if (val === '4002' || /tap/i.test(label || nama || '')) subPerusahaan = 'TAP';
+        else if (val === '4003' || /tsp/i.test(label || nama || '')) subPerusahaan = 'TSP';
+        else subPerusahaan = 'MCN';
+
+        // Render Dropdown Divisi terfilter sesuai Sub Perusahaan
+        renderDivisiDropdown(subPerusahaan, divisi);
       }
 
+      // Hanya 3 data pendapatan utama yang tampil di Dropdown Kode COA: 4001 (MCN), 4002 (TAP), 4003 (TSP)
       function isPendapatanCoa(coa) {
         if (!coa || !coa.kode) return false;
         const k = String(coa.kode).trim();
-        return k.startsWith('4');
+        return ['4001', '4002', '4003'].includes(k);
       }
 
       function renderCoaDropdownItems() {
         if (!dropdownKodeCoa) return;
         dropdownKodeCoa.innerHTML = '';
-        const list = getMasterCoaList().filter(isPendapatanCoa);
-        if (list.length === 0) {
-          dropdownKodeCoa.innerHTML = '<div style="padding: 10px; color: #94a3b8; font-size: 12.5px; font-style: italic;">Belum ada akun Pendapatan (4000-an)</div>';
-          return;
-        }
+        
+        // 3 Data COA Pendapatan Spesifik
+        const default3Coa = [
+          { kode: '4001', nama: 'Pendapatan MCN', sub: 'MCN', divisiDefault: 'MCN' },
+          { kode: '4002', nama: 'Pendapatan TAP', sub: 'TAP', divisiDefault: 'TAP' },
+          { kode: '4003', nama: 'Pendapatan TSP', sub: 'TSP', divisiDefault: 'TSP' }
+        ];
 
+        const masterList = getMasterCoaList();
         const currentVal = pndKodeCoa ? pndKodeCoa.value : '';
-        list.forEach(function (coa) {
-          const kode = coa.kode || '';
-          const nama = coa.nama || coa.namaAkun || '';
-          const kelompok = coa.kelompok || coa.kelompokAkun || '';
-          const divisi = coa.devisDefault || coa.divisiDefault || coa.divisi || '';
-          const statusAktif = (coa.aktif === 'Tidak' ? 'Tidak Aktif' : 'Aktif (Ya)');
-          const labelText = kode + (nama ? ' | ' + nama : '');
 
-          const label = document.createElement('label');
+        default3Coa.forEach(function (item) {
+          const found = masterList.find(function (c) { return String(c.kode) === item.kode; });
+          const kode = item.kode;
+          const nama = found ? (found.nama || item.nama) : item.nama;
+          const labelText = kode + ' | ' + nama;
+          const kelompok = found ? (found.kelompok || 'Pendapatan') : 'Pendapatan';
+          const divisi = found ? (found.devisDefault || found.divisiDefault || item.divisiDefault) : item.divisiDefault;
+          const statusAktif = (found && found.aktif === 'Tidak') ? 'Tidak Aktif' : 'Aktif (Ya)';
+
           const isChecked = String(currentVal) === String(kode);
+          const label = document.createElement('label');
           label.className = 'pnd-select-item' + (isChecked ? ' is-selected' : '');
 
           label.innerHTML = [
             '<input type="radio" name="optKodeCoa" value="' + escapeHtml(kode) + '"' + (isChecked ? ' checked' : '') + ' />',
-            '',
             '<span class="pnd-item-label">' + escapeHtml(labelText) + '</span>'
           ].join('');
 
@@ -4703,7 +4722,145 @@
         });
       }
 
+      /* ===== DROPDOWN DIVISI (Menyesuaikan Sub Perusahaan dari Kode COA) ===== */
+      function inferSubPerusahaan(nama) {
+        if (!nama) return 'MCN';
+        const s = String(nama).toLowerCase();
+        if (s.includes('tap') || s.includes('agency') || s.includes('advertiser') || s.includes('account management') || s.includes('coo') || s.includes('hr') || s.includes('human resource') || s.includes('operasional') || s.includes('marketing & brand')) {
+          return 'TAP';
+        }
+        if (s.includes('tsp') || s.includes('produksi') || s.includes('creative') || s.includes('it') || s.includes('programer') || s.includes('general') || s.includes('clining') || s.includes('pentry') || s.includes('probability')) {
+          return 'TSP';
+        }
+        return 'MCN';
+      }
 
+      function getMasterDivisiObjects() {
+        try {
+          const raw = localStorage.getItem(DIVISI_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              return parsed.map(function (d) {
+                const nama = (typeof d === 'string' ? d : (d.nama || d.divisi || '')).trim();
+                const sub = (typeof d === 'object' && d.subPerusahaan) ? d.subPerusahaan : inferSubPerusahaan(nama);
+                return { id: (d && d.id) ? d.id : nama, nama: nama, subPerusahaan: (sub || 'MCN').toUpperCase() };
+              }).filter(function (d) { return d.nama.length > 0; });
+            }
+          }
+        } catch (e) {}
+
+        return [
+          { nama: 'MCN', subPerusahaan: 'MCN' },
+          { nama: 'SPV KOL Management', subPerusahaan: 'MCN' },
+          { nama: 'Staf KOL Management', subPerusahaan: 'MCN' },
+          { nama: 'SPV Live Management', subPerusahaan: 'MCN' },
+          { nama: 'Staf Live Management', subPerusahaan: 'MCN' },
+          { nama: 'SPV Content Management', subPerusahaan: 'MCN' },
+          { nama: 'Staf Content Management', subPerusahaan: 'MCN' },
+          { nama: 'Live HUB', subPerusahaan: 'MCN' },
+          { nama: 'Event', subPerusahaan: 'MCN' },
+          { nama: 'Marketing', subPerusahaan: 'MCN' },
+          { nama: 'Accounting', subPerusahaan: 'MCN' },
+          { nama: 'Finance & Accounting', subPerusahaan: 'MCN' },
+          { nama: 'TAP', subPerusahaan: 'TAP' },
+          { nama: 'Manager TAP', subPerusahaan: 'TAP' },
+          { nama: 'Agency', subPerusahaan: 'TAP' },
+          { nama: 'SPV Account Management', subPerusahaan: 'TAP' },
+          { nama: 'Staf Account Management', subPerusahaan: 'TAP' },
+          { nama: 'SPV Advertiser', subPerusahaan: 'TAP' },
+          { nama: 'Staf Advertiser', subPerusahaan: 'TAP' },
+          { nama: 'Operasional', subPerusahaan: 'TAP' },
+          { nama: 'HR', subPerusahaan: 'TAP' },
+          { nama: 'TSP', subPerusahaan: 'TSP' },
+          { nama: 'Manager TSP', subPerusahaan: 'TSP' },
+          { nama: 'Produksi', subPerusahaan: 'TSP' },
+          { nama: 'SPV Creative', subPerusahaan: 'TSP' },
+          { nama: 'Staf Creative', subPerusahaan: 'TSP' },
+          { nama: 'Creative & Design', subPerusahaan: 'TSP' },
+          { nama: 'SPV IT Programer', subPerusahaan: 'TSP' },
+          { nama: 'Staf Information Technology', subPerusahaan: 'TSP' },
+          { nama: 'IT & Development', subPerusahaan: 'TSP' }
+        ];
+      }
+
+      function setDivisiValue(val) {
+        const inputDivisi = document.getElementById('pndDivisi');
+        const labelDivisi = document.getElementById('labelDivisi');
+        const btnTriggerDivisi = document.getElementById('btnTriggerDivisi');
+        const dropdownDivisi = document.getElementById('dropdownDivisi');
+
+        if (inputDivisi) inputDivisi.value = val || '';
+        if (labelDivisi) labelDivisi.textContent = val || 'Pilih Divisi';
+
+        if (btnTriggerDivisi) {
+          if (val) btnTriggerDivisi.classList.add('has-value');
+          else btnTriggerDivisi.classList.remove('has-value');
+        }
+
+        if (dropdownDivisi) {
+          dropdownDivisi.querySelectorAll('input[name="optDivisi"]').forEach(function (radio) {
+            radio.checked = String(radio.value) === String(val);
+            if (radio.parentElement) {
+              if (radio.checked) radio.parentElement.classList.add('is-selected');
+              else radio.parentElement.classList.remove('is-selected');
+            }
+          });
+        }
+      }
+
+      function renderDivisiDropdown(subPerusahaan, preferredDivisi) {
+        const dropdownDivisi = document.getElementById('dropdownDivisi');
+        if (!dropdownDivisi) return;
+        dropdownDivisi.innerHTML = '';
+
+        const allDivisi = getMasterDivisiObjects();
+        const targetSub = (subPerusahaan || 'MCN').toUpperCase();
+
+        const filtered = allDivisi.filter(function (d) {
+          const sub = (d.subPerusahaan || inferSubPerusahaan(d.nama) || 'MCN').toUpperCase();
+          return sub === targetSub;
+        });
+
+        if (filtered.length === 0) {
+          dropdownDivisi.innerHTML = '<div style="padding: 10px; color: #94a3b8; font-size: 12.5px; font-style: italic;">Belum ada divisi untuk ' + targetSub + '</div>';
+          setDivisiValue('');
+          return;
+        }
+
+        // Tentukan nilai terpilih
+        let chosenVal = '';
+        if (preferredDivisi && filtered.some(function (d) { return (d.nama || '').toUpperCase() === String(preferredDivisi).toUpperCase(); })) {
+          const matched = filtered.find(function (d) { return (d.nama || '').toUpperCase() === String(preferredDivisi).toUpperCase(); });
+          chosenVal = matched ? matched.nama : preferredDivisi;
+        } else {
+          // Default ke divisi yang bernama sama dengan Sub Perusahaan, atau item pertama
+          const sameName = filtered.find(function (d) { return (d.nama || '').toUpperCase() === targetSub; });
+          chosenVal = sameName ? sameName.nama : (filtered[0] ? filtered[0].nama : '');
+        }
+
+        setDivisiValue(chosenVal);
+
+        filtered.forEach(function (d) {
+          const nama = d.nama || '';
+          const isChecked = String(chosenVal) === String(nama);
+
+          const label = document.createElement('label');
+          label.className = 'pnd-select-item' + (isChecked ? ' is-selected' : '');
+
+          label.innerHTML = [
+            '<input type="radio" name="optDivisi" value="' + escapeHtml(nama) + '"' + (isChecked ? ' checked' : '') + ' />',
+            '<span class="pnd-item-label">' + escapeHtml(nama) + '</span>'
+          ].join('');
+
+          label.querySelector('input').addEventListener('change', function () {
+            setDivisiValue(nama);
+            closeFormDropdowns();
+          });
+
+          dropdownDivisi.appendChild(label);
+        });
+      }
 
       function setAkunLamaValue(val) {
         if (pndAkunLama) pndAkunLama.value = val || '';
@@ -4898,6 +5055,19 @@
       }
 
       // Dropdown Triggers
+      const wrapDivisi = document.getElementById('wrapDivisi');
+      const btnTriggerDivisi = document.getElementById('btnTriggerDivisi');
+      if (btnTriggerDivisi && wrapDivisi) {
+        btnTriggerDivisi.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const isOpen = wrapDivisi.classList.contains('is-open');
+          closeFormDropdowns();
+          if (!isOpen) {
+            wrapDivisi.classList.add('is-open');
+          }
+        });
+      }
+
       if (btnTriggerKodeCoa && wrapKodeCoa) {
         btnTriggerKodeCoa.addEventListener('click', function (e) {
           e.stopPropagation();
@@ -5148,8 +5318,33 @@
       }
 
       /* Open Form (Tambah / Edit) */
-      function generateNextId() {
-        return String(Date.now()) + String(Math.floor(Math.random() * 900 + 100));
+      function generateNextId(prefDate) {
+        let yearStr = '2026';
+        const tglInput = document.getElementById('pndTglPengakuan');
+        const dateVal = prefDate || (tglInput ? getBisaDateValue(tglInput) : '');
+        if (dateVal) {
+          const match = String(dateVal).match(/\d{4}/);
+          if (match) yearStr = match[0];
+        } else {
+          yearStr = String(new Date().getFullYear());
+        }
+
+        let maxNum = 0;
+        const prefix = 'PND-' + yearStr + '-';
+
+        (pndData || []).forEach(function (it) {
+          if (!it || !it.idPendapatan) return;
+          const str = String(it.idPendapatan).trim();
+          if (str.toUpperCase().startsWith(prefix.toUpperCase())) {
+            const numPart = parseInt(str.slice(prefix.length), 10);
+            if (!isNaN(numPart) && numPart > maxNum) {
+              maxNum = numPart;
+            }
+          }
+        });
+
+        const nextNum = maxNum + 1;
+        return prefix + String(nextNum).padStart(3, '0');
       }
 
       function generateNextInvoiceNumber(prefDate) {
@@ -5214,6 +5409,7 @@
         if (item) {
           if (formActionText) formActionText.textContent = 'Edit';
           document.getElementById('pndIdPendapatan').value = item.idPendapatan || '';
+          if (document.getElementById('pndIdPembayaran')) document.getElementById('pndIdPembayaran').value = item.idPembayaran || '';
           setBisaDateValue(document.getElementById('pndTglPengakuan'), item.tanggalPengakuan || '');
           document.getElementById('pndCustomer').value = item.customer || '';
           document.getElementById('pndNoInvoice').value = item.noInvoice || generateNextInvoiceNumber();
@@ -5230,7 +5426,7 @@
             statusCoaDefault
           );
 
-          document.getElementById('pndDivisi').value = item.divisi || (coaItem ? (coaItem.devisDefault || coaItem.divisiDefault || coaItem.divisi || '') : '');
+          setDivisiValue(item.divisi || (coaItem ? (coaItem.devisDefault || coaItem.divisiDefault || coaItem.divisi || '') : ''));
           document.getElementById('pndKeterangan').value = item.keterangan || '';
           document.getElementById('pndDpp').value = item.dpp ? formatRupiah(item.dpp) : '';
           document.getElementById('pndPpn').value = item.ppn ? formatRupiah(item.ppn) : '';
@@ -5257,11 +5453,11 @@
         } else {
           if (formActionText) formActionText.textContent = 'Tambah';
           document.getElementById('pndIdPendapatan').value = generateNextId();
+          if (document.getElementById('pndIdPembayaran')) document.getElementById('pndIdPembayaran').value = '';
           setBisaDateValue(document.getElementById('pndTglPengakuan'), new Date().toISOString().split('T')[0]);
           document.getElementById('pndCustomer').value = '';
           document.getElementById('pndNoInvoice').value = generateNextInvoiceNumber();
-          setKodeCoaValue('', '', '', '', '', '');
-          document.getElementById('pndDivisi').value = '';
+          setKodeCoaValue('4001', '4001 | Pendapatan MCN', 'Pendapatan MCN', 'Pendapatan', 'MCN', 'Aktif (Ya)');
           document.getElementById('pndKeterangan').value = '';
           document.getElementById('pndDpp').value = '';
           document.getElementById('pndPpn').value = '';
@@ -5282,9 +5478,9 @@
           if (pndBuktiFileName) pndBuktiFileName.textContent = 'Belum ada file';
           if (btnPreviewBuktiForm) btnPreviewBuktiForm.style.display = 'none';
           document.getElementById('pndStatus').value = 'Belum Lunas';
-          document.getElementById('pndNamaAkunCoa').value = '';
-          document.getElementById('pndKelompokCoa').value = '';
-          document.getElementById('pndStatusCoa').value = '';
+          if (document.getElementById('pndNamaAkunCoa')) document.getElementById('pndNamaAkunCoa').value = '';
+          if (document.getElementById('pndKelompokCoa')) document.getElementById('pndKelompokCoa').value = '';
+          if (document.getElementById('pndStatusCoa')) document.getElementById('pndStatusCoa').value = '';
           setDivisiPengecualianValue('');
           renderDivisiPengecualianDropdownItems();
 
@@ -5298,6 +5494,7 @@
       function openView(item) {
         if (!item) return;
         document.getElementById('viewPndIdPendapatan').value = item.idPendapatan || '-';
+        if (document.getElementById('viewPndIdPembayaran')) document.getElementById('viewPndIdPembayaran').value = item.idPembayaran || '-';
         document.getElementById('viewPndTglPengakuan').value = formatTanggalDisplay(item.tanggalPengakuan);
         document.getElementById('viewPndCustomer').value = item.customer || '-';
         document.getElementById('viewPndNoInvoice').value = item.noInvoice || '-';
@@ -5317,14 +5514,14 @@
         const vTglLama = kbInfoView.hasKasBank ? kbInfoView.tanggal : (item.tanggalBayarLama || '');
         const vAkunLama = kbInfoView.hasKasBank ? kbInfoView.akunCoaNama : (item.akunLama || '-');
 
-        document.getElementById('viewPndStatusLama').value = vStatusLama;
-        document.getElementById('viewPndTanggalBayarLama').value = formatTanggalDisplay(vTglLama);
-        document.getElementById('viewPndAkunLama').value = vAkunLama;
+        if (document.getElementById('viewPndStatusLama')) document.getElementById('viewPndStatusLama').value = vStatusLama;
+        if (document.getElementById('viewPndTanggalBayarLama')) document.getElementById('viewPndTanggalBayarLama').value = formatTanggalDisplay(vTglLama);
+        if (document.getElementById('viewPndAkunLama')) document.getElementById('viewPndAkunLama').value = vAkunLama;
         document.getElementById('viewPndPic').value = item.pic || '-';
         document.getElementById('viewPndStatus').value = item.status || 'Lunas';
-        document.getElementById('viewPndNamaAkunCoa').value = item.namaAkunCoa || '-';
-        document.getElementById('viewPndKelompokCoa').value = item.kelompokCoa || '-';
-        document.getElementById('viewPndStatusCoa').value = item.statusCoa || 'Aktif (Ya)';
+        if (document.getElementById('viewPndNamaAkunCoa')) document.getElementById('viewPndNamaAkunCoa').value = item.namaAkunCoa || '-';
+        if (document.getElementById('viewPndKelompokCoa')) document.getElementById('viewPndKelompokCoa').value = item.kelompokCoa || '-';
+        if (document.getElementById('viewPndStatusCoa')) document.getElementById('viewPndStatusCoa').value = item.statusCoa || 'Aktif (Ya)';
         document.getElementById('viewPndDivisiPengecualian').value = item.divisiPengecualian || '-';
 
         if (viewPndBuktiBtn) {
@@ -5770,9 +5967,10 @@
         const headers = [
           'No',
           'ID Pendapatan',
+          'ID Pembayaran',
+          'No. Invoice',
           'Tanggal Pengakuan',
           'Customer',
-          'No. Invoice',
           'Kode COA',
           'Divisi',
           'Keterangan',
@@ -5783,14 +5981,8 @@
           'Sisa Piutang',
           'Jatuh Tempo',
           'Project/Brand',
-          'Status Lama',
-          'Tanggal Bayar Lama',
-          'Akun Lama',
           'PIC',
           'Status',
-          'Nama Akun COA',
-          'Kelompok COA',
-          'Status COA',
           'Divisi Pengecualian'
         ];
 
@@ -5798,9 +5990,10 @@
           return [
             idx + 1,
             item.idPendapatan || '-',
+            item.idPembayaran || '-',
+            item.noInvoice || '-',
             formatTanggalDisplay(item.tanggalPengakuan),
             item.customer || '-',
-            item.noInvoice || '-',
             item.kodeCoa || '-',
             item.divisi || '-',
             item.keterangan || '-',
@@ -5811,14 +6004,8 @@
             Number(item.sisaPiutang || 0),
             formatTanggalDisplay(item.jatuhTempo || item.hatuhTempo),
             item.projectBrand || '-',
-            item.statusLama || '-',
-            formatTanggalDisplay(item.tanggalBayarLama),
-            item.akunLama || '-',
             item.pic || '-',
             item.status || 'Lunas',
-            item.namaAkunCoa || '-',
-            item.kelompokCoa || '-',
-            item.statusCoa || '-',
             item.divisiPengecualian || '-'
           ];
         });
@@ -5927,6 +6114,20 @@
         });
       }
 
+      /* pndIdPendapatanAutoSync: Sinkronisasi Otomatis ID Pendapatan & No Invoice saat Tanggal Pengakuan berubah */
+      const pndTglPengakuanInput = document.getElementById('pndTglPengakuan');
+      if (pndTglPengakuanInput) {
+        ['change', 'input'].forEach(function (evtName) {
+          pndTglPengakuanInput.addEventListener(evtName, function () {
+            if (!document.getElementById('pndEditId').value) {
+              const curVal = getBisaDateValue(this) || this.value;
+              document.getElementById('pndIdPendapatan').value = generateNextId(curVal);
+              document.getElementById('pndNoInvoice').value = generateNextInvoiceNumber(curVal);
+            }
+          });
+        });
+      }
+
       /* Submit Form (Tambah / Edit) */
       if (form) {
         form.addEventListener('submit', function (e) {
@@ -5938,6 +6139,7 @@
 
           const payload = {
             idPendapatan: document.getElementById('pndIdPendapatan').value.trim() || generateNextId(),
+            idPembayaran: document.getElementById('pndIdPembayaran') ? document.getElementById('pndIdPembayaran').value.trim() : '',
             tanggalPengakuan: getBisaDateValue(document.getElementById('pndTglPengakuan')) || new Date().toISOString().split('T')[0],
             customer: document.getElementById('pndCustomer').value.trim(),
             noInvoice: document.getElementById('pndNoInvoice').value.trim() || generateNextInvoiceNumber(),
@@ -5952,16 +6154,16 @@
             jatuhTempo: jtIso,
             hatuhTempo: jtIso, // backward compatibility
             projectBrand: document.getElementById('pndProjectBrand').value.trim(),
-            statusLama: document.getElementById('pndStatusLama').value.trim(),
-            tanggalBayarLama: getBisaDateValue(document.getElementById('pndTanggalBayarLama')),
+            statusLama: (document.getElementById('pndStatusLama') ? document.getElementById('pndStatusLama').value.trim() : ''),
+            tanggalBayarLama: (document.getElementById('pndTanggalBayarLama') ? getBisaDateValue(document.getElementById('pndTanggalBayarLama')) : ''),
             akunLama: (document.getElementById('pndAkunLama') ? document.getElementById('pndAkunLama').value.trim() : ''),
             pic: (document.getElementById('pndPic') ? document.getElementById('pndPic').value.trim() : ''),
             buktiUrl: tempUploadedFile || 'detail_tracking_jualan.png',
             buktiDataUrl: tempUploadedFileDataUrl || '',
             status: calc.status,
-            namaAkunCoa: document.getElementById('pndNamaAkunCoa').value.trim(),
-            kelompokCoa: document.getElementById('pndKelompokCoa').value.trim(),
-            statusCoa: document.getElementById('pndStatusCoa').value.trim() || 'Aktif (Ya)',
+            namaAkunCoa: (document.getElementById('pndNamaAkunCoa') ? document.getElementById('pndNamaAkunCoa').value.trim() : ''),
+            kelompokCoa: (document.getElementById('pndKelompokCoa') ? document.getElementById('pndKelompokCoa').value.trim() : ''),
+            statusCoa: (document.getElementById('pndStatusCoa') ? document.getElementById('pndStatusCoa').value.trim() : 'Aktif (Ya)'),
             divisiPengecualian: document.getElementById('pndDivisiPengecualian').value.trim() || '-',
             updatedAt: Date.now()
           };
@@ -6020,7 +6222,7 @@
         if (!event.target.closest('.filter-dropdown-wrapper')) {
           closePopovers();
         }
-        if (!event.target.closest('#wrapKodeCoa') && !event.target.closest('#wrapAkunLama') && !event.target.closest('#wrapPic') && !event.target.closest('#wrapStatusLama') && !event.target.closest('#wrapDivisiPengecualian') && !event.target.closest('#bisaDatePickerPopover') && !event.target.closest('.bisa-datepicker-wrap')) {
+        if (!event.target.closest('#wrapDivisi') && !event.target.closest('#wrapKodeCoa') && !event.target.closest('#wrapAkunLama') && !event.target.closest('#wrapPic') && !event.target.closest('#wrapStatusLama') && !event.target.closest('#wrapDivisiPengecualian') && !event.target.closest('#bisaDatePickerPopover') && !event.target.closest('.bisa-datepicker-wrap')) {
           closeFormDropdowns();
         }
       });

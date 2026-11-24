@@ -2761,20 +2761,171 @@
         return true;
       }
 
+      function generateNextExpenseDocId(expList, dateStr) {
+        let yymm = '2609';
+        if (dateStr && /^\d{4}-\d{2}/.test(String(dateStr).trim())) {
+          const s = String(dateStr).trim();
+          yymm = s.slice(2, 4) + s.slice(5, 7);
+        }
+        const prefix = 'EXP-' + yymm + '-';
+        let maxNum = 0;
+        (expList || []).forEach(function (it) {
+          if (!it || !it.idDokumen) return;
+          const str = String(it.idDokumen).trim();
+          if (str.toUpperCase().startsWith(prefix.toUpperCase())) {
+            const numPart = parseInt(str.slice(prefix.length), 10);
+            if (!isNaN(numPart) && numPart > maxNum) maxNum = numPart;
+          }
+        });
+        return prefix + String(maxNum + 1).padStart(3, '0');
+      }
+
       function syncApprovalToPengeluaranAndProfit(prevSnapshotMap) {
         const EXPENSE_KEY = 'accounting_pengeluaran_beban_data_v5';
+        const DELETED_APPROVALS_KEY = 'accounting_pengeluaran_deleted_approvals_v1';
         try {
+          let deletedSet = new Set();
+          try {
+            const rawDel = localStorage.getItem(DELETED_APPROVALS_KEY);
+            if (rawDel) {
+              const parsedDel = JSON.parse(rawDel);
+              if (Array.isArray(parsedDel)) {
+                parsedDel.forEach(function (k) { deletedSet.add(String(k).trim().toLowerCase()); });
+              }
+            }
+          } catch (eDel) {}
+
+          let expList = [];
           const rawExp = localStorage.getItem(EXPENSE_KEY);
-          if (!rawExp) return;
-          const expList = JSON.parse(rawExp);
-          if (!Array.isArray(expList) || expList.length === 0) return;
+          if (rawExp) {
+            const parsedExp = JSON.parse(rawExp);
+            if (Array.isArray(parsedExp)) expList = parsedExp;
+          } else {
+            expList = [
+              {
+                id: 'exp-1',
+                idDokumen: 'EXP-2609-001',
+                idApproval: 'APR-2609-001',
+                tanggalPengakuan: '2026-09-04',
+                vendorKaryawan: 'BCA',
+                divisi: 'General',
+                keterangan: 'Admin Bank BCA',
+                statusApproval: 'Disetujui',
+                kodeCoa: '5009',
+                namaAkunCoa: 'Beban Administrasi Bank',
+                kelompokCoa: 'Beban Operasional',
+                statusCoa: 'Aktif',
+                dpp: 30000,
+                ppn: 0,
+                tagihanBruto: 30000,
+                statusBayarLama: 'Lunas',
+                tanggalBayarLama: '2026-09-05',
+                akunLama: 'Bank BCA - 2092026028',
+                projectBrand: '7691348184035411735 | Shopee Mega Sale',
+                jenis: 'Beban',
+                bebanDiAkui: 30000,
+                terbayarKas: 30000,
+                sisaUtang: 0,
+                jatuhTempo: '2026-09-05',
+                buktiUrl: 'detail_tracking_jualan.png',
+                buktiDataUrl: '',
+                invoice: '',
+                catatan: 'Biaya admin transfer bulanan',
+                divisiPengecualian: '',
+                needsCompletion: false,
+                isEditedInPengeluaran: true
+              },
+              {
+                id: 'exp-2',
+                idDokumen: 'EXP-2609-002',
+                idApproval: 'APR-2609-002',
+                tanggalPengakuan: '2026-09-08',
+                vendorKaryawan: 'Meta Ads',
+                divisi: 'Marketing',
+                keterangan: 'Iklan Digital Campaign Meta Ads',
+                statusApproval: 'Disetujui',
+                kodeCoa: '5001',
+                namaAkunCoa: 'Beban Pemasaran & Iklan',
+                kelompokCoa: 'Beban Pemasaran',
+                statusCoa: 'Aktif',
+                dpp: 1500000,
+                ppn: 165000,
+                tagihanBruto: 1665000,
+                statusBayarLama: 'Lunas',
+                tanggalBayarLama: '2026-09-10',
+                akunLama: 'SEABANK - 901631003438',
+                projectBrand: '7691348184035411735 | Shopee Mega Sale',
+                jenis: 'Beban',
+                bebanDiAkui: 1500000,
+                terbayarKas: 1665000,
+                sisaUtang: 0,
+                jatuhTempo: '2026-09-25',
+                buktiUrl: 'detail_tracking_jualan.png',
+                buktiDataUrl: '',
+                invoice: 'INV-FB-202610',
+                catatan: 'Pengajuan campaign Facebook & Instagram Ads',
+                divisiPengecualian: '',
+                needsCompletion: false,
+                isEditedInPengeluaran: true
+              },
+              {
+                id: 'exp-5',
+                idDokumen: 'EXP-2609-005',
+                idApproval: 'APR-2609-005',
+                tanggalPengakuan: '2026-10-18',
+                vendorKaryawan: 'Google Cloud',
+                divisi: 'IT',
+                keterangan: 'Server & Cloud Hosting Database',
+                statusApproval: 'Disetujui',
+                kodeCoa: '5010',
+                namaAkunCoa: 'Beban Server & IT',
+                kelompokCoa: 'Beban Operasional',
+                statusCoa: 'Aktif',
+                dpp: 850000,
+                ppn: 93500,
+                tagihanBruto: 943500,
+                statusBayarLama: 'Lunas',
+                tanggalBayarLama: '2026-10-19',
+                akunLama: 'BCA (Bank Central Asia)',
+                projectBrand: '7691348184035411733 | Seluruh Kreator MCN',
+                jenis: 'Beban',
+                bebanDiAkui: 850000,
+                terbayarKas: 943500,
+                sisaUtang: 0,
+                jatuhTempo: '2026-10-25',
+                buktiUrl: 'detail_tracking_jualan.png',
+                buktiDataUrl: '',
+                invoice: 'INV-GCP-8831',
+                catatan: 'Langganan server cloud kuartal 4',
+                divisiPengecualian: '',
+                needsCompletion: false,
+                isEditedInPengeluaran: true
+              }
+            ];
+          }
 
           const aprMap = new Map();
           (appData || []).forEach(function (a) {
             if (a && a.idApproval) aprMap.set(String(a.idApproval).trim().toLowerCase(), a);
           });
 
-          let changed = false;
+          let changed = !rawExp;
+
+          // Hapus item di Pengeluaran & Beban jika status di Approval bukan Disetujui (Menunggu / Ditolak)
+          const beforeLen = expList.length;
+          expList = expList.filter(function (expItem) {
+            if (!expItem || !expItem.idApproval) return false;
+            const key = String(expItem.idApproval).trim().toLowerCase();
+            if (deletedSet.has(key)) return false;
+            const apr = aprMap.get(key);
+            if (apr) {
+              return normalizeStatusName(apr.statusFinal) === 'Disetujui';
+            }
+            return normalizeStatusName(expItem.statusApproval) === 'Disetujui';
+          });
+          if (expList.length !== beforeLen) changed = true;
+
+          // Update existing approved items in expList
           expList.forEach(function (expItem) {
             if (!expItem || !expItem.idApproval) return;
             const key = String(expItem.idApproval).trim().toLowerCase();
@@ -2819,16 +2970,61 @@
                 changed = true;
               }
             }
+          });
 
-            if (expItem.statusApproval === 'Ditolak') {
-              expItem.statusBayarLama = 'Ditolak';
-            } else if (expItem.statusApproval === 'Menunggu') {
-              expItem.statusBayarLama = 'Menunggu Approval';
-            } else if (expItem.statusApproval === 'Disetujui') {
-              const brutoNow = Number(expItem.tagihanBruto || 0);
-              const sisaNow = Math.max(0, brutoNow - (Number(expItem.terbayarKas) || 0));
-              expItem.sisaUtang = sisaNow;
-              expItem.statusBayarLama = sisaNow === 0 && brutoNow > 0 ? 'Lunas' : 'Menunggu Approval';
+          // Tambahkan item Approval yang statusFinal === 'Disetujui' tetapi belum ada di expList
+          const existingAprKeys = new Set(expList.map(function (e) {
+            return String(e.idApproval || '').trim().toLowerCase();
+          }));
+
+          (appData || []).slice().reverse().forEach(function (apr) {
+            if (!apr || !apr.idApproval) return;
+            const key = String(apr.idApproval).trim().toLowerCase();
+            if (deletedSet.has(key)) return;
+            if (normalizeStatusName(apr.statusFinal) === 'Disetujui' && !existingAprKeys.has(key)) {
+              const nom = Number(apr.nominal) || 0;
+              const nextDocId = generateNextExpenseDocId(expList, apr.tanggalRequest);
+              const newExp = {
+                id: 'exp-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+                idDokumen: nextDocId,
+                idApproval: apr.idApproval,
+                tanggalPengakuan: apr.tanggalRequest || new Date().toISOString().split('T')[0],
+                vendorKaryawan: apr.pemohon || '-',
+                divisi: apr.divisi || '-',
+                keterangan: apr.keperluan || '-',
+                statusApproval: 'Disetujui',
+                kodeCoa: '',
+                namaAkunCoa: '',
+                kelompokCoa: '',
+                statusCoa: '',
+                dpp: nom,
+                ppn: 0,
+                tagihanBruto: nom,
+                syncedApprovalNominal: nom,
+                statusBayarLama: 'Belum Lunas',
+                tanggalBayarLama: '',
+                akunLama: '-',
+                projectBrand: '',
+                jenis: 'Beban',
+                bebanDiAkui: nom,
+                terbayarKas: 0,
+                sisaUtang: nom,
+                jatuhTempo: '',
+                buktiUrl: '',
+                buktiDataUrl: '',
+                invoice: '',
+                invoiceUrl: '',
+                invoiceDataUrl: '',
+                catatan: (apr.catatan && apr.catatan !== '-') ? apr.catatan : '',
+                divisiPengecualian: '',
+                needsCompletion: true,
+                isEditedInPengeluaran: false,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+              };
+              expList.unshift(newExp);
+              existingAprKeys.add(key);
+              changed = true;
             }
           });
 
@@ -2950,7 +3146,7 @@
         return '<span class="approval-badge ' + badgeClass + '">' + escapeHtml(st) + '</span>';
       }
 
-      function getFilteredData() {
+      function getFilteredData(includeApproved) {
         const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
         const fDivisi = (filters.divisi || '').toLowerCase().trim();
         const fStatus = (filters.status || '').toLowerCase().trim();
@@ -2958,6 +3154,12 @@
         const fSelesai = filters.tglSelesai || '';
 
         return appData.filter(function (item) {
+          const stFinalNorm = normalizeStatusName(item.statusFinal);
+          // Di tabel Approval hanya menampilkan status Menunggu dan Ditolak (yang Disetujui masuk ke Pengeluaran & Beban)
+          if (!includeApproved && stFinalNorm === 'Disetujui') {
+            return false;
+          }
+
           const matchesQuery = !query || [
             item.idApproval,
             item.pemohon,
@@ -3014,10 +3216,15 @@
         if (!tableBody) return;
         tableBody.innerHTML = '';
 
-        const filtered = getFilteredData();
+        // Pastikan setiap item yang sudah Disetujui tersinkron ke Pengeluaran & Beban
+        syncApprovalToPengeluaranAndProfit();
+
+        const filtered = getFilteredData(false);
+        const allMatchingForCards = getFilteredData(true);
+
         if (filtered.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data approval pengeluaran yang sesuai.</td></tr>';
-          updateSummaryCards(filtered);
+          tableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data approval berstatus Menunggu atau Ditolak. (Data yang Disetujui telah masuk ke Pengeluaran & Beban)</td></tr>';
+          updateSummaryCards(allMatchingForCards);
           updateFilterButtonState();
           return;
         }
@@ -3047,7 +3254,7 @@
           tableBody.appendChild(row);
         });
 
-        updateSummaryCards(filtered);
+        updateSummaryCards(allMatchingForCards);
         updateFilterButtonState();
       }
 
@@ -3632,7 +3839,7 @@
             Swal.fire({
               icon: 'success',
               title: 'Berhasil!',
-              text: 'Data Approval Pengeluaran telah disimpan.',
+              text: sf === 'Disetujui' ? 'Approval disetujui penuh dan otomatis masuk ke tabel Pengeluaran & Beban.' : 'Data Approval Pengeluaran telah disimpan.',
               timer: 1500,
               showConfirmButton: false
             });
