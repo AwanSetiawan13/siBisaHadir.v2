@@ -3571,71 +3571,117 @@
         return idPen ? (idPen + ' | ' + s) : s;
       }
 
+      function normalizeProjectBrandName(val) {
+        return String(val || '')
+          .replace(/^[A-Za-z0-9._-]+\s*\|\s*/, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
       function getProjectBrandList() {
         const list = [];
         const seen = new Set();
 
-        // 1. Ambil dari Modul Pendapatan (Format: ID Pendapatan | Project/Brand)
-        try {
-          const raw = localStorage.getItem(PENDAPATAN_KEY);
-          let pndArr = [];
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) pndArr = parsed;
+        function addBrand(rawVal) {
+          if (!rawVal) return;
+          const clean = normalizeProjectBrandName(rawVal);
+          if (!clean || clean === '-' || clean === '0' || clean.toLowerCase() === '- tanpa project / brand -') return;
+          const key = clean.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            list.push(clean);
           }
-          if (pndArr.length === 0) {
-            pndArr = [
-              { idPendapatan: '7691348184035411734', projectBrand: 'Campaign Brand A' },
-              { idPendapatan: '7691348184035411736', projectBrand: 'Shopee Affiliate Mall' },
-              { idPendapatan: '7691348184035411737', projectBrand: 'Cosmo Endorse' },
-              { idPendapatan: '7691348184035411735', projectBrand: 'Shopee Mega Sale' },
-              { idPendapatan: '7691348184035411738', projectBrand: 'Product Launching Serum Glow' },
-              { idPendapatan: '7691348184035411739', projectBrand: 'Tap & Tsp' },
-              { idPendapatan: '7691348184035411733', projectBrand: 'Seluruh Kreator MCN' }
-            ];
-          }
+        }
 
-          pndArr.forEach(function (p) {
-            if (p && p.projectBrand && String(p.projectBrand).trim() !== '' && p.projectBrand !== '-') {
-              const brand = String(p.projectBrand).trim();
-              const combined = formatBrandWithId(brand, p.idPendapatan);
-              if (combined && !seen.has(combined)) {
-                seen.add(combined);
-                list.push(combined);
+        // 1. Ambil daftar Project/Brand sesuai modul Profit Project & Brand (sama persis dengan sumber tabel Profit Project & Brand)
+        try {
+          const rawKb = localStorage.getItem(KAS_BANK_KEY);
+          if (rawKb !== null) {
+            const parsedKb = JSON.parse(rawKb);
+            if (Array.isArray(parsedKb)) {
+              parsedKb.forEach(function (it) {
+                if (it && it.projectBrand) addBrand(it.projectBrand);
+              });
+            }
+          }
+        } catch (e) {}
+
+        try {
+          const rawPay = localStorage.getItem('bisa_payroll_data_v1') || localStorage.getItem('accounting_payroll_data_v1');
+          if (rawPay) {
+            const parsedPay = JSON.parse(rawPay);
+            if (Array.isArray(parsedPay)) {
+              parsedPay.forEach(function (py) {
+                if (py && py.projectBrand) addBrand(py.projectBrand);
+              });
+            }
+          }
+        } catch (e) {}
+
+        try {
+          let astList = null;
+          const rawPenyusutan = localStorage.getItem('accounting_penyusutan_aset_data');
+          if (rawPenyusutan) {
+            const parsedP = JSON.parse(rawPenyusutan);
+            if (Array.isArray(parsedP) && parsedP.length > 0) astList = parsedP;
+          }
+          if (!astList) {
+            const asetKeys = ['bisa_accounting_daftar_aset_data_v4', 'accounting_daftar_aset_data'];
+            for (let i = 0; i < asetKeys.length; i++) {
+              const rawAst = localStorage.getItem(asetKeys[i]);
+              if (rawAst) {
+                const parsedAst = JSON.parse(rawAst);
+                if (Array.isArray(parsedAst) && parsedAst.length > 0) {
+                  astList = parsedAst;
+                  break;
+                }
               }
             }
+          }
+          if (!astList) {
+            astList = [{ projectBrand: 'Brand Alpha' }];
+          }
+          astList.forEach(function (ast) {
+            if (ast && ast.projectBrand) addBrand(ast.projectBrand);
           });
         } catch (e) {}
 
-        // 2. Ambil dari Master Customer Project (jika ada brand baru yang belum ada di Pendapatan)
+        // Fallback dari storage Profit Project & Brand jika key utama belum terisi
         try {
-          const rawCp = localStorage.getItem('accounting_master_customer_project_v1');
-          if (rawCp) {
-            const parsedCp = JSON.parse(rawCp);
-            if (Array.isArray(parsedCp)) {
-              parsedCp.forEach(function (cp) {
-                if (cp && cp.projectBrand && String(cp.projectBrand).trim() !== '') {
-                  const brand = String(cp.projectBrand).trim();
-                  const combined = formatBrandWithId(brand);
-                  if (combined && !seen.has(combined)) {
-                    seen.add(combined);
-                    list.push(combined);
-                  }
+          const rawProfit = localStorage.getItem('bisa_profit_project_brand_data');
+          if (rawProfit) {
+            const parsedProfit = JSON.parse(rawProfit);
+            if (Array.isArray(parsedProfit)) {
+              parsedProfit.forEach(function (p) {
+                if (p && (p.projectBrand || p.rawProjectBrand)) {
+                  addBrand(p.projectBrand || p.rawProjectBrand);
                 }
               });
             }
           }
         } catch (e) {}
 
+        if (list.length === 0) {
+          try {
+            const rawRel = localStorage.getItem('accounting_kas_bank_profit_rel_v1');
+            if (rawRel) {
+              const parsedRel = JSON.parse(rawRel);
+              if (parsedRel && Array.isArray(parsedRel.brands)) {
+                parsedRel.brands.forEach(function (b) {
+                  if (b) addBrand(b.projectBrand || b.rawProjectBrand);
+                });
+              }
+            }
+          } catch (e) {}
+        }
+
         if (list.length > 0) return list;
         return [
-          '7691348184035411734 | Campaign Brand A',
-          '7691348184035411736 | Shopee Affiliate Mall',
-          '7691348184035411737 | Cosmo Endorse',
-          '7691348184035411735 | Shopee Mega Sale',
-          '7691348184035411738 | Product Launching Serum Glow',
-          '7691348184035411739 | Tap & Tsp',
-          '7691348184035411733 | Seluruh Kreator MCN'
+          'Campaign Brand A',
+          'Seluruh Kreator MCN',
+          'Shopee Mega Sale',
+          'Shopee Affiliate Mall',
+          'Brand Alpha'
         ];
       }
 
@@ -3989,12 +4035,9 @@
           if (!item.akunLama) item.akunLama = '-';
         }
 
-        // 15. Project/Brand: ID Pendapatan | Project/Brand
-        if (item.projectBrand && item.projectBrand !== '-' && !item.projectBrand.includes(' | ')) {
-          const pndMatch = getPendapatanForBrand(item.projectBrand);
-          if (pndMatch && pndMatch.idPendapatan) {
-            item.projectBrand = pndMatch.idPendapatan + ' | ' + item.projectBrand;
-          }
+        // 15. Project/Brand: sesuai kolom Project/Brand pada modul Profit Project & Brand
+        if (item.projectBrand && item.projectBrand !== '-') {
+          item.projectBrand = normalizeProjectBrandName(item.projectBrand);
         }
 
         return item;
@@ -5123,6 +5166,9 @@
         const hidden = document.getElementById(hiddenId);
 
         let finalVal = val || '';
+        if (radioName === 'optProjectBrand' && finalVal) {
+          finalVal = normalizeProjectBrandName(finalVal);
+        }
         let matchedRadio = null;
 
         document.querySelectorAll('input[name="' + radioName + '"]').forEach(function (radio) {
@@ -5130,7 +5176,7 @@
           if (finalVal) {
             if (radio.value === finalVal) {
               isMatch = true;
-            } else if (radioName === 'optProjectBrand' && radio.value.endsWith(' | ' + finalVal)) {
+            } else if (radioName === 'optProjectBrand' && normalizeProjectBrandName(radio.value).toLowerCase() === finalVal.toLowerCase()) {
               isMatch = true;
             }
           } else {

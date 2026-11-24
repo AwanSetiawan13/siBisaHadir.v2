@@ -343,11 +343,162 @@
       fill: none;
     }
 
-    /* Margin Badge */
+    /* Margin & Status Badges */
     .margin-badge {
       display: inline-block;
       font-weight: 600;
       color: #0f172a;
+    }
+
+    .profit-status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      font-style: normal;
+      white-space: nowrap;
+    }
+
+    .profit-status-badge.is-safe {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .profit-status-badge.is-over {
+      background: #fee2e2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .profit-status-badge.is-empty {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Floating Action Menu & Trigger (⋮) */
+    .profit-action-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      background: transparent;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .profit-action-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .profit-action-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      pointer-events: none;
+    }
+
+    .profit-action-menu {
+      position: fixed;
+      z-index: 2147483000;
+      min-width: 145px;
+      padding: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+      display: none;
+      box-sizing: border-box;
+    }
+
+    .profit-action-menu.is-open {
+      display: block;
+    }
+
+    .profit-action-menu button {
+      width: 100%;
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #334155;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      transition: all 0.12s ease;
+    }
+
+    .profit-action-menu button:hover {
+      color: #0f172a;
+      background: #f1f5f9;
+    }
+
+    .profit-action-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 26px;
+      color: #ffffff;
+      background: #0076C5;
+    }
+
+    .profit-action-icon svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Form Input in Edit Modal */
+    .modal-field-input {
+      width: 100%;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 8px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #0f172a;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .modal-field-input:focus:not(.is-readonly) {
+      border-color: #0076C5;
+      box-shadow: 0 0 0 3px rgba(0, 118, 197, 0.12);
+    }
+
+    .modal-field-input.is-readonly {
+      background: #f1f5f9 !important;
+      color: #64748b !important;
+      cursor: not-allowed !important;
+      font-style: italic;
+      user-select: none;
     }
 
     /* Dual Month Calendar Popover */
@@ -1629,7 +1780,7 @@
         <!-- Dashed Divider -->
         <div class="profit-dashed-divider"></div>
 
-        <!-- Table Profit Project & Brand (9 Kolom Sesuai Mockup Gambar) -->
+        <!-- Table Profit Project & Brand (11 Kolom) -->
         <div class="profit-table-wrap">
           <table class="profit-table" id="profitTable">
             <thead>
@@ -1642,6 +1793,8 @@
                 <th style="min-width: 110px;">Penyusutan</th>
                 <th style="min-width: 150px;">Laba Sebelum Pajak</th>
                 <th style="min-width: 100px; text-align: center;">Margin</th>
+                <th style="min-width: 140px;">Limitasi</th>
+                <th style="min-width: 120px; text-align: center;">Status</th>
                 <th class="col-sticky-action" style="width: 70px; text-align: center;">Aksi</th>
               </tr>
             </thead>
@@ -1654,7 +1807,23 @@
     </main>
   </div>
 
-  <!-- Detail Modal: "Lihat Project & Brand" Sesuai Mockup Gambar -->
+  <!-- Floating Action Menu (⋮) -->
+  <div id="profitActionMenu" class="profit-action-menu" role="menu">
+    <button type="button" data-action="view">
+      <span class="profit-action-icon">
+        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      </span>
+      <span>Lihat</span>
+    </button>
+    <button type="button" data-action="edit">
+      <span class="profit-action-icon">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      </span>
+      <span>Edit</span>
+    </button>
+  </div>
+
+  <!-- Detail Modal: "Lihat Project & Brand" -->
   <div id="profitDetailModal" class="modal-overlay">
     <div class="profit-modal-box">
       <div class="modal-accent-line"></div>
@@ -1680,30 +1849,102 @@
           <div class="modal-field-value" id="detailBeban">Rp. 0</div>
         </div>
 
-        <!-- Baris 2: 2 Kolom (Payroll, Penyusutan) -->
-        <div class="modal-field col-span-3">
+        <!-- Baris 2: 3 Kolom (Payroll, Penyusutan, Laba Sebelum Pajak) -->
+        <div class="modal-field col-span-2">
           <span class="modal-field-label">Payroll</span>
           <div class="modal-field-value" id="detailPayroll">Rp. 0</div>
         </div>
-        <div class="modal-field col-span-3">
+        <div class="modal-field col-span-2">
           <span class="modal-field-label">Penyusutan</span>
           <div class="modal-field-value" id="detailPenyusutan">Rp. 0</div>
         </div>
-
-        <!-- Baris 3: 2 Kolom (Laba Sebelum Pajak, Margin) -->
-        <div class="modal-field col-span-3">
+        <div class="modal-field col-span-2">
           <span class="modal-field-label">Laba Sebelum Pajak</span>
           <div class="modal-field-value" id="detailLabaSebelumPajak">Rp. 0</div>
         </div>
-        <div class="modal-field col-span-3">
+
+        <!-- Baris 3: 3 Kolom (Margin, Limitasi, Status) -->
+        <div class="modal-field col-span-2">
           <span class="modal-field-label">Margin</span>
           <div class="modal-field-value" id="detailMargin">0.0%</div>
+        </div>
+        <div class="modal-field col-span-2">
+          <span class="modal-field-label">Limitasi</span>
+          <div class="modal-field-value" id="detailLimitasi">Rp. 0</div>
+        </div>
+        <div class="modal-field col-span-2">
+          <span class="modal-field-label">Status</span>
+          <div class="modal-field-value" id="detailStatus">-</div>
         </div>
       </div>
 
       <div class="modal-footer">
         <button type="button" id="btnKeluarDetail" class="btn-modal-keluar">Keluar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal: "Edit Project & Brand" (Hanya Limitasi yang bisa diedit) -->
+  <div id="profitEditModal" class="modal-overlay">
+    <div class="profit-modal-box">
+      <div class="modal-accent-line"></div>
+      <div class="modal-header">
+        <h2 class="modal-title"><em>Edit</em> Project & Brand</h2>
+        <button class="modal-close" type="button" id="btnCloseEdit" aria-label="Tutup">x</button>
+      </div>
+
+      <div class="modal-dashed-divider"></div>
+
+      <form id="profitEditForm" autocomplete="off" novalidate>
+        <input type="hidden" id="editProfitId" />
+        <div class="modal-detail-grid">
+          <!-- Baris 1: 3 Kolom (Project/Brand, Pendapatan, Beban) - Read Only Abu -->
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editProjectBrand">Project/Brand</label>
+            <input type="text" id="editProjectBrand" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editPendapatan">Pendapatan</label>
+            <input type="text" id="editPendapatan" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editBeban">Beban</label>
+            <input type="text" id="editBeban" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+
+          <!-- Baris 2: 3 Kolom (Payroll, Penyusutan, Laba Sebelum Pajak) - Read Only Abu -->
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editPayroll">Payroll</label>
+            <input type="text" id="editPayroll" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editPenyusutan">Penyusutan</label>
+            <input type="text" id="editPenyusutan" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editLabaSebelumPajak">Laba Sebelum Pajak</label>
+            <input type="text" id="editLabaSebelumPajak" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+
+          <!-- Baris 3: 3 Kolom (Margin [Abu], Limitasi [Bisa Diedit], Status [Abu Otomatis]) -->
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editMargin">Margin</label>
+            <input type="text" id="editMargin" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editLimitasi">Limitasi</label>
+            <input type="text" id="editLimitasi" class="modal-field-input" placeholder="Rp 0" />
+          </div>
+          <div class="modal-field col-span-2">
+            <label class="modal-field-label" for="editStatus">Status</label>
+            <input type="text" id="editStatus" class="modal-field-input is-readonly" readonly tabindex="-1" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="btnSimpanEdit" class="btn-modal-keluar" style="font-weight: 600;">Simpan</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1717,6 +1958,7 @@
       'use strict';
 
       const STORAGE_KEY = 'bisa_profit_project_brand_data';
+      const LIMITASI_STORAGE_KEY = 'bisa_profit_project_brand_limitasi_v1';
       const KB_STORAGE_KEY = 'accounting_kas_bank_v2';
       const KB_PROFIT_REL_KEY = 'accounting_kas_bank_profit_rel_v1';
       const PENDAPATAN_STORAGE_KEY = 'accounting_pendapatan_data_v1';
@@ -1986,6 +2228,65 @@
         return safe.toFixed(1) + '%';
       }
 
+      const DEFAULT_LIMITASI_BY_BRAND = {
+        'campaign brand a': 10000000,
+        'seluruh kreator mcn': 5000000,
+        'shopee mega sale': 3000000,
+        'shopee affiliate mall': 5000000,
+        'brand alpha': 2000000
+      };
+
+      function getSavedLimitasiMap() {
+        try {
+          const raw = localStorage.getItem(LIMITASI_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') return parsed;
+          }
+        } catch (e) {}
+        return {};
+      }
+
+      function saveLimitasiForBrand(projectBrand, limitasiNominal) {
+        const cleanKey = normalizeProjectBrandName(projectBrand).toLowerCase();
+        if (!cleanKey) return;
+        const map = getSavedLimitasiMap();
+        map[cleanKey] = Math.max(0, Number(limitasiNominal) || 0);
+        try {
+          localStorage.setItem(LIMITASI_STORAGE_KEY, JSON.stringify(map));
+        } catch (e) {}
+      }
+
+      function getLimitasiForBrand(projectBrand) {
+        const cleanKey = normalizeProjectBrandName(projectBrand).toLowerCase();
+        const map = getSavedLimitasiMap();
+        if (cleanKey && Object.prototype.hasOwnProperty.call(map, cleanKey)) {
+          return Math.max(0, Number(map[cleanKey]) || 0);
+        }
+        if (cleanKey && Object.prototype.hasOwnProperty.call(DEFAULT_LIMITASI_BY_BRAND, cleanKey)) {
+          return DEFAULT_LIMITASI_BY_BRAND[cleanKey];
+        }
+        return 5000000;
+      }
+
+      function computeLimitasiStatus(limitasiVal, bebanVal, payrollVal, penyusutanVal) {
+        const lim = Number(limitasiVal) || 0;
+        const totalPengeluaran = Number(bebanVal) || 0;
+        if (lim <= 0) return 'Belum Diatur';
+        return totalPengeluaran > lim ? 'Over Limit' : 'Dalam Limit';
+      }
+
+      function renderStatusBadgeHtml(statusText) {
+        const st = String(statusText || '').trim();
+        if (st === 'Over Limit') {
+          return '<span class="profit-status-badge is-over">Over Limit</span>';
+        }
+        if (st === 'Dalam Limit') {
+          return '<span class="profit-status-badge is-safe">Dalam Limit</span>';
+        }
+        return '<span class="profit-status-badge is-empty">' + escapeHtml(st || 'Belum Diatur') + '</span>';
+      }
+
       function createProfitBrandRow(opts) {
         const key = String(opts.projectBrand || '').toLowerCase();
         const pendapatanDpp = opts.dppMap ? (opts.dppMap.get(key) || 0) : 0;
@@ -1994,6 +2295,8 @@
         const penyusutan = opts.penyusutanMap ? (opts.penyusutanMap.get(key) || 0) : 0;
         const laba = pendapatanDpp - (beban + payroll + penyusutan);
         const margin = calculateMarginPercent(laba, pendapatanDpp);
+        const limitasi = opts.limitasi !== undefined ? (Number(opts.limitasi) || 0) : getLimitasiForBrand(opts.projectBrand);
+        const status = computeLimitasiStatus(limitasi, beban, payroll, penyusutan);
         return {
           id: opts.id,
           projectBrand: opts.projectBrand,
@@ -2004,6 +2307,8 @@
           penyusutan: penyusutan,
           labaSebelumPajak: laba,
           margin: margin,
+          limitasi: limitasi,
+          status: status,
           tanggal: opts.tanggal || new Date().toISOString().split('T')[0],
           periode: opts.periode || formatPeriodeFromDate(opts.tanggal),
           keterangan: opts.keterangan,
@@ -2212,7 +2517,7 @@
       const cardLabaSebelumPajak = document.getElementById('cardLabaSebelumPajak');
       const cardRataRataMargin = document.getElementById('cardRataRataMargin');
 
-      // Detail Modal (7 Fields sesuai mockup "Lihat Project & Brand")
+      // Detail Modal (9 Fields)
       const detailModal = document.getElementById('profitDetailModal');
       const btnCloseDetail = document.getElementById('btnCloseDetail');
       const btnKeluarDetail = document.getElementById('btnKeluarDetail');
@@ -2223,6 +2528,27 @@
       const detailPenyusutan = document.getElementById('detailPenyusutan');
       const detailLabaSebelumPajak = document.getElementById('detailLabaSebelumPajak');
       const detailMargin = document.getElementById('detailMargin');
+      const detailLimitasi = document.getElementById('detailLimitasi');
+      const detailStatus = document.getElementById('detailStatus');
+
+      // Edit Modal (Hanya Limitasi yang bisa diedit)
+      const editModal = document.getElementById('profitEditModal');
+      const btnCloseEdit = document.getElementById('btnCloseEdit');
+      const profitEditForm = document.getElementById('profitEditForm');
+      const editProfitId = document.getElementById('editProfitId');
+      const editProjectBrand = document.getElementById('editProjectBrand');
+      const editPendapatan = document.getElementById('editPendapatan');
+      const editBeban = document.getElementById('editBeban');
+      const editPayroll = document.getElementById('editPayroll');
+      const editPenyusutan = document.getElementById('editPenyusutan');
+      const editLabaSebelumPajak = document.getElementById('editLabaSebelumPajak');
+      const editMargin = document.getElementById('editMargin');
+      const editLimitasi = document.getElementById('editLimitasi');
+      const editStatus = document.getElementById('editStatus');
+
+      // Floating Action Menu
+      const actionMenu = document.getElementById('profitActionMenu');
+      let currentActionId = null;
 
       // Calendar Popover Elements
       const btnCalendar = document.getElementById('btnCalendar');
@@ -2313,7 +2639,7 @@
         const filtered = getFilteredData();
 
         if (filtered.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Belum ada data Project/Brand dari modul Kas &amp; Bank.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Belum ada data Project/Brand dari modul Kas &amp; Bank.</td></tr>';
           updateSummaryCards(filtered);
           return;
         }
@@ -2322,6 +2648,11 @@
           const row = document.createElement('tr');
           const labaVal = Number(item.labaSebelumPajak) || 0;
           const marginVal = calculateMarginPercent(labaVal, item.pendapatan);
+          const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item.projectBrand);
+          const statusVal = computeLimitasiStatus(limitasiVal, item.beban, item.payroll, item.penyusutan);
+          item.limitasi = limitasiVal;
+          item.status = statusVal;
+
           const labaStyle = labaVal < 0 ? 'font-weight: 700; color: #dc2626;' : 'font-weight: 700; color: #16a34a;';
           const marginStyle = marginVal < 0 ? 'color: #dc2626;' : 'color: #16a34a;';
           row.innerHTML = [
@@ -2333,9 +2664,11 @@
             '<td class="pnd-cell-italic" style="color: ' + (Number(item.penyusutan) > 0 ? '#dc2626' : '#64748b') + '; font-weight: 600;">' + (Number(item.penyusutan) === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(item.penyusutan))) + '</td>',
             '<td class="pnd-cell-italic" style="' + labaStyle + '">' + (labaVal === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(labaVal))) + '</td>',
             '<td class="pnd-cell-italic" style="text-align: center;"><span class="margin-badge" style="' + marginStyle + '">' + formatMarginPercent(marginVal) + '</span></td>',
+            '<td class="pnd-cell-italic" style="color: #0f172a; font-weight: 600;">' + (limitasiVal === 0 ? 'Rp. 0' : escapeHtml(formatRupiah(limitasiVal))) + '</td>',
+            '<td style="text-align: center;">' + renderStatusBadgeHtml(statusVal) + '</td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
-              '<button type="button" class="btn-action-eye" data-action="view" data-id="' + escapeHtml(item.id) + '" aria-label="Lihat Detail" title="Lihat Detail">' +
-                '<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>' +
+              '<button type="button" class="profit-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
+                '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
               '</button>' +
             '</td>'
           ].join('');
@@ -2382,6 +2715,18 @@
           detailMargin.textContent = formatMarginPercent(marginVal);
           detailMargin.style.color = marginVal >= 0 ? '#16a34a' : '#dc2626';
         }
+        const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item.projectBrand);
+        const statusVal = computeLimitasiStatus(limitasiVal, item.beban, item.payroll, item.penyusutan);
+        if (detailLimitasi) {
+          detailLimitasi.textContent = limitasiVal === 0 ? 'Rp. 0' : formatRupiah(limitasiVal);
+          detailLimitasi.style.color = '#0f172a';
+          detailLimitasi.style.fontWeight = '600';
+        }
+        if (detailStatus) {
+          detailStatus.textContent = statusVal;
+          detailStatus.style.color = statusVal === 'Over Limit' ? '#dc2626' : (statusVal === 'Dalam Limit' ? '#16a34a' : '#64748b');
+          detailStatus.style.fontWeight = '700';
+        }
 
         detailModal.classList.add('is-active');
       }
@@ -2399,18 +2744,166 @@
         });
       }
 
-      // Delegate click on table action eye button
+      /* ===== EDIT MODAL HANDLER (HANYA LIMITASI YANG BISA DIEDIT) ===== */
+      let currentEditingItem = null;
+
+      function openEditModal(item) {
+        if (!item || !editModal) return;
+        currentEditingItem = item;
+
+        const labaVal = Number(item.labaSebelumPajak) || 0;
+        const marginVal = calculateMarginPercent(labaVal, item.pendapatan);
+        const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item.projectBrand);
+        const statusVal = computeLimitasiStatus(limitasiVal, item.beban, item.payroll, item.penyusutan);
+
+        if (editProfitId) editProfitId.value = item.id || '';
+        if (editProjectBrand) editProjectBrand.value = item.projectBrand || '-';
+        if (editPendapatan) editPendapatan.value = Number(item.pendapatan) === 0 ? 'Rp. 0' : formatRupiah(item.pendapatan);
+        if (editBeban) editBeban.value = Number(item.beban) === 0 ? 'Rp. 0' : formatRupiah(item.beban);
+        if (editPayroll) editPayroll.value = Number(item.payroll) === 0 ? 'Rp. 0' : formatRupiah(item.payroll);
+        if (editPenyusutan) editPenyusutan.value = Number(item.penyusutan) === 0 ? 'Rp. 0' : formatRupiah(item.penyusutan);
+        if (editLabaSebelumPajak) editLabaSebelumPajak.value = labaVal === 0 ? 'Rp. 0' : formatRupiah(labaVal);
+        if (editMargin) editMargin.value = formatMarginPercent(marginVal);
+        if (editLimitasi) editLimitasi.value = limitasiVal > 0 ? formatRupiah(limitasiVal) : 'Rp 0';
+        if (editStatus) editStatus.value = statusVal;
+
+        editModal.classList.add('is-active');
+        setTimeout(function () {
+          if (editLimitasi) editLimitasi.focus();
+        }, 80);
+      }
+
+      function closeEditModal() {
+        if (editModal) editModal.classList.remove('is-active');
+        currentEditingItem = null;
+      }
+
+      if (btnCloseEdit) btnCloseEdit.addEventListener('click', closeEditModal);
+      if (editModal) {
+        editModal.addEventListener('click', function (e) {
+          if (e.target === editModal) closeEditModal();
+        });
+      }
+
+      if (editLimitasi) {
+        editLimitasi.addEventListener('input', function () {
+          const clean = String(this.value || '').replace(/[^0-9]/g, '');
+          const num = clean ? parseInt(clean, 10) : 0;
+          this.value = num > 0 ? ('Rp ' + num.toLocaleString('id-ID')) : (this.value.includes('0') ? 'Rp 0' : '');
+          if (currentEditingItem && editStatus) {
+            editStatus.value = computeLimitasiStatus(num, currentEditingItem.beban, currentEditingItem.payroll, currentEditingItem.penyusutan);
+          }
+        });
+      }
+
+      if (profitEditForm) {
+        profitEditForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          if (!currentEditingItem) return;
+
+          const clean = String(editLimitasi ? editLimitasi.value : '').replace(/[^0-9]/g, '');
+          const nextLimitasi = clean ? parseInt(clean, 10) : 0;
+
+          saveLimitasiForBrand(currentEditingItem.projectBrand, nextLimitasi);
+          profitData = loadProfitData();
+          renderTable();
+          closeEditModal();
+
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'success',
+              title: 'Limitasi Project/Brand berhasil diperbarui',
+              showConfirmButton: false,
+              timer: 2200,
+              timerProgressBar: true
+            });
+          }
+        });
+      }
+
+      /* ===== FLOATING ACTION MENU (LIHAT & EDIT) ===== */
+      function closeActionMenus() {
+        if (actionMenu) actionMenu.classList.remove('is-open');
+        currentActionId = null;
+      }
+
+      function openActionMenu(button) {
+        if (!actionMenu || !button) return;
+        const id = button.getAttribute('data-action-toggle');
+
+        if (actionMenu.classList.contains('is-open') && String(currentActionId) === String(id)) {
+          closeActionMenus();
+          return;
+        }
+
+        currentActionId = id;
+        actionMenu.classList.add('is-open');
+
+        const rect = button.getBoundingClientRect();
+        const menuWidth = actionMenu.offsetWidth || 145;
+        const menuHeight = actionMenu.offsetHeight || 92;
+
+        let left = rect.left - menuWidth + 24;
+        let top = rect.bottom + 6;
+
+        if (left < 10) left = 10;
+        if (left + menuWidth > window.innerWidth - 10) {
+          left = window.innerWidth - menuWidth - 10;
+        }
+        if (top + menuHeight > window.innerHeight - 10) {
+          top = rect.top - menuHeight - 6;
+        }
+
+        actionMenu.style.top = Math.max(10, top) + 'px';
+        actionMenu.style.left = Math.max(10, left) + 'px';
+      }
+
       if (tableBody) {
         tableBody.addEventListener('click', function (e) {
-          const btn = e.target.closest('[data-action="view"]');
-          if (btn) {
+          const toggle = e.target.closest('[data-action-toggle]');
+          if (toggle) {
             e.preventDefault();
-            const id = btn.getAttribute('data-id');
+            e.stopPropagation();
+            openActionMenu(toggle);
+            return;
+          }
+          const btnView = e.target.closest('[data-action="view"]');
+          if (btnView) {
+            e.preventDefault();
+            const id = btnView.getAttribute('data-id');
             const target = profitData.find(function (p) { return p.id === id; });
             if (target) openDetailModal(target);
           }
         });
       }
+
+      if (actionMenu) {
+        actionMenu.addEventListener('click', function (e) {
+          const btn = e.target.closest('[data-action]');
+          if (!btn || !currentActionId) return;
+          e.preventDefault();
+          e.stopPropagation();
+
+          const action = btn.getAttribute('data-action');
+          const targetId = currentActionId;
+          const target = profitData.find(function (p) { return String(p.id) === String(targetId); });
+          closeActionMenus();
+
+          if (!target) return;
+          if (action === 'view') openDetailModal(target);
+          if (action === 'edit') openEditModal(target);
+        });
+      }
+
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#profitActionMenu') && !e.target.closest('[data-action-toggle]')) {
+          closeActionMenus();
+        }
+      });
+      window.addEventListener('scroll', closeActionMenus, true);
+      window.addEventListener('resize', closeActionMenus);
 
       /* ===== SEARCH EVENT ===== */
       if (searchInput) {
@@ -2632,8 +3125,10 @@
           } else {
             // Direct fallback
             const filtered = getFilteredData();
-            let csv = 'No,Project/Brand,Pendapatan,Beban,Payroll,Penyusutan,Laba Sebelum Pajak,Margin\n';
+            let csv = 'No,Project/Brand,Pendapatan,Beban,Payroll,Penyusutan,Laba Sebelum Pajak,Margin,Limitasi,Status\n';
             filtered.forEach(function (row, idx) {
+              const limVal = row.limitasi !== undefined ? (Number(row.limitasi) || 0) : getLimitasiForBrand(row.projectBrand);
+              const stVal = computeLimitasiStatus(limVal, row.beban, row.payroll, row.penyusutan);
               csv += [
                 idx + 1,
                 '"' + (row.projectBrand || '').replace(/"/g, '""') + '"',
@@ -2642,7 +3137,9 @@
                 row.payroll,
                 row.penyusutan,
                 row.labaSebelumPajak,
-                formatMarginPercent(calculateMarginPercent(row.labaSebelumPajak, row.pendapatan))
+                formatMarginPercent(calculateMarginPercent(row.labaSebelumPajak, row.pendapatan)),
+                limVal,
+                '"' + stVal + '"'
               ].join(',') + '\n';
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

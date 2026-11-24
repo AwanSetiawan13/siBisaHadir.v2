@@ -79,32 +79,32 @@
       {
         type: 'group', label: 'Data Karyawan', icon: 'users', id: 'm-bm-karyawan',
         children: [
-          { label: 'Karyawan', link: 'BM/data_karyawan/BM_karyawan.html' },
-          { label: 'Kontrak Karyawan', link: 'BM/data_karyawan/BM_Kontrak.html' },
-          { label: 'Kegiatan Karyawan', link: 'BM/data_karyawan/BM_kegiatan_karyawan.html' }
+          { label: 'Karyawan', link: 'BM/data_karyawan/BM_karyawan.html', icon: 'users' },
+          { label: 'Kontrak Karyawan', link: 'BM/data_karyawan/BM_Kontrak.html', icon: 'file-text' },
+          { label: 'Kegiatan Karyawan', link: 'BM/data_karyawan/BM_kegiatan_karyawan.html', icon: 'calendar-check' }
         ]
       },
       {
         type: 'group', label: 'Tugas & Pekerjaan', icon: 'task', id: 'm-bm-tugas',
         children: [
-          { label: 'Instruksi Tugas', link: 'BM/tugas_pekerjaan/BM_instruksi_tugas.html' },
-          { label: 'RRK', link: 'BM/tugas_pekerjaan/BM_rrk.html' },
-          { label: 'Report Pengerjaan', link: 'BM/tugas_pekerjaan/BM_report_pengerjaan.html' }
+          { label: 'Instruksi Tugas', link: 'BM/tugas_pekerjaan/BM_instruksi_tugas.html', icon: 'check-square' },
+          { label: 'RRK', link: 'BM/tugas_pekerjaan/BM_rrk.html', icon: 'file-text' },
+          { label: 'Report Pengerjaan', link: 'BM/tugas_pekerjaan/BM_report_pengerjaan.html', icon: 'file-bar-chart' }
         ]
       },
       {
         type: 'group', label: 'Absensi', icon: 'clock', id: 'm-bm-absensi',
         children: [
-          { label: 'Kehadiran', link: 'BM/absensi/BM_kehadiran.html' },
-          { label: 'Presensi Istirahat', link: 'BM/absensi/BM_presensi_istirahat.html' },
-          { label: 'Presensi Lembur', link: 'BM/absensi/BM_presensi_lembur.html' },
-          { label: 'Skenario Jam Kerja', link: 'BM/absensi/BM_skenario_jam_kerja.html' }
+          { label: 'Kehadiran', link: 'BM/absensi/BM_kehadiran.html', icon: 'calendar-check' },
+          { label: 'Presensi Istirahat', link: 'BM/absensi/BM_presensi_istirahat.html', icon: 'coffee' },
+          { label: 'Presensi Lembur', link: 'BM/absensi/BM_presensi_lembur.html', icon: 'clock-alert' },
+          { label: 'Skenario Jam Kerja', link: 'BM/absensi/BM_skenario_jam_kerja.html', icon: 'binary' }
         ]
       },
       {
         type: 'group', label: 'Penilaian', icon: 'star', id: 'm-bm-penilaian',
         children: [
-          { label: 'Penilaian Karyawan', link: 'BM/penilaian/BM_penilaian_karyawan.html' }
+          { label: 'Penilaian Karyawan', link: 'BM/penilaian/BM_penilaian_karyawan.html', icon: 'award' }
         ]
       },
 
@@ -112,17 +112,17 @@
       {
         type: 'group', label: 'Dokumen & Kolaborasi', icon: 'folder', id: 'm-bm-dokumen',
         children: [
-          { label: 'Folder', link: 'BM/dokumen_kolaborasi/BM_folder.html' }
+          { label: 'Folder', link: 'BM/dokumen_kolaborasi/BM_folder.html', icon: 'folder-open' }
         ]
       },
       {
         type: 'group', label: 'Perusahaan', icon: 'buildings', id: 'm-bm-perusahaan',
         children: [
-          { label: 'Profil Perusahaan', link: 'BM/perusahaan/BM_profil_perusahaan.html' },
-          { label: 'Sub Perusahaan', link: 'BM/perusahaan/BM_subperusahaan.html' },
-          { label: 'Divisi', link: 'BM/perusahaan/BM_divisi.html' },
-          { label: 'Jabatan', link: 'BM/perusahaan/BM_jabatan.html' },
-          { label: 'Struktur Perusahaan', link: 'BM/perusahaan/BM_struktur_perusahaan.html' }
+          { label: 'Profil Perusahaan', link: 'BM/perusahaan/BM_profil_perusahaan.html', icon: 'building-2' },
+          { label: 'Sub Perusahaan', link: 'BM/perusahaan/BM_subperusahaan.html', icon: 'layers' },
+          { label: 'Divisi', link: 'BM/perusahaan/BM_divisi.html', icon: 'layout-grid' },
+          { label: 'Jabatan', link: 'BM/perusahaan/BM_jabatan.html', icon: 'user-check' },
+          { label: 'Struktur Perusahaan', link: 'BM/perusahaan/BM_struktur_perusahaan.html', icon: 'binary' }
         ]
       }
     ],
@@ -135,31 +135,29 @@
       {
         type: 'group', label: 'Absensi', icon: 'clock', id: 'm-spv-absensi',
         children: [
-          { label: 'Absensi', link: 'SpvKol/absensi/spvkol_kehadiran.html' },
-          { label: 'Presensi Istirahat', link: 'SpvKol/absensi/spvkol_presensi_istirahat.html' },
-          { label: 'Presensi Lembur', link: 'SpvKol/absensi/spvkol_presensi_lembur.html' }
+          { label: 'Absensi', link: 'SpvKol/absensi/spvkol_kehadiran.html', icon: 'calendar-check' },
+          { label: 'Presensi Istirahat', link: 'SpvKol/absensi/spvkol_presensi_istirahat.html', icon: 'coffee' },
+          { label: 'Presensi Lembur', link: 'SpvKol/absensi/spvkol_presensi_lembur.html', icon: 'clock-alert' }
         ]
       },
       {
         type: 'group', label: 'Operasional', icon: 'briefcase', id: 'm-spv-operasional',
         children: [
-          { label: 'Dashboard Campaign', link: 'SpvKol/operasional/spvkol_dashboard_campaign.html' },
-          { label: 'Campaign', link: 'SpvKol/operasional/spvkol_campaign.html' },
-          { label: 'Data Kreator', link: 'SpvKol/operasional/spvkol_kreator.html' },
-          { label: 'Tracking Kreator', link: 'SpvKol/operasional/spvkol_tracking_kreator.html' },
-          { label: 'Tracking Sampel', link: 'SpvKol/operasional/spvkol_tracking_sampel.html' },
-          { label: 'Performa Kreator', link: 'SpvKol/operasional/spvkol_Performa_Kreator.html' },
-          { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html' },
-          { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html' }
+          { label: 'Dashboard Campaign', link: 'SpvKol/operasional/spvkol_dashboard_campaign.html', icon: 'layout-dashboard' },
+          { label: 'Campaign', link: 'SpvKol/operasional/spvkol_campaign.html', icon: 'flag' },
+          { label: 'Data Kreator', link: 'SpvKol/operasional/spvkol_kreator.html', icon: 'users' },
+          { label: 'Tracking Kreator', link: 'SpvKol/operasional/spvkol_tracking_kreator.html', icon: 'user-check' },
+          { label: 'Tracking Sampel', link: 'SpvKol/operasional/spvkol_tracking_sampel.html', icon: 'package' },
+          { label: 'Performa Kreator', link: 'SpvKol/operasional/spvkol_Performa_Kreator.html', icon: 'trending-up' }
         ]
       },
       {
         type: 'group', label: 'Brands', icon: 'brand', id: 'm-spv-brands',
         children: [
-          { label: 'Dashboard Brands', link: 'SpvKol/brand/spvkol_dashboard_brand.html' },
-          { label: 'Produk & Brands', link: 'SpvKol/brand/spvkol_produk_brand.html' },
-          { label: 'Data Brands', link: 'SpvKol/brand/spvkol_data_brand.html' },
-          { label: 'Laporan Brand', link: 'SpvKol/brand/spvkol_laporan_brand.html' }
+          { label: 'Dashboard Brands', link: 'SpvKol/brand/spvkol_dashboard_brand.html', icon: 'layout-dashboard' },
+          { label: 'Produk & Brands', link: 'SpvKol/brand/spvkol_produk_brand.html', icon: 'boxes' },
+          { label: 'Data Brands', link: 'SpvKol/brand/spvkol_data_brand.html', icon: 'sparkles' },
+          { label: 'Laporan Brand', link: 'SpvKol/brand/spvkol_laporan_brand.html', icon: 'file-bar-chart' }
         ]
       },
 
@@ -167,35 +165,35 @@
       {
         type: 'group', label: 'Dokumen & Kolaborasi', icon: 'folder', id: 'm-spv-dokumen',
         children: [
-          { label: 'My Folders', link: 'SpvKol/dokumen_kolaborasi/spvkol_folder.html' }
+          { label: 'My Folders', link: 'SpvKol/dokumen_kolaborasi/spvkol_folder.html', icon: 'folder-open' }
         ]
       },
       {
         type: 'group', label: 'Perancangan Kerja', icon: 'task', id: 'm-spv-perancangan',
         children: [
-          { label: 'RRK', link: 'SpvKol/perancangan_kerja/spvkol_rrk.html' },
-          { label: 'Milestone', link: 'SpvKol/perancangan_kerja/spvkol_Milestone.html' },
-          { label: 'Tugas', link: 'SpvKol/perancangan_kerja/spvkol_tugas.html' },
-          { label: 'Project', link: 'SpvKol/perancangan_kerja/spvkol_project.html' },
-          { label: 'Laporan', link: 'SpvKol/perancangan_kerja/spvkol_laporan.html' },
-          { label: 'Pengaduan', link: 'SpvKol/perancangan_kerja/spvkol_pengaduan.html' }
+          { label: 'RRK', link: 'SpvKol/perancangan_kerja/spvkol_rrk.html', icon: 'file-text' },
+          { label: 'Milestone', link: 'SpvKol/perancangan_kerja/spvkol_Milestone.html', icon: 'flag' },
+          { label: 'Tugas', link: 'SpvKol/perancangan_kerja/spvkol_tugas.html', icon: 'check-square' },
+          { label: 'Project', link: 'SpvKol/perancangan_kerja/spvkol_project.html', icon: 'kanban' },
+          { label: 'Laporan', link: 'SpvKol/perancangan_kerja/spvkol_laporan.html', icon: 'file-bar-chart' },
+          { label: 'Pengaduan', link: 'SpvKol/perancangan_kerja/spvkol_pengaduan.html', icon: 'alert-circle' }
         ]
       },
       {
         type: 'group', label: 'Kinerja', icon: 'chart', id: 'm-spv-kinerja',
         children: [
-          { label: 'Evaluasi Kinerja', link: 'SpvKol/kinerja/spvkol_evaluasi_kinerja.html' },
-          { label: 'Target & Capaian Kerja', link: 'SpvKol/kinerja/spvkol_target_capaian.html' },
-          { label: 'Upgrade Skill', link: 'SpvKol/kinerja/spvkol_upgrade_skill.html' }
+          { label: 'Evaluasi Kinerja', link: 'SpvKol/kinerja/spvkol_evaluasi_kinerja.html', icon: 'award' },
+          { label: 'Target & Capaian Kerja', link: 'SpvKol/kinerja/spvkol_target_capaian.html', icon: 'target' },
+          { label: 'Upgrade Skill', link: 'SpvKol/kinerja/spvkol_upgrade_skill.html', icon: 'trending-up' }
         ]
       },
       {
         type: 'group', label: 'Data Master', icon: 'tag', id: 'm-spv-master',
         children: [
-          { label: 'Kategori Produk', link: 'SpvKol/data_master/master_pendukung/spvkol_Kategori_Produk.html' },
-          { label: 'Leads Kreator', link: 'SpvKol/data_master/master_pendukung/spvkol_Leads_Kreator.html' },
-          { label: 'Leveling Kreator', link: 'SpvKol/data_master/master_pendukung/spvkol_Leveling_Kreator.html' },
-          { label: 'Ads Account', link: 'SpvKol/data_master/master_pendukung/spvkol_Ads_Account.html' }
+          { label: 'Kategori Produk', link: 'SpvKol/data_master/master_pendukung/spvkol_Kategori_Produk.html', icon: 'layers' },
+          { label: 'Leads Kreator', link: 'SpvKol/data_master/master_pendukung/spvkol_Leads_Kreator.html', icon: 'users' },
+          { label: 'Leveling Kreator', link: 'SpvKol/data_master/master_pendukung/spvkol_Leveling_Kreator.html', icon: 'layout-grid' },
+          { label: 'Ads Account', link: 'SpvKol/data_master/master_pendukung/spvkol_Ads_Account.html', icon: 'credit-card' }
         ]
       }
     ],
@@ -208,32 +206,30 @@
       {
         type: 'group', label: 'Absensi', icon: 'clock', id: 'm-staff-absensi',
         children: [
-          { label: 'Absensi', link: 'StaffKol/absensi/staffkol_kehadiran.html' },
-          { label: 'Presensi Istirahat', link: 'StaffKol/absensi/staffkol_presensi_istirahat.html' },
-          { label: 'Presensi Lembur', link: 'StaffKol/absensi/staffkol_presensi_lembur.html' }
+          { label: 'Absensi', link: 'StaffKol/absensi/staffkol_kehadiran.html', icon: 'calendar-check' },
+          { label: 'Presensi Istirahat', link: 'StaffKol/absensi/staffkol_presensi_istirahat.html', icon: 'coffee' },
+          { label: 'Presensi Lembur', link: 'StaffKol/absensi/staffkol_presensi_lembur.html', icon: 'clock-alert' }
         ]
       },
       {
         type: 'group', label: 'Operasional', icon: 'briefcase', id: 'm-staff-operasional',
         children: [
-          { label: 'Dashboard Campaign', link: 'StaffKol/operasional/staffkol_dashboard_campaign.html' },
-          { label: 'Campaign', link: 'StaffKol/operasional/staffkol_campaign.html' },
-          { label: 'Laporan Campaign', link: 'StaffKol/operasional/staffkol_laporan_campaign.html' },
-          { label: 'Data Kreator', link: 'StaffKol/operasional/staffkol_kreator.html' },
-          { label: 'Tracking Kreator', link: 'StaffKol/operasional/staffkol_tracking_kreator.html' },
-          { label: 'Tracking Sampel', link: 'StaffKol/operasional/staffkol_tracking_sampel.html' },
-          { label: 'Performa Kreator', link: 'StaffKol/operasional/staffkol_Performa_Kreator.html' },
-          { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html' },
-          { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html' }
+          { label: 'Dashboard Campaign', link: 'StaffKol/operasional/staffkol_dashboard_campaign.html', icon: 'layout-dashboard' },
+          { label: 'Campaign', link: 'StaffKol/operasional/staffkol_campaign.html', icon: 'flag' },
+          { label: 'Laporan Campaign', link: 'StaffKol/operasional/staffkol_laporan_campaign.html', icon: 'file-bar-chart' },
+          { label: 'Data Kreator', link: 'StaffKol/operasional/staffkol_kreator.html', icon: 'users' },
+          { label: 'Tracking Kreator', link: 'StaffKol/operasional/staffkol_tracking_kreator.html', icon: 'user-check' },
+          { label: 'Tracking Sampel', link: 'StaffKol/operasional/staffkol_tracking_sampel.html', icon: 'package' },
+          { label: 'Performa Kreator', link: 'StaffKol/operasional/staffkol_Performa_Kreator.html', icon: 'trending-up' }
         ]
       },
       {
         type: 'group', label: 'Brands', icon: 'brand', id: 'm-staff-brands',
         children: [
-          { label: 'Dashboard Brands', link: 'StaffKol/brand/staffkol_dashboard_brand.html' },
-          { label: 'Produk & Brands', link: 'StaffKol/brand/staffkol_produk_brand.html' },
-          { label: 'Data Brands', link: 'StaffKol/brand/staffkol_data_brand.html' },
-          { label: 'Laporan Brand', link: 'StaffKol/brand/staffkol_laporan_brand.html' }
+          { label: 'Dashboard Brands', link: 'StaffKol/brand/staffkol_dashboard_brand.html', icon: 'layout-dashboard' },
+          { label: 'Produk & Brands', link: 'StaffKol/brand/staffkol_produk_brand.html', icon: 'boxes' },
+          { label: 'Data Brands', link: 'StaffKol/brand/staffkol_data_brand.html', icon: 'sparkles' },
+          { label: 'Laporan Brand', link: 'StaffKol/brand/staffkol_laporan_brand.html', icon: 'file-bar-chart' }
         ]
       },
 
@@ -241,26 +237,26 @@
       {
         type: 'group', label: 'Dokumen & Kolaborasi', icon: 'folder', id: 'm-staff-dokumen',
         children: [
-          { label: 'My Folders', link: 'StaffKol/dokumen_kolaborasi/staffkol_folder.html' }
+          { label: 'My Folders', link: 'StaffKol/dokumen_kolaborasi/staffkol_folder.html', icon: 'folder-open' }
         ]
       },
       {
         type: 'group', label: 'Perancangan Kerja', icon: 'task', id: 'm-staff-perancangan',
         children: [
-          { label: 'RRK', link: 'StaffKol/perancangan_kerja/staffkol_rrk.html' },
-          { label: 'Milestone', link: 'StaffKol/perancangan_kerja/staffkol_Milestone.html' },
-          { label: 'Tugas', link: 'StaffKol/perancangan_kerja/staffkol_tugas.html' },
-          { label: 'Project', link: 'StaffKol/perancangan_kerja/staffkol_project.html' },
-          { label: 'Laporan', link: 'StaffKol/perancangan_kerja/staffkol_laporan.html' },
-          { label: 'Pengaduan', link: 'StaffKol/perancangan_kerja/staffkol_pengaduan.html' }
+          { label: 'RRK', link: 'StaffKol/perancangan_kerja/staffkol_rrk.html', icon: 'file-text' },
+          { label: 'Milestone', link: 'StaffKol/perancangan_kerja/staffkol_Milestone.html', icon: 'flag' },
+          { label: 'Tugas', link: 'StaffKol/perancangan_kerja/staffkol_tugas.html', icon: 'check-square' },
+          { label: 'Project', link: 'StaffKol/perancangan_kerja/staffkol_project.html', icon: 'kanban' },
+          { label: 'Laporan', link: 'StaffKol/perancangan_kerja/staffkol_laporan.html', icon: 'file-bar-chart' },
+          { label: 'Pengaduan', link: 'StaffKol/perancangan_kerja/staffkol_pengaduan.html', icon: 'alert-circle' }
         ]
       },
       {
         type: 'group', label: 'Kinerja', icon: 'chart', id: 'm-staff-kinerja',
         children: [
-          { label: 'Evaluasi Kinerja', link: 'StaffKol/kinerja/staffkol_evaluasi_kinerja.html' },
-          { label: 'Target & Capaian Kerja', link: 'StaffKol/kinerja/staffkol_target_capaian.html' },
-          { label: 'Upgrade Skill', link: 'StaffKol/kinerja/staffkol_upgrade_skill.html' }
+          { label: 'Evaluasi Kinerja', link: 'StaffKol/kinerja/staffkol_evaluasi_kinerja.html', icon: 'award' },
+          { label: 'Target & Capaian Kerja', link: 'StaffKol/kinerja/staffkol_target_capaian.html', icon: 'target' },
+          { label: 'Upgrade Skill', link: 'StaffKol/kinerja/staffkol_upgrade_skill.html', icon: 'trending-up' }
         ]
       }
     ],
@@ -416,7 +412,12 @@
     'user-check': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>`,
     'building-2': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>`,
     'tags': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/><path d="M9.586 5.586A2 2 0 0 0 8.172 5H3a1 1 0 0 0-1 1v5.172a2 2 0 0 0 .586 1.414L8.29 18.29a2.4 2.4 0 0 0 3.414 0l4.586-4.586a2.4 2.4 0 0 0 0-3.414l-5.704-5.704a2 2 0 0 0-1-.586Z"/><circle cx="6.5" cy="6.5" r="1.5"/></svg>`,
-    'users': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`
+    'users': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    'target': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+    'package': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`,
+    'award': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
+    'sparkles': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>`,
+    'star': `<svg style="width:15px;height:15px;flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
   };
 
   function renderLucideIcon(key) {
@@ -516,7 +517,7 @@
     } catch (e) {}
   })();
 
-  const NAV_CACHE_VER = 'v=20261123_v4';
+  const NAV_CACHE_VER = 'v=20261123_v6';
   let menuHtml = '';
   let isFirstHeading = true;
 
@@ -1026,7 +1027,12 @@
         <img src="${rootPrefix}media/logo.png" class="brand-logo-img" style="width:38px;height:38px;object-fit:contain;flex-shrink:0;display:block;transition:transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);" alt="Logo Bisa Media" onerror="this.style.display='none'" />
         <div style="display:flex;flex-direction:column;">
           <span style="font-size:23px;font-weight:800;color:#0f172a;letter-spacing:-0.7px;font-family:'Plus Jakarta Sans','Outfit',system-ui,sans-serif;line-height:1.15;white-space:nowrap;">Bisa Media</span>
-          ${role === 'accounting' ? '<span style="font-size:10px;font-weight:700;color:#0284c7;letter-spacing:0.8px;text-transform:uppercase;line-height:1.2;margin-top:1px;">Accounting</span>' : ''}
+          <span style="font-size:10px;font-weight:700;color:#0284c7;letter-spacing:0.8px;text-transform:uppercase;line-height:1.2;margin-top:1px;">${
+            role === 'accounting' ? 'Accounting' :
+            role === 'spv_kol' ? 'SPV KOL' :
+            role === 'staff_kol' ? 'Staff KOL' :
+            'Admin'
+          }</span>
         </div>
       </a>
       <!-- Scrollable Navigation Menu (Direct flex child: takes available height) -->
@@ -3069,17 +3075,57 @@
     initAppEmptyStateSupervisor();
   }
 
-  /* ===== GLOBAL ACCOUNTING MASTER DIVISI SYNCHRONIZER ===== */
+    /* ===== GLOBAL ACCOUNTING MASTER DIVISI SYNCHRONIZER ===== */
   const ACCOUNTING_DIVISI_STORAGE_KEY = 'accounting_master_divisi_v1';
   const DEFAULT_ACCOUNTING_DIVISI_DATA = [
-    { id: 'div-1', nama: 'Finance & Accounting' },
-    { id: 'div-2', nama: 'MCN' },
-    { id: 'div-3', nama: 'Operasional' },
-    { id: 'div-4', nama: 'Marketing & Brand' },
-    { id: 'div-5', nama: 'Creative & Design' },
-    { id: 'div-6', nama: 'General Affair' },
-    { id: 'div-7', nama: 'Human Resource (HR)' },
-    { id: 'div-8', nama: 'IT & Development' }
+    { id: 'div-1', nama: 'Accounting', subPerusahaan: 'MCN' },
+    { id: 'div-2', nama: 'Agency', subPerusahaan: 'TAP' },
+    { id: 'div-3', nama: 'CEO Office', subPerusahaan: 'MCN' },
+    { id: 'div-4', nama: 'Clining Service', subPerusahaan: 'TSP' },
+    { id: 'div-5', nama: 'COO Office', subPerusahaan: 'TAP' },
+    { id: 'div-6', nama: 'Event', subPerusahaan: 'MCN' },
+    { id: 'div-7', nama: 'General', subPerusahaan: 'TSP' },
+    { id: 'div-8', nama: 'Head Of Finance', subPerusahaan: 'MCN' },
+    { id: 'div-9', nama: 'Head Of Human Resource', subPerusahaan: 'TAP' },
+    { id: 'div-10', nama: 'Head Of IT', subPerusahaan: 'TSP' },
+    { id: 'div-11', nama: 'Head Of Marketing', subPerusahaan: 'MCN' },
+    { id: 'div-12', nama: 'HR', subPerusahaan: 'TAP' },
+    { id: 'div-13', nama: 'Live HUB', subPerusahaan: 'MCN' },
+    { id: 'div-14', nama: 'Manager Operation', subPerusahaan: 'TAP' },
+    { id: 'div-15', nama: 'Manager TAP', subPerusahaan: 'TAP' },
+    { id: 'div-16', nama: 'Manager TSP', subPerusahaan: 'TSP' },
+    { id: 'div-17', nama: 'Marketing', subPerusahaan: 'MCN' },
+    { id: 'div-18', nama: 'MCN', subPerusahaan: 'MCN' },
+    { id: 'div-19', nama: 'Pentry', subPerusahaan: 'TSP' },
+    { id: 'div-20', nama: 'Probability', subPerusahaan: 'TSP' },
+    { id: 'div-21', nama: 'Produksi', subPerusahaan: 'TSP' },
+    { id: 'div-22', nama: 'SPV Account Management', subPerusahaan: 'TAP' },
+    { id: 'div-23', nama: 'SPV Advertiser', subPerusahaan: 'TAP' },
+    { id: 'div-24', nama: 'SPV Content Management', subPerusahaan: 'MCN' },
+    { id: 'div-25', nama: 'SPV Creative', subPerusahaan: 'TSP' },
+    { id: 'div-26', nama: 'SPV IT Programer', subPerusahaan: 'TSP' },
+    { id: 'div-27', nama: 'SPV KOL Management', subPerusahaan: 'MCN' },
+    { id: 'div-28', nama: 'SPV Live Management', subPerusahaan: 'MCN' },
+    { id: 'div-29', nama: 'SPV Marketing', subPerusahaan: 'MCN' },
+    { id: 'div-30', nama: 'Staf Account Management', subPerusahaan: 'TAP' },
+    { id: 'div-31', nama: 'Staf Administrasi Umum', subPerusahaan: 'TSP' },
+    { id: 'div-32', nama: 'Staf Advertiser', subPerusahaan: 'TAP' },
+    { id: 'div-33', nama: 'Staf Content Management', subPerusahaan: 'MCN' },
+    { id: 'div-34', nama: 'Staf Creative', subPerusahaan: 'TSP' },
+    { id: 'div-35', nama: 'Staf Information Technology', subPerusahaan: 'TSP' },
+    { id: 'div-36', nama: 'Staf KOL Management', subPerusahaan: 'MCN' },
+    { id: 'div-37', nama: 'Staf Live Management', subPerusahaan: 'MCN' },
+    { id: 'div-38', nama: 'Staf Marketing Communication', subPerusahaan: 'MCN' },
+    { id: 'div-39', nama: 'Staf Public Relation', subPerusahaan: 'MCN' },
+    { id: 'div-40', nama: 'TAP', subPerusahaan: 'TAP' },
+    { id: 'div-41', nama: 'TSP', subPerusahaan: 'TSP' },
+    { id: 'div-42', nama: 'Finance & Accounting', subPerusahaan: 'MCN' },
+    { id: 'div-43', nama: 'Operasional', subPerusahaan: 'TAP' },
+    { id: 'div-44', nama: 'Marketing & Brand', subPerusahaan: 'TAP' },
+    { id: 'div-45', nama: 'Creative & Design', subPerusahaan: 'TSP' },
+    { id: 'div-46', nama: 'General Affair', subPerusahaan: 'TSP' },
+    { id: 'div-47', nama: 'Human Resource (HR)', subPerusahaan: 'TAP' },
+    { id: 'div-48', nama: 'IT & Development', subPerusahaan: 'TSP' }
   ];
 
   function getAccountingDivisiList() {

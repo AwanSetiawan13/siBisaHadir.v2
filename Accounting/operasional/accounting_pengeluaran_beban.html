@@ -424,6 +424,21 @@
     #pndTable tbody tr:hover td.col-pinned-sticky {
       background-color: #f8fafc !important;
     }
+    #pndTable tbody tr.pnd-row-needs-edit td:first-child,
+    #pndTable tbody tr.pnd-row-needs-edit td.col-pinned-sticky,
+    #pndTable tbody tr.pnd-row-needs-edit td.col-sticky-action,
+    #pndTable tbody tr.pnd-row-needs-edit td {
+      background-color: #fef9c3 !important;
+    }
+    #pndTable tbody tr.pnd-row-needs-edit td:first-child {
+      border-left: 4px solid #f59e0b !important;
+    }
+    #pndTable tbody tr.pnd-row-needs-edit:hover td:first-child,
+    #pndTable tbody tr.pnd-row-needs-edit:hover td.col-pinned-sticky,
+    #pndTable tbody tr.pnd-row-needs-edit:hover td.col-sticky-action,
+    #pndTable tbody tr.pnd-row-needs-edit:hover td {
+      background-color: #fef08a !important;
+    }
 
     #pndTable th.col-pinned-last,
     #pndTable td.col-pinned-last {
@@ -2521,21 +2536,7 @@
                   </div>
                 </div>
 
-                <!-- Group 2: Status Bayar Lama -->
-                <div class="pnd-filter-group">
-                  <label class="pnd-filter-label" for="filterStatusBayarLama">Status Bayar Lama</label>
-                  <div class="pnd-filter-box" id="boxFilterStatusBayarLama">
-                    <div class="pnd-filter-input-wrap">
-                      <input type="text" id="filterStatusBayarLama" class="pnd-filter-input pnd-filter-cyan-border" placeholder="Pilih Status Bayar Lama" autocomplete="off" />
-                      <span class="pnd-filter-arrow" title="Buka pilihan">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </span>
-                    </div>
-                    <div class="pnd-filter-dropdown-list pnd-filter-cyan-border" id="listFilterStatusBayarLama"></div>
-                  </div>
-                </div>
+
 
                 <!-- Filter Actions -->
                 <div class="pnd-filter-actions">
@@ -2630,8 +2631,8 @@
             </div>
           </div>
 
-          <div class="pnd-toolbar__right">
-            <button id="btnTambahPnd" class="btn-tambah-pnd" type="button">+ Tambah</button>
+          <div class="pnd-toolbar__right" style="display: none !important;">
+            <button id="btnTambahPnd" class="btn-tambah-pnd" type="button" style="display: none !important;">+ Tambah</button>
           </div>
         </div>
 
@@ -2668,10 +2669,8 @@
                 <th style="white-space: nowrap; text-align: right;">DPP/Beban</th>
                 <th style="white-space: nowrap; text-align: right;">PPN</th>
                 <th style="white-space: nowrap; text-align: right;">Tagihan Bruto</th>
-                <th style="white-space: nowrap; text-align: center;">Status Bayar Lama</th>
-                <th style="white-space: nowrap;">Tanggal Bayar Lama</th>
-                <th style="white-space: nowrap;">Akun Lama</th>
                 <th style="white-space: nowrap;">Project / Brand</th>
+                <th style="white-space: nowrap; text-align: right;">Limitasi</th>
                 <th style="white-space: nowrap;">Jenis</th>
                 <th style="white-space: nowrap; text-align: right;">Beban Diakui</th>
                 <th style="white-space: nowrap; text-align: right;">Terbayar Kas</th>
@@ -2680,9 +2679,6 @@
                 <th style="white-space: nowrap; text-align: center;">Bukti</th>
                 <th style="white-space: nowrap;">Catatan</th>
                 <th style="white-space: nowrap;">Divisi Pengecualian</th>
-                <th style="white-space: nowrap;">Nama Akun COA</th>
-                <th style="white-space: nowrap;">Kelompok COA</th>
-                <th style="white-space: nowrap; text-align: center;">Status COA</th>
                 <th class="col-sticky-action" style="width: 60px; text-align: center;">Aksi</th>
               </tr>
             </thead>
@@ -2713,35 +2709,15 @@
         <input type="hidden" id="pndEditId" />
 
         <div class="pnd-form-grid">
-          <!-- Row 1: ID Dokumen, ID Approval, Tanggal Pengakuan -->
+          <!-- Row 1: ID Dokumen (Auto-Increment Readonly), ID Approval (Readonly), Tanggal Pengakuan (Readonly) -->
           <div class="pnd-field">
             <label class="pnd-label" for="pndIdDokumen">ID Dokumen</label>
-            <input type="text" id="pndIdDokumen" class="pnd-input" placeholder="EXP-2609-001" required />
+            <input type="text" id="pndIdDokumen" class="pnd-input pnd-input-readonly" placeholder="Otomatis (Auto Increment)" readonly tabindex="-1" required />
           </div>
 
           <div class="pnd-field">
-            <label class="pnd-label">ID Approval</label>
-            <div class="pnd-select-wrap" id="wrapIdApproval">
-              <div class="pnd-select-btn" id="btnTriggerIdApproval">
-                <span id="labelIdApproval">Pilih ID Approval</span>
-                <span class="pnd-select-arrow">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </span>
-              </div>
-              <input type="hidden" id="pndIdApproval" />
-              <div class="pnd-select-dropdown" id="dropdownIdApproval">
-                <label class="pnd-select-item">
-                  <input type="radio" name="optIdApproval" value="APR-2609-001" data-label="APR-2609-001" />
-                  <span>APR-2609-001</span>
-                </label>
-                <label class="pnd-select-item">
-                  <input type="radio" name="optIdApproval" value="APR-2609-002" data-label="APR-2609-002" />
-                  <span>APR-2609-002</span>
-                </label>
-              </div>
-            </div>
+            <label class="pnd-label" for="pndIdApproval">ID Approval</label>
+            <input type="text" id="pndIdApproval" class="pnd-input pnd-input-readonly" placeholder="Otomatis dari Approval" readonly tabindex="-1" required />
           </div>
 
           <div class="pnd-field">
@@ -2821,43 +2797,48 @@
           <div class="pnd-field">
             <label class="pnd-label" for="pndDpp">DPP/Beban</label>
             <input type="text" id="pndDpp" class="pnd-input" placeholder="Rp. -" />
+            <div id="pndDppLimitAlert" style="display: none; margin-top: 4px; padding: 6px 10px; border-radius: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 11.5px; font-weight: 600; line-height: 1.35;"></div>
           </div>
 
-          <!-- Row 4: PPN, Tagihan Bruto, Status Bayar Lama -->
+          <!-- Row 4: PPN (Opsional), Total PPN, Tagihan Bruto -->
           <div class="pnd-field">
-            <label class="pnd-label" for="pndPpn">PPN (Opsional)</label>
-            <input type="text" id="pndPpn" class="pnd-input" placeholder="Rp. -" />
+            <label class="pnd-label">PPN (Opsional)</label>
+            <div class="pnd-select-wrap" id="wrapPpn">
+              <div class="pnd-select-btn" id="btnTriggerPpn">
+                <span id="labelPpn">Pilih PPN</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndPpnType" value="" />
+              <input type="hidden" id="pndPpn" value="0" />
+              <div class="pnd-select-dropdown" id="dropdownPpn">
+                <label class="pnd-select-item">
+                  <input type="radio" name="optPpn" value="" data-label="Pilih PPN" />
+                  <span style="color: #64748b; font-style: italic;">- Tanpa PPN -</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optPpn" value="VAT(11%)" data-label="VAT(11%)" />
+                  <span>VAT(11%)</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optPpn" value="VAT(11%) & WHT(-2%)" data-label="VAT(11%) & WHT(-2%)" />
+                  <span>VAT(11%) & WHT(-2%)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndTotalPpn">Total PPN</label>
+            <input type="text" id="pndTotalPpn" class="pnd-input pnd-input-readonly" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
 
           <div class="pnd-field">
             <label class="pnd-label" for="pndTagihanBruto">Tagihan Bruto</label>
             <input type="text" id="pndTagihanBruto" class="pnd-input pnd-input-readonly" placeholder="Otomatis dari ID Approval" readonly tabindex="-1" />
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndStatusBayarLama">Status Bayar Lama</label>
-            <input type="text" id="pndStatusBayarLama" class="pnd-input pnd-input-readonly" placeholder="Otomatis dari Approval / Sisa Utang" readonly tabindex="-1" style="cursor: not-allowed; pointer-events: none; background-color: #f1f5f9;" />
-          </div>
-
-          <!-- Row 5: Tanggal Bayar Lama, Akun Lama, Project/Brand (Auto Fill & Readonly) -->
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndTanggalBayarLama">Tanggal Bayar Lama (Opsional)</label>
-            <div class="bisa-datepicker-wrap" style="pointer-events: none; cursor: not-allowed;">
-              <input type="text" id="pndTanggalBayarLama" class="pnd-input pnd-input-readonly bisa-datepicker-input" placeholder="Otomatis dari ID Approval" readonly tabindex="-1" autocomplete="off" style="cursor: not-allowed; pointer-events: none; background-color: #f1f5f9;" />
-              <span class="bisa-datepicker-icon" title="Otomatis" style="pointer-events: none;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-              </span>
-            </div>
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndAkunLama">Akun Lama</label>
-            <input type="text" id="pndAkunLama" class="pnd-input pnd-input-readonly" placeholder="Otomatis Akun" readonly tabindex="-1" style="cursor: not-allowed; pointer-events: none; background-color: #f1f5f9;" />
           </div>
 
           <div class="pnd-field">
@@ -2878,35 +2859,32 @@
                   <span style="color: #64748b; font-style: italic;">- Tanpa Project / Brand -</span>
                 </label>
                 <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411734 | Campaign Brand A" data-label="7691348184035411734 | Campaign Brand A" />
-                  <span>7691348184035411734 | Campaign Brand A</span>
+                  <input type="radio" name="optProjectBrand" value="Campaign Brand A" data-label="Campaign Brand A" />
+                  <span>Campaign Brand A</span>
                 </label>
                 <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411735 | Shopee Affiliate Mall" data-label="7691348184035411735 | Shopee Affiliate Mall" />
-                  <span>7691348184035411735 | Shopee Affiliate Mall</span>
+                  <input type="radio" name="optProjectBrand" value="Seluruh Kreator MCN" data-label="Seluruh Kreator MCN" />
+                  <span>Seluruh Kreator MCN</span>
                 </label>
                 <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411736 | Cosmo Endorse" data-label="7691348184035411736 | Cosmo Endorse" />
-                  <span>7691348184035411736 | Cosmo Endorse</span>
+                  <input type="radio" name="optProjectBrand" value="Shopee Mega Sale" data-label="Shopee Mega Sale" />
+                  <span>Shopee Mega Sale</span>
                 </label>
                 <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411737 | Shopee Mega Sale" data-label="7691348184035411737 | Shopee Mega Sale" />
-                  <span>7691348184035411737 | Shopee Mega Sale</span>
+                  <input type="radio" name="optProjectBrand" value="Shopee Affiliate Mall" data-label="Shopee Affiliate Mall" />
+                  <span>Shopee Affiliate Mall</span>
                 </label>
                 <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411738 | Product Launching Serum Glow" data-label="7691348184035411738 | Product Launching Serum Glow" />
-                  <span>7691348184035411738 | Product Launching Serum Glow</span>
-                </label>
-                <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411739 | Tap & Tsp" data-label="7691348184035411739 | Tap & Tsp" />
-                  <span>7691348184035411739 | Tap & Tsp</span>
-                </label>
-                <label class="pnd-select-item">
-                  <input type="radio" name="optProjectBrand" value="7691348184035411733 | Seluruh Kreator MCN" data-label="7691348184035411733 | Seluruh Kreator MCN" />
-                  <span>7691348184035411733 | Seluruh Kreator MCN</span>
+                  <input type="radio" name="optProjectBrand" value="Brand Alpha" data-label="Brand Alpha" />
+                  <span>Brand Alpha</span>
                 </label>
               </div>
             </div>
+          </div>
+
+          <div class="pnd-field">
+            <label class="pnd-label" for="pndLimitasi">Limitasi</label>
+            <input type="text" id="pndLimitasi" class="pnd-input pnd-input-readonly" placeholder="Rp. -" readonly tabindex="-1" />
           </div>
 
           <!-- Row 6: Jenis, Beban di Akui, Terbayar Kas -->
@@ -2999,21 +2977,6 @@
             </div>
           </div>
 
-          <!-- Row 9: Nama Akun COA, Kelompok COA, Status COA -->
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndNamaAkunCoa">Nama Akun COA</label>
-            <input type="text" id="pndNamaAkunCoa" class="pnd-input pnd-input-readonly" placeholder="Otomatis dari Kode COA" readonly tabindex="-1" />
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndKelompokCoa">Kelompok COA</label>
-            <input type="text" id="pndKelompokCoa" class="pnd-input pnd-input-readonly" placeholder="Otomatis dari Kode COA" readonly tabindex="-1" />
-          </div>
-
-          <div class="pnd-field">
-            <label class="pnd-label" for="pndStatusCoa">Status COA</label>
-            <input type="text" id="pndStatusCoa" class="pnd-input pnd-input-readonly" placeholder="Otomatis dari Kode COA" readonly tabindex="-1" />
-          </div>
         </div>
 
         <div class="pnd-modal-footer">
@@ -3086,26 +3049,20 @@
           <input type="text" id="viewPndPpn" class="pnd-input is-muted" readonly />
         </div>
         <div class="pnd-field">
+          <label class="pnd-label">Total PPN</label>
+          <input type="text" id="viewPndTotalPpn" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
           <label class="pnd-label">Tagihan Bruto</label>
           <input type="text" id="viewPndTagihanBruto" class="pnd-input is-muted" readonly />
         </div>
         <div class="pnd-field">
-          <label class="pnd-label">Status Bayar Lama</label>
-          <input type="text" id="viewPndStatusBayarLama" class="pnd-input is-muted" readonly />
-        </div>
-
-        <!-- Row 5 -->
-        <div class="pnd-field">
-          <label class="pnd-label">Tanggal Bayar Lama</label>
-          <input type="text" id="viewPndTanggalBayarLama" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Akun Lama</label>
-          <input type="text" id="viewPndAkunLama" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
           <label class="pnd-label">Project/Brand (Opsional)</label>
           <input type="text" id="viewPndProjectBrand" class="pnd-input is-muted" readonly />
+        </div>
+        <div class="pnd-field">
+          <label class="pnd-label">Limitasi</label>
+          <input type="text" id="viewPndLimitasi" class="pnd-input is-muted" readonly />
         </div>
 
         <!-- Row 6 -->
@@ -3153,19 +3110,6 @@
           <input type="text" id="viewPndDivisiPengecualian" class="pnd-input is-muted" readonly />
         </div>
 
-        <!-- Row 9 -->
-        <div class="pnd-field">
-          <label class="pnd-label">Nama Akun COA</label>
-          <input type="text" id="viewPndNamaAkunCoa" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Kelompok COA</label>
-          <input type="text" id="viewPndKelompokCoa" class="pnd-input is-muted" readonly />
-        </div>
-        <div class="pnd-field">
-          <label class="pnd-label">Status COA</label>
-          <input type="text" id="viewPndStatusCoa" class="pnd-input is-muted" readonly />
-        </div>
       </div>
 
       <div class="pnd-modal-footer">
@@ -3571,71 +3515,246 @@
         return idPen ? (idPen + ' | ' + s) : s;
       }
 
+      function normalizeProjectBrandName(val) {
+        return String(val || '')
+          .replace(/^[A-Za-z0-9._-]+\s*\|\s*/, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      const LIMITASI_STORAGE_KEY = 'bisa_profit_project_brand_limitasi_v1';
+      const DEFAULT_LIMITASI_BY_BRAND = {
+        'campaign brand a': 10000000,
+        'seluruh kreator mcn': 5000000,
+        'shopee mega sale': 3000000,
+        'shopee affiliate mall': 5000000,
+        'brand alpha': 2000000
+      };
+
+      function getLimitasiForProjectBrand(projectBrand) {
+        const cleanKey = normalizeProjectBrandName(projectBrand).toLowerCase();
+        if (!cleanKey || cleanKey === '-' || cleanKey === '0' || cleanKey === '- tanpa project / brand -') return 0;
+        try {
+          const rawMap = localStorage.getItem(LIMITASI_STORAGE_KEY);
+          if (rawMap) {
+            const parsedMap = JSON.parse(rawMap);
+            if (parsedMap && typeof parsedMap === 'object' && Object.prototype.hasOwnProperty.call(parsedMap, cleanKey)) {
+              return Math.max(0, Number(parsedMap[cleanKey]) || 0);
+            }
+          }
+        } catch (e) {}
+        try {
+          const rawProfit = localStorage.getItem('bisa_profit_project_brand_data');
+          if (rawProfit) {
+            const parsedProfit = JSON.parse(rawProfit);
+            if (Array.isArray(parsedProfit)) {
+              const found = parsedProfit.find(function (p) {
+                return p && normalizeProjectBrandName(p.projectBrand || p.rawProjectBrand).toLowerCase() === cleanKey;
+              });
+              if (found && found.limitasi !== undefined) {
+                return Math.max(0, Number(found.limitasi) || 0);
+              }
+            }
+          }
+        } catch (e) {}
+        if (Object.prototype.hasOwnProperty.call(DEFAULT_LIMITASI_BY_BRAND, cleanKey)) {
+          return DEFAULT_LIMITASI_BY_BRAND[cleanKey];
+        }
+        return 5000000;
+      }
+
+      function updateLimitasiFieldFromProjectBrand(brandVal) {
+        const limEl = document.getElementById('pndLimitasi');
+        if (!limEl) return;
+        const clean = normalizeProjectBrandName(brandVal);
+        const limVal = getLimitasiForProjectBrand(clean);
+        limEl.value = (clean && limVal > 0) ? formatRupiahInput(limVal) : (clean ? 'Rp 0' : 'Rp. -');
+        limEl.readOnly = true;
+        limEl.setAttribute('tabindex', '-1');
+        limEl.classList.add('pnd-input-readonly');
+      }
+
+      let limitToastTimer = null;
+      function validateDppAgainstLimitasi(opts) {
+        const options = opts || {};
+        const showModalAlert = Boolean(options.showModalAlert);
+        const showToastAlert = Boolean(options.showToastAlert);
+
+        const brandEl = document.getElementById('pndProjectBrand');
+        const limEl = document.getElementById('pndLimitasi');
+        const alertEl = document.getElementById('pndDppLimitAlert');
+        const cleanBrand = normalizeProjectBrandName(brandEl ? brandEl.value : '');
+        const dppVal = parseRupiah(pndDpp ? pndDpp.value : 0);
+        const limVal = cleanBrand ? getLimitasiForProjectBrand(cleanBrand) : 0;
+
+        const isOverLimit = Boolean(cleanBrand && limVal > 0 && dppVal > limVal);
+
+        if (isOverLimit) {
+          if (pndDpp) {
+            pndDpp.style.borderColor = '#dc2626';
+            pndDpp.style.backgroundColor = '#fef2f2';
+            pndDpp.style.color = '#dc2626';
+          }
+          if (limEl) {
+            limEl.style.borderColor = '#dc2626';
+            limEl.style.backgroundColor = '#fef2f2';
+            limEl.style.color = '#dc2626';
+          }
+          if (alertEl) {
+            alertEl.style.display = 'block';
+            alertEl.textContent = '⚠ Nominal DPP/Beban (' + formatRupiahInput(dppVal) + ') melebihi Limitasi "' + cleanBrand + '" (Maks: ' + formatRupiahInput(limVal) + ')!';
+          }
+
+          if (showModalAlert) {
+            if (typeof Swal !== 'undefined') {
+              Swal.fire({
+                icon: 'error',
+                title: 'Nominal Melebihi Limitasi!',
+                html: 'Nominal <b>DPP/Beban (' + formatRupiahInput(dppVal) + ')</b> tidak boleh melebihi Limitasi untuk Project/Brand <b>' + escapeHtml(cleanBrand) + '</b> yaitu sebesar <b>' + formatRupiahInput(limVal) + '</b>.<br><br>Silakan sesuaikan nominal DPP/Beban atau ubah Limitasi di modul Profit Project &amp; Brand.',
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Mengerti'
+              });
+            } else {
+              alert('Nominal DPP/Beban (' + formatRupiahInput(dppVal) + ') melebihi Limitasi Project/Brand ' + cleanBrand + ' (' + formatRupiahInput(limVal) + ')!');
+            }
+          } else if (showToastAlert && typeof Swal !== 'undefined') {
+            if (limitToastTimer) clearTimeout(limitToastTimer);
+            limitToastTimer = setTimeout(function () {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'warning',
+                title: 'Nominal DPP/Beban melebihi Limitasi ' + cleanBrand + ' (' + formatRupiahInput(limVal) + ')!',
+                showConfirmButton: false,
+                timer: 2800,
+                timerProgressBar: true
+              });
+            }, 250);
+          }
+          return false;
+        } else {
+          if (pndDpp) {
+            pndDpp.style.borderColor = '';
+            pndDpp.style.backgroundColor = '';
+            pndDpp.style.color = '';
+          }
+          if (limEl) {
+            limEl.style.borderColor = '';
+            limEl.style.backgroundColor = '';
+            limEl.style.color = '';
+          }
+          if (alertEl) {
+            alertEl.style.display = 'none';
+            alertEl.textContent = '';
+          }
+          return true;
+        }
+      }
+
       function getProjectBrandList() {
         const list = [];
         const seen = new Set();
 
-        // 1. Ambil dari Modul Pendapatan (Format: ID Pendapatan | Project/Brand)
-        try {
-          const raw = localStorage.getItem(PENDAPATAN_KEY);
-          let pndArr = [];
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) pndArr = parsed;
+        function addBrand(rawVal) {
+          if (!rawVal) return;
+          const clean = normalizeProjectBrandName(rawVal);
+          if (!clean || clean === '-' || clean === '0' || clean.toLowerCase() === '- tanpa project / brand -') return;
+          const key = clean.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            list.push(clean);
           }
-          if (pndArr.length === 0) {
-            pndArr = [
-              { idPendapatan: '7691348184035411734', projectBrand: 'Campaign Brand A' },
-              { idPendapatan: '7691348184035411736', projectBrand: 'Shopee Affiliate Mall' },
-              { idPendapatan: '7691348184035411737', projectBrand: 'Cosmo Endorse' },
-              { idPendapatan: '7691348184035411735', projectBrand: 'Shopee Mega Sale' },
-              { idPendapatan: '7691348184035411738', projectBrand: 'Product Launching Serum Glow' },
-              { idPendapatan: '7691348184035411739', projectBrand: 'Tap & Tsp' },
-              { idPendapatan: '7691348184035411733', projectBrand: 'Seluruh Kreator MCN' }
-            ];
-          }
+        }
 
-          pndArr.forEach(function (p) {
-            if (p && p.projectBrand && String(p.projectBrand).trim() !== '' && p.projectBrand !== '-') {
-              const brand = String(p.projectBrand).trim();
-              const combined = formatBrandWithId(brand, p.idPendapatan);
-              if (combined && !seen.has(combined)) {
-                seen.add(combined);
-                list.push(combined);
+        // 1. Ambil daftar Project/Brand sesuai modul Profit Project & Brand (sama persis dengan sumber tabel Profit Project & Brand)
+        try {
+          const rawKb = localStorage.getItem(KAS_BANK_KEY);
+          if (rawKb !== null) {
+            const parsedKb = JSON.parse(rawKb);
+            if (Array.isArray(parsedKb)) {
+              parsedKb.forEach(function (it) {
+                if (it && it.projectBrand) addBrand(it.projectBrand);
+              });
+            }
+          }
+        } catch (e) {}
+
+        try {
+          const rawPay = localStorage.getItem('bisa_payroll_data_v1') || localStorage.getItem('accounting_payroll_data_v1');
+          if (rawPay) {
+            const parsedPay = JSON.parse(rawPay);
+            if (Array.isArray(parsedPay)) {
+              parsedPay.forEach(function (py) {
+                if (py && py.projectBrand) addBrand(py.projectBrand);
+              });
+            }
+          }
+        } catch (e) {}
+
+        try {
+          let astList = null;
+          const rawPenyusutan = localStorage.getItem('accounting_penyusutan_aset_data');
+          if (rawPenyusutan) {
+            const parsedP = JSON.parse(rawPenyusutan);
+            if (Array.isArray(parsedP) && parsedP.length > 0) astList = parsedP;
+          }
+          if (!astList) {
+            const asetKeys = ['bisa_accounting_daftar_aset_data_v4', 'accounting_daftar_aset_data'];
+            for (let i = 0; i < asetKeys.length; i++) {
+              const rawAst = localStorage.getItem(asetKeys[i]);
+              if (rawAst) {
+                const parsedAst = JSON.parse(rawAst);
+                if (Array.isArray(parsedAst) && parsedAst.length > 0) {
+                  astList = parsedAst;
+                  break;
+                }
               }
             }
+          }
+          if (!astList) {
+            astList = [{ projectBrand: 'Brand Alpha' }];
+          }
+          astList.forEach(function (ast) {
+            if (ast && ast.projectBrand) addBrand(ast.projectBrand);
           });
         } catch (e) {}
 
-        // 2. Ambil dari Master Customer Project (jika ada brand baru yang belum ada di Pendapatan)
+        // Fallback dari storage Profit Project & Brand jika key utama belum terisi
         try {
-          const rawCp = localStorage.getItem('accounting_master_customer_project_v1');
-          if (rawCp) {
-            const parsedCp = JSON.parse(rawCp);
-            if (Array.isArray(parsedCp)) {
-              parsedCp.forEach(function (cp) {
-                if (cp && cp.projectBrand && String(cp.projectBrand).trim() !== '') {
-                  const brand = String(cp.projectBrand).trim();
-                  const combined = formatBrandWithId(brand);
-                  if (combined && !seen.has(combined)) {
-                    seen.add(combined);
-                    list.push(combined);
-                  }
+          const rawProfit = localStorage.getItem('bisa_profit_project_brand_data');
+          if (rawProfit) {
+            const parsedProfit = JSON.parse(rawProfit);
+            if (Array.isArray(parsedProfit)) {
+              parsedProfit.forEach(function (p) {
+                if (p && (p.projectBrand || p.rawProjectBrand)) {
+                  addBrand(p.projectBrand || p.rawProjectBrand);
                 }
               });
             }
           }
         } catch (e) {}
 
+        if (list.length === 0) {
+          try {
+            const rawRel = localStorage.getItem('accounting_kas_bank_profit_rel_v1');
+            if (rawRel) {
+              const parsedRel = JSON.parse(rawRel);
+              if (parsedRel && Array.isArray(parsedRel.brands)) {
+                parsedRel.brands.forEach(function (b) {
+                  if (b) addBrand(b.projectBrand || b.rawProjectBrand);
+                });
+              }
+            }
+          } catch (e) {}
+        }
+
         if (list.length > 0) return list;
         return [
-          '7691348184035411734 | Campaign Brand A',
-          '7691348184035411736 | Shopee Affiliate Mall',
-          '7691348184035411737 | Cosmo Endorse',
-          '7691348184035411735 | Shopee Mega Sale',
-          '7691348184035411738 | Product Launching Serum Glow',
-          '7691348184035411739 | Tap & Tsp',
-          '7691348184035411733 | Seluruh Kreator MCN'
+          'Campaign Brand A',
+          'Seluruh Kreator MCN',
+          'Shopee Mega Sale',
+          'Shopee Affiliate Mall',
+          'Brand Alpha'
         ];
       }
 
@@ -3989,12 +4108,9 @@
           if (!item.akunLama) item.akunLama = '-';
         }
 
-        // 15. Project/Brand: ID Pendapatan | Project/Brand
-        if (item.projectBrand && item.projectBrand !== '-' && !item.projectBrand.includes(' | ')) {
-          const pndMatch = getPendapatanForBrand(item.projectBrand);
-          if (pndMatch && pndMatch.idPendapatan) {
-            item.projectBrand = pndMatch.idPendapatan + ' | ' + item.projectBrand;
-          }
+        // 15. Project/Brand: sesuai kolom Project/Brand pada modul Profit Project & Brand
+        if (item.projectBrand && item.projectBrand !== '-') {
+          item.projectBrand = normalizeProjectBrandName(item.projectBrand);
         }
 
         return item;
@@ -4094,8 +4210,52 @@
 
       const MONTH_NAMES_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+      const DELETED_APPROVALS_KEY = 'accounting_pengeluaran_deleted_approvals_v1';
+
+      function getDeletedApprovalSet() {
+        const set = new Set();
+        try {
+          const raw = localStorage.getItem(DELETED_APPROVALS_KEY);
+          if (raw) {
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) {
+              arr.forEach(function (k) { set.add(String(k).trim().toLowerCase()); });
+            }
+          }
+        } catch (e) {}
+        return set;
+      }
+
+      function addDeletedApprovalId(idApproval) {
+        if (!idApproval) return;
+        const set = getDeletedApprovalSet();
+        set.add(String(idApproval).trim().toLowerCase());
+        try {
+          localStorage.setItem(DELETED_APPROVALS_KEY, JSON.stringify(Array.from(set)));
+        } catch (e) {}
+      }
+
+            function isItemNeedsEdit(item) {
+        if (!item) return false;
+        return Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
+      }
+
+      function sortPengeluaranYellowFirst(list) {
+        if (!Array.isArray(list)) return [];
+        const yellowRows = [];
+        const whiteRows = [];
+        list.forEach(function (it) {
+          if (isItemNeedsEdit(it)) {
+            yellowRows.push(it);
+          } else {
+            whiteRows.push(it);
+          }
+        });
+        return yellowRows.concat(whiteRows);
+      }
+
       function loadData() {
-        // Seed data default yang real dan berelasi penuh dengan Approval, Kas & Bank, Pendapatan, dan COA
+        // Seed data default yang sudah Disetujui dan sudah dilengkapi datanya
         const seedData = [
           {
             id: 'exp-1',
@@ -4116,7 +4276,7 @@
             statusBayarLama: 'Lunas',
             tanggalBayarLama: '2026-09-05',
             akunLama: 'Bank BCA - 2092026028',
-            projectBrand: '7691348184035411735 | Shopee Mega Sale',
+            projectBrand: 'Shopee Mega Sale',
             jenis: 'Beban',
             bebanDiAkui: 30000,
             terbayarKas: 30000,
@@ -4126,7 +4286,9 @@
             buktiDataUrl: '',
             invoice: '',
             catatan: 'Biaya admin transfer bulanan',
-            divisiPengecualian: ''
+            divisiPengecualian: '',
+            needsCompletion: false,
+            isEditedInPengeluaran: true
           },
           {
             id: 'exp-2',
@@ -4147,7 +4309,7 @@
             statusBayarLama: 'Lunas',
             tanggalBayarLama: '2026-09-10',
             akunLama: 'SEABANK - 901631003438',
-            projectBrand: '7691348184035411735 | Shopee Mega Sale',
+            projectBrand: 'Shopee Mega Sale',
             jenis: 'Beban',
             bebanDiAkui: 1500000,
             terbayarKas: 1665000,
@@ -4157,69 +4319,9 @@
             buktiDataUrl: '',
             invoice: 'INV-FB-202610',
             catatan: 'Pengajuan campaign Facebook & Instagram Ads',
-            divisiPengecualian: ''
-          },
-          {
-            id: 'exp-3',
-            idDokumen: 'EXP-2609-003',
-            idApproval: 'APR-2609-003',
-            tanggalPengakuan: '2026-09-15',
-            vendorKaryawan: 'PT Gedung Megah',
-            divisi: 'Operasional',
-            keterangan: 'Sewa Ruang Kantor Lt. 3',
-            statusApproval: 'Menunggu',
-            kodeCoa: '5002',
-            namaAkunCoa: 'Beban Sewa Gedung',
-            kelompokCoa: 'Beban Operasional',
-            statusCoa: 'Aktif',
-            dpp: 4500000,
-            ppn: 495000,
-            tagihanBruto: 4995000,
-            statusBayarLama: 'Menunggu Approval',
-            tanggalBayarLama: '2026-09-18',
-            akunLama: 'Bank BCA - 2092026028',
-            projectBrand: '7691348184035411733 | Seluruh Kreator MCN',
-            jenis: 'Beban',
-            bebanDiAkui: 4500000,
-            terbayarKas: 0,
-            sisaUtang: 4995000,
-            jatuhTempo: '2026-09-30',
-            buktiUrl: 'detail_tracking_jualan.png',
-            buktiDataUrl: '',
-            invoice: 'INV-SEWA-10',
-            catatan: 'Pembayaran termin 1 sewa gedung',
-            divisiPengecualian: ''
-          },
-          {
-            id: 'exp-4',
-            idDokumen: 'EXP-2609-004',
-            idApproval: 'APR-2609-004',
-            tanggalPengakuan: '2026-09-20',
-            vendorKaryawan: 'CV Berkah Office',
-            divisi: 'Operasional',
-            keterangan: 'Pengadaan Perlengkapan Kantor',
-            statusApproval: 'Ditolak',
-            kodeCoa: '5009',
-            namaAkunCoa: 'Beban Administrasi Kantor',
-            kelompokCoa: 'Beban Operasional',
-            statusCoa: 'Aktif',
-            dpp: 450000,
-            ppn: 0,
-            tagihanBruto: 450000,
-            statusBayarLama: 'Ditolak',
-            tanggalBayarLama: '2026-09-21',
-            akunLama: 'BCA (Bank Central Asia)',
-            projectBrand: '7691348184035411733 | Seluruh Kreator MCN',
-            jenis: 'Beban',
-            bebanDiAkui: 450000,
-            terbayarKas: 0,
-            sisaUtang: 450000,
-            jatuhTempo: '2026-09-28',
-            buktiUrl: 'detail_tracking_jualan.png',
-            buktiDataUrl: '',
-            invoice: 'INV-BO-099',
-            catatan: 'Pengadaan perlengkapan kantor (Ditolak)',
-            divisiPengecualian: ''
+            divisiPengecualian: '',
+            needsCompletion: false,
+            isEditedInPengeluaran: true
           },
           {
             id: 'exp-5',
@@ -4240,7 +4342,7 @@
             statusBayarLama: 'Lunas',
             tanggalBayarLama: '2026-10-19',
             akunLama: 'BCA (Bank Central Asia)',
-            projectBrand: '7691348184035411733 | Seluruh Kreator MCN',
+            projectBrand: 'Seluruh Kreator MCN',
             jenis: 'Beban',
             bebanDiAkui: 850000,
             terbayarKas: 943500,
@@ -4250,56 +4352,132 @@
             buktiDataUrl: '',
             invoice: 'INV-GCP-8831',
             catatan: 'Langganan server cloud kuartal 4',
-            divisiPengecualian: ''
+            divisiPengecualian: '',
+            needsCompletion: false,
+            isEditedInPengeluaran: true
           }
         ];
 
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
+          let parsed = [];
           if (raw === null) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
-            return seedData.map(function (item) {
-              return syncItemWithApproval(item);
-            });
+            parsed = seedData.slice();
+          } else {
+            const tmp = JSON.parse(raw);
+            parsed = Array.isArray(tmp) ? tmp : seedData.slice();
           }
 
-          let parsed = JSON.parse(raw);
-
-          // Upgrade hanya jika format bukan array atau masih memakai seed lama yang korup
-          const needsUpgrade = !Array.isArray(parsed) || parsed.some(function (it) {
-            return (it.idDokumen === 'EXP-2609-004' && it.idApproval === 'APR-2609-005') || !it.idApproval ||
-                   (it.idDokumen === 'EXP-2609-001' && it.statusApproval === 'Menunggu') ||
-                   (it.idDokumen === 'EXP-2609-002' && it.statusApproval === 'Ditolak');
+          const deletedSet = getDeletedApprovalSet();
+          const aprList = getLegacyApprovalList();
+          const aprMap = new Map();
+          aprList.forEach(function (a) {
+            if (a && a.idApproval) aprMap.set(String(a.idApproval).trim().toLowerCase(), a);
           });
 
-          if (needsUpgrade) {
-            const userAdded = Array.isArray(parsed) ? parsed.filter(function (it) {
-              return it && it.id && !['exp-1', 'exp-2', 'exp-3', 'exp-4', 'exp-5'].includes(it.id);
-            }) : [];
-            parsed = seedData.concat(userAdded);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-          } else if (Array.isArray(parsed)) {
-            // Normalisasi jenis lama ke opsi standar jika ada
-            let updatedTypes = false;
-            parsed.forEach(function (it) {
-              if (it && (it.jenis === 'Beban Operasional' || it.jenis === 'Beban Pemasaran')) {
-                it.jenis = 'Beban';
-                updatedTypes = true;
-              }
-            });
-            if (updatedTypes) {
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+          // 1. Bersihkan item warisan seed lama (exp-3 / exp-4) yang belum diedit user,
+          // serta semua item yang status approval-nya bukan Disetujui
+          parsed = parsed.filter(function (it) {
+            if (!it || !it.idApproval) return false;
+            const key = String(it.idApproval).trim().toLowerCase();
+            if (deletedSet.has(key)) return false;
+
+            // Jika exp-3 atau exp-4 dari seed lama belum diedit di Pengeluaran & Beban, hapus dulu agar jika nanti APR-2609-003 disetujui ia masuk sebagai item baru bertanda kuning
+            if ((it.id === 'exp-3' || it.id === 'exp-4') && !it.isEditedInPengeluaran) {
+              return false;
             }
-          }
 
-          // Sinkronisasi dinamis seluruh item dengan Approval Pengeluaran dan Kas & Bank
-          const beforeJson = JSON.stringify(parsed);
-          const syncedList = parsed.map(function (item) {
-            return syncItemWithApproval(item);
+            const apr = aprMap.get(key);
+            if (apr) {
+              return String(apr.statusFinal || '').trim().toLowerCase() === 'disetujui';
+            }
+            return String(it.statusApproval || '').trim().toLowerCase() === 'disetujui';
           });
-          if (JSON.stringify(syncedList) !== beforeJson) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(syncedList));
-          }
+
+          // Pastikan seed 1, 2, 5 yang sudah lengkap ditandai isEditedInPengeluaran = true
+          parsed.forEach(function (it) {
+            if (['exp-1', 'exp-2', 'exp-5'].includes(it.id) && it.needsCompletion === undefined) {
+              it.needsCompletion = false;
+              it.isEditedInPengeluaran = true;
+            }
+          });
+
+          // 2. Masukkan otomatis setiap data Approval yang berstatus Disetujui namun belum ada di Pengeluaran & Beban
+          const existingAprKeys = new Set(parsed.map(function (it) {
+            return String(it.idApproval || '').trim().toLowerCase();
+          }));
+
+          aprList.slice().reverse().forEach(function (apr) {
+            if (!apr || !apr.idApproval) return;
+            const key = String(apr.idApproval).trim().toLowerCase();
+            if (deletedSet.has(key)) return;
+            const isApproved = String(apr.statusFinal || '').trim().toLowerCase() === 'disetujui';
+            if (isApproved && !existingAprKeys.has(key)) {
+              // Hitung nomor dokumen berikutnya
+              let yymm = '2609';
+              if (apr.tanggalRequest && /^\d{4}-\d{2}/.test(String(apr.tanggalRequest).trim())) {
+                const s = String(apr.tanggalRequest).trim();
+                yymm = s.slice(2, 4) + s.slice(5, 7);
+              }
+              const prefix = 'EXP-' + yymm + '-';
+              let maxNum = 0;
+              parsed.forEach(function (p) {
+                if (!p || !p.idDokumen) return;
+                const str = String(p.idDokumen).trim();
+                if (str.toUpperCase().startsWith(prefix.toUpperCase())) {
+                  const numPart = parseInt(str.slice(prefix.length), 10);
+                  if (!isNaN(numPart) && numPart > maxNum) maxNum = numPart;
+                }
+              });
+              const nextDocId = prefix + String(maxNum + 1).padStart(3, '0');
+              const nom = Number(apr.nominal) || 0;
+
+              parsed.unshift({
+                id: 'exp-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+                idDokumen: nextDocId,
+                idApproval: apr.idApproval,
+                tanggalPengakuan: apr.tanggalRequest || '2026-09-15',
+                vendorKaryawan: apr.pemohon || '-',
+                divisi: apr.divisi || '-',
+                keterangan: apr.keperluan || '-',
+                statusApproval: 'Disetujui',
+                kodeCoa: '',
+                namaAkunCoa: '',
+                kelompokCoa: '',
+                statusCoa: '',
+                dpp: nom,
+                ppn: 0,
+                tagihanBruto: nom,
+                syncedApprovalNominal: nom,
+                statusBayarLama: 'Belum Lunas',
+                tanggalBayarLama: '',
+                akunLama: '-',
+                projectBrand: '',
+                jenis: 'Beban',
+                bebanDiAkui: nom,
+                terbayarKas: 0,
+                sisaUtang: nom,
+                jatuhTempo: '',
+                buktiUrl: '',
+                buktiDataUrl: '',
+                invoice: '',
+                invoiceUrl: '',
+                invoiceDataUrl: '',
+                catatan: (apr.catatan && apr.catatan !== '-') ? apr.catatan : '',
+                divisiPengecualian: '',
+                needsCompletion: true,
+                isEditedInPengeluaran: false,
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+              });
+              existingAprKeys.add(key);
+            }
+          });
+
+          const syncedList = sortPengeluaranYellowFirst(parsed.map(function (item) {
+            return syncItemWithApproval(item);
+          }));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(syncedList));
           return syncedList;
         } catch (e) {
           return seedData.map(function (item) {
@@ -4412,6 +4590,7 @@
         const fSelesai = filters.tglSelesai;
 
         return pndData.filter(function (item) {
+          if (String(item.statusApproval || 'Disetujui').trim().toLowerCase() !== 'disetujui') return false;
           const matchesQuery = !query || [
             item.idDokumen,
             item.idApproval,
@@ -4446,11 +4625,6 @@
           }
 
           let matchesStatus = true;
-          if (fStatus && fStatus !== 'status bayar lama' && fStatus !== 'semua') {
-            const itemStatus = String(item.statusBayarLama || '').toLowerCase();
-            matchesStatus = itemStatus.includes(fStatus);
-          }
-
           let matchesDate = true;
           if (fMulai && item.tanggalPengakuan) {
             if (item.tanggalPengakuan < fMulai) matchesDate = false;
@@ -4561,6 +4735,7 @@
         if (!tableBody) return;
         tableBody.innerHTML = '';
 
+        pndData = sortPengeluaranYellowFirst(pndData);
         const filtered = getFilteredData();
         if (filtered.length === 0) {
           tableBody.innerHTML = '<tr><td colspan="28" style="text-align: center; color: #94a3b8; font-style: italic; padding: 24px;">Tidak ada data pengeluaran & beban yang sesuai.</td></tr>';
@@ -4572,6 +4747,10 @@
         filtered.forEach(function (item, index) {
           syncItemWithApproval(item);
           const row = document.createElement('tr');
+          const isNeedsEdit = Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
+          if (isNeedsEdit) {
+            row.classList.add('pnd-row-needs-edit');
+          }
           const terbayar = getTerbayarKasForDoc(item.idDokumen);
           const bruto = Number(item.tagihanBruto !== undefined ? item.tagihanBruto : (Number(item.dpp || 0) + Number(item.ppn || 0)));
           const sisaUtang = Math.max(0, bruto - terbayar);
@@ -4590,6 +4769,10 @@
           else if (stBayar === 'Belum Lunas' || stBayar === 'Belum Di bayar' || stBayar === 'Menunggu Approval' || stBayar === 'Belum Bayar') stBayarClass += ' is-menunggu';
           else if (stBayar === 'Ditolak') stBayarClass += ' is-ditolak';
 
+          const coaCellHtml = (item.kodeCoa && item.kodeCoa !== '-')
+            ? escapeHtml(item.kodeCoa)
+            : (isNeedsEdit ? '<span style="color: #b45309; font-weight: 700; font-style: italic;">Belum Diisi</span>' : '-');
+
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (index + 1) + '.</td>',
             '<td data-col="id_dokumen" style="font-weight: 600; color: #0284c7; white-space: nowrap;">' + escapeHtml(item.idDokumen || '-') + '</td>',
@@ -4599,14 +4782,12 @@
             '<td data-col="divisi" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.divisi || '-') + '</td>',
             '<td data-col="keterangan" style="color: #334155; min-width: 200px;">' + escapeHtml(item.keterangan || '-') + '</td>',
             '<td data-col="status_approval" style="text-align: center; white-space: nowrap;"><span class="' + stAppClass + '">' + escapeHtml(stApp) + '</span></td>',
-            '<td data-col="kode_coa" style="white-space: nowrap; font-weight: 500; color: #475569;">' + escapeHtml(item.kodeCoa || '-') + '</td>',
+            '<td data-col="kode_coa" style="white-space: nowrap; font-weight: 500; color: #475569;">' + coaCellHtml + '</td>',
             '<td data-col="dpp" style="text-align: right; white-space: nowrap; color: #1e293b; font-weight: 500;">' + escapeHtml(formatRupiah(item.dpp)) + '</td>',
-            '<td data-col="ppn" style="text-align: right; white-space: nowrap; color: #1e293b;">' + escapeHtml(formatRupiah(item.ppn)) + '</td>',
+            '<td data-col="ppn" style="text-align: right; white-space: nowrap; color: #1e293b;">' + (item.ppnType ? ('<span style="font-weight: 600;">' + escapeHtml(item.ppnType) + '</span>' + (Number(item.ppn) > 0 ? ' <span style="color: #64748b; font-size: 12px;">(' + escapeHtml(formatRupiah(item.ppn)) + ')</span>' : '')) : (Number(item.ppn) > 0 ? ('<span style="font-weight: 600;">VAT(11%)</span> <span style="color: #64748b; font-size: 12px;">(' + escapeHtml(formatRupiah(item.ppn)) + ')</span>') : 'Rp. -')) + '</td>',
             '<td data-col="tagihan_bruto" style="text-align: right; white-space: nowrap; font-weight: 600; color: #dc2626;">' + escapeHtml(formatRupiah(bruto)) + '</td>',
-            '<td data-col="status_bayar_lama" style="text-align: center; white-space: nowrap;"><span class="' + stBayarClass + '">' + escapeHtml(stBayar) + '</span></td>',
-            '<td data-col="tanggal_bayar_lama" style="white-space: nowrap; color: #334155;">' + escapeHtml(formatTanggalDisplay(item.tanggalBayarLama)) + '</td>',
-            '<td data-col="akun_lama" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.akunLama || '-') + '</td>',
             '<td data-col="project_brand" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.projectBrand || '-') + '</td>',
+            '<td data-col="limitasi" style="text-align: right; white-space: nowrap; font-weight: 600; color: #0f172a;">' + (item.projectBrand && item.projectBrand !== '-' ? escapeHtml(formatRupiah(getLimitasiForProjectBrand(item.projectBrand))) : 'Rp. -') + '</td>',
             '<td data-col="jenis" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.jenis || 'Beban') + '</td>',
             '<td data-col="beban_diakui" style="text-align: right; white-space: nowrap; color: #dc2626; font-weight: 500;">' + escapeHtml(formatRupiah(item.bebanDiAkui || item.dpp)) + '</td>',
             '<td data-col="terbayar_kas" style="text-align: right; white-space: nowrap; font-weight: 600; color: #16a34a;">' + escapeHtml(formatRupiah(terbayar)) + '</td>',
@@ -4615,9 +4796,6 @@
             '<td data-col="bukti" style="text-align: center; white-space: nowrap;">' + (item.buktiUrl ? '<button type="button" class="pnd-eye-btn" data-view-bukti="' + escapeHtml(item.id) + '" title="Lihat Bukti" style="display: inline-flex;"><svg viewBox="0 0 24 24" style="width: 13px; height: 13px;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>' : '<span style="color: #94a3b8;">-</span>') + '</td>',
             '<td data-col="catatan" style="white-space: nowrap; color: #64748b; font-size: 12.5px;">' + escapeHtml(item.catatan || '-') + '</td>',
             '<td data-col="divisi_pengecualian" style="white-space: nowrap; color: #64748b;">' + escapeHtml(item.divisiPengecualian || '-') + '</td>',
-            '<td data-col="nama_akun_coa" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.namaAkunCOA || item.namaAkunCoa || '-') + '</td>',
-            '<td data-col="kelompok_coa" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.kelompokCOA || item.kelompokCoa || '-') + '</td>',
-            '<td data-col="status_coa" style="text-align: center; white-space: nowrap;"><span class="pnd-badge-status is-disetujui">' + escapeHtml(item.statusCoa || 'Aktif') + '</span></td>',
             '<td class="col-sticky-action" style="text-align: center;">' +
               '<button type="button" class="pnd-action-btn" data-action-toggle="' + escapeHtml(item.id) + '" aria-label="Menu Aksi" title="Opsi">' +
                 '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>' +
@@ -4739,6 +4917,7 @@
       setupModalDropdownToggle('wrapKodeCoa', 'btnTriggerKodeCoa');
       setupModalDropdownToggle('wrapStatusBayarLama', 'btnTriggerStatusBayarLama');
       setupModalDropdownToggle('wrapAkunLama', 'btnTriggerAkunLama');
+      setupModalDropdownToggle('wrapPpn', 'btnTriggerPpn');
       setupModalDropdownToggle('wrapProjectBrand', 'btnTriggerProjectBrand');
       setupModalDropdownToggle('wrapDivisiPengecualian', 'btnTriggerDivisiPengecualian');
 
@@ -4891,11 +5070,15 @@
           dropdownBrand.appendChild(noneLabel);
 
           brands.forEach(function (br) {
+            const limNom = getLimitasiForProjectBrand(br);
+            const limText = limNom > 0 ? ('Limit: Rp ' + limNom.toLocaleString('id-ID')) : 'Limit: Rp 0';
             const label = document.createElement('label');
             label.className = 'pnd-select-item';
             label.innerHTML = '<input type="radio" name="optProjectBrand" value="' + escapeHtml(br) + '" data-label="' + escapeHtml(br) + '" />' +
-              '' +
-              '<span class="pnd-item-label">' + escapeHtml(br) + '</span>';
+              '<span class="pnd-item-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;">' +
+                '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(br) + '</span>' +
+                '<span style="font-size:11px;font-weight:600;color:#0284c7;background:#f0f9ff;border:1px solid #bae6fd;padding:1.5px 7px;border-radius:999px;flex-shrink:0;">' + escapeHtml(limText) + '</span>' +
+              '</span>';
             dropdownBrand.appendChild(label);
           });
         }
@@ -4909,6 +5092,8 @@
       /* Helper Kunci Kolom yang Di-autofill dari ID Approval (Pengajuan Barang & Jasa) dan Kas & Bank */
       function setApprovalFieldsReadonly() {
         const fields = [
+          { el: pndIdDokumen },
+          { el: pndIdApproval },
           { el: pndTglPengakuan, isDate: true },
           { el: pndVendorKaryawan },
           { el: pndDivisi },
@@ -4918,10 +5103,7 @@
           { el: pndJenis },
           { el: pndBebanDiAkui },
           { el: pndTerbayarKas },
-          { el: pndSisaUtang },
-          { el: pndStatusBayarLama },
-          { el: pndTanggalBayarLama, isDate: true },
-          { el: pndAkunLama }
+          { el: pndSisaUtang }
         ];
 
         fields.forEach(function (f) {
@@ -4939,13 +5121,6 @@
             }
           }
         });
-
-        // Pastikan ID Dokumen (No. 1: Input Data Mandiri) BISA diinput/diedit mandiri oleh user
-        if (pndIdDokumen) {
-          pndIdDokumen.readOnly = false;
-          pndIdDokumen.removeAttribute('tabindex');
-          pndIdDokumen.classList.remove('pnd-input-readonly');
-        }
       }
 
       function applyIdApprovalAutoFill(val) {
@@ -5019,7 +5194,7 @@
       }
 
       function rebindDropdownRadios() {
-        const dropdownRadioNames = ['optIdApproval', 'optKodeCoa', 'optProjectBrand'];
+        const dropdownRadioNames = ['optIdApproval', 'optKodeCoa', 'optPpn', 'optProjectBrand'];
         dropdownRadioNames.forEach(function (rName) {
           document.querySelectorAll('input[name="' + rName + '"]').forEach(function (r) {
             r.addEventListener('change', function () {
@@ -5097,6 +5272,26 @@
           });
         });
 
+        // PPN Dropdown (VAT(11%) & VAT(11%) & WHT(-2%)):
+        document.querySelectorAll('input[name="optPpn"]').forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            if (this.checked) {
+              const val = this.value;
+              const hiddenType = document.getElementById('pndPpnType');
+              const label = document.getElementById('labelPpn');
+              const trigger = document.getElementById('btnTriggerPpn');
+              if (hiddenType) hiddenType.value = val;
+              if (label) label.textContent = val || 'Pilih PPN';
+              if (trigger) {
+                if (val) trigger.classList.add('has-value');
+                else trigger.classList.remove('has-value');
+              }
+              recalcPpnFromDpp();
+              closeAllModalDropdowns();
+            }
+          });
+        });
+
         // Project/Brand:
         document.querySelectorAll('input[name="optProjectBrand"]').forEach(function (radio) {
           radio.addEventListener('change', function () {
@@ -5111,6 +5306,8 @@
                 if (val) trigger.classList.add('has-value');
                 else trigger.classList.remove('has-value');
               }
+              updateLimitasiFieldFromProjectBrand(val);
+              validateDppAgainstLimitasi({ showModalAlert: true });
               closeAllModalDropdowns();
             }
           });
@@ -5123,6 +5320,9 @@
         const hidden = document.getElementById(hiddenId);
 
         let finalVal = val || '';
+        if (radioName === 'optProjectBrand' && finalVal) {
+          finalVal = normalizeProjectBrandName(finalVal);
+        }
         let matchedRadio = null;
 
         document.querySelectorAll('input[name="' + radioName + '"]').forEach(function (radio) {
@@ -5130,7 +5330,7 @@
           if (finalVal) {
             if (radio.value === finalVal) {
               isMatch = true;
-            } else if (radioName === 'optProjectBrand' && radio.value.endsWith(' | ' + finalVal)) {
+            } else if (radioName === 'optProjectBrand' && normalizeProjectBrandName(radio.value).toLowerCase() === finalVal.toLowerCase()) {
               isMatch = true;
             }
           } else {
@@ -5159,6 +5359,11 @@
           if (trigger) trigger.classList.add('has-value');
         } else {
           if (trigger) trigger.classList.remove('has-value');
+        }
+
+        if (radioName === 'optProjectBrand') {
+          updateLimitasiFieldFromProjectBrand(finalVal);
+          validateDppAgainstLimitasi({ showModalAlert: false });
         }
       }
 
@@ -5211,6 +5416,36 @@
         pndIdDokumen.addEventListener('input', autoCalcTagihan);
       }
 
+      function recalcPpnFromDpp() {
+        const typeEl = document.getElementById('pndPpnType');
+        const totalPpnEl = document.getElementById('pndTotalPpn');
+        const ppnType = typeEl ? typeEl.value.trim() : '';
+        const dppVal = parseRupiah(pndDpp ? pndDpp.value : 0);
+        let vatNominal = 0;
+        let whtNominal = 0;
+        let totalPpnVal = 0;
+
+        if (ppnType === 'VAT(11%)') {
+          vatNominal = Math.round(dppVal * 0.11);
+          totalPpnVal = vatNominal;
+        } else if (ppnType === 'VAT(11%) & WHT(-2%)' || ppnType === 'VAT(11%) + WHT(-2%)') {
+          vatNominal = Math.round(dppVal * 0.11);
+          whtNominal = Math.round(dppVal * 0.02);
+          totalPpnVal = vatNominal - whtNominal;
+        }
+
+        if (pndPpn) {
+          pndPpn.value = String(totalPpnVal);
+        }
+        if (totalPpnEl) {
+          totalPpnEl.value = (ppnType && dppVal > 0) ? formatRupiahInput(totalPpnVal) : 'Rp. -';
+          totalPpnEl.readOnly = true;
+          totalPpnEl.setAttribute('tabindex', '-1');
+          totalPpnEl.classList.add('pnd-input-readonly');
+        }
+        return { ppnType: ppnType, ppnNominal: totalPpnVal, vatNominal: vatNominal, whtNominal: whtNominal, totalPpn: totalPpnVal };
+      }
+
       if (pndDpp) {
         pndDpp.addEventListener('input', function () {
           const val = parseRupiah(this.value);
@@ -5219,12 +5454,11 @@
           if (pndBebanDiAkui) {
             pndBebanDiAkui.value = val > 0 ? formatRupiahInput(val) : (this.value.includes('0') ? 'Rp 0' : '');
           }
+          recalcPpnFromDpp();
+          validateDppAgainstLimitasi({ showToastAlert: true });
         });
-      }
-      if (pndPpn) {
-        pndPpn.addEventListener('input', function () {
-          const val = parseRupiah(this.value);
-          this.value = val > 0 ? formatRupiahInput(val) : (this.value.includes('0') ? 'Rp 0' : '');
+        pndDpp.addEventListener('change', function () {
+          validateDppAgainstLimitasi({ showModalAlert: true });
         });
       }
       if (pndTagihanBruto) {
@@ -5526,7 +5760,7 @@
           if (editIdInput) editIdInput.value = item.id;
 
           if (pndIdDokumen) pndIdDokumen.value = item.idDokumen || generateNextIdDokumen(item.tanggalPengakuan);
-          setDropdownVal('wrapIdApproval', 'btnTriggerIdApproval', 'labelIdApproval', 'pndIdApproval', 'optIdApproval', item.idApproval, 'Pilih ID Approval');
+          if (pndIdApproval) pndIdApproval.value = item.idApproval || '';
           if (pndTglPengakuan) pndTglPengakuan.value = item.tanggalPengakuan || '04 Oct 2026';
 
           if (pndVendorKaryawan) pndVendorKaryawan.value = item.vendorKaryawan || '';
@@ -5537,7 +5771,14 @@
           setDropdownVal('wrapKodeCoa', 'btnTriggerKodeCoa', 'labelKodeCoa', 'pndKodeCoa', 'optKodeCoa', item.kodeCoa, 'Pilih Kode COA');
 
           if (pndDpp) pndDpp.value = item.dpp !== undefined && item.dpp !== 0 ? formatRupiahInput(item.dpp) : '';
-          if (pndPpn) pndPpn.value = item.ppn !== undefined && item.ppn !== 0 ? formatRupiahInput(item.ppn) : '';
+          let initPpnType = item.ppnType || '';
+          if (initPpnType === 'VAT(11%) + WHT(-2%)') initPpnType = 'VAT(11%) & WHT(-2%)';
+          if (!initPpnType && Number(item.ppn) > 0) {
+            const ratio = Number(item.dpp) > 0 ? (Number(item.ppn) / Number(item.dpp)) : 0.11;
+            initPpnType = (Math.abs(ratio - 1.09) < 0.02 || Math.abs(ratio - 0.09) < 0.02) ? 'VAT(11%) & WHT(-2%)' : 'VAT(11%)';
+          }
+          setDropdownVal('wrapPpn', 'btnTriggerPpn', 'labelPpn', 'pndPpnType', 'optPpn', initPpnType, 'Pilih PPN');
+          recalcPpnFromDpp();
           if (pndTagihanBruto) pndTagihanBruto.value = formatRupiah(item.tagihanBruto || item.dpp);
 
           const kbInfo = getKasBankInfoForDoc(item.idDokumen);
@@ -5605,7 +5846,7 @@
 
           if (pndIdDokumen) pndIdDokumen.value = generateNextIdDokumen();
 
-          setDropdownVal('wrapIdApproval', 'btnTriggerIdApproval', 'labelIdApproval', 'pndIdApproval', 'optIdApproval', '', 'Pilih ID Approval');
+          if (pndIdApproval) pndIdApproval.value = '';
           setApprovalFieldsReadonly();
           if (pndTglPengakuan) pndTglPengakuan.value = '';
 
@@ -5617,7 +5858,9 @@
           setDropdownVal('wrapKodeCoa', 'btnTriggerKodeCoa', 'labelKodeCoa', 'pndKodeCoa', 'optKodeCoa', '', 'Pilih Kode COA');
 
           if (pndDpp) pndDpp.value = '';
-          if (pndPpn) pndPpn.value = '';
+          setDropdownVal('wrapPpn', 'btnTriggerPpn', 'labelPpn', 'pndPpnType', 'optPpn', '', 'Pilih PPN');
+          if (pndPpn) pndPpn.value = '0';
+          if (document.getElementById('pndTotalPpn')) document.getElementById('pndTotalPpn').value = 'Rp. -';
           if (pndTagihanBruto) pndTagihanBruto.value = 'Rp. -';
 
           const docIdToAdd = pndIdDokumen ? pndIdDokumen.value.trim() : '';
@@ -5689,9 +5932,16 @@
           return;
         }
 
+        if (!validateDppAgainstLimitasi({ showModalAlert: true })) {
+          if (pndDpp) pndDpp.focus();
+          return;
+        }
+
         const editId = document.getElementById('pndEditId').value;
         const dppVal = parseRupiah(pndDpp ? pndDpp.value : 0);
-        const ppnVal = parseRupiah(pndPpn ? pndPpn.value : 0);
+        const ppnCalc = recalcPpnFromDpp();
+        const ppnVal = ppnCalc.ppnNominal;
+        const ppnTypeVal = ppnCalc.ppnType;
         const rawTagihan = parseRupiah(pndTagihanBruto ? pndTagihanBruto.value : 0) || Number(pndTagihanBruto ? pndTagihanBruto.getAttribute('data-nominal') : 0) || 0;
         const tagihanBruto = rawTagihan;
         const docIdVal = pndIdDokumen ? pndIdDokumen.value.trim() : '';
@@ -5715,11 +5965,13 @@
           kodeCoa: pndKodeCoa.value.trim() || '5009',
           dpp: dppVal,
           ppn: ppnVal,
+          totalPpn: ppnCalc.totalPpn,
+          ppnType: ppnTypeVal,
           tagihanBruto: tagihanBruto,
           syncedApprovalNominal: syncedApprovalNominal,
-          statusBayarLama: pndStatusBayarLama.value.trim(),
-          tanggalBayarLama: pndTanggalBayarLama.value.trim(),
-          akunLama: pndAkunLama.value.trim(),
+          statusBayarLama: (pndStatusBayarLama ? pndStatusBayarLama.value.trim() : ''),
+          tanggalBayarLama: (pndTanggalBayarLama ? pndTanggalBayarLama.value.trim() : ''),
+          akunLama: (pndAkunLama ? pndAkunLama.value.trim() : ''),
           projectBrand: pndProjectBrand.value.trim(),
           jenis: (pndJenis ? pndJenis.value.trim() : '') || 'Diproses',
           bebanDiAkui: parseRupiah(pndBebanDiAkui ? pndBebanDiAkui.value : 0) || dppVal,
@@ -5733,9 +5985,11 @@
           invoiceDataUrl: tempUploadedInvoiceFileDataUrl,
           catatan: pndCatatan.value.trim(),
           divisiPengecualian: pndDivisiPengecualian.value.trim(),
-          namaAkunCoa: pndNamaAkunCoa.value.trim(),
-          kelompokCoa: pndKelompokCoa.value.trim(),
-          statusCoa: pndStatusCoa.value.trim(),
+          namaAkunCoa: (pndNamaAkunCoa ? pndNamaAkunCoa.value.trim() : ''),
+          kelompokCoa: (pndKelompokCoa ? pndKelompokCoa.value.trim() : ''),
+          statusCoa: (pndStatusCoa ? pndStatusCoa.value.trim() : ''),
+          needsCompletion: false,
+          isEditedInPengeluaran: true,
           createdAt: Date.now(),
           updatedAt: Date.now()
         };
@@ -5743,11 +5997,18 @@
         if (editId) {
           const idx = pndData.findIndex(function (d) { return String(d.id) === String(editId); });
           if (idx !== -1) {
-            pndData[idx] = record;
+            pndData.splice(idx, 1);
           }
-        } else {
-          pndData.unshift(record);
         }
+        const yellowGroup = [];
+        const whiteGroup = [];
+        pndData.forEach(function (it) {
+          if (isItemNeedsEdit(it)) yellowGroup.push(it);
+          else whiteGroup.push(it);
+        });
+        // Baris yang baru selesai diedit (putih) diletakkan di paling atas kelompok putih, di bawah kelompok kuning
+        whiteGroup.unshift(record);
+        pndData = yellowGroup.concat(whiteGroup);
 
         if (typeof window.recordAccountingReferensiUpdate === 'function' && record.idDokumen) {
           window.recordAccountingReferensiUpdate(record.idDokumen);
@@ -5789,17 +6050,35 @@
         document.getElementById('viewPndKodeCoa').value = item.kodeCoa ? (item.kodeCoa + ' | ' + (item.namaAkunCoa || '')) : '-';
         document.getElementById('viewPndDpp').value = formatRupiah(item.dpp);
 
-        document.getElementById('viewPndPpn').value = item.ppn > 0 ? formatRupiah(item.ppn) : 'Rp. -';
+        const dppForView = Number(item.dpp || 0);
+        let effPpnType = item.ppnType || (Number(item.ppn) > 0 ? 'VAT(11%)' : '');
+        if (effPpnType === 'VAT(11%) + WHT(-2%)') effPpnType = 'VAT(11%) & WHT(-2%)';
+        let effTotalPpn = Number(item.totalPpn || 0);
+        if (!effTotalPpn && effPpnType && dppForView > 0) {
+          if (effPpnType === 'VAT(11%)') {
+            effTotalPpn = Math.round(dppForView * 0.11);
+          } else if (effPpnType === 'VAT(11%) & WHT(-2%)' || effPpnType === 'VAT(11%) + WHT(-2%)') {
+            effTotalPpn = Math.round(dppForView * 0.11) - Math.round(dppForView * 0.02);
+          }
+        }
+        document.getElementById('viewPndPpn').value = effPpnType || '-';
+        if (document.getElementById('viewPndTotalPpn')) {
+          document.getElementById('viewPndTotalPpn').value = effTotalPpn > 0 ? formatRupiah(effTotalPpn) : 'Rp. -';
+        }
         document.getElementById('viewPndTagihanBruto').value = formatRupiah(bruto);
         const kbInfoView = getKasBankInfoForDoc(item.idDokumen);
         const vStatusBayarLama = kbInfoView.hasKasBank ? 'Lunas' : (item.statusBayarLama || (sisaUtang === 0 ? 'Lunas' : 'Menunggu Approval'));
         const vTglBayarLama = kbInfoView.hasKasBank ? kbInfoView.tanggal : (item.tanggalBayarLama || '');
         const vAkunLama = kbInfoView.hasKasBank ? kbInfoView.akunCoaNama : (item.akunLama || '-');
 
-        document.getElementById('viewPndStatusBayarLama').value = vStatusBayarLama;
-        document.getElementById('viewPndTanggalBayarLama').value = formatTanggalDisplay(vTglBayarLama);
-        document.getElementById('viewPndAkunLama').value = vAkunLama;
+        if (document.getElementById('viewPndStatusBayarLama')) document.getElementById('viewPndStatusBayarLama').value = vStatusBayarLama;
+        if (document.getElementById('viewPndTanggalBayarLama')) document.getElementById('viewPndTanggalBayarLama').value = formatTanggalDisplay(vTglBayarLama);
+        if (document.getElementById('viewPndAkunLama')) document.getElementById('viewPndAkunLama').value = vAkunLama;
         document.getElementById('viewPndProjectBrand').value = item.projectBrand || '-';
+        if (document.getElementById('viewPndLimitasi')) {
+          const vLim = (item.projectBrand && item.projectBrand !== '-') ? getLimitasiForProjectBrand(item.projectBrand) : 0;
+          document.getElementById('viewPndLimitasi').value = (item.projectBrand && item.projectBrand !== '-') ? (vLim > 0 ? formatRupiah(vLim) : 'Rp 0') : 'Rp. -';
+        }
 
         document.getElementById('viewPndJenis').value = item.jenis || 'Beban';
         document.getElementById('viewPndBebanDiAkui').value = formatRupiah(item.bebanDiAkui || item.dpp);
@@ -5834,9 +6113,9 @@
         document.getElementById('viewPndCatatan').value = item.catatan || '-';
         document.getElementById('viewPndDivisiPengecualian').value = item.divisiPengecualian || '-';
 
-        document.getElementById('viewPndNamaAkunCoa').value = item.namaAkunCoa || 'Nama Akun COA';
-        document.getElementById('viewPndKelompokCoa').value = item.kelompokCoa || 'Kelompok COA';
-        document.getElementById('viewPndStatusCoa').value = item.statusCoa || 'Status COA';
+        if (document.getElementById('viewPndNamaAkunCoa')) document.getElementById('viewPndNamaAkunCoa').value = item.namaAkunCoa || 'Nama Akun COA';
+        if (document.getElementById('viewPndKelompokCoa')) document.getElementById('viewPndKelompokCoa').value = item.kelompokCoa || 'Kelompok COA';
+        if (document.getElementById('viewPndStatusCoa')) document.getElementById('viewPndStatusCoa').value = item.statusCoa || 'Status COA';
 
         openModal(detailModal);
       }
@@ -5937,7 +6216,7 @@
       }
 
       function initSearchableStatusBayarFilter() {
-        const box = document.getElementById('boxFilterStatusBayarLama');
+        const box = document.getElementById('boxFilterStatusBayarLama'); if (!box) return;
         const input = document.getElementById('filterStatusBayarLama');
         const list = document.getElementById('listFilterStatusBayarLama');
         if (!box || !input || !list) return;
@@ -6288,9 +6567,6 @@
           'DPP/Beban',
           'PPN',
           'Tagihan Bruto',
-          'Status Bayar Lama',
-          'Tanggal Bayar Lama',
-          'Akun Lama',
           'Project / Brand',
           'Jenis',
           'Beban Diakui',
@@ -6298,10 +6574,7 @@
           'Sisa Utang',
           'Jatuh Tempo',
           'Catatan',
-          'Divisi Pengecualian',
-          'Nama Akun COA',
-          'Kelompok COA',
-          'Status COA'
+          'Divisi Pengecualian'
         ];
 
         const rows = filtered.map(function (item, idx) {
@@ -6323,9 +6596,6 @@
             Number(item.dpp || 0),
             Number(item.ppn || 0),
             bruto,
-            item.statusBayarLama || (sisaUtang === 0 ? 'Lunas' : 'Menunggu Approval'),
-            formatTanggalDisplay(item.tanggalBayarLama),
-            item.akunLama || '-',
             item.projectBrand || '-',
             item.jenis || 'Beban',
             Number(item.bebanDiAkui || item.dpp || 0),
@@ -6333,10 +6603,7 @@
             sisaUtang,
             formatTanggalDisplay(item.jatuhTempo),
             item.catatan || '-',
-            item.divisiPengecualian || '-',
-            item.namaAkunCoa || '-',
-            item.kelompokCoa || '-',
-            item.statusCoa || 'Aktif'
+            item.divisiPengecualian || '-'
           ];
         });
 
@@ -6437,6 +6704,21 @@
                 reverseButtons: true
               }).then(function (result) {
                 if (result.isConfirmed) {
+                  if (targetItem.idApproval) {
+                    addDeletedApprovalId(targetItem.idApproval);
+                    try {
+                      const rawApr = localStorage.getItem(APPROVAL_KEY);
+                      if (rawApr) {
+                        const aprArr = JSON.parse(rawApr);
+                        if (Array.isArray(aprArr)) {
+                          const filteredApr = aprArr.filter(function (a) {
+                            return String(a.idApproval || '').trim().toLowerCase() !== String(targetItem.idApproval).trim().toLowerCase();
+                          });
+                          localStorage.setItem(APPROVAL_KEY, JSON.stringify(filteredApr));
+                        }
+                      }
+                    } catch (eAprDel) {}
+                  }
                   pndData = pndData.filter(function (item) {
                     return String(item.id) !== String(targetItem.id);
                   });
@@ -6677,9 +6959,9 @@
       setTimeout(enforcePengeluaranBebanTitle, 500);
       setTimeout(enforcePengeluaranBebanTitle, 1000);
 
-      // Realtime cross-tab sync dengan modul Approval, Kas & Bank, Pendapatan, COA, Bank Lama, dan Master Divisi
+      // Realtime cross-tab sync dengan modul Approval, Kas & Bank, Profit Project & Brand, COA, Bank Lama, dan Master Divisi
       window.addEventListener('storage', function (e) {
-        if (!e.key || e.key === STORAGE_KEY || e.key === PBJ_KEY || e.key === APPROVAL_KEY || e.key === KAS_BANK_KEY || e.key === PENDAPATAN_KEY || e.key === MASTER_COA_KEY || e.key === BANK_LAMA_KEY || e.key === DIVISI_KEY || e.key === 'accounting_referensi_updates_v1') {
+        if (!e.key || e.key === STORAGE_KEY || e.key === PBJ_KEY || e.key === APPROVAL_KEY || e.key === KAS_BANK_KEY || e.key === PENDAPATAN_KEY || e.key === MASTER_COA_KEY || e.key === BANK_LAMA_KEY || e.key === DIVISI_KEY || e.key === 'accounting_referensi_updates_v1' || e.key === 'bisa_profit_project_brand_data' || e.key === LIMITASI_STORAGE_KEY || e.key === 'accounting_kas_bank_profit_rel_v1' || e.key === 'bisa_payroll_data_v1' || e.key === 'accounting_payroll_data_v1' || e.key === 'accounting_penyusutan_aset_data' || e.key === 'bisa_accounting_daftar_aset_data_v4') {
           pndData = loadData();
           initDynamicModalDropdowns();
           updateDivisiPengecualianDatalist();
