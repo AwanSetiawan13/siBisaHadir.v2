@@ -41,11 +41,21 @@
 
     #karyawanTable th:nth-child(4),
     #karyawanTable td:nth-child(4) {
-      min-width: 240px;
+      min-width: 220px;
     }
 
     #karyawanTable th:nth-child(5),
     #karyawanTable td:nth-child(5) {
+      min-width: 170px;
+    }
+
+    #karyawanTable th:nth-child(6),
+    #karyawanTable td:nth-child(6) {
+      min-width: 150px;
+    }
+
+    #karyawanTable th:nth-child(7),
+    #karyawanTable td:nth-child(7) {
       width: 70px;
       text-align: center;
     }
@@ -209,6 +219,13 @@
       font-size: 13.5px;
       font-weight: 600;
       color: #0f172a;
+    }
+
+    .karyawan-divisi-text {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #334155;
     }
 
     .karyawan-kontrak-badge {
@@ -580,7 +597,7 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <input id="karyawanSearch" type="search" placeholder="Cari ID, NIK, atau Nama Karyawan..." autocomplete="off" />
+              <input id="karyawanSearch" type="search" placeholder="Cari ID, NIK, Nama, atau Divisi Karyawan..." autocomplete="off" />
             </div>
           </div>
 
@@ -599,6 +616,7 @@
                 <th>ID Karyawan</th>
                 <th>NIK</th>
                 <th>Nama Karyawan</th>
+                <th>Divisi</th>
                 <th>Selesai Kontrak</th>
                 <th class="col-sticky-action" style="width: 70px; text-align: center;">Aksi</th>
               </tr>
@@ -643,6 +661,11 @@
           </div>
 
           <div class="karyawan-form-field">
+            <label class="karyawan-form-label" for="karyawanDivisi">Divisi</label>
+            <input type="text" id="karyawanDivisi" data-manual-input="true" class="karyawan-form-input" placeholder="Ketik Divisi Karyawan secara manual" autocomplete="off" spellcheck="false" required />
+          </div>
+
+          <div class="karyawan-form-field" style="grid-column: 1 / -1;">
             <label class="karyawan-form-label" for="karyawanSelesaiKontrak">Selesai Kontrak (Opsional)</label>
             <input type="date" id="karyawanSelesaiKontrak" class="karyawan-form-input" />
           </div>
@@ -686,6 +709,11 @@
         </div>
 
         <div class="karyawan-form-field">
+          <label class="karyawan-form-label">Divisi</label>
+          <input type="text" id="viewKaryawanDivisi" class="karyawan-form-input karyawan-form-input-readonly" readonly />
+        </div>
+
+        <div class="karyawan-form-field" style="grid-column: 1 / -1;">
           <label class="karyawan-form-label">Selesai Kontrak</label>
           <input type="text" id="viewKaryawanSelesaiKontrak" class="karyawan-form-input karyawan-form-input-readonly" readonly />
         </div>
@@ -719,7 +747,7 @@
     </button>
   </div>
 
-  <script src="../../assets/js/layout.js?v=20261123_v4"></script>
+  <script src="../../assets/js/layout.js?v=20261125_v7"></script>
   <script>
     (function () {
       'use strict';
@@ -728,8 +756,18 @@
 
       const DEFAULT_KARYAWAN_DATA = [
         { id: 'KRY-001', nik: 'BM-2024-001', nama: 'Ahmad Fauzi', divisi: 'MCN', selesaiKontrak: '2026-12-31' },
-        { id: 'KRY-002', nik: 'BM-2024-002', nama: 'Raka Wijaya', divisi: 'Marketing & Brand', selesaiKontrak: '2027-06-30' }
+        { id: 'KRY-002', nik: 'BM-2024-002', nama: 'Raka Wijaya', divisi: 'Marketing & Brand', selesaiKontrak: '2027-06-30' },
+        { id: 'KRY-003', nik: 'BM-2024-003', nama: 'Dewi Lestari', divisi: 'Finance & Accounting', selesaiKontrak: '2027-12-31' }
       ];
+
+      const DEFAULT_DIVISI_MAP = {
+        'KRY-001': 'MCN',
+        'BM-2024-001': 'MCN',
+        'KRY-002': 'Marketing & Brand',
+        'BM-2024-002': 'Marketing & Brand',
+        'KRY-003': 'Finance & Accounting',
+        'BM-2024-003': 'Finance & Accounting'
+      };
 
       let karyawanData = loadData();
       let currentActionId = null;
@@ -747,12 +785,27 @@
       const idInput = document.getElementById('karyawanId');
       const nikInput = document.getElementById('karyawanNik');
       const namaInput = document.getElementById('karyawanNama');
+      const divisiInput = document.getElementById('karyawanDivisi');
+      if (divisiInput) {
+        divisiInput.removeAttribute('list');
+        const origSetAttr = divisiInput.setAttribute.bind(divisiInput);
+        divisiInput.setAttribute = function (name, val) {
+          if (String(name).toLowerCase() === 'list') return;
+          return origSetAttr(name, val);
+        };
+        ['focusin', 'focus', 'click', 'input'].forEach(function (ev) {
+          divisiInput.addEventListener(ev, function () {
+            divisiInput.removeAttribute('list');
+          }, true);
+        });
+      }
       const selesaiKontrakInput = document.getElementById('karyawanSelesaiKontrak');
       const formActionText = document.getElementById('karyawanFormActionText');
 
       const viewId = document.getElementById('viewKaryawanId');
       const viewNik = document.getElementById('viewKaryawanNik');
       const viewNama = document.getElementById('viewKaryawanNama');
+      const viewDivisi = document.getElementById('viewKaryawanDivisi');
       const viewSelesaiKontrak = document.getElementById('viewKaryawanSelesaiKontrak');
 
       function formatDateIndo(dateStr) {
@@ -817,11 +870,13 @@
                       const defaultKontrak = (idKry === 'KRY-001' || nik === 'BM-2024-001')
                         ? '2026-12-31'
                         : ((idKry === 'KRY-002' || nik === 'BM-2024-002') ? '2027-06-30' : '');
+                      const defaultDiv = DEFAULT_DIVISI_MAP[idKry] || DEFAULT_DIVISI_MAP[nik] || '';
 
                       employees.push({
                         id: idKry,
                         nik: nik || '-',
                         nama: nama || '-',
+                        divisi: (existing && existing.divisi && existing.divisi !== '-') ? existing.divisi : ((p.divisi && p.divisi !== '-') ? p.divisi : defaultDiv),
                         selesaiKontrak: (existing && existing.selesaiKontrak) ? existing.selesaiKontrak : (p.selesaiKontrak || defaultKontrak)
                       });
                       counter++;
@@ -854,13 +909,22 @@
           if (raw) {
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed) && parsed.length > 0) {
+              let updated = false;
               parsed.forEach(function (emp) {
                 if (emp && emp.selesaiKontrak === undefined) {
                   if (emp.id === 'KRY-001' || emp.nik === 'BM-2024-001') emp.selesaiKontrak = '2026-12-31';
                   else if (emp.id === 'KRY-002' || emp.nik === 'BM-2024-002') emp.selesaiKontrak = '2027-06-30';
                   else emp.selesaiKontrak = '';
+                  updated = true;
+                }
+                if (emp && (!emp.divisi || emp.divisi === '-')) {
+                  emp.divisi = DEFAULT_DIVISI_MAP[emp.id] || DEFAULT_DIVISI_MAP[emp.nik] || '';
+                  if (emp.divisi) updated = true;
                 }
               });
+              if (updated) {
+                try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (eS) {}
+              }
               return parsed;
             }
           }
@@ -883,7 +947,37 @@
 
       function saveData() {
         try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(karyawanData));
+          const json = JSON.stringify(karyawanData);
+          localStorage.setItem(STORAGE_KEY, json);
+          localStorage.setItem('bisa_master_karyawan_v1', json);
+          localStorage.setItem('master_karyawan_data', json);
+
+          // Sinkronkan divisi/nama/nik ke record Payroll yang sesuai ID Karyawan
+          const mapById = {};
+          karyawanData.forEach(function (k) {
+            if (k && k.id) mapById[String(k.id).trim().toLowerCase()] = k;
+          });
+          ['sibisahadir_payrolls', 'bisa_payroll_data_v1', 'accounting_payroll_data_v1'].forEach(function (pKey) {
+            try {
+              const rawP = localStorage.getItem(pKey);
+              if (!rawP) return;
+              const arrP = JSON.parse(rawP);
+              if (!Array.isArray(arrP)) return;
+              let changedP = false;
+              arrP.forEach(function (row) {
+                if (!row || !row.idKaryawan) return;
+                const matched = mapById[String(row.idKaryawan).trim().toLowerCase()];
+                if (matched && matched.divisi && row.divisi !== matched.divisi) {
+                  row.divisi = matched.divisi;
+                  changedP = true;
+                }
+              });
+              if (changedP) {
+                localStorage.setItem(pKey, JSON.stringify(arrP));
+              }
+            } catch (eP) {}
+          });
+
           window.dispatchEvent(new CustomEvent('accounting_karyawan_changed', { detail: karyawanData }));
         } catch (e) {
           console.error('[Data Karyawan] Gagal menyimpan ke localStorage:', e);
@@ -922,13 +1016,14 @@
           const id = (it.id || '').toLowerCase();
           const nik = (it.nik || '').toLowerCase();
           const nama = (it.nama || '').toLowerCase();
+          const divisi = (it.divisi || '').toLowerCase();
           const kontrak = (it.selesaiKontrak || '').toLowerCase();
           const kontrakFormatted = formatDateIndo(it.selesaiKontrak).toLowerCase();
-          return id.includes(q) || nik.includes(q) || nama.includes(q) || kontrak.includes(q) || kontrakFormatted.includes(q);
+          return id.includes(q) || nik.includes(q) || nama.includes(q) || divisi.includes(q) || kontrak.includes(q) || kontrakFormatted.includes(q);
         });
 
         if (filtered.length === 0) {
-          tableBody.innerHTML = '<tr><td colspan="6" class="karyawan-empty-cell">Belum ada data karyawan yang cocok.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="7" class="karyawan-empty-cell">Belum ada data karyawan yang cocok.</td></tr>';
           return;
         }
 
@@ -944,6 +1039,7 @@
             '<td><span class="karyawan-id-badge">' + escapeHtml(it.id) + '</span></td>',
             '<td><span class="karyawan-nik-text">' + escapeHtml(it.nik) + '</span></td>',
             '<td><span class="karyawan-nama-text">' + escapeHtml(it.nama) + '</span></td>',
+            '<td><span class="karyawan-divisi-text">' + escapeHtml(it.divisi || '-') + '</span></td>',
             '<td>' + kontrakHtml + '</td>',
             '<td class="col-sticky-action" style="text-align: center;">',
             '  <button type="button" class="btn-action-trigger karyawan-action-btn" data-action-toggle="' + escapeHtml(it.id) + '" aria-label="Menu Aksi" title="Opsi">',
@@ -990,6 +1086,7 @@
           form.reset();
           editIdInput.value = '';
           idInput.value = generateNextId();
+          if (divisiInput) divisiInput.value = '';
           if (selesaiKontrakInput) selesaiKontrakInput.value = '';
           formActionText.textContent = 'Tambah';
           openModal(formModal);
@@ -1007,6 +1104,7 @@
           const editId = (editIdInput.value || '').trim();
           const nik = (nikInput.value || '').trim();
           const nama = (namaInput.value || '').trim();
+          const divisi = divisiInput ? (divisiInput.value || '').trim() : '';
           const selesaiKontrak = selesaiKontrakInput ? (selesaiKontrakInput.value || '').trim() : '';
 
           if (!nik) {
@@ -1015,6 +1113,10 @@
           }
           if (!nama) {
             Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Nama karyawan wajib diisi.' });
+            return;
+          }
+          if (!divisi) {
+            Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Divisi karyawan wajib diisi.' });
             return;
           }
 
@@ -1038,6 +1140,7 @@
             if (targetIdx !== -1) {
               karyawanData[targetIdx].nik = nik;
               karyawanData[targetIdx].nama = nama;
+              karyawanData[targetIdx].divisi = divisi;
               karyawanData[targetIdx].selesaiKontrak = selesaiKontrak;
             }
             saveData();
@@ -1058,6 +1161,7 @@
               id: newId,
               nik: nik,
               nama: nama,
+              divisi: divisi,
               selesaiKontrak: selesaiKontrak
             };
             karyawanData.unshift(newItem);
@@ -1150,6 +1254,7 @@
             if (viewId) viewId.value = target.id || '';
             if (viewNik) viewNik.value = target.nik || '';
             if (viewNama) viewNama.value = target.nama || '';
+            if (viewDivisi) viewDivisi.value = target.divisi || '-';
             if (viewSelesaiKontrak) viewSelesaiKontrak.value = formatDateIndo(target.selesaiKontrak);
             openModal(viewModal);
           } else if (action === 'edit') {
@@ -1158,6 +1263,7 @@
             idInput.value = target.id;
             nikInput.value = target.nik || '';
             namaInput.value = target.nama || '';
+            if (divisiInput) divisiInput.value = target.divisi || '';
             if (selesaiKontrakInput) selesaiKontrakInput.value = target.selesaiKontrak || '';
             formActionText.textContent = 'Edit';
             openModal(formModal);
