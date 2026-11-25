@@ -2910,7 +2910,7 @@
 
           <div class="pnd-field">
             <label class="pnd-label" for="pndDpp">DPP/Beban</label>
-            <input type="text" id="pndDpp" class="pnd-input" placeholder="Rp. -" />
+            <input type="text" id="pndDpp" class="pnd-input pnd-input-readonly" placeholder="Rp. -" readonly tabindex="-1" />
             <div id="pndDppLimitAlert" style="display: none; margin-top: 4px; padding: 6px 10px; border-radius: 6px; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; font-size: 11.5px; font-weight: 600; line-height: 1.35;"></div>
           </div>
 
@@ -3003,8 +3003,36 @@
 
           <!-- Row 6: Jenis, Beban di Akui, Terbayar Kas -->
           <div class="pnd-field">
-            <label class="pnd-label" for="pndJenis">Jenis</label>
-            <input type="text" id="pndJenis" class="pnd-input pnd-input-readonly" placeholder="Otomatis dari ID Approval" readonly tabindex="-1" />
+            <label class="pnd-label">Jenis</label>
+            <div class="pnd-select-wrap" id="wrapJenis">
+              <div class="pnd-select-btn" id="btnTriggerJenis">
+                <span id="labelJenis">Pilih Jenis</span>
+                <span class="pnd-select-arrow">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </div>
+              <input type="hidden" id="pndJenis" />
+              <div class="pnd-select-dropdown" id="dropdownJenis">
+                <label class="pnd-select-item">
+                  <input type="radio" name="optJenis" value="Beban" data-label="Beban" />
+                  <span>Beban</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optJenis" value="Reimbursement" data-label="Reimbursement" />
+                  <span>Reimbursement</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optJenis" value="Aset" data-label="Aset" />
+                  <span>Aset</span>
+                </label>
+                <label class="pnd-select-item">
+                  <input type="radio" name="optJenis" value="Perlu Rincian" data-label="Perlu Rincian" />
+                  <span>Perlu Rincian</span>
+                </label>
+              </div>
+            </div>
           </div>
 
           <div class="pnd-field">
@@ -4367,6 +4395,11 @@
         return item.source_type === 'payroll' || item.sourceType === 'payroll' || /^PR-REKAP-/i.test(String(item.idApproval || ''));
       }
 
+      function isLoanExpenseItem(item) {
+        if (!item) return false;
+        return item.source_type === 'loan' || item.sourceType === 'loan' || Boolean(item.loan_id) || /^LOAN-/i.test(String(item.idApproval || ''));
+      }
+
       function sortPengeluaranYellowFirst(list) {
         if (!Array.isArray(list)) return [];
         const payrollRows = [];
@@ -4528,6 +4561,8 @@
           // serta semua item yang status approval-nya bukan Disetujui (kecuali transaksi Auto: Payroll)
           parsed = parsed.filter(function (it) {
             if (!it) return false;
+            // Hapus otomatis item EXP warisan relasi Loan/Piutang Karyawan karena sudah tidak berelasi
+            if (isLoanExpenseItem(it)) return false;
             if (isPayrollCollectiveItem(it)) return true;
             if (!it.idApproval) return false;
             const key = String(it.idApproval).trim().toLowerCase();
@@ -5084,14 +5119,13 @@
       setupModalDropdownToggle('wrapAkunLama', 'btnTriggerAkunLama');
       setupModalDropdownToggle('wrapPpn', 'btnTriggerPpn');
       setupModalDropdownToggle('wrapProjectBrand', 'btnTriggerProjectBrand');
+      setupModalDropdownToggle('wrapJenis', 'btnTriggerJenis');
       setupModalDropdownToggle('wrapDivisiPengecualian', 'btnTriggerDivisiPengecualian');
 
-      /* ===== HELPER SET JENIS VALUE (AUTO FILL DARI MODUL PENGAJUAN BARANG & JASA {JENIS}) ===== */
+      /* ===== HELPER SET JENIS VALUE (DROPDOWN: BEBAN, REIMBURSEMENT, ASET, PERLU RINCIAN) ===== */
       function setJenisValue(val) {
         const actualVal = (val || '').trim();
-        if (pndJenis) {
-          pndJenis.value = actualVal;
-        }
+        setDropdownVal('wrapJenis', 'btnTriggerJenis', 'labelJenis', 'pndJenis', 'optJenis', actualVal, 'Pilih Jenis');
       }
 
       function initDynamicModalDropdowns() {
@@ -5265,7 +5299,6 @@
           { el: pndKeterangan },
           { el: pndStatusApproval },
           { el: pndTagihanBruto },
-          { el: pndJenis },
           { el: pndBebanDiAkui },
           { el: pndTerbayarKas },
           { el: pndSisaUtang }
@@ -5359,7 +5392,7 @@
       }
 
       function rebindDropdownRadios() {
-        const dropdownRadioNames = ['optIdApproval', 'optKodeCoa', 'optPpn', 'optProjectBrand'];
+        const dropdownRadioNames = ['optIdApproval', 'optKodeCoa', 'optPpn', 'optProjectBrand', 'optJenis'];
         dropdownRadioNames.forEach(function (rName) {
           document.querySelectorAll('input[name="' + rName + '"]').forEach(function (r) {
             r.addEventListener('change', function () {
@@ -5477,6 +5510,25 @@
             }
           });
         });
+
+        // Jenis:
+        document.querySelectorAll('input[name="optJenis"]').forEach(function (radio) {
+          radio.addEventListener('change', function () {
+            if (this.checked) {
+              const val = this.value;
+              const hidden = document.getElementById('pndJenis');
+              const label = document.getElementById('labelJenis');
+              const trigger = document.getElementById('btnTriggerJenis');
+              if (hidden) hidden.value = val;
+              if (label) label.textContent = val || 'Pilih Jenis';
+              if (trigger) {
+                if (val) trigger.classList.add('has-value');
+                else trigger.classList.remove('has-value');
+              }
+              closeAllModalDropdowns();
+            }
+          });
+        });
       }
 
       function setDropdownVal(wrapId, triggerId, labelId, hiddenId, radioName, val, defaultLabel) {
@@ -5496,6 +5548,8 @@
             if (radio.value === finalVal) {
               isMatch = true;
             } else if (radioName === 'optProjectBrand' && normalizeProjectBrandName(radio.value).toLowerCase() === finalVal.toLowerCase()) {
+              isMatch = true;
+            } else if (radioName === 'optJenis' && radio.value.toLowerCase() === finalVal.toLowerCase()) {
               isMatch = true;
             }
           } else {
@@ -6080,28 +6134,19 @@
 
           setApprovalFieldsReadonly();
           renderPayrollBreakdownInModal('pndPayrollBreakdownBox', item);
-          if (isPayrollCollectiveItem(item)) {
-            if (pndDpp) {
-              pndDpp.readOnly = true;
-              pndDpp.setAttribute('tabindex', '-1');
-              pndDpp.classList.add('pnd-input-readonly');
-              pndDpp.title = 'Nominal DPP/Beban terkunci (Read-only) karena berasal dari Rekap Kolektif Payroll';
-            }
-          } else {
-            if (pndDpp) {
-              pndDpp.readOnly = false;
-              pndDpp.removeAttribute('tabindex');
-              pndDpp.classList.remove('pnd-input-readonly');
-              pndDpp.title = '';
-            }
+          if (pndDpp) {
+            pndDpp.readOnly = true;
+            pndDpp.setAttribute('tabindex', '-1');
+            pndDpp.classList.add('pnd-input-readonly');
+            pndDpp.title = 'Nominal DPP/Beban terkunci (Read-only)';
           }
         } else {
           renderPayrollBreakdownInModal('pndPayrollBreakdownBox', null);
           if (pndDpp) {
-            pndDpp.readOnly = false;
-            pndDpp.removeAttribute('tabindex');
-            pndDpp.classList.remove('pnd-input-readonly');
-            pndDpp.title = '';
+            pndDpp.readOnly = true;
+            pndDpp.setAttribute('tabindex', '-1');
+            pndDpp.classList.add('pnd-input-readonly');
+            pndDpp.title = 'Nominal DPP/Beban terkunci (Read-only)';
           }
           if (actionText) actionText.textContent = 'Tambah';
           if (editIdInput) editIdInput.value = '';

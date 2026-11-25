@@ -287,8 +287,7 @@
           { label: 'Daftar Aset', link: 'Accounting/operasional/accounting_daftar_aset.html', icon: 'boxes' },
           { label: 'Mutasi Aset', link: 'Accounting/operasional/accounting_mutasi_aset.html', icon: 'arrow-left-right' },
           { label: 'Alokasi Aset Project', link: 'Accounting/operasional/accounting_alokasi_aset_project.html', icon: 'layers' },
-          { label: 'Utang Karyawan', link: 'Accounting/operasional/accounting_utang_karyawan.html', icon: 'file-minus' },
-          { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_piutang_karyawan.html', icon: 'file-plus' },
+          { label: 'Piutang Karyawan', link: 'Accounting/operasional/accounting_utang_karyawan.html', icon: 'file-minus' },
           { label: 'Budget vs Actual', link: 'Accounting/operasional/accounting_budget_vs_actual.html', icon: 'scale-balance' },
           { label: 'Pengajuan Barang & Jasa', link: 'Accounting/operasional/accounting_pengajuan_barang_jasa.html', icon: 'shopping-cart' },
           { label: 'Tagihan Berkala', link: 'Accounting/operasional/accounting_tagihan_berkala.html', icon: 'repeat' }
@@ -1293,7 +1292,6 @@
       'accounting_mutasi_aset.html',
       'accounting_alokasi_aset_project.html',
       'accounting_utang_karyawan.html',
-      'accounting_piutang_karyawan.html',
       'accounting_budget_vs_actual.html',
       'accounting_pengajuan_barang_jasa.html',
       'accounting_tagihan_berkala.html',
@@ -2289,8 +2287,7 @@
       'accounting_laba_rugi.html': 'Laba Rugi',
       'accounting_neraca.html': 'Neraca',
       'accounting_rekap_divisi.html': 'Rekap Divisi',
-      'accounting_utang_karyawan.html': 'Utang Karyawan',
-      'accounting_piutang_karyawan.html': 'Piutang Karyawan',
+      'accounting_utang_karyawan.html': 'Piutang Karyawan',
       'accounting_budget_vs_actual.html': 'Budget vs Actual',
       'accounting_history_dokumen.html': 'History Dokumen',
       'accounting_folder.html': 'My Folders',
@@ -4738,6 +4735,99 @@
       scanAndUpgradeAllDateInputs();
     }
     setTimeout(scanAndUpgradeAllDateInputs, 150);
+  })();
+
+  /* ===== GLOBAL ACCOUNTING TABLE CONSISTENCY (POLISH & HEADER-CELL ALIGNMENT) ===== */
+  (function initGlobalAccountingTableConsistency() {
+    const path = (window.location.pathname || '').toLowerCase();
+    const isAccountingPage = path.includes('/accounting/') || path.includes('accounting_');
+    if (!isAccountingPage) return;
+
+    function injectTablePolishCss() {
+      if (document.getElementById('globalAccountingTablePolishCss')) return;
+      const style = document.createElement('style');
+      style.id = 'globalAccountingTablePolishCss';
+      style.textContent = [
+        '.dashboard-content table thead th {',
+        '  padding: 12px 14px;',
+        '  font-family: "Outfit", sans-serif;',
+        '  font-size: 13px;',
+        '  font-weight: 600;',
+        '  color: #0f172a;',
+        '  background-color: #f8fafc;',
+        '  border-bottom: 1.5px solid #e2e8f0;',
+        '  white-space: nowrap;',
+        '  letter-spacing: 0.01em;',
+        '  vertical-align: middle;',
+        '}',
+        '.dashboard-content table tbody td {',
+        '  padding: 12px 14px;',
+        '  font-family: "Outfit", sans-serif;',
+        '  font-size: 13.5px;',
+        '  line-height: 1.4;',
+        '  vertical-align: middle;',
+        '  border-bottom: 1px solid #f1f5f9;',
+        '  font-variant-numeric: tabular-nums;',
+        '}',
+        '.dashboard-content .pnd-cell-italic {',
+        '  font-style: normal !important;',
+        '}',
+        '.dashboard-content table tbody tr:hover td {',
+        '  background-color: #f8fafc;',
+        '}'
+      ].join('\n');
+      document.head.appendChild(style);
+    }
+
+    function syncTableAlignments(table) {
+      if (!table || !table.tHead || !table.tBodies || !table.tBodies.length) return;
+      const headRow = table.tHead.rows[table.tHead.rows.length - 1];
+      if (!headRow) return;
+      const tbody = table.tBodies[0];
+      let sampleRow = null;
+      for (let r = 0; r < tbody.rows.length; r++) {
+        const row = tbody.rows[r];
+        if (row.cells.length >= headRow.cells.length && !row.querySelector('td[colspan]')) {
+          sampleRow = row;
+          break;
+        }
+      }
+      if (!sampleRow) return;
+
+      for (let i = 0; i < headRow.cells.length; i++) {
+        const th = headRow.cells[i];
+        const td = sampleRow.cells[i];
+        if (!th || !td) continue;
+        const cs = window.getComputedStyle(td);
+        let align = (cs && cs.textAlign) ? cs.textAlign.toLowerCase() : 'left';
+        if (align === 'start') align = 'left';
+        if (align === 'end') align = 'right';
+        if (align === 'left' || align === 'center' || align === 'right') {
+          th.style.setProperty('text-align', align, 'important');
+        }
+      }
+    }
+
+    function observeAllAccountingTables() {
+      injectTablePolishCss();
+      document.querySelectorAll('.dashboard-content table').forEach(function (table) {
+        syncTableAlignments(table);
+        if (!table.dataset.bmAlignObserved && table.tBodies && table.tBodies[0]) {
+          table.dataset.bmAlignObserved = '1';
+          const obs = new MutationObserver(function () {
+            syncTableAlignments(table);
+          });
+          obs.observe(table.tBodies[0], { childList: true });
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', observeAllAccountingTables);
+    } else {
+      observeAllAccountingTables();
+    }
+    setTimeout(observeAllAccountingTables, 200);
   })();
 
   // Jaminan body selalu visible dan ready
