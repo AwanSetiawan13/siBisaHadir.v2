@@ -97,7 +97,7 @@
       font-family: 'Outfit', sans-serif;
       font-size: 20px;
       font-weight: 700;
-      font-style: italic;
+      font-style: normal;
       color: #0f172a;
       letter-spacing: -0.3px;
     }
@@ -438,6 +438,23 @@
     #pndTable tbody tr.pnd-row-needs-edit:hover td.col-sticky-action,
     #pndTable tbody tr.pnd-row-needs-edit:hover td {
       background-color: #fef08a !important;
+    }
+
+    /* Baris khusus Payroll (Pink Highlight) */
+    #pndTable tbody tr.pnd-row-payroll td:first-child,
+    #pndTable tbody tr.pnd-row-payroll td.col-pinned-sticky,
+    #pndTable tbody tr.pnd-row-payroll td.col-sticky-action,
+    #pndTable tbody tr.pnd-row-payroll td {
+      background-color: #fce7f3 !important;
+    }
+    #pndTable tbody tr.pnd-row-payroll td:first-child {
+      border-left: 4px solid #ec4899 !important;
+    }
+    #pndTable tbody tr.pnd-row-payroll:hover td:first-child,
+    #pndTable tbody tr.pnd-row-payroll:hover td.col-pinned-sticky,
+    #pndTable tbody tr.pnd-row-payroll:hover td.col-sticky-action,
+    #pndTable tbody tr.pnd-row-payroll:hover td {
+      background-color: #fbcfe8 !important;
     }
 
     #pndTable th.col-pinned-last,
@@ -2335,7 +2352,7 @@
     background-color: #f8fafc !important;
   }
 
-  /* 7. Unified Action Trigger Button (⋮) */
+  /* 7. Unified Action Trigger Button (â‹®) */
   .kb-action-btn,
   .pnd-action-btn,
   .btn-action-trigger,
@@ -2430,6 +2447,103 @@
     opacity: 1 !important;
     pointer-events: auto !important;
   }
+
+  /* ===== AUTO: PAYROLL BADGE, PINK ROW HIGHLIGHT & RINCIAN KARYAWAN BOX ===== */
+  #pndTable tbody tr.pnd-row-payroll,
+  #pndTable tbody tr.pnd-row-payroll td,
+  #pndTable tbody tr.pnd-row-payroll td:first-child,
+  #pndTable tbody tr.pnd-row-payroll td.col-pinned-sticky,
+  #pndTable tbody tr.pnd-row-payroll td.col-sticky-action,
+  #pndTable tbody tr.pnd-row-payroll td:last-child.col-sticky-action {
+    background-color: #fce7f3 !important;
+  }
+  #pndTable tbody tr.pnd-row-payroll td:first-child {
+    border-left: 4px solid #ec4899 !important;
+  }
+  #pndTable tbody tr.pnd-row-payroll:hover,
+  #pndTable tbody tr.pnd-row-payroll:hover td,
+  #pndTable tbody tr.pnd-row-payroll:hover td:first-child,
+  #pndTable tbody tr.pnd-row-payroll:hover td.col-pinned-sticky,
+  #pndTable tbody tr.pnd-row-payroll:hover td.col-sticky-action,
+  #pndTable tbody tr.pnd-row-payroll:hover td:last-child.col-sticky-action {
+    background-color: #fbcfe8 !important;
+  }
+  .badge-auto-payroll {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    font-size: 10.5px;
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: 0.3px;
+    margin-left: 6px;
+    box-shadow: 0 1px 4px rgba(2, 132, 199, 0.25);
+    vertical-align: middle;
+  }
+  .pnd-payroll-breakdown-box {
+    grid-column: 1 / -1;
+    background: #f8fafc;
+    border: 1.5px solid #bae6fd;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 4px;
+    display: none;
+  }
+  .pnd-payroll-breakdown-box.is-visible {
+    display: block;
+  }
+  .pnd-payroll-breakdown-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #cbd5e1;
+  }
+  .pnd-payroll-breakdown-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0369a1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pnd-payroll-breakdown-table {
+    width: 100%;
+    border-collapse: collapse !important;
+    font-size: 12.5px;
+  }
+  .pnd-payroll-breakdown-table th {
+    background: #e0f2fe !important;
+    color: #0369a1 !important;
+    padding: 7px 10px !important;
+    text-align: left !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    border: 1px solid #bae6fd !important;
+    position: static !important;
+    box-shadow: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  .pnd-payroll-breakdown-table td {
+    padding: 7px 10px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    color: #334155 !important;
+    font-size: 12.5px !important;
+    position: static !important;
+    box-shadow: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+
 </style>
 </head>
 
@@ -2977,6 +3091,9 @@
             </div>
           </div>
 
+          <!-- Rincian Karyawan Kolektif Payroll (Hanya tampil jika source_type === 'payroll') -->
+          <div id="pndPayrollBreakdownBox" class="pnd-payroll-breakdown-box"></div>
+
         </div>
 
         <div class="pnd-modal-footer">
@@ -3110,6 +3227,9 @@
           <input type="text" id="viewPndDivisiPengecualian" class="pnd-input is-muted" readonly />
         </div>
 
+        <!-- Rincian Karyawan Kolektif Payroll di Modal Detail -->
+        <div id="viewPndPayrollBreakdownBox" class="pnd-payroll-breakdown-box"></div>
+
       </div>
 
       <div class="pnd-modal-footer">
@@ -3159,8 +3279,9 @@
   </div>
 
   <!-- Universal Scripts -->
-  <script src="../../assets/js/layout.js?v=20261123_v4"></script>
+  <script src="../../assets/js/layout.js?v=20261125_v7"></script>
   <script src="../../assets/js/excel_engine.js?v=20261103_grup_v3"></script>
+  <script src="../../assets/js/payroll_engine.js?v=20261125_v2"></script>
 
   <!-- Main Logic Script -->
   <script>
@@ -3425,6 +3546,7 @@
         }
         // Tambahkan akun beban operasional pendukung transaksi Pengeluaran & Beban jika belum ada di list COA
         const expenseAccounts = [
+          { kode: '5101', nama: 'Beban Gaji & Tunjangan', kelompok: 'Beban', aktif: 'Ya' },
           { kode: '5001', nama: 'Beban Gaji', kelompok: 'Beban', aktif: 'Ya' },
           { kode: '5002', nama: 'Beban Internet', kelompok: 'Beban', aktif: 'Ya' },
           { kode: '5003', nama: 'Beban Iklan', kelompok: 'Beban', aktif: 'Ya' },
@@ -3602,7 +3724,7 @@
           }
           if (alertEl) {
             alertEl.style.display = 'block';
-            alertEl.textContent = '⚠ Nominal DPP/Beban (' + formatRupiahInput(dppVal) + ') melebihi Limitasi "' + cleanBrand + '" (Maks: ' + formatRupiahInput(limVal) + ')!';
+            alertEl.textContent = 'âš  Nominal DPP/Beban (' + formatRupiahInput(dppVal) + ') melebihi Limitasi "' + cleanBrand + '" (Maks: ' + formatRupiahInput(limVal) + ')!';
           }
 
           if (showModalAlert) {
@@ -4240,18 +4362,26 @@
         return Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
       }
 
+      function isPayrollCollectiveItem(item) {
+        if (!item) return false;
+        return item.source_type === 'payroll' || item.sourceType === 'payroll' || /^PR-REKAP-/i.test(String(item.idApproval || ''));
+      }
+
       function sortPengeluaranYellowFirst(list) {
         if (!Array.isArray(list)) return [];
+        const payrollRows = [];
         const yellowRows = [];
         const whiteRows = [];
         list.forEach(function (it) {
-          if (isItemNeedsEdit(it)) {
+          if (isPayrollCollectiveItem(it) && isItemNeedsEdit(it)) {
+            payrollRows.push(it);
+          } else if (isItemNeedsEdit(it)) {
             yellowRows.push(it);
           } else {
             whiteRows.push(it);
           }
         });
-        return yellowRows.concat(whiteRows);
+        return payrollRows.concat(yellowRows, whiteRows);
       }
 
       function loadData() {
@@ -4359,13 +4489,32 @@
         ];
 
         try {
-          const raw = localStorage.getItem(STORAGE_KEY);
+          const rawShared = localStorage.getItem('sibisahadir_expenses');
+          const rawLegacy = localStorage.getItem(STORAGE_KEY);
           let parsed = [];
-          if (raw === null) {
-            parsed = seedData.slice();
+
+          if (rawShared || rawLegacy) {
+            const arrShared = rawShared ? (JSON.parse(rawShared) || []) : [];
+            const arrLegacy = rawLegacy ? (JSON.parse(rawLegacy) || []) : [];
+            const seenDoc = new Set();
+            []
+              .concat(Array.isArray(arrShared) ? arrShared.filter(isPayrollCollectiveItem) : [])
+              .concat(Array.isArray(arrLegacy) ? arrLegacy.filter(isPayrollCollectiveItem) : [])
+              .concat(Array.isArray(arrShared) ? arrShared : [])
+              .concat(Array.isArray(arrLegacy) ? arrLegacy : [])
+              .forEach(function (it) {
+                if (!it || typeof it !== 'object') return;
+                if (window.BisaPayrollEngine && typeof window.BisaPayrollEngine.normalizeExpenseItem === 'function') {
+                  it = window.BisaPayrollEngine.normalizeExpenseItem(it);
+                }
+                const k = String(it.idDokumen || it.id_dokumen || it.id || '').trim().toLowerCase();
+                if (k && !seenDoc.has(k)) {
+                  seenDoc.add(k);
+                  parsed.push(it);
+                }
+              });
           } else {
-            const tmp = JSON.parse(raw);
-            parsed = Array.isArray(tmp) ? tmp : seedData.slice();
+            parsed = seedData.slice();
           }
 
           const deletedSet = getDeletedApprovalSet();
@@ -4376,13 +4525,14 @@
           });
 
           // 1. Bersihkan item warisan seed lama (exp-3 / exp-4) yang belum diedit user,
-          // serta semua item yang status approval-nya bukan Disetujui
+          // serta semua item yang status approval-nya bukan Disetujui (kecuali transaksi Auto: Payroll)
           parsed = parsed.filter(function (it) {
-            if (!it || !it.idApproval) return false;
+            if (!it) return false;
+            if (isPayrollCollectiveItem(it)) return true;
+            if (!it.idApproval) return false;
             const key = String(it.idApproval).trim().toLowerCase();
             if (deletedSet.has(key)) return false;
 
-            // Jika exp-3 atau exp-4 dari seed lama belum diedit di Pengeluaran & Beban, hapus dulu agar jika nanti APR-2609-003 disetujui ia masuk sebagai item baru bertanda kuning
             if ((it.id === 'exp-3' || it.id === 'exp-4') && !it.isEditedInPengeluaran) {
               return false;
             }
@@ -4395,10 +4545,20 @@
           });
 
           // Pastikan seed 1, 2, 5 yang sudah lengkap ditandai isEditedInPengeluaran = true
+          // dan pastikan transaksi kolektif Payroll yang belum diedit manual Kode COA-nya kosong ("Belum Diisi")
           parsed.forEach(function (it) {
             if (['exp-1', 'exp-2', 'exp-5'].includes(it.id) && it.needsCompletion === undefined) {
               it.needsCompletion = false;
               it.isEditedInPengeluaran = true;
+            }
+            if (isPayrollCollectiveItem(it) && !it.isManuallyEditedCoa) {
+              it.kodeCoa = '';
+              it.kode_coa = '';
+              it.namaAkunCoa = '';
+              it.kelompokCoa = '';
+              it.statusCoa = '';
+              it.needsCompletion = true;
+              it.isEditedInPengeluaran = false;
             }
           });
 
@@ -4478,6 +4638,7 @@
             return syncItemWithApproval(item);
           }));
           localStorage.setItem(STORAGE_KEY, JSON.stringify(syncedList));
+          localStorage.setItem('sibisahadir_expenses', JSON.stringify(syncedList));
           return syncedList;
         } catch (e) {
           return seedData.map(function (item) {
@@ -4489,6 +4650,7 @@
       function saveData() {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(pndData));
+          localStorage.setItem('sibisahadir_expenses', JSON.stringify(pndData));
           window.dispatchEvent(new CustomEvent('pengeluaranBebanUpdated', { detail: pndData }));
         } catch (e) {
           console.error('Gagal menyimpan data pengeluaran & beban', e);
@@ -4747,8 +4909,11 @@
         filtered.forEach(function (item, index) {
           syncItemWithApproval(item);
           const row = document.createElement('tr');
+          const isPayrollItem = isPayrollCollectiveItem(item);
           const isNeedsEdit = Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
-          if (isNeedsEdit) {
+          if (isPayrollItem && isNeedsEdit) {
+            row.classList.add('pnd-row-payroll');
+          } else if (isNeedsEdit) {
             row.classList.add('pnd-row-needs-edit');
           }
           const terbayar = getTerbayarKasForDoc(item.idDokumen);
@@ -4771,12 +4936,12 @@
 
           const coaCellHtml = (item.kodeCoa && item.kodeCoa !== '-')
             ? escapeHtml(item.kodeCoa)
-            : (isNeedsEdit ? '<span style="color: #b45309; font-weight: 700; font-style: italic;">Belum Diisi</span>' : '-');
+            : ((isNeedsEdit || isPayrollItem) ? '<span style="color: #b45309; font-weight: 700; font-style: italic;">Belum Diisi</span>' : '-');
 
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (index + 1) + '.</td>',
             '<td data-col="id_dokumen" style="font-weight: 600; color: #0284c7; white-space: nowrap;">' + escapeHtml(item.idDokumen || '-') + '</td>',
-            '<td data-col="id_approval" style="white-space: nowrap; color: #1e293b; font-weight: 500;">' + escapeHtml(item.idApproval || '-') + '</td>',
+            '<td data-col="id_approval" style="white-space: nowrap; color: #1e293b; font-weight: 600;">' + escapeHtml(item.idApproval || '-') + '</td>',
             '<td data-col="tanggal_pengakuan" style="white-space: nowrap; color: #334155;">' + escapeHtml(formatTanggalDisplay(item.tanggalPengakuan)) + '</td>',
             '<td data-col="vendor_karyawan" style="white-space: nowrap; font-weight: 500; color: #1e293b;">' + escapeHtml(item.vendorKaryawan || '-') + '</td>',
             '<td data-col="divisi" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.divisi || '-') + '</td>',
@@ -5548,7 +5713,7 @@
         if (dataUrl && (dataUrl.startsWith('data:image/') || dataUrl.startsWith('http') || dataUrl.startsWith('blob:'))) {
           previewContent = '<div style="margin: 6px 0; text-align: center; max-height: 480px; overflow-y: auto; padding: 4px; border-radius: 8px;">' +
             '<img src="' + dataUrl + '" alt="Bukti Transaksi" style="max-width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 18px rgba(0,0,0,0.1); object-fit: contain;" />' +
-            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">📎 ' + escapeHtml(name || 'Bukti Transaksi') + '</div>' +
+            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">ðŸ“Ž ' + escapeHtml(name || 'Bukti Transaksi') + '</div>' +
             '</div>';
         } else {
           const nom = ctx.tagihanBruto || ctx.dpp || 0;
@@ -5613,12 +5778,12 @@
         if (dataUrl && (dataUrl.startsWith('data:image/') || dataUrl.startsWith('http') || dataUrl.startsWith('blob:'))) {
           previewContent = '<div style="margin: 6px 0; text-align: center; max-height: 480px; overflow-y: auto; padding: 4px; border-radius: 8px;">' +
             '<img src="' + dataUrl + '" alt="Dokumen Invoice" style="max-width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 18px rgba(0,0,0,0.1); object-fit: contain;" />' +
-            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">📄 ' + escapeHtml(name || 'Dokumen Invoice') + '</div>' +
+            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">ðŸ“„ ' + escapeHtml(name || 'Dokumen Invoice') + '</div>' +
             '</div>';
         } else if (dataUrl && dataUrl.startsWith('data:application/pdf')) {
           previewContent = '<div style="margin: 6px 0; text-align: center;">' +
             '<embed src="' + dataUrl + '" type="application/pdf" width="100%" height="400px" style="border-radius: 8px; border: 1px solid #cbd5e1;" />' +
-            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500;">📄 ' + escapeHtml(name || 'Dokumen Invoice (PDF)') + '</div>' +
+            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500;">ðŸ“„ ' + escapeHtml(name || 'Dokumen Invoice (PDF)') + '</div>' +
             '</div>';
         } else {
           const nom = ctx.tagihanBruto || ctx.dpp || 0;
@@ -5743,6 +5908,80 @@
         });
       }
 
+      /* ===== RENDER RINCIAN KARYAWAN KOLEKTIF PAYROLL DI MODAL EDIT & DETAIL ===== */
+      function renderPayrollBreakdownInModal(containerId, item) {
+        const box = document.getElementById(containerId);
+        if (!box) return;
+        if (!item || !isPayrollCollectiveItem(item)) {
+          box.classList.remove('is-visible');
+          box.innerHTML = '';
+          return;
+        }
+
+        let employees = [];
+        if (window.BisaPayrollEngine && typeof window.BisaPayrollEngine.getPayrollEmployeesForExpense === 'function') {
+          employees = window.BisaPayrollEngine.getPayrollEmployeesForExpense(item) || [];
+        } else if (Array.isArray(item.payroll_employees)) {
+          employees = item.payroll_employees;
+        }
+
+        const periodLabel = item.payroll_period || item.payrollPeriod || '-';
+        let totalBruto = 0;
+        let totalThp = 0;
+
+        let rowsHtml = '';
+        employees.forEach(function (emp, idx) {
+          const bruto = Number(emp.bebanBruto) || 0;
+          const thp = Number(emp.takeHomePay) || 0;
+          totalBruto += bruto;
+          totalThp += thp;
+          rowsHtml += '<tr>' +
+            '<td style="text-align:center;">' + (idx + 1) + '.</td>' +
+            '<td style="font-weight:600;color:#0284c7;">' + escapeHtml(emp.idPayroll || '-') + '</td>' +
+            '<td style="font-weight:600;color:#0f172a;">' + escapeHtml(emp.nama || '-') + ' <span style="color:#64748b;font-weight:400;">(' + escapeHtml(emp.idKaryawan || emp.nik || '-') + ')</span></td>' +
+            '<td>' + escapeHtml(emp.divisi || '-') + '</td>' +
+            '<td style="text-align:right;color:#dc2626;font-weight:600;">' + escapeHtml(formatRupiah(bruto)) + '</td>' +
+            '<td style="text-align:right;color:#059669;font-weight:700;">' + escapeHtml(formatRupiah(thp)) + '</td>' +
+          '</tr>';
+        });
+
+        if (!rowsHtml) {
+          rowsHtml = '<tr><td colspan="6" style="text-align:center;color:#64748b;font-style:italic;">Rincian karyawan tidak ditemukan.</td></tr>';
+        }
+
+        box.innerHTML =
+          '<div class="pnd-payroll-breakdown-head">' +
+            '<div class="pnd-payroll-breakdown-title">' +
+              '<span class="badge-auto-payroll" style="margin-left:0;">Auto: Payroll</span>' +
+              '<span>Rincian Karyawan Tergabung â€” Periode ' + escapeHtml(periodLabel) + ' (' + employees.length + ' Karyawan)</span>' +
+            '</div>' +
+            '<span style="font-size:11.5px;color:#64748b;font-weight:600;">ðŸ”’ Nominal DPP/Beban Terkunci (Read-only)</span>' +
+          '</div>' +
+          '<div style="overflow-x:auto;">' +
+            '<table class="pnd-payroll-breakdown-table">' +
+              '<thead>' +
+                '<tr>' +
+                  '<th style="width:36px;text-align:center;">#</th>' +
+                  '<th>ID Payroll</th>' +
+                  '<th>Nama Karyawan</th>' +
+                  '<th>Divisi</th>' +
+                  '<th style="text-align:right;">Beban Bruto</th>' +
+                  '<th style="text-align:right;">Take Home Pay</th>' +
+                '</tr>' +
+              '</thead>' +
+              '<tbody>' + rowsHtml + '</tbody>' +
+              '<tfoot>' +
+                '<tr>' +
+                  '<td colspan="4" style="text-align:right;font-weight:700;background:#f0f9ff !important;color:#0f172a !important;">Total Kolektif Payroll:</td>' +
+                  '<td style="text-align:right;font-weight:700;background:#f0f9ff !important;color:#dc2626 !important;">' + escapeHtml(formatRupiah(totalBruto || item.total_beban_bruto || item.dpp)) + '</td>' +
+                  '<td style="text-align:right;font-weight:800;background:#f0f9ff !important;color:#059669 !important;">' + escapeHtml(formatRupiah(totalThp || item.dpp)) + '</td>' +
+                '</tr>' +
+              '</tfoot>' +
+            '</table>' +
+          '</div>';
+        box.classList.add('is-visible');
+      }
+
       /* ===== FORM OPEN & SUBMIT ===== */
       function openForm(item) {
         initDynamicModalDropdowns();
@@ -5840,7 +6079,30 @@
           }
 
           setApprovalFieldsReadonly();
+          renderPayrollBreakdownInModal('pndPayrollBreakdownBox', item);
+          if (isPayrollCollectiveItem(item)) {
+            if (pndDpp) {
+              pndDpp.readOnly = true;
+              pndDpp.setAttribute('tabindex', '-1');
+              pndDpp.classList.add('pnd-input-readonly');
+              pndDpp.title = 'Nominal DPP/Beban terkunci (Read-only) karena berasal dari Rekap Kolektif Payroll';
+            }
+          } else {
+            if (pndDpp) {
+              pndDpp.readOnly = false;
+              pndDpp.removeAttribute('tabindex');
+              pndDpp.classList.remove('pnd-input-readonly');
+              pndDpp.title = '';
+            }
+          }
         } else {
+          renderPayrollBreakdownInModal('pndPayrollBreakdownBox', null);
+          if (pndDpp) {
+            pndDpp.readOnly = false;
+            pndDpp.removeAttribute('tabindex');
+            pndDpp.classList.remove('pnd-input-readonly');
+            pndDpp.title = '';
+          }
           if (actionText) actionText.textContent = 'Tambah';
           if (editIdInput) editIdInput.value = '';
 
@@ -5953,7 +6215,8 @@
           ? (Number(matchedApproval.nominal) || 0)
           : tagihanBruto;
 
-        const record = {
+        const existingItem = editId ? (pndData.find(function (d) { return String(d.id) === String(editId); }) || null) : null;
+        const record = Object.assign({}, existingItem || {}, {
           id: editId || ('exp-' + Date.now()),
           idDokumen: pndIdDokumen.value.trim(),
           idApproval: pndIdApproval.value.trim(),
@@ -5962,7 +6225,16 @@
           divisi: pndDivisi.value.trim(),
           keterangan: pndKeterangan.value.trim(),
           statusApproval: pndStatusApproval.value.trim() || 'Disetujui',
-          kodeCoa: pndKodeCoa.value.trim() || '5009',
+          kodeCoa: pndKodeCoa.value.trim() || (existingItem && isPayrollCollectiveItem(existingItem) ? '' : '5009'),
+          isManuallyEditedCoa: Boolean(pndKodeCoa.value.trim()),
+          source_type: existingItem && existingItem.source_type ? existingItem.source_type : undefined,
+          sourceType: existingItem && existingItem.sourceType ? existingItem.sourceType : undefined,
+          payroll_period: existingItem && existingItem.payroll_period ? existingItem.payroll_period : undefined,
+          payrollPeriod: existingItem && existingItem.payrollPeriod ? existingItem.payrollPeriod : undefined,
+          payroll_count: existingItem && existingItem.payroll_count ? existingItem.payroll_count : undefined,
+          payroll_employees: existingItem && existingItem.payroll_employees ? existingItem.payroll_employees : undefined,
+          total_beban_bruto: existingItem && existingItem.total_beban_bruto ? existingItem.total_beban_bruto : undefined,
+          total_take_home_pay: existingItem && existingItem.total_take_home_pay ? existingItem.total_take_home_pay : undefined,
           dpp: dppVal,
           ppn: ppnVal,
           totalPpn: ppnCalc.totalPpn,
@@ -5990,9 +6262,9 @@
           statusCoa: (pndStatusCoa ? pndStatusCoa.value.trim() : ''),
           needsCompletion: false,
           isEditedInPengeluaran: true,
-          createdAt: Date.now(),
+          createdAt: (existingItem && existingItem.createdAt) ? existingItem.createdAt : Date.now(),
           updatedAt: Date.now()
-        };
+        });
 
         if (editId) {
           const idx = pndData.findIndex(function (d) { return String(d.id) === String(editId); });
@@ -6116,6 +6388,7 @@
         if (document.getElementById('viewPndNamaAkunCoa')) document.getElementById('viewPndNamaAkunCoa').value = item.namaAkunCoa || 'Nama Akun COA';
         if (document.getElementById('viewPndKelompokCoa')) document.getElementById('viewPndKelompokCoa').value = item.kelompokCoa || 'Kelompok COA';
         if (document.getElementById('viewPndStatusCoa')) document.getElementById('viewPndStatusCoa').value = item.statusCoa || 'Status COA';
+        renderPayrollBreakdownInModal('viewPndPayrollBreakdownBox', item);
 
         openModal(detailModal);
       }
@@ -6421,7 +6694,14 @@
               }
             }
             updateCalendarSelectedText();
-            renderDualCalendar();
+            window.addEventListener('storage', function (e) {
+        if (!e.key || e.key === 'sibisahadir_expenses' || e.key === STORAGE_KEY || e.key === KAS_BANK_KEY) {
+          pndData = loadData();
+          renderTable();
+        }
+      });
+
+      renderDualCalendar();
           });
 
           container.appendChild(cell);

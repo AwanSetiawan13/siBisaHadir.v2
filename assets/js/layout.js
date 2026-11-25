@@ -3177,7 +3177,7 @@
     const divisiInputSelectors = [
       '#pndDivisiPengecualian',
       '#crudDivisiPengecualian',
-      '#crudDivisi',
+      '#crudDivisi:not([readonly])',
       '#pjDivisi',
       '#coaDevisDefault',
       '#kbDivisi',
@@ -3186,11 +3186,17 @@
 
     divisiInputSelectors.forEach(function (sel) {
       document.querySelectorAll(sel).forEach(function (inp) {
+        if (inp.id === 'karyawanDivisi' || (inp.dataset && inp.dataset.manualInput === 'true')) {
+          inp.removeAttribute('list');
+          return;
+        }
         if (!inp.hasAttribute('list') || inp.getAttribute('list') === 'globalAccountingDivisiList') {
           inp.setAttribute('list', 'globalAccountingDivisiList');
         }
       });
     });
+    const manualKryDiv = document.getElementById('karyawanDivisi');
+    if (manualKryDiv) manualKryDiv.removeAttribute('list');
   }
 
   window.getAccountingDivisiList = getAccountingDivisiList;
@@ -3218,6 +3224,7 @@
     const target = e.target;
     if (target && target.tagName === 'INPUT' && !target.readOnly) {
       const id = target.id || '';
+      if (id === 'karyawanDivisi' || (target.dataset && target.dataset.manualInput === 'true')) return;
       const name = target.name || '';
       const placeholder = target.placeholder || '';
       if (id.toLowerCase().includes('divisi') || name.toLowerCase().includes('divisi') || placeholder.toLowerCase().includes('divisi')) {
@@ -4624,7 +4631,7 @@
         return;
       }
       // Skip payroll custom month picker #crudPeriode in accounting_payroll.html
-      if (id === 'crudPeriode' && document.getElementById('payrollMonthPickerPopover')) {
+      if (id === 'crudPeriode' && (document.getElementById('payrollMonthModal') || document.getElementById('payrollMonthPickerPopover'))) {
         return;
       }
 
