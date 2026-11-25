@@ -3047,10 +3047,7 @@
                         <option value="income">INV â€” Semua Pemasukan</option>
                         <option value="expense">EXP â€” Semua Pengeluaran</option>
                         <option value="invoice">Invoice Pendapatan (INV-...)</option>
-                        <option value="pengeluaran">Pengeluaran &amp; Beban (PB-...)</option>
-                        <option value="payroll">Payroll (PR-...)</option>
-                        <option value="utang_karyawan">Utang Karyawan (LOAN-...)</option>
-                        <option value="piutang_karyawan_direct">Piutang Karyawan (PAY-...)</option>
+                        <option value="pengeluaran">Pengeluaran &amp; Beban (PB-... / EXP-...)</option>
                       </select>
                     </div>
                   </div>
@@ -3059,13 +3056,10 @@
                     <button type="button" class="kb-ref-pill" data-ref-filter="new">NEW</button>
                     <button type="button" class="kb-ref-pill" data-ref-filter="income">INV</button>
                     <button type="button" class="kb-ref-pill" data-ref-filter="expense">EXP</button>
-                    <button type="button" class="kb-ref-pill" data-ref-filter="payroll">Payroll</button>
-                    <button type="button" class="kb-ref-pill" data-ref-filter="utang_karyawan">Utang</button>
-                    <button type="button" class="kb-ref-pill" data-ref-filter="piutang_karyawan_direct">Piutang</button>
                   </div>
                   <div class="kb-select-search-box" style="padding-bottom: 0; margin-bottom: 0; border-bottom: none;">
                     <svg viewBox="0 0 24 24" class="kb-select-search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="searchReferensiDokumen" class="kb-select-search-input" placeholder="Cari No. Invoice / ID Dokumen / Kode Utang..." autocomplete="off" />
+                    <input type="text" id="searchReferensiDokumen" class="kb-select-search-input" placeholder="Cari No. Invoice / ID Dokumen..." autocomplete="off" />
                   </div>
                 </div>
                 <div class="kb-select-options-list" id="listReferensiDokumen">
@@ -5272,136 +5266,9 @@
           return fallbackIdx !== undefined ? (1000000000 - fallbackIdx) : 0;
         }
 
-        // 1. Ambil Kode & No Utang dari modul Utang Karyawan secara realtime (Pengeluaran -> Kode utama EXP)
-        try {
-          const rawUtang = localStorage.getItem('accounting_utang_karyawan_data');
-          const utangList = rawUtang ? JSON.parse(rawUtang) : [];
-          if (Array.isArray(utangList)) {
-            utangList.forEach(function (u, idx) {
-              if (!u || typeof u !== 'object') return;
-              const code = String(u.idPinjaman || u.idPinjam || '').trim();
-              if (code && !seen.has(code.toLowerCase())) {
-                const lowerCode = code.toLowerCase();
-                seen.add(lowerCode);
-                const emp = String(u.namaKaryawan || u.nama || 'Karyawan').trim();
-                const idKry = String(u.idKaryawan || '').trim();
-                const desc = 'Pinjaman Karyawan: ' + emp + (idKry ? ' (' + idKry + ')' : '');
-                const nom = typeof u.pokokPinjaman === 'number'
-                  ? u.pokokPinjaman
-                  : (Number(String(u.pokokPinjaman || '0').replace(/[^0-9]/g, '')) || 0);
-                const isUnused = !usedRefsInKb.has(lowerCode);
-                result.push({
-                  kode: code,
-                  tipe: 'expense',
-                  source: 'utang_karyawan',
-                  labelTipe: 'Utang Karyawan',
-                  keterangan: desc,
-                  nominal: nom,
-                  customerOrVendor: emp,
-                  projectBrand: '',
-                  divisi: (u.divisi && u.divisi !== '-') ? String(u.divisi).trim() : '',
-                  buktiUrl: (u.buktiUrl || '').trim(),
-                  buktiDataUrl: (u.buktiDataUrl || '').trim(),
-                  isUnused: isUnused,
-                  sortTime: extractSortTime(u, code, idx)
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.warn('Error loading utang karyawan list for referensi:', e);
-        }
+        // (Relasi Utang/Piutang Karyawan ke Kas & Bank dihapus — pelunasan otomatis via Potong Gaji di Payroll)
 
-        // 2. Ambil Pembayaran Piutang Karyawan yang menggunakan Cash / Tunai atau Transfer Bank (Langsung ke Kas & Bank)
-        try {
-          const rawPiutang = localStorage.getItem('accounting_piutang_karyawan_data');
-          const piutangList = rawPiutang ? JSON.parse(rawPiutang) : [];
-          if (Array.isArray(piutangList)) {
-            piutangList.forEach(function (pt, idx) {
-              if (!pt || typeof pt !== 'object') return;
-              const metodeRaw = String(pt.metode || '').trim();
-              const metodeLower = metodeRaw.toLowerCase();
-              // Hanya metode Cash / Tunai / Transfer Bank yang langsung masuk ke Kas & Bank
-              if (metodeLower === 'potong gaji') return;
-
-              const code = String(pt.idPembayaran || '').trim();
-              if (code && !seen.has(code.toLowerCase())) {
-                const lowerCode = code.toLowerCase();
-                seen.add(lowerCode);
-                const emp = String(pt.namaKaryawan || pt.nama || 'Karyawan').trim();
-                const idLoan = String(pt.idPinjamanBayar || pt.idPinjamBayar || '').trim();
-                const metodeLabel = (metodeLower === 'tunai' || metodeLower === 'kas' || metodeLower === 'cash') ? 'Cash' : (metodeRaw || 'Transfer Bank');
-                const desc = 'Cicilan Piutang Karyawan (' + metodeLabel + '): ' + emp + (idLoan ? ' - ' + idLoan : '');
-                const nom = typeof pt.nominal === 'number'
-                  ? pt.nominal
-                  : (Number(String(pt.nominal || '0').replace(/[^0-9]/g, '')) || 0);
-                const isUnused = !usedRefsInKb.has(lowerCode);
-                result.push({
-                  kode: code,
-                  tipe: 'income',
-                  source: 'piutang_karyawan_direct',
-                  metode: metodeLabel,
-                  labelTipe: 'Piutang Karyawan (' + metodeLabel + ')',
-                  keterangan: desc,
-                  nominal: nom,
-                  customerOrVendor: emp,
-                  projectBrand: '',
-                  divisi: (pt.divisi && pt.divisi !== '-') ? String(pt.divisi).trim() : '',
-                  buktiUrl: (pt.buktiUrl || '').trim(),
-                  buktiDataUrl: (pt.buktiDataUrl || '').trim(),
-                  isUnused: isUnused,
-                  sortTime: extractSortTime(pt, code, idx)
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.warn('Error loading piutang karyawan list for referensi:', e);
-        }
-
-        // 3. Ambil ID Payroll dari modul Payroll secara realtime (Termasuk hasil Potong Gaji dari Piutang Karyawan)
-        try {
-          const rawPay = localStorage.getItem('bisa_payroll_data_v1') || localStorage.getItem('accounting_payroll_data_v1');
-          let payList = rawPay ? JSON.parse(rawPay) : [];
-          if (!Array.isArray(payList) || payList.length === 0) {
-            payList = [
-              { idPayroll: 'PR-202610-001', nama: 'Ahmad Fauzi', periode: 'Oktober 2026', takeHomePay: 6350000, potonganPiutang: 0, projectBrand: 'Seluruh Kreator MCN', divisi: 'MCN' },
-              { idPayroll: 'PR-202610-002', nama: 'Raka Wijaya', periode: 'Oktober 2026', takeHomePay: 5500000, potonganPiutang: 0, projectBrand: 'Campaign Brand A', divisi: 'Marketing & Brand' }
-            ];
-          }
-          if (Array.isArray(payList)) {
-            payList.forEach(function (p, idx) {
-              const code = (p.idPayroll || '').trim();
-              if (code && !seen.has(code.toLowerCase())) {
-                const lowerCode = code.toLowerCase();
-                seen.add(lowerCode);
-                const emp = (p.nama || 'Karyawan').trim();
-                const potPiutang = Number(String(p.potonganPiutang || '0').replace(/[^0-9]/g, '')) || 0;
-                const potInfo = potPiutang > 0 ? ' [Potong Gaji Piutang]' : '';
-                const desc = 'Payroll: ' + emp + (p.periode ? ' (' + p.periode + ')' : '') + potInfo;
-                const nom = Number(p.takeHomePay || 0);
-                const isUnused = !usedRefsInKb.has(lowerCode);
-                result.push({
-                  kode: code,
-                  tipe: 'expense',
-                  source: 'payroll',
-                  labelTipe: 'Payroll',
-                  keterangan: desc,
-                  nominal: nom,
-                  customerOrVendor: emp,
-                  projectBrand: (p.projectBrand && p.projectBrand !== '-' && p.projectBrand !== '0') ? String(p.projectBrand).trim() : '',
-                  divisi: (p.divisi && p.divisi !== '-') ? String(p.divisi).trim() : '',
-                  buktiUrl: (p.buktiUrl || p.buktiName || '').trim(),
-                  buktiDataUrl: (p.buktiDataUrl || p.buktiImg || '').trim(),
-                  isUnused: isUnused,
-                  sortTime: extractSortTime(p, code, idx)
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.warn('Error loading payroll list for referensi:', e);
-        }
+        // (ID Payroll PR-... & ID Pengajuan PBJ-... tidak dimunculkan langsung — hanya dari Pendapatan & Pengeluaran/Beban)
 
         // 4. Ambil No. Invoice dari Pendapatan secara real
         try {
@@ -5482,116 +5349,15 @@
           console.warn('Error loading pengeluaran list for referensi:', e);
         }
 
-        // 5b. Ambil ID Pengajuan Barang & Jasa (PBJ-...)
-        try {
-          const rawPbj = localStorage.getItem('accounting_pengajuan_barang_jasa_v1');
-          const pbjList = rawPbj ? JSON.parse(rawPbj) : [];
-          if (Array.isArray(pbjList)) {
-            pbjList.forEach(function (pbj, idx) {
-              const code = String(pbj.id || pbj.idPengajuan || '').trim();
-              if (code && !seen.has(code.toLowerCase())) {
-                const lowerCode = code.toLowerCase();
-                seen.add(lowerCode);
-                const desc = 'Pengajuan: ' + (pbj.namaBarang || pbj.kategori || 'Barang/Jasa') + (pbj.periode ? ' (' + pbj.periode + ')' : '');
-                const nom = Number(pbj.totalEstimasi || pbj.estimasiBiaya || pbj.harga || 0);
-                const isUnused = !usedRefsInKb.has(lowerCode);
-                result.push({
-                  kode: code,
-                  tipe: 'expense',
-                  source: 'pengajuan_bj',
-                  labelTipe: 'Pengajuan B&J',
-                  keterangan: desc,
-                  nominal: nom,
-                  customerOrVendor: pbj.pic || pbj.vendor || pbj.pemohon || '',
-                  projectBrand: (pbj.projectBrand && pbj.projectBrand !== '-') ? String(pbj.projectBrand).trim() : '',
-                  divisi: (pbj.divisi && pbj.divisi !== '-') ? String(pbj.divisi).trim() : '',
-                  buktiUrl: (pbj.buktiUrl || '').trim(),
-                  buktiDataUrl: (pbj.buktiDataUrl || '').trim(),
-                  isUnused: isUnused,
-                  sortTime: extractSortTime(pbj, code, idx)
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.warn('Error loading pengajuan barang jasa for referensi:', e);
-        }
+        // (ID Pengajuan Barang & Jasa PBJ-... tidak dimunculkan langsung di Kas & Bank)
 
-        // 5c. Ambil ID Tagihan Berkala (TB-...)
-        try {
-          const rawTb = localStorage.getItem('accounting_tagihan_berkala_v2');
-          const tbList = rawTb ? JSON.parse(rawTb) : [];
-          if (Array.isArray(tbList)) {
-            tbList.forEach(function (tb, idx) {
-              const code = String(tb.id || tb.idTagihan || '').trim();
-              if (code && !seen.has(code.toLowerCase())) {
-                const lowerCode = code.toLowerCase();
-                seen.add(lowerCode);
-                const desc = 'Tagihan Berkala: ' + (tb.itemTagihan || tb.keterangan || 'Langganan');
-                const nom = Number(tb.harga || 0);
-                const isUnused = !usedRefsInKb.has(lowerCode);
-                result.push({
-                  kode: code,
-                  tipe: 'expense',
-                  source: 'tagihan_berkala',
-                  labelTipe: 'Tagihan Berkala',
-                  keterangan: desc,
-                  nominal: nom,
-                  customerOrVendor: tb.akses || '',
-                  projectBrand: '',
-                  divisi: 'Operasional',
-                  buktiUrl: '',
-                  buktiDataUrl: '',
-                  isUnused: isUnused,
-                  sortTime: extractSortTime(tb, code, idx)
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.warn('Error loading tagihan berkala for referensi:', e);
-        }
+        // (Tagihan Berkala TB-... & Pajak PJK-... tidak dimunculkan langsung di Kas & Bank — hanya Pendapatan & Pengeluaran/Beban)
 
-        // 5d. Ambil ID Pajak dari modul Pajak (PJK-...)
-        try {
-          const rawPjk = localStorage.getItem('bisa_pajak_data_v1');
-          const pjkList = rawPjk ? JSON.parse(rawPjk) : [];
-          if (Array.isArray(pjkList)) {
-            pjkList.forEach(function (pjk, idx) {
-              const code = String(pjk.idPajak || pjk.id || '').trim();
-              if (code && !seen.has(code.toLowerCase())) {
-                const lowerCode = code.toLowerCase();
-                seen.add(lowerCode);
-                const desc = 'Pajak ' + (pjk.jenisPajak || '') + (pjk.periode ? ' (' + pjk.periode + ')' : '') + (pjk.catatan && pjk.catatan !== '-' ? ' - ' + pjk.catatan : '');
-                const nom = Number(pjk.dibayarKas || pjk.pajakTerutang || 0);
-                const isUnused = !usedRefsInKb.has(lowerCode);
-                result.push({
-                  kode: code,
-                  tipe: 'expense',
-                  source: 'pajak',
-                  labelTipe: 'Pajak',
-                  keterangan: desc,
-                  nominal: nom,
-                  customerOrVendor: pjk.jenisPajak || 'Pajak',
-                  projectBrand: '',
-                  divisi: (pjk.divisi && pjk.divisi !== '-') ? String(pjk.divisi).trim() : 'Operasional',
-                  buktiUrl: '',
-                  buktiDataUrl: '',
-                  isUnused: isUnused,
-                  sortTime: extractSortTime(pjk, code, idx)
-                });
-              }
-            });
-          }
-        } catch (e) {
-          console.warn('Error loading pajak for referensi:', e);
-        }
-
-        // 6. Sertakan referensi yang saat ini digunakan di Kas & Bank jika belum ada dalam list (kecuali ID APR-... yang tidak berelasi dengan Kas & Bank)
+        // 6. Sertakan referensi yang saat ini digunakan di Kas & Bank jika belum ada dalam list (kecuali ID APR/PR/PBJ/TB/PJK yang tidak berelasi langsung)
         if (Array.isArray(kbData)) {
           kbData.forEach(function (item, idx) {
             const ref = (item.referensi || '').trim();
-            if (ref && ref !== '-' && ref !== 'Tambah Reverensi' && !/^APR-/i.test(ref) && !seen.has(ref.toLowerCase())) {
+            if (ref && ref !== '-' && ref !== 'Tambah Reverensi' && !/^(APR|PR|PBJ|TB|PJK)-/i.test(ref) && !seen.has(ref.toLowerCase())) {
               seen.add(ref.toLowerCase());
               const isInc = ref.toUpperCase().startsWith('INV') || ref.toUpperCase().startsWith('PAY');
               result.push({

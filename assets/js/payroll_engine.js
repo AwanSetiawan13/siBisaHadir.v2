@@ -449,6 +449,7 @@
     item.penguranganLainnya = pengLain;
     item.potonganLain = pengLain;
     item.potonganPiutang = potPiutang;
+    item.jedaUtang = Boolean(item.jedaUtang);
     item.bebanBruto = calcBruto;
     item.takeHomePay = calcThp;
 
@@ -832,6 +833,10 @@
         it.id_pengeluaran = rekapApprovalId;
         it.idDokumenExpense = newDocId;
         it.updatedAt = Date.now();
+        if (it.idPinjaman && it.idPinjaman !== '-' && it.jedaUtang === true &&
+            window.LoanEngine && typeof window.LoanEngine.pauseLoanInstallment === 'function') {
+          window.LoanEngine.pauseLoanInstallment(it.idPinjaman, cleanPeriod);
+        }
       }
       return it;
     });
