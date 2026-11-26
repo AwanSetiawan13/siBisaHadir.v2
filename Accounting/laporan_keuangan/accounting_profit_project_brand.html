@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" translate="no" class="notranslate">
 
 <head>
@@ -372,6 +372,12 @@
       background: #fee2e2;
       color: #dc2626;
       border: 1px solid #fecaca;
+    }
+
+    .profit-status-badge.is-lunas {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
     }
 
     .profit-status-badge.is-empty {
@@ -2214,11 +2220,11 @@
         return resultMap;
       }
 
-      function calculateMarginPercent(labaSebelumPajak, pendapatan) {
-        const rev = Number(pendapatan) || 0;
-        const laba = Number(labaSebelumPajak) || 0;
-        if (rev <= 0) return 0;
-        const pct = Number(((laba / rev) * 100).toFixed(1));
+      function calculateMarginPercent(bebanVal, limitasiVal) {
+        const beban = Number(bebanVal) || 0;
+        const lim = Number(limitasiVal) || 0;
+        if (lim <= 0) return 0;
+        const pct = Number(((beban / lim) * 100).toFixed(1));
         return Math.abs(pct) < 0.05 ? 0 : pct;
       }
 
@@ -2247,21 +2253,38 @@
         return {};
       }
 
-      function saveLimitasiForBrand(projectBrand, limitasiNominal) {
-        const cleanKey = normalizeProjectBrandName(projectBrand).toLowerCase();
-        if (!cleanKey) return;
+      function getLimitasiExactKey(projectBrandOrItem) {
+        const rawVal = (projectBrandOrItem && typeof projectBrandOrItem === 'object')
+          ? (projectBrandOrItem.rawProjectBrand || projectBrandOrItem.projectBrand || '')
+          : (projectBrandOrItem || '');
+        return String(rawVal).replace(/\s+/g, ' ').trim().toLowerCase();
+      }
+
+      function saveLimitasiForBrand(projectBrandOrItem, limitasiNominal) {
+        const exactKey = getLimitasiExactKey(projectBrandOrItem);
+        if (!exactKey) return;
         const map = getSavedLimitasiMap();
-        map[cleanKey] = Math.max(0, Number(limitasiNominal) || 0);
+        map[exactKey] = Math.max(0, Number(limitasiNominal) || 0);
         try {
           localStorage.setItem(LIMITASI_STORAGE_KEY, JSON.stringify(map));
         } catch (e) {}
       }
 
-      function getLimitasiForBrand(projectBrand) {
-        const cleanKey = normalizeProjectBrandName(projectBrand).toLowerCase();
+      function getLimitasiForBrand(projectBrandOrItem) {
+        const rawVal = (projectBrandOrItem && typeof projectBrandOrItem === 'object')
+          ? (projectBrandOrItem.rawProjectBrand || projectBrandOrItem.projectBrand || '')
+          : (projectBrandOrItem || '');
+        const exactKey = getLimitasiExactKey(projectBrandOrItem);
+        const cleanKey = normalizeProjectBrandName(rawVal).toLowerCase();
         const map = getSavedLimitasiMap();
-        if (cleanKey && Object.prototype.hasOwnProperty.call(map, cleanKey)) {
+        if (exactKey && Object.prototype.hasOwnProperty.call(map, exactKey)) {
+          return Math.max(0, Number(map[exactKey]) || 0);
+        }
+        if (cleanKey && exactKey === cleanKey && Object.prototype.hasOwnProperty.call(map, cleanKey)) {
           return Math.max(0, Number(map[cleanKey]) || 0);
+        }
+        if (exactKey && Object.prototype.hasOwnProperty.call(DEFAULT_LIMITASI_BY_BRAND, exactKey)) {
+          return DEFAULT_LIMITASI_BY_BRAND[exactKey];
         }
         if (cleanKey && Object.prototype.hasOwnProperty.call(DEFAULT_LIMITASI_BY_BRAND, cleanKey)) {
           return DEFAULT_LIMITASI_BY_BRAND[cleanKey];
@@ -2273,11 +2296,15 @@
         const lim = Number(limitasiVal) || 0;
         const totalPengeluaran = Number(bebanVal) || 0;
         if (lim <= 0) return 'Belum Diatur';
+        if (totalPengeluaran === lim) return 'Lunas';
         return totalPengeluaran > lim ? 'Over Limit' : 'Dalam Limit';
       }
 
       function renderStatusBadgeHtml(statusText) {
         const st = String(statusText || '').trim();
+        if (st === 'Lunas') {
+          return '<span class="profit-status-badge is-lunas">Lunas</span>';
+        }
         if (st === 'Over Limit') {
           return '<span class="profit-status-badge is-over">Over Limit</span>';
         }
@@ -2294,8 +2321,8 @@
         const payroll = opts.payrollMap ? (opts.payrollMap.get(key) || 0) : 0;
         const penyusutan = opts.penyusutanMap ? (opts.penyusutanMap.get(key) || 0) : 0;
         const laba = pendapatanDpp - (beban + payroll + penyusutan);
-        const margin = calculateMarginPercent(laba, pendapatanDpp);
-        const limitasi = opts.limitasi !== undefined ? (Number(opts.limitasi) || 0) : getLimitasiForBrand(opts.projectBrand);
+        const limitasi = opts.limitasi !== undefined ? (Number(opts.limitasi) || 0) : getLimitasiForBrand(opts);
+        const margin = calculateMarginPercent(beban, limitasi);
         const status = computeLimitasiStatus(limitasi, beban, payroll, penyusutan);
         return {
           id: opts.id,
@@ -2603,7 +2630,8 @@
           const p = Number(item.pendapatan) || 0;
           const b = (Number(item.beban) || 0) + (Number(item.payroll) || 0) + (Number(item.penyusutan) || 0);
           const l = item.labaSebelumPajak !== undefined ? (Number(item.labaSebelumPajak) || 0) : (p - b);
-          const m = calculateMarginPercent(l, p);
+          const lim = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item);
+          const m = calculateMarginPercent(item.beban, lim);
 
           totalPendapatan += p;
           totalBebanAll += b;
@@ -2647,14 +2675,15 @@
         filtered.forEach(function (item, index) {
           const row = document.createElement('tr');
           const labaVal = Number(item.labaSebelumPajak) || 0;
-          const marginVal = calculateMarginPercent(labaVal, item.pendapatan);
-          const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item.projectBrand);
+          const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item);
+          const marginVal = calculateMarginPercent(item.beban, limitasiVal);
           const statusVal = computeLimitasiStatus(limitasiVal, item.beban, item.payroll, item.penyusutan);
           item.limitasi = limitasiVal;
+          item.margin = marginVal;
           item.status = statusVal;
 
           const labaStyle = labaVal < 0 ? 'font-weight: 700; color: #dc2626;' : 'font-weight: 700; color: #16a34a;';
-          const marginStyle = marginVal < 0 ? 'color: #dc2626;' : 'color: #16a34a;';
+          const marginStyle = marginVal > 100 ? 'color: #dc2626;' : (marginVal === 100 ? 'color: #1d4ed8;' : 'color: #16a34a;');
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-style: italic;">' + (index + 1) + '.</td>',
             '<td class="pnd-cell-italic" style="font-weight: 500;">' + escapeHtml(item.projectBrand || '-') + '</td>',
@@ -2683,7 +2712,8 @@
         if (!item || !detailModal) return;
 
         const labaVal = Number(item.labaSebelumPajak) || 0;
-        const marginVal = calculateMarginPercent(labaVal, item.pendapatan);
+        const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item);
+        const marginVal = calculateMarginPercent(item.beban, limitasiVal);
 
         if (detailProjectBrand) detailProjectBrand.textContent = item.projectBrand || '-';
         if (detailPendapatan) {
@@ -2713,9 +2743,8 @@
         }
         if (detailMargin) {
           detailMargin.textContent = formatMarginPercent(marginVal);
-          detailMargin.style.color = marginVal >= 0 ? '#16a34a' : '#dc2626';
+          detailMargin.style.color = marginVal > 100 ? '#dc2626' : (marginVal === 100 ? '#1d4ed8' : '#16a34a');
         }
-        const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item.projectBrand);
         const statusVal = computeLimitasiStatus(limitasiVal, item.beban, item.payroll, item.penyusutan);
         if (detailLimitasi) {
           detailLimitasi.textContent = limitasiVal === 0 ? 'Rp. 0' : formatRupiah(limitasiVal);
@@ -2724,7 +2753,7 @@
         }
         if (detailStatus) {
           detailStatus.textContent = statusVal;
-          detailStatus.style.color = statusVal === 'Over Limit' ? '#dc2626' : (statusVal === 'Dalam Limit' ? '#16a34a' : '#64748b');
+          detailStatus.style.color = statusVal === 'Lunas' ? '#1d4ed8' : (statusVal === 'Over Limit' ? '#dc2626' : (statusVal === 'Dalam Limit' ? '#16a34a' : '#64748b'));
           detailStatus.style.fontWeight = '700';
         }
 
@@ -2752,8 +2781,8 @@
         currentEditingItem = item;
 
         const labaVal = Number(item.labaSebelumPajak) || 0;
-        const marginVal = calculateMarginPercent(labaVal, item.pendapatan);
-        const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item.projectBrand);
+        const limitasiVal = item.limitasi !== undefined ? (Number(item.limitasi) || 0) : getLimitasiForBrand(item);
+        const marginVal = calculateMarginPercent(item.beban, limitasiVal);
         const statusVal = computeLimitasiStatus(limitasiVal, item.beban, item.payroll, item.penyusutan);
 
         if (editProfitId) editProfitId.value = item.id || '';
@@ -2790,8 +2819,13 @@
           const clean = String(this.value || '').replace(/[^0-9]/g, '');
           const num = clean ? parseInt(clean, 10) : 0;
           this.value = num > 0 ? ('Rp ' + num.toLocaleString('id-ID')) : (this.value.includes('0') ? 'Rp 0' : '');
-          if (currentEditingItem && editStatus) {
-            editStatus.value = computeLimitasiStatus(num, currentEditingItem.beban, currentEditingItem.payroll, currentEditingItem.penyusutan);
+          if (currentEditingItem) {
+            if (editStatus) {
+              editStatus.value = computeLimitasiStatus(num, currentEditingItem.beban, currentEditingItem.payroll, currentEditingItem.penyusutan);
+            }
+            if (editMargin) {
+              editMargin.value = formatMarginPercent(calculateMarginPercent(currentEditingItem.beban, num));
+            }
           }
         });
       }
@@ -2804,7 +2838,7 @@
           const clean = String(editLimitasi ? editLimitasi.value : '').replace(/[^0-9]/g, '');
           const nextLimitasi = clean ? parseInt(clean, 10) : 0;
 
-          saveLimitasiForBrand(currentEditingItem.projectBrand, nextLimitasi);
+          saveLimitasiForBrand(currentEditingItem, nextLimitasi);
           profitData = loadProfitData();
           renderTable();
           closeEditModal();
@@ -3127,7 +3161,7 @@
             const filtered = getFilteredData();
             let csv = 'No,Project/Brand,Pendapatan,Beban,Payroll,Penyusutan,Laba Sebelum Pajak,Margin,Limitasi,Status\n';
             filtered.forEach(function (row, idx) {
-              const limVal = row.limitasi !== undefined ? (Number(row.limitasi) || 0) : getLimitasiForBrand(row.projectBrand);
+              const limVal = row.limitasi !== undefined ? (Number(row.limitasi) || 0) : getLimitasiForBrand(row);
               const stVal = computeLimitasiStatus(limVal, row.beban, row.payroll, row.penyusutan);
               csv += [
                 idx + 1,
@@ -3137,7 +3171,7 @@
                 row.payroll,
                 row.penyusutan,
                 row.labaSebelumPajak,
-                formatMarginPercent(calculateMarginPercent(row.labaSebelumPajak, row.pendapatan)),
+                formatMarginPercent(calculateMarginPercent(row.beban, limVal)),
                 limVal,
                 '"' + stVal + '"'
               ].join(',') + '\n';

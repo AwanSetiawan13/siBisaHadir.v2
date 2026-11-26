@@ -2916,7 +2916,7 @@
 
           <!-- Row 4: PPN (Opsional), Total PPN, Tagihan Bruto -->
           <div class="pnd-field">
-            <label class="pnd-label">PPN (Opsional)</label>
+            <label class="pnd-label">PPN</label>
             <div class="pnd-select-wrap" id="wrapPpn">
               <div class="pnd-select-btn" id="btnTriggerPpn">
                 <span id="labelPpn">Pilih PPN</span>
@@ -2956,7 +2956,7 @@
           </div>
 
           <div class="pnd-field">
-            <label class="pnd-label">Project/Brand (Opsional)</label>
+            <label class="pnd-label">Project/Brand</label>
             <div class="pnd-select-wrap" id="wrapProjectBrand">
               <div class="pnd-select-btn" id="btnTriggerProjectBrand">
                 <span id="labelProjectBrand">Pilih Project / Brand</span>
@@ -3052,7 +3052,7 @@
           </div>
 
           <div class="pnd-field">
-            <label class="pnd-label" for="pndJatuhTempo">Jatuh Tempo (Opsional)</label>
+            <label class="pnd-label" for="pndJatuhTempo">Jatuh Tempo</label>
             <div class="bisa-datepicker-wrap">
               <input type="text" id="pndJatuhTempo" class="pnd-input bisa-datepicker-input" placeholder="dd/mm/yyyy" autocomplete="off" />
               <span class="bisa-datepicker-icon" title="Pilih Tanggal">
@@ -3097,12 +3097,12 @@
           </div>
 
           <div class="pnd-field">
-            <label class="pnd-label" for="pndCatatan">Catatan (Opsional)</label>
+            <label class="pnd-label" for="pndCatatan">Catatan</label>
             <input type="text" id="pndCatatan" class="pnd-input" placeholder="Tambah Catatan" />
           </div>
 
           <div class="pnd-field">
-            <label class="pnd-label">Divisi Pengecualian (Opsional)</label>
+            <label class="pnd-label">Divisi Pengecualian</label>
             <div class="pnd-select-wrap" id="wrapDivisiPengecualian">
               <div class="pnd-select-btn" id="btnTriggerDivisiPengecualian">
                 <span id="labelDivisiPengecualian">Pilih atau ketik divisi</span>
@@ -3202,7 +3202,7 @@
           <input type="text" id="viewPndTagihanBruto" class="pnd-input is-muted" readonly />
         </div>
         <div class="pnd-field">
-          <label class="pnd-label">Project/Brand (Opsional)</label>
+          <label class="pnd-label">Project/Brand</label>
           <input type="text" id="viewPndProjectBrand" class="pnd-input is-muted" readonly />
         </div>
         <div class="pnd-field">
@@ -3682,14 +3682,20 @@
       };
 
       function getLimitasiForProjectBrand(projectBrand) {
+        const exactKey = String(projectBrand || '').replace(/\s+/g, ' ').trim().toLowerCase();
         const cleanKey = normalizeProjectBrandName(projectBrand).toLowerCase();
         if (!cleanKey || cleanKey === '-' || cleanKey === '0' || cleanKey === '- tanpa project / brand -') return 0;
         try {
           const rawMap = localStorage.getItem(LIMITASI_STORAGE_KEY);
           if (rawMap) {
             const parsedMap = JSON.parse(rawMap);
-            if (parsedMap && typeof parsedMap === 'object' && Object.prototype.hasOwnProperty.call(parsedMap, cleanKey)) {
-              return Math.max(0, Number(parsedMap[cleanKey]) || 0);
+            if (parsedMap && typeof parsedMap === 'object') {
+              if (exactKey && Object.prototype.hasOwnProperty.call(parsedMap, exactKey)) {
+                return Math.max(0, Number(parsedMap[exactKey]) || 0);
+              }
+              if (exactKey === cleanKey && Object.prototype.hasOwnProperty.call(parsedMap, cleanKey)) {
+                return Math.max(0, Number(parsedMap[cleanKey]) || 0);
+              }
             }
           }
         } catch (e) {}
@@ -3699,7 +3705,10 @@
             const parsedProfit = JSON.parse(rawProfit);
             if (Array.isArray(parsedProfit)) {
               const found = parsedProfit.find(function (p) {
-                return p && normalizeProjectBrandName(p.projectBrand || p.rawProjectBrand).toLowerCase() === cleanKey;
+                if (!p) return false;
+                const pExact = String(p.rawProjectBrand || p.projectBrand || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                if (exactKey && pExact === exactKey) return true;
+                return exactKey === cleanKey && normalizeProjectBrandName(p.projectBrand || p.rawProjectBrand).toLowerCase() === cleanKey;
               });
               if (found && found.limitasi !== undefined) {
                 return Math.max(0, Number(found.limitasi) || 0);
@@ -3707,17 +3716,87 @@
             }
           }
         } catch (e) {}
+        if (Object.prototype.hasOwnProperty.call(DEFAULT_LIMITASI_BY_BRAND, exactKey)) {
+          return DEFAULT_LIMITASI_BY_BRAND[exactKey];
+        }
         if (Object.prototype.hasOwnProperty.call(DEFAULT_LIMITASI_BY_BRAND, cleanKey)) {
           return DEFAULT_LIMITASI_BY_BRAND[cleanKey];
         }
         return 5000000;
       }
 
+      function getTotalBebanForProjectBrand(brandVal) {
+        const exactKey = String(brandVal || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        const cleanKey = normalizeProjectBrandName(brandVal).toLowerCase();
+        if (!cleanKey || cleanKey === '-' || cleanKey === '0' || cleanKey === '- tanpa project / brand -') return 0;
+
+        let list = [];
+        if (typeof pndData !== 'undefined' && Array.isArray(pndData)) {
+          list = pndData;
+        } else {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) list = parsed;
+            }
+          } catch (e) {}
+        }
+
+        let total = 0;
+        list.forEach(function (item) {
+          if (!item || !item.projectBrand) return;
+          const itemExact = String(item.projectBrand || '').replace(/\s+/g, ' ').trim().toLowerCase();
+          const itemClean = normalizeProjectBrandName(item.projectBrand).toLowerCase();
+          const matches = (exactKey && itemExact === exactKey) || (cleanKey && itemClean === cleanKey);
+          if (!matches) return;
+          const rawVal = item.bebanDiAkui !== undefined && item.bebanDiAkui !== null && item.bebanDiAkui !== ''
+            ? item.bebanDiAkui
+            : item.dpp;
+          total += parseRupiah(rawVal);
+        });
+        return total;
+      }
+
+      function isProjectBrandLunas(brandVal) {
+        const exactKey = String(brandVal || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        const cleanKey = normalizeProjectBrandName(brandVal).toLowerCase();
+        if (!cleanKey || cleanKey === '-' || cleanKey === '0' || cleanKey === '- tanpa project / brand -') return false;
+
+        const limVal = getLimitasiForProjectBrand(brandVal);
+        if (limVal > 0) {
+          const totalBeban = getTotalBebanForProjectBrand(brandVal);
+          if (totalBeban === limVal) return true;
+        }
+
+        try {
+          const rawProfit = localStorage.getItem('bisa_profit_project_brand_data');
+          if (rawProfit) {
+            const parsedProfit = JSON.parse(rawProfit);
+            if (Array.isArray(parsedProfit)) {
+              const found = parsedProfit.find(function (p) {
+                if (!p) return false;
+                const pExact = String(p.rawProjectBrand || p.projectBrand || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                if (exactKey && pExact === exactKey) return true;
+                return exactKey === cleanKey && normalizeProjectBrandName(p.projectBrand || p.rawProjectBrand).toLowerCase() === cleanKey;
+              });
+              if (found) {
+                const fLim = Number(found.limitasi) || 0;
+                const fBeban = Number(found.beban) || 0;
+                if (found.status === 'Lunas' || (fLim > 0 && fBeban === fLim)) return true;
+              }
+            }
+          }
+        } catch (e) {}
+
+        return false;
+      }
+
       function updateLimitasiFieldFromProjectBrand(brandVal) {
         const limEl = document.getElementById('pndLimitasi');
         if (!limEl) return;
         const clean = normalizeProjectBrandName(brandVal);
-        const limVal = getLimitasiForProjectBrand(clean);
+        const limVal = getLimitasiForProjectBrand(brandVal);
         limEl.value = (clean && limVal > 0) ? formatRupiahInput(limVal) : (clean ? 'Rp 0' : 'Rp. -');
         limEl.readOnly = true;
         limEl.setAttribute('tabindex', '-1');
@@ -3733,9 +3812,10 @@
         const brandEl = document.getElementById('pndProjectBrand');
         const limEl = document.getElementById('pndLimitasi');
         const alertEl = document.getElementById('pndDppLimitAlert');
-        const cleanBrand = normalizeProjectBrandName(brandEl ? brandEl.value : '');
+        const rawBrandVal = brandEl ? brandEl.value : '';
+        const cleanBrand = normalizeProjectBrandName(rawBrandVal);
         const dppVal = parseRupiah(pndDpp ? pndDpp.value : 0);
-        const limVal = cleanBrand ? getLimitasiForProjectBrand(cleanBrand) : 0;
+        const limVal = cleanBrand ? getLimitasiForProjectBrand(rawBrandVal) : 0;
 
         const isOverLimit = Boolean(cleanBrand && limVal > 0 && dppVal > limVal);
 
@@ -5259,7 +5339,9 @@
         // 3. Project/Brand Dropdown (Dari Pendapatan {Project/Brand})
         const dropdownBrand = document.getElementById('dropdownProjectBrand');
         if (dropdownBrand) {
-          const brands = getProjectBrandList();
+          const brands = getProjectBrandList().filter(function (br) {
+            return !isProjectBrandLunas(br);
+          });
           dropdownBrand.innerHTML = '';
           const noneLabel = document.createElement('label');
           noneLabel.className = 'pnd-select-item';
@@ -5269,15 +5351,10 @@
           dropdownBrand.appendChild(noneLabel);
 
           brands.forEach(function (br) {
-            const limNom = getLimitasiForProjectBrand(br);
-            const limText = limNom > 0 ? ('Limit: Rp ' + limNom.toLocaleString('id-ID')) : 'Limit: Rp 0';
             const label = document.createElement('label');
             label.className = 'pnd-select-item';
             label.innerHTML = '<input type="radio" name="optProjectBrand" value="' + escapeHtml(br) + '" data-label="' + escapeHtml(br) + '" />' +
-              '<span class="pnd-item-label" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;">' +
-                '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(br) + '</span>' +
-                '<span style="font-size:11px;font-weight:600;color:#0284c7;background:#f0f9ff;border:1px solid #bae6fd;padding:1.5px 7px;border-radius:999px;flex-shrink:0;">' + escapeHtml(limText) + '</span>' +
-              '</span>';
+              '<span class="pnd-item-label">' + escapeHtml(br) + '</span>';
             dropdownBrand.appendChild(label);
           });
         }
@@ -6332,6 +6409,7 @@
         }
 
         saveData();
+        initDynamicModalDropdowns();
         renderTable();
         closeModal(formModal);
 
