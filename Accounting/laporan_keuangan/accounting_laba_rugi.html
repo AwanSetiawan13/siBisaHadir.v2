@@ -415,8 +415,9 @@
       display: inline-flex;
       align-items: center;
       gap: 3px;
-      padding: 2px 7px;
-      border-radius: 12px;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
       font-size: 10px;
       font-weight: 700;
       white-space: nowrap;
@@ -424,17 +425,17 @@
     }
 
     .lr-pill-badge.is-green {
-      background: #dcfce7;
+      background: transparent;
       color: #16a34a;
     }
 
     .lr-pill-badge.is-red {
-      background: #fee2e2;
+      background: transparent;
       color: #dc2626;
     }
 
     .lr-pill-badge.is-blue {
-      background: #e0f2fe;
+      background: transparent;
       color: #0284c7;
     }
 
@@ -1042,7 +1043,7 @@
           <div class="lr-top-card-info">
             <span class="lr-top-card-label">Total Pendapatan</span>
             <span class="lr-top-card-value" id="cardPendapatan">Rp. 0</span>
-            <span class="lr-pill-badge is-green" id="cardBadgePendapatan">â†‘ 8.9% Bulan Ini</span>
+            <span class="lr-pill-badge is-green" id="cardBadgePendapatan">&uarr; 8.9% Bulan Ini</span>
           </div>
         </div>
 
@@ -1058,7 +1059,7 @@
           <div class="lr-top-card-info">
             <span class="lr-top-card-label">Total Beban</span>
             <span class="lr-top-card-value" id="cardTotalBeban">Rp. 0</span>
-            <span class="lr-pill-badge is-red" id="cardBadgeBeban">â†“ Beban Terkendali</span>
+            <span class="lr-pill-badge is-red" id="cardBadgeBeban">&darr; Beban Terkendali</span>
           </div>
         </div>
 
@@ -1073,7 +1074,7 @@
           <div class="lr-top-card-info">
             <span class="lr-top-card-label">Laba Bersih</span>
             <span class="lr-top-card-value" id="cardLabaBersih">Rp. 0</span>
-            <span class="lr-pill-badge is-green" id="cardBadgeLabaBersih">â†‘ Profit Bersih</span>
+            <span class="lr-pill-badge is-green" id="cardBadgeLabaBersih">&uarr; Profit Bersih</span>
           </div>
         </div>
 
@@ -1119,16 +1120,13 @@
         <!-- 1. Kas Kecil (UI V2) -->
         <div class="lr-comp-card lr-comp-card--v2" data-component="kasKecil" data-bank="kasKecil" title="Klik untuk menampilkan grafik tren Kas Kecil">
           <div class="lr-v2-logo-box">
-            <div style="height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin: 0;">
-              <span style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0076C5 0%, #0ea5e9 100%); display: inline-flex; align-items: center; justify-content: center; color: #ffffff; box-shadow: 0 3px 10px rgba(0, 118, 197, 0.25);">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;">
-                  <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
-                  <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
-                  <circle cx="18" cy="12" r="1.8" fill="currentColor"></circle>
-                </svg>
-              </span>
-              <span style="font-size: 21px; font-weight: 800; color: #0f4c81; letter-spacing: 0.4px;">KAS KECIL</span>
-            </div>
+            <span style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #0076C5 0%, #0ea5e9 100%); display: inline-flex; align-items: center; justify-content: center; color: #ffffff; box-shadow: 0 3px 10px rgba(0, 118, 197, 0.25);">
+              <svg viewBox="0 0 24 24" style="width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;">
+                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+                <circle cx="18" cy="12" r="1.8" fill="currentColor"></circle>
+              </svg>
+            </span>
             <span class="lr-v2-norek">KAS KECIL &bull; COA 1001</span>
           </div>
           <div class="lr-v2-metrics">
@@ -2383,6 +2381,51 @@
         const marginPctNum = statement.pendapatan.bulan > 0 ? (labaBersihBln / statement.pendapatan.bulan * 100) : 0;
         if (cardMarginLaba) cardMarginLaba.textContent = marginPctNum.toFixed(1) + '%';
 
+        const bebanRatioPct = statement.pendapatan.bulan > 0 ? ((totBebanBln / statement.pendapatan.bulan) * 100).toFixed(1) : "0.0";
+        const absMarginPct = Math.abs(marginPctNum).toFixed(1);
+        const prevPeriodKey = currentPeriod === "okt2026" ? "sep2026" : (currentPeriod === "sep2026" ? "agu2026" : "jul2026");
+        const prevPend = (LABA_RUGI_DATA[prevPeriodKey] && LABA_RUGI_DATA[prevPeriodKey].statement && LABA_RUGI_DATA[prevPeriodKey].statement.pendapatan) ? (LABA_RUGI_DATA[prevPeriodKey].statement.pendapatan.bulan || 0) : 0;
+        const pendDiffPct = prevPend > 0 ? (((statement.pendapatan.bulan - prevPend) / prevPend) * 100) : (statement.pendapatan.bulan > 0 ? 100 : 0);
+
+        const cardBadgePendapatan = document.getElementById('cardBadgePendapatan');
+        if (cardBadgePendapatan) {
+          const pendUp = pendDiffPct >= 0;
+          cardBadgePendapatan.textContent = (pendUp ? '\u2191 ' : '\u2193 ') + Math.abs(pendDiffPct).toFixed(1) + '% Bulan Ini';
+          cardBadgePendapatan.classList.toggle('is-green', pendUp);
+          cardBadgePendapatan.classList.toggle('is-red', !pendUp);
+        }
+
+        const cardBadgeBeban = document.getElementById('cardBadgeBeban');
+        if (cardBadgeBeban) {
+          const isControlled = Number(bebanRatioPct) <= 70;
+          cardBadgeBeban.textContent = (isControlled ? '\u2193 ' : '\u2191 ') + bebanRatioPct + '% dari Pendapatan';
+          cardBadgeBeban.classList.toggle('is-green', isControlled);
+          cardBadgeBeban.classList.toggle('is-red', !isControlled);
+        }
+
+        const cardBadgeLabaBersih = document.getElementById('cardBadgeLabaBersih');
+        if (cardBadgeLabaBersih) {
+          const isProfit = labaBersihBln >= 0;
+          cardBadgeLabaBersih.textContent = (isProfit ? '\u2191 ' : '\u2193 ') + absMarginPct + (isProfit ? '% Profit Bersih' : '% Rugi Bersih');
+          cardBadgeLabaBersih.classList.toggle('is-green', isProfit);
+          cardBadgeLabaBersih.classList.toggle('is-red', !isProfit);
+        }
+
+        const cardBadgeMargin = document.getElementById('cardBadgeMargin');
+        if (cardBadgeMargin) {
+          cardBadgeMargin.classList.remove('is-green', 'is-blue', 'is-red');
+          if (marginPctNum < 0) {
+            cardBadgeMargin.textContent = 'Margin Negatif';
+            cardBadgeMargin.classList.add('is-red');
+          } else if (marginPctNum >= 20) {
+            cardBadgeMargin.textContent = 'Sangat Sehat';
+            cardBadgeMargin.classList.add('is-green');
+          } else {
+            cardBadgeMargin.textContent = 'Stabil Sehat';
+            cardBadgeMargin.classList.add('is-blue');
+          }
+        }
+
         const ratioCostIncome = document.getElementById('ratioCostIncome');
         const costIncomePct = statement.pendapatan.bulan > 0 ? ((totBebanBln / statement.pendapatan.bulan) * 100).toFixed(1) : '0';
         if (ratioCostIncome) ratioCostIncome.textContent = costIncomePct + '%';
@@ -2643,7 +2686,7 @@
             '<td><strong>' + escapeHtml(it.name) + '</strong></td>',
             '<td class="col-amount">' + valIni + '</td>',
             '<td class="col-amount" style="color:#64748b;">' + valLalu + '</td>',
-            '<td class="col-amount" style="text-align: right;"><span class="lr-pill-badge ' + badgeClass + '">' + (change.isUp ? 'â†‘ ' : 'â†“ ') + change.pct + '</span></td>',
+            '<td class="col-amount" style="text-align: right;"><span class="lr-pill-badge ' + badgeClass + '">' + (change.isUp ? '\u2191 ' : '\u2193 ') + change.pct + '</span></td>',
             '</tr>'
           ].join('');
         }).join('');

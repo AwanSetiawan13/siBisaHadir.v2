@@ -370,8 +370,9 @@
       display: inline-flex;
       align-items: center;
       gap: 3px;
-      padding: 2px 7px;
-      border-radius: 12px;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
       font-size: 10px;
       font-weight: 700;
       white-space: nowrap;
@@ -379,17 +380,17 @@
     }
 
     .ak-pill-badge.is-green {
-      background: #dcfce7;
+      background: transparent;
       color: #16a34a;
     }
 
     .ak-pill-badge.is-red {
-      background: #fee2e2;
+      background: transparent;
       color: #dc2626;
     }
 
     .ak-pill-badge.is-blue {
-      background: #e0f2fe;
+      background: transparent;
       color: #0284c7;
     }
 
@@ -1024,7 +1025,7 @@
           <div class="ak-top-card-info">
             <span class="ak-top-card-label">Total Uang Masuk</span>
             <span class="ak-top-card-value" id="cardTotalMasuk">Rp. 0</span>
-            <span class="ak-pill-badge is-green" id="cardBadgeMasuk">â†‘ 20% Bulan Ini</span>
+            <span class="ak-pill-badge is-green" id="cardBadgeMasuk">&uarr; 20% Bulan Ini</span>
           </div>
         </div>
 
@@ -1040,7 +1041,7 @@
           <div class="ak-top-card-info">
             <span class="ak-top-card-label">Total Uang Keluar</span>
             <span class="ak-top-card-value" id="cardTotalKeluar">Rp. 0</span>
-            <span class="ak-pill-badge is-red" id="cardBadgeKeluar">â†“ 20% Bulan Ini</span>
+            <span class="ak-pill-badge is-red" id="cardBadgeKeluar">&darr; 20% Bulan Ini</span>
           </div>
         </div>
 
@@ -1057,7 +1058,7 @@
           <div class="ak-top-card-info">
             <span class="ak-top-card-label">Arus Kas Bersih</span>
             <span class="ak-top-card-value" id="cardArusBersih">Rp. 0</span>
-            <span class="ak-pill-badge is-green" id="cardBadgeBersih">â†‘ Surplus</span>
+            <span class="ak-pill-badge is-green" id="cardBadgeBersih">&uarr; Surplus</span>
           </div>
         </div>
 
@@ -1102,16 +1103,13 @@
         <!-- 1. Kas Kecil (UI V2) -->
         <div class="ak-bank-card ak-bank-card--v2" data-bank="kasKecil" title="Klik kartu untuk grafik tren atau klik Audit untuk Ringkasan Bulanan Kas Kecil">
           <div class="ak-v2-logo-box">
-            <div style="height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin: 0;">
-              <span style="width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg, #0076C5 0%, #0ea5e9 100%); display: inline-flex; align-items: center; justify-content: center; color: #ffffff; box-shadow: 0 3px 10px rgba(0, 118, 197, 0.25);">
-                <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;">
-                  <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
-                  <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
-                  <circle cx="18" cy="12" r="1.8" fill="currentColor"></circle>
-                </svg>
-              </span>
-              <span style="font-size: 21px; font-weight: 800; color: #0f4c81; letter-spacing: 0.4px;">KAS KECIL</span>
-            </div>
+            <span style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #0076C5 0%, #0ea5e9 100%); display: inline-flex; align-items: center; justify-content: center; color: #ffffff; box-shadow: 0 3px 10px rgba(0, 118, 197, 0.25);">
+              <svg viewBox="0 0 24 24" style="width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;">
+                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path>
+                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path>
+                <circle cx="18" cy="12" r="1.8" fill="currentColor"></circle>
+              </svg>
+            </span>
             <span class="ak-v2-norek">KAS KECIL &bull; COA 1001</span>
           </div>
           <div class="ak-v2-metrics">
@@ -2260,6 +2258,28 @@
         if (cardTotalKeluar) cardTotalKeluar.textContent = formatRupiah(data.cards.keluar);
         if (cardArusBersih) cardArusBersih.textContent = formatRupiah(data.cards.bersih);
         if (cardSaldoAkhir) cardSaldoAkhir.textContent = formatRupiah(data.cards.saldoAkhir);
+        const masukVal = Number(data.cards.masuk) || 0;
+        const keluarVal = Number(data.cards.keluar) || 0;
+        const bersihVal = Number(data.cards.bersih) || 0;
+        const totalArus = masukVal + keluarVal;
+        const masukPct = totalArus > 0 ? ((masukVal / totalArus) * 100).toFixed(1) : "0.0";
+        const keluarPct = totalArus > 0 ? ((keluarVal / totalArus) * 100).toFixed(1) : "0.0";
+        const bersihPct = masukVal > 0 ? Math.abs((bersihVal / masukVal) * 100).toFixed(1) : "0.0";
+
+        const cardBadgeMasuk = document.getElementById('cardBadgeMasuk');
+        if (cardBadgeMasuk) {
+          cardBadgeMasuk.textContent = '\u2191 ' + masukPct + '% Total Arus';
+        }
+        const cardBadgeKeluar = document.getElementById('cardBadgeKeluar');
+        if (cardBadgeKeluar) {
+          cardBadgeKeluar.textContent = '\u2193 ' + keluarPct + '% Total Arus';
+        }
+        const cardBadgeBersih = document.getElementById('cardBadgeBersih');
+        if (cardBadgeBersih) {
+          cardBadgeBersih.textContent = (bersihVal >= 0 ? '\u2191 ' + bersihPct + '% Surplus' : '\u2193 ' + bersihPct + '% Defisit');
+          cardBadgeBersih.classList.toggle('is-green', bersihVal >= 0);
+          cardBadgeBersih.classList.toggle('is-red', bersihVal < 0);
+        }
 
         // 2. Update Nilai pada Kartu Total Keseluruhan + 5 Akun Bank
         const bankKeys = ['kasKecil', 'bca1', 'bca2', 'seabank', 'bni'];

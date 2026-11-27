@@ -4465,9 +4465,39 @@
         } catch (e) {}
       }
 
-            function isItemNeedsEdit(item) {
+      function isItemApprovedAndDisbursed(item) {
         if (!item) return false;
+        const stApp = String(item.statusApproval || 'Disetujui').trim();
+        if (stApp !== 'Disetujui') return false;
+        const bruto = Number(item.tagihanBruto !== undefined ? item.tagihanBruto : (Number(item.dpp || 0) + Number(item.ppn || 0)));
+        const terbayar = getTerbayarKasForDoc(item.idDokumen, item.idApproval);
+        const sisa = Math.max(0, bruto - terbayar);
+        return terbayar > 0 && sisa === 0;
+      }
+
+      function isItemNeedsEdit(item) {
+        if (!item) return false;
+        if (isItemApprovedAndDisbursed(item)) return false;
         return Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
+      }
+
+      function renderIdApprovalBadgeHtml(idVal) {
+        const raw = String(idVal || '').trim();
+        if (!raw || raw === '-') return '<span style="color: #94a3b8;">-</span>';
+        const upper = raw.toUpperCase();
+        let bg = '#f1f5f9';
+        let fg = '#334155';
+        let bd = '#e2e8f0';
+        if (upper.startsWith('APR-')) {
+          bg = '#fff1f2'; fg = '#be123c'; bd = '#fecdd3';
+        } else if (upper.startsWith('PR-REKAP-') || upper.startsWith('PR-')) {
+          bg = '#f5f3ff'; fg = '#6d28d9'; bd = '#ddd6fe';
+        } else if (upper.startsWith('PBJ-')) {
+          bg = '#ecfdf5'; fg = '#047857'; bd = '#a7f3d0';
+        } else if (upper.startsWith('LOAN-')) {
+          bg = '#fffbeb'; fg = '#b45309'; bd = '#fde68a';
+        }
+        return '<span style="font-weight: 700; letter-spacing: 0.2px; color: ' + fg + ';">' + escapeHtml(raw) + '</span>';
       }
 
       function isPayrollCollectiveItem(item) {
@@ -5025,13 +5055,13 @@
           syncItemWithApproval(item);
           const row = document.createElement('tr');
           const isPayrollItem = isPayrollCollectiveItem(item);
-          const isNeedsEdit = Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
+          const isNeedsEdit = isItemNeedsEdit(item);
           if (isPayrollItem && isNeedsEdit) {
             row.classList.add('pnd-row-payroll');
           } else if (isNeedsEdit) {
             row.classList.add('pnd-row-needs-edit');
           }
-          const terbayar = getTerbayarKasForDoc(item.idDokumen);
+          const terbayar = getTerbayarKasForDoc(item.idDokumen, item.idApproval);
           const bruto = Number(item.tagihanBruto !== undefined ? item.tagihanBruto : (Number(item.dpp || 0) + Number(item.ppn || 0)));
           const sisaUtang = Math.max(0, bruto - terbayar);
 
@@ -5056,7 +5086,7 @@
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (index + 1) + '.</td>',
             '<td data-col="id_dokumen" style="font-weight: 600; color: #0284c7; white-space: nowrap;">' + escapeHtml(item.idDokumen || '-') + '</td>',
-            '<td data-col="id_approval" style="white-space: nowrap; color: #1e293b; font-weight: 600;">' + escapeHtml(item.idApproval || '-') + '</td>',
+            '<td data-col="id_approval" style="white-space: nowrap;">' + renderIdApprovalBadgeHtml(item.idApproval) + '</td>',
             '<td data-col="tanggal_pengakuan" style="white-space: nowrap; color: #334155;">' + escapeHtml(formatTanggalDisplay(item.tanggalPengakuan)) + '</td>',
             '<td data-col="vendor_karyawan" style="white-space: nowrap; font-weight: 500; color: #1e293b;">' + escapeHtml(item.vendorKaryawan || '-') + '</td>',
             '<td data-col="divisi" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.divisi || '-') + '</td>',

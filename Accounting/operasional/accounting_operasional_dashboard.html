@@ -219,8 +219,8 @@
     .dash-saldo-akun-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      justify-content: flex-start;
+      gap: 14px;
       padding: 13px 4px;
       min-height: 82px;
       box-sizing: border-box;
@@ -258,6 +258,7 @@
       font-style: normal;
       color: #0f172a;
       letter-spacing: -0.3px;
+      font-variant-numeric: tabular-nums;
       line-height: 1.2;
       white-space: nowrap;
     }
@@ -281,6 +282,28 @@
       stroke: #ffffff;
       stroke-width: 2;
       fill: none;
+    }
+
+    .dash-saldo-akun-icon:not(.is-logo) {
+      margin: 0 8px;
+    }
+
+    .dash-saldo-akun-icon.is-logo {
+      width: 56px;
+      height: 40px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      box-sizing: border-box;
+    }
+
+    .dash-saldo-akun-icon.is-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      mix-blend-mode: multiply;
     }
 
     /* Divider Pemisah Ringkasan Bulanan & Perlu Ditindaklanjuti di Dalam Tabel */
@@ -1633,11 +1656,11 @@
         }
 
         const saldoPerAkunItems = [
-          { key: 'kasKecil', name: 'Kas Kecil', saldo: currentAccounts.kasKecil },
-          { key: 'bca1', name: 'Bank BCA 1', saldo: currentAccounts.bca1 },
-          { key: 'bca2', name: 'Bank BCA 2', saldo: currentAccounts.bca2 },
-          { key: 'seabank', name: 'SEABANK', saldo: currentAccounts.seabank },
-          { key: 'bni', name: 'Bank BNI', saldo: currentAccounts.bni }
+          { key: 'kasKecil', name: 'Kas Kecil', norek: 'COA 1001', saldo: currentAccounts.kasKecil },
+          { key: 'bca1', name: 'Bank BCA 1', norek: '2092026028', saldo: currentAccounts.bca1 },
+          { key: 'bca2', name: 'Bank BCA 2', norek: '2091139784', saldo: currentAccounts.bca2 },
+          { key: 'seabank', name: 'SEABANK', norek: '901631003438', saldo: currentAccounts.seabank },
+          { key: 'bni', name: 'Bank BNI', norek: '2049368973', saldo: currentAccounts.bni }
         ];
 
         // Tambahkan akun bank tambahan dari data master jika ada
@@ -2243,11 +2266,11 @@
         if (!container) return;
 
         const items = (Array.isArray(accountsList) && accountsList.length > 0) ? accountsList : [
-          { key: 'kasKecil', name: 'Kas Kecil', saldo: 15000000 },
-          { key: 'bca1', name: 'Bank BCA 1', saldo: 450000000 },
-          { key: 'bca2', name: 'Bank BCA 2', saldo: 280000000 },
-          { key: 'seabank', name: 'SEABANK', saldo: 125000000 },
-          { key: 'bni', name: 'Bank BNI', saldo: 95000000 }
+          { key: 'kasKecil', name: 'Kas Kecil', norek: 'COA 1001', saldo: 15000000 },
+          { key: 'bca1', name: 'Bank BCA 1', norek: '2092026028', saldo: 450000000 },
+          { key: 'bca2', name: 'Bank BCA 2', norek: '2091139784', saldo: 280000000 },
+          { key: 'seabank', name: 'SEABANK', norek: '901631003438', saldo: 125000000 },
+          { key: 'bni', name: 'Bank BNI', norek: '2049368973', saldo: 95000000 }
         ];
 
         const bankSvg = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">' +
@@ -2258,13 +2281,30 @@
 
         let html = '';
         items.forEach(function (acc) {
+          const key = String(acc.key || '').toLowerCase();
+          const nm = String(acc.name || '').toLowerCase();
+          let iconHtml = '';
+          let iconClass = 'dash-saldo-akun-icon';
+          if (key === 'bca1' || key === 'bca2' || nm.includes('bca')) {
+            iconClass += ' is-logo';
+            iconHtml = '<img src="../../media/logo_bca.png?v=2" alt="Bank BCA" />';
+          } else if (key === 'seabank' || nm.includes('seabank')) {
+            iconClass += ' is-logo';
+            iconHtml = '<img src="../../media/logo_seabank.png?v=2" alt="SeaBank" />';
+          } else if (key === 'bni' || nm.includes('bni')) {
+            iconClass += ' is-logo';
+            iconHtml = '<img src="../../media/logo_bni.png?v=2" alt="Bank BNI" />';
+          } else {
+            iconHtml = bankSvg;
+          }
+
           html += '<div class="dash-saldo-akun-item">' +
-            '<div class="dash-saldo-akun-info">' +
-              '<span class="dash-saldo-akun-name">' + escapeHtml(acc.name) + '</span>' +
-              '<span class="dash-saldo-akun-val">' + formatRupiah(acc.saldo) + '</span>' +
+            '<div class="' + iconClass + '" title="' + escapeHtml(acc.name) + '">' +
+              iconHtml +
             '</div>' +
-            '<div class="dash-saldo-akun-icon" title="' + escapeHtml(acc.name) + '">' +
-              bankSvg +
+            '<div class="dash-saldo-akun-info">' +
+              '<span class="dash-saldo-akun-name">' + escapeHtml(acc.name) + (acc.norek ? ' &bull; ' + escapeHtml(acc.norek) : '') + '</span>' +
+              '<span class="dash-saldo-akun-val">' + formatRupiah(acc.saldo) + '</span>' +
             '</div>' +
           '</div>';
         });
