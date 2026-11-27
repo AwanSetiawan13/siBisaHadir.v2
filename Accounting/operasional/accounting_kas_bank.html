@@ -1494,7 +1494,6 @@
       font-weight: 500;
     }
 
-    #labelKodeCoa,
     #labelBankLama,
     #labelReferensi,
     #labelRekonsiliasi,
@@ -1505,6 +1504,54 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       display: inline-block;
+    }
+
+    #labelKodeCoa {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .kb-coa-opt-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .kb-coa-logo-img {
+      width: 28px;
+      height: 18px;
+      object-fit: contain;
+      flex-shrink: 0;
+      border-radius: 3px;
+    }
+
+    .kb-coa-kas-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #0076C5 0%, #0ea5e9 100%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .kb-coa-kas-icon svg {
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .kb-select-btn:hover {
@@ -3088,19 +3135,19 @@
                 </label>
                 <label class="kb-select-item">
                   <input type="radio" name="optKodeCoa" value="1002" data-label="1002 | Bank BCA | 2092026028" />
-                  <span>1002 | Bank BCA | 2092026028</span>
+                  <span class="kb-coa-opt-wrap"><img src="../../media/logo_bca.png?v=2" alt="BCA" class="kb-coa-logo-img" /><span>1002 | Bank BCA | 2092026028</span></span>
                 </label>
                 <label class="kb-select-item">
                   <input type="radio" name="optKodeCoa" value="1003" data-label="1003 | Bank BCA | 2091139784" />
-                  <span>1003 | Bank BCA | 2091139784</span>
+                  <span class="kb-coa-opt-wrap"><img src="../../media/logo_bca.png?v=2" alt="BCA" class="kb-coa-logo-img" /><span>1003 | Bank BCA | 2091139784</span></span>
                 </label>
                 <label class="kb-select-item">
                   <input type="radio" name="optKodeCoa" value="1005" data-label="1005 | SEABANK | 901631003438" />
-                  <span>1005 | SEABANK | 901631003438</span>
+                  <span class="kb-coa-opt-wrap"><img src="../../media/logo_seabank.png?v=2" alt="SeaBank" class="kb-coa-logo-img" /><span>1005 | SEABANK | 901631003438</span></span>
                 </label>
                 <label class="kb-select-item">
                   <input type="radio" name="optKodeCoa" value="1006" data-label="1006 | BNI | 2049368973" />
-                  <span>1006 | BNI | 2049368973</span>
+                  <span class="kb-coa-opt-wrap"><img src="../../media/logo_bni.png?v=2" alt="BNI" class="kb-coa-logo-img" /><span>1006 | BNI | 2049368973</span></span>
                 </label>
               </div>
             </div>
@@ -4834,6 +4881,32 @@
         return kode.startsWith('100') || sub.includes('kas') || kel.includes('kas');
       }
 
+      function getCoaLogoHtml(itemOrText) {
+        let kode = '';
+        let nama = '';
+        if (itemOrText && typeof itemOrText === 'object') {
+          kode = String(itemOrText.kode || '').trim();
+          nama = String((itemOrText.namaBank && itemOrText.namaBank !== '-' ? itemOrText.namaBank : '') + ' ' + (itemOrText.nama || '')).toLowerCase();
+        } else {
+          const raw = String(itemOrText || '').trim();
+          kode = raw.split('|')[0].trim();
+          nama = raw.toLowerCase();
+        }
+        if (kode === '1001' || nama.includes('kas kecil')) {
+          return '';
+        }
+        if (kode === '1002' || kode === '1003' || nama.includes('bca')) {
+          return '<img src="../../media/logo_bca.png?v=2" alt="BCA" class="kb-coa-logo-img" />';
+        }
+        if (kode === '1005' || nama.includes('seabank')) {
+          return '<img src="../../media/logo_seabank.png?v=2" alt="SeaBank" class="kb-coa-logo-img" />';
+        }
+        if (kode === '1006' || nama.includes('bni')) {
+          return '<img src="../../media/logo_bni.png?v=2" alt="BNI" class="kb-coa-logo-img" />';
+        }
+        return '';
+      }
+
       /* Dynamically Populate Dropdown Options from Master COA & Bank Lama */
       function renderCoaDropdownItems() {
         const dropdown = document.getElementById('dropdownKodeCoa');
@@ -4841,9 +4914,10 @@
         const list = getMasterCoaList().filter(isKasBankCoa);
         dropdown.innerHTML = list.map(function (item) {
           const label = formatCoaOptionLabel(item);
+          const logoHtml = getCoaLogoHtml(item);
           return '<label class="kb-select-item">' +
             '<input type="radio" name="optKodeCoa" value="' + escapeHtml(item.kode) + '" data-label="' + escapeHtml(label) + '" />' +
-            '<span>' + escapeHtml(label) + '</span>' +
+            '<span class="kb-coa-opt-wrap">' + logoHtml + '<span>' + escapeHtml(label) + '</span></span>' +
           '</label>';
         }).join('');
 
@@ -5945,7 +6019,13 @@
       function setKodeCoaValue(val, label) {
         if (kbKodeCoa) kbKodeCoa.value = val || '';
         if (labelKodeCoa) {
-          labelKodeCoa.textContent = label || val || 'Pilih Kode COA';
+          const textVal = label || val || 'Pilih Kode COA';
+          const logoHtml = val ? getCoaLogoHtml(label || val) : '';
+          if (logoHtml) {
+            labelKodeCoa.innerHTML = logoHtml + '<span>' + escapeHtml(textVal) + '</span>';
+          } else {
+            labelKodeCoa.textContent = textVal;
+          }
         }
         if (btnTriggerKodeCoa) {
           if (val) {
@@ -7055,7 +7135,12 @@
             const itemDiv = document.createElement('div');
             const isSelected = input.value.trim().toLowerCase() === String(opt).toLowerCase();
             itemDiv.className = 'kb-filter-item' + (isSelected ? ' is-selected' : '');
-            itemDiv.textContent = opt;
+            if (listId === 'listFilterKodeCoa') {
+              const logoHtml = getCoaLogoHtml(opt);
+              itemDiv.innerHTML = '<span class="kb-coa-opt-wrap">' + logoHtml + '<span>' + escapeHtml(opt) + '</span></span>';
+            } else {
+              itemDiv.textContent = opt;
+            }
             itemDiv.addEventListener('click', function (e) {
               e.stopPropagation();
               input.value = opt;
