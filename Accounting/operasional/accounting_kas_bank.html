@@ -4167,38 +4167,58 @@
 
       function getBebanDiakuiMapForProfit() {
         reconcileExpenseStorageWithApprovalForProfit();
-        const resultMap = getBrandNominalMapForProfit('accounting_pengeluaran_beban_data_v5', [
-          { projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 30000, dpp: 30000 },
-          { projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 1500000, dpp: 1500000 },
-          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 4500000, dpp: 4500000 },
-          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 450000, dpp: 450000 },
-          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 850000, dpp: 850000 }
-        ], function (b) {
-          return b.bebanDiAkui !== undefined && b.bebanDiAkui !== null && b.bebanDiAkui !== '' ? b.bebanDiAkui : b.dpp;
+        const sourceData = Array.isArray(kbData) ? kbData : [];
+        const kbOutflowRefs = new Set();
+        sourceData.forEach(function (kb) {
+          if (!kb || Number(kb.uangKeluar || 0) <= 0) return;
+          [kb.referensi, kb.referensiDokumen, kb.idDokumen, kb.idApproval, kb.noInvoice, kb.invoice].forEach(function (r) {
+            const k = String(r || '').trim().toLowerCase();
+            if (!k) return;
+            kbOutflowRefs.add(k);
+            if (k.startsWith('exp-')) kbOutflowRefs.add('pb-' + k.slice(4));
+            if (k.startsWith('pb-')) kbOutflowRefs.add('exp-' + k.slice(3));
+          });
         });
 
         const coveredRefs = new Set();
-        try {
-          const rawExp = localStorage.getItem('accounting_pengeluaran_beban_data_v5');
-          const expList = rawExp ? (JSON.parse(rawExp) || []) : [];
-          if (Array.isArray(expList)) {
-            expList.forEach(function (ex) {
-              if (!ex) return;
-              const cleanPb = normalizeProjectBrandName(ex.projectBrand);
-              const val = Number(ex.bebanDiAkui !== undefined && ex.bebanDiAkui !== null && ex.bebanDiAkui !== '' ? ex.bebanDiAkui : ex.dpp) || 0;
-              if (!cleanPb || cleanPb === '-' || val <= 0) return;
-              [ex.idDokumen, ex.idApproval, ex.id, ex.invoice].forEach(function (r) {
-                const k = String(r || '').trim().toLowerCase();
-                if (!k) return;
-                coveredRefs.add(k);
-                if (k.startsWith('exp-')) coveredRefs.add('pb-' + k.slice(4));
-                if (k.startsWith('pb-')) coveredRefs.add('exp-' + k.slice(3));
-              });
+        const resultMap = getBrandNominalMapForProfit('accounting_pengeluaran_beban_data_v5', [
+          { idDokumen: 'EXP-2609-001', projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 30000, dpp: 30000, terbayarKas: 30000 },
+          { idDokumen: 'EXP-2609-002', projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 1500000, dpp: 1500000, terbayarKas: 1665000 },
+          { idDokumen: 'EXP-2609-005', projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 850000, dpp: 850000, terbayarKas: 943500 }
+        ], function (b) {
+          if (!b) return 0;
+          const src = String(b.source_type || b.sourceType || '').trim().toLowerCase();
+          const idApr = String(b.idApproval || '').trim();
+          const jns = String(b.jenis || '').trim().toLowerCase();
+          const isPr = src === 'payroll' || /^PR-/i.test(idApr) || jns === 'beban payroll';
+          const itemRefs = [b.idDokumen, b.idApproval, b.id, b.invoice]
+            .map(function (r) { return String(r || '').trim().toLowerCase(); })
+            .filter(Boolean);
+          const hasKbOutflow = (Number(b.terbayarKas || 0) > 0) || itemRefs.some(function (r) { return kbOutflowRefs.has(r); });
+
+          if (isPr) {
+            itemRefs.forEach(function (k) {
+              coveredRefs.add(k);
+              if (k.startsWith('exp-')) coveredRefs.add('pb-' + k.slice(4));
+              if (k.startsWith('pb-')) coveredRefs.add('exp-' + k.slice(3));
+            });
+            return 0;
+          }
+
+          if (!hasKbOutflow) return 0;
+
+          const val = Number(b.bebanDiAkui !== undefined && b.bebanDiAkui !== null && b.bebanDiAkui !== '' ? b.bebanDiAkui : b.dpp) || 0;
+          const cleanPb = normalizeProjectBrandName(b.projectBrand);
+          if (cleanPb && cleanPb !== '-' && val > 0) {
+            itemRefs.forEach(function (k) {
+              coveredRefs.add(k);
+              if (k.startsWith('exp-')) coveredRefs.add('pb-' + k.slice(4));
+              if (k.startsWith('pb-')) coveredRefs.add('exp-' + k.slice(3));
             });
           }
-        } catch (eExp) {}
+          return val;
+        });
 
-        const sourceData = Array.isArray(kbData) ? kbData : [];
         sourceData.forEach(function (kb) {
           if (!kb) return;
           const uangKeluar = Number(kb.uangKeluar || 0);

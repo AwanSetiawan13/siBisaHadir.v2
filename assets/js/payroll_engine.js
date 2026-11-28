@@ -628,6 +628,63 @@
       }
     });
     if (!silent) {
+      // Sinkronkan projectBrand dari Payroll ke item PR-REKAP-... yang sudah ada di Pengeluaran & Beban
+      try {
+        const expList = getExpenses();
+        let expChanged = false;
+        expList.forEach(function (ex) {
+          if (!ex) return;
+          const isPr = String(ex.source_type || ex.sourceType || '').toLowerCase() === 'payroll' || /^PR-/i.test(String(ex.idApproval || ''));
+          if (!isPr) return;
+          const exApr = String(ex.idApproval || '').trim().toLowerCase();
+          const exDoc = String(ex.idDokumen || '').trim().toLowerCase();
+          const exPeriod = String(ex.payroll_period || ex.payrollPeriod || '').trim().toLowerCase();
+          const matchedPayrolls = normalized.filter(function (py) {
+            if (!py) return false;
+            const pyPeng = String(py.idPengeluaran || py.id_pengeluaran || '').trim().toLowerCase();
+            const pyDoc = String(py.idDokumenExpense || '').trim().toLowerCase();
+            const pyPeriod = String(py.periode || '').trim().toLowerCase();
+            return (exApr && pyPeng === exApr) || (exDoc && pyDoc === exDoc) || (exPeriod && pyPeriod === exPeriod);
+          });
+          if (matchedPayrolls.length === 0) return;
+
+          const empMap = new Map();
+          const pbList = [];
+          const pbSeen = new Set();
+          matchedPayrolls.forEach(function (py) {
+            const pb = String(py.projectBrand || '').trim();
+            if (pb && pb !== '-' && pb.toLowerCase() !== '- tanpa project / brand -') {
+              if (py.idPayroll) empMap.set(String(py.idPayroll).trim().toLowerCase(), pb);
+              if (py.id) empMap.set(String(py.id).trim().toLowerCase(), pb);
+              if (!pbSeen.has(pb.toLowerCase())) {
+                pbSeen.add(pb.toLowerCase());
+                pbList.push(pb);
+              }
+            }
+          });
+          if (Array.isArray(ex.payroll_employees) && empMap.size > 0) {
+            ex.payroll_employees.forEach(function (emp) {
+              if (!emp) return;
+              const k1 = String(emp.idPayroll || '').trim().toLowerCase();
+              const k2 = String(emp.id || '').trim().toLowerCase();
+              const foundPb = (k1 && empMap.get(k1)) || (k2 && empMap.get(k2)) || '';
+              if (foundPb && emp.projectBrand !== foundPb) {
+                emp.projectBrand = foundPb;
+                expChanged = true;
+              }
+            });
+          }
+          const nextPb = pbList.join(', ');
+          if (nextPb && ex.projectBrand !== nextPb) {
+            ex.projectBrand = nextPb;
+            expChanged = true;
+          }
+        });
+        if (expChanged) {
+          saveExpenses(expList, false);
+        }
+      } catch (eSyncPb) {}
+
       try {
         window.dispatchEvent(new CustomEvent('payroll_data_changed', { detail: normalized }));
       } catch (e) {}
@@ -745,10 +802,20 @@
     let totalBruto = 0;
     let totalThp = 0;
     const employeeDetails = [];
+    const pbSet = [];
+    const pbSeen = new Set();
 
     draftItems.forEach(function (item) {
       const bruto = parseNumber(item.bebanBruto);
       const thp = parseNumber(item.takeHomePay);
+      const rawPb = String(item.projectBrand || '').trim();
+      if (rawPb && rawPb !== '-' && rawPb.toLowerCase() !== '- tanpa project / brand -') {
+        const pbKey = rawPb.toLowerCase();
+        if (!pbSeen.has(pbKey)) {
+          pbSeen.add(pbKey);
+          pbSet.push(rawPb);
+        }
+      }
       totalBruto += bruto;
       totalThp += thp;
       employeeDetails.push({
@@ -758,10 +825,13 @@
         nik: item.nik || '-',
         nama: item.nama || '-',
         divisi: item.divisi || '-',
+        projectBrand: rawPb || '-',
         bebanBruto: bruto,
         takeHomePay: thp
       });
     });
+
+    const collectiveProjectBrand = pbSet.length > 0 ? pbSet.join(', ') : '-';
 
     const empCount = draftItems.length;
     const yymm = extractYymmFromPeriode(cleanPeriod);
@@ -810,7 +880,7 @@
       statusBayarLama: 'Belum Lunas',
       tanggalBayarLama: '',
       akunLama: '-',
-      projectBrand: '-',
+      projectBrand: collectiveProjectBrand,
       jenis: 'Beban Payroll',
       jatuhTempo: todayIso,
       buktiUrl: 'rekap_payroll_' + yymm + '.pdf',
