@@ -1961,96 +1961,165 @@
         }
       }
 
+      function isPayrollExpenseRecord(item) {
+        if (!item) return false;
+        const src = String(item.source_type || item.sourceType || '').trim().toLowerCase();
+        const idApr = String(item.idApproval || '').trim();
+        const jns = String(item.jenis || '').trim().toLowerCase();
+        return src === 'payroll' || /^PR-/i.test(idApr) || jns === 'beban payroll';
+      }
+
       function getPengeluaranBebanDiakuiMapByBrand() {
         reconcileExpenseStorageWithApproval();
-        // Seed awal modul Pengeluaran & Beban jika halaman tersebut belum pernah dibuka
-        const seedExp = [
-          { projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 30000, dpp: 30000 },
-          { projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 1500000, dpp: 1500000 },
-          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 4500000, dpp: 4500000 },
-          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 450000, dpp: 450000 },
-          { projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 850000, dpp: 850000 }
-        ];
-        const resultMap = getBrandNominalMapByBrand(BEBAN_STORAGE_KEY, seedExp, function (item) {
-          return item.bebanDiAkui !== undefined && item.bebanDiAkui !== null && item.bebanDiAkui !== ''
-            ? item.bebanDiAkui
-            : item.dpp;
-        }, 'Pengeluaran & Beban');
-
-        // Kumpulkan referensi dokumen yang sudah terhitung di Pengeluaran & Beban agar tidak double-count
-        const coveredRefs = new Set();
-        try {
-          const rawExp = localStorage.getItem(BEBAN_STORAGE_KEY);
-          const expList = rawExp ? (JSON.parse(rawExp) || []) : [];
-          if (Array.isArray(expList)) {
-            expList.forEach(function (ex) {
-              if (!ex) return;
-              const cleanPb = normalizeProjectBrandName(ex.projectBrand);
-              const val = parseNumericNominal(ex.bebanDiAkui !== undefined && ex.bebanDiAkui !== null && ex.bebanDiAkui !== '' ? ex.bebanDiAkui : ex.dpp);
-              if (!cleanPb || cleanPb === '-' || val <= 0) return;
-              [ex.idDokumen, ex.idApproval, ex.id, ex.invoice].forEach(function (r) {
-                const k = String(r || '').trim().toLowerCase();
-                if (!k) return;
-                coveredRefs.add(k);
-                if (k.startsWith('exp-')) coveredRefs.add('pb-' + k.slice(4));
-                if (k.startsWith('pb-')) coveredRefs.add('exp-' + k.slice(3));
-              });
-            });
-          }
-        } catch (eExp) {}
-
-        // Tambahkan Uang Keluar langsung dari Kas & Bank untuk transaksi yang belum terhitung dari Pengeluaran & Beban
+        // Kumpulkan semua referensi transaksi Uang Keluar dari Kas & Bank
+        const kbOutflowRefs = new Set();
+        let kbList = [];
         try {
           const rawKb = localStorage.getItem(KB_STORAGE_KEY);
-          const kbList = rawKb ? (JSON.parse(rawKb) || []) : [];
-          if (Array.isArray(kbList)) {
-            kbList.forEach(function (kb) {
-              if (!kb) return;
-              const uangKeluar = parseNumericNominal(kb.uangKeluar || 0);
-              if (uangKeluar <= 0) return;
-              const cleanPb = normalizeProjectBrandName(kb.projectBrand);
-              if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
-
-              const ref = String(kb.referensi || kb.referensiDokumen || kb.idDokumen || kb.idApproval || '').trim().toLowerCase();
-              if (ref && coveredRefs.has(ref)) return;
-
-              const key = cleanPb.toLowerCase();
-              resultMap.set(key, (resultMap.get(key) || 0) + uangKeluar);
-            });
+          if (rawKb) {
+            const parsedKb = JSON.parse(rawKb);
+            if (Array.isArray(parsedKb)) kbList = parsedKb;
           }
         } catch (eKb) {}
+
+        kbList.forEach(function (kb) {
+          if (!kb || parseNumericNominal(kb.uangKeluar || 0) <= 0) return;
+          [kb.referensi, kb.referensiDokumen, kb.idDokumen, kb.idApproval, kb.noInvoice, kb.invoice].forEach(function (r) {
+            const k = String(r || '').trim().toLowerCase();
+            if (!k) return;
+            kbOutflowRefs.add(k);
+            if (k.startsWith('exp-')) kbOutflowRefs.add('pb-' + k.slice(4));
+            if (k.startsWith('pb-')) kbOutflowRefs.add('exp-' + k.slice(3));
+          });
+        });
+
+        const seedExp = [
+          { idDokumen: 'EXP-2609-001', projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 30000, dpp: 30000, terbayarKas: 30000 },
+          { idDokumen: 'EXP-2609-002', projectBrand: '7691348184035411735 | Shopee Mega Sale', bebanDiAkui: 1500000, dpp: 1500000, terbayarKas: 1665000 },
+          { idDokumen: 'EXP-2609-005', projectBrand: '7691348184035411733 | Seluruh Kreator MCN', bebanDiAkui: 850000, dpp: 850000, terbayarKas: 943500 }
+        ];
+
+        const coveredRefs = new Set();
+        // Kolom Beban di Profit hanya mengambil data yang SUDAH dikeluarkan dari Kas & Bank
+        const resultMap = getBrandNominalMapByBrand(BEBAN_STORAGE_KEY, seedExp, function (item) {
+          if (!item) return 0;
+          const isPr = isPayrollExpenseRecord(item);
+          const itemRefs = [item.idDokumen, item.idApproval, item.id, item.invoice]
+            .map(function (r) { return String(r || '').trim().toLowerCase(); })
+            .filter(Boolean);
+          const hasKbOutflow = (parseNumericNominal(item.terbayarKas || 0) > 0) || itemRefs.some(function (r) { return kbOutflowRefs.has(r); });
+
+          if (isPr) {
+            itemRefs.forEach(function (k) {
+              coveredRefs.add(k);
+              if (k.startsWith('exp-')) coveredRefs.add('pb-' + k.slice(4));
+              if (k.startsWith('pb-')) coveredRefs.add('exp-' + k.slice(3));
+            });
+            return 0;
+          }
+
+          if (!hasKbOutflow) return 0;
+
+          const val = parseNumericNominal(item.bebanDiAkui !== undefined && item.bebanDiAkui !== null && item.bebanDiAkui !== '' ? item.bebanDiAkui : item.dpp);
+          const cleanPb = normalizeProjectBrandName(item.projectBrand);
+          if (cleanPb && cleanPb !== '-' && val > 0) {
+            itemRefs.forEach(function (k) {
+              coveredRefs.add(k);
+              if (k.startsWith('exp-')) coveredRefs.add('pb-' + k.slice(4));
+              if (k.startsWith('pb-')) coveredRefs.add('exp-' + k.slice(3));
+            });
+          }
+          return val;
+        }, 'Pengeluaran & Beban');
+
+        // Tambahkan Uang Keluar dari Kas & Bank untuk transaksi yang belum terhitung dari Pengeluaran & Beban
+        kbList.forEach(function (kb) {
+          if (!kb) return;
+          const uangKeluar = parseNumericNominal(kb.uangKeluar || 0);
+          if (uangKeluar <= 0) return;
+          const cleanPb = normalizeProjectBrandName(kb.projectBrand);
+          if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+
+          const ref = String(kb.referensi || kb.referensiDokumen || kb.idDokumen || kb.idApproval || '').trim().toLowerCase();
+          if (ref && coveredRefs.has(ref)) return;
+
+          const key = cleanPb.toLowerCase();
+          resultMap.set(key, (resultMap.get(key) || 0) + uangKeluar);
+        });
 
         return resultMap;
       }
 
       function getPayrollBebanBrutoMapByBrand() {
         const resultMap = new Map();
-        let list = [];
+        let expList = [];
         try {
-          const raw1 = localStorage.getItem(PAYROLL_STORAGE_KEY);
-          if (raw1) {
-            const parsed1 = JSON.parse(raw1);
-            if (Array.isArray(parsed1) && parsed1.length > 0) list = parsed1;
+          const rawExp = localStorage.getItem(BEBAN_STORAGE_KEY);
+          if (rawExp) {
+            const parsedExp = JSON.parse(rawExp);
+            if (Array.isArray(parsedExp)) expList = parsedExp;
           }
-        } catch (e1) {}
+        } catch (eExp) {}
 
-        if (list.length === 0) {
-          try {
-            const raw2 = localStorage.getItem(PAYROLL_FALLBACK_KEY);
-            if (raw2) {
-              const parsed2 = JSON.parse(raw2);
-              if (Array.isArray(parsed2) && parsed2.length > 0) list = parsed2;
-            }
-          } catch (e2) {}
-        }
+        // Kumpulkan seluruh referensi Uang Keluar dari Kas & Bank agar Payroll hanya masuk Profit setelah dikeluarkan dari Kas & Bank
+        const kbOutflowRefs = new Set();
+        try {
+          const rawKb = localStorage.getItem(KB_STORAGE_KEY);
+          const kbList = rawKb ? (JSON.parse(rawKb) || []) : [];
+          if (Array.isArray(kbList)) {
+            kbList.forEach(function (kb) {
+              if (!kb || parseNumericNominal(kb.uangKeluar || 0) <= 0) return;
+              [kb.referensi, kb.referensiDokumen, kb.idDokumen, kb.idApproval, kb.noInvoice, kb.invoice].forEach(function (r) {
+                const k = String(r || '').trim().toLowerCase();
+                if (k) kbOutflowRefs.add(k);
+              });
+            });
+          }
+        } catch (eKb) {}
 
-        list.forEach(function (item) {
-          if (!item) return;
-          const cleanPb = normalizeProjectBrandName(item.projectBrand);
-          if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
-          const key = cleanPb.toLowerCase();
-          const val = parseNumericNominal(item.bebanBruto !== undefined ? item.bebanBruto : (item.totalGajiBruto || item.gajiBruto || 0));
-          resultMap.set(key, (resultMap.get(key) || 0) + val);
+        // Kolom Payroll di Profit Project & Brand diambil dari item ID Payroll (PR-...) di Pengeluaran & Beban yang SUDAH dikeluarkan dari Kas & Bank
+        expList.forEach(function (item) {
+          if (!isPayrollExpenseRecord(item)) return;
+          const emps = Array.isArray(item.payroll_employees) ? item.payroll_employees : [];
+          const itemRefs = [item.idDokumen, item.idApproval, item.id, item.invoice]
+            .map(function (r) { return String(r || '').trim().toLowerCase(); })
+            .filter(Boolean);
+          emps.forEach(function (emp) {
+            if (emp && emp.idPayroll) itemRefs.push(String(emp.idPayroll).trim().toLowerCase());
+          });
+
+          const hasKasBankOutflow = (Number(item.terbayarKas) || 0) > 0 || itemRefs.some(function (r) { return kbOutflowRefs.has(r); });
+          if (!hasKasBankOutflow) return;
+
+          const hasEmpBrands = emps.some(function (emp) {
+            const pb = normalizeProjectBrandName(emp && emp.projectBrand);
+            return pb && pb !== '-' && pb.toLowerCase() !== '- tanpa project / brand -';
+          });
+
+          if (hasEmpBrands) {
+            emps.forEach(function (emp) {
+              if (!emp) return;
+              const rawEmpPb = emp.projectBrand && emp.projectBrand !== '-' ? emp.projectBrand : item.projectBrand;
+              const cleanPb = normalizeProjectBrandName(rawEmpPb);
+              if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+              const key = cleanPb.toLowerCase();
+              const val = parseNumericNominal(emp.bebanBruto !== undefined ? emp.bebanBruto : (emp.takeHomePay || 0));
+              resultMap.set(key, (resultMap.get(key) || 0) + val);
+            });
+          } else {
+            const rawPb = String(item.projectBrand || '').trim();
+            if (!rawPb || rawPb === '-') return;
+            const brands = rawPb.split(',').map(function (s) { return normalizeProjectBrandName(s); }).filter(function (b) {
+              return b && b !== '-' && b.toLowerCase() !== '- tanpa project / brand -';
+            });
+            if (brands.length === 0) return;
+            const totalVal = parseNumericNominal(item.total_beban_bruto !== undefined ? item.total_beban_bruto : (item.bebanDiAkui !== undefined ? item.bebanDiAkui : (item.dpp || 0)));
+            const perBrand = brands.length > 1 ? Math.round(totalVal / brands.length) : totalVal;
+            brands.forEach(function (b) {
+              const key = b.toLowerCase();
+              resultMap.set(key, (resultMap.get(key) || 0) + perBrand);
+            });
+          }
         });
 
         return resultMap;
@@ -2281,7 +2350,46 @@
           console.error('Error reading Kas & Bank data:', e);
         }
 
-        // 2. Kumpulkan project/brand dari modul Payroll agar otomatis muncul di Profit Project/Brand
+        // 2. Kumpulkan project/brand dari item ID Payroll (PR-...) di Pengeluaran & Beban agar otomatis muncul di Profit Project/Brand
+        try {
+          const rawExpPr = localStorage.getItem(BEBAN_STORAGE_KEY);
+          if (rawExpPr) {
+            const parsedExpPr = JSON.parse(rawExpPr);
+            if (Array.isArray(parsedExpPr)) {
+              parsedExpPr.forEach(function (ex) {
+                if (!isPayrollExpenseRecord(ex)) return;
+                const candBrands = [];
+                if (Array.isArray(ex.payroll_employees)) {
+                  ex.payroll_employees.forEach(function (emp) {
+                    if (emp && emp.projectBrand) candBrands.push(emp.projectBrand);
+                  });
+                }
+                if (ex.projectBrand) {
+                  String(ex.projectBrand).split(',').forEach(function (b) { candBrands.push(b); });
+                }
+                candBrands.forEach(function (rawPb) {
+                  const cleanPb = normalizeProjectBrandName(rawPb);
+                  if (!cleanPb || cleanPb === '-' || cleanPb.toLowerCase() === '- tanpa project / brand -') return;
+                  const key = cleanPb.toLowerCase();
+                  if (!payrollMap.has(key)) return;
+                  if (!aggMap.has(key)) {
+                    aggMap.set(key, {
+                      projectBrand: cleanPb,
+                      rawProjectBrand: String(rawPb).trim(),
+                      tanggal: ex.tanggalPengakuan || new Date().toISOString().split('T')[0],
+                      jenisSet: new Set(['Payroll']),
+                      txIds: []
+                    });
+                  } else {
+                    aggMap.get(key).jenisSet.add('Payroll');
+                  }
+                });
+              });
+            }
+          }
+        } catch (ePr) {}
+
+        // 2b. Kumpulkan project/brand dari modul Payroll jika belum diposting
         try {
           const rawPay = localStorage.getItem(PAYROLL_STORAGE_KEY) || localStorage.getItem(PAYROLL_FALLBACK_KEY);
           if (rawPay) {
@@ -2349,6 +2457,7 @@
                   const cleanPb = normalizeProjectBrandName(b.projectBrand || b.rawProjectBrand);
                   if (!cleanPb) return;
                   const key = cleanPb.toLowerCase();
+                  if (!payrollMap.has(key)) return;
                   if (!aggMap.has(key)) {
                     aggMap.set(key, {
                       projectBrand: cleanPb,

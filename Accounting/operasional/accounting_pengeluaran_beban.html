@@ -4271,9 +4271,80 @@
         renderDivisiPengecualianDropdownItems();
       }
 
+      // Helper ambil Project/Brand dari modul Payroll berdasarkan ID Payroll / PR-REKAP / periode
+      function getPayrollProjectBrandInfoForItem(idApprovalVal, itemObj) {
+        const idStr = String(idApprovalVal || '').trim().toLowerCase();
+        const docStr = String((itemObj && itemObj.idDokumen) || '').trim().toLowerCase();
+        const periodStr = String((itemObj && (itemObj.payroll_period || itemObj.payrollPeriod)) || '').trim().toLowerCase();
+        const empIds = new Set(
+          (itemObj && Array.isArray(itemObj.payroll_employees))
+            ? itemObj.payroll_employees.map(function (e) { return String((e && (e.idPayroll || e.id)) || '').trim().toLowerCase(); }).filter(Boolean)
+            : []
+        );
+
+        let payList = [];
+        try {
+          const raw1 = localStorage.getItem('accounting_payroll_data_v1') || localStorage.getItem('bisa_payroll_data_v1');
+          if (raw1) {
+            const parsed1 = JSON.parse(raw1);
+            if (Array.isArray(parsed1)) payList = parsed1;
+          }
+        } catch (e) {}
+
+        const empBrandMap = new Map();
+        const brandList = [];
+        const brandSeen = new Set();
+
+        payList.forEach(function (py) {
+          if (!py) return;
+          const pyPr = String(py.idPayroll || '').trim().toLowerCase();
+          const pyPeng = String(py.idPengeluaran || py.id_pengeluaran || '').trim().toLowerCase();
+          const pyDoc = String(py.idDokumenExpense || '').trim().toLowerCase();
+          const pyId = String(py.id || '').trim().toLowerCase();
+          const pyPeriod = String(py.periode || '').trim().toLowerCase();
+
+          const matched = (idStr && (pyPeng === idStr || pyPr === idStr)) ||
+                          (docStr && pyDoc === docStr) ||
+                          (empIds.size > 0 && ((pyPr && empIds.has(pyPr)) || (pyId && empIds.has(pyId)))) ||
+                          (periodStr && pyPeriod === periodStr);
+          if (!matched) return;
+
+          const pb = String(py.projectBrand || '').trim();
+          if (pb && pb !== '-' && pb.toLowerCase() !== '- tanpa project / brand -') {
+            if (pyPr) empBrandMap.set(pyPr, pb);
+            if (pyId) empBrandMap.set(pyId, pb);
+            const k = pb.toLowerCase();
+            if (!brandSeen.has(k)) {
+              brandSeen.add(k);
+              brandList.push(pb);
+            }
+          }
+        });
+
+        return {
+          projectBrand: brandList.join(', '),
+          empBrandMap: empBrandMap
+        };
+      }
+
       // Sinkronisasi dinamis satu item Pengeluaran & Beban dengan Approval Pengeluaran dan Kas & Bank
       function syncItemWithApproval(item) {
         if (!item) return item;
+        if (isPayrollCollectiveItem(item) || /^PR-/i.test(String(item.idApproval || ''))) {
+          const prInfo = getPayrollProjectBrandInfoForItem(item.idApproval, item);
+          if (Array.isArray(item.payroll_employees) && prInfo.empBrandMap.size > 0) {
+            item.payroll_employees.forEach(function (emp) {
+              if (!emp) return;
+              const k1 = String(emp.idPayroll || '').trim().toLowerCase();
+              const k2 = String(emp.id || '').trim().toLowerCase();
+              const foundPb = (k1 && prInfo.empBrandMap.get(k1)) || (k2 && prInfo.empBrandMap.get(k2)) || '';
+              if (foundPb) emp.projectBrand = foundPb;
+            });
+          }
+          if (prInfo.projectBrand) {
+            item.projectBrand = prInfo.projectBrand;
+          }
+        }
         if (item.idApproval) {
           const apr = getApprovalForId(item.idApproval);
           if (apr) {
@@ -5537,6 +5608,10 @@
               return d && String(d.idApproval || '').trim().toLowerCase() === String(val).trim().toLowerCase();
             }) : null;
             if (matchExisting && matchExisting.projectBrand && matchExisting.projectBrand !== '-') fallbackPb = matchExisting.projectBrand;
+            if (!fallbackPb && /^PR-/i.test(String(val).trim())) {
+              const prInfo = getPayrollProjectBrandInfoForItem(val, matchExisting || null);
+              if (prInfo.projectBrand) fallbackPb = prInfo.projectBrand;
+            }
           }
           setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', fallbackPb, /^PR-/i.test(String(val || '')) ? '-' : 'Pilih Project / Brand');
           updateProjectBrandFieldMode(val, null);
