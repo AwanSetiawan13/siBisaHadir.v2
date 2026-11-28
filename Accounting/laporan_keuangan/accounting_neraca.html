@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id" translate="no" class="notranslate">
 
 <head>
@@ -57,7 +57,7 @@
       border: 1px solid #e2e8f0;
       border-top: 3.5px solid #0076C5;
       border-radius: 12px;
-      padding: 14px 18px;
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -110,57 +110,60 @@
 
     .pnd-card-label {
       font-family: 'Outfit', sans-serif;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 500;
       color: #64748b;
     }
 
     .pnd-card-value {
       font-family: 'Outfit', sans-serif;
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 700;
+      font-style: normal;
       color: #0f172a;
       letter-spacing: -0.3px;
     }
 
     .pnd-card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
       background: #0076C5;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #ffffff;
       flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.28);
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.25);
     }
 
     .pnd-card-icon.icon-aset {
       background: #0076C5;
-      box-shadow: 0 4px 10px rgba(0, 118, 197, 0.28);
+      box-shadow: 0 2px 6px rgba(0, 118, 197, 0.28);
     }
 
     .pnd-card-icon.icon-liabilitas {
       background: #ef4444;
-      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.28);
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.28);
     }
 
     .pnd-card-icon.icon-ekuitas {
       background: #16a34a;
-      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.28);
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.28);
     }
 
     .pnd-card-icon.icon-pasiva {
       background: #f59e0b;
-      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.28);
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.28);
     }
 
     .pnd-card-icon svg {
       width: 20px;
       height: 20px;
       stroke: #ffffff;
-      stroke-width: 2;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
       fill: none;
     }
 
@@ -895,6 +898,25 @@
       color: #0076C5 !important;
       font-weight: 800 !important;
     }
+
+    /* Unified clean chevron for native select elements */
+    select.form-select,
+    select.pnd-filter-select,
+    select.pnd-perpage-select,
+    select.pnd-form-select,
+    select.pnd-input,
+    select.divisi-form-input,
+    select.jt-form-select {
+      -webkit-appearance: none !important;
+      appearance: none !important;
+      padding-right: 32px !important;
+      background-color: #ffffff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 10px center !important;
+      background-size: 14px 14px !important;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -1286,10 +1308,133 @@
           .replace(/'/g, '&#39;');
       }
 
+      function getLiveNeracaValues() {
+        function readJson(key) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : null;
+          } catch (e) { return null; }
+        }
+        function norm(v) { return String(v || "").trim().toLowerCase(); }
+
+        const kbList = readJson("accounting_kas_bank_v2") || [];
+
+        // 1. Kas & Bank = Total Uang Masuk - Total Uang Keluar pada tab Kas & Bank
+        let kasBankNet = 0;
+        kbList.forEach(function (kb) {
+          if (!kb) return;
+          kasBankNet += (Number(kb.uangMasuk) || 0) - (Number(kb.uangKeluar) || 0);
+        });
+
+        // 2. Piutang usaha = Total sisa piutang pada fitur Piutang (sinkron dengan accounting_piutang.html)
+        let piutangUsaha = 0;
+        const pndList = readJson("accounting_pendapatan_data_v1");
+        if (pndList && pndList.length > 0) {
+          pndList.forEach(function (p) {
+            if (!p) return;
+            const tagihan = Number(p.totalTagihan !== undefined ? p.totalTagihan : ((Number(p.dpp) || 0) + (Number(p.ppn) || 0))) || 0;
+            const refs = new Set([norm(p.idDokumen), norm(p.noInvoice)].filter(Boolean));
+            let masuk = 0;
+            kbList.forEach(function (kb) {
+              const r = norm(kb.referensiDokumen || kb.referensi || kb.idReferensi || kb.idDokumen || kb.noInvoice || kb.invoice);
+              if (r && refs.has(r)) masuk += (Number(kb.uangMasuk) || 0);
+            });
+            const terbayar = Math.max(Number(p.terbayarKas || 0), masuk);
+            piutangUsaha += Math.max(0, tagihan - terbayar);
+          });
+        } else {
+          const piutangList = readJson("bisa_piutang_data_v5") || [];
+          piutangList.forEach(function (p) {
+            if (!p) return;
+            piutangUsaha += Math.max(0, Number(p.sisaPiutang) || 0);
+          });
+        }
+
+        // 3. Piutang karyawan = Total sisa piutang pada fitur Piutang Karyawan
+        let piutangKaryawan = 0;
+        const loanKey = (window.LoanEngine && window.LoanEngine.LOAN_KEY) || "sibisahadir_loans";
+        const loanList = readJson(loanKey) || readJson("accounting_utang_karyawan_v1") || [];
+        loanList.forEach(function (ln) {
+          if (!ln) return;
+          piutangKaryawan += Math.max(0, Number(ln.sisaUtang) || 0);
+        });
+
+        // 4. Aset tetap (neto) = Total Nilai Buku pada fitur Daftar Aset
+        let asetTetapNeto = 0;
+        const asetList = readJson("bisa_accounting_daftar_aset_data_v4") || readJson("accounting_daftar_aset_data") || [];
+        asetList.forEach(function (ast) {
+          if (!ast) return;
+          asetTetapNeto += (Number(ast.nilaiBuku) || 0);
+        });
+
+        // 7. Utang vendor & reimbursement = Total Sisa Utang Pada Modul Utang (sinkron dengan accounting_utang.html)
+        let utangVendor = 0;
+        const expList = readJson("accounting_pengeluaran_beban_data_v5") || [];
+        expList.forEach(function (ex) {
+          if (!ex) return;
+          const bruto = Number(ex.tagihanBruto !== undefined ? ex.tagihanBruto : ((Number(ex.dpp) || 0) + (Number(ex.ppn) || 0))) || 0;
+          const refs = new Set([norm(ex.idDokumen), norm(ex.idApproval), norm(ex.id), norm(ex.invoice), norm(ex.noInvoice)].filter(Boolean));
+          let keluar = 0;
+          kbList.forEach(function (kb) {
+            const r = norm(kb.referensiDokumen || kb.referensi || kb.idReferensi || kb.idDokumen || kb.idApproval || kb.noInvoice || kb.invoice);
+            if (r && refs.has(r)) keluar += (Number(kb.uangKeluar) || 0);
+          });
+          const terbayar = Math.max(Number(ex.terbayarKas || 0), keluar);
+          utangVendor += Math.max(0, bruto - terbayar);
+        });
+
+        // 8. Payroll belum tercatat dibayar = Total Sisa Utang Pada Modul Payroll
+        let payrollBelumDibayar = 0;
+        const payList = readJson("accounting_payroll_data_v1") || readJson("bisa_payroll_data_v1") || [];
+        payList.forEach(function (py) {
+          if (!py) return;
+          if (py.sisaUtang !== undefined && py.sisaUtang !== null && py.sisaUtang !== "") {
+            payrollBelumDibayar += Math.max(0, Number(py.sisaUtang) || 0);
+          } else {
+            const thp = Number(py.takeHomePay !== undefined ? py.takeHomePay : py.gajiBersih) || 0;
+            const terbayar = Number(py.terbayarKas) || 0;
+            payrollBelumDibayar += Math.max(0, thp - terbayar);
+          }
+        });
+
+        // 9. PPN / pajak terisi = Total Sisa Kewajiban Pada Pajak
+        let pajakTerisi = 0;
+        const pajakList = readJson("bisa_pajak_data_v1") || [];
+        pajakList.forEach(function (pj) {
+          if (!pj) return;
+          pajakTerisi += Math.max(0, Number(pj.sisaKewajiban) || 0);
+        });
+
+        return {
+          aset: [
+            { name: "Kas & Bank", amount: kasBankNet },
+            { name: "Piutang usaha", amount: piutangUsaha },
+            { name: "Piutang karyawan", amount: piutangKaryawan },
+            { name: "Aset tetap (neto)", amount: asetTetapNeto },
+            { name: "Aset lain (saldo awal)", amount: 0 }
+          ],
+          liabilitas: [
+            { name: "Utang vendor & reimbursement", amount: utangVendor },
+            { name: "Payroll belum tercatat dibayar", amount: payrollBelumDibayar },
+            { name: "PPN / pajak terisi", amount: pajakTerisi },
+            { name: "Potongan payroll belum dialokasikan", amount: 0 },
+            { name: "Liabilitas lain (saldo awal)", amount: 0 }
+          ]
+        };
+      }
+
       /* ===== RENDER NERACA (1 TABEL 4 KOLOM PERSIS GAMBAR) ===== */
       function renderNeraca() {
         const periodKey = periodSelector ? periodSelector.value : 'okt2026';
-        const data = NERACA_DATA[periodKey] || NERACA_DATA.okt2026;
+        const baseData = NERACA_DATA[periodKey] || NERACA_DATA.okt2026;
+        const liveVals = getLiveNeracaValues();
+        const data = {
+          aset: liveVals.aset,
+          liabilitas: liveVals.liabilitas,
+          ekuitas: baseData.ekuitas
+        };
         const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
 
         // Filter items by search query & category filter
@@ -1325,6 +1470,8 @@
         if (cardTotalLiabilitas) cardTotalLiabilitas.textContent = formatRupiah(totalLiabilitas);
         if (cardEkuitasModal) cardEkuitasModal.textContent = formatRupiah(sumEkuitas);
         if (cardTotalLiabEkuitas) cardTotalLiabEkuitas.textContent = formatRupiah(totalLiabEkuitas);
+        const selisihNeraca = (totalAset !== null && totalLiabEkuitas !== null) ? (totalAset - totalLiabEkuitas) : 0;
+        try { localStorage.setItem('accounting_neraca_selisih_v1', String(selisihNeraca || 0)); } catch (e) {}
 
         let html = '';
         let rowNum = 1;
@@ -1649,7 +1796,10 @@
 
       renderNeraca();
     })();
-  </script>
+        window.addEventListener("storage", function () {
+        renderNeraca();
+      });
+</script>
 </body>
 
 </html>

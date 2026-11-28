@@ -3473,58 +3473,33 @@
       }
 
       function getProjectBrandFromPendapatan() {
-        ensurePendapatanDataSeeded();
         const uniqueProjects = [];
         const seen = new Set();
 
-        // 1. Ambil data riil langsung dari modul Pendapatan
-        for (let i = 0; i < PENDAPATAN_STORAGE_KEYS.length; i++) {
-          try {
-            const raw = localStorage.getItem(PENDAPATAN_STORAGE_KEYS[i]);
-            if (!raw) continue;
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              parsed.forEach(function (it) {
-                if (!it) return;
-                const p = String(it.projectBrand || it.project || it.brand || '').trim();
-                if (p && p !== '-' && !seen.has(p.toLowerCase())) {
-                  seen.add(p.toLowerCase());
-                  uniqueProjects.push(p);
-                }
-              });
-              if (uniqueProjects.length > 0) break;
-            }
-          } catch (e) {
-            console.warn('[Payroll] Gagal membaca data Pendapatan:', e);
+        function addProject(rawVal) {
+          const p = String(rawVal || '').trim();
+          if (!p || p === '-' || p === '0' || p.toLowerCase() === '- tanpa project / brand -') return;
+          const key = p.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueProjects.push(p);
           }
         }
 
-        // 2. Juga periksa transaksi Kas & Bank Pendapatan jika ada
+        // Ambil HANYA dari modul Profit Project & Brand (bisa_profit_project_brand_data)
         try {
-          const rawKb = localStorage.getItem('accounting_kas_bank_v2');
-          if (rawKb) {
-            const parsedKb = JSON.parse(rawKb);
-            if (Array.isArray(parsedKb)) {
-              parsedKb.forEach(function (kb) {
-                if (!kb) return;
-                const p = String(kb.projectBrand || kb.project || kb.brand || '').trim();
-                if (p && p !== '-' && !seen.has(p.toLowerCase())) {
-                  seen.add(p.toLowerCase());
-                  uniqueProjects.push(p);
-                }
+          const rawProfit = localStorage.getItem('bisa_profit_project_brand_data');
+          if (rawProfit) {
+            const parsedProfit = JSON.parse(rawProfit);
+            if (Array.isArray(parsedProfit)) {
+              parsedProfit.forEach(function (it) {
+                if (!it) return;
+                addProject(it.projectBrand || it.rawProjectBrand);
               });
             }
           }
-        } catch (eKb) {}
-
-        // 3. Fallback ke daftar Project/Brand riil pendapatan jika belum ada
-        if (uniqueProjects.length === 0) {
-          DEFAULT_PENDAPATAN_PROJECTS.forEach(function (p) {
-            if (!seen.has(p.toLowerCase())) {
-              seen.add(p.toLowerCase());
-              uniqueProjects.push(p);
-            }
-          });
+        } catch (e) {
+          console.warn('[Payroll] Gagal membaca data Profit Project & Brand:', e);
         }
 
         return uniqueProjects;
@@ -5691,12 +5666,12 @@
           previewContent =
             '<div style="margin: 6px 0; text-align: center; max-height: 480px; overflow-y: auto; padding: 4px; border-radius: 8px;">' +
               '<img src="' + dataUrl + '" alt="Slip Gaji" style="max-width: 100%; max-height: 380px; border-radius: 8px; border: 1.5px solid #cbd5e1; box-shadow: 0 4px 18px rgba(0,0,0,0.1); object-fit: contain;" />' +
-              '<div style="margin-top: 10px; font-size: 13px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">ðŸ“„ ' + escapeHtml(name || 'Slip Gaji Karyawan') + '</div>' +
+              '<div style="margin-top: 10px; font-size: 13px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">&#128196; ' + escapeHtml(name || 'Slip Gaji Karyawan') + '</div>' +
             '</div>';
         } else {
           previewContent =
             '<div style="padding: 28px 20px; text-align: center; color: #64748b; font-family: \'Outfit\', sans-serif;">' +
-              '<div style="font-size: 38px; margin-bottom: 8px;">ðŸ“„</div>' +
+              '<div style="font-size: 38px; margin-bottom: 8px;">&#128196;</div>' +
               '<div style="font-size: 14px; font-weight: 600; color: #334155;">File Dokumen Slip Gaji</div>' +
               '<div style="font-size: 12.5px; margin-top: 4px; color: #64748b;">' + escapeHtml(name || 'Tidak ada file fisik yang diunggah') + '</div>' +
             '</div>';
