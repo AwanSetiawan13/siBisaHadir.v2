@@ -775,6 +775,10 @@
       gap: 5px;
     }
 
+    .pnd-field-span-2 {
+      grid-column: span 2;
+    }
+
     .pnd-label {
       font-family: 'Outfit', sans-serif;
       font-size: 12.5px;
@@ -1760,6 +1764,9 @@
       .pnd-form-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+      .pnd-field-span-2 {
+        grid-column: auto;
+      }
     }
 
     @media (max-width: 600px) {
@@ -1768,6 +1775,9 @@
       }
       .pnd-form-grid {
         grid-template-columns: 1fr;
+      }
+      .pnd-field-span-2 {
+        grid-column: auto;
       }
     }
   
@@ -3096,7 +3106,7 @@
             <input type="hidden" id="pndInvoice" />
           </div>
 
-          <div class="pnd-field">
+          <div class="pnd-field pnd-field-span-2">
             <label class="pnd-label" for="pndCatatan">Catatan</label>
             <input type="text" id="pndCatatan" class="pnd-input" placeholder="Tambah Catatan" />
           </div>
@@ -3722,7 +3732,7 @@
         if (Object.prototype.hasOwnProperty.call(DEFAULT_LIMITASI_BY_BRAND, cleanKey)) {
           return DEFAULT_LIMITASI_BY_BRAND[cleanKey];
         }
-        return 5000000;
+        return 0;
       }
 
       function getTotalBebanForProjectBrand(brandVal) {
@@ -4267,6 +4277,8 @@
         if (item.idApproval) {
           const apr = getApprovalForId(item.idApproval);
           if (apr) {
+            const aprPb = String(apr.projectBrand || apr.project || apr.brand || '').trim();
+            if (aprPb && (!item.projectBrand || item.projectBrand === '-')) { item.projectBrand = aprPb; }
             const isPbj = apr.source === 'pbj' || /^PBJ-/i.test(String(item.idApproval));
 
             if (isPbj) {
@@ -4465,9 +4477,39 @@
         } catch (e) {}
       }
 
-            function isItemNeedsEdit(item) {
+      function isItemApprovedAndDisbursed(item) {
         if (!item) return false;
+        const stApp = String(item.statusApproval || 'Disetujui').trim();
+        if (stApp !== 'Disetujui') return false;
+        const bruto = Number(item.tagihanBruto !== undefined ? item.tagihanBruto : (Number(item.dpp || 0) + Number(item.ppn || 0)));
+        const terbayar = getTerbayarKasForDoc(item.idDokumen, item.idApproval);
+        const sisa = Math.max(0, bruto - terbayar);
+        return terbayar > 0 && sisa === 0;
+      }
+
+      function isItemNeedsEdit(item) {
+        if (!item) return false;
+        if (isItemApprovedAndDisbursed(item)) return false;
         return Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
+      }
+
+      function renderIdApprovalBadgeHtml(idVal) {
+        const raw = String(idVal || '').trim();
+        if (!raw || raw === '-') return '<span style="color: #94a3b8;">-</span>';
+        const upper = raw.toUpperCase();
+        let bg = '#f1f5f9';
+        let fg = '#334155';
+        let bd = '#e2e8f0';
+        if (upper.startsWith('APR-')) {
+          bg = '#fff1f2'; fg = '#be123c'; bd = '#fecdd3';
+        } else if (upper.startsWith('PR-REKAP-') || upper.startsWith('PR-')) {
+          bg = '#f5f3ff'; fg = '#6d28d9'; bd = '#ddd6fe';
+        } else if (upper.startsWith('PBJ-')) {
+          bg = '#ecfdf5'; fg = '#047857'; bd = '#a7f3d0';
+        } else if (upper.startsWith('LOAN-')) {
+          bg = '#fffbeb'; fg = '#b45309'; bd = '#fde68a';
+        }
+        return '<span style="font-weight: 700; letter-spacing: 0.2px; color: ' + fg + ';">' + escapeHtml(raw) + '</span>';
       }
 
       function isPayrollCollectiveItem(item) {
@@ -4482,19 +4524,21 @@
 
       function sortPengeluaranYellowFirst(list) {
         if (!Array.isArray(list)) return [];
-        const payrollRows = [];
-        const yellowRows = [];
-        const whiteRows = [];
-        list.forEach(function (it) {
-          if (isPayrollCollectiveItem(it) && isItemNeedsEdit(it)) {
-            payrollRows.push(it);
-          } else if (isItemNeedsEdit(it)) {
-            yellowRows.push(it);
-          } else {
-            whiteRows.push(it);
-          }
+        const rank = function (it) {
+          return isItemNeedsEdit(it) ? 0 : 1;
+        };
+        return list.slice().sort(function (a, b) {
+          const rDiff = rank(a) - rank(b);
+          if (rDiff !== 0) return rDiff;
+
+          const tsA = Math.max(Number(a && a.updatedAt) || 0, Number(a && a.createdAt) || 0);
+          const tsB = Math.max(Number(b && b.updatedAt) || 0, Number(b && b.createdAt) || 0);
+          if (tsA !== tsB) return tsB - tsA;
+
+          const pA = isPayrollCollectiveItem(a) ? 0 : 1;
+          const pB = isPayrollCollectiveItem(b) ? 0 : 1;
+          return pA - pB;
         });
-        return payrollRows.concat(yellowRows, whiteRows);
       }
 
       function loadData() {
@@ -4613,8 +4657,8 @@
             []
               .concat(Array.isArray(arrShared) ? arrShared.filter(isPayrollCollectiveItem) : [])
               .concat(Array.isArray(arrLegacy) ? arrLegacy.filter(isPayrollCollectiveItem) : [])
-              .concat(Array.isArray(arrShared) ? arrShared : [])
               .concat(Array.isArray(arrLegacy) ? arrLegacy : [])
+              .concat(Array.isArray(arrShared) ? arrShared : [])
               .forEach(function (it) {
                 if (!it || typeof it !== 'object') return;
                 if (window.BisaPayrollEngine && typeof window.BisaPayrollEngine.normalizeExpenseItem === 'function') {
@@ -5025,13 +5069,13 @@
           syncItemWithApproval(item);
           const row = document.createElement('tr');
           const isPayrollItem = isPayrollCollectiveItem(item);
-          const isNeedsEdit = Boolean(item.needsCompletion === true || (!item.isEditedInPengeluaran && (!item.kodeCoa || item.kodeCoa === '-')));
+          const isNeedsEdit = isItemNeedsEdit(item);
           if (isPayrollItem && isNeedsEdit) {
             row.classList.add('pnd-row-payroll');
           } else if (isNeedsEdit) {
             row.classList.add('pnd-row-needs-edit');
           }
-          const terbayar = getTerbayarKasForDoc(item.idDokumen);
+          const terbayar = getTerbayarKasForDoc(item.idDokumen, item.idApproval);
           const bruto = Number(item.tagihanBruto !== undefined ? item.tagihanBruto : (Number(item.dpp || 0) + Number(item.ppn || 0)));
           const sisaUtang = Math.max(0, bruto - terbayar);
 
@@ -5056,7 +5100,7 @@
           row.innerHTML = [
             '<td style="text-align: center; color: #64748b; font-weight: 500;">' + (index + 1) + '.</td>',
             '<td data-col="id_dokumen" style="font-weight: 600; color: #0284c7; white-space: nowrap;">' + escapeHtml(item.idDokumen || '-') + '</td>',
-            '<td data-col="id_approval" style="white-space: nowrap; color: #1e293b; font-weight: 600;">' + escapeHtml(item.idApproval || '-') + '</td>',
+            '<td data-col="id_approval" style="white-space: nowrap;">' + renderIdApprovalBadgeHtml(item.idApproval) + '</td>',
             '<td data-col="tanggal_pengakuan" style="white-space: nowrap; color: #334155;">' + escapeHtml(formatTanggalDisplay(item.tanggalPengakuan)) + '</td>',
             '<td data-col="vendor_karyawan" style="white-space: nowrap; font-weight: 500; color: #1e293b;">' + escapeHtml(item.vendorKaryawan || '-') + '</td>',
             '<td data-col="divisi" style="white-space: nowrap; color: #334155;">' + escapeHtml(item.divisi || '-') + '</td>',
@@ -5198,9 +5242,38 @@
       setupModalDropdownToggle('wrapStatusBayarLama', 'btnTriggerStatusBayarLama');
       setupModalDropdownToggle('wrapAkunLama', 'btnTriggerAkunLama');
       setupModalDropdownToggle('wrapPpn', 'btnTriggerPpn');
-      setupModalDropdownToggle('wrapProjectBrand', 'btnTriggerProjectBrand');
       setupModalDropdownToggle('wrapJenis', 'btnTriggerJenis');
+      setupModalDropdownToggle('wrapProjectBrand', 'btnTriggerProjectBrand');
       setupModalDropdownToggle('wrapDivisiPengecualian', 'btnTriggerDivisiPengecualian');
+
+      function updateProjectBrandFieldMode(idApprovalVal, itemObj) {
+        const trigger = document.getElementById('btnTriggerProjectBrand');
+        const wrap = document.getElementById('wrapProjectBrand');
+        if (!trigger) return;
+        const idStr = String(idApprovalVal || '').trim();
+        const isPayroll = Boolean((itemObj && isPayrollCollectiveItem(itemObj)) || /^PR-/i.test(idStr));
+        const arrow = trigger.querySelector('.pnd-select-arrow');
+        if (isPayroll) {
+          trigger.classList.add('pnd-input-readonly');
+          trigger.setAttribute('tabindex', '-1');
+          trigger.style.pointerEvents = 'none';
+          trigger.style.cursor = 'not-allowed';
+          trigger.style.background = '#f1f5f9';
+          trigger.style.borderColor = '#e2e8f0';
+          trigger.style.color = '#475569';
+          if (arrow) arrow.style.display = 'none';
+          if (wrap) wrap.classList.remove('is-open');
+        } else {
+          trigger.classList.remove('pnd-input-readonly');
+          trigger.removeAttribute('tabindex');
+          trigger.style.pointerEvents = '';
+          trigger.style.cursor = 'pointer';
+          trigger.style.background = '';
+          trigger.style.borderColor = '';
+          trigger.style.color = '';
+          if (arrow) arrow.style.display = '';
+        }
+      }
 
       /* ===== HELPER SET JENIS VALUE (DROPDOWN: BEBAN, REIMBURSEMENT, ASET, PERLU RINCIAN) ===== */
       function setJenisValue(val) {
@@ -5450,9 +5523,23 @@
             setJenisValue(apr.jenis || 'Beban');
           }
 
+          const aprProjectBrand = String(apr.projectBrand || apr.project || apr.brand || '').trim();
+          const pbPlaceholder = /^PR-/i.test(String(val || '')) ? '-' : 'Pilih Project / Brand';
+          setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', aprProjectBrand, pbPlaceholder);
+          updateProjectBrandFieldMode(val, null);
+          updateLimitasiFieldFromProjectBrand(aprProjectBrand);
           setApprovalFieldsReadonly();
           autoCalcTagihan();
         } else {
+          let fallbackPb = '';
+          if (val) {
+            const matchExisting = (typeof pndData !== 'undefined' && Array.isArray(pndData)) ? pndData.find(function (d) {
+              return d && String(d.idApproval || '').trim().toLowerCase() === String(val).trim().toLowerCase();
+            }) : null;
+            if (matchExisting && matchExisting.projectBrand && matchExisting.projectBrand !== '-') fallbackPb = matchExisting.projectBrand;
+          }
+          setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', fallbackPb, /^PR-/i.test(String(val || '')) ? '-' : 'Pilih Project / Brand');
+          updateProjectBrandFieldMode(val, null);
           if (pndTglPengakuan) pndTglPengakuan.value = '';
           if (pndVendorKaryawan) pndVendorKaryawan.value = '';
           if (pndDivisi) pndDivisi.value = '';
@@ -5463,6 +5550,7 @@
             pndTagihanBruto.removeAttribute('data-nominal');
           }
           setJenisValue('');
+          updateLimitasiFieldFromProjectBrand(fallbackPb);
           setApprovalFieldsReadonly();
           autoCalcTagihan();
         }
@@ -5909,12 +5997,12 @@
         if (dataUrl && (dataUrl.startsWith('data:image/') || dataUrl.startsWith('http') || dataUrl.startsWith('blob:'))) {
           previewContent = '<div style="margin: 6px 0; text-align: center; max-height: 480px; overflow-y: auto; padding: 4px; border-radius: 8px;">' +
             '<img src="' + dataUrl + '" alt="Dokumen Invoice" style="max-width: 100%; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 18px rgba(0,0,0,0.1); object-fit: contain;" />' +
-            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">ðŸ“„ ' + escapeHtml(name || 'Dokumen Invoice') + '</div>' +
+            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500; font-family: Outfit, sans-serif;">&#128196; ' + escapeHtml(name || 'Dokumen Invoice') + '</div>' +
             '</div>';
         } else if (dataUrl && dataUrl.startsWith('data:application/pdf')) {
           previewContent = '<div style="margin: 6px 0; text-align: center;">' +
             '<embed src="' + dataUrl + '" type="application/pdf" width="100%" height="400px" style="border-radius: 8px; border: 1px solid #cbd5e1;" />' +
-            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500;">ðŸ“„ ' + escapeHtml(name || 'Dokumen Invoice (PDF)') + '</div>' +
+            '<div style="margin-top: 10px; font-size: 12.5px; color: #475569; font-weight: 500;">&#128196; ' + escapeHtml(name || 'Dokumen Invoice (PDF)') + '</div>' +
             '</div>';
         } else {
           const nom = ctx.tagihanBruto || ctx.dpp || 0;
@@ -6084,9 +6172,9 @@
           '<div class="pnd-payroll-breakdown-head">' +
             '<div class="pnd-payroll-breakdown-title">' +
               '<span class="badge-auto-payroll" style="margin-left:0;">Auto: Payroll</span>' +
-              '<span>Rincian Karyawan Tergabung â€” Periode ' + escapeHtml(periodLabel) + ' (' + employees.length + ' Karyawan)</span>' +
+              '<span>Rincian Karyawan Tergabung &mdash; Periode ' + escapeHtml(periodLabel) + ' (' + employees.length + ' Karyawan)</span>' +
             '</div>' +
-            '<span style="font-size:11.5px;color:#64748b;font-weight:600;">ðŸ”’ Nominal DPP/Beban Terkunci (Read-only)</span>' +
+            '<span style="font-size:11.5px;color:#64748b;font-weight:600;">Nominal DPP/Beban Terkunci (Read-only)</span>' +
           '</div>' +
           '<div style="overflow-x:auto;">' +
             '<table class="pnd-payroll-breakdown-table">' +
@@ -6155,7 +6243,9 @@
           if (pndStatusBayarLama) pndStatusBayarLama.value = kbInfo.hasKasBank ? 'Lunas' : (item.statusBayarLama || (Number(item.sisaUtang) === 0 ? 'Lunas' : 'Menunggu Approval'));
           if (pndTanggalBayarLama) pndTanggalBayarLama.value = kbInfo.hasKasBank ? kbInfo.tanggal : (item.tanggalBayarLama || '');
           if (pndAkunLama) pndAkunLama.value = kbInfo.hasKasBank ? kbInfo.akunCoaNama : (item.akunLama || '-');
-          setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', item.projectBrand, 'Pilih Project / Brand');
+          const editPbPlaceholder = (isPayrollCollectiveItem(item) || /^PR-/i.test(String(item.idApproval || ''))) ? '-' : 'Pilih Project / Brand';
+          setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', item.projectBrand, editPbPlaceholder);
+          updateProjectBrandFieldMode(item.idApproval, item);
 
           setJenisValue(item.jenis || 'Beban');
           if (pndBebanDiAkui) pndBebanDiAkui.value = item.bebanDiAkui !== undefined && item.bebanDiAkui !== 0 ? formatRupiahInput(item.bebanDiAkui) : (item.dpp ? formatRupiahInput(item.dpp) : '');
@@ -6253,6 +6343,7 @@
           if (pndTanggalBayarLama) pndTanggalBayarLama.value = kbInfoNew.hasKasBank ? kbInfoNew.tanggal : '';
           if (pndAkunLama) pndAkunLama.value = kbInfoNew.hasKasBank ? kbInfoNew.akunCoaNama : '-';
           setDropdownVal('wrapProjectBrand', 'btnTriggerProjectBrand', 'labelProjectBrand', 'pndProjectBrand', 'optProjectBrand', '', 'Pilih Project / Brand');
+          updateProjectBrandFieldMode('', null);
 
           setJenisValue('');
           if (pndBebanDiAkui) pndBebanDiAkui.value = '';
@@ -6394,15 +6485,7 @@
             pndData.splice(idx, 1);
           }
         }
-        const yellowGroup = [];
-        const whiteGroup = [];
-        pndData.forEach(function (it) {
-          if (isItemNeedsEdit(it)) yellowGroup.push(it);
-          else whiteGroup.push(it);
-        });
-        // Baris yang baru selesai diedit (putih) diletakkan di paling atas kelompok putih, di bawah kelompok kuning
-        whiteGroup.unshift(record);
-        pndData = yellowGroup.concat(whiteGroup);
+        pndData.unshift(record);
 
         if (typeof window.recordAccountingReferensiUpdate === 'function' && record.idDokumen) {
           window.recordAccountingReferensiUpdate(record.idDokumen);

@@ -3030,6 +3030,7 @@
 
           if (changed) {
             localStorage.setItem(EXPENSE_KEY, JSON.stringify(expList));
+            try { localStorage.setItem('sibisahadir_expenses', JSON.stringify(expList)); } catch (eSync) {}
             try {
               window.dispatchEvent(new CustomEvent('pengeluaranBebanUpdated', { detail: expList }));
             } catch (evErr) {}
@@ -3829,6 +3830,20 @@
 
           if (typeof window.recordAccountingReferensiUpdate === 'function' && payload.idApproval) {
             window.recordAccountingReferensiUpdate(payload.idApproval);
+          }
+
+          if (sf === 'Disetujui' && payload.idApproval) {
+            try {
+              const delRaw = localStorage.getItem('accounting_pengeluaran_deleted_approvals_v1');
+              if (delRaw) {
+                const delArr = JSON.parse(delRaw);
+                if (Array.isArray(delArr)) {
+                  const targetKey = String(payload.idApproval).trim().toLowerCase();
+                  const nextDel = delArr.filter(function (k) { return String(k).trim().toLowerCase() !== targetKey; });
+                  localStorage.setItem('accounting_pengeluaran_deleted_approvals_v1', JSON.stringify(nextDel));
+                }
+              }
+            } catch (eDelClear) {}
           }
 
           saveData(prevSnapshotMap);
